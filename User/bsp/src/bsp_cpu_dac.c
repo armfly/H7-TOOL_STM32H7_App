@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : DAC²¨ĞÎ·¢ÉúÆ÷
-*	ÎÄ¼şÃû³Æ : bsp_cpu_dac.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ê¹ÓÃSTM32ÄÚ²¿DACÊä³ö²¨ĞÎ¡£Ö§³ÖDAC1ºÍDAC2Êä³ö²»Í¬µÄ²¨ĞÎ¡£
+*	æ¨¡å—åç§° : DACæ³¢å½¢å‘ç”Ÿå™¨
+*	æ–‡ä»¶åç§° : bsp_cpu_dac.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ä½¿ç”¨STM32å†…éƒ¨DACè¾“å‡ºæ³¢å½¢ã€‚æ”¯æŒDAC1å’ŒDAC2è¾“å‡ºä¸åŒçš„æ³¢å½¢ã€‚
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-02-07  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-02-07  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,101 +19,100 @@
 #include "param.h"
 
 /*
-	H7-TOOL Ê¹ÓÃPA4ÓÃ×÷ DAC_OUT1
+	H7-TOOL ä½¿ç”¨PA4ç”¨ä½œ DAC_OUT1
 
-	DAC1Ê¹ÓÃÁËTIM6×÷Îª¶¨Ê±´¥·¢£¬ DMAÍ¨µÀ: DMA1_Stream5
-//	DAC2Ê¹ÓÃÁËTIM7×÷Îª¶¨Ê±´¥·¢£¬ DMAÍ¨µÀ: DMA2_Stream6	
+	DAC1ä½¿ç”¨äº†TIM6ä½œä¸ºå®šæ—¶è§¦å‘ï¼Œ DMAé€šé“: DMA1_Stream5
+//	DAC2ä½¿ç”¨äº†TIM7ä½œä¸ºå®šæ—¶è§¦å‘ï¼Œ DMAé€šé“: DMA2_Stream6	
 	
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable ¿ªÆôÁËDACÊä³ö»º³å£¬Ôö¼ÓÇı¶¯ÄÜÁ¦,
-	¿ªÁË»º³åÖ®ºó£¬¿¿½ü0VºÍ²Î¿¼µçÔ´Ê±£¬Ê§ÕæÀ÷º¦£¬×îµÍ50mV
-	²»¿ª»º³å²¨ĞÎ½ÏºÃ£¬µ½0VÄ¿²â²»³öÃ÷ÏÔÊ§Õæ¡£
+	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable å¼€å¯äº†DACè¾“å‡ºç¼“å†²ï¼Œå¢åŠ é©±åŠ¨èƒ½åŠ›,
+	å¼€äº†ç¼“å†²ä¹‹åï¼Œé è¿‘0Vå’Œå‚è€ƒç”µæºæ—¶ï¼Œå¤±çœŸå‰å®³ï¼Œæœ€ä½50mV
+	ä¸å¼€ç¼“å†²æ³¢å½¢è¾ƒå¥½ï¼Œåˆ°0Vç›®æµ‹ä¸å‡ºæ˜æ˜¾å¤±çœŸã€‚
 	
-	¹¦ÄÜ£º
-	1¡¢Êä³öÕıÏÒ²¨£¬·ù¶ÈºÍÆµÂÊ¿Éµ÷½Ú
-	2¡¢Êä³ö·½²¨£¬·ù¶ÈÆ«ÒÆ¿Éµ÷½Ú£¬ÆµÂÊ¿Éµ÷½Ú£¬Õ¼¿Õ±È¿ÉÒÔµ÷½Ú
-	3¡¢Êä³öÈı½Ç²¨£¬·ù¶È¿Éµ÷½Ú£¬ÆµÂÊ¿Éµ÷½Ú£¬ÉÏÉıÑØÕ¼±È¿Éµ÷½Ú
-	4¡¢»ù±¾µÄDACÊä³öÖ±Á÷µçÆ½µÄº¯Êı
+	åŠŸèƒ½ï¼š
+	1ã€è¾“å‡ºæ­£å¼¦æ³¢ï¼Œå¹…åº¦å’Œé¢‘ç‡å¯è°ƒèŠ‚
+	2ã€è¾“å‡ºæ–¹æ³¢ï¼Œå¹…åº¦åç§»å¯è°ƒèŠ‚ï¼Œé¢‘ç‡å¯è°ƒèŠ‚ï¼Œå ç©ºæ¯”å¯ä»¥è°ƒèŠ‚
+	3ã€è¾“å‡ºä¸‰è§’æ³¢ï¼Œå¹…åº¦å¯è°ƒèŠ‚ï¼Œé¢‘ç‡å¯è°ƒèŠ‚ï¼Œä¸Šå‡æ²¿å æ¯”å¯è°ƒèŠ‚
+	4ã€åŸºæœ¬çš„DACè¾“å‡ºç›´æµç”µå¹³çš„å‡½æ•°
 	
 	
-	Ó²¼şÓÃPG3¿ØÖÆÊä³öµçÑ¹Á¿³Ì 0-10V¡¢¡À10V
+	ç¡¬ä»¶ç”¨PG3æ§åˆ¶è¾“å‡ºç”µå‹é‡ç¨‹ 0-10Vã€Â±10V
 	
-	Ó²¼şÓÃ PE3/65130_SW ¿ØÖÆDACµçÂ·µÄµçÔ´
+	ç¡¬ä»¶ç”¨ PE3/65130_SW æ§åˆ¶DACç”µè·¯çš„ç”µæº
 */
-/* ¿ØÖÆDACµçÂ·µÄµçÔ´ PE3/65130_SW */
-#define DAC_POWER_CLK_ENABLE()	__HAL_RCC_GPIOE_CLK_ENABLE()
-#define DAC_POWER_GPIO			GPIOE
-#define DAC_POWER_PIN			GPIO_PIN_3
-#define DAC_POWER_ON()  		DAC_POWER_GPIO->BSRRL = DAC_POWER_PIN			/* DAC POWER ON */
-#define DAC_POWER_OFF()  		DAC_POWER_GPIO->BSRRH = DAC_POWER_PIN			/* DAC POWER OFF */
-#define DAC_POWER_IS_ON()		((DAC_POWER_GPIO->IDR & DAC_POWER_PIN) == 0)	/* Èç¹ûÒÑÊ¹ÄÜÊä³ö£¬·µ»Øture */
+/* æ§åˆ¶DACç”µè·¯çš„ç”µæº PE3/65130_SW */
+#define DAC_POWER_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define DAC_POWER_GPIO GPIOE
+#define DAC_POWER_PIN GPIO_PIN_3
+#define DAC_POWER_ON() DAC_POWER_GPIO->BSRRL = DAC_POWER_PIN					 /* DAC POWER ON */
+#define DAC_POWER_OFF() DAC_POWER_GPIO->BSRRH = DAC_POWER_PIN					 /* DAC POWER OFF */
+#define DAC_POWER_IS_ON() ((DAC_POWER_GPIO->IDR & DAC_POWER_PIN) == 0) /* å¦‚æœå·²ä½¿èƒ½è¾“å‡ºï¼Œè¿”å›ture */
 
-/* DAC Òı½Å¶¨Òå */
-#define DACx                            DAC1
-#define DACx_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
-#define DMAx_CLK_ENABLE()               __HAL_RCC_DMA1_CLK_ENABLE()
+/* DAC å¼•è„šå®šä¹‰ */
+#define DACx DAC1
+#define DACx_CHANNEL_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define DMAx_CLK_ENABLE() __HAL_RCC_DMA1_CLK_ENABLE()
 
-#define DACx_CLK_ENABLE()               __HAL_RCC_DAC12_CLK_ENABLE()
-#define DACx_FORCE_RESET()              __HAL_RCC_DAC12_FORCE_RESET()
-#define DACx_RELEASE_RESET()            __HAL_RCC_DAC12_RELEASE_RESET()
-					  
-					  /* Definition for DACx Channel Pin */
-#define DACx_CHANNEL_PIN                GPIO_PIN_4
-#define DACx_CHANNEL_GPIO_PORT          GPIOA
-					  
-/* Definition for DACx's DMA_STREAM */
-#define DACx_CHANNEL                    DAC_CHANNEL_1
+#define DACx_CLK_ENABLE() __HAL_RCC_DAC12_CLK_ENABLE()
+#define DACx_FORCE_RESET() __HAL_RCC_DAC12_FORCE_RESET()
+#define DACx_RELEASE_RESET() __HAL_RCC_DAC12_RELEASE_RESET()
+
+/* Definition for DACx Channel Pin */
+#define DACx_CHANNEL_PIN GPIO_PIN_4
+#define DACx_CHANNEL_GPIO_PORT GPIOA
 
 /* Definition for DACx's DMA_STREAM */
-#define DACx_DMA_INSTANCE               DMA1_Stream5
+#define DACx_CHANNEL DAC_CHANNEL_1
+
+/* Definition for DACx's DMA_STREAM */
+#define DACx_DMA_INSTANCE DMA1_Stream5
 
 /* Definition for DACx's NVIC */
-#define DACx_DMA_IRQn                   DMA1_Stream5_IRQn
-#define DACx_DMA_IRQHandler             DMA1_Stream5_IRQHandler
+#define DACx_DMA_IRQn DMA1_Stream5_IRQn
+#define DACx_DMA_IRQHandler DMA1_Stream5_IRQHandler
 
-/* DMA²¨ĞÎ»º³åÇø */
-#define WAVE_SAMPLE_SIZE	128
+/* DMAæ³¢å½¢ç¼“å†²åŒº */
+#define WAVE_SAMPLE_SIZE 128
 uint16_t g_Wave1[WAVE_SAMPLE_SIZE];
 //uint16_t g_Wave2[128];
-					  
-DAC_WAVE_T g_tDacWave;					  
-					  
-DAC_HandleTypeDef    DacHandle;
+
+DAC_WAVE_T g_tDacWave;
+
+DAC_HandleTypeDef DacHandle;
 static DAC_ChannelConfTypeDef sConfig;
 
 static void TIM6_Config(uint32_t _freq);
-	
+
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitDAC1
-*	¹¦ÄÜËµÃ÷: ÅäÖÃPA4/DAC1¡£ ²»ÆôÓÃDMA¡£µ÷ÓÃ bsp_SetDAC1()º¯ÊıĞŞ¸ÄÊä³öDACÖµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitDAC1
+*	åŠŸèƒ½è¯´æ˜: é…ç½®PA4/DAC1ã€‚ ä¸å¯ç”¨DMAã€‚è°ƒç”¨ bsp_SetDAC1()å‡½æ•°ä¿®æ”¹è¾“å‡ºDACå€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitDAC1(void)
-{	
-	/* µçÑ¹Êä³öÁ¿³Ì¿ØÖÆGPIOÅäÖÃ */
+{
+	/* ç”µå‹è¾“å‡ºé‡ç¨‹æ§åˆ¶GPIOé…ç½® */
 	{
 		GPIO_InitTypeDef gpio_init;
 
-
-		/* DAC power ¿ØÖÆ */		
+		/* DAC power æ§åˆ¶ */
 		DAC_POWER_CLK_ENABLE();
 		DAC_POWER_OFF();
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* ÉèÖÃÍÆÍìÊä³ö */
-		gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */			
+		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+		gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
 		gpio_init.Pin = DAC_POWER_PIN;
 		HAL_GPIO_Init(DAC_POWER_GPIO, &gpio_init);
 	}
-	
-	/* ÅäÖÃDAC, ÎŞ´¥·¢£¬²»ÓÃDMA */
-	{		
+
+	/* é…ç½®DAC, æ— è§¦å‘ï¼Œä¸ç”¨DMA */
+	{
 		DacHandle.Instance = DACx;
 
 		HAL_DAC_DeInit(&DacHandle);
-		
-		  /*##-1- Initialize the DAC peripheral ######################################*/
+
+		/*##-1- Initialize the DAC peripheral ######################################*/
 		if (HAL_DAC_Init(&DacHandle) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
@@ -130,23 +129,22 @@ void bsp_InitDAC1(void)
 		}
 
 		/*##-2- Enable DAC selected channel and associated DMA #############################*/
-		if (HAL_DAC_Start(&DacHandle, DAC_CHANNEL_1) != HAL_OK)  
+		if (HAL_DAC_Start(&DacHandle, DAC_CHANNEL_1) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	
+
 	g_tDacWave.Type = DAC_WAVE_NONE;
 	g_tDacWave.CycleSetting = 0;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SetDAC1
-*	¹¦ÄÜËµÃ÷: ÉèÖÃDAC1Êä³öÊı¾İ¼Ä´æÆ÷£¬¸Ä±äÊä³öµçÑ¹
-*	ĞÎ    ²Î: _dac : DACÊı¾İ£¬0-4095
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_SetDAC1
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®DAC1è¾“å‡ºæ•°æ®å¯„å­˜å™¨ï¼Œæ”¹å˜è¾“å‡ºç”µå‹
+*	å½¢    å‚: _dac : DACæ•°æ®ï¼Œ0-4095
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_SetDAC1(uint16_t _dac)
@@ -156,10 +154,10 @@ void bsp_SetDAC1(uint16_t _dac)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SetDAC2
-*	¹¦ÄÜËµÃ÷: ÉèÖÃDAC2Êä³öÊı¾İ¼Ä´æÆ÷£¬¸Ä±äÊä³öµçÑ¹
-*	ĞÎ    ²Î: _dac : DACÊı¾İ£¬0-4095
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_SetDAC2
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®DAC2è¾“å‡ºæ•°æ®å¯„å­˜å™¨ï¼Œæ”¹å˜è¾“å‡ºç”µå‹
+*	å½¢    å‚: _dac : DACæ•°æ®ï¼Œ0-4095
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_SetDAC2(uint16_t _dac)
@@ -169,24 +167,24 @@ void bsp_SetDAC2(uint16_t _dac)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_DAC_MspInit
-*	¹¦ÄÜËµÃ÷: ÅäÖÃDACÓÃµ½µÄÊ±ÖÓ£¬Òı½ÅºÍDMAÍ¨µÀ
-*	ĞÎ    ²Î: hdac  DAC_HandleTypeDefÀàĞÍ½á¹¹ÌåÖ¸Õë±äÁ¿
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_DAC_MspInit
+*	åŠŸèƒ½è¯´æ˜: é…ç½®DACç”¨åˆ°çš„æ—¶é’Ÿï¼Œå¼•è„šå’ŒDMAé€šé“
+*	å½¢    å‚: hdac  DAC_HandleTypeDefç±»å‹ç»“æ„ä½“æŒ‡é’ˆå˜é‡
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
 {
-	GPIO_InitTypeDef          GPIO_InitStruct;
+	GPIO_InitTypeDef GPIO_InitStruct;
 
-	/*##-1- Ê¹ÄÜÊ±ÖÓ #################################*/
-	/* Ê¹ÄÜGPIOÊ±ÖÓ */
+	/*##-1- ä½¿èƒ½æ—¶é’Ÿ #################################*/
+	/* ä½¿èƒ½GPIOæ—¶é’Ÿ */
 	DACx_CHANNEL_GPIO_CLK_ENABLE();
-	/* Ê¹ÄÜDACÍâÉèÊ±ÖÓ */
+	/* ä½¿èƒ½DACå¤–è®¾æ—¶é’Ÿ */
 	DACx_CLK_ENABLE();
 
-	/*##-2- ÅäÖÃGPIO ##########################################*/
-	/* DAC Channel1 GPIO ÅäÖÃ */
+	/*##-2- é…ç½®GPIO ##########################################*/
+	/* DAC Channel1 GPIO é…ç½® */
 	GPIO_InitStruct.Pin = DACx_CHANNEL_PIN;
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -195,91 +193,91 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_DAC_MspDeInit
-*	¹¦ÄÜËµÃ÷: ¸´Î»DAC
-*	ĞÎ    ²Î: hdac  DAC_HandleTypeDefÀàĞÍ½á¹¹ÌåÖ¸Õë±äÁ¿
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_DAC_MspDeInit
+*	åŠŸèƒ½è¯´æ˜: å¤ä½DAC
+*	å½¢    å‚: hdac  DAC_HandleTypeDefç±»å‹ç»“æ„ä½“æŒ‡é’ˆå˜é‡
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac)
 {
-	/*##-1- ¸´Î»DACÍâÉè ##################################################*/
+	/*##-1- å¤ä½DACå¤–è®¾ ##################################################*/
 	DACx_FORCE_RESET();
 	DACx_RELEASE_RESET();
 
-	/*##-2- ¸´Î»DAC¶ÔÓ¦GPIO ################################*/
+	/*##-2- å¤ä½DACå¯¹åº”GPIO ################################*/
 	HAL_GPIO_DeInit(DACx_CHANNEL_GPIO_PORT, DACx_CHANNEL_PIN);
 
-	/*##-3- ¹Ø±ÕDACÓÃµÄDMA Stream ############################################*/
+	/*##-3- å…³é—­DACç”¨çš„DMA Stream ############################################*/
 	HAL_DMA_DeInit(hdac->DMA_Handle1);
 
-	/*##-4- ¹Ø±ÕDMAÖĞ¶Ï ###########################################*/
+	/*##-4- å…³é—­DMAä¸­æ–­ ###########################################*/
 	HAL_NVIC_DisableIRQ(DACx_DMA_IRQn);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_TIM_Base_MspInit
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¶¨Ê±Æ÷Ê±ÖÓ
-*	ĞÎ    ²Î: htim  TIM_HandleTypeDefÀàĞÍ½á¹¹ÌåÖ¸Õë±äÁ¿
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_TIM_Base_MspInit
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–å®šæ—¶å™¨æ—¶é’Ÿ
+*	å½¢    å‚: htim  TIM_HandleTypeDefç±»å‹ç»“æ„ä½“æŒ‡é’ˆå˜é‡
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
-	/* TIM6 Ê±ÖÓÊ¹ÄÜ */
+	/* TIM6 æ—¶é’Ÿä½¿èƒ½ */
 	__HAL_RCC_TIM6_CLK_ENABLE();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_TIM_Base_MspDeInit
-*	¹¦ÄÜËµÃ÷: ¸´Î»¶¨Ê±Æ÷Ê±ÖÓ
-*	ĞÎ    ²Î: htim  TIM_HandleTypeDefÀàĞÍ½á¹¹ÌåÖ¸Õë±äÁ¿
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_TIM_Base_MspDeInit
+*	åŠŸèƒ½è¯´æ˜: å¤ä½å®šæ—¶å™¨æ—¶é’Ÿ
+*	å½¢    å‚: htim  TIM_HandleTypeDefç±»å‹ç»“æ„ä½“æŒ‡é’ˆå˜é‡
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
 {
-	/*##-1- ¸´Î»ÍâÉè ##################################################*/
+	/*##-1- å¤ä½å¤–è®¾ ##################################################*/
 	__HAL_RCC_TIM6_FORCE_RESET();
 	__HAL_RCC_TIM6_RELEASE_RESET();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TIM6_Config
-*	¹¦ÄÜËµÃ÷: ÅäÖÃTIM6×÷ÎªDAC´¥·¢Ô´
-*	ĞÎ    ²Î: _freq : ²ÉÑùÆµÂÊ£¬µ¥Î»Hz
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TIM6_Config
+*	åŠŸèƒ½è¯´æ˜: é…ç½®TIM6ä½œä¸ºDACè§¦å‘æº
+*	å½¢    å‚: _freq : é‡‡æ ·é¢‘ç‡ï¼Œå•ä½Hz
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void TIM6_Config(uint32_t _freq)
 {
-	static TIM_HandleTypeDef  htim;
+	static TIM_HandleTypeDef htim;
 	TIM_MasterConfigTypeDef sMasterConfig;
 
 	/*##-1- Configure the TIM peripheral #######################################*/
 	/* Time base configuration */
 	htim.Instance = TIM6;
-	
+
 	if (_freq < 100)
 	{
-		htim.Init.Prescaler         = 100;		
-		htim.Init.Period            = ((SystemCoreClock / 2) / htim.Init.Prescaler) / _freq - 1;		
-		htim.Init.ClockDivision     = 0;
+		htim.Init.Prescaler = 100;
+		htim.Init.Period = ((SystemCoreClock / 2) / htim.Init.Prescaler) / _freq - 1;
+		htim.Init.ClockDivision = 0;
 	}
 	else
 	{
-		htim.Init.Period            = (SystemCoreClock / 2) / _freq - 1;
-		htim.Init.Prescaler         = 0;
-		htim.Init.ClockDivision     = 0;		
+		htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
+		htim.Init.Prescaler = 0;
+		htim.Init.ClockDivision = 0;
 	}
 
-	htim.Init.Period            = (SystemCoreClock / 2) / _freq - 1;
-	htim.Init.Prescaler         = 0;
-	htim.Init.ClockDivision     = 0;
-	htim.Init.CounterMode       = TIM_COUNTERMODE_UP;
+	htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
+	htim.Init.Prescaler = 0;
+	htim.Init.ClockDivision = 0;
+	htim.Init.CounterMode = TIM_COUNTERMODE_UP;
 	htim.Init.RepetitionCounter = 0;
 	HAL_TIM_Base_Init(&htim);
 
@@ -295,43 +293,43 @@ static void TIM6_Config(uint32_t _freq)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartDAC1_DMA
-*	¹¦ÄÜËµÃ÷: ÅäÖÃPA4 ÎªDAC_OUT1, ÆôÓÃDMA, ¿ªÊ¼³ÖĞøÊä³ö²¨ĞÎ
-*	ĞÎ    ²Î: _BufAddr : DMAÊı¾İ»º³åÇøµØÖ·¡£ ±ØĞë¶¨Î»ÔÚ0x24000000 RAM£¬»òflash³£Á¿
-*			  _Count  : »º³åÇøÑù±¾¸öÊı
-*			 _DacFreq : DACÑù±¾¸üĞÂÆµÂÊ, Hz,Ğ¾Æ¬¹æ¸ñÊé×î¸ß1MHz¡£ Êµ²â¿ÉÒÔµ½10MHz.
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartDAC1_DMA
+*	åŠŸèƒ½è¯´æ˜: é…ç½®PA4 ä¸ºDAC_OUT1, å¯ç”¨DMA, å¼€å§‹æŒç»­è¾“å‡ºæ³¢å½¢
+*	å½¢    å‚: _BufAddr : DMAæ•°æ®ç¼“å†²åŒºåœ°å€ã€‚ å¿…é¡»å®šä½åœ¨0x24000000 RAMï¼Œæˆ–flashå¸¸é‡
+*			  _Count  : ç¼“å†²åŒºæ ·æœ¬ä¸ªæ•°
+*			 _DacFreq : DACæ ·æœ¬æ›´æ–°é¢‘ç‡, Hz,èŠ¯ç‰‡è§„æ ¼ä¹¦æœ€é«˜1MHzã€‚ å®æµ‹å¯ä»¥åˆ°10MHz.
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
-{		
-	DAC_POWER_ON();		/* ´ò¿ªDAC¹©µçµçÂ· */
-	
-	TIM6_Config(_DacFreq);  /* DAC×ª»»ÆµÂÊ×î¸ß1M */
-		
-	/* ÅäÖÃDAC, TIM6´¥·¢£¬DMAÆôÓÃ */
-	{		
+{
+	DAC_POWER_ON(); /* æ‰“å¼€DACä¾›ç”µç”µè·¯ */
+
+	TIM6_Config(_DacFreq); /* DACè½¬æ¢é¢‘ç‡æœ€é«˜1M */
+
+	/* é…ç½®DAC, TIM6è§¦å‘ï¼ŒDMAå¯ç”¨ */
+	{
 		DacHandle.Instance = DACx;
 
 		HAL_DAC_DeInit(&DacHandle);
-		
-		  /*##-1- Initialize the DAC peripheral ######################################*/
+
+		/*##-1- Initialize the DAC peripheral ######################################*/
 		if (HAL_DAC_Init(&DacHandle) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
 		}
 
-		/* ÅäÖÃDMA */
+		/* é…ç½®DMA */
 		{
-			static DMA_HandleTypeDef  hdma_dac1;
-			
-			/* Ê¹ÄÜDMA1Ê±ÖÓ */
+			static DMA_HandleTypeDef hdma_dac1;
+
+			/* ä½¿èƒ½DMA1æ—¶é’Ÿ */
 			DMAx_CLK_ENABLE();
-			
-			/* ÅäÖÃ DACx_DMA_STREAM  */
+
+			/* é…ç½® DACx_DMA_STREAM  */
 			hdma_dac1.Instance = DACx_DMA_INSTANCE;
 
-			hdma_dac1.Init.Request  = DMA_REQUEST_DAC1;
+			hdma_dac1.Init.Request = DMA_REQUEST_DAC1;
 
 			hdma_dac1.Init.Direction = DMA_MEMORY_TO_PERIPH;
 			hdma_dac1.Init.PeriphInc = DMA_PINC_DISABLE;
@@ -343,13 +341,13 @@ void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
 
 			HAL_DMA_Init(&hdma_dac1);
 
-			/* ¹ØÁªDMA¾ä±úµ½DAC¾ä±úÏÂ */
+			/* å…³è”DMAå¥æŸ„åˆ°DACå¥æŸ„ä¸‹ */
 			__HAL_LINKDMA(&DacHandle, DMA_Handle1, hdma_dac1);
-		}		
+		}
 
 		/*##-1- DAC channel1 Configuration #########################################*/
 		sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
-//		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;	//GND¸½½ü·ÇÏßĞÔÊ§ÕæÀ÷º¦
+		//		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;	//GNDé™„è¿‘éçº¿æ€§å¤±çœŸå‰å®³
 		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
 
 		if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DAC_CHANNEL_1) != HAL_OK)
@@ -358,7 +356,7 @@ void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
 		}
 
 		/*##-2- Enable DAC selected channel and associated DMA #############################*/
-		if (HAL_DAC_Start_DMA(&DacHandle, DAC_CHANNEL_1, (uint32_t *)_BufAddr, _Count, DAC_ALIGN_12B_R) != HAL_OK)  
+		if (HAL_DAC_Start_DMA(&DacHandle, DAC_CHANNEL_1, (uint32_t *)_BufAddr, _Count, DAC_ALIGN_12B_R) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
 		}
@@ -367,21 +365,21 @@ void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_SetSinWave
-*	¹¦ÄÜËµÃ÷: DAC1Êä³öÕıÏÒ²¨
-*	ĞÎ    ²Î: _vpp : ·ù¶È 0-2047;
-*			  _freq : ÆµÂÊ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_SetSinWave
+*	åŠŸèƒ½è¯´æ˜: DAC1è¾“å‡ºæ­£å¼¦æ³¢
+*	å½¢    å‚: _vpp : å¹…åº¦ 0-2047;
+*			  _freq : é¢‘ç‡
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void dac1_SetSinWave(uint16_t _bottom, uint16_t _top, uint32_t _freq)
-{	
+{
 	uint16_t i;
-	uint16_t mid;	/* ÖĞÖµ */
-	uint16_t att;	/* ·ù¶È */
+	uint16_t mid; /* ä¸­å€¼ */
+	uint16_t att; /* å¹…åº¦ */
 
-	mid = (_bottom + _top) / 2;	/* 0Î»µÄÖµ */
-	att = (_top - _bottom) / 2;  	/* ÕıÏÒ²¨·ù¶È£¬·å·åÖµ³ıÒÔ2 */
+	mid = (_bottom + _top) / 2; /* 0ä½çš„å€¼ */
+	att = (_top - _bottom) / 2; /* æ­£å¼¦æ³¢å¹…åº¦ï¼Œå³°å³°å€¼é™¤ä»¥2 */
 
 	for (i = 0; i < WAVE_SAMPLE_SIZE; i++)
 	{
@@ -393,19 +391,19 @@ void dac1_SetSinWave(uint16_t _bottom, uint16_t _top, uint32_t _freq)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_SetRectWave
-*	¹¦ÄÜËµÃ÷: DAC1Êä³ö·½²¨
-*	ĞÎ    ²Î: _bottom : µÍµçÆ½Ê±DAC, 
-*			  _top : ¸ßµçÆ½Ê±DAC
-*			  _freq : ÆµÂÊ Hz
-*			  _duty : Õ¼¿Õ±È 1% - 99%, µ÷½Ú²½Êı 1%
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_SetRectWave
+*	åŠŸèƒ½è¯´æ˜: DAC1è¾“å‡ºæ–¹æ³¢
+*	å½¢    å‚: _bottom : ä½ç”µå¹³æ—¶DAC, 
+*			  _top : é«˜ç”µå¹³æ—¶DAC
+*			  _freq : é¢‘ç‡ Hz
+*			  _duty : å ç©ºæ¯” 1% - 99%, è°ƒèŠ‚æ­¥æ•° 1%
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void dac1_SetRectWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _duty)
-{	
+{
 	uint16_t i;
-	
+
 	for (i = 0; i < (_duty * WAVE_SAMPLE_SIZE) / 100; i++)
 	{
 		g_Wave1[i] = _top;
@@ -414,35 +412,35 @@ void dac1_SetRectWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t 
 	{
 		g_Wave1[i] = _bottom;
 	}
-	
+
 	bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_SetTriWave
-*	¹¦ÄÜËµÃ÷: DAC1Êä³öÈı½Ç²¨
-*	ĞÎ    ²Î: _bottom : µÍµçÆ½Ê±DAC, 
-*			  _top : ¸ßµçÆ½Ê±DAC
-*			  _freq : ÆµÂÊ Hz
-*			  _duty : Õ¼¿Õ±È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_SetTriWave
+*	åŠŸèƒ½è¯´æ˜: DAC1è¾“å‡ºä¸‰è§’æ³¢
+*	å½¢    å‚: _bottom : ä½ç”µå¹³æ—¶DAC, 
+*			  _top : é«˜ç”µå¹³æ—¶DAC
+*			  _freq : é¢‘ç‡ Hz
+*			  _duty : å ç©ºæ¯”
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void dac1_SetTriWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _duty)
-{	
+{
 	uint32_t i;
 	uint16_t dac;
 	uint16_t m;
-		
-	/* ¹¹ÔìÈı½Ç²¨Êı×é£¬128¸öÑù±¾£¬´Ó _bottom µ½ _top */		
+
+	/* æ„é€ ä¸‰è§’æ³¢æ•°ç»„ï¼Œ128ä¸ªæ ·æœ¬ï¼Œä» _bottom åˆ° _top */
 	m = (_duty * WAVE_SAMPLE_SIZE) / 100;
-	
+
 	if (m == 0)
 	{
 		m = 1;
 	}
-	
+
 	if (m > WAVE_SAMPLE_SIZE - 1)
 	{
 		m = WAVE_SAMPLE_SIZE - 1;
@@ -456,92 +454,92 @@ void dac1_SetTriWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _
 	{
 		dac = _top - ((_top - _bottom) * (i - m)) / (WAVE_SAMPLE_SIZE - m);
 		g_Wave1[i] = dac;
-	}	
-	
+	}
+
 	bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_StopWave
-*	¹¦ÄÜËµÃ÷: Í£Ö¹DAC1Êä³ö
-*	ĞÎ    ²Î: ÎŞ
-*			  _freq : ÆµÂÊ 0-5Hz
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_StopWave
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢DAC1è¾“å‡º
+*	å½¢    å‚: æ— 
+*			  _freq : é¢‘ç‡ 0-5Hz
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void dac1_StopWave(void)
-{	
-//	__HAL_RCC_DAC12_FORCE_RESET();
-//	__HAL_RCC_DAC12_RELEASE_RESET();
-//	
-//	HAL_DMA_DeInit(DacHandle.DMA_Handle1);
-	
-	HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1);	/* º¯ÊıÄÚ²¿»á¹Ø±ÕDAC */
-	
-	bsp_InitDAC1();	/* ÖØĞÂÆôÓÃDAC */
-	
+{
+	//	__HAL_RCC_DAC12_FORCE_RESET();
+	//	__HAL_RCC_DAC12_RELEASE_RESET();
+	//
+	//	HAL_DMA_DeInit(DacHandle.DMA_Handle1);
+
+	HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1); /* å‡½æ•°å†…éƒ¨ä¼šå…³é—­DAC */
+
+	bsp_InitDAC1(); /* é‡æ–°å¯ç”¨DAC */
+
 	bsp_SetDAC1(32767);
-	
+
 	DAC_POWER_OFF();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_DacToVolt
-*	¹¦ÄÜËµÃ÷: DACÖµ×ª»»ÎªµçÑ¹ mV   (ÔİÎ´ÓÃµ½£¬Ã»ÓĞÊµÏÖ4µãĞ£×¼£©
-*	ĞÎ    ²Î: _dac £º DACÖµ£¬0-4095
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_DacToVolt
+*	åŠŸèƒ½è¯´æ˜: DACå€¼è½¬æ¢ä¸ºç”µå‹ mV   (æš‚æœªç”¨åˆ°ï¼Œæ²¡æœ‰å®ç°4ç‚¹æ ¡å‡†ï¼‰
+*	å½¢    å‚: _dac ï¼š DACå€¼ï¼Œ0-4095
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 int16_t dac1_DacToVolt(uint16_t _dac)
 {
 	int32_t volt;
-	
-	/* Õı¸º10VÁ¿³Ì */
+
+	/* æ­£è´Ÿ10Vé‡ç¨‹ */
 	{
 		volt = CaculTwoPoint(g_tCalib.Dac10V.x1, g_tCalib.Dac10V.y1,
-			g_tCalib.Dac10V.x2, g_tCalib.Dac10V.y2, _dac);
+												 g_tCalib.Dac10V.x2, g_tCalib.Dac10V.y2, _dac);
 	}
 	return volt;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_VoltToDac
-*	¹¦ÄÜËµÃ÷: µçÑ¹ mV×ª»¯ÎªDACÖµ
-*	ĞÎ    ²Î: _volt £º mvµçÑ¹Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_VoltToDac
+*	åŠŸèƒ½è¯´æ˜: ç”µå‹ mVè½¬åŒ–ä¸ºDACå€¼
+*	å½¢    å‚: _volt ï¼š mvç”µå‹å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 int16_t dac1_VoltToDac(int16_t _volt)
 {
 	int32_t dac;
-	int32_t x1,y1,x2,y2;
-	
-	if (_volt  <= g_tCalib.Dac10V.y2)
+	int32_t x1, y1, x2, y2;
+
+	if (_volt <= g_tCalib.Dac10V.y2)
 	{
 		x1 = g_tCalib.Dac10V.y1;
 		y1 = g_tCalib.Dac10V.x1;
 		x2 = g_tCalib.Dac10V.y2;
 		y2 = g_tCalib.Dac10V.x2;
-	}		
-	else if (_volt  <= g_tCalib.Dac10V.y3)
+	}
+	else if (_volt <= g_tCalib.Dac10V.y3)
 	{
 		x1 = g_tCalib.Dac10V.y2;
 		y1 = g_tCalib.Dac10V.x2;
 		x2 = g_tCalib.Dac10V.y3;
 		y2 = g_tCalib.Dac10V.x3;
-	}	
+	}
 	else
 	{
 		x1 = g_tCalib.Dac10V.y3;
 		y1 = g_tCalib.Dac10V.x3;
 		x2 = g_tCalib.Dac10V.y4;
 		y2 = g_tCalib.Dac10V.x4;
-	}	
-	
-	/* Õı¸º10VÁ¿³Ì */
+	}
+
+	/* æ­£è´Ÿ10Vé‡ç¨‹ */
 	dac = CaculTwoPoint(x1, y1, x2, y2, _volt);
 	if (dac < 0)
 	{
@@ -554,60 +552,59 @@ int16_t dac1_VoltToDac(int16_t _volt)
 	return dac;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_DacToCurr
-*	¹¦ÄÜËµÃ÷: DACÖµ×ª»»ÎªµçÁ÷ uA   (ÔİÎ´ÓÃµ½£¬Ã»ÓĞÊµÏÖ4µãĞ£×¼£©
-*	ĞÎ    ²Î: _dac £º DACÖµ£¬0-4095
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_DacToCurr
+*	åŠŸèƒ½è¯´æ˜: DACå€¼è½¬æ¢ä¸ºç”µæµ uA   (æš‚æœªç”¨åˆ°ï¼Œæ²¡æœ‰å®ç°4ç‚¹æ ¡å‡†ï¼‰
+*	å½¢    å‚: _dac ï¼š DACå€¼ï¼Œ0-4095
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 int16_t dac1_DacToCurr(uint16_t _dac)
 {
 	int32_t curr;
-	
+
 	curr = CaculTwoPoint(g_tCalib.Dac20mA.x1, g_tCalib.Dac20mA.y1,
-			g_tCalib.Dac20mA.x2, g_tCalib.Dac20mA.y2, _dac);
+											 g_tCalib.Dac20mA.x2, g_tCalib.Dac20mA.y2, _dac);
 	return curr;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_CurrToDac
-*	¹¦ÄÜËµÃ÷: µçÁ÷uA×ª»¯ÎªDACÖµ
-*	ĞÎ    ²Î: _curr £º uA µçÁ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_CurrToDac
+*	åŠŸèƒ½è¯´æ˜: ç”µæµuAè½¬åŒ–ä¸ºDACå€¼
+*	å½¢    å‚: _curr ï¼š uA ç”µæµå€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 int16_t dac1_CurrToDac(int16_t _curr)
 {
 	int32_t dac;
-	int32_t x1,y1,x2,y2;
-	
-	if (_curr  <= g_tCalib.Dac20mA.y2)
+	int32_t x1, y1, x2, y2;
+
+	if (_curr <= g_tCalib.Dac20mA.y2)
 	{
 		x1 = g_tCalib.Dac20mA.y1;
 		y1 = g_tCalib.Dac20mA.x1;
 		x2 = g_tCalib.Dac20mA.y2;
 		y2 = g_tCalib.Dac20mA.x2;
-	}		
-	else if (_curr  <= g_tCalib.Dac20mA.y3)
+	}
+	else if (_curr <= g_tCalib.Dac20mA.y3)
 	{
 		x1 = g_tCalib.Dac20mA.y2;
 		y1 = g_tCalib.Dac20mA.x2;
 		x2 = g_tCalib.Dac20mA.y3;
 		y2 = g_tCalib.Dac20mA.x3;
-	}	
+	}
 	else
 	{
 		x1 = g_tCalib.Dac20mA.y3;
 		y1 = g_tCalib.Dac20mA.x3;
 		x2 = g_tCalib.Dac20mA.y4;
 		y2 = g_tCalib.Dac20mA.x4;
-	}	
-	
-	/* Õı¸º10VÁ¿³Ì */
+	}
+
+	/* æ­£è´Ÿ10Vé‡ç¨‹ */
 	dac = CaculTwoPoint(x1, y1, x2, y2, _curr);
 	if (dac < 0)
 	{
@@ -622,52 +619,52 @@ int16_t dac1_CurrToDac(int16_t _curr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: dac1_StartDacWave
-*	¹¦ÄÜËµÃ÷: Æô¶¯²¨ĞÎ
-*	ĞÎ    ²Î: ÎŞ¡£  g_tDacWave È«¾Ö½á¹¹ÖĞ´æ·ÅÓĞ²¨ĞÎ²ÎÊı
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: dac1_StartDacWave
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨æ³¢å½¢
+*	å½¢    å‚: æ— ã€‚  g_tDacWave å…¨å±€ç»“æ„ä¸­å­˜æ”¾æœ‰æ³¢å½¢å‚æ•°
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void dac1_StartDacWave(void)
 {
 	uint16_t bottom;
 	uint16_t top;
-	
-	g_tDacWave.CycleCount = 0;	
-	
+
+	g_tDacWave.CycleCount = 0;
+
 	switch (g_tDacWave.Type)
-	{		
-		case DAC_WAVE_NO:	
-			dac1_StopWave();		
-			DAC_POWER_ON();		/* ´ò¿ªDAC¹©µçµçÂ· */
-			break;
-		
-		case DAC_WAVE_SIN:
-			bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-			top = dac1_VoltToDac(g_tDacWave.VoltMax);
-			dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
-			break;
-		
-		case DAC_WAVE_SQUARE:
-			bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-			top = dac1_VoltToDac(g_tDacWave.VoltMax);
-			dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);			
-			break;
-		
-		case DAC_WAVE_TRI:
-			bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-			top = dac1_VoltToDac(g_tDacWave.VoltMax);
-			dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);			
-			break;
+	{
+	case DAC_WAVE_NO:
+		dac1_StopWave();
+		DAC_POWER_ON(); /* æ‰“å¼€DACä¾›ç”µç”µè·¯ */
+		break;
+
+	case DAC_WAVE_SIN:
+		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+		top = dac1_VoltToDac(g_tDacWave.VoltMax);
+		dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
+		break;
+
+	case DAC_WAVE_SQUARE:
+		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+		top = dac1_VoltToDac(g_tDacWave.VoltMax);
+		dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+		break;
+
+	case DAC_WAVE_TRI:
+		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+		top = dac1_VoltToDac(g_tDacWave.VoltMax);
+		dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+		break;
 	}
 }
 
-/* DMA´«ÊäÍê³ÉÊ±»Øµ÷ */
-void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdac)
+/* DMAä¼ è¾“å®Œæˆæ—¶å›è°ƒ */
+void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)
 {
 	if (hdac == &DacHandle)
 	{
-		if (g_tDacWave.CycleSetting == 0)	/* Ò»Ö±Ñ­»· */
+		if (g_tDacWave.CycleSetting == 0) /* ä¸€ç›´å¾ªç¯ */
 		{
 			;
 		}
@@ -682,4 +679,4 @@ void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef* hdac)
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

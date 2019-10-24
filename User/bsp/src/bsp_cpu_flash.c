@@ -1,96 +1,95 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : cpuÄÚ²¿falsh²Ù×÷Ä£¿é(for F4)
-*	ÎÄ¼şÃû³Æ : bsp_cpu_flash.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ìá¹©¶ÁĞ´CPUÄÚ²¿FlashµÄº¯Êı
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : cpuå†…éƒ¨falshæ“ä½œæ¨¡å—(for F4)
+*	æ–‡ä»¶åç§° : bsp_cpu_flash.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æä¾›è¯»å†™CPUå†…éƒ¨Flashçš„å‡½æ•°
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-#define FLASH_BASE_ADDR      (uint32_t)(FLASH_BASE)
-#define FLASH_END_ADDR       (uint32_t)(0x081FFFFF)
+#define FLASH_BASE_ADDR (uint32_t)(FLASH_BASE)
+#define FLASH_END_ADDR (uint32_t)(0x081FFFFF)
 
 /* Base address of the Flash sectors Bank 1 */
-#define ADDR_FLASH_SECTOR_0_BANK1     ((uint32_t)0x08000000) /* Base @ of Sector 0, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_1_BANK1     ((uint32_t)0x08020000) /* Base @ of Sector 1, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_2_BANK1     ((uint32_t)0x08040000) /* Base @ of Sector 2, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_3_BANK1     ((uint32_t)0x08060000) /* Base @ of Sector 3, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_4_BANK1     ((uint32_t)0x08080000) /* Base @ of Sector 4, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_5_BANK1     ((uint32_t)0x080A0000) /* Base @ of Sector 5, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_6_BANK1     ((uint32_t)0x080C0000) /* Base @ of Sector 6, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_7_BANK1     ((uint32_t)0x080E0000) /* Base @ of Sector 7, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_0_BANK1 ((uint32_t)0x08000000) /* Base @ of Sector 0, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_1_BANK1 ((uint32_t)0x08020000) /* Base @ of Sector 1, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_2_BANK1 ((uint32_t)0x08040000) /* Base @ of Sector 2, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_3_BANK1 ((uint32_t)0x08060000) /* Base @ of Sector 3, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_4_BANK1 ((uint32_t)0x08080000) /* Base @ of Sector 4, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_5_BANK1 ((uint32_t)0x080A0000) /* Base @ of Sector 5, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_6_BANK1 ((uint32_t)0x080C0000) /* Base @ of Sector 6, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_7_BANK1 ((uint32_t)0x080E0000) /* Base @ of Sector 7, 128 Kbytes */
 
 /* Base address of the Flash sectors Bank 2 */
-#define ADDR_FLASH_SECTOR_0_BANK2     ((uint32_t)0x08100000) /* Base @ of Sector 0, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_1_BANK2     ((uint32_t)0x08120000) /* Base @ of Sector 1, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_2_BANK2     ((uint32_t)0x08140000) /* Base @ of Sector 2, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_3_BANK2     ((uint32_t)0x08160000) /* Base @ of Sector 3, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_4_BANK2     ((uint32_t)0x08180000) /* Base @ of Sector 4, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_5_BANK2     ((uint32_t)0x081A0000) /* Base @ of Sector 5, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_6_BANK2     ((uint32_t)0x081C0000) /* Base @ of Sector 6, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_7_BANK2     ((uint32_t)0x081E0000) /* Base @ of Sector 7, 128 Kbytes */
-
+#define ADDR_FLASH_SECTOR_0_BANK2 ((uint32_t)0x08100000) /* Base @ of Sector 0, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_1_BANK2 ((uint32_t)0x08120000) /* Base @ of Sector 1, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_2_BANK2 ((uint32_t)0x08140000) /* Base @ of Sector 2, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_3_BANK2 ((uint32_t)0x08160000) /* Base @ of Sector 3, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_4_BANK2 ((uint32_t)0x08180000) /* Base @ of Sector 4, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_5_BANK2 ((uint32_t)0x081A0000) /* Base @ of Sector 5, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_6_BANK2 ((uint32_t)0x081C0000) /* Base @ of Sector 6, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_7_BANK2 ((uint32_t)0x081E0000) /* Base @ of Sector 7, 128 Kbytes */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_GetSector
-*	¹¦ÄÜËµÃ÷: ¸ù¾İµØÖ·¼ÆËãÉÈÇøÊ×µØÖ·
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÉÈÇøºÅ£¨0-7)
+*	å‡½ æ•° å: bsp_GetSector
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®åœ°å€è®¡ç®—æ‰‡åŒºé¦–åœ°å€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ‰‡åŒºå·ï¼ˆ0-7)
 *********************************************************************************************************
 */
 uint32_t bsp_GetSector(uint32_t Address)
 {
 	uint32_t sector = 0;
 
-	if (((Address < ADDR_FLASH_SECTOR_1_BANK1) && (Address >= ADDR_FLASH_SECTOR_0_BANK1)) || \
-		((Address < ADDR_FLASH_SECTOR_1_BANK2) && (Address >= ADDR_FLASH_SECTOR_0_BANK2)))    
+	if (((Address < ADDR_FLASH_SECTOR_1_BANK1) && (Address >= ADDR_FLASH_SECTOR_0_BANK1)) ||
+			((Address < ADDR_FLASH_SECTOR_1_BANK2) && (Address >= ADDR_FLASH_SECTOR_0_BANK2)))
 	{
-		sector = FLASH_SECTOR_0;  
+		sector = FLASH_SECTOR_0;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_2_BANK1) && (Address >= ADDR_FLASH_SECTOR_1_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_2_BANK2) && (Address >= ADDR_FLASH_SECTOR_1_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_2_BANK1) && (Address >= ADDR_FLASH_SECTOR_1_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_2_BANK2) && (Address >= ADDR_FLASH_SECTOR_1_BANK2)))
 	{
-		sector = FLASH_SECTOR_1;  
+		sector = FLASH_SECTOR_1;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_3_BANK1) && (Address >= ADDR_FLASH_SECTOR_2_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_3_BANK2) && (Address >= ADDR_FLASH_SECTOR_2_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_3_BANK1) && (Address >= ADDR_FLASH_SECTOR_2_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_3_BANK2) && (Address >= ADDR_FLASH_SECTOR_2_BANK2)))
 	{
-		sector = FLASH_SECTOR_2;  
+		sector = FLASH_SECTOR_2;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_4_BANK1) && (Address >= ADDR_FLASH_SECTOR_3_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_4_BANK2) && (Address >= ADDR_FLASH_SECTOR_3_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_4_BANK1) && (Address >= ADDR_FLASH_SECTOR_3_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_4_BANK2) && (Address >= ADDR_FLASH_SECTOR_3_BANK2)))
 	{
-		sector = FLASH_SECTOR_3;  
+		sector = FLASH_SECTOR_3;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_5_BANK1) && (Address >= ADDR_FLASH_SECTOR_4_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_5_BANK2) && (Address >= ADDR_FLASH_SECTOR_4_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_5_BANK1) && (Address >= ADDR_FLASH_SECTOR_4_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_5_BANK2) && (Address >= ADDR_FLASH_SECTOR_4_BANK2)))
 	{
-		sector = FLASH_SECTOR_4;  
+		sector = FLASH_SECTOR_4;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_6_BANK1) && (Address >= ADDR_FLASH_SECTOR_5_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_6_BANK2) && (Address >= ADDR_FLASH_SECTOR_5_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_6_BANK1) && (Address >= ADDR_FLASH_SECTOR_5_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_6_BANK2) && (Address >= ADDR_FLASH_SECTOR_5_BANK2)))
 	{
-		sector = FLASH_SECTOR_5;  
+		sector = FLASH_SECTOR_5;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_7_BANK1) && (Address >= ADDR_FLASH_SECTOR_6_BANK1)) || \
-	  ((Address < ADDR_FLASH_SECTOR_7_BANK2) && (Address >= ADDR_FLASH_SECTOR_6_BANK2)))    
+	else if (((Address < ADDR_FLASH_SECTOR_7_BANK1) && (Address >= ADDR_FLASH_SECTOR_6_BANK1)) ||
+					 ((Address < ADDR_FLASH_SECTOR_7_BANK2) && (Address >= ADDR_FLASH_SECTOR_6_BANK2)))
 	{
-		sector = FLASH_SECTOR_6;  
+		sector = FLASH_SECTOR_6;
 	}
-	else if (((Address < ADDR_FLASH_SECTOR_0_BANK2) && (Address >= ADDR_FLASH_SECTOR_7_BANK1)) || \
-	  ((Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_7_BANK2)))
+	else if (((Address < ADDR_FLASH_SECTOR_0_BANK2) && (Address >= ADDR_FLASH_SECTOR_7_BANK1)) ||
+					 ((Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_7_BANK2)))
 	{
-		sector = FLASH_SECTOR_7;  
+		sector = FLASH_SECTOR_7;
 	}
 	else
 	{
@@ -102,12 +101,12 @@ uint32_t bsp_GetSector(uint32_t Address)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_ReadCpuFlash
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡CPU FlashµÄÄÚÈİ
-*	ĞÎ    ²Î:  _ucpDst : Ä¿±ê»º³åÇø
-*			 _ulFlashAddr : ÆğÊ¼µØÖ·
-*			 _ulSize : Êı¾İ´óĞ¡£¨µ¥Î»ÊÇ×Ö½Ú£©
-*	·µ »Ø Öµ: 0=³É¹¦£¬1=Ê§°Ü
+*	å‡½ æ•° å: bsp_ReadCpuFlash
+*	åŠŸèƒ½è¯´æ˜: è¯»å–CPU Flashçš„å†…å®¹
+*	å½¢    å‚:  _ucpDst : ç›®æ ‡ç¼“å†²åŒº
+*			 _ulFlashAddr : èµ·å§‹åœ°å€
+*			 _ulSize : æ•°æ®å¤§å°ï¼ˆå•ä½æ˜¯å­—èŠ‚ï¼‰
+*	è¿” å› å€¼: 0=æˆåŠŸï¼Œ1=å¤±è´¥
 *********************************************************************************************************
 */
 uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize)
@@ -119,7 +118,7 @@ uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSi
 		return 1;
 	}
 
-	/* ³¤¶ÈÎª0Ê±²»¼ÌĞø²Ù×÷,·ñÔòÆğÊ¼µØÖ·ÎªÆæµØÖ·»á³ö´í */
+	/* é•¿åº¦ä¸º0æ—¶ä¸ç»§ç»­æ“ä½œ,å¦åˆ™èµ·å§‹åœ°å€ä¸ºå¥‡åœ°å€ä¼šå‡ºé”™ */
 	if (_ulSize == 0)
 	{
 		return 1;
@@ -135,37 +134,37 @@ uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSi
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_CmpCpuFlash
-*	¹¦ÄÜËµÃ÷: ±È½ÏFlashÖ¸¶¨µØÖ·µÄÊı¾İ.
-*	ĞÎ    ²Î: _ulFlashAddr : FlashµØÖ·
-*			 _ucpBuf : Êı¾İ»º³åÇø
-*			 _ulSize : Êı¾İ´óĞ¡£¨µ¥Î»ÊÇ×Ö½Ú£©
-*	·µ »Ø Öµ:
-*			FLASH_IS_EQU		0   FlashÄÚÈİºÍ´ıĞ´ÈëµÄÊı¾İÏàµÈ£¬²»ĞèÒª²Á³ıºÍĞ´²Ù×÷
-*			FLASH_REQ_WRITE		1	Flash²»ĞèÒª²Á³ı£¬Ö±½ÓĞ´
-*			FLASH_REQ_ERASE		2	FlashĞèÒªÏÈ²Á³ı,ÔÙĞ´
-*			FLASH_PARAM_ERR		3	º¯Êı²ÎÊı´íÎó
+*	å‡½ æ•° å: bsp_CmpCpuFlash
+*	åŠŸèƒ½è¯´æ˜: æ¯”è¾ƒFlashæŒ‡å®šåœ°å€çš„æ•°æ®.
+*	å½¢    å‚: _ulFlashAddr : Flashåœ°å€
+*			 _ucpBuf : æ•°æ®ç¼“å†²åŒº
+*			 _ulSize : æ•°æ®å¤§å°ï¼ˆå•ä½æ˜¯å­—èŠ‚ï¼‰
+*	è¿” å› å€¼:
+*			FLASH_IS_EQU		0   Flashå†…å®¹å’Œå¾…å†™å…¥çš„æ•°æ®ç›¸ç­‰ï¼Œä¸éœ€è¦æ“¦é™¤å’Œå†™æ“ä½œ
+*			FLASH_REQ_WRITE		1	Flashä¸éœ€è¦æ“¦é™¤ï¼Œç›´æ¥å†™
+*			FLASH_REQ_ERASE		2	Flashéœ€è¦å…ˆæ“¦é™¤,å†å†™
+*			FLASH_PARAM_ERR		3	å‡½æ•°å‚æ•°é”™è¯¯
 *********************************************************************************************************
 */
 uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSize)
 {
 	uint32_t i;
-	uint8_t ucIsEqu;	/* ÏàµÈ±êÖ¾ */
+	uint8_t ucIsEqu; /* ç›¸ç­‰æ ‡å¿— */
 	uint8_t ucByte;
 
-	/* Èç¹ûÆ«ÒÆµØÖ·³¬¹ıĞ¾Æ¬ÈİÁ¿£¬Ôò²»¸ÄĞ´Êä³ö»º³åÇø */
+	/* å¦‚æœåç§»åœ°å€è¶…è¿‡èŠ¯ç‰‡å®¹é‡ï¼Œåˆ™ä¸æ”¹å†™è¾“å‡ºç¼“å†²åŒº */
 	if (_ulFlashAddr + _ulSize > FLASH_BASE + FLASH_SIZE)
 	{
-		return FLASH_PARAM_ERR;		/*¡¡º¯Êı²ÎÊı´íÎó¡¡*/
+		return FLASH_PARAM_ERR; /*ã€€å‡½æ•°å‚æ•°é”™è¯¯ã€€*/
 	}
 
-	/* ³¤¶ÈÎª0Ê±·µ»ØÕıÈ· */
+	/* é•¿åº¦ä¸º0æ—¶è¿”å›æ­£ç¡® */
 	if (_ulSize == 0)
 	{
-		return FLASH_IS_EQU;		/* FlashÄÚÈİºÍ´ıĞ´ÈëµÄÊı¾İÏàµÈ */
+		return FLASH_IS_EQU; /* Flashå†…å®¹å’Œå¾…å†™å…¥çš„æ•°æ®ç›¸ç­‰ */
 	}
 
-	ucIsEqu = 1;			/* ÏÈ¼ÙÉèËùÓĞ×Ö½ÚºÍ´ıĞ´ÈëµÄÊı¾İÏàµÈ£¬Èç¹ûÓöµ½ÈÎºÎÒ»¸ö²»ÏàµÈ£¬ÔòÉèÖÃÎª 0 */
+	ucIsEqu = 1; /* å…ˆå‡è®¾æ‰€æœ‰å­—èŠ‚å’Œå¾…å†™å…¥çš„æ•°æ®ç›¸ç­‰ï¼Œå¦‚æœé‡åˆ°ä»»ä½•ä¸€ä¸ªä¸ç›¸ç­‰ï¼Œåˆ™è®¾ç½®ä¸º 0 */
 	for (i = 0; i < _ulSize; i++)
 	{
 		ucByte = *(uint8_t *)_ulFlashAddr;
@@ -174,11 +173,11 @@ uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSiz
 		{
 			if (ucByte != 0xFF)
 			{
-				return FLASH_REQ_ERASE;		/* ĞèÒª²Á³ıºóÔÙĞ´ */
+				return FLASH_REQ_ERASE; /* éœ€è¦æ“¦é™¤åå†å†™ */
 			}
 			else
 			{
-				ucIsEqu = 0;	/* ²»ÏàµÈ£¬ĞèÒªĞ´ */
+				ucIsEqu = 0; /* ä¸ç›¸ç­‰ï¼Œéœ€è¦å†™ */
 			}
 		}
 
@@ -188,22 +187,22 @@ uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSiz
 
 	if (ucIsEqu == 1)
 	{
-		return FLASH_IS_EQU;	/* FlashÄÚÈİºÍ´ıĞ´ÈëµÄÊı¾İÏàµÈ£¬²»ĞèÒª²Á³ıºÍĞ´²Ù×÷ */
+		return FLASH_IS_EQU; /* Flashå†…å®¹å’Œå¾…å†™å…¥çš„æ•°æ®ç›¸ç­‰ï¼Œä¸éœ€è¦æ“¦é™¤å’Œå†™æ“ä½œ */
 	}
 	else
 	{
-		return FLASH_REQ_WRITE;	/* Flash²»ĞèÒª²Á³ı£¬Ö±½ÓĞ´ */
+		return FLASH_REQ_WRITE; /* Flashä¸éœ€è¦æ“¦é™¤ï¼Œç›´æ¥å†™ */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_WriteCpuFlash
-*	¹¦ÄÜËµÃ÷: Ğ´Êı¾İµ½CPU ÄÚ²¿Flash¡£
-*	ĞÎ    ²Î: _ulFlashAddr : FlashµØÖ·
-*			 _ucpSrc : Êı¾İ»º³åÇø
-*			 _ulSize : Êı¾İ´óĞ¡£¨µ¥Î»ÊÇ×Ö½Ú, 32×Ö½ÚÕûÊı±¶£©
-*	·µ »Ø Öµ: 0-³É¹¦£¬1-Êı¾İ³¤¶È»òµØÖ·Òç³ö£¬2-Ğ´Flash³ö´í(¹À¼ÆFlashÊÙÃüµ½)
+*	å‡½ æ•° å: bsp_WriteCpuFlash
+*	åŠŸèƒ½è¯´æ˜: å†™æ•°æ®åˆ°CPU å†…éƒ¨Flashã€‚
+*	å½¢    å‚: _ulFlashAddr : Flashåœ°å€
+*			 _ucpSrc : æ•°æ®ç¼“å†²åŒº
+*			 _ulSize : æ•°æ®å¤§å°ï¼ˆå•ä½æ˜¯å­—èŠ‚, 32å­—èŠ‚æ•´æ•°å€ï¼‰
+*	è¿” å› å€¼: 0-æˆåŠŸï¼Œ1-æ•°æ®é•¿åº¦æˆ–åœ°å€æº¢å‡ºï¼Œ2-å†™Flashå‡ºé”™(ä¼°è®¡Flashå¯¿å‘½åˆ°)
 *********************************************************************************************************
 */
 uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize)
@@ -211,13 +210,13 @@ uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulS
 	uint32_t i;
 	uint8_t ucRet;
 
-	/* Èç¹ûÆ«ÒÆµØÖ·³¬¹ıĞ¾Æ¬ÈİÁ¿£¬Ôò²»¸ÄĞ´Êä³ö»º³åÇø */
+	/* å¦‚æœåç§»åœ°å€è¶…è¿‡èŠ¯ç‰‡å®¹é‡ï¼Œåˆ™ä¸æ”¹å†™è¾“å‡ºç¼“å†²åŒº */
 	if (_ulFlashAddr + _ulSize > FLASH_BASE + FLASH_SIZE)
 	{
 		return 1;
 	}
 
-	/* ³¤¶ÈÎª0Ê±²»¼ÌĞø²Ù×÷  */
+	/* é•¿åº¦ä¸º0æ—¶ä¸ç»§ç»­æ“ä½œ  */
 	if (_ulSize == 0)
 	{
 		return 0;
@@ -230,29 +229,29 @@ uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulS
 		return 0;
 	}
 
-	__set_PRIMASK(1);  		/* ¹ØÖĞ¶Ï */
+	__set_PRIMASK(1); /* å…³ä¸­æ–­ */
 
-	/* FLASH ½âËø */
+	/* FLASH è§£é” */
 	HAL_FLASH_Unlock();
 
-	/* ĞèÒª²Á³ı */
+	/* éœ€è¦æ“¦é™¤ */
 	if (ucRet == FLASH_REQ_ERASE)
 	{
 		uint32_t FirstSector = 0, NbOfSectors = 0;
 		FLASH_EraseInitTypeDef EraseInitStruct;
 		uint32_t SECTORError = 0;
-		
+
 		/* Get the 1st sector to erase */
 		FirstSector = bsp_GetSector(_ulFlashAddr);
 		/* Get the number of sector to erase from 1st sector*/
 		NbOfSectors = bsp_GetSector(_ulFlashAddr + _ulSize) - FirstSector + 1;
 
 		/* Fill EraseInit structure*/
-		EraseInitStruct.TypeErase     = FLASH_TYPEERASE_SECTORS;
-		EraseInitStruct.VoltageRange  = FLASH_VOLTAGE_RANGE_3;
-		EraseInitStruct.Banks         = FLASH_BANK_1;
-		EraseInitStruct.Sector        = FirstSector;
-		EraseInitStruct.NbSectors     = NbOfSectors;
+		EraseInitStruct.TypeErase = FLASH_TYPEERASE_SECTORS;
+		EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		EraseInitStruct.Banks = FLASH_BANK_1;
+		EraseInitStruct.Sector = FirstSector;
+		EraseInitStruct.NbSectors = NbOfSectors;
 		if (HAL_FLASHEx_Erase(&EraseInitStruct, &SECTORError) != HAL_OK)
 		{
 			/*
@@ -269,25 +268,25 @@ uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulS
 		}
 	}
 
-	for (i = 0; i < _ulSize / 32; i++)	/* Î´´¦Àí·Ç32×Ö½ÚÕûÊı±¶¸öÊıÇé¿ö */
+	for (i = 0; i < _ulSize / 32; i++) /* æœªå¤„ç†é32å­—èŠ‚æ•´æ•°å€ä¸ªæ•°æƒ…å†µ */
 	{
 		uint64_t FlashWord[4];
-		
-		memcpy((char *)FlashWord, _ucpSrc, 32);	/* ÊÇ·ñĞèÒªµ÷Õû×Ö½ÚÅÅÁĞ´ÎÊı£¬´ıµ÷ÊÔ */
+
+		memcpy((char *)FlashWord, _ucpSrc, 32); /* æ˜¯å¦éœ€è¦è°ƒæ•´å­—èŠ‚æ’åˆ—æ¬¡æ•°ï¼Œå¾…è°ƒè¯• */
 		_ucpSrc += 32;
-		
+
 		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, _ulFlashAddr, (uint64_t)((uint32_t)FlashWord)) == HAL_OK)
 		{
-			_ulFlashAddr = _ulFlashAddr + 32; /* increment for the next Flash word*/			
-		}			
+			_ulFlashAddr = _ulFlashAddr + 32; /* increment for the next Flash word*/
+		}
 	}
 
-  	/* Flash ¼ÓËø£¬½ûÖ¹Ğ´Flash¿ØÖÆ¼Ä´æÆ÷ */
-  	HAL_FLASH_Lock();
+	/* Flash åŠ é”ï¼Œç¦æ­¢å†™Flashæ§åˆ¶å¯„å­˜å™¨ */
+	HAL_FLASH_Lock();
 
-  	__set_PRIMASK(0);  		/* ¿ªÖĞ¶Ï */
+	__set_PRIMASK(0); /* å¼€ä¸­æ–­ */
 
 	return 0;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

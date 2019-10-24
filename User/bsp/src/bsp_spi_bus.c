@@ -1,18 +1,18 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : SPI×ÜÏßÇı¶¯
-*	ÎÄ¼şÃû³Æ : bsp_spi_bus1.h
-*	°æ    ±¾ : V1.2
-*	Ëµ    Ã÷ : SPI×ÜÏßµ×²ãÇı¶¯¡£Ö§³Ö¶à¸öSPI¶ÀÁ¢Ê¹ÓÃ¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß    ËµÃ÷
-*       v1.0    2014-10-24 armfly  Ê×°æ¡£½«´®ĞĞFLASH¡¢TSC2046¡¢VS1053¡¢AD7705¡¢ADS1256µÈSPIÉè±¸µÄÅäÖÃ
-*									ºÍÊÕ·¢Êı¾İµÄº¯Êı½øĞĞ»ã×Ü·ÖÀà¡£²¢½â¾ö²»Í¬ËÙ¶ÈµÄÉè±¸¼äµÄ¹²ÏíÎÊÌâ¡£
-*		V1.1	2015-02-25 armfly  Ó²¼şSPIÊ±£¬Ã»ÓĞ¿ªÆôGPIOBÊ±ÖÓ£¬ÒÑ½â¾ö¡£
-*		V1.2	2015-07-23 armfly  ĞŞ¸Ä bsp_SPI_Init() º¯Êı£¬Ôö¼Ó¿ª¹ØSPIÊ±ÖÓµÄÓï¾ä¡£¹æ·¶Ó²¼şSPIºÍÈí¼şSPIµÄºê¶¨Òå.
+*	æ¨¡å—åç§° : SPIæ€»çº¿é©±åŠ¨
+*	æ–‡ä»¶åç§° : bsp_spi_bus1.h
+*	ç‰ˆ    æœ¬ : V1.2
+*	è¯´    æ˜ : SPIæ€»çº¿åº•å±‚é©±åŠ¨ã€‚æ”¯æŒå¤šä¸ªSPIç‹¬ç«‹ä½¿ç”¨ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…    è¯´æ˜
+*       v1.0    2014-10-24 armfly  é¦–ç‰ˆã€‚å°†ä¸²è¡ŒFLASHã€TSC2046ã€VS1053ã€AD7705ã€ADS1256ç­‰SPIè®¾å¤‡çš„é…ç½®
+*									å’Œæ”¶å‘æ•°æ®çš„å‡½æ•°è¿›è¡Œæ±‡æ€»åˆ†ç±»ã€‚å¹¶è§£å†³ä¸åŒé€Ÿåº¦çš„è®¾å¤‡é—´çš„å…±äº«é—®é¢˜ã€‚
+*		V1.1	2015-02-25 armfly  ç¡¬ä»¶SPIæ—¶ï¼Œæ²¡æœ‰å¼€å¯GPIOBæ—¶é’Ÿï¼Œå·²è§£å†³ã€‚
+*		V1.2	2015-07-23 armfly  ä¿®æ”¹ bsp_SPI_Init() å‡½æ•°ï¼Œå¢åŠ å¼€å…³SPIæ—¶é’Ÿçš„è¯­å¥ã€‚è§„èŒƒç¡¬ä»¶SPIå’Œè½¯ä»¶SPIçš„å®å®šä¹‰.
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,37 +20,37 @@
 #include "bsp.h"
 
 /*
-	¿ÚÏß·ÖÅä
+	å£çº¿åˆ†é…
 	LCD :
 		PC10/SPI3_SCK	
 		PC12/SPI3_MOSI
 		
-	Êä³ö¶Ë¿Ú£¨SPI¿ØÖÆÆ÷£©
+	è¾“å‡ºç«¯å£ï¼ˆSPIæ§åˆ¶å™¨ï¼‰
 		PE2/SPI4_SCK
 		PE5/SPI4_MISO
 		PE6/SPI4_MOSI
 	
-	SWDÉÕĞ´¿Ú
+	SWDçƒ§å†™å£
 		PD3/SPI2_SCK
 		PI3/SPI2_MOSI
 		PH6/SPI5_SCK
 
-		- SWDIO·¢ËÍÊ± : PD3/SPI2_SCK, PI3/SPI2_MOSI   (SPI2×öÖ÷»ú£©
-		- SWDIO½ÓÊÕÊ± : PD3/SPI2_SCK£¬, PI3/SPI2_MOSI (SPI2×ö´Ó»ú£¬SPI5Ö»ÓÃSCK²úÉúÊ±ÖÓ£©
+		- SWDIOå‘é€æ—¶ : PD3/SPI2_SCK, PI3/SPI2_MOSI   (SPI2åšä¸»æœºï¼‰
+		- SWDIOæ¥æ”¶æ—¶ : PD3/SPI2_SCKï¼Œ, PI3/SPI2_MOSI (SPI2åšä»æœºï¼ŒSPI5åªç”¨SCKäº§ç”Ÿæ—¶é’Ÿï¼‰
 */
 
 /* 
-	armfly £º 2018-10-03  SPI ÒÅÁôÎÊÌâ´ı²é (¹À¼ÆHAL¿â´æÔÚÈ±Ïİ£©
-	1. DMAÄ£Ê½£¬·¢ËÍ»º³åÇø±ØĞëÊÇ const ¶¨Î»ÔÚflash²ÅÄÜÕı³£´«Êä¡£¶¨Î»ÔÚSRAM£¬ÔòDMA´«ÊäÒì³£¡£
-	2. INTÄ£Ê½£¬32×Ö½ÚÒ»ÏÂÁ¬Ğø·¢ËÍÕı³£¡£48×Ö½ÚÒÔÉÏÒì³££¬Ö»ÄÜ·¢ËÍÒ»´Î¡£µÚ2´Î»áÖĞÍ¾ÖÕÖ¹¡£
-	3. Ä¿Ç°²ÉÓÃÆÕÍ¨ÂÖÑ¯Ä£Ê½£¬Î´·¢ÏÖÎÊÌâ¡£
+	armfly ï¼š 2018-10-03  SPI é—ç•™é—®é¢˜å¾…æŸ¥ (ä¼°è®¡HALåº“å­˜åœ¨ç¼ºé™·ï¼‰
+	1. DMAæ¨¡å¼ï¼Œå‘é€ç¼“å†²åŒºå¿…é¡»æ˜¯ const å®šä½åœ¨flashæ‰èƒ½æ­£å¸¸ä¼ è¾“ã€‚å®šä½åœ¨SRAMï¼Œåˆ™DMAä¼ è¾“å¼‚å¸¸ã€‚
+	2. INTæ¨¡å¼ï¼Œ32å­—èŠ‚ä¸€ä¸‹è¿ç»­å‘é€æ­£å¸¸ã€‚48å­—èŠ‚ä»¥ä¸Šå¼‚å¸¸ï¼Œåªèƒ½å‘é€ä¸€æ¬¡ã€‚ç¬¬2æ¬¡ä¼šä¸­é€”ç»ˆæ­¢ã€‚
+	3. ç›®å‰é‡‡ç”¨æ™®é€šè½®è¯¢æ¨¡å¼ï¼Œæœªå‘ç°é—®é¢˜ã€‚
 	
-	²âÊÔ´úÂëÈçÏÂ£º
+	æµ‹è¯•ä»£ç å¦‚ä¸‹ï¼š
 	bsp_InitSPIBus();
 	bsp_InitSPIParam(SPI_BAUDRATEPRESCALER_8, SPI_PHASE_1EDGE, SPI_POLARITY_LOW);
 	while (1)
 	{
-		g_spiLen = 32;		// Êı¾İ³¤¶È
+		g_spiLen = 32;		// æ•°æ®é•¿åº¦
 		bsp_spiTransfer();
 		
 		bsp_DelayUS(1000);
@@ -205,10 +205,10 @@ enum {
 #if USE_SPI1_EN == 1
 	static SPI_HandleTypeDef hspi1;
 	uint8_t spi1_TxBuf[SPI1_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi1_RxBuf[SPI1_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi1_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */
+	ALIGN_32BYTES(uint8_t spi1_RxBuf[SPI1_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi1_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */
 	__IO uint32_t spi1_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi1_BaudRatePrescaler;
 	static uint32_t spi1_CLKPhase;
 	static uint32_t spi1_CLKPolarity;
@@ -217,10 +217,10 @@ enum {
 #if USE_SPI2_EN == 1
 	SPI_HandleTypeDef hspi2;
 	uint8_t spi2_TxBuf[SPI2_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi2_RxBuf[SPI2_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi2_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */	
+	ALIGN_32BYTES(uint8_t spi2_RxBuf[SPI2_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi2_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */	
 	__IO uint32_t spi2_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi2_BaudRatePrescaler;
 	static uint32_t spi2_CLKPhase;
 	static uint32_t spi2_CLKPolarity;
@@ -229,10 +229,10 @@ enum {
 #if USE_SPI3_EN == 1
 	static SPI_HandleTypeDef hspi3;
 	uint8_t spi3_TxBuf[SPI3_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi3_RxBuf[SPI3_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi3_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */
+	ALIGN_32BYTES(uint8_t spi3_RxBuf[SPI3_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi3_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */
 	__IO uint32_t spi3_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi3_BaudRatePrescaler;
 	static uint32_t spi3_CLKPhase;
 	static uint32_t spi3_CLKPolarity;	
@@ -241,10 +241,10 @@ enum {
 #if USE_SPI4_EN == 1
 	static SPI_HandleTypeDef hspi4;
 	uint8_t spi4_TxBuf[SPI4_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi4_RxBuf[SPI4_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi4_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */	
+	ALIGN_32BYTES(uint8_t spi4_RxBuf[SPI4_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi4_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */	
 	__IO uint32_t spi4_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi4_BaudRatePrescaler;
 	static uint32_t spi4_CLKPhase;
 	static uint32_t spi4_CLKPolarity;	
@@ -253,10 +253,10 @@ enum {
 #if USE_SPI5_EN == 1
 	static SPI_HandleTypeDef hspi5;
 	uint8_t spi5_TxBuf[SPI5_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi5_RxBuf[SPI5_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi5_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */	
+	ALIGN_32BYTES(uint8_t spi5_RxBuf[SPI5_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi5_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */	
 	__IO uint32_t spi5_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi5_BaudRatePrescaler;
 	static uint32_t spi5_CLKPhase;
 	static uint32_t spi5_CLKPolarity;	
@@ -265,10 +265,10 @@ enum {
 #if USE_SPI6_EN == 1
 	static SPI_HandleTypeDef hspi6;
 	uint8_t spi6_TxBuf[SPI6_BUFFER_SIZE];
-	ALIGN_32BYTES(uint8_t spi6_RxBuf[SPI6_BUFFER_SIZE]);	/* ±ØĞë32×Ö½Ú¶ÔÆë */
-	uint32_t spi6_len;		/* ÊÕ·¢µÄÊı¾İ³¤¶È */	
+	ALIGN_32BYTES(uint8_t spi6_RxBuf[SPI6_BUFFER_SIZE]);	/* å¿…é¡»32å­—èŠ‚å¯¹é½ */
+	uint32_t spi6_len;		/* æ”¶å‘çš„æ•°æ®é•¿åº¦ */	
 	__IO uint32_t spi6_wTransferState = TRANSFER_WAIT;		/* transfer state */
-	/* ±¸·İSPI¼¸¸ö¹Ø¼ü´«Êä²ÎÊı£¬²¨ÌØÂÊ£¬ÏàÎ»£¬¼«ĞÔ. Èç¹û²»Í¬ÍâÉèÇĞ»»£¬ĞèÒªÖØĞÂInit SPI²ÎÊı */
+	/* å¤‡ä»½SPIå‡ ä¸ªå…³é”®ä¼ è¾“å‚æ•°ï¼Œæ³¢ç‰¹ç‡ï¼Œç›¸ä½ï¼Œææ€§. å¦‚æœä¸åŒå¤–è®¾åˆ‡æ¢ï¼Œéœ€è¦é‡æ–°Init SPIå‚æ•° */
 	static uint32_t spi6_BaudRatePrescaler;
 	static uint32_t spi6_CLKPhase;
 	static uint32_t spi6_CLKPolarity;	
@@ -285,24 +285,24 @@ static DMA_HandleTypeDef hdma_rx;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitSPIBus1
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSPI×ÜÏß¡£ Ö»°üÀ¨ SCK¡¢ MOSI¡¢ MISO¿ÚÏßµÄÅäÖÃ¡£²»°üÀ¨Æ¬Ñ¡CS£¬Ò²²»°üÀ¨ÍâÉèĞ¾Æ¬ÌØÓĞµÄINT¡¢BUSYµÈ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitSPIBus1
+*	åŠŸèƒ½è¯´æ˜: é…ç½®SPIæ€»çº¿ã€‚ åªåŒ…æ‹¬ SCKã€ MOSIã€ MISOå£çº¿çš„é…ç½®ã€‚ä¸åŒ…æ‹¬ç‰‡é€‰CSï¼Œä¹Ÿä¸åŒ…æ‹¬å¤–è®¾èŠ¯ç‰‡ç‰¹æœ‰çš„INTã€BUSYç­‰
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitSPIBus(void)
 {		
-	/* SPI3 ÓÃÓÚLCD */
+	/* SPI3 ç”¨äºLCD */
 	bsp_InitSPIParam(SPI3, SPI_BAUDRATEPRESCALER_64, SPI_PHASE_1EDGE, SPI_POLARITY_LOW);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitSPIParam
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSPI×ÜÏß²ÎÊı£¬²¨ÌØÂÊ¡¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitSPIParam
+*	åŠŸèƒ½è¯´æ˜: é…ç½®SPIæ€»çº¿å‚æ•°ï¼Œæ³¢ç‰¹ç‡ã€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitSPIParam(SPI_TypeDef *_spi, uint32_t _BaudRatePrescaler, uint32_t _CLKPhase, uint32_t _CLKPolarity)
@@ -550,10 +550,10 @@ void bsp_InitSPIParam(SPI_TypeDef *_spi, uint32_t _BaudRatePrescaler, uint32_t _
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SPI_MspInit
-*	¹¦ÄÜËµÃ÷: HAL¿â³õÊ¼»¯SPIµÄ»Øµ÷º¯Êı¡£Ö÷ÒªÊÇÅäÖÃGPIO¡¢SPIÊ±ÖÓ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SPI_MspInit
+*	åŠŸèƒ½è¯´æ˜: HALåº“åˆå§‹åŒ–SPIçš„å›è°ƒå‡½æ•°ã€‚ä¸»è¦æ˜¯é…ç½®GPIOã€SPIæ—¶é’Ÿã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
@@ -563,7 +563,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI1_SCK_GPIO
 		SPI1_SCK_CLK_ENABLE();
 		#endif
@@ -576,12 +576,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPIx_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI1_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI1_SCK_AF;
 		
@@ -609,7 +609,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI2_SCK_GPIO
 		SPI2_SCK_CLK_ENABLE();
 		#endif
@@ -622,12 +622,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPI2_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI2_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI2_SCK_AF;
 		
@@ -655,7 +655,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI3_SCK_GPIO
 		SPI3_SCK_CLK_ENABLE();
 		#endif
@@ -668,12 +668,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPI3_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI3_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI3_SCK_AF;
 		
@@ -701,7 +701,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI4_SCK_GPIO
 		SPI4_SCK_CLK_ENABLE();
 		#endif
@@ -714,12 +714,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPI4_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI4_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI4_SCK_AF;
 		
@@ -747,7 +747,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI5_SCK_GPIO
 		SPI5_SCK_CLK_ENABLE();
 		#endif
@@ -760,12 +760,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPI5_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI5_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI5_SCK_AF;
 		
@@ -793,7 +793,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	{
 		GPIO_InitTypeDef  GPIO_InitStruct;
 			
-		/* ÅäÖÃGPIOÊ±ÖÓ */
+		/* é…ç½®GPIOæ—¶é’Ÿ */
 		#ifdef SPI6_SCK_GPIO
 		SPI6_SCK_CLK_ENABLE();
 		#endif
@@ -806,12 +806,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 		SPI6_MOSI_CLK_ENABLE();
 		#endif
 
-		/* Ê¹ÄÜSPIÊ±ÖÓ */
+		/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 		__HAL_RCC_SPI6_CLK_ENABLE();
 
-		/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
+		/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
 		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ÏÂÀ­ */
+		GPIO_InitStruct.Pull      = GPIO_PULLDOWN;		/* ä¸‹æ‹‰ */
 		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
 		GPIO_InitStruct.Alternate = SPI6_SCK_AF;
 		
@@ -835,7 +835,7 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 #endif
 
 
-/* ÅäÖÃDMAºÍNVIC -- ÔİÊ±Î´ÆôÓÃDMA ºÍÖĞ¶ÏÄ£Ê½ */
+/* é…ç½®DMAå’ŒNVIC -- æš‚æ—¶æœªå¯ç”¨DMA å’Œä¸­æ–­æ¨¡å¼ */
 	#ifdef USE_SPI_DMA
 	{
 		/* Enable DMA clock */
@@ -899,12 +899,12 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 	
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_spiTransfer
-*	¹¦ÄÜËµÃ÷: ÏòSPI×ÜÏß·¢ËÍ1¸ö»ò¶à¸ö×Ö½Ú
-*	ĞÎ    ²Î:  g_spi_TxBuf : ·¢ËÍµÄÊı¾İ
-*		      g_spi_RxBuf  £ºÊÕ·¢µÄÊı¾İ³¤¶È
-*			  _TxRxLen £º½ÓÊÕµÄÊı¾İ»º³åÇø
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_spiTransfer
+*	åŠŸèƒ½è¯´æ˜: å‘SPIæ€»çº¿å‘é€1ä¸ªæˆ–å¤šä¸ªå­—èŠ‚
+*	å½¢    å‚:  g_spi_TxBuf : å‘é€çš„æ•°æ®
+*		      g_spi_RxBuf  ï¼šæ”¶å‘çš„æ•°æ®é•¿åº¦
+*			  _TxRxLen ï¼šæ¥æ”¶çš„æ•°æ®ç¼“å†²åŒº
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_spiTransfer(SPI_TypeDef *_spi)
@@ -1005,10 +1005,10 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SpiBusEnter
-*	¹¦ÄÜËµÃ÷: Õ¼ÓÃSPI×ÜÏß
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾²»Ã¦  1±íÊ¾Ã¦
+*	å‡½ æ•° å: bsp_SpiBusEnter
+*	åŠŸèƒ½è¯´æ˜: å ç”¨SPIæ€»çº¿
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºä¸å¿™  1è¡¨ç¤ºå¿™
 *********************************************************************************************************
 */
 void bsp_SpiBusEnter(void)
@@ -1018,10 +1018,10 @@ void bsp_SpiBusEnter(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SpiBusExit
-*	¹¦ÄÜËµÃ÷: ÊÍ·ÅÕ¼ÓÃµÄSPI×ÜÏß
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾²»Ã¦  1±íÊ¾Ã¦
+*	å‡½ æ•° å: bsp_SpiBusExit
+*	åŠŸèƒ½è¯´æ˜: é‡Šæ”¾å ç”¨çš„SPIæ€»çº¿
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºä¸å¿™  1è¡¨ç¤ºå¿™
 *********************************************************************************************************
 */
 void bsp_SpiBusExit(void)
@@ -1031,10 +1031,10 @@ void bsp_SpiBusExit(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SpiBusBusy
-*	¹¦ÄÜËµÃ÷: ÅĞ¶ÏSPI×ÜÏßÃ¦¡£·½·¨ÊÇ¼ì²âÆäËûSPIĞ¾Æ¬µÄÆ¬Ñ¡ĞÅºÅÊÇ·ñÎª1
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾²»Ã¦  1±íÊ¾Ã¦
+*	å‡½ æ•° å: bsp_SpiBusBusy
+*	åŠŸèƒ½è¯´æ˜: åˆ¤æ–­SPIæ€»çº¿å¿™ã€‚æ–¹æ³•æ˜¯æ£€æµ‹å…¶ä»–SPIèŠ¯ç‰‡çš„ç‰‡é€‰ä¿¡å·æ˜¯å¦ä¸º1
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºä¸å¿™  1è¡¨ç¤ºå¿™
 *********************************************************************************************************
 */
 uint8_t bsp_SpiBusBusy(void)
@@ -1088,4 +1088,4 @@ uint8_t bsp_SpiBusBusy(void)
 	}	
 #endif
 	
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

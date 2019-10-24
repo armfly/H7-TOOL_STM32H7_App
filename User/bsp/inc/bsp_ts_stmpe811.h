@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-	Ä£¿éÃû³Æ : µç×èÊ½´¥ÃşĞ¾Æ¬STMPE811Çı¶¯Ä£¿é
-	ÎÄ¼şÃû³Æ : TOUCH_STMPE811,h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+	æ¨¡å—åç§° : ç”µé˜»å¼è§¦æ‘¸èŠ¯ç‰‡STMPE811é©±åŠ¨æ¨¡å—
+	æ–‡ä»¶åç§° : TOUCH_STMPE811,h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,14 +14,14 @@
 #ifndef _TOUCH_STMPE811_H
 #define _TOUCH_STMPE811_H
 
-/* ¶¨ÒåÏÔÊ¾Æ÷Ó²¼şÊ¶±ğÂë 
+/* å®šä¹‰æ˜¾ç¤ºå™¨ç¡¬ä»¶è¯†åˆ«ç  
 
-	0 = 4.3´ç (480*272)
-	1 = 5.0´ç (480*272)
-	2 = 5.0´ç (800*480)
-	3 = 7.0´ç (800*480)
-	4 = 7.0´ç (1024*600)
-	5 = 3.5´ç (480*272)
+	0 = 4.3å¯¸ (480*272)
+	1 = 5.0å¯¸ (480*272)
+	2 = 5.0å¯¸ (800*480)
+	3 = 7.0å¯¸ (800*480)
+	4 = 7.0å¯¸ (1024*600)
+	5 = 3.5å¯¸ (480*272)
 
 */
 typedef enum
@@ -34,13 +34,13 @@ typedef enum
 	LCD429_35_480X272 = 5,
 }LCD_TYPE_E;
 
-/* I2C×ÜÏßµØÖ·  0x82 »òÕß 0x88 */
+/* I2Cæ€»çº¿åœ°å€  0x82 æˆ–è€… 0x88 */
 #define STMPE811_I2C_ADDRESS	0x88
 
-/* ¼Ä´æÆ÷µØÖ·¶¨Òå */
+/* å¯„å­˜å™¨åœ°å€å®šä¹‰ */
 enum
 {
-	/*                         µØÖ·      bit ¶ÁĞ´  ¸´Î»Öµ    ¹¦ÄÜËµÃ÷  */
+	/*                         åœ°å€      bit è¯»å†™  å¤ä½å€¼    åŠŸèƒ½è¯´æ˜  */
 	REG811_CHIP_ID            = 0x00,  /* 16 R   0x0811 Device identification    */
 	REG811_ID_VER             = 0x02,  /*  8 R   0x03 Revision number,
 							0x01 for engineering sample, 0x03 for final silicon */
@@ -88,10 +88,10 @@ enum
 	REG811_TSC_DATA_XYZ       = 0x52,  /* 32 R   0x00000000 Data port for touch screen controller data access  */
 	REG811_TSC_FRACT_XYZ       = 0x56,  /*  8     0x00 Touch screen controller FRACTION_XYZ   */
 	
-	/* ´¥ÃşÊı¾İ·ÃÎÊ¶Ë¿Ú (µØÖ·×Ô¶¯µİÔö) */
+	/* è§¦æ‘¸æ•°æ®è®¿é—®ç«¯å£ (åœ°å€è‡ªåŠ¨é€’å¢) */
 	REG811_TSC_DATA           = 0x57,  /*  8 R   0x00 Data port for touch screen controller data access   */
 	
-	/* ´¥ÃşÊı¾İ·ÃÎÊ¶Ë¿Ú (µØÖ·²»µİÔö) */
+	/* è§¦æ‘¸æ•°æ®è®¿é—®ç«¯å£ (åœ°å€ä¸é€’å¢) */
 	REG811_TSC_DATA1		  = 0xD7,  /*  8 R   0x00 Data port for touch screen controller data access   */
 	
 	REG811_TSC_I_DRIVE        = 0x58,  /*  8 R/W 0x00 Touch screen controller drive I   */
@@ -101,7 +101,7 @@ enum
 	REG811_TEMP_TH            = 0x62,  /*  8 R/W 0x00 Threshold for temperature controlled interrupt   */
 };
 
-/* ¿É¹©Íâ²¿Ä£¿éµ÷ÓÃµÄº¯Êı */
+/* å¯ä¾›å¤–éƒ¨æ¨¡å—è°ƒç”¨çš„å‡½æ•° */
 
 void STMPE811_InitHard(void);
 void STMPE811_InitHardForGPIO(void);
@@ -127,4 +127,4 @@ void STMPE811_WriteGPIO(uint8_t _pin, uint8_t _vlaue);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

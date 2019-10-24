@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : SPI×ÜÏßÇı¶¯£¨¿ìËÙÄ£Ê½£©
-*	ÎÄ¼şÃû³Æ : bsp_spi_fast.h
-*	°æ    ±¾ : V1.2
-*	Ëµ    Ã÷ : SPI×ÜÏßµ×²ãÇı¶¯¡£²»ÓÃHAL¿â£¬Ö±½Ó¼Ä´æÆ÷²Ù×÷Ìá¸ßĞ§ÂÊ¡£½ö½öÓÃÓÚSWD½Ó¿Ú
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß    ËµÃ÷
-*       v1.0    2019-08-23  armfly  Ê×°æ¡£
+*	æ¨¡å—åç§° : SPIæ€»çº¿é©±åŠ¨ï¼ˆå¿«é€Ÿæ¨¡å¼ï¼‰
+*	æ–‡ä»¶åç§° : bsp_spi_fast.h
+*	ç‰ˆ    æœ¬ : V1.2
+*	è¯´    æ˜ : SPIæ€»çº¿åº•å±‚é©±åŠ¨ã€‚ä¸ç”¨HALåº“ï¼Œç›´æ¥å¯„å­˜å™¨æ“ä½œæé«˜æ•ˆç‡ã€‚ä»…ä»…ç”¨äºSWDæ¥å£
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…    è¯´æ˜
+*       v1.0    2019-08-23  armfly  é¦–ç‰ˆã€‚
 
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,67 +18,68 @@
 
 /************************* SPI2 *********************/
 
-#define SPI2_SCK_CLK_ENABLE()		__HAL_RCC_GPIOD_CLK_ENABLE()
-#define SPI2_SCK_GPIO				GPIOD
-#define SPI2_SCK_PIN				GPIO_PIN_3
-#define SPI2_SCK_AF					GPIO_AF5_SPI2
+#define SPI2_SCK_CLK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
+#define SPI2_SCK_GPIO GPIOD
+#define SPI2_SCK_PIN GPIO_PIN_3
+#define SPI2_SCK_AF GPIO_AF5_SPI2
 
-	//#define SPI2_MISO_CLK_ENABLE()		__HAL_RCC_GPIOB_CLK_ENABLE()
-	//#define SPI2_MISO_GPIO				GPIOB
-	//#define SPI2_MISO_PIN 				GPIO_PIN_4
-	//#define SPI2_MISO_AF				GPIO_AF5_SPI2
+//#define SPI2_MISO_CLK_ENABLE()		__HAL_RCC_GPIOB_CLK_ENABLE()
+//#define SPI2_MISO_GPIO				GPIOB
+//#define SPI2_MISO_PIN 				GPIO_PIN_4
+//#define SPI2_MISO_AF				GPIO_AF5_SPI2
 
-#define SPI2_MOSI_CLK_ENABLE()		__HAL_RCC_GPIOI_CLK_ENABLE()
-#define SPI2_MOSI_GPIO				GPIOI
-#define SPI2_MOSI_PIN 				GPIO_PIN_3
-#define SPI2_MOSI_AF				GPIO_AF5_SPI2
+#define SPI2_MOSI_CLK_ENABLE() __HAL_RCC_GPIOI_CLK_ENABLE()
+#define SPI2_MOSI_GPIO GPIOI
+#define SPI2_MOSI_PIN GPIO_PIN_3
+#define SPI2_MOSI_AF GPIO_AF5_SPI2
 
-
-#define SET_SPI_TX_MODE(datasize)	\
-	SPI2->CR2 = 1;					\
-	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;\
-	while ((SPI2->SR & SPI_FLAG_TXE) == 0);\
-	SPI2->TXDR = 0X125A;\
-	while ((SPI2->SR & SPI_SR_TXC) == 0);  \
-	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;\
+#define SET_SPI_TX_MODE(datasize)                         \
+	SPI2->CR2 = 1;                                          \
+	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART; \
+	while ((SPI2->SR & SPI_FLAG_TXE) == 0)                  \
+		;                                                     \
+	SPI2->TXDR = 0X125A;                                    \
+	while ((SPI2->SR & SPI_SR_TXC) == 0)                    \
+		;                                                     \
+	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;            \
 	SPI2->CR1 &= ~(SPI_CR1_SPE);
-	
 
-#define SET_SPI_RX_MODE(datasize)	\
-	SPI2->CR1 &= ~(SPI_CR1_SPE);	\
-	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_2 | SPI_DATASIZE_8BIT;		\
-	SPI2->CR1 &= ~(SPI_CR1_HDDIR);	/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */	\
-	SPI2->CR1 |= SPI_CR1_SPE;		/* Ê¹ÄÜSPI */	
+#define SET_SPI_RX_MODE(datasize)                                      \
+	SPI2->CR1 &= ~(SPI_CR1_SPE);                                         \
+	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_2 | SPI_DATASIZE_8BIT;            \
+	SPI2->CR1 &= ~(SPI_CR1_HDDIR); /* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */ \
+	SPI2->CR1 |= SPI_CR1_SPE;			 /* ä½¿èƒ½SPI */
 
 extern SPI_HandleTypeDef hspi2;
 void SWD_SendBitsOK(uint8_t _bits, uint32_t _data)
 {
 #if 1
 	static uint8_t s_first = 1;
-	
-//	if (s_first == 0)
-//	{
-//		while ((SPI2->SR & SPI_SR_TXC) == 0);				//while ((SPI2->SR & SPI_FLAG_EOT) == 0); SPI_SR_TXC	
-//	}
-//	else
-//	{
-//		s_first = 0;
-//	}
-//	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
-//	SPI2->CR1 &= ~(SPI_CR1_SPE);
-	
-	//SPI2->CR1 |= SPI_CR1_HDDIR;	/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */
+
+	//	if (s_first == 0)
+	//	{
+	//		while ((SPI2->SR & SPI_SR_TXC) == 0);				//while ((SPI2->SR & SPI_FLAG_EOT) == 0); SPI_SR_TXC
+	//	}
+	//	else
+	//	{
+	//		s_first = 0;
+	//	}
+	//	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
+	//	SPI2->CR1 &= ~(SPI_CR1_SPE);
+
+	//SPI2->CR1 |= SPI_CR1_HDDIR;	/* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */
 	_bits--;
-	
+
 	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_8 | _bits;
 	SPI2->CR1 = SPI_CR1_SSI | SPI_CR1_HDDIR;
-	SPI2->CR2 = 1;	
-	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_HDDIR | SPI_CR1_SSI;		
+	SPI2->CR2 = 1;
+	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_HDDIR | SPI_CR1_SSI;
 
 	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_HDDIR | SPI_CR1_SSI | SPI_CR1_CSTART;
-	
-	while ((SPI2->SR & SPI_FLAG_TXE) == 0);
-	
+
+	while ((SPI2->SR & SPI_FLAG_TXE) == 0)
+		;
+
 	if (_bits > 15)
 	{
 		*((__IO uint32_t *)&SPI2->TXDR) = _data;
@@ -91,30 +92,32 @@ void SWD_SendBitsOK(uint8_t _bits, uint32_t _data)
 	{
 		*((__IO uint8_t *)&SPI2->TXDR) = _data;
 	}
-	
-	while ((SPI2->SR & SPI_SR_TXC) == 0);	
+
+	while ((SPI2->SR & SPI_SR_TXC) == 0)
+		;
 	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
-	
-	SPI2->CR1 &= ~(SPI_CR1_SPE);	
-#else	
+
+	SPI2->CR1 &= ~(SPI_CR1_SPE);
+#else
 	HAL_SPI_Transmit(&hspi2, "123", 1, 1000);
 #endif
 }
 
 uint32_t SWD_ReadBitsOK(uint8_t _bits)
 {
-	
+
 	_bits--;
-	
+
 	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_8 | _bits;
-	SPI2->CR1 = SPI_CR1_SSI ;
-	SPI2->CR2 = 1;	
-	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI;		
+	SPI2->CR1 = SPI_CR1_SSI;
+	SPI2->CR2 = 1;
+	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI;
 
 	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
-	
-	while ((SPI2->SR & SPI_FLAG_TXE) == 0);
-	
+
+	while ((SPI2->SR & SPI_FLAG_TXE) == 0)
+		;
+
 	if (_bits > 15)
 	{
 		*((__IO uint32_t *)&SPI2->TXDR) = 0;
@@ -127,133 +130,133 @@ uint32_t SWD_ReadBitsOK(uint8_t _bits)
 	{
 		*((__IO uint8_t *)&SPI2->TXDR) = 0;
 	}
-	
-	while ((SPI2->SR & SPI_SR_TXC) == 0);	
+
+	while ((SPI2->SR & SPI_SR_TXC) == 0)
+		;
 	SPI2->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
-	
-	SPI2->CR1 &= ~(SPI_CR1_SPE);	
-	
+
+	SPI2->CR1 &= ~(SPI_CR1_SPE);
+
 	return SPI2->RXDR;
 }
-
 
 void bsp_InitSPIParamFast(void)
 {
 	SPI_HandleTypeDef hspi2;
-	
-	hspi2.Instance               = SPI2;
-	hspi2.Init.BaudRatePrescaler = 						SPI_BAUDRATEPRESCALER_8;
-	hspi2.Init.Direction         = SPI_DIRECTION_2LINES;
-	hspi2.Init.CLKPhase          = 						SPI_PHASE_1EDGE;
-	hspi2.Init.CLKPolarity       = 						SPI_POLARITY_HIGH;
-	hspi2.Init.DataSize          = SPI_DATASIZE_8BIT;
-	hspi2.Init.FirstBit          = SPI_FIRSTBIT_MSB;
-	hspi2.Init.TIMode            = SPI_TIMODE_DISABLE;
-	hspi2.Init.CRCCalculation    = SPI_CRCCALCULATION_DISABLE;
-	hspi2.Init.CRCPolynomial     = 7;
-	hspi2.Init.CRCLength         = SPI_CRC_LENGTH_8BIT;
-	hspi2.Init.NSS               = SPI_NSS_SOFT;
-	hspi2.Init.NSSPMode          = SPI_NSS_PULSE_DISABLE;
-	hspi2.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_ENABLE;  /* Recommanded setting to avoid glitches */
-	hspi2.Init.Mode 			 = SPI_MODE_MASTER;
+
+	hspi2.Instance = SPI2;
+	hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+	hspi2.Init.Direction = SPI_DIRECTION_2LINES;
+	hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
+	hspi2.Init.CLKPolarity = SPI_POLARITY_HIGH;
+	hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
+	hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
+	hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
+	hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+	hspi2.Init.CRCPolynomial = 7;
+	hspi2.Init.CRCLength = SPI_CRC_LENGTH_8BIT;
+	hspi2.Init.NSS = SPI_NSS_SOFT;
+	hspi2.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
+	hspi2.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_ENABLE; /* Recommanded setting to avoid glitches */
+	hspi2.Init.Mode = SPI_MODE_MASTER;
 
 	HAL_SPI_Init(&hspi2);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitSPI2_Fast
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSPI×ÜÏß¡£ 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitSPI2_Fast
+*	åŠŸèƒ½è¯´æ˜: é…ç½®SPIæ€»çº¿ã€‚ 
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitSPI2_Fast(void)
-{		
-	GPIO_InitTypeDef  GPIO_InitStruct;
-		
-	/* ÅäÖÃGPIOÊ±ÖÓ */
+{
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	/* é…ç½®GPIOæ—¶é’Ÿ */
 	SPI2_SCK_CLK_ENABLE();
-	
+
 	SPI2_MOSI_CLK_ENABLE();
 
-	/* Ê¹ÄÜSPIÊ±ÖÓ */
+	/* ä½¿èƒ½SPIæ—¶é’Ÿ */
 	__HAL_RCC_SPI2_CLK_ENABLE();
 
-	/* ÅäÖÃGPIOÎªSPI¹¦ÄÜ */
-	GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull      = GPIO_PULLUP;		/* ÉÏÀ­ */
-	GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+	/* é…ç½®GPIOä¸ºSPIåŠŸèƒ½ */
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP; /* ä¸Šæ‹‰ */
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 	GPIO_InitStruct.Alternate = SPI2_SCK_AF;
-	
-	GPIO_InitStruct.Pin       = SPI2_SCK_PIN;
+
+	GPIO_InitStruct.Pin = SPI2_SCK_PIN;
 	HAL_GPIO_Init(SPI2_SCK_GPIO, &GPIO_InitStruct);
-	
+
 	GPIO_InitStruct.Pin = SPI2_MOSI_PIN;
 	GPIO_InitStruct.Alternate = SPI2_MOSI_AF;
 	HAL_GPIO_Init(SPI2_MOSI_GPIO, &GPIO_InitStruct);
-	
+
 	bsp_InitSPIParam(SPI2, SPI_BAUDRATEPRESCALER_256, SPI_PHASE_2EDGE, SPI_POLARITY_HIGH);
-	
+
 	SPI2->CR2 = 1;
 	//bsp_InitSPIParamFast();
-	
-//	SPI2->CR1 &= ~(SPI_CR1_SPE);
-//	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_64 | SPI_DATASIZE_8BIT;
-//	SPI2->CFG2 = SPI_DIRECTION_2LINES | SPI_MODE_MASTER | SPI_FIRSTBIT_LSB | SPI_PHASE_1EDGE | SPI_POLARITY_HIGH | SPI_MASTER_KEEP_IO_STATE_ENABLE;
-//	//SPI2->CR1 &= ~(SPI_CR1_HDDIR);		/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */
-//	SPI2->CR1 |= SPI_CR1_HDDIR;			/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */	
-//	SPI2->CR1 |= SPI_CR1_SPE;		/* Ê¹ÄÜSPI */	
-//				SPI2->CR1 &= ~(SPI_CR1_SPE);
-//		SPI2->CFG1 = SPI_BAUDRATEPRESCALER_64 | (datasize - 1);				
 
-//	SPI2->CR2 = 2;
-//	SPI2->CR1 |= SPI_CR1_SPE ;	/* Ê¹ÄÜSPI */	
-//	while ((SPI2->SR & SPI_FLAG_TXE) == 0);
-//	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
-//	while(1)
-//	{
-//		static uint32_t rx = 0;
-////		
-//		SWD_SendBits(4, 5);
-//		SWD_SendBits(16, 5);
-//		SWD_SendBits(16, 5);
-//		SWD_SendBits(16, 5);
+	//	SPI2->CR1 &= ~(SPI_CR1_SPE);
+	//	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_64 | SPI_DATASIZE_8BIT;
+	//	SPI2->CFG2 = SPI_DIRECTION_2LINES | SPI_MODE_MASTER | SPI_FIRSTBIT_LSB | SPI_PHASE_1EDGE | SPI_POLARITY_HIGH | SPI_MASTER_KEEP_IO_STATE_ENABLE;
+	//	//SPI2->CR1 &= ~(SPI_CR1_HDDIR);		/* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */
+	//	SPI2->CR1 |= SPI_CR1_HDDIR;			/* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */
+	//	SPI2->CR1 |= SPI_CR1_SPE;		/* ä½¿èƒ½SPI */
+	//				SPI2->CR1 &= ~(SPI_CR1_SPE);
+	//		SPI2->CFG1 = SPI_BAUDRATEPRESCALER_64 | (datasize - 1);
 
-////		rx = SWD_ReadBits(8);
-////		rx = SWD_ReadBits(12);
-////		rx = SWD_ReadBits(32);
-////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
-////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
-////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
-//		
-//		bsp_DelayUS(2000);
-//	}
+	//	SPI2->CR2 = 2;
+	//	SPI2->CR1 |= SPI_CR1_SPE ;	/* ä½¿èƒ½SPI */
+	//	while ((SPI2->SR & SPI_FLAG_TXE) == 0);
+	//	SPI2->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+	//	while(1)
+	//	{
+	//		static uint32_t rx = 0;
+	////
+	//		SWD_SendBits(4, 5);
+	//		SWD_SendBits(16, 5);
+	//		SWD_SendBits(16, 5);
+	//		SWD_SendBits(16, 5);
+
+	////		rx = SWD_ReadBits(8);
+	////		rx = SWD_ReadBits(12);
+	////		rx = SWD_ReadBits(32);
+	////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
+	////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
+	////		HAL_SPI_Transmit(&hspi2, "U", 1, 1000);
+	//
+	//		bsp_DelayUS(2000);
+	//	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitSPIParam
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSPI×ÜÏß²ÎÊı£¬²¨ÌØÂÊ¡¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitSPIParam
+*	åŠŸèƒ½è¯´æ˜: é…ç½®SPIæ€»çº¿å‚æ•°ï¼Œæ³¢ç‰¹ç‡ã€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitSPI2_TxMode(void)
 {
 	/* Disable the selected SPI peripheral */
-	//__HAL_SPI_DISABLE(hspi);	
+	//__HAL_SPI_DISABLE(hspi);
 	SPI2->CR1 &= ~(SPI_CR1_SPE);
 
 	/*----------------------- SPIx CR1 & CR2 Configuration ---------------------*/
 	/* Configure : SPI Mode, Communication Mode, Clock polarity and phase, NSS management,
 	Communication speed, First bit, CRC calculation state, CRC Length */
-  
-	/* SPIx CFG1 Configuration */  
+
+	/* SPIx CFG1 Configuration */
 	//  WRITE_REG(hspi->Instance->CFG1, (hspi->Init.BaudRatePrescaler | hspi->Init.CRCCalculation | crc_length |
 	//                                   hspi->Init.FifoThreshold     | hspi->Init.DataSize));
 	SPI2->CFG1 = SPI_BAUDRATEPRESCALER_2 | SPI_DATASIZE_8BIT;
-  
+
 	/* SPIx CFG2 Configuration */
 	//	WRITE_REG(hspi->Instance->CFG2, (hspi->Init.NSSPMode   | hspi->Init.TIMode           | hspi->Init.NSSPolarity             |
 	//								   hspi->Init.NSS          | hspi->Init.CLKPolarity      | hspi->Init.CLKPhase                |
@@ -261,11 +264,10 @@ void bsp_InitSPI2_TxMode(void)
 	//								   hspi->Init.Direction    | hspi->Init.MasterSSIdleness | hspi->Init.IOSwap));
 	SPI2->CFG2 = SPI_DIRECTION_1LINE | SPI_MODE_MASTER | SPI_PHASE_1EDGE | SPI_POLARITY_HIGH | SPI_MASTER_KEEP_IO_STATE_ENABLE;
 
-	//SPI2->CR1 &= ~(SPI_CR1_HDDIR);		/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */
-	SPI2->CR1 |= SPI_CR1_HDDIR;			/* 0 ±íÊ¾½ÓÊÕ£¬ 1±íÊ¾·¢ËÍ */
-	
-	SPI2->CR1 |= SPI_CR1_SPE;		/* Ê¹ÄÜSPI */
+	//SPI2->CR1 &= ~(SPI_CR1_HDDIR);		/* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */
+	SPI2->CR1 |= SPI_CR1_HDDIR; /* 0 è¡¨ç¤ºæ¥æ”¶ï¼Œ 1è¡¨ç¤ºå‘é€ */
+
+	SPI2->CR1 |= SPI_CR1_SPE; /* ä½¿èƒ½SPI */
 }
 
-			
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

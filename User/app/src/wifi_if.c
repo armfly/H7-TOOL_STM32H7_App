@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : wifiÄ£¿éÇı¶¯½Ó¿Ú interface
-*	ÎÄ¼şÃû³Æ : wifi_if.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ¼æÈİ²»Í¬³§¼ÒµÄÄ£¿é£¬Ìá¹©api¹²wifiÍ¨ĞÅ³ÌĞòÊ¹ÓÃ¡£¸ôÀëWiFiÄ£¿éÖ®¼äµÄ²îÒì¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		V1.0    2015-12-17 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : wifiæ¨¡å—é©±åŠ¨æ¥å£ interface
+*	æ–‡ä»¶åç§° : wifi_if.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å…¼å®¹ä¸åŒå‚å®¶çš„æ¨¡å—ï¼Œæä¾›apiå…±wifié€šä¿¡ç¨‹åºä½¿ç”¨ã€‚éš”ç¦»WiFiæ¨¡å—ä¹‹é—´çš„å·®å¼‚ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		V1.0    2015-12-17 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,10 +19,10 @@
 #include "param.h"
 #include "main.h"
 
-uint8_t link_id = 0xFF;	/* µ±Ç°µÄTCPÁ¬½Óid,  0-4ÓĞĞ§¡£  FF±íÊ¾ÎŞTCPÁ¬½Ó */
+uint8_t link_id = 0xFF; /* å½“å‰çš„TCPè¿æ¥id,  0-4æœ‰æ•ˆã€‚  FFè¡¨ç¤ºæ— TCPè¿æ¥ */
 uint8_t wifi_state = WIFI_STOP;
 
-/* ¼ÇÂ¼·¢ËÍ»º³åÇøºÍÊı¾İ³¤¶È */
+/* è®°å½•å‘é€ç¼“å†²åŒºå’Œæ•°æ®é•¿åº¦ */
 uint8_t s_wifi_send_req = 0;
 uint8_t *s_wifi_send_buf;
 uint8_t s_wifi_send_len;
@@ -30,67 +30,66 @@ uint8_t s_wifi_send_len;
 uint8_t wifi_link_tcp_ok = 0;
 uint8_t wifi_join_ap_ok = 0;
 
-uint8_t wifi_server_ack_ok = 0;	/* ·¢ËÍµ½Æ½Ì¨£¬Æ½Ì¨Ó¦´ğOK */
-			
+uint8_t wifi_server_ack_ok = 0; /* å‘é€åˆ°å¹³å°ï¼Œå¹³å°åº”ç­”OK */
+
 void wifi_ReprotIOEvent(void);
 void wifi_ReprotIOEvent(void);
 void wifi_WatchDog(void);
-uint8_t wifi_SendRegisterPackage(void) ;
+uint8_t wifi_SendRegisterPackage(void);
 
 void wifi_Poll(void);
 
-// wifiÕıÔÚÁ¬½ÓÖĞ.... 
+// wifiæ­£åœ¨è¿æ¥ä¸­....
 void wifi_led_joinap(void)
 {
-	PERIOD_Start(&g_tRunLed, 50, 30, 0);	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+	PERIOD_Start(&g_tRunLed, 50, 30, 0); /* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 }
 
-// wifi³É¹¦£¬ home wifiÄ£Ê½ 
+// wifiæˆåŠŸï¼Œ home wifiæ¨¡å¼
 void wifi_led_ok(void)
 {
-	PERIOD_Stop(&g_tRunLed);		// Á¬½Ó³É¹¦¹Ø±ÕLED 
-	//PERIOD_Start(&g_tRunLed, 500, 1500, 0);	/* Ã¿2ÃëÉÁË¸Ò»´Î */
+	PERIOD_Stop(&g_tRunLed); // è¿æ¥æˆåŠŸå…³é—­LED
+													 //PERIOD_Start(&g_tRunLed, 500, 1500, 0);	/* æ¯2ç§’é—ªçƒä¸€æ¬¡ */
 }
 
-// Á¬½ÓTCP Server Ê§°Ü
+// è¿æ¥TCP Server å¤±è´¥
 void wifi_led_err_link_tcp_server(void)
 {
-	PERIOD_Start(&g_tRunLed, 250, 250, 0);	/* Ã¿500msÉÁË¸Ò»´Î */	
+	PERIOD_Start(&g_tRunLed, 250, 250, 0); /* æ¯500msé—ªçƒä¸€æ¬¡ */
 }
 
-
-// wifi³É¹¦, P2P Ä£Ê½
+// wifiæˆåŠŸ, P2P æ¨¡å¼
 void wifi_led_ok_p2p(void)
 {
-	PERIOD_Start(&g_tRunLed, 200, 800, 0);	/* Ã¿1ÃëÉÁË¸Ò»´Î */
+	PERIOD_Start(&g_tRunLed, 200, 800, 0); /* æ¯1ç§’é—ªçƒä¸€æ¬¡ */
 }
 
-// wifiÁ¬½ÓÊ§°Ü
+// wifiè¿æ¥å¤±è´¥
 void wifi_led_err(void)
 {
-	//PERIOD_Stop(&g_tWiFiLed);		
+	//PERIOD_Stop(&g_tWiFiLed);
 }
 
-// ÊÕµ½Ö¸Áî£¬ÉÁË¸1´Î
+// æ”¶åˆ°æŒ‡ä»¤ï¼Œé—ªçƒ1æ¬¡
 void wifi_led_rx_data(void)
 {
-	PERIOD_Start(&g_tRunLed, 100, 10, 1);  // 3ÃëÖÓ²ÅÒ»¸öÊı¾İ£¬Ì«ÂıÁË£¬¸É´à²»Ö»ÊÇÊı¾İÁ÷ÁË 
+	PERIOD_Start(&g_tRunLed, 100, 10, 1); // 3ç§’é’Ÿæ‰ä¸€ä¸ªæ•°æ®ï¼Œå¤ªæ…¢äº†ï¼Œå¹²è„†ä¸åªæ˜¯æ•°æ®æµäº†
 }
 
-// ·¢ËÍÖ¸ÁîÊ±ÉÁË¸1´Î
+// å‘é€æŒ‡ä»¤æ—¶é—ªçƒ1æ¬¡
 void wifi_led_tx_data(void)
 {
-	PERIOD_Start(&g_tRunLed, 100, 10, 1);  // 3ÃëÖÓ²ÅÒ»¸öÊı¾İ£¬Ì«ÂıÁË£¬¸É´à²»Ö»ÊÇÊı¾İÁ÷ÁË 
+	PERIOD_Start(&g_tRunLed, 100, 10, 1); // 3ç§’é’Ÿæ‰ä¸€ä¸ªæ•°æ®ï¼Œå¤ªæ…¢äº†ï¼Œå¹²è„†ä¸åªæ˜¯æ•°æ®æµäº†
 }
 
 uint8_t wifi_WatchDog_PT(uint8_t _init);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_task
-*	¹¦ÄÜËµÃ÷: NB73ÈÎÎñ£¬²åÈëbsp_Idle()Ö´ĞĞ¡££¡£¡£¡×¢Òâ£¬´Ëº¯ÊıÄÚ²¿²»µÃÓĞ bsp_Idleµ÷ÓÃ£¬±ÜÃâÇ¶Ì×.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0:²»Âú×ãÌõ¼ş  1:³É¹¦¼ì²âµ½×Ö·û´®  2:³¬Ê±ÁË
+*	å‡½ æ•° å: wifi_task
+*	åŠŸèƒ½è¯´æ˜: NB73ä»»åŠ¡ï¼Œæ’å…¥bsp_Idle()æ‰§è¡Œã€‚ï¼ï¼ï¼æ³¨æ„ï¼Œæ­¤å‡½æ•°å†…éƒ¨ä¸å¾—æœ‰ bsp_Idleè°ƒç”¨ï¼Œé¿å…åµŒå¥—.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0:ä¸æ»¡è¶³æ¡ä»¶  1:æˆåŠŸæ£€æµ‹åˆ°å­—ç¬¦ä¸²  2:è¶…æ—¶äº†
 *********************************************************************************************************
 */
 uint8_t wifi_task(void)
@@ -100,354 +99,352 @@ uint8_t wifi_task(void)
 	static uint8_t retry = 0;
 	uint16_t rx_len;
 	uint8_t re;
-	
-	if (g_tVar.WiFiRecivedIPD == 1)		/* ÊÕµ½UDP. TCPÊı¾İ°ü */
+
+	if (g_tVar.WiFiRecivedIPD == 1) /* æ”¶åˆ°UDP. TCPæ•°æ®åŒ… */
 	{
 		g_tVar.WiFiRecivedIPD = 0;
-		
-		wifi_led_rx_data();		/* Êı¾İledÉÁÒ»ÏÂ */
-		
-		wifi_server_ack_ok = 1;		/* 2019-01-17, ÊÕµ½Æ½Ì¨Êı¾İ°ü£¬ ¼òµ¥´¦Àí£¬Î´×öĞ£Ñé */
-		
+
+		wifi_led_rx_data(); /* æ•°æ®ledé—ªä¸€ä¸‹ */
+
+		wifi_server_ack_ok = 1; /* 2019-01-17, æ”¶åˆ°å¹³å°æ•°æ®åŒ…ï¼Œ ç®€å•å¤„ç†ï¼Œæœªåšæ ¡éªŒ */
+
 		return 1;
-	}	
-			
-//	g_tVar.WiFiIdleDoRS485 = 1;		/* bsp_Idle Ö´ĞĞMODBUS RTU 485 */
-		
+	}
+
+	//	g_tVar.WiFiIdleDoRS485 = 1;		/* bsp_Idle æ‰§è¡ŒMODBUS RTU 485 */
+
 	switch (wifi_state)
 	{
-		case WIFI_STOP:
-			break;
-						
-		case WIFI_INIT:
-//			g_tVar.WiFiDebugEn  = 1;
-		
-			wifi_led_joinap();		/* Á¬½ÓAP¹ı³Ì£¬¿ìÉÁ */
-		
-			comSetBaud(COM_ESP32, 115200);
-			bsp_InitESP32();	/* ÄÚ²¿ÓĞ 20ms ÑÓ³Ù */
-			s_last_time = bsp_GetRunTime();
-			WIFI_CheckAck("", 0);			/* 0²ÎÊı±íÊ¾³õÊ¼»¯º¯ÊıÄÚ²¿µÄ¾²Ì¬±äÁ¿ */
-			wifi_state++;
-			break;
-		
-		case WIFI_INIT + 1:
-			re = WIFI_CheckAck("ready", 300);
-			if (re == 1)
-			{
-				wifi_state++;			/* ÊÕµ½ÕıÈ·Ó¦´ğ */
-			}
-			else if (re == 2)
-			{
-				wifi_state = WIFI_INIT;	/* ³¬Ê± */
-			}			
-			break;
-			
-		case WIFI_INIT + 2:
-			/* ¹Ø±Õ»ØÏÔ¹¦ÄÜ£¬Ö÷»ú·¢ËÍµÄ×Ö·û£¬Ä£¿éÎŞĞè·µ»Ø */	
-			ESP32_SendAT("ATE0");		
-			ESP32_WaitResponse("OK\r\n", 100);
+	case WIFI_STOP:
+		break;
 
-			/* »ñÈ¡MAC */
+	case WIFI_INIT:
+		//			g_tVar.WiFiDebugEn  = 1;
+
+		wifi_led_joinap(); /* è¿æ¥APè¿‡ç¨‹ï¼Œå¿«é—ª */
+
+		comSetBaud(COM_ESP32, 115200);
+		bsp_InitESP32(); /* å†…éƒ¨æœ‰ 20ms å»¶è¿Ÿ */
+		s_last_time = bsp_GetRunTime();
+		WIFI_CheckAck("", 0); /* 0å‚æ•°è¡¨ç¤ºåˆå§‹åŒ–å‡½æ•°å†…éƒ¨çš„é™æ€å˜é‡ */
+		wifi_state++;
+		break;
+
+	case WIFI_INIT + 1:
+		re = WIFI_CheckAck("ready", 300);
+		if (re == 1)
+		{
+			wifi_state++; /* æ”¶åˆ°æ­£ç¡®åº”ç­” */
+		}
+		else if (re == 2)
+		{
+			wifi_state = WIFI_INIT; /* è¶…æ—¶ */
+		}
+		break;
+
+	case WIFI_INIT + 2:
+		/* å…³é—­å›æ˜¾åŠŸèƒ½ï¼Œä¸»æœºå‘é€çš„å­—ç¬¦ï¼Œæ¨¡å—æ— éœ€è¿”å› */
+		ESP32_SendAT("ATE0");
+		ESP32_WaitResponse("OK\r\n", 100);
+
+		/* è·å–MAC */
+		{
+			uint8_t mac[6];
+			const uint8_t mac_0[6] = {0, 0, 0, 0, 0, 0};
+
+			ESP32_GetMac(mac);
+
+			if (memcmp(mac, g_tParam.WiFiMac, 6) != 0 && memcmp(mac, mac_0, 6) != 0)
 			{
-				uint8_t mac[6];
-				const uint8_t mac_0[6] = {0,0,0,0,0,0};
-				
-				ESP32_GetMac(mac);		
-				
-				if (memcmp(mac, g_tParam.WiFiMac, 6) != 0 && memcmp(mac, mac_0, 6) != 0)
-				{
-					memcpy(g_tParam.WiFiMac, mac, 6);
-					SaveParam();
-				}
+				memcpy(g_tParam.WiFiMac, mac, 6);
+				SaveParam();
 			}
-			
-			/* ¸ù¾İ²ÎÊı¾ö¶¨ÊÇ·ñ°çÑİsoftAP */
-			if (g_tParam.APSelfEn == 1)
-			{
-				wifi_state = WIFI_SOFT_AP;
-			}
-			else
-			{
-				wifi_state = WIFI_LINK_AP;
-			}
+		}
+
+		/* æ ¹æ®å‚æ•°å†³å®šæ˜¯å¦æ‰®æ¼”softAP */
+		if (g_tParam.APSelfEn == 1)
+		{
+			wifi_state = WIFI_SOFT_AP;
+		}
+		else
+		{
+			wifi_state = WIFI_LINK_AP;
+		}
+		break;
+
+	case WIFI_LINK_AP:
+		ESP32_SetWiFiMode(1); /* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
+
+		if (g_tParam.DHCPEn == 0) /* DHCH = 0, ä½¿ç”¨é™æ€IP */
+		{
+			ESP32_SendAT("AT+CWDHCP_CUR=1,0");
+			ESP32_WaitResponse("OK\r\n", 300);
+
+			ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway); /* è®¾ç½®é™æ€IP */
+		}
+		else /* DHCH = 1, ä½¿ç”¨åŠ¨æ€IP */
+		{
+			ESP32_SendAT("AT+CWDHCP_CUR=1,1");
+			ESP32_WaitResponse("OK\r\n", 300);
+		}
+		wifi_led_joinap(); /* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
+		wifi_state++;
+		break;
+
+	case WIFI_LINK_AP + 1:
+		if (ESP32_ValidSSID((char *)g_tParam.AP_SSID) == 0 || ESP32_ValidPassword((char *)g_tParam.AP_PASS) == 0)
+		{
+			wifi_state = WIFI_STOP; /* iFi SSIDå’Œå¯†ç å‚æ•°å¼‚å¸¸ */
 			break;
+		}
 
-		case WIFI_LINK_AP:
-			ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */	
-			
-			if (g_tParam.DHCPEn == 0)	/* DHCH = 0, Ê¹ÓÃ¾²Ì¬IP */
-			{				
-				ESP32_SendAT("AT+CWDHCP_CUR=1,0");	
-				ESP32_WaitResponse("OK\r\n", 300);
+		sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", g_tParam.AP_SSID, g_tParam.AP_PASS);
+		ESP32_SendAT(buf);
+		s_last_time = bsp_GetRunTime();
+		wifi_state++;
+		break;
 
-				ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway);	/* ÉèÖÃ¾²Ì¬IP */	
-			}
-			else	/* DHCH = 1, Ê¹ÓÃ¶¯Ì¬IP */
-			{				
-				ESP32_SendAT("AT+CWDHCP_CUR=1,1");	
-				ESP32_WaitResponse("OK\r\n", 300);
-			}			
-			wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */	
-			wifi_state++;
-			break;
-
-		case WIFI_LINK_AP + 1:				
-			if (ESP32_ValidSSID((char *)g_tParam.AP_SSID) == 0 || ESP32_ValidPassword((char *)g_tParam.AP_PASS) == 0)
+	case WIFI_LINK_AP + 2:
+		if (ESP32_ReadLineNoWait(buf, 64))
+		{
+			if (memcmp(buf, "OK", 2) == 0)
 			{
-				wifi_state = WIFI_STOP;		/* iFi SSIDºÍÃÜÂë²ÎÊıÒì³£ */
+				wifi_state = WIFI_LINK_AP + 3; /* è¿æ¥AP OK */
+			}
+			else if (memcmp(buf, "WIFI CONNECTED", 14) == 0 || memcmp(buf, "WIFI GOT IP", 11) == 0)
+			{
+				; /* è¿æ¥è¿‡ç¨‹ä¸­ï¼Œæ­£å¸¸åº”ç­”ï¼Œä¸ç†ä¼šï¼Œç»§ç»­ç­‰å¾…æœ€åçš„OK */
+			}
+			else if (memcmp(buf, "+CWJAP:", 7) == 0 || memcmp(buf, "FAIL", 4) == 0 || memcmp(buf, "DISCONNECT", 10) == 0)
+			{
+				wifi_state = WIFI_INIT; /* è¿æ¥å¤±è´¥ */
+			}
+		}
+
+		if (bsp_CheckRunTime(s_last_time) > 20 * 1000) /* è¶…æ—¶ */
+		{
+			wifi_state = WIFI_INIT;
+		}
+		break;
+
+	case WIFI_LINK_AP + 3:			 /* è¿æ¥AP OK */
+		g_tVar.HomeWiFiLinkOk = 1; /* å·²è¿æ¥åˆ°HOME WIFI */
+		wifi_led_ok();						 /* LEDç†„ç­ */
+
+		ESP32_CIPMUX(1); /* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
+		//ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
+
+		/* åˆ›å»ºTCPæœåŠ¡å™¨. */
+		ESP32_CreateTCPServer(g_tParam.LocalTCPPort);
+
+		/* åˆ›å»ºUDPç›‘å¬ç«¯å£, id = 0 */
+		ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
+
+		wifi_state = WIFI_READY;
+		break;
+
+	/*---------------------------------------------------------------------------*/
+	case WIFI_WATCH_DOG: /* WiFiçœ‹æŠ¤ */
+		retry = 0;
+		wifi_state++;
+		break;
+
+	case WIFI_WATCH_DOG + 1: /* WiFiçœ‹æŠ¤ */
+		wifi_link_tcp_ok = 0;
+		wifi_join_ap_ok = 0;
+		ESP32_SendAT("AT+CIPSTATUS");
+		s_last_time = bsp_GetRunTime();
+		wifi_state++;
+		break;
+
+	case WIFI_WATCH_DOG + 2:
+		while (1)
+		{
+			rx_len = ESP32_ReadLineNoWait(buf, 64);
+			if (rx_len == 0)
+			{
 				break;
-			}	
-			
-			sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", g_tParam.AP_SSID, g_tParam.AP_PASS);
-			ESP32_SendAT(buf);
-			s_last_time = bsp_GetRunTime();
-			wifi_state++;
-			break;
-			
-		case WIFI_LINK_AP + 2:
-			if (ESP32_ReadLineNoWait(buf, 64))
-			{
-				if (memcmp(buf, "OK", 2) == 0)
-				{				
-					wifi_state = WIFI_LINK_AP + 3;	/* Á¬½ÓAP OK */
-				}					
-				else if (memcmp(buf, "WIFI CONNECTED", 14) == 0
-					|| memcmp(buf, "WIFI GOT IP", 11) == 0)
-				{
-					; /* Á¬½Ó¹ı³ÌÖĞ£¬Õı³£Ó¦´ğ£¬²»Àí»á£¬¼ÌĞøµÈ´ı×îºóµÄOK */
-				}
-				else if (memcmp(buf, "+CWJAP:", 7) == 0 || memcmp(buf, "FAIL", 4) == 0
-					|| memcmp(buf, "DISCONNECT", 10) == 0)
-				{
-					wifi_state = WIFI_INIT;	/* Á¬½ÓÊ§°Ü */
-				}
 			}
-			
-			if (bsp_CheckRunTime(s_last_time) > 20 * 1000)	/* ³¬Ê± */
+			else if (rx_len > 7 && memcmp(buf, "STATUS:", 7) == 0)
 			{
-				wifi_state = WIFI_INIT;
-			}
-			break;
-	
-		case WIFI_LINK_AP + 3:			/* Á¬½ÓAP OK */
-			g_tVar.HomeWiFiLinkOk = 1;	/* ÒÑÁ¬½Óµ½HOME WIFI */
-			wifi_led_ok();		/* LEDÏ¨Ãğ */
-			
-			ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
-			//ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
-		
-			/* ´´½¨TCP·şÎñÆ÷. */
-			ESP32_CreateTCPServer(g_tParam.LocalTCPPort);		
-
-			/* ´´½¨UDP¼àÌı¶Ë¿Ú, id = 0 */
-			ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);		
-			
-			wifi_state = WIFI_READY;
-			break;		
-		
-		/*---------------------------------------------------------------------------*/			
-		case WIFI_WATCH_DOG:					/* WiFi¿´»¤ */
-			retry = 0;
-			wifi_state++;
-			break;
-
-		case WIFI_WATCH_DOG + 1:				/* WiFi¿´»¤ */
-			wifi_link_tcp_ok = 0;
-			wifi_join_ap_ok = 0;
-			ESP32_SendAT("AT+CIPSTATUS");
-			s_last_time = bsp_GetRunTime();
-			wifi_state++;
-			break;		
-		
-		case WIFI_WATCH_DOG + 2:
-			while (1)
-			{
-				rx_len = ESP32_ReadLineNoWait(buf, 64);
-				if (rx_len == 0)
+				/*  STATUS:3 */
+				if (buf[7] == '2' || buf[7] == '3' || buf[7] == '4')
 				{
-					break;
-				}
-				else if (rx_len > 7 && memcmp(buf, "STATUS:", 7) == 0)
-				{
-					/*  STATUS:3 */						
-					if (buf[7] == '2' || buf[7] == '3' || buf[7] == '4')
-					{
-						wifi_join_ap_ok = 1;	/* Á¬½ÓAP ok */
-					}
-					else
-					{
-						if (g_tParam.APSelfEn == 1)	/* ×öSoftAP */
-						{
-							;	/* ²»ÅĞ¶Ï, ¸ù¾İUDP×´Ì¬ÅĞ¶Ï */
-						}
-						else	/* ×öSTAÕ¾µã */
-						{
-							wifi_join_ap_ok = 0;	/* Ã»ÓĞÁ¬½Óµ½AP */
-						}
-					}
-				}
-				else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:0,\"UDP\"", 18) == 0)
-				{
-					if (g_tParam.APSelfEn == 1)
-					{
-						wifi_join_ap_ok = 1;
-					}
-				}					
-				else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
-				{
-					/* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
-					wifi_link_tcp_ok = 1;
-				}
-				else if (rx_len >= 2 && memcmp(buf, "OK", 2) == 0)
-				{
-					if (wifi_join_ap_ok == 1)
-					{
-						wifi_state = WIFI_READY;
-					}
-					else
-					{
-						//wifi_state = WIFI_INIT; ²»ÒªÁ¢¼´¸Ä±ä×´Ì¬£¬µÈ3´Î²éÑ¯Ê§°ÜºóÔÙ×ß
-					}							
-				}	
-				else if (rx_len >= 5 && memcmp(buf, "busy p...", 5) == 0)	/* ÄÚ²¿Ã¦ */
-				{
-					;
-				}		
-			}
-			
-			if (bsp_CheckRunTime(s_last_time) > 100)	/* ³¬Ê± */
-			{	
-				if (++retry > 2)
-				{			
-					if (wifi_join_ap_ok == 0)
-					{
-						wifi_state = WIFI_INIT;		/* ¸´Î»WIFIÄ£¿é£¬ÖØÁ¬AP */
-					}
-					else
-					{
-						wifi_state = WIFI_READY;	/* Ó¦¸Ã½ø²»À´ */
-					}
+					wifi_join_ap_ok = 1; /* è¿æ¥AP ok */
 				}
 				else
 				{
-					wifi_state--;
+					if (g_tParam.APSelfEn == 1) /* åšSoftAP */
+					{
+						; /* ä¸åˆ¤æ–­, æ ¹æ®UDPçŠ¶æ€åˆ¤æ–­ */
+					}
+					else /* åšSTAç«™ç‚¹ */
+					{
+						wifi_join_ap_ok = 0; /* æ²¡æœ‰è¿æ¥åˆ°AP */
+					}
 				}
-			}		
-			break;
+			}
+			else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:0,\"UDP\"", 18) == 0)
+			{
+				if (g_tParam.APSelfEn == 1)
+				{
+					wifi_join_ap_ok = 1;
+				}
+			}
+			else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
+			{
+				/* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
+				wifi_link_tcp_ok = 1;
+			}
+			else if (rx_len >= 2 && memcmp(buf, "OK", 2) == 0)
+			{
+				if (wifi_join_ap_ok == 1)
+				{
+					wifi_state = WIFI_READY;
+				}
+				else
+				{
+					//wifi_state = WIFI_INIT; ä¸è¦ç«‹å³æ”¹å˜çŠ¶æ€ï¼Œç­‰3æ¬¡æŸ¥è¯¢å¤±è´¥åå†èµ°
+				}
+			}
+			else if (rx_len >= 5 && memcmp(buf, "busy p...", 5) == 0) /* å†…éƒ¨å¿™ */
+			{
+				;
+			}
+		}
 
-		/*---------------------------------------------------------------------------*/			
-		case WIFI_READY:				/* wifi ¾ÍĞ÷ */			
-			wifi_Poll();
-			break;
+		if (bsp_CheckRunTime(s_last_time) > 100) /* è¶…æ—¶ */
+		{
+			if (++retry > 2)
+			{
+				if (wifi_join_ap_ok == 0)
+				{
+					wifi_state = WIFI_INIT; /* å¤ä½WIFIæ¨¡å—ï¼Œé‡è¿AP */
+				}
+				else
+				{
+					wifi_state = WIFI_READY; /* åº”è¯¥è¿›ä¸æ¥ */
+				}
+			}
+			else
+			{
+				wifi_state--;
+			}
+		}
+		break;
+
+	/*---------------------------------------------------------------------------*/
+	case WIFI_READY: /* wifi å°±ç»ª */
+		wifi_Poll();
+		break;
 	}
-	
+
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_Start_SoftAP_Station
-*	¹¦ÄÜËµÃ÷: ÉèÖÃWIFIÄ£¿é¹¤×÷ÔÚSoftAP + StationÄ£Ê½
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_Start_SoftAP_Station
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®WIFIæ¨¡å—å·¥ä½œåœ¨SoftAP + Stationæ¨¡å¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wifi_Start_SoftAP_Station(void)
 {
 	uint8_t re;
-	
-	ESP32_SetWiFiMode(2);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */
-	
+
+	ESP32_SetWiFiMode(2); /* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
+
 	/*
 	CPU ID :
 		00 43 00 3B 57 18 52 34 30 38 20 33
 		00 36 00 42 57 17 52 34 30 38 20 33
 	       *      *  *  *
 	*/
-	
-	/* ÉèSoft AP µÄSSID ºÍÃÜÂë */
+
+	/* è®¾Soft AP çš„SSID å’Œå¯†ç  */
 	{
-//		char ap_name[40];
-//		uint16_t sn0, sn1, sn2;
-//		
-//		sn0 = *(uint16_t *)(0x1ffff7ac);
-//		sn1 = *(uint16_t *)(0x1ffff7ac + 2);
-//		sn2 = *(uint16_t *)(0x1ffff7ac + 4);
-//		
-//		/* g_tParam1.GrillID ÊÇ8Î»ascii */
-//		sprintf(ap_name, "R%04X_%03d_%02X%02X%04X", HARD_MODEL,  g_tParam.Addr485, sn0 & 0xFF, sn1 & 0xFF, sn2);
-		
-		/* ÉèÖÃAPµÄIPµØÖ· */
+		//		char ap_name[40];
+		//		uint16_t sn0, sn1, sn2;
+		//
+		//		sn0 = *(uint16_t *)(0x1ffff7ac);
+		//		sn1 = *(uint16_t *)(0x1ffff7ac + 2);
+		//		sn2 = *(uint16_t *)(0x1ffff7ac + 4);
+		//
+		//		/* g_tParam1.GrillID æ˜¯8ä½ascii */
+		//		sprintf(ap_name, "R%04X_%03d_%02X%02X%04X", HARD_MODEL,  g_tParam.Addr485, sn0 & 0xFF, sn1 & 0xFF, sn2);
+
+		/* è®¾ç½®APçš„IPåœ°å€ */
 		{
 			char ip_str[20];
-			
-			sprintf(ip_str, "%d.%d.%d.%d", g_tParam.WiFiIPAddr[0], g_tParam.WiFiIPAddr[1],g_tParam.WiFiIPAddr[2],g_tParam.WiFiIPAddr[3]);
+
+			sprintf(ip_str, "%d.%d.%d.%d", g_tParam.WiFiIPAddr[0], g_tParam.WiFiIPAddr[1], g_tParam.WiFiIPAddr[2], g_tParam.WiFiIPAddr[3]);
 			ESP32_Set_AP_IP(ip_str);
 		}
-		
-		/* ÉèÖÃAPµÄÃû×ÖºÍÃÜÂë */
-		ESP32_Set_AP_NamePass((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 1, ECN_WPA2_PSK);		
-	}
-	
-	/* DHCH = 0 */
-	ESP32_SendAT("AT+CWDHCP=2,0");	
-	ESP32_WaitResponse("OK\r\n", 1000);
-	
-	ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
 
-	/* ´´½¨UDP¼àÌı¶Ë¿Ú, id = 0 */
+		/* è®¾ç½®APçš„åå­—å’Œå¯†ç  */
+		ESP32_Set_AP_NamePass((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 1, ECN_WPA2_PSK);
+	}
+
+	/* DHCH = 0 */
+	ESP32_SendAT("AT+CWDHCP=2,0");
+	ESP32_WaitResponse("OK\r\n", 1000);
+
+	ESP32_CIPMUX(1); /* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
+
+	/* åˆ›å»ºUDPç›‘å¬ç«¯å£, id = 0 */
 	re = ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
 
-	if (re == 1)	/* Ö´ĞĞ³É¹¦ */
+	if (re == 1) /* æ‰§è¡ŒæˆåŠŸ */
 	{
 		wifi_led_ok();
 	}
-	else	/* Ö´ĞĞÊ§°Ü */
+	else /* æ‰§è¡Œå¤±è´¥ */
 	{
 		wifi_led_err();
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_LinkHomeAP
-*	¹¦ÄÜËµÃ÷: Á¬½Óµ½AP£¬¿ªÆôUDP·şÎñºÍTCP·şÎñ¡£Á½¸ö¶¼ÒªÓÃµÄ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_LinkHomeAP
+*	åŠŸèƒ½è¯´æ˜: è¿æ¥åˆ°APï¼Œå¼€å¯UDPæœåŠ¡å’ŒTCPæœåŠ¡ã€‚ä¸¤ä¸ªéƒ½è¦ç”¨çš„ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint8_t wifi_LinkHomeAP(void)
-{	
-	uint8_t re;	
-	
-	/* 2018-12-12 ¶ÏÍøÖØÁ¬Ê±£¬Ó²¼ş¸´Î»WiFiÄ£¿é */
+{
+	uint8_t re;
+
+	/* 2018-12-12 æ–­ç½‘é‡è¿æ—¶ï¼Œç¡¬ä»¶å¤ä½WiFiæ¨¡å— */
 	{
 		bsp_InitESP32();
-		comClearRxFifo(COM_ESP32);	/* µÈ´ı·¢ËÍ»º³åÇøÎª¿Õ£¬Ó¦´ğ½áÊø*/	
+		comClearRxFifo(COM_ESP32); /* ç­‰å¾…å‘é€ç¼“å†²åŒºä¸ºç©ºï¼Œåº”ç­”ç»“æŸ*/
 		ESP32_PowerOn();
 	}
-	
-	g_tVar.HomeWiFiLinkOk = 0;	/* ÒÑÁ¬½Óµ½HOME WIFI */
-	
-	/* ¹Ø±Õ»ØÏÔ¹¦ÄÜ£¬Ö÷»ú·¢ËÍµÄ×Ö·û£¬Ä£¿éÎŞĞè·µ»Ø */	
-	ESP32_SendAT("ATE0");		
+
+	g_tVar.HomeWiFiLinkOk = 0; /* å·²è¿æ¥åˆ°HOME WIFI */
+
+	/* å…³é—­å›æ˜¾åŠŸèƒ½ï¼Œä¸»æœºå‘é€çš„å­—ç¬¦ï¼Œæ¨¡å—æ— éœ€è¿”å› */
+	ESP32_SendAT("ATE0");
 	ESP32_WaitResponse("OK\r\n", 100);
-	
-	/* ×Ô¼º×öSoftAPÊ±£¬ÎŞĞèÁ¬½ÓÍâÍø */
+
+	/* è‡ªå·±åšSoftAPæ—¶ï¼Œæ— éœ€è¿æ¥å¤–ç½‘ */
 	if (g_tParam.APSelfEn == 1)
 	{
-		wifi_Start_SoftAP_Station();	/* ×Ô¼º°çÑİSoftAP, ´´½¨UDP¼àÌı·şÎñ */		
-		return 1;	
+		wifi_Start_SoftAP_Station(); /* è‡ªå·±æ‰®æ¼”SoftAP, åˆ›å»ºUDPç›‘å¬æœåŠ¡ */
+		return 1;
 	}
-	
-	/* »ñÈ¡MAC */
+
+	/* è·å–MAC */
 	{
 		uint8_t mac[6];
-		const uint8_t mac_0[6] = {0,0,0,0,0,0};
-		
-		ESP32_GetMac(mac);		
-		
+		const uint8_t mac_0[6] = {0, 0, 0, 0, 0, 0};
+
+		ESP32_GetMac(mac);
+
 		if (memcmp(mac, g_tParam.WiFiMac, 6) != 0 && memcmp(mac, mac_0, 6) != 0)
 		{
 			memcpy(g_tParam.WiFiMac, mac, 6);
@@ -455,88 +452,88 @@ uint8_t wifi_LinkHomeAP(void)
 		}
 	}
 
-	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */	
-	
+	ESP32_SetWiFiMode(1); /* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
+
 	if (g_tParam.DHCPEn == 0)
 	{
-		/* DHCH = 0, Ê¹ÓÃ¾²Ì¬IP */
-		ESP32_SendAT("AT+CWDHCP_DEF=1,0");	
+		/* DHCH = 0, ä½¿ç”¨é™æ€IP */
+		ESP32_SendAT("AT+CWDHCP_DEF=1,0");
 		ESP32_WaitResponse("OK\r\n", 300);
 
-		ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway);	/* ÉèÖÃ¾²Ì¬IP */	
+		ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway); /* è®¾ç½®é™æ€IP */
 	}
 	else
 	{
-		/* DHCH = 1, Ê¹ÓÃ¶¯Ì¬IP */
-		ESP32_SendAT("AT+CWDHCP_DEF=1,1");	
+		/* DHCH = 1, ä½¿ç”¨åŠ¨æ€IP */
+		ESP32_SendAT("AT+CWDHCP_DEF=1,1");
 		ESP32_WaitResponse("OK\r\n", 300);
 	}
-	
-	wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
 
-	re = ESP32_JoinAP((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 20000);		
+	wifi_led_joinap(); /* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
+
+	re = ESP32_JoinAP((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 20000);
 	if (re != 0)
 	{
 		g_tVar.HomeWiFiLinkOk = 0;
 		g_tVar.RemoteTCPServerOk = 0;
 		return 0;
 	}
-	if (re == 0)	/* Ö´ĞĞ³É¹¦ */
+	if (re == 0) /* æ‰§è¡ŒæˆåŠŸ */
 	{
 		wifi_led_ok();
 	}
-	else	/* Ö´ĞĞÊ§°Ü */
+	else /* æ‰§è¡Œå¤±è´¥ */
 	{
 		wifi_led_err();
-	}		
+	}
 
-	g_tVar.HomeWiFiLinkOk = 1;	/* ÒÑÁ¬½Óµ½HOME WIFI */
-	
-	/* ´òÓ¡±¾µØIP */
+	g_tVar.HomeWiFiLinkOk = 1; /* å·²è¿æ¥åˆ°HOME WIFI */
+
+	/* æ‰“å°æœ¬åœ°IP */
 	{
 		char ip[20];
 		char mac[64];
-	
+
 		ESP32_GetLocalIP(ip, mac);
 
-		ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */			
+		ESP32_QueryIPStatus(); /* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */
 	}
-	
-	ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
 
-//	ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
-	
-	/* ´´½¨TCP·şÎñÆ÷. */
+	ESP32_CIPMUX(1); /* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
+
+	//	ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
+
+	/* åˆ›å»ºTCPæœåŠ¡å™¨. */
 	ESP32_CreateTCPServer(g_tParam.LocalTCPPort);
-	
-	/* ´´½¨UDP¼àÌı¶Ë¿Ú, id = 0 */
+
+	/* åˆ›å»ºUDPç›‘å¬ç«¯å£, id = 0 */
 	re = ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
-	
+
 	return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_LinkSoftAP
-*	¹¦ÄÜËµÃ÷: Á¬½ÓESP32ÈíAP.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_LinkSoftAP
+*	åŠŸèƒ½è¯´æ˜: è¿æ¥ESP32è½¯AP.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint8_t wifi_LinkSoftAP(void)
-{	
+{
 	uint8_t re;
-	
-	/* ¹Ø±Õ»ØÏÔ¹¦ÄÜ£¬Ö÷»ú·¢ËÍµÄ×Ö·û£¬Ä£¿éÎŞĞè·µ»Ø */	
-	ESP32_SendAT("ATE0");		
+
+	/* å…³é—­å›æ˜¾åŠŸèƒ½ï¼Œä¸»æœºå‘é€çš„å­—ç¬¦ï¼Œæ¨¡å—æ— éœ€è¿”å› */
+	ESP32_SendAT("ATE0");
 	ESP32_WaitResponse("OK\r\n", 100);
-	
-	/* »ñÈ¡MAC */
+
+	/* è·å–MAC */
 	{
 		uint8_t mac[6];
-		
-		ESP32_GetMac(mac);		
-		
+
+		ESP32_GetMac(mac);
+
 		if (memcmp(mac, g_tParam.WiFiMac, 6) != 0)
 		{
 			memcpy(g_tParam.WiFiMac, mac, 6);
@@ -544,148 +541,147 @@ uint8_t wifi_LinkSoftAP(void)
 		}
 	}
 
-	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */	
-	
-	/* DHCH = 0, Ê¹ÓÃ¾²Ì¬IP */
-	ESP32_SendAT("AT+CWDHCP_DEF=1,0");	
+	ESP32_SetWiFiMode(1); /* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
+
+	/* DHCH = 0, ä½¿ç”¨é™æ€IP */
+	ESP32_SendAT("AT+CWDHCP_DEF=1,0");
 	ESP32_WaitResponse("OK\r\n", 300);
 
-	ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway);	/* ÉèÖÃ¾²Ì¬IP */	
-	
-	wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+	ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway); /* è®¾ç½®é™æ€IP */
 
-	re = ESP32_JoinAP((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 20000);		
+	wifi_led_joinap(); /* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
+
+	re = ESP32_JoinAP((char *)g_tParam.AP_SSID, (char *)g_tParam.AP_PASS, 20000);
 	if (re != 0)
 	{
 		g_tVar.HomeWiFiLinkOk = 0;
 		return 0;
 	}
-	if (re == 0)	/* Ö´ĞĞ³É¹¦ */
+	if (re == 0) /* æ‰§è¡ŒæˆåŠŸ */
 	{
 		wifi_led_ok();
 	}
-	else	/* Ö´ĞĞÊ§°Ü */
+	else /* æ‰§è¡Œå¤±è´¥ */
 	{
 		wifi_led_err();
-	}		
+	}
 
-	g_tVar.HomeWiFiLinkOk = 1;	/* ÒÑÁ¬½Óµ½HOME WIFI */
-	
-	ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+	g_tVar.HomeWiFiLinkOk = 1; /* å·²è¿æ¥åˆ°HOME WIFI */
+
+	ESP32_CIPMUX(1); /* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 
 	ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
-	
-	/* ´´½¨UDP¼àÌı¶Ë¿Ú, id = 0 */
+
+	/* åˆ›å»ºUDPç›‘å¬ç«¯å£, id = 0 */
 	re = ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
-	
+
 	return 1;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_Poll
-*	¹¦ÄÜËµÃ÷: ²åÈëmainÖ÷Ñ­»·£¬´¦ÀíWiFiÖ¸Áî
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_Poll
+*	åŠŸèƒ½è¯´æ˜: æ’å…¥mainä¸»å¾ªç¯ï¼Œå¤„ç†WiFiæŒ‡ä»¤
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wifi_Poll(void)
-{	
-	static int32_t s_rx_ok_time = 0;	/* ×îºóÒ»´ÎÊÕ·¢okµÄÊ±¿Ì */
+{
+	static int32_t s_rx_ok_time = 0; /* æœ€åä¸€æ¬¡æ”¶å‘okçš„æ—¶åˆ» */
 	uint8_t rx_byte;
-	uint8_t re;		
-		
-	/* Êı¾İ°üÊÕ·¢ */
-	/* ·ÖÊı¾İÖ¡£¬ºÍATÃüÁîÖ¡½âÎö */
-	/* ½âÎö +IPD Êı¾İÖ¡ */
-	
+	uint8_t re;
+
+	/* æ•°æ®åŒ…æ”¶å‘ */
+	/* åˆ†æ•°æ®å¸§ï¼Œå’ŒATå‘½ä»¤å¸§è§£æ */
+	/* è§£æ +IPD æ•°æ®å¸§ */
+
 	while (1)
 	{
-		re = ESP32_GetChar(&rx_byte);		/* GetCharº¯ÊıÄÚ²¿»á½âÎö¶ÏÍøÊÂ¼ş£¬TCP CLOSEÊÂ¼ş */
+		re = ESP32_GetChar(&rx_byte); /* GetCharå‡½æ•°å†…éƒ¨ä¼šè§£ææ–­ç½‘äº‹ä»¶ï¼ŒTCP CLOSEäº‹ä»¶ */
 		if (re == 0)
 		{
-			/* 10ÃëÃ»ÓĞÊı¾İÊÕ·¢£¬Ôò¼ì²éÍøÂ·×´Ì¬ */
+			/* 10ç§’æ²¡æœ‰æ•°æ®æ”¶å‘ï¼Œåˆ™æ£€æŸ¥ç½‘è·¯çŠ¶æ€ */
 			if (bsp_CheckRunTime(s_rx_ok_time) > 10000)
-			{	
-				wifi_WatchDog();	/* wifi Á¬½Ó¿´»¤½ø³Ì, Ê§È¥Á¬½Óºó£¬×Ô¶¯ÖØÁ¬ */	
-				
+			{
+				wifi_WatchDog(); /* wifi è¿æ¥çœ‹æŠ¤è¿›ç¨‹, å¤±å»è¿æ¥åï¼Œè‡ªåŠ¨é‡è¿ */
+
 				s_rx_ok_time = bsp_GetRunTime();
-			}						
+			}
 			break;
 		}
-		else	/* ÊÕµ½Êı¾İ */
+		else /* æ”¶åˆ°æ•°æ® */
 		{
 			;
 		}
 	}
-	
-	if (g_tVar.WiFiRecivedIPD == 1)		/* ÊÕµ½UDP. TCPÊı¾İ°ü */
+
+	if (g_tVar.WiFiRecivedIPD == 1) /* æ”¶åˆ°UDP. TCPæ•°æ®åŒ… */
 	{
 		g_tVar.WiFiRecivedIPD = 0;
-		
+
 		s_rx_ok_time = bsp_GetRunTime();
-		
-		wifi_led_rx_data();		/* Êı¾İledÉÁÒ»ÏÂ */
+
+		wifi_led_rx_data(); /* æ•°æ®ledé—ªä¸€ä¸‹ */
 
 		return;
 	}
-	
-	/* ¶ÏÍø»òTCP·şÎñ¹Ø±ÕÁ¬½Ó£¬ÔòÖØÆôÍøÂç.  */
+
+	/* æ–­ç½‘æˆ–TCPæœåŠ¡å…³é—­è¿æ¥ï¼Œåˆ™é‡å¯ç½‘ç»œ.  */
 	{
 		if (g_tVar.HomeWiFiLinkOk == 0)
 		{
-			wifi_state = WIFI_INIT;		/* ÖØĞÂÁ¬½ÓAP */
+			wifi_state = WIFI_INIT; /* é‡æ–°è¿æ¥AP */
 			return;
 		}
-	}		
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_SendBuf
-*	¹¦ÄÜËµÃ÷: Ïòµ±Ç°Á´½Ó·¢ËÍÒ»´®Êı¾İ
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_SendBuf
+*	åŠŸèƒ½è¯´æ˜: å‘å½“å‰é“¾æ¥å‘é€ä¸€ä¸²æ•°æ®
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void wifi_SendBuf(uint8_t *str, uint16_t len) 
-{	
-	/* µÈ´ıWIFI¾ÍĞ÷ */
+void wifi_SendBuf(uint8_t *str, uint16_t len)
+{
+	/* ç­‰å¾…WIFIå°±ç»ª */
 	while (wifi_state != WIFI_READY)
 	{
 		wifi_task();
 	}
-		
+
 	if (link_id < 5)
 	{
 		if (ESP32_SendTcpUdp(link_id, str, len) == 0)
 		{
-			/* Èç¹û·¢ËÍÊ§°Ü£¬ÔòĞèÒª¸´Î»wifiÄ£¿é */			
+			/* å¦‚æœå‘é€å¤±è´¥ï¼Œåˆ™éœ€è¦å¤ä½wifiæ¨¡å— */
 			wifi_LinkHomeAP();
-			
-			ESP32_SendTcpUdp(link_id, str, len);	/* V2.14Ôö¼Ó 2018-12-12 */
+
+			ESP32_SendTcpUdp(link_id, str, len); /* V2.14å¢åŠ  2018-12-12 */
 		}
 		else
 		{
-			wifi_led_tx_data();		/* txÊı¾İledÉÁÒ»ÏÂ */
+			wifi_led_tx_data(); /* txæ•°æ®ledé—ªä¸€ä¸‹ */
 		}
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_WatchDog
-*	¹¦ÄÜËµÃ÷: WiFiÁ¬½Ó¼à¿Ø³ÌĞò¡£¼àÊÓÊÇ·ñÁ¬½Óµ½AP£¬ ¼àÊÓÊÇ·ñÁ¬½Óµ½TCP ·şÎñÆ÷.
-*	ĞÎ    ²Î: ÎŞ¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_WatchDog
+*	åŠŸèƒ½è¯´æ˜: WiFiè¿æ¥ç›‘æ§ç¨‹åºã€‚ç›‘è§†æ˜¯å¦è¿æ¥åˆ°APï¼Œ ç›‘è§†æ˜¯å¦è¿æ¥åˆ°TCP æœåŠ¡å™¨.
+*	å½¢    å‚: æ— ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wifi_WatchDog(void)
 {
-	
-	/*
-	ÕıÈ·µÄÓ¦´ğ°ü£º
+
+/*
+	æ­£ç¡®çš„åº”ç­”åŒ…ï¼š
 	
 	(4451)=>AT+CIPSTATUS
 	(4451)=>
@@ -697,22 +693,22 @@ void wifi_WatchDog(void)
 	
 	----------------------
 	
-	STATUS: ¶¨Òå
-		2: ESP32 station ÒÑÁ¬½ÓAP£¬»ñµÃIPµØÖ·
-		3: ÒÑ½¨Á¢TCP»òUDP´«Êä
-		4£ºESP32 ÒÑ¶Ï¿ªÍøÂçÁ¬½Ó
-		5£ºÎ´Á¬½Óµ½AP
+	STATUS: å®šä¹‰
+		2: ESP32 station å·²è¿æ¥APï¼Œè·å¾—IPåœ°å€
+		3: å·²å»ºç«‹TCPæˆ–UDPä¼ è¾“
+		4ï¼šESP32 å·²æ–­å¼€ç½‘ç»œè¿æ¥
+		5ï¼šæœªè¿æ¥åˆ°AP
 	
 	
-	----------------------- ¶ÏÍø£¬¸´Î»ºó ---
+	----------------------- æ–­ç½‘ï¼Œå¤ä½å ---
 	AT+CIPSTATUS
 	STATUS:5
 
 	OK
-	*/	
+	*/
 
-	/*
-		SoftAP , µ±¿Í»§¶Ë½ÓÈëÊ±£º
+/*
+		SoftAP , å½“å®¢æˆ·ç«¯æ¥å…¥æ—¶ï¼š
 				
 		+STA_DISCONNECTED:"18:fe:34:d1:b0:07"
 		+STA_CONNECTED:"18:fe:34:d1:b0:07"
@@ -720,9 +716,8 @@ void wifi_WatchDog(void)
 	
 	*/
 
-	
-	/* Í£Ö¹Í¨ĞÅºó10Ãë£¬¿ªÊ¼¶¨Ê±É¨ÃèÍøÂç×´Ì¬ */	
-	#if 1
+/* åœæ­¢é€šä¿¡å10ç§’ï¼Œå¼€å§‹å®šæ—¶æ‰«æç½‘ç»œçŠ¶æ€ */
+#if 1
 	{
 		uint8_t buf[64];
 		uint16_t rx_len;
@@ -736,28 +731,28 @@ void wifi_WatchDog(void)
 			while (1)
 			{
 				rx_len = ESP32_ReadLine((char *)buf, sizeof(buf), 100);
-				if (rx_len == 0)	/* ³¬Ê±Ã»ÓĞÊÕµ½OK */
+				if (rx_len == 0) /* è¶…æ—¶æ²¡æœ‰æ”¶åˆ°OK */
 				{
 					break;
-				}				
+				}
 				else if (rx_len > 7 && memcmp(buf, "STATUS:", 7) == 0)
 				{
 					/*  STATUS:3 */
 					net_status = buf[7];
-					
+
 					if (net_status == '2' || net_status == '3' || net_status == '4')
 					{
-						link_ap_ok = 1;	/* Á¬½ÓAP ok */
+						link_ap_ok = 1; /* è¿æ¥AP ok */
 					}
 					else
 					{
-						if (g_tParam.APSelfEn == 1)	/* ×öSoftAP */
+						if (g_tParam.APSelfEn == 1) /* åšSoftAP */
 						{
-							;	/* ²»ÅĞ¶Ï, ¸ù¾İUDP×´Ì¬ÅĞ¶Ï */
+							; /* ä¸åˆ¤æ–­, æ ¹æ®UDPçŠ¶æ€åˆ¤æ–­ */
 						}
-						else	/* ×öSTAÕ¾µã */
+						else /* åšSTAç«™ç‚¹ */
 						{
-							link_ap_ok = 0;	/* Ã»ÓĞÁ¬½Óµ½AP */
+							link_ap_ok = 0; /* æ²¡æœ‰è¿æ¥åˆ°AP */
 						}
 					}
 				}
@@ -767,73 +762,73 @@ void wifi_WatchDog(void)
 					{
 						link_ap_ok = 1;
 					}
-				}					
-//				else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
-//				{
-//					/* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
-//					tcp_ok = 1;
-//				}
+				}
+				//				else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
+				//				{
+				//					/* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
+				//					tcp_ok = 1;
+				//				}
 				else if (rx_len >= 2 && memcmp(buf, "OK", 2) == 0)
 				{
-					/* ²»ĞèÒªÁ¬½Óµ½TCP·şÎñÆ÷ */
+					/* ä¸éœ€è¦è¿æ¥åˆ°TCPæœåŠ¡å™¨ */
 					{
 						if (link_ap_ok == 1)
 						{
-							i = 4;	/* Ö»ÒªÓĞ1´Î³É¹¦¾ÍÍË³öfor */
-						}							
+							i = 4; /* åªè¦æœ‰1æ¬¡æˆåŠŸå°±é€€å‡ºfor */
+						}
 					}
 					break;
 				}
-			}	
+			}
 		}
-		
+
 		if (link_ap_ok == 0)
 		{
-			wifi_LinkHomeAP();	/* ×èÈû£¬µÈ´ıÁ¬½ÓAP */
+			wifi_LinkHomeAP(); /* é˜»å¡ï¼Œç­‰å¾…è¿æ¥AP */
 		}
 		else
 		{
 			;
 		}
 	}
-	#endif
+#endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wifi_DebugATCommand
-*	¹¦ÄÜËµÃ÷: ½âÎö485ÊÕµ½µÄMODBUS Êı¾İ°ü£¬Èç¹ûÊÇATÖ¸Áî£¬ÔòÍ¸´«¸øWiFiÄ£¿é.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wifi_DebugATCommand
+*	åŠŸèƒ½è¯´æ˜: è§£æ485æ”¶åˆ°çš„MODBUS æ•°æ®åŒ…ï¼Œå¦‚æœæ˜¯ATæŒ‡ä»¤ï¼Œåˆ™é€ä¼ ç»™WiFiæ¨¡å—.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wifi_DebugATCommand(uint8_t *_rxbuf, uint16_t _rxlen)
 {
 	if (_rxbuf[0] != 'A' || _rxbuf[1] != 'T')
 	{
-		return;		/* ²»ÊÇATÖ¸Áî²»Í¸´« */
+		return; /* ä¸æ˜¯ATæŒ‡ä»¤ä¸é€ä¼  */
 	}
-	
+
 	if (_rxbuf[_rxlen - 1] != 0x0A)
 	{
-		return;		/* Ä©Î²²»ÊÇ»Ø³µ»»ĞĞ */
+		return; /* æœ«å°¾ä¸æ˜¯å›è½¦æ¢è¡Œ */
 	}
-	
-	/* 120ÃëÄÚ¿ªÆôÍ¸´« */
-	
+
+	/* 120ç§’å†…å¼€å¯é€ä¼  */
+
 	if (g_tVar.WiFiDebugEn == 1)
 	{
-	//	g_tVar.WiFiDebugTime = bsp_GetRunTime();
-		
+		//	g_tVar.WiFiDebugTime = bsp_GetRunTime();
+
 		comSendBuf(COM_DEBUG, _rxbuf, _rxlen);
-		
-		/* ½«È«²¿µÄÊı¾İ×ª·¢µ½WiFiÄ£¿é */
+
+		/* å°†å…¨éƒ¨çš„æ•°æ®è½¬å‘åˆ°WiFiæ¨¡å— */
 		comSendBuf(COM_ESP32, _rxbuf, _rxlen);
 	}
 }
 
 #if 0
-/********************************************** ±£Áô´úÂë **********************/
+/********************************************** ä¿ç•™ä»£ç  **********************/
 
 
 char Rx_Protocol[STRINGLEN] = {0};
@@ -845,25 +840,25 @@ static uint8_t s_setserver_state = 0;
 static char s_setserver_ip[48];
 static uint16_t s_setserver_port;
 
-uint8_t g_wifi_tx_halt = 0;		/* wifiËÀ»ú,ĞèÒªÖØÆô£¬ ·¢ËÍÊ§°ÜÔòÉèÎª1 */
+uint8_t g_wifi_tx_halt = 0;		/* wifiæ­»æœº,éœ€è¦é‡å¯ï¼Œ å‘é€å¤±è´¥åˆ™è®¾ä¸º1 */
 
 void sethomewifi_loop(void);
 void setserver_loop(void);
 void WifiWatchdog(void);
 
-wifiÕıÔÚµÈ´ıÖÇÄÜÅäÖÃ.... 
+wifiæ­£åœ¨ç­‰å¾…æ™ºèƒ½é…ç½®.... 
 void wifi_led_smartlink(void)
 {
-	PERIOD_Start(&g_tWiFiLed, 50, 100, 0);	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+	PERIOD_Start(&g_tWiFiLed, 50, 100, 0);	/* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 }
 
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: putcharA
-*	¹¦ÄÜËµÃ÷: Ïòµ±Ç°Á´½Ó·¢ËÍÒ»¸ö×Ö·û´®£¬0½áÊø·û
-*	ĞÎ    ²Î: str : 0½áÊøµÄ×Ö·û´®
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: putcharA
+*	åŠŸèƒ½è¯´æ˜: å‘å½“å‰é“¾æ¥å‘é€ä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œ0ç»“æŸç¬¦
+*	å½¢    å‚: str : 0ç»“æŸçš„å­—ç¬¦ä¸²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void putcharA(char *str) 
@@ -880,12 +875,12 @@ void putcharA(char *str)
 }
 
 
-// ´®¿Ú½ÓÊÕÖĞ¶Ï·ÖÖ®1£¬ ÓÃÓÚÂ¯×Ó¿ØÖÆ
+// ä¸²å£æ¥æ”¶ä¸­æ–­åˆ†ä¹‹1ï¼Œ ç”¨äºç‚‰å­æ§åˆ¶
 void get_char(void)
 {
 	uint8_t r = 0;
 
-	//uint8_t r = UART3_ReceiveData8();  // °Ñ½ÓÊÕµ½µÄÊı¾İ¸´ÖÆ¸ø±äÁ¿
+	//uint8_t r = UART3_ReceiveData8();  // æŠŠæ¥æ”¶åˆ°çš„æ•°æ®å¤åˆ¶ç»™å˜é‡
 	//UART3_ClearFlag(UART3_FLAG_RXNE);
 		
 	if (Rx_len >= STRINGLEN)
@@ -917,10 +912,10 @@ void get_char(void)
 }
 
 
-// ´®¿ÚÖĞ¶Ï·şÎñ³ÌĞò2 -  ÓÃÓÚºÍÔ¶³Ì·şÎñÆ÷Í¨ĞÅ
+// ä¸²å£ä¸­æ–­æœåŠ¡ç¨‹åº2 -  ç”¨äºå’Œè¿œç¨‹æœåŠ¡å™¨é€šä¿¡
 void recvdata(void)
 {
-	uint8_t r;// = UART3_ReceiveData8();  // °Ñ½ÓÊÕµ½µÄÊı¾İ¸´ÖÆ¸ø±äÁ¿
+	uint8_t r;// = UART3_ReceiveData8();  // æŠŠæ¥æ”¶åˆ°çš„æ•°æ®å¤åˆ¶ç»™å˜é‡
 	//UART3_ClearFlag(UART3_FLAG_RXNE);
 
 	if(Rx_len >= STRINGLEN)
@@ -935,7 +930,7 @@ void recvdata(void)
 	{
 		//if(r == '1')
 		{
-			if(strncmp(&Rx_String[Rx_len - 8],GMGHeader,8) == 0)    // ½«Í··Åµ½×îÇ°¶Ë
+			if(strncmp(&Rx_String[Rx_len - 8],GMGHeader,8) == 0)    // å°†å¤´æ”¾åˆ°æœ€å‰ç«¯
 			{
 				//memcpy(Rx_String,Rx_String + Rx_len - 8,8);
 				Rx_String[0] = Rx_String[Rx_len - 8];
@@ -977,7 +972,7 @@ void factory_atoupdate(void)
 {
 	uint16_t i; 
 	
-	printf("\r\n¡¾factory_atoupdate¡¿\r\n");
+	printf("\r\nã€factory_atoupdateã€‘\r\n");
 	
 	DispUPD();
 	for(i = 0;i < 30;i++)
@@ -1013,71 +1008,71 @@ void factory_atoupdate(void)
 }
 
 
-/* UH Ö¸Áî£¬ÊÖ»úÉèÖÃÂ¯×Ó£¬¸æËßÂ¯×Ó¼ÒÍ¥APµÄÃû×ÖºÍÃÜÂë  */
+/* UH æŒ‡ä»¤ï¼Œæ‰‹æœºè®¾ç½®ç‚‰å­ï¼Œå‘Šè¯‰ç‚‰å­å®¶åº­APçš„åå­—å’Œå¯†ç   */
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: sethomewifi
-*	¹¦ÄÜËµÃ÷: ÉèÖÃWiFiÎªHome WifiÄ£Ê½¡£¿ÉÒÔÉèÖÃUDP·şÎñ»òTCP·şÎñ¡£Á½¸ö¶¼ÒªÓÃµÄ¡£
-*	ĞÎ    ²Î: mode £º 0±íÊ¾TCP·şÎñ¡£ 1±íÊ¾UDP·şÎñ¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: sethomewifi
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®WiFiä¸ºHome Wifiæ¨¡å¼ã€‚å¯ä»¥è®¾ç½®UDPæœåŠ¡æˆ–TCPæœåŠ¡ã€‚ä¸¤ä¸ªéƒ½è¦ç”¨çš„ã€‚
+*	å½¢    å‚: mode ï¼š 0è¡¨ç¤ºTCPæœåŠ¡ã€‚ 1è¡¨ç¤ºUDPæœåŠ¡ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void sethomewifi(int mode,char* ssid,char* password)
 {	
 	uint8_t re;
 	
-	printf("\r\n¡¾ÉèÖÃÎª home wifi Ä£Ê½¡¿\r\n");
+	printf("\r\nã€è®¾ç½®ä¸º home wifi æ¨¡å¼ã€‘\r\n");
 	
-	ESP32_PowerOn();	/* WIFIÄ£¿éµôµç¸´Î»Ò»´Î */
+	ESP32_PowerOn();	/* WIFIæ¨¡å—æ‰ç”µå¤ä½ä¸€æ¬¡ */
 	
-	/* ÇĞ»»Ä£Ê½Ç°£¬²éÑ¯ÏÂµ±Ç°×´Ì¬ */
+	/* åˆ‡æ¢æ¨¡å¼å‰ï¼ŒæŸ¥è¯¢ä¸‹å½“å‰çŠ¶æ€ */
 	{
-		ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */	
+		ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */	
 	}
 	
-	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */
+	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
 	
-	/* ¼ÓÈë¼ÒÍ¥AP */
-	printf("\r\n¡¾¼ÓÈëHome AP...¡¿\r\n");
+	/* åŠ å…¥å®¶åº­AP */
+	printf("\r\nã€åŠ å…¥Home AP...ã€‘\r\n");
 	
-	wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+	wifi_led_joinap();	/* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 	re = ESP32_JoinAP(g_tParam2.wifi_ssid, g_tParam2.wifi_password, 20000);
 
 
-	/* ´òÓ¡±¾µØIP */
+	/* æ‰“å°æœ¬åœ°IP */
 	{
 		char ip[20];
 		char mac[64];
 	
 		ESP32_GetLocalIP(ip, mac);
 
-		ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */		
+		ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */		
 	}
 	
-	/* Æô¶¯DHCH = 1 , ´ËÃüÁî»áĞ´flash²ÎÊı */
+	/* å¯åŠ¨DHCH = 1 , æ­¤å‘½ä»¤ä¼šå†™flashå‚æ•° */
 	//SP8266_SendAT("AT+CWDHCP=1,1");	
 	//ESP32_WaitResponse("OK\r\n", 1000);
 	
-	ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+	ESP32_CIPMUX(1);		/* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 
 	if (mode == 0)
 	{
-		/* ´´½¨TCP·şÎñÆ÷ */
-		printf("\r\n¡¾´´½¨TCP·şÎñÆ÷.¡¿\r\n");
+		/* åˆ›å»ºTCPæœåŠ¡å™¨ */
+		printf("\r\nã€åˆ›å»ºTCPæœåŠ¡å™¨.ã€‘\r\n");
 		re  = ESP32_CreateTCPServer(8080);		
 	}
 	else
 	{
-		/* ´´½¨UDP¼àÌı¶Ë¿Ú */
-		printf("\r\n¡¾´´½¨UDP¼àÌı¶Ë¿Ú¡¿\r\n");
+		/* åˆ›å»ºUDPç›‘å¬ç«¯å£ */
+		printf("\r\nã€åˆ›å»ºUDPç›‘å¬ç«¯å£ã€‘\r\n");
 		re  = ESP32_CreateUDPServer(0, 8080);
 	}
 	
-	if (re == 1)	/* Ö´ĞĞ³É¹¦ */
+	if (re == 1)	/* æ‰§è¡ŒæˆåŠŸ */
 	{
 		wifi_led_ok();
 	}
-	else	/* Ö´ĞĞÊ§°Ü */
+	else	/* æ‰§è¡Œå¤±è´¥ */
 	{
 		wifi_led_err();
 	}	
@@ -1085,11 +1080,11 @@ void sethomewifi(int mode,char* ssid,char* password)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: sethomewifi_start
-*	¹¦ÄÜËµÃ÷: ÉèÖÃWiFiÎªHome WifiÄ£Ê½¡£¿ÉÒÔÉèÖÃUDP·şÎñ»òTCP·şÎñ¡£Á½¸ö¶¼ÒªÓÃµÄ¡£ 
-*			 ·Ç×èÈû£¬½áºÏsethomewifi_loopº¯ÊıÊ¹ÓÃ
-*	ĞÎ    ²Î: mode £º 0±íÊ¾TCP·şÎñ¡£ 1±íÊ¾UDP·şÎñ¡£ 2±íÊ¾Í¬Ê±½¨Á¢2¸ö·şÎñ¡£ 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: sethomewifi_start
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®WiFiä¸ºHome Wifiæ¨¡å¼ã€‚å¯ä»¥è®¾ç½®UDPæœåŠ¡æˆ–TCPæœåŠ¡ã€‚ä¸¤ä¸ªéƒ½è¦ç”¨çš„ã€‚ 
+*			 éé˜»å¡ï¼Œç»“åˆsethomewifi_loopå‡½æ•°ä½¿ç”¨
+*	å½¢    å‚: mode ï¼š 0è¡¨ç¤ºTCPæœåŠ¡ã€‚ 1è¡¨ç¤ºUDPæœåŠ¡ã€‚ 2è¡¨ç¤ºåŒæ—¶å»ºç«‹2ä¸ªæœåŠ¡ã€‚ 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void sethomewifi_start(int mode)
@@ -1097,7 +1092,7 @@ void sethomewifi_start(int mode)
 	s_sethomewifi_state = 1;
 	s_sethomewifi_mode = mode;
 
-	g_tParam2.CommState = WIFI_STATE_HOMEWIFI;		/* ÉèÖÃWIFIÄ£¿éÎªSTAÄ£Ê½  */
+	g_tParam2.CommState = WIFI_STATE_HOMEWIFI;		/* è®¾ç½®WIFIæ¨¡å—ä¸ºSTAæ¨¡å¼  */
 		
 	SaveParam2();		
 }
@@ -1109,122 +1104,122 @@ void sethomewifi_loop(void)
 	
 	switch (s_sethomewifi_state)
 	{
-		case 0:			/* Ö´ĞĞÍê±Ï£¬ĞİÃß×´Ì¬ */
+		case 0:			/* æ‰§è¡Œå®Œæ¯•ï¼Œä¼‘çœ çŠ¶æ€ */
 			break;
 
-		case 1:			/* ½øÈëÒ»´Î */
-			s_err_cout = 0;		/* Çå³ö´í´ÎÊı */
+		case 1:			/* è¿›å…¥ä¸€æ¬¡ */
+			s_err_cout = 0;		/* æ¸…å‡ºé”™æ¬¡æ•° */
 			s_sethomewifi_state++;
 			break;
 		
-		case 2:		/* <------ ³ö´íÊ±£¬Ñ­»·Èë¿Ú  */
-			printf("\r\n¡¾ÉèÖÃÎª home wifi Ä£Ê½¡¿\r\n");
+		case 2:		/* <------ å‡ºé”™æ—¶ï¼Œå¾ªç¯å…¥å£  */
+			printf("\r\nã€è®¾ç½®ä¸º home wifi æ¨¡å¼ã€‘\r\n");
 		
-			ESP32_PowerOn();	/* WIFIÄ£¿éµôµç¸´Î»Ò»´Î */
+			ESP32_PowerOn();	/* WIFIæ¨¡å—æ‰ç”µå¤ä½ä¸€æ¬¡ */
 
 			s_sethomewifi_state++;
 			break;
 	
 		case 3:
-			/* ÇĞ»»Ä£Ê½Ç°£¬²éÑ¯ÏÂµ±Ç°×´Ì¬ */
+			/* åˆ‡æ¢æ¨¡å¼å‰ï¼ŒæŸ¥è¯¢ä¸‹å½“å‰çŠ¶æ€ */
 			{
-				ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */	
+				ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */	
 			}						
-			ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */		
+			ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */		
 
 			s_sethomewifi_state++;
 			break;
 			
 		case 4:
-			/* ¼ÓÈë¼ÒÍ¥AP */
-			printf("\r\n¡¾¼ÓÈëHome AP...¡¿\r\n");	
-			wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+			/* åŠ å…¥å®¶åº­AP */
+			printf("\r\nã€åŠ å…¥Home AP...ã€‘\r\n");	
+			wifi_led_joinap();	/* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 			ESP32_PT_JoinAP(g_tParam2.wifi_ssid, g_tParam2.wifi_password, 30000);	
 			
 			s_sethomewifi_state++;
 			break;
 
-		case 5:	/* ÔÚÕâ¸ö×´Ì¬µÈ´ıAPÓ¦´ğ 30s³¬Ê± */	
+		case 5:	/* åœ¨è¿™ä¸ªçŠ¶æ€ç­‰å¾…APåº”ç­” 30sè¶…æ—¶ */	
 			{
 				uint8_t re;
 				
 				re = ESP32_PT_WaitResonse();
-				if (re == PT_NULL)	/* ¿Õ²Ù×÷£¬ĞèÒª¼ÌĞøµÈ´ı */
+				if (re == PT_NULL)	/* ç©ºæ“ä½œï¼Œéœ€è¦ç»§ç»­ç­‰å¾… */
 				{
 					;
 				}
-				else if (re == PT_OK)	/* ³É¹¦Ö´ĞĞ */
+				else if (re == PT_OK)	/* æˆåŠŸæ‰§è¡Œ */
 				{
-					s_sethomewifi_state++;		/* Ö´ĞĞ³É¹¦ */
+					s_sethomewifi_state++;		/* æ‰§è¡ŒæˆåŠŸ */
 				}
 				else if (re == PT_ERR || re == PT_TIMEOUT)
 				{					
-					wifi_led_err();	/* Ö´ĞĞÊ§°Ü */
+					wifi_led_err();	/* æ‰§è¡Œå¤±è´¥ */
 					
-					s_sethomewifi_state = 10;	/* Ê§°Ü */
+					s_sethomewifi_state = 10;	/* å¤±è´¥ */
 				}				
 			}
 			break;
 		
 		case 6:
-			/* ´òÓ¡±¾µØIP */
+			/* æ‰“å°æœ¬åœ°IP */
 			{
 				char ip[20];
 				char mac[64];
 			
 				ESP32_GetLocalIP(ip, mac);
 
-				ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */		
+				ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */		
 			}
 			
-			/* Æô¶¯DHCH = 1 , ´ËÃüÁî»áĞ´flash²ÎÊı */
+			/* å¯åŠ¨DHCH = 1 , æ­¤å‘½ä»¤ä¼šå†™flashå‚æ•° */
 			//SP8266_SendAT("AT+CWDHCP=1,1");	
 			//ESP32_WaitResponse("OK\r\n", 1000);
 			
-			ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+			ESP32_CIPMUX(1);		/* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 
 			{
 				uint8_t re;
 				
 				if (s_sethomewifi_mode == 0)
 				{
-					/* ´´½¨TCP·şÎñÆ÷ */
-					printf("\r\n¡¾´´½¨TCP·şÎñÆ÷.¡¿\r\n");
+					/* åˆ›å»ºTCPæœåŠ¡å™¨ */
+					printf("\r\nã€åˆ›å»ºTCPæœåŠ¡å™¨.ã€‘\r\n");
 					re  = ESP32_CreateTCPServer(8080);		
 				}
 				else if (s_sethomewifi_mode == 1)
 				{
-					/* ´´½¨UDP¼àÌı¶Ë¿Ú */
-					printf("\r\n¡¾´´½¨UDP¼àÌı¶Ë¿Ú¡¿\r\n");
+					/* åˆ›å»ºUDPç›‘å¬ç«¯å£ */
+					printf("\r\nã€åˆ›å»ºUDPç›‘å¬ç«¯å£ã€‘\r\n");
 					re  = ESP32_CreateUDPServer(0, 8080);
 				}
-				else   /* 3 ±íÊ¾Í¬Ê±½¨Á¢UDPºÍTCP */
+				else   /* 3 è¡¨ç¤ºåŒæ—¶å»ºç«‹UDPå’ŒTCP */
 				{
-					/* ´´½¨UDP¼àÌı¶Ë¿Ú */
-					printf("\r\n¡¾´´½¨UDP¼àÌı¶Ë¿Ú¡¿\r\n");
+					/* åˆ›å»ºUDPç›‘å¬ç«¯å£ */
+					printf("\r\nã€åˆ›å»ºUDPç›‘å¬ç«¯å£ã€‘\r\n");
 					re  = ESP32_CreateUDPServer(0, 8080);
 
-					/* ´´½¨TCP·şÎñÆ÷ */
-					printf("\r\n¡¾´´½¨TCP·şÎñÆ÷.¡¿\r\n");
+					/* åˆ›å»ºTCPæœåŠ¡å™¨ */
+					printf("\r\nã€åˆ›å»ºTCPæœåŠ¡å™¨.ã€‘\r\n");
 					re  = ESP32_CreateTCPServer(8080);						
 				}				
 				
-				if (re == 1)		/* Ö´ĞĞ³É¹¦ */
+				if (re == 1)		/* æ‰§è¡ŒæˆåŠŸ */
 				{
 					wifi_led_ok();
 					
-					s_sethomewifi_state = 0;	/* ³É¹¦½áÊø */
+					s_sethomewifi_state = 0;	/* æˆåŠŸç»“æŸ */
 				}
-				else				/* Ö´ĞĞÊ§°Ü */
+				else				/* æ‰§è¡Œå¤±è´¥ */
 				{
 					wifi_led_err();
 					
-					s_sethomewifi_state = 10;	/* Ê§°Ü */
+					s_sethomewifi_state = 10;	/* å¤±è´¥ */
 				}								
 			}				
 			break;
 
-		case 10:			/* Ö´ĞĞÊ§°Ü, ĞİÏ¢1Ãëºó£¬ÖØÊÔ */
+		case 10:			/* æ‰§è¡Œå¤±è´¥, ä¼‘æ¯1ç§’åï¼Œé‡è¯• */
 			if (++s_err_cout > 10)
 			{
 				s_sethomewifi_state = 0;
@@ -1232,14 +1227,14 @@ void sethomewifi_loop(void)
 			else
 			{
 				s_sethomewifi_state = 11;
-				s_last_time = bsp_GetRunTime();	/* ±£´æµ±Ç°ÔËĞĞÊ±¼ä */	
+				s_last_time = bsp_GetRunTime();	/* ä¿å­˜å½“å‰è¿è¡Œæ—¶é—´ */	
 			}
 			break;
 		
 		case 11:
 			if (bsp_CheckRunTime(s_last_time) > 1000)
 			{
-				//s_sethomewifi_state = 2;	2ÊÇ Ó²¼ş¸´Î»WIFIÄ£¿é
+				//s_sethomewifi_state = 2;	2æ˜¯ ç¡¬ä»¶å¤ä½WIFIæ¨¡å—
 				s_sethomewifi_state = 4;
 			}
 			break;
@@ -1248,10 +1243,10 @@ void sethomewifi_loop(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_SmartLink
-*	¹¦ÄÜËµÃ÷: ½øÈëÖÇÄÜÁ¬½Ó×´Ì¬¡£´ËÊ±wifiÄ£¿éÊÇSTAÄ£Ê½£¬ÊÖ»úÍ¨¹ıAPP¸æËßwifiÄ£¿é APµÄÃû×ÖºÍÃÜÂë¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_SmartLink
+*	åŠŸèƒ½è¯´æ˜: è¿›å…¥æ™ºèƒ½è¿æ¥çŠ¶æ€ã€‚æ­¤æ—¶wifiæ¨¡å—æ˜¯STAæ¨¡å¼ï¼Œæ‰‹æœºé€šè¿‡APPå‘Šè¯‰wifiæ¨¡å— APçš„åå­—å’Œå¯†ç ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_SmartLink(void)
@@ -1262,27 +1257,27 @@ void status_SmartLink(void)
 	uint8_t ucKey;
 	uint8_t fQuit = 0;
 	
-	printf("\r\n¡¾½øÈëÖÇÄÜÁ¬½Ó×´Ì¬¡¿\r\n");
+	printf("\r\nã€è¿›å…¥æ™ºèƒ½è¿æ¥çŠ¶æ€ã€‘\r\n");
 	
-	wifi_led_smartlink();	/* ×Ô¶¯ÉÁµÆ */
+	wifi_led_smartlink();	/* è‡ªåŠ¨é—ªç¯ */
 
-	ESP32_PowerOn();	/* WIFIÄ£¿éµôµç¸´Î»Ò»´Î */
+	ESP32_PowerOn();	/* WIFIæ¨¡å—æ‰ç”µå¤ä½ä¸€æ¬¡ */
 	
 	LED8_DispStr("CFG");
 	
 	bsp_StartAutoTimer(0, 1000);
 	
-	ESP32_PT_SmartStrat(0);	/* ¿ªÆôÖÇÄÜÁ¬½Ó¡£ 0 = °²¿ÉĞÅ¼¼Êõ  1 = ESP-TOUCH   2 = AIR-KISS */
+	ESP32_PT_SmartStrat(0);	/* å¼€å¯æ™ºèƒ½è¿æ¥ã€‚ 0 = å®‰å¯ä¿¡æŠ€æœ¯  1 = ESP-TOUCH   2 = AIR-KISS */
 	
 	while (fQuit == 0)		
 	{
-		/* µÈ´ıÊÖ»úÅäÖÃ */
+		/* ç­‰å¾…æ‰‹æœºé…ç½® */
 		if (ESP32_PT_SmartWait(ssid, password) == PT_OK)
 		{
 			LED8_DispStr("SUCC");
-			BEEP_Start(5, 10, 2);	/* ÅäÖÃ³É¹¦£¬½Ğ2Éù */
+			BEEP_Start(5, 10, 2);	/* é…ç½®æˆåŠŸï¼Œå«2å£° */
 			
-			/* ÅäÖÃ³É¹¦ºó£¬Ä£¿é»á×Ô¶¯ÍË³ösmart link Ä£Ê½ */
+			/* é…ç½®æˆåŠŸåï¼Œæ¨¡å—ä¼šè‡ªåŠ¨é€€å‡ºsmart link æ¨¡å¼ */
 			//memcpy(g_tParam2.wifi_ssid, ssid, strlen(ssid));
 			//memcpy(g_tParam2.wifi_password, password, strlen(password));
 			strncpy(g_tParam2.wifi_ssid, ssid, SSID_MAX_LEN);
@@ -1290,12 +1285,12 @@ void status_SmartLink(void)
 
 			g_tParam2.CommState = WIFI_STATE_HOMEWIFI;	   		
 			
-			SaveParam2();	/* ±£´æ²ÎÊı */
+			SaveParam2();	/* ä¿å­˜å‚æ•° */
 
-			bsp_DelayMS(1000);	/* ÑÓ³Ù1Ãë */
+			bsp_DelayMS(1000);	/* å»¶è¿Ÿ1ç§’ */
 			
-			/* ÅäÖÃ³É¹¦ */
-			sethomewifi_start(2);	/* Á¬½Óµ½HOME WIFI , UDP·şÎñ£¬  ---> UDP + TCPÍ¬Ê±½¨Á¢ */
+			/* é…ç½®æˆåŠŸ */
+			sethomewifi_start(2);	/* è¿æ¥åˆ°HOME WIFI , UDPæœåŠ¡ï¼Œ  ---> UDP + TCPåŒæ—¶å»ºç«‹ */
 			break;
 		}
 		
@@ -1316,12 +1311,12 @@ void status_SmartLink(void)
 		ucKey = bsp_GetKey();
 		switch (ucKey)
 		{
-			case KEY_PWR_DOWN:	/* µçÔ´¼ü°´ÏÂ */
+			case KEY_PWR_DOWN:	/* ç”µæºé”®æŒ‰ä¸‹ */
 				fQuit = 1;
 				break;
 
-			case KEY_INC_DOWN:	/* ¼Ó1¼ü°´ÏÂ */
-			case KEY_DEC_DOWN:	/* ¼õ1¼ü°´ÏÂ */
+			case KEY_INC_DOWN:	/* åŠ 1é”®æŒ‰ä¸‹ */
+			case KEY_DEC_DOWN:	/* å‡1é”®æŒ‰ä¸‹ */
 				ESP32_PT_SmartStrat(0);
 				time = 300;
 				break;			
@@ -1332,49 +1327,49 @@ void status_SmartLink(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: setserver
-*	¹¦ÄÜËµÃ÷: ¸ù¾İ¸ø¶¨µÄssidºÍÃÜÂëÁ¬½Óµ½home ap£¬ È»ºó·ÃÎÊÔ¶³ÌTCP·şÎñÆ÷¡£´´½¨Ò»¸öTCP¿Í»§¶ËÁ¬½Ó¡£ ×èÈûÊ½¡£
-*	ĞÎ    ²Î: ssid, [assword, 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: setserver
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®ç»™å®šçš„ssidå’Œå¯†ç è¿æ¥åˆ°home apï¼Œ ç„¶åè®¿é—®è¿œç¨‹TCPæœåŠ¡å™¨ã€‚åˆ›å»ºä¸€ä¸ªTCPå®¢æˆ·ç«¯è¿æ¥ã€‚ é˜»å¡å¼ã€‚
+*	å½¢    å‚: ssid, [assword, 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void setserver(char* ssid, char* password, char* serverip, char* port)
 {
 	uint8_t re;
 	
-	printf("\r\n¡¾Á¬½Óµ½Home WiFi£¬·ÃÎÊÔ¶³ÌTCP·şÎñÆ÷¡¿\r\n");
+	printf("\r\nã€è¿æ¥åˆ°Home WiFiï¼Œè®¿é—®è¿œç¨‹TCPæœåŠ¡å™¨ã€‘\r\n");
 
-	ESP32_PowerOn();	/* WIFIÄ£¿éµôµç¸´Î»Ò»´Î */
+	ESP32_PowerOn();	/* WIFIæ¨¡å—æ‰ç”µå¤ä½ä¸€æ¬¡ */
 	
-	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */
+	ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */
 	
-	/* ¼ÓÈë¼ÒÍ¥AP -- ´ËÊ±ESP32 ¿ÉÄÜ¸´Î»ÖØÆô */
-	wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+	/* åŠ å…¥å®¶åº­AP -- æ­¤æ—¶ESP32 å¯èƒ½å¤ä½é‡å¯ */
+	wifi_led_joinap();	/* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 	re = ESP32_JoinAP(ssid, password, 20000);
 
 
-	ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+	ESP32_CIPMUX(1);		/* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 	
-	/* ´òÓ¡±¾µØIP */
+	/* æ‰“å°æœ¬åœ°IP */
 	{
 		char ip[20];
 		char mac[64];
 	
 		ESP32_GetLocalIP(ip, mac);
 		
-		ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */
+		ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */
 	}
 	
-	//ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+	//ESP32_CIPMUX(1);		/* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 
-	/* Á´½Óµ½TCP·şÎñÆ÷ */
-	printf("\r\n¡¾Á¬½Óµ½Ô¶³ÌTCP·şÎñÆ÷.¡¿\r\n");
+	/* é“¾æ¥åˆ°TCPæœåŠ¡å™¨ */
+	printf("\r\nã€è¿æ¥åˆ°è¿œç¨‹TCPæœåŠ¡å™¨.ã€‘\r\n");
 	re = ESP32_LinkTCPServer(0, serverip, str_to_int(port));
-	if (re == 1)	/* Ö´ĞĞ³É¹¦ */
+	if (re == 1)	/* æ‰§è¡ŒæˆåŠŸ */
 	{
 		wifi_led_ok();
 	}
-	else	/* Ö´ĞĞÊ§°Ü */
+	else	/* æ‰§è¡Œå¤±è´¥ */
 	{
 		wifi_led_err();
 	}	
@@ -1383,12 +1378,12 @@ void setserver(char* ssid, char* password, char* serverip, char* port)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: setserver_start
-*	¹¦ÄÜËµÃ÷: Á´½Óµ½Ô¶³Ì·şÎñÆ÷,TCP·şÎñ¶Ë¿Ú.  Â¯×Ó×öTCP¿Í»§¶Ë
-*			 ·Ç×èÈû£¬½áºÏsethomewifi_loopº¯ÊıÊ¹ÓÃ
-*	ĞÎ    ²Î: serverip : ·şÎñÆ÷IPµØÖ·
-*			  port £º Ô¶³Ì·şÎñµÄTCP¶Ë¿Ú
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: setserver_start
+*	åŠŸèƒ½è¯´æ˜: é“¾æ¥åˆ°è¿œç¨‹æœåŠ¡å™¨,TCPæœåŠ¡ç«¯å£.  ç‚‰å­åšTCPå®¢æˆ·ç«¯
+*			 éé˜»å¡ï¼Œç»“åˆsethomewifi_loopå‡½æ•°ä½¿ç”¨
+*	å½¢    å‚: serverip : æœåŠ¡å™¨IPåœ°å€
+*			  port ï¼š è¿œç¨‹æœåŠ¡çš„TCPç«¯å£
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void setserver_start(char * serverip, char * port)
@@ -1397,7 +1392,7 @@ void setserver_start(char * serverip, char * port)
 	strncpy(s_setserver_ip, serverip, sizeof(s_setserver_ip));
 	s_setserver_port = str_to_int(port);	
 	
-	printf("\r\n¡¾Á¬½Óµ½Home WiFi£¬·ÃÎÊÔ¶³ÌTCP·şÎñÆ÷¡¿\r\n");	
+	printf("\r\nã€è¿æ¥åˆ°Home WiFiï¼Œè®¿é—®è¿œç¨‹TCPæœåŠ¡å™¨ã€‘\r\n");	
 }
 
 void setserver_start2(char * serverip, char * port)
@@ -1406,19 +1401,19 @@ void setserver_start2(char * serverip, char * port)
 	strncpy(s_setserver_ip, serverip, sizeof(s_setserver_ip));
 	s_setserver_port = str_to_int(port);	
 	
-	printf("\r\n¡¾Á¬½Óµ½Home WiFi£¬·ÃÎÊÔ¶³ÌTCP·şÎñÆ÷¡¿\r\n");	
+	printf("\r\nã€è¿æ¥åˆ°Home WiFiï¼Œè®¿é—®è¿œç¨‹TCPæœåŠ¡å™¨ã€‘\r\n");	
 }
 
-/* ÓÃÓÚÊ§°ÜÖØĞÂÁ¬½Ó Ô¶³Ì·şÎñÆ÷£¬½öÓÃÓÚ³ÌĞòÉı¼¶ÖĞµ÷ÓÃ */
+/* ç”¨äºå¤±è´¥é‡æ–°è¿æ¥ è¿œç¨‹æœåŠ¡å™¨ï¼Œä»…ç”¨äºç¨‹åºå‡çº§ä¸­è°ƒç”¨ */
 void setserver_reconnect(void)
 {			
-	printf("\r\n¡¾Ê§°ÜºóÖØÁ¬£¬·ÃÎÊÔ¶³ÌTCP·şÎñÆ÷¡¿\r\n");	
+	printf("\r\nã€å¤±è´¥åé‡è¿ï¼Œè®¿é—®è¿œç¨‹TCPæœåŠ¡å™¨ã€‘\r\n");	
 	ESP32_LinkTCPServer(2, s_setserver_ip, s_setserver_port);
 }
 
 
 
-/* Á¬½ÓÈÎÎñÖ´ĞĞÍê±Ï */
+/* è¿æ¥ä»»åŠ¡æ‰§è¡Œå®Œæ¯• */
 uint8_t setserver_finished(void)
 {
 	if (s_setserver_state == 0)
@@ -1435,114 +1430,114 @@ void setserver_loop(void)
 	
 	switch (s_setserver_state)
 	{
-		case 0:			/* Ö´ĞĞÍê±Ï£¬ĞİÃß×´Ì¬ */
+		case 0:			/* æ‰§è¡Œå®Œæ¯•ï¼Œä¼‘çœ çŠ¶æ€ */
 			break;
 
-		case 1:			/* ½øÈëÒ»´Î */
-			s_err_cout = 0;		/* Çå³ö´í´ÎÊı */
-			s_setserver_state = 6;	/* ²»¸´Î»WIFIÄ£¿é */
+		case 1:			/* è¿›å…¥ä¸€æ¬¡ */
+			s_err_cout = 0;		/* æ¸…å‡ºé”™æ¬¡æ•° */
+			s_setserver_state = 6;	/* ä¸å¤ä½WIFIæ¨¡å— */
 			break;
 
 		case 99:
-			s_err_cout = 0;		/* Çå³ö´í´ÎÊı */
-			s_setserver_state = 2;	/* ¸´Î»wifiÄ£¿é */	
+			s_err_cout = 0;		/* æ¸…å‡ºé”™æ¬¡æ•° */
+			s_setserver_state = 2;	/* å¤ä½wifiæ¨¡å— */	
 			break;
 		
-		case 2:		/* <------ ³ö´íÊ±£¬Ñ­»·Èë¿Ú  */	
-			ESP32_PowerOn();	/* WIFIÄ£¿éµôµç¸´Î»Ò»´Î */
+		case 2:		/* <------ å‡ºé”™æ—¶ï¼Œå¾ªç¯å…¥å£  */	
+			ESP32_PowerOn();	/* WIFIæ¨¡å—æ‰ç”µå¤ä½ä¸€æ¬¡ */
 
 			s_setserver_state++;
 			break;
 	
 		case 3:
-			/* ÇĞ»»Ä£Ê½Ç°£¬²éÑ¯ÏÂµ±Ç°×´Ì¬ */
+			/* åˆ‡æ¢æ¨¡å¼å‰ï¼ŒæŸ¥è¯¢ä¸‹å½“å‰çŠ¶æ€ */
 			{
-				ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */	
+				ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */	
 			}						
-			ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + StationÄ£Ê½ */		
+			ESP32_SetWiFiMode(1);		/* 1 = STA, 2 = SAP,  3 = SAP + Stationæ¨¡å¼ */		
 
 			s_setserver_state++;
 			break;
 			
 		case 4:
-			/* ¼ÓÈë¼ÒÍ¥AP */
-			printf("\r\n¡¾¼ÓÈëHome AP...¡¿\r\n");	
-			wifi_led_joinap();	/* Á¬½Ówifi¹ı³ÌÖĞ¿ìËÙÉÁË¸ */
+			/* åŠ å…¥å®¶åº­AP */
+			printf("\r\nã€åŠ å…¥Home AP...ã€‘\r\n");	
+			wifi_led_joinap();	/* è¿æ¥wifiè¿‡ç¨‹ä¸­å¿«é€Ÿé—ªçƒ */
 			ESP32_PT_JoinAP(g_tParam2.wifi_ssid, g_tParam2.wifi_password, 30000);	
 			
 			s_setserver_state++;
 			break;
 
-		case 5:	/* ÔÚÕâ¸ö×´Ì¬µÈ´ıAPÓ¦´ğ 30s³¬Ê± */	
+		case 5:	/* åœ¨è¿™ä¸ªçŠ¶æ€ç­‰å¾…APåº”ç­” 30sè¶…æ—¶ */	
 			{
 				uint8_t re;
 				
 				re = ESP32_PT_WaitResonse();
-				if (re == PT_NULL)	/* ¿Õ²Ù×÷£¬ĞèÒª¼ÌĞøµÈ´ı */
+				if (re == PT_NULL)	/* ç©ºæ“ä½œï¼Œéœ€è¦ç»§ç»­ç­‰å¾… */
 				{
 					;
 				}
-				else if (re == PT_OK)	/* ³É¹¦Ö´ĞĞ */
+				else if (re == PT_OK)	/* æˆåŠŸæ‰§è¡Œ */
 				{
-					s_setserver_state++;		/* Ö´ĞĞ³É¹¦ */
+					s_setserver_state++;		/* æ‰§è¡ŒæˆåŠŸ */
 				}
 				else if (re == PT_ERR || re == PT_TIMEOUT)
 				{					
-					wifi_led_err();	/* Ö´ĞĞÊ§°Ü */
+					wifi_led_err();	/* æ‰§è¡Œå¤±è´¥ */
 					
-					s_setserver_state = 10;	/* Ê§°Ü */
+					s_setserver_state = 10;	/* å¤±è´¥ */
 				}				
 			}
 			break;
 		
 		case 6:
-			/* ´òÓ¡±¾µØIP */
+			/* æ‰“å°æœ¬åœ°IP */
 			{
 				char ip[20];
 				char mac[64];
 			
 				ESP32_GetLocalIP(ip, mac);
 
-				ESP32_QueryIPStatus();	/* ²éÑ¯µ±Ç°IPÁ´½Ó×´Ì¬ */		
+				ESP32_QueryIPStatus();	/* æŸ¥è¯¢å½“å‰IPé“¾æ¥çŠ¶æ€ */		
 			}
 			
-			/* Æô¶¯DHCH = 1 , ´ËÃüÁî»áĞ´flash²ÎÊı */
+			/* å¯åŠ¨DHCH = 1 , æ­¤å‘½ä»¤ä¼šå†™flashå‚æ•° */
 			//SP8266_SendAT("AT+CWDHCP=1,1");	
 			//ESP32_WaitResponse("OK\r\n", 1000);
 			
-			ESP32_CIPMUX(1);		/* ÆôÓÃ¶àÁ¬½ÓÄ£Ê½ */
+			ESP32_CIPMUX(1);		/* å¯ç”¨å¤šè¿æ¥æ¨¡å¼ */
 
 			{
 				uint8_t re;
 				
-				printf("\r\n¡¾Á¬½Óµ½Ô¶³ÌTCP·şÎñÆ÷.¡¿\r\n");
-				re = ESP32_LinkTCPServer(2, s_setserver_ip, s_setserver_port);  // ZHG Ê¹ÓÃÁ¬½ÓID2£¬  id = 1ÊÇ8080 tcp
-				if (re == 1)	/* Ö´ĞĞ³É¹¦ */
+				printf("\r\nã€è¿æ¥åˆ°è¿œç¨‹TCPæœåŠ¡å™¨.ã€‘\r\n");
+				re = ESP32_LinkTCPServer(2, s_setserver_ip, s_setserver_port);  // ZHG ä½¿ç”¨è¿æ¥ID2ï¼Œ  id = 1æ˜¯8080 tcp
+				if (re == 1)	/* æ‰§è¡ŒæˆåŠŸ */
 				{
 					wifi_led_ok();
 				}
-				else	/* Ö´ĞĞÊ§°Ü */
+				else	/* æ‰§è¡Œå¤±è´¥ */
 				{
 					wifi_led_err();
 				}	
 				link_id = 2;
 				
-				if (re == 1)		/* Ö´ĞĞ³É¹¦ */
+				if (re == 1)		/* æ‰§è¡ŒæˆåŠŸ */
 				{
 					wifi_led_ok();
 					
-					s_setserver_state = 0;	/* ³É¹¦½áÊø */
+					s_setserver_state = 0;	/* æˆåŠŸç»“æŸ */
 				}
-				else				/* Ö´ĞĞÊ§°Ü */
+				else				/* æ‰§è¡Œå¤±è´¥ */
 				{
 					wifi_led_err();
 					
-					s_setserver_state = 10;	/* Ê§°Ü */
+					s_setserver_state = 10;	/* å¤±è´¥ */
 				}								
 			}				
 			break;
 
-		case 10:			/* Ö´ĞĞÊ§°Ü, ĞİÏ¢1Ãëºó£¬ÖØÊÔ10´Î */
+		case 10:			/* æ‰§è¡Œå¤±è´¥, ä¼‘æ¯1ç§’åï¼Œé‡è¯•10æ¬¡ */
 			if (++s_err_cout > 10)
 			{
 				s_setserver_state = 0;
@@ -1550,12 +1545,12 @@ void setserver_loop(void)
 			else
 			{
 				s_setserver_state = 11;
-				s_last_time = bsp_GetRunTime();	/* ±£´æµ±Ç°ÔËĞĞÊ±¼ä */	
+				s_last_time = bsp_GetRunTime();	/* ä¿å­˜å½“å‰è¿è¡Œæ—¶é—´ */	
 			}
 			break;
 		
 		case 11:
-			if (bsp_CheckRunTime(s_last_time) > 1000)		/* 5ÃëºóÖØÊÔ */
+			if (bsp_CheckRunTime(s_last_time) > 1000)		/* 5ç§’åé‡è¯• */
 			{
 				//s_setserver_state = 2;
 				s_setserver_state = 4;
@@ -1564,8 +1559,6 @@ void setserver_loop(void)
 	}
 }
 
-	
 #endif
 
 /********************************************************/
-

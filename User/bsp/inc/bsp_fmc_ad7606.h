@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : AD7606Êı¾İ²É¼¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_ad7606.h
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : AD7606æ•°æ®é‡‡é›†æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_ad7606.h
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,7 +13,7 @@
 #ifndef _BSP_AD7606_H
 #define _BSP_AD7606_H
 
-/* ¹ı²ÉÑù±¶ÂÊ */
+/* è¿‡é‡‡æ ·å€ç‡ */
 typedef enum
 {
 	AD_OS_NO = 0,
@@ -23,30 +23,29 @@ typedef enum
 	AD_OS_X16 = 4,
 	AD_OS_X32 = 5,
 	AD_OS_X64 = 6
-}AD7606_OS_E;
+} AD7606_OS_E;
 
-
-/* ADÊı¾İ²É¼¯»º³åÇø FIFO */
-#define ADC_FIFO_SIZE	(2*1024)	/* ×ÜÌåÑù±¾Êı */
-
-typedef struct
-{
-	uint8_t ucOS;			/* ¹ı²ÉÑù±¶ÂÊ£¬0 - 6. 0±íÊ¾ÎŞ¹ı²ÉÑù */
-	uint8_t ucRange;		/* ÊäÈëÁ¿³Ì£¬0±íÊ¾Õı¸º5V, 1±íÊ¾Õı¸º10V */
-	int16_t sNowAdc[8];		/* µ±Ç°ADCÖµ, ÓĞ·ûºÅÊı */
-}AD7606_VAR_T;
+/* ADæ•°æ®é‡‡é›†ç¼“å†²åŒº FIFO */
+#define ADC_FIFO_SIZE (2 * 1024) /* æ€»ä½“æ ·æœ¬æ•° */
 
 typedef struct
 {
-	/* FIFO ½á¹¹ */
-	uint16_t usRead;		/* ¶ÁÖ¸Õë */
-	uint16_t usWrite;		/* Ğ´Ö¸Õë */
+	uint8_t ucOS;				/* è¿‡é‡‡æ ·å€ç‡ï¼Œ0 - 6. 0è¡¨ç¤ºæ— è¿‡é‡‡æ · */
+	uint8_t ucRange;		/* è¾“å…¥é‡ç¨‹ï¼Œ0è¡¨ç¤ºæ­£è´Ÿ5V, 1è¡¨ç¤ºæ­£è´Ÿ10V */
+	int16_t sNowAdc[8]; /* å½“å‰ADCå€¼, æœ‰ç¬¦å·æ•° */
+} AD7606_VAR_T;
 
-	uint16_t usCount;		/* ĞÂÊı¾İ¸öÊı */
-	uint8_t ucFull;			/* FIFOÂú±êÖ¾ */
+typedef struct
+{
+	/* FIFO ç»“æ„ */
+	uint16_t usRead;	/* è¯»æŒ‡é’ˆ */
+	uint16_t usWrite; /* å†™æŒ‡é’ˆ */
 
-	int16_t  sBuf[ADC_FIFO_SIZE];
-}AD7606_FIFO_T;
+	uint16_t usCount; /* æ–°æ•°æ®ä¸ªæ•° */
+	uint8_t ucFull;		/* FIFOæ»¡æ ‡å¿— */
+
+	int16_t sBuf[ADC_FIFO_SIZE];
+} AD7606_FIFO_T;
 
 void bsp_InitAD7606(void);
 void AD7606_SetOS(uint8_t _ucOS);
@@ -55,7 +54,7 @@ void AD7606_Reset(void);
 void AD7606_StartConvst(void);
 void AD7606_ReadNowAdc(void);
 
-/* ÏÂÃæµÄº¯ÊıÓÃÓÚFIFO²Ù×÷Ä£Ê½ */
+/* ä¸‹é¢çš„å‡½æ•°ç”¨äºFIFOæ“ä½œæ¨¡å¼ */
 void AD7606_EnterAutoMode(uint32_t _ulFreq);
 void AD7606_StartRecord(uint32_t _ulFreq);
 void AD7606_StopRecord(void);
@@ -63,11 +62,10 @@ uint8_t AD7606_FifoNewData(void);
 uint8_t AD7606_ReadFifo(uint16_t *_usReadAdc);
 uint8_t AD7606_FifoFull(void);
 
-
-/* È«¾Ö±äÁ¿ */
+/* å…¨å±€å˜é‡ */
 extern AD7606_VAR_T g_tAD7606;
 extern AD7606_FIFO_T g_tAdcFifo;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

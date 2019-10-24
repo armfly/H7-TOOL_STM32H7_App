@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : DAC8562Ä£¿é²âÊÔ½çÃæ
-*	ÎÄ¼şÃû³Æ : form_dac8562.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Çı¶¯°²¸»À³DAC8562Ä£¿é¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2014-10-15 armfly  Ê×·¢
+*	æ¨¡å—åç§° : DAC8562æ¨¡å—æµ‹è¯•ç•Œé¢
+*	æ–‡ä»¶åç§° : form_dac8562.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : é©±åŠ¨å®‰å¯Œè±DAC8562æ¨¡å—ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2014-10-15 armfly  é¦–å‘
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,13 +18,13 @@
 #include "form_dac8562.h"
 #include "math.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ºÚÉ« */
-	FONT_T FontBlue;	/* À¶É« */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é»‘è‰² */
+	FONT_T FontBlue;	/* è“è‰² */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
@@ -53,139 +53,138 @@ typedef struct
 	LABEL_T Label5;
 	LABEL_T Label6;
 
-	uint16_t DacValue;	/* DACÊı¾İ */
-	int32_t Voltage;	/* Êä³öµçÑ¹ */
-}Form8562_T;
+	uint16_t DacValue; /* DACæ•°æ® */
+	int32_t Voltage;	 /* è¾“å‡ºç”µå‹ */
+} Form8562_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - 53)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_T	"DAC8562 Ë«Â·DACÄ£¿é(16bit, -10V -> +10V)"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - 53)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_T "DAC8562 åŒè·¯DACæ¨¡å—(16bit, -10V -> +10V)"
 
-#define BTN1_H	32
-#define BTN1_W	105
+#define BTN1_H 32
+#define BTN1_W 105
 
-/* µÚ1ĞĞ°´Å¥×ø±ê */
-#define	BTN1_X	(BOX1_X + 10)
-#define	BTN1_Y	(BOX1_Y + 20)
-#define	BTN1_T	"-10V"
+/* ç¬¬1è¡ŒæŒ‰é’®åæ ‡ */
+#define BTN1_X (BOX1_X + 10)
+#define BTN1_Y (BOX1_Y + 20)
+#define BTN1_T "-10V"
 
-	#define BTN2_H	BTN1_H
-	#define BTN2_W	BTN1_W
-	#define	BTN2_X	(BTN1_X +  BTN1_W + 10)
-	#define	BTN2_Y	BTN1_Y
-	#define	BTN2_T	"0V"
+#define BTN2_H BTN1_H
+#define BTN2_W BTN1_W
+#define BTN2_X (BTN1_X + BTN1_W + 10)
+#define BTN2_Y BTN1_Y
+#define BTN2_T "0V"
 
-		#define BTN3_H	BTN1_H
-		#define BTN3_W	BTN1_W
-		#define	BTN3_X	(BTN1_X + 2 * (BTN1_W + 10))
-		#define	BTN3_Y	BTN1_Y
-		#define	BTN3_T	"+10V"
+#define BTN3_H BTN1_H
+#define BTN3_W BTN1_W
+#define BTN3_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN3_Y BTN1_Y
+#define BTN3_T "+10V"
 
-/* µÚ2ĞĞ°´Å¥×ø±ê */
-#define BTN4_H	BTN1_H
-#define BTN4_W	BTN1_W
-#define	BTN4_X	BTN1_X
-#define	BTN4_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN4_T	"DACÖµ+1"
+/* ç¬¬2è¡ŒæŒ‰é’®åæ ‡ */
+#define BTN4_H BTN1_H
+#define BTN4_W BTN1_W
+#define BTN4_X BTN1_X
+#define BTN4_Y (BTN1_Y + BTN1_H + 10)
+#define BTN4_T "DACå€¼+1"
 
-	#define BTN5_H	BTN1_H
-	#define BTN5_W	BTN1_W
-	#define	BTN5_X	(BTN1_X +  1 * (BTN1_W + 10))
-	#define	BTN5_Y	BTN4_Y
-	#define	BTN5_T	"DACÖµ-1"
+#define BTN5_H BTN1_H
+#define BTN5_W BTN1_W
+#define BTN5_X (BTN1_X + 1 * (BTN1_W + 10))
+#define BTN5_Y BTN4_Y
+#define BTN5_T "DACå€¼-1"
 
-		#define BTN6_H	BTN1_H
-		#define BTN6_W	BTN1_W
-		#define	BTN6_X	(BTN1_X +  2 * (BTN1_W + 10))
-		#define	BTN6_Y	BTN4_Y
-		#define	BTN6_T	"DACÖµ+100"
+#define BTN6_H BTN1_H
+#define BTN6_W BTN1_W
+#define BTN6_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN6_Y BTN4_Y
+#define BTN6_T "DACå€¼+100"
 
-			#define BTN7_H	BTN1_H
-			#define BTN7_W	BTN1_W
-			#define	BTN7_X	(BTN1_X +  3 * (BTN1_W + 10))
-			#define	BTN7_Y	BTN4_Y
-			#define	BTN7_T	"DACÖµ-100"
+#define BTN7_H BTN1_H
+#define BTN7_W BTN1_W
+#define BTN7_X (BTN1_X + 3 * (BTN1_W + 10))
+#define BTN7_Y BTN4_Y
+#define BTN7_T "DACå€¼-100"
 
-/* µÚ3ĞĞ°´Å¥×ø±ê */
-#define BTN8_H	BTN1_H
-#define BTN8_W	BTN1_W
-#define	BTN8_X	BTN1_X
-#define	BTN8_Y	(BTN1_Y + 2 * (BTN1_H + 10))
-#define	BTN8_T	"µçÑ¹+1mV"
+/* ç¬¬3è¡ŒæŒ‰é’®åæ ‡ */
+#define BTN8_H BTN1_H
+#define BTN8_W BTN1_W
+#define BTN8_X BTN1_X
+#define BTN8_Y (BTN1_Y + 2 * (BTN1_H + 10))
+#define BTN8_T "ç”µå‹+1mV"
 
-	#define BTN9_H	BTN1_H
-	#define BTN9_W	BTN1_W
-	#define	BTN9_X	(BTN1_X +  1 * (BTN1_W + 10))
-	#define	BTN9_Y	BTN8_Y
-	#define	BTN9_T	"µçÑ¹-1mV"
+#define BTN9_H BTN1_H
+#define BTN9_W BTN1_W
+#define BTN9_X (BTN1_X + 1 * (BTN1_W + 10))
+#define BTN9_Y BTN8_Y
+#define BTN9_T "ç”µå‹-1mV"
 
-		#define BTN10_H	BTN1_H
-		#define BTN10_W	BTN1_W
-		#define	BTN10_X	(BTN1_X +  2 * (BTN1_W + 10))
-		#define	BTN10_Y	BTN8_Y
-		#define	BTN10_T	"µçÑ¹+100mV"
+#define BTN10_H BTN1_H
+#define BTN10_W BTN1_W
+#define BTN10_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN10_Y BTN8_Y
+#define BTN10_T "ç”µå‹+100mV"
 
-			#define BTN11_H	BTN1_H
-			#define BTN11_W	BTN1_W
-			#define	BTN11_X	(BTN1_X +  3 * (BTN1_W + 10))
-			#define	BTN11_Y	BTN8_Y
-			#define	BTN11_T	"µçÑ¹-100mV"
+#define BTN11_H BTN1_H
+#define BTN11_W BTN1_W
+#define BTN11_X (BTN1_X + 3 * (BTN1_W + 10))
+#define BTN11_Y BTN8_Y
+#define BTN11_T "ç”µå‹-100mV"
 
-/* µÚ4ĞĞ°´Å¥×ø±ê */
-#define BTN12_H	BTN1_H
-#define BTN12_W	BTN1_W
-#define	BTN12_X	BTN1_X
-#define	BTN12_Y	(BTN1_Y + 3 * (BTN1_H + 10))
-#define	BTN12_T	"Í¬²½ÕıÏÒ²¨"
+/* ç¬¬4è¡ŒæŒ‰é’®åæ ‡ */
+#define BTN12_H BTN1_H
+#define BTN12_W BTN1_W
+#define BTN12_X BTN1_X
+#define BTN12_Y (BTN1_Y + 3 * (BTN1_H + 10))
+#define BTN12_T "åŒæ­¥æ­£å¼¦æ³¢"
 
-	#define BTN13_H	BTN1_H
-	#define BTN13_W	BTN1_W
-	#define	BTN13_X	(BTN1_X +  1 * (BTN1_W + 10))
-	#define	BTN13_Y	BTN12_Y
-	#define	BTN13_T	"2Â·90¶ÈÕıÏÒ"
+#define BTN13_H BTN1_H
+#define BTN13_W BTN1_W
+#define BTN13_X (BTN1_X + 1 * (BTN1_W + 10))
+#define BTN13_Y BTN12_Y
+#define BTN13_T "2è·¯90åº¦æ­£å¼¦"
 
-		#define BTN14_H	BTN1_H
-		#define BTN14_W	BTN1_W
-		#define	BTN14_X	(BTN1_X +  2 * (BTN1_W + 10))
-		#define	BTN14_Y	BTN12_Y
-		#define	BTN14_T	"2Â·180¶ÈÕıÏÒ"
+#define BTN14_H BTN1_H
+#define BTN14_W BTN1_W
+#define BTN14_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN14_Y BTN12_Y
+#define BTN14_T "2è·¯180åº¦æ­£å¼¦"
 
-			#define BTN15_H	BTN1_H
-			#define BTN15_W	BTN1_W
-			#define	BTN15_X	(BTN1_X +  3 * (BTN1_W + 10))
-			#define	BTN15_Y	BTN12_Y
-			#define	BTN15_T	"Í£Ö¹ÕıÏÒÊä³ö"
+#define BTN15_H BTN1_H
+#define BTN15_W BTN1_W
+#define BTN15_X (BTN1_X + 3 * (BTN1_W + 10))
+#define BTN15_Y BTN12_Y
+#define BTN15_T "åœæ­¢æ­£å¼¦è¾“å‡º"
 
-#define	LBL1_X	BOX1_X + 5
-#define	LBL1_Y	190
-#define	LBL1_T "µ±Ç°DACÖµ:"
+#define LBL1_X BOX1_X + 5
+#define LBL1_Y 190
+#define LBL1_T "å½“å‰DACå€¼:"
 
-#define	LBL2_X	LBL1_X + 85
-#define	LBL2_Y	LBL1_Y
-#define	LBL2_T ""
+#define LBL2_X LBL1_X + 85
+#define LBL2_Y LBL1_Y
+#define LBL2_T ""
 
-#define	LBL3_X	LBL1_X
-#define	LBL3_Y	LBL1_Y + 20
-#define	LBL3_T " Êä³öµçÑ¹:"
+#define LBL3_X LBL1_X
+#define LBL3_Y LBL1_Y + 20
+#define LBL3_T " è¾“å‡ºç”µå‹:"
 
-#define	LBL4_X	LBL3_X + 85
-#define	LBL4_Y	LBL3_Y
-#define	LBL4_T " "
+#define LBL4_X LBL3_X + 85
+#define LBL4_Y LBL3_Y
+#define LBL4_T " "
 
-
-/* °´Å¥ */
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	80
-#define	BTN_RET_X	(g_LcdWidth - BTN_RET_W - 8)
-#define	BTN_RET_Y	(g_LcdHeight - BTN_RET_H - 4)
-#define	BTN_RET_T	"·µ»Ø"
+/* æŒ‰é’® */
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 80
+#define BTN_RET_X (g_LcdWidth - BTN_RET_W - 8)
+#define BTN_RET_Y (g_LcdHeight - BTN_RET_H - 4)
+#define BTN_RET_T "è¿”å›"
 
 static void InitForm8562(void);
 static void DispForm8562(void);
@@ -196,46 +195,46 @@ static void MakeSinTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBotto
 
 Form8562_T *Form8562;
 
-#define DAC_OUT_FREQ	10000		/* DAC Êä³öÑù±¾ÆµÂÊ 10KHz */
-#define WAVE_SAMPLES	200			/* Ã¿ÖÜÆÚÑù±¾Êı£¬ Ô½´ó²¨ĞÎ·ù¶ÈÔ½Ï¸Äå£¬µ«ÊÇÊä³ö×î´óÆµÂÊ»á½µµÍ */
+#define DAC_OUT_FREQ 10000 /* DAC è¾“å‡ºæ ·æœ¬é¢‘ç‡ 10KHz */
+#define WAVE_SAMPLES 200	 /* æ¯å‘¨æœŸæ ·æœ¬æ•°ï¼Œ è¶Šå¤§æ³¢å½¢å¹…åº¦è¶Šç»†è…»ï¼Œä½†æ˜¯è¾“å‡ºæœ€å¤§é¢‘ç‡ä¼šé™ä½ */
 
 static uint16_t s_WaveBuf[WAVE_SAMPLES];
 static uint16_t s_WavePos1, s_WavePos2;
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitForm8562
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitForm8562
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitForm8562(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	Form8562->FontBox.FontCode = FC_ST_16;
-	Form8562->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	Form8562->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	Form8562->FontBox.FrontColor = CL_BLACK;
 	Form8562->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	Form8562->FontBlack.FontCode = FC_ST_16;
-	Form8562->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	Form8562->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	Form8562->FontBlack.FrontColor = CL_BLACK;
 	Form8562->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	Form8562->FontBlue.FontCode = FC_ST_16;
 	Form8562->FontBlue.BackColor = CL_BTN_FACE;
 	Form8562->FontBlue.FrontColor = CL_BLUE;
 	Form8562->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	Form8562->FontBtn.FontCode = FC_ST_16;
-	Form8562->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	Form8562->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	Form8562->FontBtn.FrontColor = CL_BLACK;
 	Form8562->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	Form8562->Box1.Left = BOX1_X;
 	Form8562->Box1.Top = BOX1_Y;
 	Form8562->Box1.Height = BOX1_H;
@@ -243,7 +242,7 @@ static void InitForm8562(void)
 	Form8562->Box1.pCaption = BOX1_T;
 	Form8562->Box1.Font = &Form8562->FontBox;
 
-	/* ±êÇ© */
+	/* æ ‡ç­¾ */
 	Form8562->Label1.Left = LBL1_X;
 	Form8562->Label1.Top = LBL1_Y;
 	Form8562->Label1.MaxLen = 0;
@@ -268,7 +267,7 @@ static void InitForm8562(void)
 	Form8562->Label4.pCaption = LBL4_T;
 	Form8562->Label4.Font = &Form8562->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	Form8562->BtnRet.Left = BTN_RET_X;
 	Form8562->BtnRet.Top = BTN_RET_Y;
 	Form8562->BtnRet.Height = BTN_RET_H;
@@ -400,16 +399,16 @@ static void InitForm8562(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: FormMainDAC8562
-*	¹¦ÄÜËµÃ÷: DAC8562²âÊÔÖ÷³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: FormMainDAC8562
+*	åŠŸèƒ½è¯´æ˜: DAC8562æµ‹è¯•ä¸»ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void FormMainDAC8562(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	Form8562_T form;
@@ -426,7 +425,7 @@ void FormMainDAC8562(void)
 
 	Form8562->DacValue = 0;
 
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -435,8 +434,8 @@ void FormMainDAC8562(void)
 		{
 			fDispVolt = 0;
 
-			bsp_SetTIMforInt(TIM7, 0, 0, 0); 	/* ¹Ø±ÕÓÃÓÚ²¨ĞÎ·¢ÉúµÄ¶¨Ê±Æ÷ */
-			
+			bsp_SetTIMforInt(TIM7, 0, 0, 0); /* å…³é—­ç”¨äºæ³¢å½¢å‘ç”Ÿçš„å®šæ—¶å™¨ */
+
 			DAC8562_SetDacData(0, Form8562->DacValue);
 			DAC8562_SetDacData(1, Form8562->DacValue);
 
@@ -444,189 +443,189 @@ void FormMainDAC8562(void)
 			DispDacVoltage();
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (LCD_ButtonTouchDown(&Form8562->BtnRet, tpX, tpY))
-					{
-						//fQuit = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn1, tpX, tpY))
-					{
-						Form8562->DacValue = 0;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn2, tpX, tpY))
-					{
-						Form8562->DacValue = 32767;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn3, tpX, tpY))
-					{
-						Form8562->DacValue = 65535;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn4, tpX, tpY))
-					{
-						Form8562->DacValue++;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn5, tpX, tpY))
-					{
-						Form8562->DacValue--;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn6, tpX, tpY))
-					{
-						Form8562->DacValue += 100;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn7, tpX, tpY))
-					{
-						Form8562->DacValue -= 100;
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn8, tpX, tpY))
-					{
-						/* +1mV */
-						Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
-						Form8562->Voltage += 10;
-						Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn9, tpX, tpY))
-					{
-						/* -1mV */
-						Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
-						Form8562->Voltage -= 10;
-						Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn10, tpX, tpY))
-					{
-						/* +100mV */
-						Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
-						Form8562->Voltage += 1000;
-						Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn11, tpX, tpY))
-					{
-						/* -100mV */
-						Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
-						Form8562->Voltage -= 1000;
-						Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
-						fDispVolt = 1;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn12, tpX, tpY))
-					{
-						bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
-						s_WavePos1 = 0;					/* ²¨ĞÎ1³¬Ç° 0¶È */
-						s_WavePos2 = 0;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn13, tpX, tpY))
-					{
-						bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
-						s_WavePos1 = WAVE_SAMPLES / 4;	/* ²¨ĞÎ1³¬Ç° 90¶È */
-						s_WavePos2 = 0;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn14, tpX, tpY))
-					{
-						bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
-						s_WavePos1 = WAVE_SAMPLES / 2;	/* ²¨ĞÎ1³¬Ç° 180¶È */
-						s_WavePos2 = 0;
-					}
-					else if (LCD_ButtonTouchDown(&Form8562->Btn15, tpX, tpY))
-					{
-						bsp_SetTIMforInt(TIM7, 0, 0, 0); 	/* ¹Ø±ÕÓÃÓÚ²¨ĞÎ·¢ÉúµÄ¶¨Ê±Æ÷ */
-						fDispVolt = 1;
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (LCD_ButtonTouchDown(&Form8562->BtnRet, tpX, tpY))
+				{
+					//fQuit = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn1, tpX, tpY))
+				{
+					Form8562->DacValue = 0;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn2, tpX, tpY))
+				{
+					Form8562->DacValue = 32767;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn3, tpX, tpY))
+				{
+					Form8562->DacValue = 65535;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn4, tpX, tpY))
+				{
+					Form8562->DacValue++;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn5, tpX, tpY))
+				{
+					Form8562->DacValue--;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn6, tpX, tpY))
+				{
+					Form8562->DacValue += 100;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn7, tpX, tpY))
+				{
+					Form8562->DacValue -= 100;
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn8, tpX, tpY))
+				{
+					/* +1mV */
+					Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
+					Form8562->Voltage += 10;
+					Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn9, tpX, tpY))
+				{
+					/* -1mV */
+					Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
+					Form8562->Voltage -= 10;
+					Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn10, tpX, tpY))
+				{
+					/* +100mV */
+					Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
+					Form8562->Voltage += 1000;
+					Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn11, tpX, tpY))
+				{
+					/* -100mV */
+					Form8562->Voltage = DAC8562_DacToVoltage(Form8562->DacValue);
+					Form8562->Voltage -= 1000;
+					Form8562->DacValue = DAC8562_VoltageToDac(Form8562->Voltage);
+					fDispVolt = 1;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn12, tpX, tpY))
+				{
+					bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
+					s_WavePos1 = 0; /* æ³¢å½¢1è¶…å‰ 0åº¦ */
+					s_WavePos2 = 0;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn13, tpX, tpY))
+				{
+					bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
+					s_WavePos1 = WAVE_SAMPLES / 4; /* æ³¢å½¢1è¶…å‰ 90åº¦ */
+					s_WavePos2 = 0;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn14, tpX, tpY))
+				{
+					bsp_SetTIMforInt(TIM7, DAC_OUT_FREQ, 0, 0);
+					s_WavePos1 = WAVE_SAMPLES / 2; /* æ³¢å½¢1è¶…å‰ 180åº¦ */
+					s_WavePos2 = 0;
+				}
+				else if (LCD_ButtonTouchDown(&Form8562->Btn15, tpX, tpY))
+				{
+					bsp_SetTIMforInt(TIM7, 0, 0, 0); /* å…³é—­ç”¨äºæ³¢å½¢å‘ç”Ÿçš„å®šæ—¶å™¨ */
+					fDispVolt = 1;
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&Form8562->BtnRet, tpX, tpY))
-					{
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else
-					{
-						LCD_ButtonTouchRelease(&Form8562->BtnRet, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn1, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn2, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn3, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn4, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn5, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn6, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn7, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn8, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn9, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn10, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn11, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn12, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn13, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn14, tpX, tpY);
-						LCD_ButtonTouchRelease(&Form8562->Btn15, tpX, tpY);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&Form8562->BtnRet, tpX, tpY))
+				{
+					fQuit = 1; /* è¿”å› */
+				}
+				else
+				{
+					LCD_ButtonTouchRelease(&Form8562->BtnRet, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn1, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn2, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn3, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn4, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn5, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn6, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn7, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn8, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn9, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn10, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn11, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn12, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn13, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn14, tpX, tpY);
+					LCD_ButtonTouchRelease(&Form8562->Btn15, tpX, tpY);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü + 1*/
-					break;
+			case KEY_DOWN_K1: /* K1é”® + 1*/
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü - 1 */
-					break;
+			case KEY_DOWN_K2: /* K2é”® - 1 */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü - Çå0 */
-					break;
+			case KEY_DOWN_K3: /* K3é”® - æ¸…0 */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
 
-	bsp_SetTIMforInt(TIM7, 0, 0, 0); 	/* ¹Ø±ÕÓÃÓÚ²¨ĞÎ·¢ÉúµÄ¶¨Ê±Æ÷ */
+	bsp_SetTIMforInt(TIM7, 0, 0, 0); /* å…³é—­ç”¨äºæ³¢å½¢å‘ç”Ÿçš„å®šæ—¶å™¨ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispForm8562
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispForm8562
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispForm8562(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&Form8562->Box1);
 
 	LCD_DrawLabel(&Form8562->Label1);
@@ -634,7 +633,7 @@ static void DispForm8562(void)
 	LCD_DrawLabel(&Form8562->Label3);
 	LCD_DrawLabel(&Form8562->Label4);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&Form8562->Btn1);
 	LCD_DrawButton(&Form8562->Btn2);
 	LCD_DrawButton(&Form8562->Btn3);
@@ -657,10 +656,10 @@ static void DispForm8562(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispDacValue
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾µ±Ç°DACÊıÖµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispDacValue
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºå½“å‰DACæ•°å€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispDacValue(void)
@@ -675,11 +674,11 @@ static void DispDacValue(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispDacVoltage
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾µçÑ¹
-*	ĞÎ    ²Î: ÎŞ
+*	å‡½ æ•° å: DispDacVoltage
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºç”µå‹
+*	å½¢    å‚: æ— 
 *			  _
-*	·µ »Ø Öµ: ÎŞ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispDacVoltage(void)
@@ -694,26 +693,25 @@ static void DispDacVoltage(void)
 	LCD_DrawLabel(&Form8562->Label4);
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MakeSinTable
-*	¹¦ÄÜËµÃ÷: ¼ÆËã²úÉúÕıÏÒ²¨Êı×é
-*	ĞÎ    ²Î: _pBuf : Ä¿±ê»º³åÇø
-*			  _usSamples : Ã¿¸öÖÜÆÚµÄÑù±¾Êı £¨½¨Òé´óÓÚ32£¬²¢ÇÒÊÇÅ¼Êı£©
-*			 _usBottom : ²¨¹ÈÖµ
-*			 _usTop : ²¨·åÖµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MakeSinTable
+*	åŠŸèƒ½è¯´æ˜: è®¡ç®—äº§ç”Ÿæ­£å¼¦æ³¢æ•°ç»„
+*	å½¢    å‚: _pBuf : ç›®æ ‡ç¼“å†²åŒº
+*			  _usSamples : æ¯ä¸ªå‘¨æœŸçš„æ ·æœ¬æ•° ï¼ˆå»ºè®®å¤§äº32ï¼Œå¹¶ä¸”æ˜¯å¶æ•°ï¼‰
+*			 _usBottom : æ³¢è°·å€¼
+*			 _usTop : æ³¢å³°å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void MakeSinTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBottom, uint16_t _usTop)
 {
 	uint16_t i;
-	uint16_t mid;	/* ÖĞÖµ */
-	uint16_t att;	/* ·ù¶È */
+	uint16_t mid; /* ä¸­å€¼ */
+	uint16_t att; /* å¹…åº¦ */
 
-	mid = (_usBottom + _usTop) / 2;	/* 0Î»µÄÖµ */
-	att = (_usTop - _usBottom) / 2;  	/* ÕıÏÒ²¨·ù¶È£¬·å·åÖµ³ıÒÔ2 */
+	mid = (_usBottom + _usTop) / 2; /* 0ä½çš„å€¼ */
+	att = (_usTop - _usBottom) / 2; /* æ­£å¼¦æ³¢å¹…åº¦ï¼Œå³°å³°å€¼é™¤ä»¥2 */
 
 	for (i = 0; i < _usSamples; i++)
 	{
@@ -723,10 +721,10 @@ static void MakeSinTable(uint16_t *_pBuf, uint16_t _usSamples, uint16_t _usBotto
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TIM7_IRQHandler
-*	¹¦ÄÜËµÃ÷: TIM7 ÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TIM7_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: TIM7 ä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TIM7_IRQHandler(void)
@@ -734,31 +732,31 @@ void TIM7_IRQHandler(void)
 	uint16_t dac;
 
 	if (READ_BIT(TIM7->SR, TIM_IT_UPDATE) != 0)
-	{		
+	{
 		CLEAR_BIT(TIM7->SR, TIM_IT_UPDATE);
 
-		/* 3.5´çÆÁ£¬Èç¹û´¥Ãş³ÌĞòÕıÔÚ·ÃÎÊSPI´¥ÃşĞ¾Æ¬TSC2046£¬Ôò¶ªÆú±¾´Î */
+		/* 3.5å¯¸å±ï¼Œå¦‚æœè§¦æ‘¸ç¨‹åºæ­£åœ¨è®¿é—®SPIè§¦æ‘¸èŠ¯ç‰‡TSC2046ï¼Œåˆ™ä¸¢å¼ƒæœ¬æ¬¡ */
 		if (bsp_SpiBusBusy())
 		{
 			return;
 		}
 
-		/* ²¨ĞÎ1 */
+		/* æ³¢å½¢1 */
 		dac = s_WaveBuf[s_WavePos1++];
 		if (s_WavePos1 >= WAVE_SAMPLES)
 		{
 			s_WavePos1 = 0;
 		}
-		DAC8562_SetDacData(0, dac);		/* ¸Ä±äµÚ1Í¨µÀ DACÊä³öµçÑ¹ */
+		DAC8562_SetDacData(0, dac); /* æ”¹å˜ç¬¬1é€šé“ DACè¾“å‡ºç”µå‹ */
 
-		/* ²¨ĞÎ1 */
+		/* æ³¢å½¢1 */
 		dac = s_WaveBuf[s_WavePos2++];
 		if (s_WavePos2 >= WAVE_SAMPLES)
 		{
 			s_WavePos2 = 0;
 		}
-		DAC8562_SetDacData(1, dac);		/* ¸Ä±äµÚ2Í¨µÀ DACÊä³öµçÑ¹ */
+		DAC8562_SetDacData(1, dac); /* æ”¹å˜ç¬¬2é€šé“ DACè¾“å‡ºç”µå‹ */
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

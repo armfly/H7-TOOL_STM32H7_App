@@ -1,86 +1,85 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : TIM¶¨Ê±DMA²Ù×÷Ä£¿é
-*	ÎÄ¼şÃû³Æ : bps_tim_dma.c
-*	°æ    ±¾ : V1.3
-*	Ëµ    Ã÷ : TIM¶¨Ê±´¥·¢DMA´«Êä£¬FMCÊä³öµ½GPIO
+*	æ¨¡å—åç§° : TIMå®šæ—¶DMAæ“ä½œæ¨¡å—
+*	æ–‡ä»¶åç§° : bps_tim_dma.c
+*	ç‰ˆ    æœ¬ : V1.3
+*	è¯´    æ˜ : TIMå®šæ—¶è§¦å‘DMAä¼ è¾“ï¼ŒFMCè¾“å‡ºåˆ°GPIO
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-01-20  Eric    ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-01-20  Eric    æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 #include "bsp.h"
 
-/* ·½±ãCacheÀàµÄAPI²Ù×÷£¬×ö32×Ö½Ú¶ÔÆë, ÓÃµÄSRAM3 */
-#if defined ( __ICCARM__ )
+/* æ–¹ä¾¿Cacheç±»çš„APIæ“ä½œï¼Œåš32å­—èŠ‚å¯¹é½, ç”¨çš„SRAM3 */
+#if defined(__ICCARM__)
 #pragma location = 0x38000000
-uint8_t SRC_Buffer_Toggle[16]  =
-                              { 
-                                0x00U,     
-                                0xFFU,   
-                                0x00U,   
-                                0xFFU,   
-                                0x00U,  
-                                0xFFU,   
-                                0x00U,  
-                                0xFFU,   
-                                0x00U, 
-                                0xFFU,   
-                                0x00U,  
-                                0xFFU,  
-                                0x00U, 
-                                0xFFU,  
-                                0x00U,  
-                                0xFFU, 
-                              };
+uint8_t SRC_Buffer_Toggle[16] =
+    {
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+};
 
-#elif defined ( __CC_ARM )
+#elif defined(__CC_ARM)
 //ALIGN_32BYTES(__attribute__((section (".RAM_D3"))) uint32_t SRC_Buffer_Toggle[16]) =
 const uint32_t SRC_Buffer_Toggle[16] =
-                                                                  { 
-                                                                    0x00U,     
-                                                                    0xFFU,   
-                                                                    0x00U,   
-                                                                    0xFFU,   
-                                                                    0x00U,  
-                                                                    0xFFU,   
-                                                                    0x00U,  
-                                                                    0xFFU,   
-                                                                    0x00U, 
-                                                                    0xFFU,   
-                                                                    0x00U,  
-                                                                    0xFFU,  
-                                                                    0x00U, 
-                                                                    0xFFU,  
-                                                                    0x00U,  
-                                                                    0xFFU, 
-                                                                  };
+    {
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+        0x00U,
+        0xFFU,
+};
 #endif
-
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TIM12_Config
-*	¹¦ÄÜËµÃ÷: ÅäÖÃTIM12£¬ÓÃÓÚ´¥·¢DMAMUXµÄÇëÇó·¢ÉúÆ÷
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TIM12_Config
+*	åŠŸèƒ½è¯´æ˜: é…ç½®TIM12ï¼Œç”¨äºè§¦å‘DMAMUXçš„è¯·æ±‚å‘ç”Ÿå™¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TIM12_Config(void)
 {
-    TIM_HandleTypeDef  htim ={0};
-    TIM_MasterConfigTypeDef sMasterConfig;
-    TIM_OC_InitTypeDef sConfig;
-    
-  	__HAL_RCC_TIM12_CLK_ENABLE();
+  TIM_HandleTypeDef htim = {0};
+  TIM_MasterConfigTypeDef sMasterConfig;
+  TIM_OC_InitTypeDef sConfig;
 
-    /*-----------------------------------------------------------------------
-		bsp.c ÎÄ¼şÖĞ void SystemClock_Config(void) º¯Êı¶ÔÊ±ÖÓµÄÅäÖÃÈçÏÂ: 
+  __HAL_RCC_TIM12_CLK_ENABLE();
+
+  /*-----------------------------------------------------------------------
+		bsp.c æ–‡ä»¶ä¸­ void SystemClock_Config(void) å‡½æ•°å¯¹æ—¶é’Ÿçš„é…ç½®å¦‚ä¸‹: 
 
         System Clock source       = PLL (HSE)
         SYSCLK(Hz)                = 400000000 (CPU Clock)
@@ -91,101 +90,101 @@ void TIM12_Config(void)
         D2 APB2 Prescaler         = 2 (APB2 Clock  100MHz)
         D3 APB4 Prescaler         = 2 (APB4 Clock  100MHz)
 
-        ÒòÎªAPB1 prescaler != 1, ËùÒÔ APB1ÉÏµÄTIMxCLK = APB1 x 2 = 200MHz;
-        ÒòÎªAPB2 prescaler != 1, ËùÒÔ APB2ÉÏµÄTIMxCLK = APB2 x 2 = 200MHz;
-        APB4ÉÏÃæµÄTIMxCLKÃ»ÓĞ·ÖÆµ£¬ËùÒÔ¾ÍÊÇ100MHz;
+        å› ä¸ºAPB1 prescaler != 1, æ‰€ä»¥ APB1ä¸Šçš„TIMxCLK = APB1 x 2 = 200MHz;
+        å› ä¸ºAPB2 prescaler != 1, æ‰€ä»¥ APB2ä¸Šçš„TIMxCLK = APB2 x 2 = 200MHz;
+        APB4ä¸Šé¢çš„TIMxCLKæ²¡æœ‰åˆ†é¢‘ï¼Œæ‰€ä»¥å°±æ˜¯100MHz;
 
-        APB1 ¶¨Ê±Æ÷ÓĞ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13, TIM14£¬LPTIM1
-        APB2 ¶¨Ê±Æ÷ÓĞ TIM1, TIM8 , TIM15, TIM16£¬TIM17
+        APB1 å®šæ—¶å™¨æœ‰ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13, TIM14ï¼ŒLPTIM1
+        APB2 å®šæ—¶å™¨æœ‰ TIM1, TIM8 , TIM15, TIM16ï¼ŒTIM17
 
-        APB4 ¶¨Ê±Æ÷ÓĞ LPTIM2£¬LPTIM3£¬LPTIM4£¬LPTIM5
+        APB4 å®šæ—¶å™¨æœ‰ LPTIM2ï¼ŒLPTIM3ï¼ŒLPTIM4ï¼ŒLPTIM5
 
     TIM12CLK = 200MHz/(Period + 1) / (Prescaler + 1) = 5MHz
-    º¯Êıbsp_InitTimDMA1ÖĞDMAMUX1Ñ¡ÔñµÄÊÇË«±ßÑØ´¥·¢£¬Ã¿¸öÊ±ÖÓ¿ÉÒÔ´¥·¢Á½´Î¡£
-	----------------------------------------------------------------------- */    
-    htim.Instance = TIM12;
+    å‡½æ•°bsp_InitTimDMA1ä¸­DMAMUX1é€‰æ‹©çš„æ˜¯åŒè¾¹æ²¿è§¦å‘ï¼Œæ¯ä¸ªæ—¶é’Ÿå¯ä»¥è§¦å‘ä¸¤æ¬¡ã€‚
+	----------------------------------------------------------------------- */
+  htim.Instance = TIM12;
 
-	htim.Init.Period            = 200 / 1 - 1;	
-	htim.Init.Prescaler         = 0;
-	htim.Init.ClockDivision     = 0;
-	htim.Init.CounterMode       = TIM_COUNTERMODE_UP;
-	htim.Init.RepetitionCounter = 0;
-	HAL_TIM_Base_Init(&htim);
-    
-    sConfig.OCMode     = TIM_OCMODE_PWM1;
-    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+  htim.Init.Period = 200 / 1 - 1;
+  htim.Init.Prescaler = 0;
+  htim.Init.ClockDivision = 0;
+  htim.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim.Init.RepetitionCounter = 0;
+  HAL_TIM_Base_Init(&htim);
 
-    /* Ñ¡ÔñOC1 */
-    sConfig.Pulse =  (htim.Init.Period + 1) / 2 - 1;  
-    if(HAL_TIM_OC_ConfigChannel(&htim, &sConfig, TIM_CHANNEL_1) != HAL_OK)
-    {
-		Error_Handler(__FILE__, __LINE__);
-    }
+  sConfig.OCMode = TIM_OCMODE_PWM1;
+  sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
 
-    if(HAL_TIM_OC_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
-    {
-		Error_Handler(__FILE__, __LINE__);
-    }
-    
-    /* TIM12 TRGO ´¥·¢DMAMUX1µÄÇëÇó·¢ÉúÆ÷ HAL_DMAMUX1_REQ_GEN_TIM12_TRGO */
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC1REF;
-    sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
-	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  /* é€‰æ‹©OC1 */
+  sConfig.Pulse = (htim.Init.Period + 1) / 2 - 1;
+  if (HAL_TIM_OC_ConfigChannel(&htim, &sConfig, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler(__FILE__, __LINE__);
+  }
 
-	HAL_TIMEx_MasterConfigSynchronization(&htim, &sMasterConfig);
+  if (HAL_TIM_OC_Start(&htim, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler(__FILE__, __LINE__);
+  }
+
+  /* TIM12 TRGO è§¦å‘DMAMUX1çš„è¯·æ±‚å‘ç”Ÿå™¨ HAL_DMAMUX1_REQ_GEN_TIM12_TRGO */
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC1REF;
+  sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+
+  HAL_TIMEx_MasterConfigSynchronization(&htim, &sMasterConfig);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitTimDMA1
-*	¹¦ÄÜËµÃ÷: ¶¨Ê±´¥·¢DMA¿ØÖÆFMC
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitTimDMA1
+*	åŠŸèƒ½è¯´æ˜: å®šæ—¶è§¦å‘DMAæ§åˆ¶FMC
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitTimDMA1(void)
 {
-    DMA_HandleTypeDef DMA_Handle = {0};
-    HAL_DMA_MuxRequestGeneratorConfigTypeDef dmamux_ReqGenParams = {0};
-    
-    /* Ê¹ÄÜÊ±ÖÓ */
-    __HAL_RCC_DMA1_CLK_ENABLE();
+  DMA_HandleTypeDef DMA_Handle = {0};
+  HAL_DMA_MuxRequestGeneratorConfigTypeDef dmamux_ReqGenParams = {0};
 
-     /*##-1- ÅäÖÃDMA ##################################################*/
-    /* Ê¹ÓÃµÄDMA1£¬¶øDMAMUX1µÄÇëÇó·¢ÉúÆ÷Ê¹ÓÃµÄÍ¨µÀ0£¬¼´DMA_REQUEST_GENERATOR0 */
-    DMA_Handle.Instance                 = DMA1_Stream1;
-    DMA_Handle.Init.Request             = DMA_REQUEST_GENERATOR0;  
-    DMA_Handle.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-    DMA_Handle.Init.PeriphInc           = DMA_PINC_DISABLE;
-    DMA_Handle.Init.MemInc              = DMA_MINC_ENABLE;
-    DMA_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;		//DMA_PDATAALIGN_BYTE;
-    DMA_Handle.Init.MemDataAlignment    = DMA_MDATAALIGN_WORD;	//DMA_PDATAALIGN_BYTE;
-    DMA_Handle.Init.Mode                = DMA_CIRCULAR;
-    DMA_Handle.Init.Priority            = DMA_PRIORITY_VERY_HIGH;	//DMA_PRIORITY_LOW;
-    DMA_Handle.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-    DMA_Handle.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-    DMA_Handle.Init.MemBurst            = DMA_MBURST_SINGLE; // DMA_MBURST_SINGLE;
-    DMA_Handle.Init.PeriphBurst         = DMA_MBURST_SINGLE;	//DMA_PBURST_SINGLE;
-    
-    /* ³õÊ¼»¯ */
-    HAL_DMA_Init(&DMA_Handle);
+  /* ä½¿èƒ½æ—¶é’Ÿ */
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
-    /*##-2- ÅäÖÃDMAMUX1 ##################################################*/
-    /* ¿ÉÒÔÑ¡ÔñLPTIM1ºÍTIM12´¥·¢ */
-    //dmamux_ReqGenParams.SignalID  =    HAL_DMAMUX1_REQ_GEN_LPTIM1_OUT;  /* ÇëÇó´¥·¢Æ÷Ñ¡ÔñLPTIM1_OUT */
-    dmamux_ReqGenParams.SignalID  = HAL_DMAMUX1_REQ_GEN_TIM12_TRGO;   /* ÇëÇó´¥·¢Æ÷Ñ¡ÔñTIM12_TRGO */
-    dmamux_ReqGenParams.Polarity  = HAL_DMAMUX_REQ_GEN_RISING; /* TIMÊä³öµÄÉÏÉıÑØºÍÏÂ½µÑØ¾ù¿É´¥·¢  */
-    dmamux_ReqGenParams.RequestNumber = 3;                             /* ´¥·¢ºó£¬´«Êä½øĞĞ1´ÎDMA´«Êä */
+  /*##-1- é…ç½®DMA ##################################################*/
+  /* ä½¿ç”¨çš„DMA1ï¼Œè€ŒDMAMUX1çš„è¯·æ±‚å‘ç”Ÿå™¨ä½¿ç”¨çš„é€šé“0ï¼Œå³DMA_REQUEST_GENERATOR0 */
+  DMA_Handle.Instance = DMA1_Stream1;
+  DMA_Handle.Init.Request = DMA_REQUEST_GENERATOR0;
+  DMA_Handle.Init.Direction = DMA_MEMORY_TO_PERIPH;
+  DMA_Handle.Init.PeriphInc = DMA_PINC_DISABLE;
+  DMA_Handle.Init.MemInc = DMA_MINC_ENABLE;
+  DMA_Handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD; //DMA_PDATAALIGN_BYTE;
+  DMA_Handle.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;    //DMA_PDATAALIGN_BYTE;
+  DMA_Handle.Init.Mode = DMA_CIRCULAR;
+  DMA_Handle.Init.Priority = DMA_PRIORITY_VERY_HIGH; //DMA_PRIORITY_LOW;
+  DMA_Handle.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+  DMA_Handle.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+  DMA_Handle.Init.MemBurst = DMA_MBURST_SINGLE;    // DMA_MBURST_SINGLE;
+  DMA_Handle.Init.PeriphBurst = DMA_MBURST_SINGLE; //DMA_PBURST_SINGLE;
 
-    HAL_DMAEx_ConfigMuxRequestGenerator(&DMA_Handle, &dmamux_ReqGenParams);
-    HAL_DMAEx_EnableMuxRequestGenerator (&DMA_Handle);
+  /* åˆå§‹åŒ– */
+  HAL_DMA_Init(&DMA_Handle);
 
-    /*##-3- Æô¶¯DMA #####################################################*/
-    HAL_DMA_Start(&DMA_Handle, (uint32_t)SRC_Buffer_Toggle, (uint32_t)0x60000000, 8);
+  /*##-2- é…ç½®DMAMUX1 ##################################################*/
+  /* å¯ä»¥é€‰æ‹©LPTIM1å’ŒTIM12è§¦å‘ */
+  //dmamux_ReqGenParams.SignalID  =    HAL_DMAMUX1_REQ_GEN_LPTIM1_OUT;  /* è¯·æ±‚è§¦å‘å™¨é€‰æ‹©LPTIM1_OUT */
+  dmamux_ReqGenParams.SignalID = HAL_DMAMUX1_REQ_GEN_TIM12_TRGO; /* è¯·æ±‚è§¦å‘å™¨é€‰æ‹©TIM12_TRGO */
+  dmamux_ReqGenParams.Polarity = HAL_DMAMUX_REQ_GEN_RISING;      /* TIMè¾“å‡ºçš„ä¸Šå‡æ²¿å’Œä¸‹é™æ²¿å‡å¯è§¦å‘  */
+  dmamux_ReqGenParams.RequestNumber = 3;                         /* è§¦å‘åï¼Œä¼ è¾“è¿›è¡Œ1æ¬¡DMAä¼ è¾“ */
 
-    /* LPTIM1ºÍTIM12¶¼½øĞĞÁË³õÊ¼»¯£¬·½±ã²âÊÔ */
-//    LPTIM1_Config();
-    TIM12_Config();
+  HAL_DMAEx_ConfigMuxRequestGenerator(&DMA_Handle, &dmamux_ReqGenParams);
+  HAL_DMAEx_EnableMuxRequestGenerator(&DMA_Handle);
+
+  /*##-3- å¯åŠ¨DMA #####################################################*/
+  HAL_DMA_Start(&DMA_Handle, (uint32_t)SRC_Buffer_Toggle, (uint32_t)0x60000000, 8);
+
+  /* LPTIM1å’ŒTIM12éƒ½è¿›è¡Œäº†åˆå§‹åŒ–ï¼Œæ–¹ä¾¿æµ‹è¯• */
+  //    LPTIM1_Config();
+  TIM12_Config();
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

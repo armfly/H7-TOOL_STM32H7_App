@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µçÑ¹±í
-*	ÎÄ¼şÃû³Æ : status_voltage_meter.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : µçÑ¹±í
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-10-06 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : ç”µå‹è¡¨
+*	æ–‡ä»¶åç§° : status_voltage_meter.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ç”µå‹è¡¨
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-10-06 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -21,69 +21,69 @@ static void AutoVoltRange(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_VoltageMeter
-*	¹¦ÄÜËµÃ÷: µçÑ¹±í×´Ì¬.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_VoltageMeter
+*	åŠŸèƒ½è¯´æ˜: ç”µå‹è¡¨çŠ¶æ€.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_VoltageMeter(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
 
-	DispHeader("µçÑ¹±í");
-	
-	DSO_StartMode2();	/* Ê¾²¨Æ÷Æô¶¯Ä£Ê½2-µÍËÙ¶àÍ¨µÀÉ¨Ãè */
-	
+	DispHeader("ç”µå‹è¡¨");
+
+	DSO_StartMode2(); /* ç¤ºæ³¢å™¨å¯åŠ¨æ¨¡å¼2-ä½é€Ÿå¤šé€šé“æ‰«æ */
+
 	fRefresh = 1;
-	
+
 	bsp_StartAutoTimer(0, 300);
 	while (g_MainStatus == MS_VOLTAGE_METER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
-		
+
 			DispCH1CH2();
-			AutoVoltRange();			
+			AutoVoltRange();
 		}
-		
+
 		if (bsp_CheckTimer(0))
 		{
 			fRefresh = 1;
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* S¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_S: /* Sé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_S:			/* S¼üÊÍ·Å */
-					g_MainStatus = NextStatus(MS_VOLTAGE_METER);
-					break;
+			case KEY_UP_S: /* Sé”®é‡Šæ”¾ */
+				g_MainStatus = NextStatus(MS_VOLTAGE_METER);
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü³¤°´ */
-					break;				
+			case KEY_LONG_S: /* Sé”®é•¿æŒ‰ */
+				break;
 
-				case  KEY_DOWN_C:		/* C¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_C: /* Cé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_C:			/* C¼üÊÍ·Å */
-					g_MainStatus = LastStatus(MS_VOLTAGE_METER);
-					break;
+			case KEY_UP_C: /* Cé”®é‡Šæ”¾ */
+				g_MainStatus = LastStatus(MS_VOLTAGE_METER);
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					break;	
-				
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -92,31 +92,31 @@ void status_VoltageMeter(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AutoVoltRange
-*	¹¦ÄÜËµÃ÷: ×Ô¶¯µ÷½ÚÁ¿³Ì
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AutoVoltRange
+*	åŠŸèƒ½è¯´æ˜: è‡ªåŠ¨è°ƒèŠ‚é‡ç¨‹
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void AutoVoltRange(void)
 {
 	float range[] = {13.8, 6.4, 3.2, 1.6, 0.8, 0.4, 0.2, 0.1};
 	uint8_t i;
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		if (g_tVar.CH1Volt >= -range[7 - i] && g_tVar.CH1Volt <= range[7 - i])
 		{
-			WriteRegValue_06H(0x0202, 7 - i);		/* CH1Í¨µÀÁ¿³Ì0-7 */
+			WriteRegValue_06H(0x0202, 7 - i); /* CH1é€šé“é‡ç¨‹0-7 */
 			break;
 		}
 	}
-	
+
 	for (i = 0; i < 8; i++)
 	{
 		if (g_tVar.CH2Volt >= -range[7 - i] && g_tVar.CH2Volt <= range[7 - i])
 		{
-			WriteRegValue_06H(0x0203, 7 - i);		/* CH2Í¨µÀÁ¿³Ì0-7 */
+			WriteRegValue_06H(0x0203, 7 - i); /* CH2é€šé“é‡ç¨‹0-7 */
 			break;
 		}
 	}
@@ -124,30 +124,30 @@ static void AutoVoltRange(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispCH1CH2
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾CH1 CH2µçÑ¹
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispCH1CH2
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºCH1 CH2ç”µå‹
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispCH1CH2(void)
 {
 	FONT_T tFont;
 	char buf[64];
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_24;			/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = HEAD_BAR_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_24;				/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			/* å­—ä½“é¢œè‰² */
+		tFont.BackColor = HEAD_BAR_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
-	
+
 	sprintf(buf, "CH1: %8.3fV", g_tVar.CH1Volt);
 	LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 
 	sprintf(buf, "CH2: %8.3fV", g_tVar.CH2Volt);
-	LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);	
+	LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

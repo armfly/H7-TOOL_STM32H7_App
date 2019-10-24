@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : lwipĞ­ÒéÕ»Ó¦ÓÃ½Ó¿Ú
-*	ÎÄ¼şÃû³Æ : lwip_user.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : lwipåè®®æ ˆåº”ç”¨æ¥å£
+*	æ–‡ä»¶åç§° : lwip_user.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -15,48 +15,45 @@
 #ifndef _LWIP_USER
 #define _LWIP_USER
 
-#if 1	
-	/* IPµØÖ· */
-	#define IP_ADDR0   g_tParam.LocalIPAddr[0]
-	#define IP_ADDR1   g_tParam.LocalIPAddr[1]
-	#define IP_ADDR2   g_tParam.LocalIPAddr[2]
-	#define IP_ADDR3   g_tParam.LocalIPAddr[3]
-	
-	/* ×ÓÍøÑÚÂë */
-	#define NETMASK_ADDR0   g_tParam.NetMask[0]
-	#define NETMASK_ADDR1   g_tParam.NetMask[1]
-	#define NETMASK_ADDR2   g_tParam.NetMask[2]
-	#define NETMASK_ADDR3   g_tParam.NetMask[3]
+#if 1
+/* IPåœ°å€ */
+#define IP_ADDR0 g_tParam.LocalIPAddr[0]
+#define IP_ADDR1 g_tParam.LocalIPAddr[1]
+#define IP_ADDR2 g_tParam.LocalIPAddr[2]
+#define IP_ADDR3 g_tParam.LocalIPAddr[3]
 
-	/* Íø¹Ø */
-	#define GW_ADDR0   g_tParam.Gateway[0]
-	#define GW_ADDR1   g_tParam.Gateway[1]
-	#define GW_ADDR2   g_tParam.Gateway[2]
-	#define GW_ADDR3   g_tParam.Gateway[3]
+/* å­ç½‘æ©ç  */
+#define NETMASK_ADDR0 g_tParam.NetMask[0]
+#define NETMASK_ADDR1 g_tParam.NetMask[1]
+#define NETMASK_ADDR2 g_tParam.NetMask[2]
+#define NETMASK_ADDR3 g_tParam.NetMask[3]
+
+/* ç½‘å…³ */
+#define GW_ADDR0 g_tParam.Gateway[0]
+#define GW_ADDR1 g_tParam.Gateway[1]
+#define GW_ADDR2 g_tParam.Gateway[2]
+#define GW_ADDR3 g_tParam.Gateway[3]
 #else
-	/*Static IP ADDRESS: IP_ADDR0.IP_ADDR1.IP_ADDR2.IP_ADDR3 */
-	#define IP_ADDR0   ((uint8_t) 192U)
-	#define IP_ADDR1   ((uint8_t) 168U)
-	#define IP_ADDR2   ((uint8_t) 1U)
-	#define IP_ADDR3   ((uint8_t) 86U)
-	   
-	/*NETMASK*/
-	#define NETMASK_ADDR0   ((uint8_t) 255U)
-	#define NETMASK_ADDR1   ((uint8_t) 255U)
-	#define NETMASK_ADDR2   ((uint8_t) 255U)
-	#define NETMASK_ADDR3   ((uint8_t) 0U)
+/*Static IP ADDRESS: IP_ADDR0.IP_ADDR1.IP_ADDR2.IP_ADDR3 */
+#define IP_ADDR0 ((uint8_t)192U)
+#define IP_ADDR1 ((uint8_t)168U)
+#define IP_ADDR2 ((uint8_t)1U)
+#define IP_ADDR3 ((uint8_t)86U)
 
-	/*Gateway Address*/
-	#define GW_ADDR0   ((uint8_t) 192U)
-	#define GW_ADDR1   ((uint8_t) 168U)
-	#define GW_ADDR2   ((uint8_t) 1U)
-	#define GW_ADDR3   ((uint8_t) 1U) 
+/*NETMASK*/
+#define NETMASK_ADDR0 ((uint8_t)255U)
+#define NETMASK_ADDR1 ((uint8_t)255U)
+#define NETMASK_ADDR2 ((uint8_t)255U)
+#define NETMASK_ADDR3 ((uint8_t)0U)
+
+/*Gateway Address*/
+#define GW_ADDR0 ((uint8_t)192U)
+#define GW_ADDR1 ((uint8_t)168U)
+#define GW_ADDR2 ((uint8_t)1U)
+#define GW_ADDR3 ((uint8_t)1U)
 #endif
 
 void lwip_start(void);
 void lwip_pro(void);
 
-
 #endif
-
-

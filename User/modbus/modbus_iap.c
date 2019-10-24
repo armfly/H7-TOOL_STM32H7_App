@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÔÚÏßÉı¼¶¹Ì¼ş¡£
-*	ÎÄ¼şÃû³Æ : modbus_iap.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : 
+*	æ¨¡å—åç§° : åœ¨çº¿å‡çº§å›ºä»¶ã€‚
+*	æ–‡ä»¶åç§° : modbus_iap.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : 
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,20 +20,20 @@
 #include "param.h"
 #include "modbus_slave.h"
 
-uint32_t g_FlashAddr = 0;			/* CPUµ±Ç°Ğ´ÈëµÄµØÖ· */
-static uint8_t s_Databuf[1024];	/* Éı¼¶³ÌĞòbuf¡£½ÓÊÕµ½1024¸ö×Ö½ÚÒ»´ÎĞÔĞ´Èëcpu flash */
-uint32_t g_DataLen = 0;			/* ×îºóÒ»°ü°ü³¤ */
+uint32_t g_FlashAddr = 0;				/* CPUå½“å‰å†™å…¥çš„åœ°å€ */
+static uint8_t s_Databuf[1024]; /* å‡çº§ç¨‹åºbufã€‚æ¥æ”¶åˆ°1024ä¸ªå­—èŠ‚ä¸€æ¬¡æ€§å†™å…¥cpu flash */
+uint32_t g_DataLen = 0;					/* æœ€åä¸€åŒ…åŒ…é•¿ */
 
 uint8_t g_Upgrade = 0;
-uint8_t g_Erase = 0;			/* APPÓ¦ÓÃÇø´úÂë²Á³ı±êÖ¾ */
+uint8_t g_Erase = 0; /* APPåº”ç”¨åŒºä»£ç æ“¦é™¤æ ‡å¿— */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: WriteRegValue
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡±£³Ö¼Ä´æÆ÷µÄÖµ
-*	ĞÎ    ²Î: reg_addr ¼Ä´æÆ÷µØÖ·
-*			  reg_value ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: 1±íÊ¾OK 0±íÊ¾´íÎó
+*	å‡½ æ•° å: WriteRegValue
+*	åŠŸèƒ½è¯´æ˜: è¯»å–ä¿æŒå¯„å­˜å™¨çš„å€¼
+*	å½¢    å‚: reg_addr å¯„å­˜å™¨åœ°å€
+*			  reg_value å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: 1è¡¨ç¤ºOK 0è¡¨ç¤ºé”™è¯¯
 *********************************************************************************************************
 */
 extern uint8_t g_fReset;
@@ -42,150 +42,147 @@ uint8_t IAP_Write06H(uint16_t reg_addr, uint16_t reg_value)
 {
 	switch (reg_addr)
 	{
-		case BOOT_UPGRADE_FLAG:			/* ³ÌĞòÉı¼¶±êÖ¾¼Ä´æÆ÷ */
-			g_Upgrade = reg_value;
-			if (reg_value == 0)			/* Éı¼¶½áÊø */
+	case BOOT_UPGRADE_FLAG: /* ç¨‹åºå‡çº§æ ‡å¿—å¯„å­˜å™¨ */
+		g_Upgrade = reg_value;
+		if (reg_value == 0) /* å‡çº§ç»“æŸ */
+		{
+			if (bsp_WriteCpuFlash(g_FlashAddr, s_Databuf, g_DataLen) == 0) /* å†™æœ€åä¸€åŒ…æ•°æ®(å…ˆè¯»å–ï¼Œç»„æˆæ–°çš„1Kæ•°æ®ï¼Œå†å†™å…¥) */
 			{
-				if (bsp_WriteCpuFlash(g_FlashAddr, s_Databuf, g_DataLen) == 0)		/* Ğ´×îºóÒ»°üÊı¾İ(ÏÈ¶ÁÈ¡£¬×é³ÉĞÂµÄ1KÊı¾İ£¬ÔÙĞ´Èë) */
-				{
-					//DispMessage("³ÌĞòÉı¼¶³É¹¦£¡");
-					g_tParam.UpgradeFlag = 0x55AAA55A;
-					return 1;
-				}
-				else
-				{
-					return 0;
-				}
+				//DispMessage("ç¨‹åºå‡çº§æˆåŠŸï¼");
+				g_tParam.UpgradeFlag = 0x55AAA55A;
+				return 1;
 			}
-			break;
-		
-		case BOOT_BAUD:					/* ²¨ÌØÂÊ¼Ä´æÆ÷ */	
-			break;
-			
-		case SYS_RESET:					/* ÏµÍ³¸´Î» */
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_3, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_4, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_5, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_6, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_7, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_8, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_9, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_10, VoltageRange_3);
-//			FLASH_EraseSector(ADDR_FLASH_SECTOR_11, VoltageRange_3);
-			break;
-		
-		default:
-			return 0;		/* ²ÎÊıÒì³££¬·µ»Ø 0 */
+			else
+			{
+				return 0;
+			}
+		}
+		break;
+
+	case BOOT_BAUD: /* æ³¢ç‰¹ç‡å¯„å­˜å™¨ */
+		break;
+
+	case SYS_RESET: /* ç³»ç»Ÿå¤ä½ */
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_3, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_4, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_5, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_6, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_7, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_8, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_9, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_10, VoltageRange_3);
+									//			FLASH_EraseSector(ADDR_FLASH_SECTOR_11, VoltageRange_3);
+		break;
+
+	default:
+		return 0; /* å‚æ•°å¼‚å¸¸ï¼Œè¿”å› 0 */
 	}
 
-	return 1;		/* ³É¹¦ */
+	return 1; /* æˆåŠŸ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MODS_15H
-*	¹¦ÄÜËµÃ÷: Ğ´ÎÄ¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MODS_15H
+*	åŠŸèƒ½è¯´æ˜: å†™æ–‡ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern uint8_t g_Erase;
 void MODS_15H(void)
 {
 	/*
-		Ö÷»ú·¢ËÍ:
-			11 ´Ó»úµØÖ·
-			15 ¹¦ÄÜÂë
-			00 ÇëÇóÊı¾İ³¤¶È
-			01 ×ÓÇëÇóx£¬²Î¿¼ÀàĞÍ
-			00 ×ÓÇëÇóx£¬ÎÄ¼şºÅ
-			01 ×ÓÇëÇóx£¬¼ÇÂ¼ºÅ
-			9A ×ÓÇëÇóx£¬¼ÇÂ¼³¤¶È
-			9B ×ÓÇëÇóx£¬¼ÇÂ¼Êı¾İ
-			18 Ğ£Ñé¸ß×Ö½Ú
-			FC Ğ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€:
+			11 ä»æœºåœ°å€
+			15 åŠŸèƒ½ç 
+			00 è¯·æ±‚æ•°æ®é•¿åº¦
+			01 å­è¯·æ±‚xï¼Œå‚è€ƒç±»å‹
+			00 å­è¯·æ±‚xï¼Œæ–‡ä»¶å·
+			01 å­è¯·æ±‚xï¼Œè®°å½•å·
+			9A å­è¯·æ±‚xï¼Œè®°å½•é•¿åº¦
+			9B å­è¯·æ±‚xï¼Œè®°å½•æ•°æ®
+			18 æ ¡éªŒé«˜å­—èŠ‚
+			FC æ ¡éªŒä½å­—èŠ‚
 	
-		´Ó»úÏìÓ¦:
-			11 ´Ó»úµØÖ·
-			15 ¹¦ÄÜÂë
-			00 ÇëÇóÊı¾İ³¤¶È
-			01 ×ÓÇëÇóx£¬²Î¿¼ÀàĞÍ
-			00 ×ÓÇëÇóx£¬ÎÄ¼şºÅ
-			01 ×ÓÇëÇóx£¬¼ÇÂ¼ºÅ
-			9A ×ÓÇëÇóx£¬¼ÇÂ¼³¤¶È
-			9B ×ÓÇëÇóx£¬¼ÇÂ¼Êı¾İ
-			18 Ğ£Ñé¸ß×Ö½Ú
-			FC Ğ£ÑéµÍ×Ö½Ú
+		ä»æœºå“åº”:
+			11 ä»æœºåœ°å€
+			15 åŠŸèƒ½ç 
+			00 è¯·æ±‚æ•°æ®é•¿åº¦
+			01 å­è¯·æ±‚xï¼Œå‚è€ƒç±»å‹
+			00 å­è¯·æ±‚xï¼Œæ–‡ä»¶å·
+			01 å­è¯·æ±‚xï¼Œè®°å½•å·
+			9A å­è¯·æ±‚xï¼Œè®°å½•é•¿åº¦
+			9B å­è¯·æ±‚xï¼Œè®°å½•æ•°æ®
+			18 æ ¡éªŒé«˜å­—èŠ‚
+			FC æ ¡éªŒä½å­—èŠ‚
 */
 	uint8_t i;
-//	uint8_t DateLen;		/* ÇëÇóÊı¾İ³¤¶È */
-//	uint8_t Type;			/* ²Î¿¼ÀàĞÍ */
-//	uint16_t FileID;		/* ÎÄ¼şºÅ */
-	uint16_t RecordID;		/* ¼ÇÂ¼ºÅ */
-	uint16_t RecordLen;		/* ¼ÇÂ¼³¤¶È */
-	uint32_t Packet;		/* µÚ¼¸°üÊı¾İ */
-	static uint16_t s_LenBak;	/* ¼ÇÂ¼Ö®Ç°µÄÊı¾İ³¤¶È£¬Èç¹û³¤¶ÈÓëÖ®Ç°µÄ²»Í¬£¬ÔòÈÏÎªÊÇ×îºóÒ»°üÊı¾İ,ĞèÒªĞ´Èë */
-	uint32_t Cpu_Offset;	/* CPUµØÖ·Æ«ÒÆ */
-//	char buf[50];
-	
-	g_tModS.RspCode = RSP_OK;	
-	
-//	DateLen = g_tModS.RxBuf[2];
-//	Type = g_tModS.RxBuf[3];
-//	FileID = BEBufToUint16(&g_tModS.RxBuf[4]); 		/* ×ÓÇëÇóx£¬ÎÄ¼şºÅ */
-	RecordID = BEBufToUint16(&g_tModS.RxBuf[6]); 		/* ×ÓÇëÇóx£¬¼ÇÂ¼ºÅ */
-	RecordLen = BEBufToUint16(&g_tModS.RxBuf[8]); 	/* ×ÓÇëÇóx£¬¼ÇÂ¼³¤¶È */
-	
-	if (RecordID == 0)				/* µÚÒ»°üÊı¾İ£¬¾Í°ÑflashĞ´ÈëµØÖ·ÉèÎª»ùµØÖ·,Í¬Ê±²Á³ıÓ¦ÓÃÇø´úÂë */
+	//	uint8_t DateLen;		/* è¯·æ±‚æ•°æ®é•¿åº¦ */
+	//	uint8_t Type;			/* å‚è€ƒç±»å‹ */
+	//	uint16_t FileID;		/* æ–‡ä»¶å· */
+	uint16_t RecordID;				/* è®°å½•å· */
+	uint16_t RecordLen;				/* è®°å½•é•¿åº¦ */
+	uint32_t Packet;					/* ç¬¬å‡ åŒ…æ•°æ® */
+	static uint16_t s_LenBak; /* è®°å½•ä¹‹å‰çš„æ•°æ®é•¿åº¦ï¼Œå¦‚æœé•¿åº¦ä¸ä¹‹å‰çš„ä¸åŒï¼Œåˆ™è®¤ä¸ºæ˜¯æœ€åä¸€åŒ…æ•°æ®,éœ€è¦å†™å…¥ */
+	uint32_t Cpu_Offset;			/* CPUåœ°å€åç§» */
+														//	char buf[50];
+
+	g_tModS.RspCode = RSP_OK;
+
+	//	DateLen = g_tModS.RxBuf[2];
+	//	Type = g_tModS.RxBuf[3];
+	//	FileID = BEBufToUint16(&g_tModS.RxBuf[4]); 		/* å­è¯·æ±‚xï¼Œæ–‡ä»¶å· */
+	RecordID = BEBufToUint16(&g_tModS.RxBuf[6]);	/* å­è¯·æ±‚xï¼Œè®°å½•å· */
+	RecordLen = BEBufToUint16(&g_tModS.RxBuf[8]); /* å­è¯·æ±‚xï¼Œè®°å½•é•¿åº¦ */
+
+	if (RecordID == 0) /* ç¬¬ä¸€åŒ…æ•°æ®ï¼Œå°±æŠŠflashå†™å…¥åœ°å€è®¾ä¸ºåŸºåœ°å€,åŒæ—¶æ“¦é™¤åº”ç”¨åŒºä»£ç  */
 	{
 		//g_FlashAddr = APPLICATION_ADDRESS;
 		g_Erase = 1;
-		s_LenBak = RecordLen;		/* µÚ1°üµÄÊı¾İ³¤¶È£¬ÈÏÎªÊÇÊÕµ½Ã¿°üµÄ³¤¶È */
+		s_LenBak = RecordLen; /* ç¬¬1åŒ…çš„æ•°æ®é•¿åº¦ï¼Œè®¤ä¸ºæ˜¯æ”¶åˆ°æ¯åŒ…çš„é•¿åº¦ */
 	}
-	
+
 	Packet = RecordID + 1;
-	Cpu_Offset = RecordID * s_LenBak / 1024 * 1024;			/* CPUĞ´ÈëµÄÆ«ÒÆµØÖ· */
-	g_FlashAddr = APP_BUF_ADDR + Cpu_Offset;			/* ÏÂÒ»°üÊı¾İĞ´ÈëµÄÎ»ÖÃ£¬1024µÄÕûÊı±¶ */
-	
-	memcpy(&s_Databuf[(RecordID * s_LenBak) % 1024], &g_tModS.RxBuf[10], RecordLen);		/* ×é³É1KÊı¾İÔÙĞ´ÈëCPU flash */
-		
-	if ((Packet * s_LenBak) % 1024 != 0)					/* ÅĞ¶Ïµ±Ç°Êı¾İ°üÊÇ·ñÂú×ã1KµÄÕûÊı±¶ */
-	{	
-		g_DataLen = ((RecordID * s_LenBak) % 1024) + RecordLen;		/* ¼ÇÂ¼µ±Ç°ĞèÒªĞ´ÈëµÄ°ü³¤ */
+	Cpu_Offset = RecordID * s_LenBak / 1024 * 1024; /* CPUå†™å…¥çš„åç§»åœ°å€ */
+	g_FlashAddr = APP_BUF_ADDR + Cpu_Offset;				/* ä¸‹ä¸€åŒ…æ•°æ®å†™å…¥çš„ä½ç½®ï¼Œ1024çš„æ•´æ•°å€ */
+
+	memcpy(&s_Databuf[(RecordID * s_LenBak) % 1024], &g_tModS.RxBuf[10], RecordLen); /* ç»„æˆ1Kæ•°æ®å†å†™å…¥CPU flash */
+
+	if ((Packet * s_LenBak) % 1024 != 0) /* åˆ¤æ–­å½“å‰æ•°æ®åŒ…æ˜¯å¦æ»¡è¶³1Kçš„æ•´æ•°å€ */
+	{
+		g_DataLen = ((RecordID * s_LenBak) % 1024) + RecordLen; /* è®°å½•å½“å‰éœ€è¦å†™å…¥çš„åŒ…é•¿ */
 	}
-	else													/* Âú×ã1KµÄÕûÊı±¶£¬´ËÊ±²Å¿ªÊ¼½«1KÊı¾İĞ´ÈëCPU flash */
-	{	
-		if (bsp_WriteCpuFlash(g_FlashAddr, s_Databuf, 1024) == 0)		/* Ã¿´ÎĞ´Èë1024¸ö×Ö½Ú */
+	else /* æ»¡è¶³1Kçš„æ•´æ•°å€ï¼Œæ­¤æ—¶æ‰å¼€å§‹å°†1Kæ•°æ®å†™å…¥CPU flash */
+	{
+		if (bsp_WriteCpuFlash(g_FlashAddr, s_Databuf, 1024) == 0) /* æ¯æ¬¡å†™å…¥1024ä¸ªå­—èŠ‚ */
 		{
-//			sprintf(buf, "½ø¶È£º%d%%", RecordID * s_LenBak * 100 % 1024);
-//			DispMessage(buf);
-			//DispMessage("³ÌĞòÉı¼¶ÖĞ...");
+			//			sprintf(buf, "è¿›åº¦ï¼š%d%%", RecordID * s_LenBak * 100 % 1024);
+			//			DispMessage(buf);
+			//DispMessage("ç¨‹åºå‡çº§ä¸­...");
 			g_tModS.RspCode = RSP_OK;
 		}
 		else
 		{
-			g_tModS.RspCode = RSP_ERR_WRITE;				/* Ğ´ÈëÊ§°Ü */
+			g_tModS.RspCode = RSP_ERR_WRITE; /* å†™å…¥å¤±è´¥ */
 			goto err_ret;
 		}
 	}
 
-	
 err_ret:
-	if (g_tModS.RspCode == RSP_OK)			/* ÕıÈ·Ó¦´ğ */
+	if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 	{
 		g_tModS.TxCount = 0;
 		for (i = 0; i < 10; i++)
 		{
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[i];	/* Ó¦´ğÊı¾İ°ü */
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[i]; /* åº”ç­”æ•°æ®åŒ… */
 		}
 		MODS_SendWithCRC(g_tModS.TxBuf, g_tModS.TxCount);
 	}
 	else
 	{
-		MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+		MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
-
-
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

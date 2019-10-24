@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÖÜÆÚĞÔ¿ØÖÆÄ³¸öIO. ±ÈÈçÉÁË¸Ö¸Ê¾µÆ
-*	ÎÄ¼şÃû³Æ : bsp_period_ctrl.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : å‘¨æœŸæ€§æ§åˆ¶æŸä¸ªIO. æ¯”å¦‚é—ªçƒæŒ‡ç¤ºç¯
+*	æ–‡ä»¶åç§° : bsp_period_ctrl.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -16,10 +16,10 @@
 
 typedef struct
 {
-	/* ÏÂÃæÊÇÒ»¸öº¯ÊıÖ¸Õë */
-	void (*OnFunc)(void);	/* »Øµ÷º¯Êı£¬±ÈÈçµãÁÁLEDµÄº¯Êı */
-	void (*OffFunc)(void);	/* »Øµ÷º¯Êı£¬±ÈÈçÏ¨ÃğLEDµÄº¯Êı */
-		
+	/* ä¸‹é¢æ˜¯ä¸€ä¸ªå‡½æ•°æŒ‡é’ˆ */
+	void (*OnFunc)(void);	/* å›è°ƒå‡½æ•°ï¼Œæ¯”å¦‚ç‚¹äº®LEDçš„å‡½æ•° */
+	void (*OffFunc)(void); /* å›è°ƒå‡½æ•°ï¼Œæ¯”å¦‚ç†„ç­LEDçš„å‡½æ•° */
+
 	uint8_t ucEnalbe;
 	uint8_t ucState;
 	uint16_t usOnTime;
@@ -27,17 +27,17 @@ typedef struct
 	uint16_t usCycle;
 	uint16_t usCount;
 	uint16_t usCycleCount;
-}PERIOD_CTRL_T;
+} PERIOD_CTRL_T;
 
-/* ¹©Íâ²¿µ÷ÓÃµÄº¯ÊıÉùÃ÷ */
+/* ä¾›å¤–éƒ¨è°ƒç”¨çš„å‡½æ•°å£°æ˜ */
 void PERIOD_InitVar(void);
 void PERIOD_Scan(void);
 void PERIOD_Start(PERIOD_CTRL_T *_ptPer, uint16_t _usOnTime, uint16_t _usOffTime, uint16_t _usCycle);
 void PERIOD_Stop(PERIOD_CTRL_T *_ptPer);
 
-extern PERIOD_CTRL_T g_tWiFiLed;	/* WiFi Ö¸Ê¾µÆ */
-extern PERIOD_CTRL_T g_tRunLed;		/* ÔËĞĞ Ö¸Ê¾µÆ */
+extern PERIOD_CTRL_T g_tWiFiLed; /* WiFi æŒ‡ç¤ºç¯ */
+extern PERIOD_CTRL_T g_tRunLed;	/* è¿è¡Œ æŒ‡ç¤ºç¯ */
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

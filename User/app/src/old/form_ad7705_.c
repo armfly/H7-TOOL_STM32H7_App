@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µÈ´ı¿ª·¢µÄ³ÌĞò½çÃæ
-*	ÎÄ¼şÃû³Æ : reserve.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔMPU-6050, HCM5833L, BMP085, BH1750
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
+*	æ¨¡å—åç§° : ç­‰å¾…å¼€å‘çš„ç¨‹åºç•Œé¢
+*	æ–‡ä»¶åç§° : reserve.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•MPU-6050, HCM5833L, BMP085, BH1750
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,60 +17,61 @@
 #include "bsp.h"
 #include "form_ad7705.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; 
-	
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+
 	BUTTON_T BtnRet;
-}FormAD7705_T;
+} FormAD7705_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"AD7705Ä£¿é²âÊÔ³ÌĞò..."
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "AD7705æ¨¡å—æµ‹è¯•ç¨‹åº..."
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Í¨µÀ1 : "
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "é€šé“1 : "
 
-	#define LABEL2_X  	(LABEL1_X + 64)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"0000.0000"
+#define LABEL2_X (LABEL1_X + 64)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "0000.0000"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"Í¨µÀ2 : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "é€šé“2 : "
 
-	#define LABEL4_X  	(LABEL3_X + 64)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"00000.0000"
+#define LABEL4_X (LABEL3_X + 64)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "00000.0000"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 3)
-#define LABEL5_TEXT	"----"
-
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 3)
+#define LABEL5_TEXT "----"
 
 static void InitFormAD7705(void);
 static void DispFormAD7705(void);
@@ -79,16 +80,16 @@ FormAD7705_T *FormAD7705;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestAD7705
-*	¹¦ÄÜËµÃ÷: ²âÊÔAD7705Ä£¿é¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestAD7705
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•AD7705æ¨¡å—ã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestAD7705(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormAD7705_T form;
@@ -98,48 +99,48 @@ void TestAD7705(void)
 	InitFormAD7705();
 	DispFormAD7705();
 
-	bsp_InitTM7705();			/* ³õÊ¼»¯ÅäÖÃTM7705 */
+	bsp_InitTM7705(); /* åˆå§‹åŒ–é…ç½®TM7705 */
 
-	if (g_TM7705_OK == 0)	
+	if (g_TM7705_OK == 0)
 	{
-		FormAD7705->Label5.pCaption = "Î´¼ì²âµ½ AD7705";
+		FormAD7705->Label5.pCaption = "æœªæ£€æµ‹åˆ° AD7705";
 		LCD_DrawLabel(&FormAD7705->Label5);
 	}
-	else	
-	{		
-		FormAD7705->Label5.pCaption = "ÒÑ¼ì²âµ½ AD7705";
+	else
+	{
+		FormAD7705->Label5.pCaption = "å·²æ£€æµ‹åˆ° AD7705";
 		LCD_DrawLabel(&FormAD7705->Label5);
-		
-		TM7705_CalibSelf(1);		/* ×ÔĞ£×¼¡£Ö´ĞĞÊ±¼ä½Ï³¤£¬Ô¼180ms */
+
+		TM7705_CalibSelf(1); /* è‡ªæ ¡å‡†ã€‚æ‰§è¡Œæ—¶é—´è¾ƒé•¿ï¼Œçº¦180ms */
 		adc1 = TM7705_ReadAdc(1);
 
-		TM7705_CalibSelf(2);		/* ×ÔĞ£×¼¡£Ö´ĞĞÊ±¼ä½Ï³¤£¬Ô¼180ms */
+		TM7705_CalibSelf(2); /* è‡ªæ ¡å‡†ã€‚æ‰§è¡Œæ—¶é—´è¾ƒé•¿ï¼Œçº¦180ms */
 		adc2 = TM7705_ReadAdc(2);
 	}
 
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-		//TM7705_Scan1();		/* É¨ÃèADCÍ¨µÀ1 */
-		TM7705_Scan2();		/* É¨ÃèÁ½¸ö¸öADCÍ¨µÀ, ÎŞµÈ´ıµÄ */
+		//TM7705_Scan1();		/* æ‰«æADCé€šé“1 */
+		TM7705_Scan2(); /* æ‰«æä¸¤ä¸ªä¸ªADCé€šé“, æ— ç­‰å¾…çš„ */
 
 		{
-			/* ¶ÁÈ¡É¨Ãè½á¹û (½á¹û¶¨Ê±¶ÁÈ¡¼´¿É) */
+			/* è¯»å–æ‰«æç»“æœ (ç»“æœå®šæ—¶è¯»å–å³å¯) */
 			adc1 = TM7705_GetAdc1();
 			adc2 = TM7705_GetAdc2();
-			
-			/* ´òÓ¡²É¼¯Êı¾İ */
+
+			/* æ‰“å°é‡‡é›†æ•°æ® */
 			{
 				int volt1, volt2;
 				char buf[64];
 
-				/* ¼ÆËãÊµ¼ÊµçÑ¹Öµ£¨½üËÆ¹ÀËãµÄ£©£¬ÈçĞè×¼È·£¬Çë½øĞĞĞ£×¼ */
+				/* è®¡ç®—å®é™…ç”µå‹å€¼ï¼ˆè¿‘ä¼¼ä¼°ç®—çš„ï¼‰ï¼Œå¦‚éœ€å‡†ç¡®ï¼Œè¯·è¿›è¡Œæ ¡å‡† */
 				volt1 = (adc1 * 5000) / 65535;
 				volt2 = (adc2 * 5000) / 65535;
 
-				/* ÏÔÊ¾ADC²ÉÑù½á¹û */
+				/* æ˜¾ç¤ºADCé‡‡æ ·ç»“æœ */
 				sprintf(buf, "%5d (%5dmV)", adc1, volt1);
 				FormAD7705->Label2.pCaption = buf;
 				LCD_DrawLabel(&FormAD7705->Label2);
@@ -150,68 +151,68 @@ void TestAD7705(void)
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormAD7705->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormAD7705->BtnRet);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormAD7705->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormAD7705->BtnRet);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormAD7705->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormAD7705->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormAD7705->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormAD7705->BtnRet);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormAD7705->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormAD7705->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormAD7705->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormAD7705->BtnRet);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -219,39 +220,39 @@ void TestAD7705(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormAD7705
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormAD7705
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormAD7705(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormAD7705->FontBox.FontCode = FC_ST_16;
-	FormAD7705->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormAD7705->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormAD7705->FontBox.FrontColor = CL_BLACK;
 	FormAD7705->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormAD7705->FontBlack.FontCode = FC_ST_16;
-	FormAD7705->FontBlack.BackColor = CL_BTN_FACE;		/* Í¸Ã÷É« */
+	FormAD7705->FontBlack.BackColor = CL_BTN_FACE; /* é€æ˜è‰² */
 	FormAD7705->FontBlack.FrontColor = CL_BLACK;
 	FormAD7705->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormAD7705->FontBlue.FontCode = FC_ST_16;
 	FormAD7705->FontBlue.BackColor = CL_BTN_FACE;
 	FormAD7705->FontBlue.FrontColor = CL_BLUE;
 	FormAD7705->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormAD7705->FontBtn.FontCode = FC_ST_16;
-	FormAD7705->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormAD7705->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormAD7705->FontBtn.FrontColor = CL_BLACK;
 	FormAD7705->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormAD7705->Box1.Left = BOX1_X;
 	FormAD7705->Box1.Top = BOX1_Y;
 	FormAD7705->Box1.Height = BOX1_H;
@@ -259,7 +260,7 @@ static void InitFormAD7705(void)
 	FormAD7705->Box1.pCaption = BOX1_TEXT;
 	FormAD7705->Box1.Font = &FormAD7705->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormAD7705->Label1.Left = LABEL1_X;
 	FormAD7705->Label1.Top = LABEL1_Y;
 	FormAD7705->Label1.MaxLen = 0;
@@ -278,8 +279,7 @@ static void InitFormAD7705(void)
 	FormAD7705->Label5.pCaption = LABEL5_TEXT;
 	FormAD7705->Label5.Font = &FormAD7705->FontBlack;
 
-
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormAD7705->Label2.Left = LABEL2_X;
 	FormAD7705->Label2.Top = LABEL2_Y;
 	FormAD7705->Label2.MaxLen = 0;
@@ -292,7 +292,7 @@ static void InitFormAD7705(void)
 	FormAD7705->Label4.pCaption = LABEL4_TEXT;
 	FormAD7705->Label4.Font = &FormAD7705->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormAD7705->BtnRet.Left = BTN_RET_X;
 	FormAD7705->BtnRet.Top = BTN_RET_Y;
 	FormAD7705->BtnRet.Height = BTN_RET_H;
@@ -304,30 +304,30 @@ static void InitFormAD7705(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormAD7705
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormAD7705
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormAD7705(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormAD7705->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormAD7705->Label1);
 	LCD_DrawLabel(&FormAD7705->Label3);
 	LCD_DrawLabel(&FormAD7705->Label5);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormAD7705->Label2);
 	LCD_DrawLabel(&FormAD7705->Label4);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormAD7705->BtnRet);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

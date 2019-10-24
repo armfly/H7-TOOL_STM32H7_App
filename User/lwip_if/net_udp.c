@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : UDPËÑË÷Ä£¿é
-*	ÎÄ¼şÃû³Æ : net_udp.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ê¹ÓÃUDP¹ã²¥£¬ËÑË÷¾ÖÓòÍøÄÚµÄÉè±¸£¬²¢ÅäÖÃIPµÈ²ÎÊı
+*	æ¨¡å—åç§° : UDPæœç´¢æ¨¡å—
+*	æ–‡ä»¶åç§° : net_udp.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ä½¿ç”¨UDPå¹¿æ’­ï¼Œæœç´¢å±€åŸŸç½‘å†…çš„è®¾å¤‡ï¼Œå¹¶é…ç½®IPç­‰å‚æ•°
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2016-11-22  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2016-11-22  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2016-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2016-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -21,13 +21,12 @@
 #include "param.h"
 #include "modbus_slave.h"
 
+#define MODS_ADDR 0x01 /* MODBSU ä»ç«™åœ°å€ */
 
-#define	MODS_ADDR	0x01	/* MODBSU ´ÓÕ¾µØÖ· */
-
-#define UDP_TX_SIZE	(1500 + 8)
+#define UDP_TX_SIZE (1500 + 8)
 
 struct udp_pcb *g_udp_pcb;
-struct pbuf *p_udp_tx; 
+struct pbuf *p_udp_tx;
 
 static uint8_t udp_tx_buf[UDP_TX_SIZE];
 //static uint16_t udp_tx_len;
@@ -39,10 +38,10 @@ static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, c
 
 ip_addr_t destAddr;
 
-#define PRINT_FIFO_SIZE  1024
+#define PRINT_FIFO_SIZE 1024
 static uint8_t udp_print_buf[PRINT_FIFO_SIZE];
 static uint16_t udp_print_putp = 0;
-static uint16_t udp_print_getp = 0;	  
+static uint16_t udp_print_getp = 0;
 
 void udp_print_put(uint8_t ch)
 {
@@ -56,7 +55,7 @@ void udp_print_put(uint8_t ch)
 uint8_t udp_print_get(uint8_t *ch)
 {
 	uint8_t data;
-	
+
 	if (udp_print_putp != udp_print_getp)
 	{
 		data = udp_print_buf[udp_print_getp];
@@ -74,14 +73,14 @@ void udp_print_send(void)
 {
 	uint16_t len;
 	uint8_t data;
-	
+
 	len = 0;
-	while(1)
+	while (1)
 	{
 		if (udp_print_get(&data))
 		{
 			udp_tx_buf[len] = data;
-			
+
 			if (++len >= UDP_TX_SIZE)
 			{
 				break;
@@ -92,124 +91,123 @@ void udp_print_send(void)
 			break;
 		}
 	}
-	
-	/* ×¼±¸Ó¦´ğÊı¾İ */
-	p_udp_tx->payload = udp_tx_buf; 
+
+	/* å‡†å¤‡åº”ç­”æ•°æ® */
+	p_udp_tx->payload = udp_tx_buf;
 	p_udp_tx->len = len;
 	p_udp_tx->tot_len = len;
 
-	udp_sendto(g_udp_pcb, p_udp_tx, &destAddr, LUA_UDP_PORT); /* Êı¾İ·¢ËÍ³öÈ¥ */	
+	udp_sendto(g_udp_pcb, p_udp_tx, &destAddr, LUA_UDP_PORT); /* æ•°æ®å‘é€å‡ºå» */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: udp_SendBuf
-*	¹¦ÄÜËµÃ÷: ·¢ËÍUDPÊı¾İ°ü£¬ÓÃÓÚlua. ÏÈ»º´æÔÙ·¢ËÍ. 5ms³¬Ê±»ã×Üºó¼¯ÖĞ·¢ËÍ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: udp_SendBuf
+*	åŠŸèƒ½è¯´æ˜: å‘é€UDPæ•°æ®åŒ…ï¼Œç”¨äºlua. å…ˆç¼“å­˜å†å‘é€. 5msè¶…æ—¶æ±‡æ€»åé›†ä¸­å‘é€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
-*/	
+*/
 void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port)
 {
 	uint16_t i;
-	
+
 	for (i = 0; i < _len; i++)
 	{
 		udp_print_put(_buf[i]);
 	}
 	bsp_StartHardTimer(1, 5, udp_print_send);
 }
-		
+
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: UDP_server_init
-*	¹¦ÄÜËµÃ÷: ´´½¨UDP·şÎñÆ÷£¬¶Ë¿ÚºÅ¹Ì¶¨ 30010
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: UDP_server_init
+*	åŠŸèƒ½è¯´æ˜: åˆ›å»ºUDPæœåŠ¡å™¨ï¼Œç«¯å£å·å›ºå®š 30010
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
-*/	
+*/
 void udp_server_init(void)
 {
-	g_udp_pcb = udp_new();	//ÉêÇëudp¿ØÖÆ¿é
-	//udp_bind(pcb,IP_ADDR_ANY,UDP_LOCAL_PORT); 	
+	g_udp_pcb = udp_new(); //ç”³è¯·udpæ§åˆ¶å—
+	//udp_bind(pcb,IP_ADDR_ANY,UDP_LOCAL_PORT);
 
-	p_udp_tx = pbuf_alloc(PBUF_RAW, sizeof(udp_tx_buf), PBUF_RAM);  // °´ÕÕÖ¸¶¨ÀàĞÍ·ÖÅäÒ»¸öpbuf½á¹¹Ìå  // struct pbuf *p_tx;
-	p_udp_tx->payload = (void *)udp_tx_buf; 
-	
+	p_udp_tx = pbuf_alloc(PBUF_RAW, sizeof(udp_tx_buf), PBUF_RAM); // æŒ‰ç…§æŒ‡å®šç±»å‹åˆ†é…ä¸€ä¸ªpbufç»“æ„ä½“  // struct pbuf *p_tx;
+	p_udp_tx->payload = (void *)udp_tx_buf;
+
 	//g_udp_pcb->so_options |= SOF_BROADCAST;
-	udp_bind(g_udp_pcb, IP_ADDR_ANY, 30010);		/* °ó¶¨±¾µØIPµØÖ·ºÍ¶Ë¿ÚºÅ£¨×÷Îªudp·şÎñÆ÷£© */
-	udp_recv(g_udp_pcb, udp_server_recv, NULL); 	/* ÉèÖÃUDP¶Îµ½Ê±µÄ»Øµ÷º¯Êı */
+	udp_bind(g_udp_pcb, IP_ADDR_ANY, 30010);		/* ç»‘å®šæœ¬åœ°IPåœ°å€å’Œç«¯å£å·ï¼ˆä½œä¸ºudpæœåŠ¡å™¨ï¼‰ */
+	udp_recv(g_udp_pcb, udp_server_recv, NULL); /* è®¾ç½®UDPæ®µåˆ°æ—¶çš„å›è°ƒå‡½æ•° */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: udp_server_recv
-*	¹¦ÄÜËµÃ÷: ½ÓÊÕµ½UDPÊı¾İ°üµÄ»Øµ÷º¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: udp_server_recv
+*	åŠŸèƒ½è¯´æ˜: æ¥æ”¶åˆ°UDPæ•°æ®åŒ…çš„å›è°ƒå‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 //static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, struct ip_addr *addr, u16_t port)
 static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, const ip_addr_t *addr, u16_t port)
 {
-	// 2019-07-03 destAddr¸ÄÎªÈ«¾Ö±äÁ¿
-	//ip_addr_t destAddr = *addr; 	/* »ñÈ¡Ô¶³ÌÖ÷»ú IPµØÖ· */	
+	// 2019-07-03 destAddræ”¹ä¸ºå…¨å±€å˜é‡
+	//ip_addr_t destAddr = *addr; 	/* è·å–è¿œç¨‹ä¸»æœº IPåœ°å€ */
 	destAddr = *addr;
 
 	if (p_rx != NULL)
 	{
-		// EIO_SetOutLevel(EIO_D0, 1);   ²âÊÔ¸ßÂö³åÊ±¼ä 40us  
-		
-		/* ·ÖÎöUDPÊı¾İ°ü */
+		// EIO_SetOutLevel(EIO_D0, 1);   æµ‹è¯•é«˜è„‰å†²æ—¶é—´ 40us
+
+		/* åˆ†æUDPæ•°æ®åŒ… */
 		{
-			const uint8_t mac_ff[6]= {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+			const uint8_t mac_ff[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 			uint16_t i;
-			
+
 			g_tModS.TCP_Flag = 0;
-			if ( p_rx->len >= 8)
+			if (p_rx->len >= 8)
 			{
-				/* 6×Ö½ÚMACµØÖ·£¬ 0xFFFFFF ÊÇ¹ã²¥MAC. */	
+				/* 6å­—èŠ‚MACåœ°å€ï¼Œ 0xFFFFFF æ˜¯å¹¿æ’­MAC. */
 				if (memcmp(p_rx->payload, mac_ff, 6) == 0 || memcmp(p_rx->payload, &g_tVar.MACaddr, 6) == 0)
 				{
-					/* ´øMACÇ°×ºµÄudpÊı¾İ°ü */
+					/* å¸¦MACå‰ç¼€çš„udpæ•°æ®åŒ… */
 					MODS_Poll((uint8_t *)p_rx->payload + 6, p_rx->len - 6);
-					
+
 					for (i = 0; i < g_tModS.TxCount; i++)
 					{
 						g_tModS.TxBuf[g_tModS.TxCount - i - 1 + 6] = g_tModS.TxBuf[g_tModS.TxCount - i - 1];
 					}
-					
-					//MODS_Analyze((uint8_t *)p_rx->payload + 6, p_rx->len - 6, &udp_tx_buf[6], &udp_tx_len);	/* ·ÖÎöMODBUSÊı¾İÖ¡ */
+
+					//MODS_Analyze((uint8_t *)p_rx->payload + 6, p_rx->len - 6, &udp_tx_buf[6], &udp_tx_len);	/* åˆ†æMODBUSæ•°æ®å¸§ */
 					if (g_tModS.TxCount > 0)
 					{
-						memcpy(g_tModS.TxBuf, &g_tVar.MACaddr, 6);	/* ±¾»úMAC·Åµ½Ó¦´ğÊı¾İ°üÇ°×º */
+						memcpy(g_tModS.TxBuf, &g_tVar.MACaddr, 6); /* æœ¬æœºMACæ”¾åˆ°åº”ç­”æ•°æ®åŒ…å‰ç¼€ */
 						g_tModS.TxCount += 6;
 					}
-					
-					IP4_ADDR(&destAddr, 255, 255, 255, 255);  	//ÉèÖÃÍøÂç½Ó¿ÚµÄipµØÖ·
+
+					IP4_ADDR(&destAddr, 255, 255, 255, 255); //è®¾ç½®ç½‘ç»œæ¥å£çš„ipåœ°å€
 				}
-				else	/* ²»´øMACÇ°×º */
+				else /* ä¸å¸¦MACå‰ç¼€ */
 				{
-					MODS_Poll(p_rx->payload, p_rx->len);		/* ·ÖÎöMODBUSÊı¾İÖ¡ */
+					MODS_Poll(p_rx->payload, p_rx->len); /* åˆ†æMODBUSæ•°æ®å¸§ */
 				}
 			}
-		}		
-		
+		}
+
 		if (g_tModS.TxCount > 0)
 		{
-			/* ×¼±¸Ó¦´ğÊı¾İ */
-			p_udp_tx->payload =  (void *)g_tModS.TxBuf; 
+			/* å‡†å¤‡åº”ç­”æ•°æ® */
+			p_udp_tx->payload = (void *)g_tModS.TxBuf;
 			p_udp_tx->len = g_tModS.TxCount;
 			p_udp_tx->tot_len = g_tModS.TxCount;
-			
-			udp_sendto(pcb, p_udp_tx, &destAddr, port); /* ·¢ËÍÊı¾İ */	
-			
-			// EIO_SetOutLevel(EIO_D0, 0);  Ê±¼ä²âÊÔ
+
+			udp_sendto(pcb, p_udp_tx, &destAddr, port); /* å‘é€æ•°æ® */
+
+			// EIO_SetOutLevel(EIO_D0, 0);  æ—¶é—´æµ‹è¯•
 		}
-		
-		pbuf_free(p_rx); 	/* ÊÍ·Å¸ÃUDP¶Î */
+
+		pbuf_free(p_rx); /* é‡Šæ”¾è¯¥UDPæ®µ */
 	}
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

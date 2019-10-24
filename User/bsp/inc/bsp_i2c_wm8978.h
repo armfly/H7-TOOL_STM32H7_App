@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : WM8978ÒôÆµĞ¾Æ¬Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_wm8978.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-03-01 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : WM8978éŸ³é¢‘èŠ¯ç‰‡é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_wm8978.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-03-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,53 +17,53 @@
 #ifndef _BSP_WM8978_H
 #define _BSP_WM8978_H
 
-#define WM8978_SLAVE_ADDRESS    0x34	/* WM8978 I2C´Ó»úµØÖ· */
+#define WM8978_SLAVE_ADDRESS 0x34 /* WM8978 I2Cä»æœºåœ°å€ */
 
-/* WM8978 ÒôÆµÊäÈëÍ¨µÀ¿ØÖÆÑ¡Ïî, ¿ÉÒÔÑ¡Ôñ¶àÂ·£¬±ÈÈç MIC_LEFT_ON | LINE_ON */
+/* WM8978 éŸ³é¢‘è¾“å…¥é€šé“æ§åˆ¶é€‰é¡¹, å¯ä»¥é€‰æ‹©å¤šè·¯ï¼Œæ¯”å¦‚ MIC_LEFT_ON | LINE_ON */
 typedef enum
 {
-	IN_PATH_OFF		= 0x00,	/* ÎŞÊäÈë */
-	MIC_LEFT_ON 	= 0x01,	/* LIN,LIP½Å£¬MIC×óÉùµÀ£¨½Ó°åÔØßäÍ·£© */
-	MIC_RIGHT_ON	= 0x02,	/* RIN,RIP½Å£¬MICÓÒÉùµÀ£¨½ÓGPRSÄ£¿éÒôÆµÊä³ö£© */
-	LINE_ON			= 0x04, /* L2,R2 Á¢ÌåÉùÊäÈë */
-	AUX_ON			= 0x08,	/* AUXL,AUXR Á¢ÌåÉùÊäÈë */
-	DAC_ON			= 0x10,	/* I2SÊı¾İDAC (CPU²úÉúÒôÆµĞÅºÅ) */
-	ADC_ON			= 0x20	/* ÊäÈëµÄÒôÆµÀ¡ÈëWM8978ÄÚ²¿ADC £¨I2SÂ¼Òô) */
-}IN_PATH_E;
+	IN_PATH_OFF = 0x00,	/* æ— è¾“å…¥ */
+	MIC_LEFT_ON = 0x01,	/* LIN,LIPè„šï¼ŒMICå·¦å£°é“ï¼ˆæ¥æ¿è½½å’ªå¤´ï¼‰ */
+	MIC_RIGHT_ON = 0x02, /* RIN,RIPè„šï¼ŒMICå³å£°é“ï¼ˆæ¥GPRSæ¨¡å—éŸ³é¢‘è¾“å‡ºï¼‰ */
+	LINE_ON = 0x04,			 /* L2,R2 ç«‹ä½“å£°è¾“å…¥ */
+	AUX_ON = 0x08,			 /* AUXL,AUXR ç«‹ä½“å£°è¾“å…¥ */
+	DAC_ON = 0x10,			 /* I2Sæ•°æ®DAC (CPUäº§ç”ŸéŸ³é¢‘ä¿¡å·) */
+	ADC_ON = 0x20				 /* è¾“å…¥çš„éŸ³é¢‘é¦ˆå…¥WM8978å†…éƒ¨ADC ï¼ˆI2Så½•éŸ³) */
+} IN_PATH_E;
 
-/* WM8978 ÒôÆµÊä³öÍ¨µÀ¿ØÖÆÑ¡Ïî, ¿ÉÒÔÑ¡Ôñ¶àÂ· */
+/* WM8978 éŸ³é¢‘è¾“å‡ºé€šé“æ§åˆ¶é€‰é¡¹, å¯ä»¥é€‰æ‹©å¤šè·¯ */
 typedef enum
 {
-	OUT_PATH_OFF	= 0x00,	/* ÎŞÊä³ö */
-	EAR_LEFT_ON 	= 0x01,	/* LOUT1 ¶ú»ú×óÉùµÀ */
-	EAR_RIGHT_ON	= 0x02,	/* ROUT1 ¶ú»úÓÒÉùµÀ */
-	SPK_ON			= 0x04,	/* LOUT2ºÍROUT2·´ÏàÊä³öµ¥ÉùµÀ,½ÓÑïÉùÆ÷ */
-	OUT3_4_ON		= 0x08,	/* OUT3 ºÍ OUT4 Êä³öµ¥ÉùµÀÒôÆµ£¬ ½ÓGSMÄ£¿éµÄÒôÆµÊäÈë */
-}OUT_PATH_E;
+	OUT_PATH_OFF = 0x00, /* æ— è¾“å‡º */
+	EAR_LEFT_ON = 0x01,	/* LOUT1 è€³æœºå·¦å£°é“ */
+	EAR_RIGHT_ON = 0x02, /* ROUT1 è€³æœºå³å£°é“ */
+	SPK_ON = 0x04,			 /* LOUT2å’ŒROUT2åç›¸è¾“å‡ºå•å£°é“,æ¥æ‰¬å£°å™¨ */
+	OUT3_4_ON = 0x08,		 /* OUT3 å’Œ OUT4 è¾“å‡ºå•å£°é“éŸ³é¢‘ï¼Œ æ¥GSMæ¨¡å—çš„éŸ³é¢‘è¾“å…¥ */
+} OUT_PATH_E;
 
-/* ¶¨Òå×î´óÒôÁ¿ */
-#define VOLUME_MAX		63		/* ×î´óÒôÁ¿ */
-#define VOLUME_STEP		1		/* ÒôÁ¿µ÷½Ú²½³¤ */
+/* å®šä¹‰æœ€å¤§éŸ³é‡ */
+#define VOLUME_MAX 63 /* æœ€å¤§éŸ³é‡ */
+#define VOLUME_STEP 1 /* éŸ³é‡è°ƒèŠ‚æ­¥é•¿ */
 
-/* ¶¨Òå×î´óMICÔöÒæ */
-#define GAIN_MAX		63		/* ×î´óÔöÒæ */
-#define GAIN_STEP		1		/* ÔöÒæ²½³¤ */
+/* å®šä¹‰æœ€å¤§MICå¢ç›Š */
+#define GAIN_MAX 63 /* æœ€å¤§å¢ç›Š */
+#define GAIN_STEP 1 /* å¢ç›Šæ­¥é•¿ */
 
-/* STM32F429µÄSAIÖ§³ÖµÄÒôÆµ²ÉÑùÆµÂÊ£¬ 8978½öÖ§³Ö48K */
-/* ÏÂÃæµÄ²ÉÑùÆµÂÊ¶ÔÓ¦µÄ MCLK = 192KHz * 256 = 49.152MHz */
-#define SAI_AudioFreq_192k          ((uint32_t)192000)
-#define SAI_AudioFreq_96k           ((uint32_t)96000)
-#define SAI_AudioFreq_48k           ((uint32_t)48000)
-#define SAI_AudioFreq_32k           ((uint32_t)32000)
-#define SAI_AudioFreq_16k           ((uint32_t)16000)
-#define SAI_AudioFreq_8k            ((uint32_t)8000) 
+/* STM32F429çš„SAIæ”¯æŒçš„éŸ³é¢‘é‡‡æ ·é¢‘ç‡ï¼Œ 8978ä»…æ”¯æŒ48K */
+/* ä¸‹é¢çš„é‡‡æ ·é¢‘ç‡å¯¹åº”çš„ MCLK = 192KHz * 256 = 49.152MHz */
+#define SAI_AudioFreq_192k ((uint32_t)192000)
+#define SAI_AudioFreq_96k ((uint32_t)96000)
+#define SAI_AudioFreq_48k ((uint32_t)48000)
+#define SAI_AudioFreq_32k ((uint32_t)32000)
+#define SAI_AudioFreq_16k ((uint32_t)16000)
+#define SAI_AudioFreq_8k ((uint32_t)8000)
 
-/* ÏÂÃæµÄ²ÉÑùÆµÂÊ¶ÔÓ¦µÄ MCLK = 44.1kHz x256 = 11.2896MHz */
-#define SAI_AudioFreq_44_1k         ((uint32_t)44100)
-#define SAI_AudioFreq_22_05k        ((uint32_t)22050)
-#define SAI_AudioFreq_11_025k       ((uint32_t)11025)
+/* ä¸‹é¢çš„é‡‡æ ·é¢‘ç‡å¯¹åº”çš„ MCLK = 44.1kHz x256 = 11.2896MHz */
+#define SAI_AudioFreq_44_1k ((uint32_t)44100)
+#define SAI_AudioFreq_22_05k ((uint32_t)22050)
+#define SAI_AudioFreq_11_025k ((uint32_t)11025)
 
-/* ¹©Íâ²¿ÒıÓÃµÄº¯ÊıÉùÃ÷ */
+/* ä¾›å¤–éƒ¨å¼•ç”¨çš„å‡½æ•°å£°æ˜ */
 uint8_t wm8978_Init(void);
 
 void wm8978_CfgAudioIF(uint16_t _usStandard, uint8_t _ucWordLen);
@@ -83,13 +83,13 @@ void wm8978_NotchFilter(uint16_t _NFA0, uint16_t _NFA1);
 
 //void AUDIO_Init(uint16_t _usStandard, uint32_t _uiWordLen, uint32_t _uiAudioFreq);
 void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint32_t _uiAudioFreq);
-uint32_t AUDIO_Play(int16_t* pBuffer, uint32_t Size);
-uint32_t AUDIO_Record(int16_t* pBuffer, uint32_t Size);
+uint32_t AUDIO_Play(int16_t *pBuffer, uint32_t Size);
+uint32_t AUDIO_Record(int16_t *pBuffer, uint32_t Size);
 void AUDIO_Pause(void);
 void AUDIO_Resume(uint32_t Cmd);
 void AUDIO_Stop(void);
 
-void AUDIO_MakeSine16bit(int16_t *_outbuf, uint32_t _sin_freq,  uint32_t _sample_freq, uint32_t _count);
+void AUDIO_MakeSine16bit(int16_t *_outbuf, uint32_t _sin_freq, uint32_t _sample_freq, uint32_t _count);
 void AUDIO_Poll(void);
 uint32_t AUDIO_GetRecordSampleCount(void);
 

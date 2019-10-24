@@ -1,9 +1,9 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : emmc«˝∂Øƒ£øÈ
-*	Œƒº˛√˚≥∆ : bsp_emmc.h
-*	Àµ    √˜ : SDø®µ◊≤„«˝∂Ø°£∏˘æ›stm32h750b_discovery_mmc.hŒƒº˛–ﬁ∏ƒ°£
+*	Ê®°ÂùóÂêçÁß∞ : emmcÈ©±Âä®Ê®°Âùó
+*	Êñá‰ª∂ÂêçÁß∞ : bsp_emmc.h
+*	ËØ¥    Êòé : SDÂç°Â∫ïÂ±ÇÈ©±Âä®„ÄÇÊ†πÊçÆstm32h750b_discovery_mmc.hÊñá‰ª∂‰øÆÊîπ„ÄÇ
 *
 *********************************************************************************************************
 */
@@ -26,15 +26,16 @@
   *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef STM32H750B_DISCOVERY_MMC_H
 #define STM32H750B_DISCOVERY_MMC_H
 
 #ifdef __cplusplus
- extern "C" {
-#endif 
+extern "C"
+{
+#endif
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h7xx_hal.h"
@@ -42,15 +43,15 @@
 
 /** @addtogroup BSP
   * @{
-  */ 
+  */
 
 /** @addtogroup STM32H750B_DISCOVERY
   * @{
   */
-    
+
 /** @addtogroup STM32H750B_DISCOVERY_MMC
   * @{
-  */    
+  */
 
 /** @defgroup STM32H750B_DISCOVERY_MMC_Exported_Types Exported Types
   * @{
@@ -63,75 +64,72 @@
 /**
   * @}
   */
-  
+
 /** @defgroup STM32H750B_DISCOVERY_MMC_Exported_Constants Exported Constants
   * @{
-  */    
+  */
 /** 
   * @brief  SD status structure definition  
-  */     
-#define MMC_OK                        ((uint8_t)0x00)
-#define MMC_ERROR                     ((uint8_t)0x01)
-#define MMC_ERROR_MMC_NOT_PRESENT     ((uint8_t)0x02)
+  */
+#define MMC_OK ((uint8_t)0x00)
+#define MMC_ERROR ((uint8_t)0x01)
+#define MMC_ERROR_MMC_NOT_PRESENT ((uint8_t)0x02)
 
 /** 
   * @brief  MMC transfer state definition  
-  */     
-#define MMC_TRANSFER_OK                ((uint8_t)0x00)
-#define MMC_TRANSFER_BUSY              ((uint8_t)0x01)
+  */
+#define MMC_TRANSFER_OK ((uint8_t)0x00)
+#define MMC_TRANSFER_BUSY ((uint8_t)0x01)
 
+#define MMC_PRESENT ((uint8_t)0x01)
+#define MMC_NOT_PRESENT ((uint8_t)0x00)
 
-#define MMC_PRESENT               ((uint8_t)0x01)
-#define MMC_NOT_PRESENT           ((uint8_t)0x00)
+#define MMC_DATATIMEOUT ((uint32_t)0xFFFFFFFFU)
 
-#define MMC_DATATIMEOUT           ((uint32_t)0xFFFFFFFFU)
-    
-/**
+  /**
   * @}
   */
-  
-   
-/** @addtogroup STM32H750B_DISCOVERY_MMC_Exported_Functions
+
+  /** @addtogroup STM32H750B_DISCOVERY_MMC_Exported_Functions
   * @{
-  */   
-uint8_t BSP_MMC_Init(void);
-uint8_t BSP_MMC_DeInit(void);
-uint8_t BSP_MMC_ITConfig(void);
+  */
+  uint8_t BSP_MMC_Init(void);
+  uint8_t BSP_MMC_DeInit(void);
+  uint8_t BSP_MMC_ITConfig(void);
 
-uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
-uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout);
-uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
-uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
-uint8_t BSP_MMC_Erase(uint32_t StartAddr, uint32_t EndAddr);
-uint8_t BSP_MMC_GetCardState(void);
-void    BSP_MMC_GetCardInfo(BSP_MMC_CardInfo *CardInfo);
-uint8_t BSP_MMC_IsDetected(void);
-void    BSP_MMC_IRQHandler(void);
+  uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+  uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+  uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
+  uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
+  uint8_t BSP_MMC_Erase(uint32_t StartAddr, uint32_t EndAddr);
+  uint8_t BSP_MMC_GetCardState(void);
+  void BSP_MMC_GetCardInfo(BSP_MMC_CardInfo *CardInfo);
+  uint8_t BSP_MMC_IsDetected(void);
+  void BSP_MMC_IRQHandler(void);
 
-/* These functions can be modified in case the current settings (e.g. DMA stream)
+  /* These functions can be modified in case the current settings (e.g. DMA stream)
    need to be changed for specific application needs */
-void    BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params);
-void    BSP_MMC_MspDeInit(MMC_HandleTypeDef *hmmc, void *Params);
-void    BSP_MMC_AbortCallback(void);
-void    BSP_MMC_WriteCpltCallback(void);
-void    BSP_MMC_ReadCpltCallback(void);
+  void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params);
+  void BSP_MMC_MspDeInit(MMC_HandleTypeDef *hmmc, void *Params);
+  void BSP_MMC_AbortCallback(void);
+  void BSP_MMC_WriteCpltCallback(void);
+  void BSP_MMC_ReadCpltCallback(void);
 
-
-/**
+  /**
   * @}
-  */ 
+  */
 
-/**
+  /**
   * @}
-  */ 
+  */
 
-/**
+  /**
   * @}
-  */ 
+  */
 
-/**
+  /**
   * @}
-  */ 
+  */
 
 #ifdef __cplusplus
 }

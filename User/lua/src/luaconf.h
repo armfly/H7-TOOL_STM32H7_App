@@ -758,7 +758,7 @@
 #if LUA_FLOAT_TYPE == LUA_FLOAT_LONGDOUBLE
 #define LUAL_BUFFERSIZE		8192
 #else
-/* armfly  2019-04-18  ×Ö·û´®³¤¶ÈÏŞÖÆ£¬ 2560×Ö½Ú£¬ µ÷Õûµ½3 * 1024 */
+/* armfly  2019-04-18  å­—ç¬¦ä¸²é•¿åº¦é™åˆ¶ï¼Œ 2560å­—èŠ‚ï¼Œ è°ƒæ•´åˆ°3 * 1024 */
 //#define LUAL_BUFFERSIZE   ((int)(0x80 * sizeof(void*) * sizeof(lua_Integer)))
 #define LUAL_BUFFERSIZE		(8 * 1024)
 #endif

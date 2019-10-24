@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : SPI½Ó¿Ú´®ĞĞFLASH ¶ÁĞ´Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_spi_flash.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : SPIæ¥å£ä¸²è¡ŒFLASH è¯»å†™æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_spi_flash.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,36 +14,36 @@
 #ifndef _BSP_SPI_FLASH_H
 #define _BSP_SPI_FLASH_H
 
-#define SF_MAX_PAGE_SIZE	(4 * 1024)
+#define SF_MAX_PAGE_SIZE (4 * 1024)
 
-/* ¶¨Òå´®ĞĞFlash ID */
+/* å®šä¹‰ä¸²è¡ŒFlash ID */
 enum
 {
 	SST25VF016B_ID = 0xBF2541,
-	MX25L1606E_ID  = 0xC22015,
-	W25Q64BV_ID    = 0xEF4017,
-	W25Q128_ID     = 0xEF4018
+	MX25L1606E_ID = 0xC22015,
+	W25Q64BV_ID = 0xEF4017,
+	W25Q128_ID = 0xEF4018
 };
 
 typedef struct
 {
-	uint32_t ChipID;		/* Ğ¾Æ¬ID */
-	char ChipName[16];		/* Ğ¾Æ¬ĞÍºÅ×Ö·û´®£¬Ö÷ÒªÓÃÓÚÏÔÊ¾ */
-	uint32_t TotalSize;		/* ×ÜÈİÁ¿ */
-	uint16_t PageSize;		/* Ò³Ãæ´óĞ¡ */
-}SFLASH_T;
+	uint32_t ChipID;		/* èŠ¯ç‰‡ID */
+	char ChipName[16];	/* èŠ¯ç‰‡å‹å·å­—ç¬¦ä¸²ï¼Œä¸»è¦ç”¨äºæ˜¾ç¤º */
+	uint32_t TotalSize; /* æ€»å®¹é‡ */
+	uint16_t PageSize;	/* é¡µé¢å¤§å° */
+} SFLASH_T;
 
 void bsp_InitSFlash(void);
 uint32_t sf_ReadID(void);
 void sf_EraseChip(void);
 void sf_EraseSector(uint32_t _uiSectorAddr);
-void sf_PageWrite(uint8_t * _pBuf, uint32_t _uiWriteAddr, uint16_t _usSize);
-uint8_t sf_WriteBuffer(uint8_t* _pBuf, uint32_t _uiWriteAddr, uint16_t _usWriteSize);
-void sf_ReadBuffer(uint8_t * _pBuf, uint32_t _uiReadAddr, uint32_t _uiSize);
+void sf_PageWrite(uint8_t *_pBuf, uint32_t _uiWriteAddr, uint16_t _usSize);
+uint8_t sf_WriteBuffer(uint8_t *_pBuf, uint32_t _uiWriteAddr, uint16_t _usWriteSize);
+void sf_ReadBuffer(uint8_t *_pBuf, uint32_t _uiReadAddr, uint32_t _uiSize);
 void sf_ReadInfo(void);
 
 extern SFLASH_T g_tSF;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

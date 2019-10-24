@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : BSPÄ£¿é(For STM32H7)
-*	ÎÄ¼şÃû³Æ : bsp.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ÕâÊÇÓ²¼şµ×²ãÇı¶¯³ÌĞòµÄÖ÷ÎÄ¼ş¡£Ã¿¸öcÎÄ¼ş¿ÉÒÔ #include "bsp.h" À´°üº¬ËùÓĞµÄÍâÉèÇı¶¯Ä£¿é¡£
-*			   bsp = Borad surport packet °å¼¶Ö§³Ö°ü
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ         ×÷Õß       ËµÃ÷
-*		V1.0    2018-07-29  Eric2013   ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : BSPæ¨¡å—(For STM32H7)
+*	æ–‡ä»¶åç§° : bsp.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : è¿™æ˜¯ç¡¬ä»¶åº•å±‚é©±åŠ¨ç¨‹åºçš„ä¸»æ–‡ä»¶ã€‚æ¯ä¸ªcæ–‡ä»¶å¯ä»¥ #include "bsp.h" æ¥åŒ…å«æ‰€æœ‰çš„å¤–è®¾é©±åŠ¨æ¨¡å—ã€‚
+*			   bsp = Borad surport packet æ¿çº§æ”¯æŒåŒ…
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ         ä½œè€…       è¯´æ˜
+*		V1.0    2018-07-29  Eric2013   æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,7 +18,7 @@
 
 /*
 *********************************************************************************************************
-*	                                   º¯ÊıÉùÃ÷
+*	                                   å‡½æ•°å£°æ˜
 *********************************************************************************************************
 */
 static void SystemClock_Config(void);
@@ -27,83 +27,82 @@ static void MPU_Config(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_Init
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯ËùÓĞµÄÓ²¼şÉè±¸¡£¸Ãº¯ÊıÅäÖÃCPU¼Ä´æÆ÷ºÍÍâÉèµÄ¼Ä´æÆ÷²¢³õÊ¼»¯Ò»Ğ©È«¾Ö±äÁ¿¡£Ö»ĞèÒªµ÷ÓÃÒ»´Î
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_Init
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ‰€æœ‰çš„ç¡¬ä»¶è®¾å¤‡ã€‚è¯¥å‡½æ•°é…ç½®CPUå¯„å­˜å™¨å’Œå¤–è®¾çš„å¯„å­˜å™¨å¹¶åˆå§‹åŒ–ä¸€äº›å…¨å±€å˜é‡ã€‚åªéœ€è¦è°ƒç”¨ä¸€æ¬¡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_Init(void)
 {
-    /* ÅäÖÃMPU */
+	/* é…ç½®MPU */
 	MPU_Config();
-	
-	/* Ê¹ÄÜL1 Cache */
+
+	/* ä½¿èƒ½L1 Cache */
 	CPU_CACHE_Enable();
 	SCB_EnableDCache();
-	
+
 	/* 
-       STM32H7xx HAL ¿â³õÊ¼»¯£¬´ËÊ±ÏµÍ³ÓÃµÄ»¹ÊÇH7×Ô´øµÄ64MHz£¬HSIÊ±ÖÓ:
-	   - µ÷ÓÃº¯ÊıHAL_InitTick£¬³õÊ¼»¯µÎ´ğÊ±ÖÓÖĞ¶Ï1ms¡£
-	   - ÉèÖÃNVIVÓÅÏÈ¼¶·Ö×éÎª4¡£
+       STM32H7xx HAL åº“åˆå§‹åŒ–ï¼Œæ­¤æ—¶ç³»ç»Ÿç”¨çš„è¿˜æ˜¯H7è‡ªå¸¦çš„64MHzï¼ŒHSIæ—¶é’Ÿ:
+	   - è°ƒç”¨å‡½æ•°HAL_InitTickï¼Œåˆå§‹åŒ–æ»´ç­”æ—¶é’Ÿä¸­æ–­1msã€‚
+	   - è®¾ç½®NVIVä¼˜å…ˆçº§åˆ†ç»„ä¸º4ã€‚
 	 */
 	HAL_Init();
 
 	/* 
-       ÅäÖÃÏµÍ³Ê±ÖÓµ½400MHz
-       - ÇĞ»»Ê¹ÓÃHSE¡£
-       - ´Ëº¯Êı»á¸üĞÂÈ«¾Ö±äÁ¿SystemCoreClock£¬²¢ÖØĞÂÅäÖÃHAL_InitTick¡£
+       é…ç½®ç³»ç»Ÿæ—¶é’Ÿåˆ°400MHz
+       - åˆ‡æ¢ä½¿ç”¨HSEã€‚
+       - æ­¤å‡½æ•°ä¼šæ›´æ–°å…¨å±€å˜é‡SystemCoreClockï¼Œå¹¶é‡æ–°é…ç½®HAL_InitTickã€‚
     */
 	SystemClock_Config();
 
 	/* 
-	   Event Recorder£º
-	   - ¿ÉÓÃÓÚ´úÂëÖ´ĞĞÊ±¼ä²âÁ¿£¬MDK5.25¼°ÆäÒÔÉÏ°æ±¾²ÅÖ§³Ö£¬IAR²»Ö§³Ö¡£
-	   - Ä¬ÈÏ²»¿ªÆô£¬Èç¹ûÒªÊ¹ÄÜ´ËÑ¡Ïî£¬Îñ±Ø¿´V7¿ª·¢°åÓÃ»§ÊÖ²áµÚxxÕÂ
-	*/	
-#if Enable_EventRecorder == 1  
-	/* ³õÊ¼»¯EventRecorder²¢¿ªÆô */
+	   Event Recorderï¼š
+	   - å¯ç”¨äºä»£ç æ‰§è¡Œæ—¶é—´æµ‹é‡ï¼ŒMDK5.25åŠå…¶ä»¥ä¸Šç‰ˆæœ¬æ‰æ”¯æŒï¼ŒIARä¸æ”¯æŒã€‚
+	   - é»˜è®¤ä¸å¼€å¯ï¼Œå¦‚æœè¦ä½¿èƒ½æ­¤é€‰é¡¹ï¼ŒåŠ¡å¿…çœ‹V7å¼€å‘æ¿ç”¨æˆ·æ‰‹å†Œç¬¬xxç« 
+	*/
+#if Enable_EventRecorder == 1
+	/* åˆå§‹åŒ–EventRecorderå¹¶å¼€å¯ */
 	EventRecorderInitialize(EventRecordAll, 1U);
 	EventRecorderStart();
 #endif
-		
-	bsp_InitKey();    	/* °´¼ü³õÊ¼»¯£¬Òª·ÅÔÚµÎ´ğ¶¨Ê±Æ÷Ö®Ç°£¬ÒòÎª°´Å¥¼ì²âÊÇÍ¨¹ıµÎ´ğ¶¨Ê±Æ÷É¨Ãè */
-	bsp_InitTimer();  	/* ³õÊ¼»¯µÎ´ğ¶¨Ê±Æ÷ */
-	
+
+	bsp_InitKey();	 /* æŒ‰é”®åˆå§‹åŒ–ï¼Œè¦æ”¾åœ¨æ»´ç­”å®šæ—¶å™¨ä¹‹å‰ï¼Œå› ä¸ºæŒ‰é’®æ£€æµ‹æ˜¯é€šè¿‡æ»´ç­”å®šæ—¶å™¨æ‰«æ */
+	bsp_InitTimer(); /* åˆå§‹åŒ–æ»´ç­”å®šæ—¶å™¨ */
+
 	ENABLE_INT();
-	
+
 	PERIOD_InitVar();
-	
-	bsp_InitUart();		/* ³õÊ¼»¯´®¿Ú */
-	bsp_InitLed();    	/* ³õÊ¼»¯LED */	
-	bsp_InitI2C();		/* ³õÊ¼»¯I2C×ÜÏß */
-	bsp_InitSPIBus();	/* ³õÊ¼»¯SPI×ÜÏß */
-//	bsp_InitSFlash();	/* Ê¶±ğ´®ĞĞflash W25Q64 */
+
+	bsp_InitUart();		/* åˆå§‹åŒ–ä¸²å£ */
+	bsp_InitLed();		/* åˆå§‹åŒ–LED */
+	bsp_InitI2C();		/* åˆå§‹åŒ–I2Cæ€»çº¿ */
+	bsp_InitSPIBus(); /* åˆå§‹åŒ–SPIæ€»çº¿ */
+										//	bsp_InitSFlash();	/* è¯†åˆ«ä¸²è¡Œflash W25Q64 */
 
 	BEEP_InitHard();
-	ee_CheckOk();		/* ¼ì²âEEPROM */
-	
-	
-	HC595_InitHard();	/* ÅäÖÃÊ¾²¨Æ÷Ä£¿éÉÏµÄGPIOĞ¾Æ¬ */
-	
-	bsp_InitDAC1();		/* ÅäÖÃDACÒı½Å */
-	
-	bsp_InitTVCC();		/* TVCC¿ØÖÆÒı½Å */
-	
-	bsp_InitMCP4725();	/* Ê¾²¨Æ÷Æ«ÖÃµçÑ¹ */
-	
-	bsp_InitExtIO();		/* Êä³ö¶Ë¿Ú³õÊ¼»¯ */
+	ee_CheckOk(); /* æ£€æµ‹EEPROM */
+
+	HC595_InitHard(); /* é…ç½®ç¤ºæ³¢å™¨æ¨¡å—ä¸Šçš„GPIOèŠ¯ç‰‡ */
+
+	bsp_InitDAC1(); /* é…ç½®DACå¼•è„š */
+
+	bsp_InitTVCC(); /* TVCCæ§åˆ¶å¼•è„š */
+
+	bsp_InitMCP4725(); /* ç¤ºæ³¢å™¨åç½®ç”µå‹ */
+
+	bsp_InitExtIO(); /* è¾“å‡ºç«¯å£åˆå§‹åŒ– */
 	LCD_InitHard();
-	
-	bsp_InitQSPI_W25Q256();	/* ³õÊ¼»¯QSPI */
-	
-	bsp_InitRTC();		/* ³õÊ¼»¯Ê±ÖÓ */
+
+	bsp_InitQSPI_W25Q256(); /* åˆå§‹åŒ–QSPI */
+
+	bsp_InitRTC(); /* åˆå§‹åŒ–æ—¶é’Ÿ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SystemClock_Config
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯ÏµÍ³Ê±ÖÓ
+*	å‡½ æ•° å: SystemClock_Config
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–ç³»ç»Ÿæ—¶é’Ÿ
 *            	System Clock source            = PLL (HSE BYPASS)
 *            	SYSCLK(Hz)                     = 400000000 (CPU Clock)
 *           	HCLK(Hz)                       = 200000000 (AXI and AHBs Clock)
@@ -120,8 +119,8 @@ void bsp_Init(void)
 *            	PLL_R                          = 2
 *            	VDD(V)                         = 3.3
 *            	Flash Latency(WS)              = 4
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void SystemClock_Config(void)
@@ -131,25 +130,27 @@ static void SystemClock_Config(void)
 	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 	HAL_StatusTypeDef ret = HAL_OK;
 
-	/* Ëø×¡SCU(Supply configuration update) */
+	/* é”ä½SCU(Supply configuration update) */
 	MODIFY_REG(PWR->CR3, PWR_CR3_SCUEN, 0);
 
 	/* 
-      1¡¢Ğ¾Æ¬ÄÚ²¿µÄLDOÎÈÑ¹Æ÷Êä³öµÄµçÑ¹·¶Î§£¬¿ÉÑ¡VOS1£¬VOS2ºÍVOS3£¬²»Í¬·¶Î§¶ÔÓ¦²»Í¬µÄFlash¶ÁËÙ¶È£¬
-         ÏêÇé¿´²Î¿¼ÊÖ²áµÄTable 12µÄ±í¸ñ¡£
-		//      2¡¢ÕâÀïÑ¡ÔñÊ¹ÓÃVOS1£¬µçÑ¹·¶Î§1.15V - 1.26V¡£
+      1ã€èŠ¯ç‰‡å†…éƒ¨çš„LDOç¨³å‹å™¨è¾“å‡ºçš„ç”µå‹èŒƒå›´ï¼Œå¯é€‰VOS1ï¼ŒVOS2å’ŒVOS3ï¼Œä¸åŒèŒƒå›´å¯¹åº”ä¸åŒçš„Flashè¯»é€Ÿåº¦ï¼Œ
+         è¯¦æƒ…çœ‹å‚è€ƒæ‰‹å†Œçš„Table 12çš„è¡¨æ ¼ã€‚
+		//      2ã€è¿™é‡Œé€‰æ‹©ä½¿ç”¨VOS1ï¼Œç”µå‹èŒƒå›´1.15V - 1.26Vã€‚
     */
 	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-	while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
-	
+	while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
+	{
+	}
+
 	/* Enable D2 domain SRAM3 Clock (0x30040000 AXI)*/
 	__HAL_RCC_D2SRAM3_CLK_ENABLE();
-		
-//	/* Macro to configure the PLL clock source  */
-//	__HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
 
-	/* Ê¹ÄÜHSE£¬²¢Ñ¡ÔñHSE×÷ÎªPLLÊ±ÖÓÔ´ */	
+	//	/* Macro to configure the PLL clock source  */
+	//	__HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
+
+	/* ä½¿èƒ½HSEï¼Œå¹¶é€‰æ‹©HSEä½œä¸ºPLLæ—¶é’Ÿæº */
 	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
 	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.HSIState = RCC_HSI_OFF;
@@ -160,17 +161,17 @@ static void SystemClock_Config(void)
 	RCC_OscInitStruct.PLL.PLLN = 160;
 	RCC_OscInitStruct.PLL.PLLP = 2;
 	RCC_OscInitStruct.PLL.PLLR = 2;
-	RCC_OscInitStruct.PLL.PLLQ = 4;		
+	RCC_OscInitStruct.PLL.PLLQ = 4;
 	RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
-	RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2;		
+	RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2;
 	ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);
-	if(ret != HAL_OK)
+	if (ret != HAL_OK)
 	{
-        Error_Handler(__FILE__, __LINE__);
+		Error_Handler(__FILE__, __LINE__);
 	}
-	
+
 	/* PLL3-Q for USB Clock = 48M */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB;
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USB;
 	PeriphClkInitStruct.PLL3.PLL3M = 5;
 	PeriphClkInitStruct.PLL3.PLL3N = 48;
 	PeriphClkInitStruct.PLL3.PLL3P = 2;
@@ -180,102 +181,102 @@ static void SystemClock_Config(void)
 	PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
 	PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
 	PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_PLL3;
-	  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
-	  
-	/* PLL3-R for LTDC */
-//	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC;
-//	PeriphClkInitStruct.PLL3.PLL3M = 25;    
-//	PeriphClkInitStruct.PLL3.PLL3N = 160;
-//	PeriphClkInitStruct.PLL3.PLL3P = 2;
-//	PeriphClkInitStruct.PLL3.PLL3Q = 2;
-//	PeriphClkInitStruct.PLL3.PLL3R = 32;  
-//	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct); 		
+	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
 
-//	/* Disable  PLL3. */
-//	__HAL_RCC_PLL3_DISABLE();
+	/* PLL3-R for LTDC */
+	//	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC;
+	//	PeriphClkInitStruct.PLL3.PLL3M = 25;
+	//	PeriphClkInitStruct.PLL3.PLL3N = 160;
+	//	PeriphClkInitStruct.PLL3.PLL3P = 2;
+	//	PeriphClkInitStruct.PLL3.PLL3Q = 2;
+	//	PeriphClkInitStruct.PLL3.PLL3R = 32;
+	//	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+	//	/* Disable  PLL3. */
+	//	__HAL_RCC_PLL3_DISABLE();
 
 	/* 
-       Ñ¡ÔñPLLµÄÊä³ö×÷ÎªÏµÍ³Ê±ÖÓ
-       ÅäÖÃRCC_CLOCKTYPE_SYSCLKÏµÍ³Ê±ÖÓ
-       ÅäÖÃRCC_CLOCKTYPE_HCLK Ê±ÖÓ£¬¶ÔÓ¦AHB1£¬AHB2£¬AHB3ºÍAHB4×ÜÏß
-       ÅäÖÃRCC_CLOCKTYPE_PCLK1Ê±ÖÓ£¬¶ÔÓ¦APB1×ÜÏß
-       ÅäÖÃRCC_CLOCKTYPE_PCLK2Ê±ÖÓ£¬¶ÔÓ¦APB2×ÜÏß
-       ÅäÖÃRCC_CLOCKTYPE_D1PCLK1Ê±ÖÓ£¬¶ÔÓ¦APB3×ÜÏß
-       ÅäÖÃRCC_CLOCKTYPE_D3PCLK1Ê±ÖÓ£¬¶ÔÓ¦APB4×ÜÏß     
+       é€‰æ‹©PLLçš„è¾“å‡ºä½œä¸ºç³»ç»Ÿæ—¶é’Ÿ
+       é…ç½®RCC_CLOCKTYPE_SYSCLKç³»ç»Ÿæ—¶é’Ÿ
+       é…ç½®RCC_CLOCKTYPE_HCLK æ—¶é’Ÿï¼Œå¯¹åº”AHB1ï¼ŒAHB2ï¼ŒAHB3å’ŒAHB4æ€»çº¿
+       é…ç½®RCC_CLOCKTYPE_PCLK1æ—¶é’Ÿï¼Œå¯¹åº”APB1æ€»çº¿
+       é…ç½®RCC_CLOCKTYPE_PCLK2æ—¶é’Ÿï¼Œå¯¹åº”APB2æ€»çº¿
+       é…ç½®RCC_CLOCKTYPE_D1PCLK1æ—¶é’Ÿï¼Œå¯¹åº”APB3æ€»çº¿
+       é…ç½®RCC_CLOCKTYPE_D3PCLK1æ—¶é’Ÿï¼Œå¯¹åº”APB4æ€»çº¿     
     */
-	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_D1PCLK1 | RCC_CLOCKTYPE_PCLK1 | \
-								 RCC_CLOCKTYPE_PCLK2  | RCC_CLOCKTYPE_D3PCLK1);
+	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_D1PCLK1 | RCC_CLOCKTYPE_PCLK1 |
+																 RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_D3PCLK1);
 
 	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
 	RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
 	RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
-	RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;  
-	RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2; 
-	RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2; 
-	RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2; 
-	
-	/* ´Ëº¯Êı»á¸üĞÂSystemCoreClock£¬²¢ÖØĞÂÅäÖÃHAL_InitTick */
-	ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4);
-	if(ret != HAL_OK)
-	{
-        Error_Handler(__FILE__, __LINE__);
-	}
-  
-    /*
-      Ê¹ÓÃIOµÄ¸ßËÙÄ£Ê½£¬ÒªÊ¹ÄÜIO²¹³¥£¬¼´µ÷ÓÃÏÂÃæÈı¸öº¯Êı 
-      £¨1£©Ê¹ÄÜCSI clock
-      £¨2£©Ê¹ÄÜSYSCFG clock
-      £¨3£©Ê¹ÄÜI/O²¹³¥µ¥Ôª£¬ ÉèÖÃSYSCFG_CCCSR¼Ä´æÆ÷µÄbit0
-    */
-	__HAL_RCC_CSI_ENABLE() ;
+	RCC_ClkInitStruct.APB3CLKDivider = RCC_APB3_DIV2;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_APB1_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
+	RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-	__HAL_RCC_SYSCFG_CLK_ENABLE() ;
+	/* æ­¤å‡½æ•°ä¼šæ›´æ–°SystemCoreClockï¼Œå¹¶é‡æ–°é…ç½®HAL_InitTick */
+	ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4);
+	if (ret != HAL_OK)
+	{
+		Error_Handler(__FILE__, __LINE__);
+	}
+
+	/*
+      ä½¿ç”¨IOçš„é«˜é€Ÿæ¨¡å¼ï¼Œè¦ä½¿èƒ½IOè¡¥å¿ï¼Œå³è°ƒç”¨ä¸‹é¢ä¸‰ä¸ªå‡½æ•° 
+      ï¼ˆ1ï¼‰ä½¿èƒ½CSI clock
+      ï¼ˆ2ï¼‰ä½¿èƒ½SYSCFG clock
+      ï¼ˆ3ï¼‰ä½¿èƒ½I/Oè¡¥å¿å•å…ƒï¼Œ è®¾ç½®SYSCFG_CCCSRå¯„å­˜å™¨çš„bit0
+    */
+	__HAL_RCC_CSI_ENABLE();
+
+	__HAL_RCC_SYSCFG_CLK_ENABLE();
 
 	HAL_EnableCompensationCell();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: Error_Handler
-*	ĞÎ    ²Î: file : Ô´´úÂëÎÄ¼şÃû³Æ¡£¹Ø¼ü×Ö __FILE__ ±íÊ¾Ô´´úÂëÎÄ¼şÃû¡£
-*			  line £º´úÂëĞĞºÅ¡£¹Ø¼ü×Ö __LINE__ ±íÊ¾Ô´´úÂëĞĞºÅ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: Error_Handler
+*	å½¢    å‚: file : æºä»£ç æ–‡ä»¶åç§°ã€‚å…³é”®å­— __FILE__ è¡¨ç¤ºæºä»£ç æ–‡ä»¶åã€‚
+*			  line ï¼šä»£ç è¡Œå·ã€‚å…³é”®å­— __LINE__ è¡¨ç¤ºæºä»£ç è¡Œå·
+*	è¿” å› å€¼: æ— 
 *		Error_Handler(__FILE__, __LINE__);
 *********************************************************************************************************
 */
 void Error_Handler(char *file, uint32_t line)
 {
 	/* 
-		ÓÃ»§¿ÉÒÔÌí¼Ó×Ô¼ºµÄ´úÂë±¨¸æÔ´´úÂëÎÄ¼şÃûºÍ´úÂëĞĞºÅ£¬±ÈÈç½«´íÎóÎÄ¼şºÍĞĞºÅ´òÓ¡µ½´®¿Ú
+		ç”¨æˆ·å¯ä»¥æ·»åŠ è‡ªå·±çš„ä»£ç æŠ¥å‘Šæºä»£ç æ–‡ä»¶åå’Œä»£ç è¡Œå·ï¼Œæ¯”å¦‚å°†é”™è¯¯æ–‡ä»¶å’Œè¡Œå·æ‰“å°åˆ°ä¸²å£
 		printf("Wrong parameters value: file %s on line %d\r\n", file, line) 
 	*/
-	
-	/* ÕâÊÇÒ»¸öËÀÑ­»·£¬¶ÏÑÔÊ§°ÜÊ±³ÌĞò»áÔÚ´Ë´¦ËÀ»ú£¬ÒÔ±ãÓÚÓÃ»§²é´í */
+
+	/* è¿™æ˜¯ä¸€ä¸ªæ­»å¾ªç¯ï¼Œæ–­è¨€å¤±è´¥æ—¶ç¨‹åºä¼šåœ¨æ­¤å¤„æ­»æœºï¼Œä»¥ä¾¿äºç”¨æˆ·æŸ¥é”™ */
 	if (line == 0)
 	{
 		return;
 	}
-	
-	while(1)
+
+	while (1)
 	{
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MPU_Config
-*	¹¦ÄÜËµÃ÷: ÅäÖÃMPU
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MPU_Config
+*	åŠŸèƒ½è¯´æ˜: é…ç½®MPU
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static void MPU_Config( void )
+static void MPU_Config(void)
 {
 	MPU_Region_InitTypeDef MPU_InitStruct;
 
-	/* ½ûÖ¹ MPU */
+	/* ç¦æ­¢ MPU */
 	HAL_MPU_Disable();
-	
+
 #if 1
 	/* Configure the MPU attributes as Device not cacheable 
 	 for ETH DMA descriptors */
@@ -310,99 +311,99 @@ static void MPU_Config( void )
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
 #endif
 
-	/* ÅäÖÃAXI SRAMµÄMPUÊôĞÔÎªWrite through */
-	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
-	MPU_InitStruct.BaseAddress      = 0x24000000;
-	MPU_InitStruct.Size             = MPU_REGION_SIZE_512KB;
+	/* é…ç½®AXI SRAMçš„MPUå±æ€§ä¸ºWrite through */
+	MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress = 0x24000000;
+	MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;
 	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-	MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
-	MPU_InitStruct.IsCacheable      = MPU_ACCESS_CACHEABLE;
-	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
-	
+	MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+	MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+	MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+
 	//MPU_InitStruct.Number           = MPU_REGION_NUMBER1;
-	MPU_InitStruct.Number           = MPU_REGION_NUMBER2;
-	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
+	MPU_InitStruct.Number = MPU_REGION_NUMBER2;
+	MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
 	MPU_InitStruct.SubRegionDisable = 0x00;
-	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
-		
-	/* ÅäÖÃ×ÜÏßÀ©Õ¹IO¿Õ¼äµÄÊôĞÔÎªWrite through */
-	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
-	MPU_InitStruct.BaseAddress      = 0x60000000;
-	MPU_InitStruct.Size             = ARM_MPU_REGION_SIZE_64KB;	// ARM_MPU_REGION_SIZE_16KB;
+
+	/* é…ç½®æ€»çº¿æ‰©å±•IOç©ºé—´çš„å±æ€§ä¸ºWrite through */
+	MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress = 0x60000000;
+	MPU_InitStruct.Size = ARM_MPU_REGION_SIZE_64KB; // ARM_MPU_REGION_SIZE_16KB;
 	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-	MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
-	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;		/* ²»ÄÜÓÃMPU_ACCESS_CACHEABLE;»á³öÏÖ2´ÎCS¡¢WEĞÅºÅ */
-	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
-	MPU_InitStruct.Number           = MPU_REGION_NUMBER3;
-	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL0;
+	MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+	MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE; /* ä¸èƒ½ç”¨MPU_ACCESS_CACHEABLE;ä¼šå‡ºç°2æ¬¡CSã€WEä¿¡å· */
+	MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number = MPU_REGION_NUMBER3;
+	MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
 	MPU_InitStruct.SubRegionDisable = 0x00;
-	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
-	
-	/*Ê¹ÄÜ MPU */
+
+	/*ä½¿èƒ½ MPU */
 	HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CPU_CACHE_Enable
-*	¹¦ÄÜËµÃ÷: Ê¹ÄÜL1 Cache
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CPU_CACHE_Enable
+*	åŠŸèƒ½è¯´æ˜: ä½¿èƒ½L1 Cache
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void CPU_CACHE_Enable(void)
 {
-	/* Ê¹ÄÜ I-Cache */
+	/* ä½¿èƒ½ I-Cache */
 	SCB_EnableICache();
 
-	/* Ê¹ÄÜ D-Cache */
+	/* ä½¿èƒ½ D-Cache */
 	SCB_EnableDCache();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_GetCpuID
-*	¹¦ÄÜËµÃ÷: ¸ÃCPU UID
-*	ĞÎ    ²Î: _id : ·µ»ØID
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_GetCpuID
+*	åŠŸèƒ½è¯´æ˜: è¯¥CPU UID
+*	å½¢    å‚: _id : è¿”å›ID
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_GetCpuID(uint32_t *_id)
 {
-	_id[0] = *(__IO uint32_t*)(0x1FF1E800);
-	_id[1] = *(__IO uint32_t*)(0x1FF1E800 + 4);
-	_id[2] = *(__IO uint32_t*)(0x1FF1E800 + 8);
+	_id[0] = *(__IO uint32_t *)(0x1FF1E800);
+	_id[1] = *(__IO uint32_t *)(0x1FF1E800 + 4);
+	_id[2] = *(__IO uint32_t *)(0x1FF1E800 + 8);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_RunPer10ms
-*	¹¦ÄÜËµÃ÷: ¸Ãº¯ÊıÃ¿¸ô10ms±»SystickÖĞ¶Ïµ÷ÓÃ1´Î¡£Ïê¼û bsp_timer.cµÄ¶¨Ê±ÖĞ¶Ï·şÎñ³ÌĞò¡£Ò»Ğ©´¦ÀíÊ±¼äÒªÇó²»ÑÏ¸ñµÄ
-*			ÈÎÎñ¿ÉÒÔ·ÅÔÚ´Ëº¯Êı¡£±ÈÈç£º°´¼üÉ¨Ãè¡¢·äÃùÆ÷Ãù½Ğ¿ØÖÆµÈ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_RunPer10ms
+*	åŠŸèƒ½è¯´æ˜: è¯¥å‡½æ•°æ¯éš”10msè¢«Systickä¸­æ–­è°ƒç”¨1æ¬¡ã€‚è¯¦è§ bsp_timer.cçš„å®šæ—¶ä¸­æ–­æœåŠ¡ç¨‹åºã€‚ä¸€äº›å¤„ç†æ—¶é—´è¦æ±‚ä¸ä¸¥æ ¼çš„
+*			ä»»åŠ¡å¯ä»¥æ”¾åœ¨æ­¤å‡½æ•°ã€‚æ¯”å¦‚ï¼šæŒ‰é”®æ‰«æã€èœ‚é¸£å™¨é¸£å«æ§åˆ¶ç­‰ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_RunPer10ms(void)
 {
 	bsp_KeyScan10ms();
-	
-	BEEP_Pro();		/* ·äÃùÆ÷ÈÎÎñ */
-	
-	PERIOD_Scan();	/* ¿ØÖÆLEDÉÁË¸ */
-	
-	bsp_AdcTask10ms();	/* ADCºóÌ¨ÈÎÎñ */
+
+	BEEP_Pro(); /* èœ‚é¸£å™¨ä»»åŠ¡ */
+
+	PERIOD_Scan(); /* æ§åˆ¶LEDé—ªçƒ */
+
+	bsp_AdcTask10ms(); /* ADCåå°ä»»åŠ¡ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_RunPer1ms
-*	¹¦ÄÜËµÃ÷: ¸Ãº¯ÊıÃ¿¸ô1ms±»SystickÖĞ¶Ïµ÷ÓÃ1´Î¡£Ïê¼û bsp_timer.cµÄ¶¨Ê±ÖĞ¶Ï·şÎñ³ÌĞò¡£Ò»Ğ©ĞèÒªÖÜÆÚĞÔ´¦ÀíµÄÊÂÎñ
-*			 ¿ÉÒÔ·ÅÔÚ´Ëº¯Êı¡£±ÈÈç£º´¥Ãş×ø±êÉ¨Ãè¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_RunPer1ms
+*	åŠŸèƒ½è¯´æ˜: è¯¥å‡½æ•°æ¯éš”1msè¢«Systickä¸­æ–­è°ƒç”¨1æ¬¡ã€‚è¯¦è§ bsp_timer.cçš„å®šæ—¶ä¸­æ–­æœåŠ¡ç¨‹åºã€‚ä¸€äº›éœ€è¦å‘¨æœŸæ€§å¤„ç†çš„äº‹åŠ¡
+*			 å¯ä»¥æ”¾åœ¨æ­¤å‡½æ•°ã€‚æ¯”å¦‚ï¼šè§¦æ‘¸åæ ‡æ‰«æã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_RunPer1ms(void)
@@ -412,37 +413,37 @@ void bsp_RunPer1ms(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_Idle
-*	¹¦ÄÜËµÃ÷: ¿ÕÏĞÊ±Ö´ĞĞµÄº¯Êı¡£Ò»°ãÖ÷³ÌĞòÔÚforºÍwhileÑ­»·³ÌĞòÌåÖĞĞèÒª²åÈë CPU_IDLE() ºêÀ´µ÷ÓÃ±¾º¯Êı¡£
-*			 ±¾º¯ÊıÈ±Ê¡Îª¿Õ²Ù×÷¡£ÓÃ»§¿ÉÒÔÌí¼ÓÎ¹¹·¡¢ÉèÖÃCPU½øÈëĞİÃßÄ£Ê½µÄ¹¦ÄÜ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_Idle
+*	åŠŸèƒ½è¯´æ˜: ç©ºé—²æ—¶æ‰§è¡Œçš„å‡½æ•°ã€‚ä¸€èˆ¬ä¸»ç¨‹åºåœ¨forå’Œwhileå¾ªç¯ç¨‹åºä½“ä¸­éœ€è¦æ’å…¥ CPU_IDLE() å®æ¥è°ƒç”¨æœ¬å‡½æ•°ã€‚
+*			 æœ¬å‡½æ•°ç¼ºçœä¸ºç©ºæ“ä½œã€‚ç”¨æˆ·å¯ä»¥æ·»åŠ å–‚ç‹—ã€è®¾ç½®CPUè¿›å…¥ä¼‘çœ æ¨¡å¼çš„åŠŸèƒ½ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern void lwip_pro(void);
 extern void lua_Poll();
 void bsp_Idle(void)
 {
-	/* --- Î¹¹· */
+	/* --- å–‚ç‹— */
 
-	/* --- ÈÃCPU½øÈëĞİÃß£¬ÓÉSystick¶¨Ê±ÖĞ¶Ï»½ĞÑ»òÕßÆäËûÖĞ¶Ï»½ĞÑ */
+	/* --- è®©CPUè¿›å…¥ä¼‘çœ ï¼Œç”±Systickå®šæ—¶ä¸­æ–­å”¤é†’æˆ–è€…å…¶ä»–ä¸­æ–­å”¤é†’ */
 
-	lwip_pro();		/* ÒÔÌ«ÍøĞ­ÒéÕ»ÂÖÑ¯ */	
-	
+	lwip_pro(); /* ä»¥å¤ªç½‘åè®®æ ˆè½®è¯¢ */
+
 	wifi_task();
-	
-	lua_Poll();			/* ±à³Ì½Ó¿Ú */
-	
-	EXIO_ScanTask();	/* À©Õ¹IOÈÎÎñ£¬Ê¹ÄÜÇ°ÌìÏÂÄÚ²¿10msÖ´ĞĞÒ»´Î */
+
+	lua_Poll(); /* ç¼–ç¨‹æ¥å£ */
+
+	EXIO_ScanTask(); /* æ‰©å±•IOä»»åŠ¡ï¼Œä½¿èƒ½å‰å¤©ä¸‹å†…éƒ¨10msæ‰§è¡Œä¸€æ¬¡ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_Delay
-*	¹¦ÄÜËµÃ÷: ºÁÃëÑÓ³Ùº¯Êı¡£Ìæ»»HALÖĞµÄº¯Êı¡£ÒòÎªHALÖĞµÄÈ±Ê¡º¯ÊıÒÀÀµÓÚsystickÖĞ¶Ï£¬Èç¹ûÔÚUSB¡¢SD¿¨ÖĞ¶ÏÖĞ
-*		ÓĞÑÓ³Ùº¯Êı£¬Ôò»áËøËÀ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_Delay
+*	åŠŸèƒ½è¯´æ˜: æ¯«ç§’å»¶è¿Ÿå‡½æ•°ã€‚æ›¿æ¢HALä¸­çš„å‡½æ•°ã€‚å› ä¸ºHALä¸­çš„ç¼ºçœå‡½æ•°ä¾èµ–äºsystickä¸­æ–­ï¼Œå¦‚æœåœ¨USBã€SDå¡ä¸­æ–­ä¸­
+*		æœ‰å»¶è¿Ÿå‡½æ•°ï¼Œåˆ™ä¼šé”æ­»ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_Delay(uint32_t Delay)
@@ -452,73 +453,73 @@ void HAL_Delay(uint32_t Delay)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestGpio_USB3300
-*	¹¦ÄÜËµÃ÷: ·­×ªUSB3300Ïà¹ØµÄGPIO£¬ÓÃÀ´×öÓ²¼şDEBUG
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestGpio_USB3300
+*	åŠŸèƒ½è¯´æ˜: ç¿»è½¬USB3300ç›¸å…³çš„GPIOï¼Œç”¨æ¥åšç¡¬ä»¶DEBUG
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestGpio_USB3300(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct;
-	
+
 	/* Configure USB FS GPIOs */
-    __GPIOA_CLK_ENABLE();
-    __GPIOB_CLK_ENABLE();
-    __GPIOC_CLK_ENABLE();
-    __GPIOH_CLK_ENABLE();
-    __GPIOI_CLK_ENABLE();
+	__GPIOA_CLK_ENABLE();
+	__GPIOB_CLK_ENABLE();
+	__GPIOC_CLK_ENABLE();
+	__GPIOH_CLK_ENABLE();
+	__GPIOI_CLK_ENABLE();
 
-    /* CLK */
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	/* CLK */
+	GPIO_InitStruct.Pin = GPIO_PIN_5;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* D0 */
-    GPIO_InitStruct.Pin = GPIO_PIN_3;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	/* D0 */
+	GPIO_InitStruct.Pin = GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* D1 D2 D3 D4 D5 D6 D7 */
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 |
-      GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct); 
+	/* D1 D2 D3 D4 D5 D6 D7 */
+	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 |
+												GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* STP */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+	/* STP */
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    /* NXT */
-    GPIO_InitStruct.Pin = GPIO_PIN_4;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+	/* NXT */
+	GPIO_InitStruct.Pin = GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-    /* DIR */
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
-	
+	/* DIR */
+	GPIO_InitStruct.Pin = GPIO_PIN_11;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Alternate = 0;
+	HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+
 	while (1)
 	{
 		GPIOA->BSRRH = GPIO_PIN_5;
 		GPIOA->BSRRH = GPIO_PIN_3;
-		
+
 		GPIOB->BSRRH = GPIO_PIN_0;
 		GPIOB->BSRRH = GPIO_PIN_1;
 		GPIOB->BSRRH = GPIO_PIN_5;
@@ -526,30 +527,30 @@ void TestGpio_USB3300(void)
 		GPIOB->BSRRH = GPIO_PIN_11;
 		GPIOB->BSRRH = GPIO_PIN_12;
 		GPIOB->BSRRH = GPIO_PIN_13;
-		
+
 		GPIOC->BSRRH = GPIO_PIN_0;
 		GPIOH->BSRRH = GPIO_PIN_4;
 		GPIOI->BSRRH = GPIO_PIN_11;
-		
+
 		bsp_DelayMS(100);
 
 		GPIOA->BSRRL = GPIO_PIN_5;
 		GPIOA->BSRRL = GPIO_PIN_3;
-		
+
 		GPIOB->BSRRL = GPIO_PIN_0;
 		GPIOB->BSRRL = GPIO_PIN_1;
 		GPIOB->BSRRL = GPIO_PIN_5;
 		GPIOB->BSRRL = GPIO_PIN_10;
 		GPIOB->BSRRL = GPIO_PIN_11;
 		GPIOB->BSRRL = GPIO_PIN_12;
-		GPIOB->BSRRL = GPIO_PIN_13;		
-		
+		GPIOB->BSRRL = GPIO_PIN_13;
+
 		GPIOC->BSRRL = GPIO_PIN_0;
 		GPIOH->BSRRL = GPIO_PIN_4;
 		GPIOI->BSRRL = GPIO_PIN_11;
-		
-		bsp_DelayMS(100);		
+
+		bsp_DelayMS(100);
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

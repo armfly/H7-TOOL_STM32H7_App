@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÈıÖáÍÓÂİÒÇMPU-6050Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_mpu6050.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : ä¸‰è½´é™€èºä»ªMPU-6050é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_mpu6050.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2012-10-12 armfly  ST¹Ì¼ş¿â°æ±¾ V2.1.0
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2012-10-12 armfly  STå›ºä»¶åº“ç‰ˆæœ¬ V2.1.0
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,36 +18,36 @@
 #ifndef _BSP_MPU6050_H
 #define _BSP_MPU6050_H
 
-#define MPU6050_SLAVE_ADDRESS    0xD0		/* I2C´Ó»úµØÖ· */
+#define MPU6050_SLAVE_ADDRESS 0xD0 /* I2Cä»æœºåœ°å€ */
 
 //****************************************
-// ¶¨ÒåMPU6050ÄÚ²¿µØÖ·
+// å®šä¹‰MPU6050å†…éƒ¨åœ°å€
 //****************************************
-#define	SMPLRT_DIV		0x19	//ÍÓÂİÒÇ²ÉÑùÂÊ£¬µäĞÍÖµ£º0x07(125Hz)
-#define	CONFIG			0x1A	//µÍÍ¨ÂË²¨ÆµÂÊ£¬µäĞÍÖµ£º0x06(5Hz)
-#define	GYRO_CONFIG		0x1B	//ÍÓÂİÒÇ×Ô¼ì¼°²âÁ¿·¶Î§£¬µäĞÍÖµ£º0x18(²»×Ô¼ì£¬2000deg/s)
+#define SMPLRT_DIV 0x19	//é™€èºä»ªé‡‡æ ·ç‡ï¼Œå…¸å‹å€¼ï¼š0x07(125Hz)
+#define CONFIG 0x1A			 //ä½é€šæ»¤æ³¢é¢‘ç‡ï¼Œå…¸å‹å€¼ï¼š0x06(5Hz)
+#define GYRO_CONFIG 0x1B //é™€èºä»ªè‡ªæ£€åŠæµ‹é‡èŒƒå›´ï¼Œå…¸å‹å€¼ï¼š0x18(ä¸è‡ªæ£€ï¼Œ2000deg/s)
 
-#define	ACCEL_CONFIG	0x1C	//¼ÓËÙ¼Æ×Ô¼ì¡¢²âÁ¿·¶Î§¼°¸ßÍ¨ÂË²¨ÆµÂÊ£¬µäĞÍÖµ£º0x01(²»×Ô¼ì£¬2G£¬5Hz)
+#define ACCEL_CONFIG 0x1C //åŠ é€Ÿè®¡è‡ªæ£€ã€æµ‹é‡èŒƒå›´åŠé«˜é€šæ»¤æ³¢é¢‘ç‡ï¼Œå…¸å‹å€¼ï¼š0x01(ä¸è‡ªæ£€ï¼Œ2Gï¼Œ5Hz)
 
-#define	ACCEL_XOUT_H	0x3B
-#define	ACCEL_XOUT_L	0x3C
-#define	ACCEL_YOUT_H	0x3D
-#define	ACCEL_YOUT_L	0x3E
-#define	ACCEL_ZOUT_H	0x3F
-#define	ACCEL_ZOUT_L	0x40
+#define ACCEL_XOUT_H 0x3B
+#define ACCEL_XOUT_L 0x3C
+#define ACCEL_YOUT_H 0x3D
+#define ACCEL_YOUT_L 0x3E
+#define ACCEL_ZOUT_H 0x3F
+#define ACCEL_ZOUT_L 0x40
 
-#define	TEMP_OUT_H		0x41
-#define	TEMP_OUT_L		0x42
+#define TEMP_OUT_H 0x41
+#define TEMP_OUT_L 0x42
 
-#define	GYRO_XOUT_H		0x43
-#define	GYRO_XOUT_L		0x44
-#define	GYRO_YOUT_H		0x45
-#define	GYRO_YOUT_L		0x46
-#define	GYRO_ZOUT_H		0x47
-#define	GYRO_ZOUT_L		0x48
+#define GYRO_XOUT_H 0x43
+#define GYRO_XOUT_L 0x44
+#define GYRO_YOUT_H 0x45
+#define GYRO_YOUT_L 0x46
+#define GYRO_ZOUT_H 0x47
+#define GYRO_ZOUT_L 0x48
 
-#define	PWR_MGMT_1		0x6B	//µçÔ´¹ÜÀí£¬µäĞÍÖµ£º0x00(Õı³£ÆôÓÃ)
-#define	WHO_AM_I		0x75	//IICµØÖ·¼Ä´æÆ÷(Ä¬ÈÏÊıÖµ0x68£¬Ö»¶Á)
+#define PWR_MGMT_1 0x6B //ç”µæºç®¡ç†ï¼Œå…¸å‹å€¼ï¼š0x00(æ­£å¸¸å¯ç”¨)
+#define WHO_AM_I 0x75		//IICåœ°å€å¯„å­˜å™¨(é»˜è®¤æ•°å€¼0x68ï¼Œåªè¯»)
 
 typedef struct
 {
@@ -60,7 +60,7 @@ typedef struct
 	int16_t GYRO_X;
 	int16_t GYRO_Y;
 	int16_t GYRO_Z;
-}MPU6050_T;
+} MPU6050_T;
 
 extern MPU6050_T g_tMPU6050;
 
@@ -70,7 +70,6 @@ uint8_t MPU6050_ReadByte(uint8_t _ucRegAddr);
 
 void MPU6050_ReadData(void);
 
-
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

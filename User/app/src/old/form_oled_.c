@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ²âÊÔOLEDÏÔÊ¾Æ÷
-*	ÎÄ¼şÃû³Æ : oled_test.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : ²âÊÔOLEDÏÔÊ¾Æ÷Ä£¿é
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß     ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
-*		v1.1    2015-10-14 armfly  Ôö¼Ó24µãÕóºÍ32µãÕóºº×ÖºÍASCIIÏÔÊ¾¹¦ÄÜ
+*	æ¨¡å—åç§° : æµ‹è¯•OLEDæ˜¾ç¤ºå™¨
+*	æ–‡ä»¶åç§° : oled_test.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : æµ‹è¯•OLEDæ˜¾ç¤ºå™¨æ¨¡å—
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…     è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
+*		v1.1    2015-10-14 armfly  å¢åŠ 24ç‚¹é˜µå’Œ32ç‚¹é˜µæ±‰å­—å’ŒASCIIæ˜¾ç¤ºåŠŸèƒ½
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,74 +18,78 @@
 #include "bsp.h"
 #include "form_oled.h"
 
-#define DEMO_PAGE_COUNT		7	/* OLEDÑİÊ¾Ò³ÃæµÄ¸öÊı */
+#define DEMO_PAGE_COUNT 7 /* OLEDæ¼”ç¤ºé¡µé¢çš„ä¸ªæ•° */
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
-	LABEL_T Label7; LABEL_T Label8;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
+	LABEL_T Label7;
+	LABEL_T Label8;
 
 	BUTTON_T BtnRet;
-}FormOLED_T;
+} FormOLED_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"OLEDÏÔÊ¾Ä£¿é²âÊÔ³ÌĞò"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "OLEDæ˜¾ç¤ºæ¨¡å—æµ‹è¯•ç¨‹åº"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Ò¡¸Ë×ó¡¢ÓÒ¼ü: "
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "æ‘‡æ†å·¦ã€å³é”®: "
 
-	#define LABEL2_X  	(LABEL1_X + 135)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"ÇĞ»»OLEDÏÔÊ¾½çÃæ"
+#define LABEL2_X (LABEL1_X + 135)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "åˆ‡æ¢OLEDæ˜¾ç¤ºç•Œé¢"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"Ò¡¸ËÉÏ¡¢ÏÂ¼ü: "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "æ‘‡æ†ä¸Šã€ä¸‹é”®: "
 
-	#define LABEL4_X  	(LABEL3_X + 135)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"µ÷½ÚOLED¶Ô±È¶È"
+#define LABEL4_X (LABEL3_X + 135)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "è°ƒèŠ‚OLEDå¯¹æ¯”åº¦"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"Ò¡¸ËOK¼ü    : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "æ‘‡æ†OKé”®    : "
 
-	#define LABEL6_X  	(LABEL5_X + 135)
-	#define LABEL6_Y	LABEL5_Y
-	#define LABEL6_TEXT	"ÇĞ»»ÏÔÊ¾·½Ïò"
+#define LABEL6_X (LABEL5_X + 135)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT "åˆ‡æ¢æ˜¾ç¤ºæ–¹å‘"
 
-#define LABEL7_X  	(LABEL1_X)
-#define LABEL7_Y	(LABEL1_Y + 20 * 3)
-#define LABEL7_TEXT	"µ±Ç°×´Ì¬    :"
+#define LABEL7_X (LABEL1_X)
+#define LABEL7_Y (LABEL1_Y + 20 * 3)
+#define LABEL7_TEXT "å½“å‰çŠ¶æ€    :"
 
-	#define LABEL8_X  	(LABEL7_X + 135)
-	#define LABEL8_Y	LABEL7_Y
-	#define LABEL8_TEXT	"80"
+#define LABEL8_X (LABEL7_X + 135)
+#define LABEL8_Y LABEL7_Y
+#define LABEL8_TEXT "80"
 
 static void InitFormOLED(void);
 static void DispFormOLED(void);
@@ -94,16 +98,16 @@ FormOLED_T *FormOLED;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestOLED
-*	¹¦ÄÜËµÃ÷: ²âÊÔOLEDÏÔÊ¾Ä£¿é
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestOLED
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•OLEDæ˜¾ç¤ºæ¨¡å—
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestOLED(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormOLED_T form;
@@ -111,42 +115,42 @@ void TestOLED(void)
 	FONT_T tFont12, tFont16, tFont24, tFont32;
 	uint8_t fRefreshOled;
 	uint8_t ucItem;
-	uint8_t ucContrast = 0x80;	/* ¶Ô±È¶È */
-	uint8_t ucDir = 0;	/* ÏÔÊ¾·½Ïò, 0 ±íÊ¾Õı³£·½Ïò£¬1±íÊ¾µ¹180¶È */
+	uint8_t ucContrast = 0x80; /* å¯¹æ¯”åº¦ */
+	uint8_t ucDir = 0;				 /* æ˜¾ç¤ºæ–¹å‘, 0 è¡¨ç¤ºæ­£å¸¸æ–¹å‘ï¼Œ1è¡¨ç¤ºå€’180åº¦ */
 
-	FormOLED= &form;
+	FormOLED = &form;
 	InitFormOLED();
 	DispFormOLED();
 
-	OLED_InitHard();	 /* ³õÊ¼»¯OLEDÓ²¼ş */
-	OLED_ClrScr(0x00);	 /* ÇåÆÁ£¬0x00±íÊ¾ºÚµ×£» 0xFF ±íÊ¾°×µ× */
+	OLED_InitHard();	 /* åˆå§‹åŒ–OLEDç¡¬ä»¶ */
+	OLED_ClrScr(0x00); /* æ¸…å±ï¼Œ0x00è¡¨ç¤ºé»‘åº•ï¼› 0xFF è¡¨ç¤ºç™½åº• */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont16.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont16.FrontColor = 1;		/* ×ÖÌåÑÕÉ« 0 »ò 1 */
-		tFont16.BackColor = 0;		/* ÎÄ×Ö±³¾°ÑÕÉ« 0 »ò 1 */
-		tFont16.Space = 0;			/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont16.FontCode = FC_ST_16; /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont16.FrontColor = 1;			 /* å­—ä½“é¢œè‰² 0 æˆ– 1 */
+		tFont16.BackColor = 0;			 /* æ–‡å­—èƒŒæ™¯é¢œè‰² 0 æˆ– 1 */
+		tFont16.Space = 0;					 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		tFont12.FontCode = FC_ST_12;	/* ×ÖÌå´úÂë 12µãÕó */
-		tFont12.FrontColor = 1;		/* ×ÖÌåÑÕÉ« 0 »ò 1 */
-		tFont12.BackColor = 0;		/* ÎÄ×Ö±³¾°ÑÕÉ« 0 »ò 1 */
-		tFont12.Space = 1;			/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont12.FontCode = FC_ST_12; /* å­—ä½“ä»£ç  12ç‚¹é˜µ */
+		tFont12.FrontColor = 1;			 /* å­—ä½“é¢œè‰² 0 æˆ– 1 */
+		tFont12.BackColor = 0;			 /* æ–‡å­—èƒŒæ™¯é¢œè‰² 0 æˆ– 1 */
+		tFont12.Space = 1;					 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		tFont24.FontCode = FC_ST_24;	/* ×ÖÌå´úÂë 24µãÕó */
-		tFont24.FrontColor = 1;		/* ×ÖÌåÑÕÉ« 0 »ò 1 */
-		tFont24.BackColor = 0;		/* ÎÄ×Ö±³¾°ÑÕÉ« 0 »ò 1 */
-		tFont24.Space = 1;			/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		
-		tFont32.FontCode = FC_ST_32;	/* ×ÖÌå´úÂë 32µãÕó */
-		tFont32.FrontColor = 1;		/* ×ÖÌåÑÕÉ« 0 »ò 1 */
-		tFont32.BackColor = 0;		/* ÎÄ×Ö±³¾°ÑÕÉ« 0 »ò 1 */
-		tFont32.Space = 1;			/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */		
+		tFont24.FontCode = FC_ST_24; /* å­—ä½“ä»£ç  24ç‚¹é˜µ */
+		tFont24.FrontColor = 1;			 /* å­—ä½“é¢œè‰² 0 æˆ– 1 */
+		tFont24.BackColor = 0;			 /* æ–‡å­—èƒŒæ™¯é¢œè‰² 0 æˆ– 1 */
+		tFont24.Space = 1;					 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+
+		tFont32.FontCode = FC_ST_32; /* å­—ä½“ä»£ç  32ç‚¹é˜µ */
+		tFont32.FrontColor = 1;			 /* å­—ä½“é¢œè‰² 0 æˆ– 1 */
+		tFont32.BackColor = 0;			 /* æ–‡å­—èƒŒæ™¯é¢œè‰² 0 æˆ– 1 */
+		tFont32.Space = 1;					 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 	ucItem = 0;
 	fRefreshOled = 1;
 	fRefreshTFT = 1;
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -157,38 +161,38 @@ void TestOLED(void)
 
 			fRefreshTFT = 0;
 
-			sprintf(buf, "µÚ%dÒ³  ¶Ô±È¶È = %3d", ucItem + 1, ucContrast);
+			sprintf(buf, "ç¬¬%dé¡µ  å¯¹æ¯”åº¦ = %3d", ucItem + 1, ucContrast);
 
 			FormOLED->Label8.pCaption = buf;
 			LCD_DrawLabel(&FormOLED->Label8);
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormOLED->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormOLED->BtnRet);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormOLED->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormOLED->BtnRet);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormOLED->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormOLED->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormOLED->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormOLED->BtnRet);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormOLED->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormOLED->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormOLED->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormOLED->BtnRet);
+				}
+				break;
 			}
 		}
 
@@ -198,146 +202,146 @@ void TestOLED(void)
 
 			switch (ucItem)
 			{
-				case 0:
-					OLED_ClrScr(0);			 /* ÇåÆÁ£¬ºÚµ× */
-					OLED_DrawRect(0, 0, 64, 128, 1);
-					OLED_DispStr(8, 3, "°²¸»À³OLEDÀı³Ì", &tFont16);		/* ÔÚ(8,3)×ø±ê´¦ÏÔÊ¾Ò»´®ºº×Ö */
-					OLED_DispStr(10, 22, "Çë²Ù×÷Ò¡¸Ë!", &tFont16);
-					OLED_DispStr(5, 22 + 20, "www.ARMfly.com", &tFont16);
-					break;
+			case 0:
+				OLED_ClrScr(0); /* æ¸…å±ï¼Œé»‘åº• */
+				OLED_DrawRect(0, 0, 64, 128, 1);
+				OLED_DispStr(8, 3, "å®‰å¯Œè±OLEDä¾‹ç¨‹", &tFont16); /* åœ¨(8,3)åæ ‡å¤„æ˜¾ç¤ºä¸€ä¸²æ±‰å­— */
+				OLED_DispStr(10, 22, "è¯·æ“ä½œæ‘‡æ†!", &tFont16);
+				OLED_DispStr(5, 22 + 20, "www.ARMfly.com", &tFont16);
+				break;
 
-				case 1:
-					//OLED_StartDraw();	  µ÷ÓÃ¸Äº¯Êı£¬Ö»Ë¢ĞÂ»º³åÇø£¬²»ËÍÏÔÊ¾
-					OLED_ClrScr(0);
-					OLED_DispStr(0, 0,  "¹ÊÈËÎ÷´Ç»Æº×Â¥£¬", &tFont16);
-					OLED_DispStr(0, 16, "ÑÌ»¨ÈıÔÂÏÂÑïÖİ¡£", &tFont16);
-					OLED_DispStr(0, 32, "¹Â·«Ô¶Ó°±Ì¿Õ¾¡£¬", &tFont16);
-					OLED_DispStr(0, 48, "Î¨¼û³¤½­Ìì¼ÊÁ÷¡£", &tFont16);
-					//OLED_EndDraw();	  µ÷ÓÃ¸Äº¯Êı£¬½«»º³åÇøÖĞÊı¾İËÍÏÔÊ¾
-					break;
+			case 1:
+				//OLED_StartDraw();	  è°ƒç”¨æ”¹å‡½æ•°ï¼Œåªåˆ·æ–°ç¼“å†²åŒºï¼Œä¸é€æ˜¾ç¤º
+				OLED_ClrScr(0);
+				OLED_DispStr(0, 0, "æ•…äººè¥¿è¾é»„é¹¤æ¥¼ï¼Œ", &tFont16);
+				OLED_DispStr(0, 16, "çƒŸèŠ±ä¸‰æœˆä¸‹æ‰¬å·ã€‚", &tFont16);
+				OLED_DispStr(0, 32, "å­¤å¸†è¿œå½±ç¢§ç©ºå°½ï¼Œ", &tFont16);
+				OLED_DispStr(0, 48, "å”¯è§é•¿æ±Ÿå¤©é™…æµã€‚", &tFont16);
+				//OLED_EndDraw();	  è°ƒç”¨æ”¹å‡½æ•°ï¼Œå°†ç¼“å†²åŒºä¸­æ•°æ®é€æ˜¾ç¤º
+				break;
 
-				case 2:
-					OLED_ClrScr(0);
-					OLED_DispStr(5, 0,  "¡¶ËÍÃÏºÆÈ»Ö®¹ãÁê¡·", &tFont12);
-					OLED_DispStr(0, 13, "¹ÊÈËÎ÷´Ç»Æº×Â¥£¬", &tFont12);
-					OLED_DispStr(0, 26, "ÑÌ»¨ÈıÔÂÏÂÑïÖİ¡£", &tFont12);
-					OLED_DispStr(0, 39, "¹Â·«Ô¶Ó°±Ì¿Õ¾¡£¬", &tFont12);
-					OLED_DispStr(0, 52, "Î¨¼û³¤½­Ìì¼ÊÁ÷¡£", &tFont12);
+			case 2:
+				OLED_ClrScr(0);
+				OLED_DispStr(5, 0, "ã€Šé€å­Ÿæµ©ç„¶ä¹‹å¹¿é™µã€‹", &tFont12);
+				OLED_DispStr(0, 13, "æ•…äººè¥¿è¾é»„é¹¤æ¥¼ï¼Œ", &tFont12);
+				OLED_DispStr(0, 26, "çƒŸèŠ±ä¸‰æœˆä¸‹æ‰¬å·ã€‚", &tFont12);
+				OLED_DispStr(0, 39, "å­¤å¸†è¿œå½±ç¢§ç©ºå°½ï¼Œ", &tFont12);
+				OLED_DispStr(0, 52, "å”¯è§é•¿æ±Ÿå¤©é™…æµã€‚", &tFont12);
 
-					OLED_DispStr(110, 14, "°²", &tFont16);
-					OLED_DispStr(110, 30, "¸»", &tFont16);
-					OLED_DispStr(110, 46, "À³", &tFont16);
-					OLED_DrawRect(109,13, 50, 17,1);
-					break;
+				OLED_DispStr(110, 14, "å®‰", &tFont16);
+				OLED_DispStr(110, 30, "å¯Œ", &tFont16);
+				OLED_DispStr(110, 46, "è±", &tFont16);
+				OLED_DrawRect(109, 13, 50, 17, 1);
+				break;
 
-				case 3:	
-					OLED_ClrScr(0);
-					OLED_DispStr(5, 0,  "°²¸»À³123", &tFont24);
-					OLED_DispStr(0, 26, "¿ª·¢°å8", &tFont32);
-					break;
+			case 3:
+				OLED_ClrScr(0);
+				OLED_DispStr(5, 0, "å®‰å¯Œè±123", &tFont24);
+				OLED_DispStr(0, 26, "å¼€å‘æ¿8", &tFont32);
+				break;
 
-				case 4:
-					OLED_ClrScr(0);
-					OLED_DrawRect(0,0, 10,10,1);	/* ÔÚ(0,0)×ø±ê´¦»æÖÆÒ»¸ö¸ß10¿í10µÄ¾ØĞÎ */
-					OLED_DrawRect(10,10, 20,30,1);	/* ÔÚ(10,10)×ø±ê´¦»æÖÆÒ»¸ö¸ß20¿í30µÄ¾ØĞÎ */
-					OLED_DrawCircle(64,32,30,1);	/* ÔÚ(64,32)»æÖÆ°ë¾¶30µÄÔ² */
-					OLED_DrawLine(127,0,0,63,1);	/* ÔÚ(127,0) ºÍ (0,63) Ö®¼ä»æÖÆÒ»ÌõÖ±Ïß */
-					break;
+			case 4:
+				OLED_ClrScr(0);
+				OLED_DrawRect(0, 0, 10, 10, 1);		/* åœ¨(0,0)åæ ‡å¤„ç»˜åˆ¶ä¸€ä¸ªé«˜10å®½10çš„çŸ©å½¢ */
+				OLED_DrawRect(10, 10, 20, 30, 1); /* åœ¨(10,10)åæ ‡å¤„ç»˜åˆ¶ä¸€ä¸ªé«˜20å®½30çš„çŸ©å½¢ */
+				OLED_DrawCircle(64, 32, 30, 1);		/* åœ¨(64,32)ç»˜åˆ¶åŠå¾„30çš„åœ† */
+				OLED_DrawLine(127, 0, 0, 63, 1);	/* åœ¨(127,0) å’Œ (0,63) ä¹‹é—´ç»˜åˆ¶ä¸€æ¡ç›´çº¿ */
+				break;
 
-				case 5:
-					OLED_ClrScr(0x00);				/* ÇåÆÁ£¬ºÚµ× */
-					break;
+			case 5:
+				OLED_ClrScr(0x00); /* æ¸…å±ï¼Œé»‘åº• */
+				break;
 
-				case 6:
-					OLED_ClrScr(0xFF);				/* ÇåÆÁ£¬°×µ× */
-					{
-						//char buf[32];
+			case 6:
+				OLED_ClrScr(0xFF); /* æ¸…å±ï¼Œç™½åº• */
+				{
+					//char buf[32];
 
-						//sprintf(buf, "%d", ucContrast);
-						//OLED_DispStr(10,10,buf,&tFont16);
-					}
-					break;
+					//sprintf(buf, "%d", ucContrast);
+					//OLED_DispStr(10,10,buf,&tFont16);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËÉÏ¼ü°´ÏÂ */
-					if (ucContrast < 255)
-					{
-						ucContrast++;
-					}
-					OLED_SetContrast(ucContrast);
-					fRefreshOled = 1;
-					fRefreshTFT = 1;
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†ä¸Šé”®æŒ‰ä¸‹ */
+				if (ucContrast < 255)
+				{
+					ucContrast++;
+				}
+				OLED_SetContrast(ucContrast);
+				fRefreshOled = 1;
+				fRefreshTFT = 1;
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËÏÂ¼ü°´ÏÂ */
-					if (ucContrast > 0)
-					{
-						ucContrast--;
-					}
-					OLED_SetContrast(ucContrast);
-					fRefreshOled = 1;
-					fRefreshTFT = 1;
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†ä¸‹é”®æŒ‰ä¸‹ */
+				if (ucContrast > 0)
+				{
+					ucContrast--;
+				}
+				OLED_SetContrast(ucContrast);
+				fRefreshOled = 1;
+				fRefreshTFT = 1;
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					if (ucItem > 0)
-					{
-						ucItem--;
-					}
-					else
-					{
-						ucItem = DEMO_PAGE_COUNT - 1;
-					}
-					fRefreshOled = 1;
-					fRefreshTFT = 1;
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				if (ucItem > 0)
+				{
+					ucItem--;
+				}
+				else
+				{
+					ucItem = DEMO_PAGE_COUNT - 1;
+				}
+				fRefreshOled = 1;
+				fRefreshTFT = 1;
+				break;
 
-				case JOY_DOWN_R:	/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					if (ucItem < DEMO_PAGE_COUNT - 1)
-					{
-						ucItem++;
-					}
-					else
-					{
-						ucItem = 0;
-					}
-					fRefreshOled = 1;
-					fRefreshTFT = 1;
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				if (ucItem < DEMO_PAGE_COUNT - 1)
+				{
+					ucItem++;
+				}
+				else
+				{
+					ucItem = 0;
+				}
+				fRefreshOled = 1;
+				fRefreshTFT = 1;
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü */
-					if (ucDir == 0)
-					{
-						ucDir = 1;
-						OLED_SetDir(1);	/* ÉèÖÃÏÔÊ¾·½Ïò */
-					}
-					else
-					{
-						ucDir = 0;
-						OLED_SetDir(0);	/* ÉèÖÃÏÔÊ¾·½Ïò */
-					}
-					fRefreshOled = 1;
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”® */
+				if (ucDir == 0)
+				{
+					ucDir = 1;
+					OLED_SetDir(1); /* è®¾ç½®æ˜¾ç¤ºæ–¹å‘ */
+				}
+				else
+				{
+					ucDir = 0;
+					OLED_SetDir(0); /* è®¾ç½®æ˜¾ç¤ºæ–¹å‘ */
+				}
+				fRefreshOled = 1;
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -345,39 +349,39 @@ void TestOLED(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormOLED
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormOLED
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormOLED(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormOLED->FontBox.FontCode = FC_ST_16;
-	FormOLED->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormOLED->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormOLED->FontBox.FrontColor = CL_BLACK;
 	FormOLED->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormOLED->FontBlack.FontCode = FC_ST_16;
-	FormOLED->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormOLED->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormOLED->FontBlack.FrontColor = CL_BLACK;
 	FormOLED->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormOLED->FontBlue.FontCode = FC_ST_16;
 	FormOLED->FontBlue.BackColor = CL_BTN_FACE;
 	FormOLED->FontBlue.FrontColor = CL_BLUE;
 	FormOLED->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormOLED->FontBtn.FontCode = FC_ST_16;
-	FormOLED->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormOLED->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormOLED->FontBtn.FrontColor = CL_BLACK;
 	FormOLED->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormOLED->Box1.Left = BOX1_X;
 	FormOLED->Box1.Top = BOX1_Y;
 	FormOLED->Box1.Height = BOX1_H;
@@ -385,7 +389,7 @@ static void InitFormOLED(void)
 	FormOLED->Box1.pCaption = BOX1_TEXT;
 	FormOLED->Box1.Font = &FormOLED->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormOLED->Label1.Left = LABEL1_X;
 	FormOLED->Label1.Top = LABEL1_Y;
 	FormOLED->Label1.MaxLen = 0;
@@ -410,7 +414,7 @@ static void InitFormOLED(void)
 	FormOLED->Label7.pCaption = LABEL7_TEXT;
 	FormOLED->Label7.Font = &FormOLED->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormOLED->Label2.Left = LABEL2_X;
 	FormOLED->Label2.Top = LABEL2_Y;
 	FormOLED->Label2.MaxLen = 0;
@@ -435,7 +439,7 @@ static void InitFormOLED(void)
 	FormOLED->Label8.pCaption = LABEL8_TEXT;
 	FormOLED->Label8.Font = &FormOLED->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormOLED->BtnRet.Left = BTN_RET_X;
 	FormOLED->BtnRet.Top = BTN_RET_Y;
 	FormOLED->BtnRet.Height = BTN_RET_H;
@@ -447,33 +451,33 @@ static void InitFormOLED(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispRSVInitFace
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispRSVInitFace
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormOLED(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormOLED->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormOLED->Label1);
 	LCD_DrawLabel(&FormOLED->Label3);
 	LCD_DrawLabel(&FormOLED->Label5);
 	LCD_DrawLabel(&FormOLED->Label7);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormOLED->Label2);
 	LCD_DrawLabel(&FormOLED->Label4);
 	LCD_DrawLabel(&FormOLED->Label6);
 	LCD_DrawLabel(&FormOLED->Label8);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormOLED->BtnRet);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

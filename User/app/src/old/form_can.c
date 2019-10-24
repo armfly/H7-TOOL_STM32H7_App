@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : CANÍøÂç²âÊÔ½çÃæ
-*	ÎÄ¼şÃû³Æ : form_can.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Á½¸ö¿ª·¢°åÖ®¼ä½øĞĞCANÍøÂç»¥Í¨²âÊÔ
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-08-09 armfly  Ê×·¢
+*	æ¨¡å—åç§° : CANç½‘ç»œæµ‹è¯•ç•Œé¢
+*	æ–‡ä»¶åç§° : form_can.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ä¸¤ä¸ªå¼€å‘æ¿ä¹‹é—´è¿›è¡ŒCANç½‘ç»œäº’é€šæµ‹è¯•
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-08-09 armfly  é¦–å‘
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,19 +18,22 @@
 #include "form_can.h"
 #include "can_network.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
 
 	BUTTON_T BtnRet;
 
@@ -41,96 +44,96 @@ typedef struct
 	BUTTON_T Btn5;
 	BUTTON_T Btn6;
 
-	LABEL_T LblInfo1; LABEL_T LblInfo2;
-}FormCAN_T;
+	LABEL_T LblInfo1;
+	LABEL_T LblInfo2;
+} FormCAN_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	100
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"CANÍøÂç²âÊÔ"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H 100
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "CANç½‘ç»œæµ‹è¯•"
 
-	/* µÚ1¸ö¿òÄÚµÄ°´Å¥ */
-	#define BTN1_H	32
-	#define BTN1_W	100
-	#define	BTN1_X	(BOX1_X + 10)
-	#define	BTN1_Y	(BOX1_Y + 20)
-	#define	BTN1_TEXT	"µãÁÁLED2"
+/* ç¬¬1ä¸ªæ¡†å†…çš„æŒ‰é’® */
+#define BTN1_H 32
+#define BTN1_W 100
+#define BTN1_X (BOX1_X + 10)
+#define BTN1_Y (BOX1_Y + 20)
+#define BTN1_TEXT "ç‚¹äº®LED2"
 
-	#define BTN2_H	BTN1_H
-	#define BTN2_W	BTN1_W
-	#define	BTN2_X	(BTN1_X +  BTN1_W + 10)
-	#define	BTN2_Y	BTN1_Y
-	#define	BTN2_TEXT	"¹Ø±ÕLED2"
+#define BTN2_H BTN1_H
+#define BTN2_W BTN1_W
+#define BTN2_X (BTN1_X + BTN1_W + 10)
+#define BTN2_Y BTN1_Y
+#define BTN2_TEXT "å…³é—­LED2"
 
-	#define BTN3_H	BTN1_H
-	#define BTN3_W	BTN1_W
-	#define	BTN3_X	BTN1_X
-	#define	BTN3_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN3_TEXT	"·äÃù2Éù"
+#define BTN3_H BTN1_H
+#define BTN3_W BTN1_W
+#define BTN3_X BTN1_X
+#define BTN3_Y (BTN1_Y + BTN1_H + 10)
+#define BTN3_TEXT "èœ‚é¸£2å£°"
 
-	#define BTN4_H	BTN1_H
-	#define BTN4_W	BTN1_W
-	#define	BTN4_X	(BTN1_X +  BTN1_W + 10)
-	#define	BTN4_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN4_TEXT	"·äÃù3Éù"
+#define BTN4_H BTN1_H
+#define BTN4_W BTN1_W
+#define BTN4_X (BTN1_X + BTN1_W + 10)
+#define BTN4_Y (BTN1_Y + BTN1_H + 10)
+#define BTN4_TEXT "èœ‚é¸£3å£°"
 
-	#define BTN5_H	BTN1_H
-	#define BTN5_W	BTN1_W
-	#define	BTN5_X	(BTN1_X +  2 * (BTN1_W + 10))
-	#define	BTN5_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN5_TEXT	"·äÃù20Éù"
+#define BTN5_H BTN1_H
+#define BTN5_W BTN1_W
+#define BTN5_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN5_Y (BTN1_Y + BTN1_H + 10)
+#define BTN5_TEXT "èœ‚é¸£20å£°"
 
-	#define BTN6_H	BTN1_H
-	#define BTN6_W	BTN1_W
-	#define	BTN6_X	(BTN1_X +  3 * (BTN1_W + 10))
-	#define	BTN6_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN6_TEXT	"Í£Ö¹·äÃù"
+#define BTN6_H BTN1_H
+#define BTN6_W BTN1_W
+#define BTN6_X (BTN1_X + 3 * (BTN1_W + 10))
+#define BTN6_Y (BTN1_Y + BTN1_H + 10)
+#define BTN6_TEXT "åœæ­¢èœ‚é¸£"
 
-	#define LABEL1_X  	(BTN5_X + 10)
-	#define LABEL1_Y	BTN2_Y
-	#define LABEL1_TEXT	"µØÖ·: "
+#define LABEL1_X (BTN5_X + 10)
+#define LABEL1_Y BTN2_Y
+#define LABEL1_TEXT "åœ°å€: "
 
-		#define LABEL2_X  	(LABEL1_X + 48)
-		#define LABEL2_Y	LABEL1_Y
-		#define LABEL2_TEXT	"0"
+#define LABEL2_X (LABEL1_X + 48)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "0"
 
-	#define LABEL3_X  	(LABEL2_X + 32)
-	#define LABEL3_Y	LABEL1_Y
-	#define LABEL3_TEXT	"²¨ÌØÂÊ: "
+#define LABEL3_X (LABEL2_X + 32)
+#define LABEL3_Y LABEL1_Y
+#define LABEL3_TEXT "æ³¢ç‰¹ç‡: "
 
-		#define LABEL4_X  	(LABEL3_X + 64)
-		#define LABEL4_Y	(LABEL3_Y)
-		#define LABEL4_TEXT	"0"
+#define LABEL4_X (LABEL3_X + 64)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "0"
 
-	#define LABEL5_X  	(LABEL1_X)
-	#define LABEL5_Y	(LABEL1_Y + 20)
-	#define LABEL5_TEXT	"½ÓÊÕ:"
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20)
+#define LABEL5_TEXT "æ¥æ”¶:"
 
-		#define LABEL6_X  	(LABEL5_X + 48)
-		#define LABEL6_Y	LABEL5_Y
-		#define LABEL6_TEXT	" "
+#define LABEL6_X (LABEL5_X + 48)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT " "
 
-#define	LBL_INFO1_X		(BOX1_X)
-#define	LBL_INFO1_Y		(BOX1_Y + BOX1_H + 10)
-#define	LBL_INFO1_TEXT "Çë½«Á½¸ö¿ª·¢°åµÄCAN½Ó¿Ú»¥Áª"
+#define LBL_INFO1_X (BOX1_X)
+#define LBL_INFO1_Y (BOX1_Y + BOX1_H + 10)
+#define LBL_INFO1_TEXT "è¯·å°†ä¸¤ä¸ªå¼€å‘æ¿çš„CANæ¥å£äº’è”"
 
-#define	LBL_INFO2_X		LBL_INFO1_X
-#define	LBL_INFO2_Y		(LBL_INFO1_Y + 20)
-#define	LBL_INFO2_TEXT "¿ÉÒÔ»¥Ïà¿ØÖÆ¶Ô·½µÄLED2ºÍ·äÃùÆ÷"
+#define LBL_INFO2_X LBL_INFO1_X
+#define LBL_INFO2_Y (LBL_INFO1_Y + 20)
+#define LBL_INFO2_TEXT "å¯ä»¥äº’ç›¸æ§åˆ¶å¯¹æ–¹çš„LED2å’Œèœ‚é¸£å™¨"
 
-/* °´Å¥ */
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	80
-#define	BTN_RET_X	(g_LcdWidth - BTN_RET_W - 8)
-#define	BTN_RET_Y	(g_LcdHeight - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
-
+/* æŒ‰é’® */
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 80
+#define BTN_RET_X (g_LcdWidth - BTN_RET_W - 8)
+#define BTN_RET_Y (g_LcdHeight - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
 static void InitFormCAN(void);
 static void DispFormCAN(void);
@@ -138,105 +141,103 @@ static void DispFormCAN(void);
 static void DispLabelBaud(uint32_t _Baud);
 static void DispLabelRx(uint8_t *_buf, uint8_t _len);
 
-
 FormCAN_T *FormCAN;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: FormMainCAN
-*	¹¦ÄÜËµÃ÷: CAN²âÊÔÖ÷³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: FormMainCAN
+*	åŠŸèƒ½è¯´æ˜: CANæµ‹è¯•ä¸»ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void FormMainCAN(void)
 {
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucTouch; /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormCAN_T form;
 	uint32_t baud;
-	
+
 	FormCAN = &form;
 
 	InitFormCAN();
 	DispFormCAN();
 
 	baud = 500000;
-	DispLabelBaud (baud);
-	
-	can_Init();				/* ³õÊ¼»¯STM32 CANÓ²¼ş */
-	
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	DispLabelBaud(baud);
+
+	can_Init(); /* åˆå§‹åŒ–STM32 CANç¡¬ä»¶ */
+
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	bsp_StartAutoTimer(2, 10);
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-//		MODBUS_Poll();
+		//		MODBUS_Poll();
 
 		if (bsp_CheckTimer(2))
 		{
 			can_LedOn(1, 1);
 		}
-		
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (LCD_ButtonTouchDown(&FormCAN->BtnRet, tpX, tpY))
-					{
-						//fQuit = 1;
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn1, tpX, tpY))
-					{
-						can_LedOn(1, 2);						
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn2, tpX, tpY))
-					{
-						can_LedOff(1, 2);
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn3, tpX, tpY))
-					{
-						can_BeepCtrl(1, 2);	/* ¿ØÖÆ·äÃùÆ÷Ãù½Ğ2Éù */
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn4, tpX, tpY))
-					{
-						can_BeepCtrl(1, 3);	/* ¿ØÖÆ·äÃùÆ÷Ãù½Ğ3Éù */
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn5, tpX, tpY))
-					{
-						can_BeepCtrl(1, 20);	/* ¿ØÖÆ·äÃùÆ÷Ãù½Ğ20Éù */
-					}
-					else if (LCD_ButtonTouchDown(&FormCAN->Btn6, tpX, tpY))
-					{
-						can_BeepCtrl(1, 0);	/* ¿ØÖÆ·äÃùÆ÷Í£Ö¹Ãù½Ğ */
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (LCD_ButtonTouchDown(&FormCAN->BtnRet, tpX, tpY))
+				{
+					//fQuit = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn1, tpX, tpY))
+				{
+					can_LedOn(1, 2);
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn2, tpX, tpY))
+				{
+					can_LedOff(1, 2);
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn3, tpX, tpY))
+				{
+					can_BeepCtrl(1, 2); /* æ§åˆ¶èœ‚é¸£å™¨é¸£å«2å£° */
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn4, tpX, tpY))
+				{
+					can_BeepCtrl(1, 3); /* æ§åˆ¶èœ‚é¸£å™¨é¸£å«3å£° */
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn5, tpX, tpY))
+				{
+					can_BeepCtrl(1, 20); /* æ§åˆ¶èœ‚é¸£å™¨é¸£å«20å£° */
+				}
+				else if (LCD_ButtonTouchDown(&FormCAN->Btn6, tpX, tpY))
+				{
+					can_BeepCtrl(1, 0); /* æ§åˆ¶èœ‚é¸£å™¨åœæ­¢é¸£å« */
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&FormCAN->BtnRet, tpX, tpY))
-					{
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else
-					{
-						LCD_ButtonTouchRelease(&FormCAN->BtnRet, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn1, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn2, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn3, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn4, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn5, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormCAN->Btn6, tpX, tpY);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&FormCAN->BtnRet, tpX, tpY))
+				{
+					fQuit = 1; /* è¿”å› */
+				}
+				else
+				{
+					LCD_ButtonTouchRelease(&FormCAN->BtnRet, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn1, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn2, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn3, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn4, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn5, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormCAN->Btn6, tpX, tpY);
+				}
+				break;
 			}
 		}
-		
 
-		/* ´¦ÀíÓ¦ÓÃ²ãÏûÏ¢ */
+		/* å¤„ç†åº”ç”¨å±‚æ¶ˆæ¯ */
 		{
 			MSG_T msg;
 
@@ -244,58 +245,58 @@ void FormMainCAN(void)
 			{
 				switch (msg.MsgCode)
 				{
-					case MSG_CAN1_RX:		/* ½ÓÊÕµ½CANÉè±¸µÄÓ¦´ğ */
-						DispLabelRx(g_Can1RxData, g_Can1RxHeader.DataLength);
-						can1_Analyze();
-						break;	
-					
-					case MSG_CAN2_RX:		/* ½ÓÊÕµ½CANÉè±¸µÄÓ¦´ğ */
-						DispLabelRx(g_Can2RxData, g_Can2RxHeader.DataLength);
-						can1_Analyze();
-						break;					
+				case MSG_CAN1_RX: /* æ¥æ”¶åˆ°CANè®¾å¤‡çš„åº”ç­” */
+					DispLabelRx(g_Can1RxData, g_Can1RxHeader.DataLength);
+					can1_Analyze();
+					break;
+
+				case MSG_CAN2_RX: /* æ¥æ”¶åˆ°CANè®¾å¤‡çš„åº”ç­” */
+					DispLabelRx(g_Can2RxData, g_Can2RxHeader.DataLength);
+					can1_Analyze();
+					break;
 				}
 			}
 		}
 	}
-	
-	can_DeInit();	/* ¹Ø±ÕCANÊ±ÖÓ */
+
+	can_DeInit(); /* å…³é—­CANæ—¶é’Ÿ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormCAN
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormCAN
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormCAN(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormCAN->FontBox.FontCode = FC_ST_16;
-	FormCAN->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormCAN->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormCAN->FontBox.FrontColor = CL_BLACK;
 	FormCAN->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormCAN->FontBlack.FontCode = FC_ST_16;
-	FormCAN->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormCAN->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormCAN->FontBlack.FrontColor = CL_BLACK;
 	FormCAN->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormCAN->FontBlue.FontCode = FC_ST_16;
 	FormCAN->FontBlue.BackColor = CL_BTN_FACE;
 	FormCAN->FontBlue.FrontColor = CL_BLUE;
 	FormCAN->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormCAN->FontBtn.FontCode = FC_ST_16;
-	FormCAN->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormCAN->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormCAN->FontBtn.FrontColor = CL_BLACK;
 	FormCAN->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormCAN->Box1.Left = BOX1_X;
 	FormCAN->Box1.Top = BOX1_Y;
 	FormCAN->Box1.Height = BOX1_H;
@@ -303,7 +304,7 @@ static void InitFormCAN(void)
 	FormCAN->Box1.pCaption = BOX1_TEXT;
 	FormCAN->Box1.Font = &FormCAN->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormCAN->Label1.Left = LABEL1_X;
 	FormCAN->Label1.Top = LABEL1_Y;
 	FormCAN->Label1.MaxLen = 0;
@@ -322,7 +323,7 @@ static void InitFormCAN(void)
 	FormCAN->Label5.pCaption = LABEL5_TEXT;
 	FormCAN->Label5.Font = &FormCAN->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormCAN->Label2.Left = LABEL2_X;
 	FormCAN->Label2.Top = LABEL2_Y;
 	FormCAN->Label2.MaxLen = 0;
@@ -341,7 +342,7 @@ static void InitFormCAN(void)
 	FormCAN->Label6.pCaption = LABEL6_TEXT;
 	FormCAN->Label6.Font = &FormCAN->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormCAN->BtnRet.Left = BTN_RET_X;
 	FormCAN->BtnRet.Top = BTN_RET_Y;
 	FormCAN->BtnRet.Height = BTN_RET_H;
@@ -415,17 +416,17 @@ static void InitFormCAN(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormCAN
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormCAN
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormCAN(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormCAN->Box1);
 
 	LCD_DrawLabel(&FormCAN->Label1);
@@ -436,7 +437,7 @@ static void DispFormCAN(void)
 	LCD_DrawLabel(&FormCAN->Label4);
 	LCD_DrawLabel(&FormCAN->Label6);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormCAN->Btn1);
 	LCD_DrawButton(&FormCAN->Btn2);
 	LCD_DrawButton(&FormCAN->Btn3);
@@ -450,14 +451,13 @@ static void DispFormCAN(void)
 	LCD_DrawButton(&FormCAN->BtnRet);
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispLabelTx
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾·¢ËÍµÄÊı¾İ
-*	ĞÎ    ²Î: _Baud ²¨ÌØÂÊ
+*	å‡½ æ•° å: DispLabelTx
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºå‘é€çš„æ•°æ®
+*	å½¢    å‚: _Baud æ³¢ç‰¹ç‡
 *			  _
-*	·µ »Ø Öµ: ÎŞ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispLabelBaud(uint32_t _Baud)
@@ -466,36 +466,36 @@ static void DispLabelBaud(uint32_t _Baud)
 
 	sprintf(buf, "%d", _Baud);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormCAN->Label4.pCaption = buf;
 	LCD_DrawLabel(&FormCAN->Label4);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispLabelTx
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾·¢ËÍµÄÊı¾İ
-*	ĞÎ    ²Î: _buf Òª·¢ËÍµÄÊı¾İ
+*	å‡½ æ•° å: DispLabelTx
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºå‘é€çš„æ•°æ®
+*	å½¢    å‚: _buf è¦å‘é€çš„æ•°æ®
 *			  _
-*	·µ »Ø Öµ: ÎŞ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispLabelRx(uint8_t *_buf, uint8_t _len)
 {
 	char disp_buf[32];
 	uint8_t len;
-	
+
 	len = _len;
 	if (len > sizeof(disp_buf) / 3)
 	{
 		len = sizeof(disp_buf) / 3;
 	}
-	
+
 	HexToAscll(_buf, disp_buf, len);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormCAN->Label6.pCaption = disp_buf;
 	LCD_DrawLabel(&FormCAN->Label6);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

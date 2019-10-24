@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÍÑ»ú±à³ÌÆ÷
-*	ÎÄ¼şÃû³Æ : status_programmer.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ÍÑ»ú±à³ÌÆ÷
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-10-06 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : è„±æœºç¼–ç¨‹å™¨
+*	æ–‡ä»¶åç§° : status_programmer.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : è„±æœºç¼–ç¨‹å™¨
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-10-06 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,60 +18,60 @@
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_Programmmer
-*	¹¦ÄÜËµÃ÷: ÍÑ»ú±à³ÌÆ÷
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_Programmmer
+*	åŠŸèƒ½è¯´æ˜: è„±æœºç¼–ç¨‹å™¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_Programmer(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
 
-	DispHeader("ÉÕÂ¼Æ÷");
-	
+	DispHeader("çƒ§å½•å™¨");
+
 	fRefresh = 1;
 	while (g_MainStatus == MS_PROGRAMMER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* S¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_S: /* Sé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_S:			/* S¼üÊÍ·Å */
-					g_MainStatus = NextStatus(MS_PROGRAMMER);
-					break;
+			case KEY_UP_S: /* Sé”®é‡Šæ”¾ */
+				g_MainStatus = NextStatus(MS_PROGRAMMER);
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü³¤°´ */
-					break;				
+			case KEY_LONG_S: /* Sé”®é•¿æŒ‰ */
+				break;
 
-				case  KEY_DOWN_C:		/* C¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_C: /* Cé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_C:			/* C¼üÊÍ·Å */
-					g_MainStatus = LastStatus(MS_PROGRAMMER);
-					break;
+			case KEY_UP_C: /* Cé”®é‡Šæ”¾ */
+				g_MainStatus = LastStatus(MS_PROGRAMMER);
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					break;	
-				
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

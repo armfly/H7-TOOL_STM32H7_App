@@ -1,63 +1,62 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : LEDÖ¸Ê¾µÆÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_led.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Çı¶¯LEDÖ¸Ê¾µÆ
+*	æ¨¡å—åç§° : LEDæŒ‡ç¤ºç¯é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_led.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : é©±åŠ¨LEDæŒ‡ç¤ºç¯
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-09-05 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-09-05 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-#define ALL_LED_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOI_CLK_ENABLE()
+#define ALL_LED_GPIO_CLK_ENABLE() __HAL_RCC_GPIOI_CLK_ENABLE()
 
-#define GPIO_LED1	GPIOI
-#define PIN_LED1	GPIO_PIN_8
+#define GPIO_LED1 GPIOI
+#define PIN_LED1 GPIO_PIN_8
 
-#define LED1_ON()  	GPIO_LED1->BSRRH = PIN_LED1				/* LED1 = 0 */
-#define LED1_OFF()  GPIO_LED1->BSRRL = PIN_LED1				/* LED1 = 1 */
+#define LED1_ON() GPIO_LED1->BSRRH = PIN_LED1	/* LED1 = 0 */
+#define LED1_OFF() GPIO_LED1->BSRRL = PIN_LED1 /* LED1 = 1 */
 
-#define LED1_IS_ON()	((GPIO_LED1->IDR & PIN_LED1) == 0)	/* Èç¹ûÒÑµãÁÁ£¬·µ»Ø1 */
-
+#define LED1_IS_ON() ((GPIO_LED1->IDR & PIN_LED1) == 0) /* å¦‚æœå·²ç‚¹äº®ï¼Œè¿”å›1 */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitLed
-*	¹¦ÄÜËµÃ÷: ÅäÖÃLEDÖ¸Ê¾µÆÏà¹ØµÄGPIO,  ¸Ãº¯Êı±» bsp_Init() µ÷ÓÃ¡£
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitLed
+*	åŠŸèƒ½è¯´æ˜: é…ç½®LEDæŒ‡ç¤ºç¯ç›¸å…³çš„GPIO,  è¯¥å‡½æ•°è¢« bsp_Init() è°ƒç”¨ã€‚
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitLed(void)
 {
 	GPIO_InitTypeDef gpio_init;
 
-	/* µÚ1²½£º´ò¿ªGPIOÊ±ÖÓ */
+	/* ç¬¬1æ­¥ï¼šæ‰“å¼€GPIOæ—¶é’Ÿ */
 	ALL_LED_GPIO_CLK_ENABLE();
-	
+
 	bsp_LedOff(1);
-	
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* ÉèÖÃ¿ªÂ©Êä³ö */
-	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */	
-	gpio_init.Pin = PIN_LED1;	
-	HAL_GPIO_Init(GPIO_LED1, &gpio_init);		
+
+	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®å¼€æ¼è¾“å‡º */
+	gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
+	gpio_init.Pin = PIN_LED1;
+	HAL_GPIO_Init(GPIO_LED1, &gpio_init);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_LedOn
-*	¹¦ÄÜËµÃ÷: µãÁÁÖ¸¶¨µÄLEDÖ¸Ê¾µÆ¡£
-*	ĞÎ    ²Î:  _no : Ö¸Ê¾µÆĞòºÅ£¬·¶Î§ 1 - 4
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_LedOn
+*	åŠŸèƒ½è¯´æ˜: ç‚¹äº®æŒ‡å®šçš„LEDæŒ‡ç¤ºç¯ã€‚
+*	å½¢    å‚:  _no : æŒ‡ç¤ºç¯åºå·ï¼ŒèŒƒå›´ 1 - 4
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_LedOn(uint8_t _no)
@@ -70,10 +69,10 @@ void bsp_LedOn(uint8_t _no)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_LedOff
-*	¹¦ÄÜËµÃ÷: Ï¨ÃğÖ¸¶¨µÄLEDÖ¸Ê¾µÆ¡£
-*	ĞÎ    ²Î:  _no : Ö¸Ê¾µÆĞòºÅ£¬·¶Î§ 1 - 4
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_LedOff
+*	åŠŸèƒ½è¯´æ˜: ç†„ç­æŒ‡å®šçš„LEDæŒ‡ç¤ºç¯ã€‚
+*	å½¢    å‚:  _no : æŒ‡ç¤ºç¯åºå·ï¼ŒèŒƒå›´ 1 - 4
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_LedOff(uint8_t _no)
@@ -86,10 +85,10 @@ void bsp_LedOff(uint8_t _no)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_LedToggle
-*	¹¦ÄÜËµÃ÷: ·­×ªÖ¸¶¨µÄLEDÖ¸Ê¾µÆ¡£
-*	ĞÎ    ²Î:  _no : Ö¸Ê¾µÆĞòºÅ£¬·¶Î§ 1 - 4
-*	·µ »Ø Öµ: °´¼ü´úÂë
+*	å‡½ æ•° å: bsp_LedToggle
+*	åŠŸèƒ½è¯´æ˜: ç¿»è½¬æŒ‡å®šçš„LEDæŒ‡ç¤ºç¯ã€‚
+*	å½¢    å‚:  _no : æŒ‡ç¤ºç¯åºå·ï¼ŒèŒƒå›´ 1 - 4
+*	è¿” å› å€¼: æŒ‰é”®ä»£ç 
 *********************************************************************************************************
 */
 void bsp_LedToggle(uint8_t _no)
@@ -104,13 +103,12 @@ void bsp_LedToggle(uint8_t _no)
 	}
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_IsLedOn
-*	¹¦ÄÜËµÃ÷: ÅĞ¶ÏLEDÖ¸Ê¾µÆÊÇ·ñÒÑ¾­µãÁÁ¡£
-*	ĞÎ    ²Î:  _no : Ö¸Ê¾µÆĞòºÅ£¬·¶Î§ 1 - 4
-*	·µ »Ø Öµ: 1±íÊ¾ÒÑ¾­µãÁÁ£¬0±íÊ¾Î´µãÁÁ
+*	å‡½ æ•° å: bsp_IsLedOn
+*	åŠŸèƒ½è¯´æ˜: åˆ¤æ–­LEDæŒ‡ç¤ºç¯æ˜¯å¦å·²ç»ç‚¹äº®ã€‚
+*	å½¢    å‚:  _no : æŒ‡ç¤ºç¯åºå·ï¼ŒèŒƒå›´ 1 - 4
+*	è¿” å› å€¼: 1è¡¨ç¤ºå·²ç»ç‚¹äº®ï¼Œ0è¡¨ç¤ºæœªç‚¹äº®
 *********************************************************************************************************
 */
 uint8_t bsp_IsLedOn(uint8_t _no)
@@ -119,43 +117,43 @@ uint8_t bsp_IsLedOn(uint8_t _no)
 	{
 		return LED1_IS_ON();
 	}
-	
+
 	return 0;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_TestSDIO
-*	¹¦ÄÜËµÃ÷: ·­×ªSDIOµÄGPIO. debug ÓÃ
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_TestSDIO
+*	åŠŸèƒ½è¯´æ˜: ç¿»è½¬SDIOçš„GPIO. debug ç”¨
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_TestSDIO(void)
 {
 	GPIO_InitTypeDef gpio_init;
-	
+
 	__HAL_RCC_GPIOA_CLK_ENABLE();
-	
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* ÉèÖÃ¿ªÂ©Êä³ö */
-	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */	
-	gpio_init.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;;	
-	HAL_GPIO_Init(GPIOC, &gpio_init);	
+
+	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®å¼€æ¼è¾“å‡º */
+	gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
+	gpio_init.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
+	;
+	HAL_GPIO_Init(GPIOC, &gpio_init);
 
 	gpio_init.Pin = GPIO_PIN_2;
-	HAL_GPIO_Init(GPIOD, &gpio_init);	
-	
-	while(1)
+	HAL_GPIO_Init(GPIOD, &gpio_init);
+
+	while (1)
 	{
 		GPIOC->BSRRH = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
 		GPIOD->BSRRH = GPIO_PIN_2;
 		bsp_DelayMS(100);
-		GPIOC->BSRRL =  GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
+		GPIOC->BSRRL = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
 		GPIOD->BSRRL = GPIO_PIN_2;
-		bsp_DelayMS(100);		
+		bsp_DelayMS(100);
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

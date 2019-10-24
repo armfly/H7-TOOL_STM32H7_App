@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ê¾²¨Æ÷ADCÄ£¿é
-*	ÎÄ¼şÃû³Æ : bsp_adc_dso.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ê¹ÓÃSTM32ÄÚ²¿ADC£¬Í¬²½²É¼¯Á½Â·²¨ĞÎ¡£Õ¼ÓÃÁË²¿·ÖGPIO¿ØÖÆÊ¾²¨Æ÷Ä£¿éµÄÔöÒæºÍñîºÏ·½Ê½¡£
-*				Ê¹ÓÃ ADC_EXTERNALTRIG_T3_TRGO ×÷ÎªADC´¥·¢Ô´
+*	æ¨¡å—åç§° : ç¤ºæ³¢å™¨ADCæ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_adc_dso.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ä½¿ç”¨STM32å†…éƒ¨ADCï¼ŒåŒæ­¥é‡‡é›†ä¸¤è·¯æ³¢å½¢ã€‚å ç”¨äº†éƒ¨åˆ†GPIOæ§åˆ¶ç¤ºæ³¢å™¨æ¨¡å—çš„å¢ç›Šå’Œè€¦åˆæ–¹å¼ã€‚
+*				ä½¿ç”¨ ADC_EXTERNALTRIG_T3_TRGO ä½œä¸ºADCè§¦å‘æº
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-10-25  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-10-25  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,22 +20,22 @@
 #include "param.h"
 
 /*
-	PF11/ADC1_INP2	---- CH1µçÑ¹
-	PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+	PF11/ADC1_INP2	---- CH1ç”µå‹
+	PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 
-	PC3_C/ADC3_INP1	---- CH2µçÑ¹
-	PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-	PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-	PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-	PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-	PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-	PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+	PC3_C/ADC3_INP1	---- CH2ç”µå‹
+	PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+	PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+	PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+	PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+	PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+	PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 */
 		
 /*
-	H7-TOOL Ê¾²¨Æ÷µçÂ·£¬AC/DCñîºÏ¡¢ÔöÒæ¿ØÖÆGPIO
+	H7-TOOL ç¤ºæ³¢å™¨ç”µè·¯ï¼ŒAC/DCè€¦åˆã€å¢ç›Šæ§åˆ¶GPIO
 */	
-/* CH1 ÔöÒæ¿ØÖÆ */
+/* CH1 å¢ç›Šæ§åˆ¶ */
 #define G1A_PIN				0
 #define G1A_0()				HC595_WriteGPIO(G1A_PIN, 0)
 #define G1A_1()				HC595_WriteGPIO(G1A_PIN, 1)
@@ -48,7 +48,7 @@
 #define G1C_0()				HC595_WriteGPIO(G1C_PIN, 0)
 #define G1C_1()				HC595_WriteGPIO(G1C_PIN, 1)
 
-/* CH2 ÔöÒæ¿ØÖÆ */
+/* CH2 å¢ç›Šæ§åˆ¶ */
 #define G2A_PIN				4
 #define G2A_0()				HC595_WriteGPIO(G2A_PIN, 0)
 #define G2A_1()				HC595_WriteGPIO(G2A_PIN, 1)
@@ -61,18 +61,18 @@
 #define G2C_0()				HC595_WriteGPIO(G2C_PIN, 0)
 #define G2C_1()				HC595_WriteGPIO(G2C_PIN, 1)
 
-/* CH1 ½»Á÷/Ö±Á÷ñîºÏ */
+/* CH1 äº¤æµ/ç›´æµè€¦åˆ */
 #define AC1_PIN				3
 #define AC1_0()				HC595_WriteGPIO(AC1_PIN, 0)
 #define AC1_1()				HC595_WriteGPIO(AC1_PIN, 1)
 
-/* CH2 ½»Á÷/Ö±Á÷ñîºÏ */
+/* CH2 äº¤æµ/ç›´æµè€¦åˆ */
 #define AC2_PIN				7
 #define AC2_0()				HC595_WriteGPIO(AC2_PIN, 0)
 #define AC2_1()				HC595_WriteGPIO(AC2_PIN, 1)
 
 
-/* ¸ß¶ËµçÁ÷ ÔöÒæ¿ØÖÆ */
+/* é«˜ç«¯ç”µæµ å¢ç›Šæ§åˆ¶ */
 #define GC_CLK_ENABLE()		__HAL_RCC_GPIOG_CLK_ENABLE()
 #define GC_GPIO				GPIOG
 #define GC_PIN				GPIO_PIN_2
@@ -80,29 +80,29 @@
 #define GC_1()				GC_GPIO->BSRRL = GC_PIN
 
 
-/* Ê¾²¨Æ÷Ä£Ê½£¬µçÑ¹Ä£Ê½ºÍµçÁ÷Ä£Ê½Ê¹ÓÃ²»Í¬µÄADCÍ¨µÀ */
+/* ç¤ºæ³¢å™¨æ¨¡å¼ï¼Œç”µå‹æ¨¡å¼å’Œç”µæµæ¨¡å¼ä½¿ç”¨ä¸åŒçš„ADCé€šé“ */
 
-#define	ENABLE_DIFFERENTIAL_ENDED		0	/* 0±íÊ¾ÅäÖÃÎªµ¥¶Ë£¬1±íÊ¾ÅäÖÃÎª²î·Ö */
+#define	ENABLE_DIFFERENTIAL_ENDED		0	/* 0è¡¨ç¤ºé…ç½®ä¸ºå•ç«¯ï¼Œ1è¡¨ç¤ºé…ç½®ä¸ºå·®åˆ† */
 
 #define	H7_ADC_SAMPLETIME_1CYCLE_5	ADC_SAMPLETIME_1CYCLE_5
 
-/********************************** µçÑ¹Ä£Ê½µÄGPIO¶¨Òå ***********************************/
+/********************************** ç”µå‹æ¨¡å¼çš„GPIOå®šä¹‰ ***********************************/
 
-/*-------------ADC CH1Í¨µÀGPIO, ADCÍ¨µÀ£¬DMA¶¨Òå -------------*/
+/*-------------ADC CH1é€šé“GPIO, ADCé€šé“ï¼ŒDMAå®šä¹‰ -------------*/
 #if 1
 	#define ADCH1                            ADC1
 	#define ADCH1_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
 	#define ADCH1_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
 	#define ADCH1_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
-	#define ADCH1_CHANNEL                    ADC_CHANNEL_2		/* ÓÃPF11 */
+	#define ADCH1_CHANNEL                    ADC_CHANNEL_2		/* ç”¨PF11 */
 	
-	/* ²î·ÖÕı¶Ë PF11/ADC1_INP2 + PF13/ADC2_INP2 + PF9/ADC3_INP2 */
+	/* å·®åˆ†æ­£ç«¯ PF11/ADC1_INP2 + PF13/ADC2_INP2 + PF9/ADC3_INP2 */
 	#define ADCH1_P_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
 	#define ADCH1_P_GPIO_PORT          GPIOF
 	//#define ADCH1_P_PIN                GPIO_PIN_11 | GPIO_PIN_9 | GPIO_PIN_13
 	#define ADCH1_P_PIN                GPIO_PIN_11
 
-	/* ²î·Ö¸º¶Ë PF12/ADC1_INN2 + PF10/ADC3_INN2 + PF14/ADC2_INN2 */
+	/* å·®åˆ†è´Ÿç«¯ PF12/ADC1_INN2 + PF10/ADC3_INN2 + PF14/ADC2_INN2 */
 	#define ADCH1_N_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
 	#define ADCH1_N_GPIO_PORT          GPIOF
 	#define ADCH1_N_PIN                GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_14
@@ -117,14 +117,14 @@
 	#define ADCH1_CLK_ENABLE()               __HAL_RCC_ADC3_CLK_ENABLE()
 	#define ADCH1_FORCE_RESET()              __HAL_RCC_ADC3_FORCE_RESET()
 	#define ADCH1_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
-	#define ADCH1_CHANNEL                    ADC_CHANNEL_2		/* ÓÃPF11 */
-	/* ²î·ÖÕı¶Ë PF11/ADC1_INP2 + PF13/ADC2_INP2 + PF9/ADC3_INP2 */
+	#define ADCH1_CHANNEL                    ADC_CHANNEL_2		/* ç”¨PF11 */
+	/* å·®åˆ†æ­£ç«¯ PF11/ADC1_INP2 + PF13/ADC2_INP2 + PF9/ADC3_INP2 */
 	#define ADCH1_P_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
 	#define ADCH1_P_GPIO_PORT          GPIOF
 	//#define ADCH1_P_PIN                GPIO_PIN_11 | GPIO_PIN_9 | GPIO_PIN_13
 	#define ADCH1_P_PIN                GPIO_PIN_9
 
-	/* ²î·Ö¸º¶Ë PF12/ADC1_INN2 + PF10/ADC3_INN2 + PF14/ADC2_INN2 */
+	/* å·®åˆ†è´Ÿç«¯ PF12/ADC1_INN2 + PF10/ADC3_INN2 + PF14/ADC2_INN2 */
 	#define ADCH1_N_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
 	#define ADCH1_N_GPIO_PORT          GPIOF
 	#define ADCH1_N_PIN                GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_14
@@ -136,18 +136,18 @@
 	#define CH1_DMA_REQUEST_ADC				 DMA_REQUEST_ADC1
 #endif
 
-/*------------- ADC CH2Í¨µÀGPIO, ADCÍ¨µÀ£¬DMA¶¨Òå -------------*/
+/*------------- ADC CH2é€šé“GPIO, ADCé€šé“ï¼ŒDMAå®šä¹‰ -------------*/
 #if 1
 	#define ADCH2                            ADC3
 	#define ADCH2_CLK_ENABLE()               __HAL_RCC_ADC3_CLK_ENABLE()
 	#define ADCH2_FORCE_RESET()              __HAL_RCC_ADC3_FORCE_RESET()
 	#define ADCH2_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
 	#define ADCH2_CHANNEL					ADC_CHANNEL_1
-	/* ²î·ÖÕı¶Ë PC3_C/ADC3_INP1 */
+	/* å·®åˆ†æ­£ç«¯ PC3_C/ADC3_INP1 */
 	#define ADCH2_P_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOC_CLK_ENABLE()
 	#define ADCH2_P_PIN                		GPIO_PIN_3
 	#define ADCH2_P_GPIO_PORT         	 	GPIOC
-	/* ²î·Ö¸º¶Ë PC2_C/ADC3_INN1 */
+	/* å·®åˆ†è´Ÿç«¯ PC2_C/ADC3_INN1 */
 	#define ADCH2_N_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOC_CLK_ENABLE()
 	#define ADCH2_N_PIN                		GPIO_PIN_2
 	#define ADCH2_N_GPIO_PORT         	 	GPIOC
@@ -164,11 +164,11 @@
 	#define ADCH2_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
 	#define ADCH2_CHANNEL					ADC_CHANNEL_2
 
-	/* ²î·ÖÕı¶Ë PF9/ADC3_INP2 */ 
+	/* å·®åˆ†æ­£ç«¯ PF9/ADC3_INP2 */ 
 	#define ADCH2_P_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOF_CLK_ENABLE()
 	#define ADCH2_P_PIN                		GPIO_PIN_9
 	#define ADCH2_P_GPIO_PORT         	 	GPIOF
-	/* ²î·Ö¸º¶Ë PC2_C/ADC3_INN1 */
+	/* å·®åˆ†è´Ÿç«¯ PC2_C/ADC3_INN1 */
 	#define ADCH2_N_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOC_CLK_ENABLE()
 	#define ADCH2_N_PIN                		GPIO_PIN_2
 	#define ADCH2_N_GPIO_PORT         	 	GPIOC
@@ -182,25 +182,25 @@
 #endif
 
 
-/********************************** µçÑ¹Ä£Ê½µÄGPIO¶¨Òå£¨½áÊø£©********************************/
+/********************************** ç”µå‹æ¨¡å¼çš„GPIOå®šä¹‰ï¼ˆç»“æŸï¼‰********************************/
 
 
-/********************************** ¸ß¶ËµçÁ÷Ä£Ê½µÄGPIO¶¨Òå (ÎŞ²î·Ö£© ***********************************/
+/********************************** é«˜ç«¯ç”µæµæ¨¡å¼çš„GPIOå®šä¹‰ (æ— å·®åˆ†ï¼‰ ***********************************/
 /*
-	¸ß¶ËµçÁ÷£º PA6/ADC12_INP3
-	¸ºÔØµçÑ¹£º PF8/ADC3_INP7
+	é«˜ç«¯ç”µæµï¼š PA6/ADC12_INP3
+	è´Ÿè½½ç”µå‹ï¼š PF8/ADC3_INP7
 */
-/* ADC CH1Í¨µÀGPIO, ADCÍ¨µÀ£¬DMA¶¨Òå */
+/* ADC CH1é€šé“GPIO, ADCé€šé“ï¼ŒDMAå®šä¹‰ */
 #define CT_ADCH1                            ADC1
 #define CT_ADCH1_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
 #define CT_ADCH1_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
 #define CT_ADCH1_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
 #define CT_ADCH1_CHANNEL                    ADC_CHANNEL_3
-/* ²î·ÖÕı¶Ë PA6/ADC12_INP3 */
+/* å·®åˆ†æ­£ç«¯ PA6/ADC12_INP3 */
 #define CT_ADCH1_P_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
 #define CT_ADCH1_P_GPIO_PORT          GPIOA
 #define CT_ADCH1_P_PIN                GPIO_PIN_6
-/* ²î·Ö¸º¶ËÃ»ÓĞ */
+/* å·®åˆ†è´Ÿç«¯æ²¡æœ‰ */
 #define CT_ADCH1_N_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
 #define CT_ADCH1_N_GPIO_PORT          GPIOA
 #define CT_ADCH1_N_PIN                GPIO_PIN_6
@@ -211,17 +211,17 @@
 #define CT_CH1_DMA_Stream_IRQHandle         DMA1_Stream1_IRQHandler
 #define CT_CH1_DMA_REQUEST_ADC				 DMA_REQUEST_ADC1
 
-/* ADC CH2Í¨µÀGPIO, ADCÍ¨µÀ£¬DMA¶¨Òå */
+/* ADC CH2é€šé“GPIO, ADCé€šé“ï¼ŒDMAå®šä¹‰ */
 #define CT_ADCH2                            ADC3
 #define CT_ADCH2_CLK_ENABLE()               __HAL_RCC_ADC3_CLK_ENABLE()
 #define CT_ADCH2_FORCE_RESET()              __HAL_RCC_ADC3_FORCE_RESET()
 #define CT_ADCH2_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
 #define CT_ADCH2_CHANNEL					ADC_CHANNEL_7
-/* ²î·ÖÕı¶Ë PF8/ADC3_INP7 */
+/* å·®åˆ†æ­£ç«¯ PF8/ADC3_INP7 */
 #define CT_ADCH2_P_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOF_CLK_ENABLE()
 #define CT_ADCH2_P_PIN                		GPIO_PIN_8
 #define CT_ADCH2_P_GPIO_PORT         	 	GPIOF
-/* ²î·Ö¸º¶ËÃ»ÓĞ£¬PF8/ADC3_INP7 */
+/* å·®åˆ†è´Ÿç«¯æ²¡æœ‰ï¼ŒPF8/ADC3_INP7 */
 #define CT_ADCH2_N_GPIO_CLK_ENABLE()  		__HAL_RCC_GPIOF_CLK_ENABLE()
 #define CT_ADCH2_N_PIN                		GPIO_PIN_8
 #define CT_ADCH2_N_GPIO_PORT         	 	GPIOF
@@ -231,7 +231,7 @@
 #define CT_CH2_DMA_Stream_IRQn				 DMA2_Stream1_IRQn
 #define CT_CH2_DMA_Stream_IRQHandle          DMA2_Stream1_IRQHandler
 #define CT_CH2_DMA_REQUEST_ADC				 DMA_REQUEST_ADC3
-/********************************** ¸ß¶ËµçÁ÷Ä£Ê½µÄGPIO¶¨Òå£¨½áÊø£© *******************************/
+/********************************** é«˜ç«¯ç”µæµæ¨¡å¼çš„GPIOå®šä¹‰ï¼ˆç»“æŸï¼‰ *******************************/
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -247,17 +247,17 @@ ADC_ChannelConfTypeDef        sConfig2 = {0};
 ALIGN_32BYTES (uint16_t   aADCH1ConvertedData[ADC_BUFFER_SIZE]);
 ALIGN_32BYTES (uint16_t   aADCH2ConvertedData[ADC_BUFFER_SIZE]);
 
-#if 1	/* ´«ËÍĞ£×¼ºóµÄ¸¡µãÊı */
+#if 1	/* ä¼ é€æ ¡å‡†åçš„æµ®ç‚¹æ•° */
 float g_Ch1WaveBuf[ADC_BUFFER_SIZE];
 float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
-#else	/* ´«ËÍADCÖµ */
+#else	/* ä¼ é€ADCå€¼ */
 uint16_t g_Ch1WaveBuf[ADC_BUFFER_SIZE];
 uint16_t g_Ch2WaveBuf[ADC_BUFFER_SIZE];
 #endif
 
-#define SCAN_MODE_ADC1_NUM			2		/* µÍËÙÉ¨ÃèÄ£Ê½, ADC1Í¨µÀ¸öÊı */
-#define SCAN_MODE_ADC3_NUM			7		/* µÍËÙÉ¨ÃèÄ£Ê½, ADC3Í¨µÀ¸öÊı */
-#define SCAN_MODE_SAMPLE_SIZE		16		/* µÍËÙÉ¨ÃèÄ£Ê½, Ã¿Í¨µÀÑù±¾¸öÊı. ÓÃÓÚÈí¼şÆ½¾ù */
+#define SCAN_MODE_ADC1_NUM			2		/* ä½é€Ÿæ‰«ææ¨¡å¼, ADC1é€šé“ä¸ªæ•° */
+#define SCAN_MODE_ADC3_NUM			7		/* ä½é€Ÿæ‰«ææ¨¡å¼, ADC3é€šé“ä¸ªæ•° */
+#define SCAN_MODE_SAMPLE_SIZE		16		/* ä½é€Ÿæ‰«ææ¨¡å¼, æ¯é€šé“æ ·æœ¬ä¸ªæ•°. ç”¨äºè½¯ä»¶å¹³å‡ */
 #define SCAN_MODE_SAMPLETIME_ADC1		ADC_SAMPLETIME_64CYCLES_5	//ADC_SAMPLETIME_810CYCLES_5
 #define SCAN_MODE_SAMPLETIME_ADC3		ADC_SAMPLETIME_64CYCLES_5
 
@@ -282,7 +282,7 @@ const int32_t TabelFreq[FREQ_NUM] =
 	20 * 1000000,
 };
 
-/* ²ÉÑùÉî¶È */
+/* é‡‡æ ·æ·±åº¦ */
 const int TabelBufSize[BUFF_SIZE_NUM] =
 {
 	1*1024,
@@ -307,15 +307,15 @@ void bsp_StopAdcCH2(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_TrigFinished
-*	¹¦ÄÜËµÃ÷: ´¥·¢²É¼¯½áÊø. ÔÚÖĞ¶ÏÖĞÖ´ĞĞµÄ.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_TrigFinished
+*	åŠŸèƒ½è¯´æ˜: è§¦å‘é‡‡é›†ç»“æŸ. åœ¨ä¸­æ–­ä¸­æ‰§è¡Œçš„.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_TrigFinished(void)
 {
-	//DSO_LockWave();  -- ²»ÄÜÔÚÕâ¸öµØ·½±£´æÊı¾İ
+	//DSO_LockWave();  -- ä¸èƒ½åœ¨è¿™ä¸ªåœ°æ–¹ä¿å­˜æ•°æ®
 	DSO_PauseADC();
 	g_tDSO.TrigFlag = 1;
 	
@@ -323,15 +323,15 @@ void DSO_TrigFinished(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADC_IRQHandler
-*	¹¦ÄÜËµÃ÷: ADCÄ£Äâ¿´ÃÅ¹·ÖĞ¶Ï.  ; ADC1, ADC2 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADC_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: ADCæ¨¡æ‹Ÿçœ‹é—¨ç‹—ä¸­æ–­.  ; ADC1, ADC2 
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void IRQ_WatchDog(void)
 {
-	uint32_t TransBuffSize;	/* Í¨ĞÅ´«ÊäµÄ²ÉÑùÉî¶È- PCÈí¼şÉèÖÃµÄ */
+	uint32_t TransBuffSize;	/* é€šä¿¡ä¼ è¾“çš„é‡‡æ ·æ·±åº¦- PCè½¯ä»¶è®¾ç½®çš„ */
 	int32_t DmaPos;
 	int32_t BeginPos;
 	uint32_t tmp_isr;
@@ -343,7 +343,7 @@ void IRQ_WatchDog(void)
 //	HAL_ADC_IRQHandler(&AdcHandle1);
 //	HAL_ADC_IRQHandler(&AdcHandle2);	
 	
-	/* CH1 ´¥·¢ */
+	/* CH1 è§¦å‘ */
 	tmp_isr = AdcHandle1.Instance->ISR;
 	tmp_ier = AdcHandle1.Instance->IER;
 	if (((tmp_isr & ADC_FLAG_AWD1) == ADC_FLAG_AWD1) && ((tmp_ier & ADC_IT_AWD1) == ADC_IT_AWD1))
@@ -353,11 +353,11 @@ void IRQ_WatchDog(void)
 		
 		pAdcBuf = aADCH1ConvertedData;
 		hadc = &AdcHandle1;
-		DmaPos = ADC_BUFFER_SIZE - CT_CH1_DMA_Stream->NDTR;		/* DMA´«ÊäÎ»ÖÃ */		
+		DmaPos = ADC_BUFFER_SIZE - CT_CH1_DMA_Stream->NDTR;		/* DMAä¼ è¾“ä½ç½® */		
 		triged = 1;
 	}
 
-	/* CH2 ´¥·¢*/
+	/* CH2 è§¦å‘*/
 	tmp_isr = AdcHandle2.Instance->ISR;
 	tmp_ier = AdcHandle2.Instance->IER;
 	if (((tmp_isr & ADC_FLAG_AWD1) == ADC_FLAG_AWD1) && ((tmp_ier & ADC_IT_AWD1) == ADC_IT_AWD1))
@@ -367,7 +367,7 @@ void IRQ_WatchDog(void)
 		
 		pAdcBuf = aADCH2ConvertedData;
 		hadc = &AdcHandle2;		
-		DmaPos = ADC_BUFFER_SIZE - CT_CH2_DMA_Stream->NDTR;		/* DMA´«ÊäÊ£Óà×Ö½ÚÊı */	
+		DmaPos = ADC_BUFFER_SIZE - CT_CH2_DMA_Stream->NDTR;		/* DMAä¼ è¾“å‰©ä½™å­—èŠ‚æ•° */	
 		triged = 2;
 	}	
 
@@ -378,8 +378,8 @@ void IRQ_WatchDog(void)
 			DmaPos = 0;
 		}
 
-		/* Èí¼şÂË²¨£¬·ÀÖ¹´¥·¢µçÆ½¸½½ü¶¶¶¯ */
-		/* ÔÚÆô¶¯ADC DMAºó£¬±ØĞë²É¼¯ÖÁÉÙ10¸öÑù±¾£¬²Å¿ªÊ¼×ö´¥·¢ÓĞĞ§ÅĞ¶Ï */
+		/* è½¯ä»¶æ»¤æ³¢ï¼Œé˜²æ­¢è§¦å‘ç”µå¹³é™„è¿‘æŠ–åŠ¨ */
+		/* åœ¨å¯åŠ¨ADC DMAåï¼Œå¿…é¡»é‡‡é›†è‡³å°‘10ä¸ªæ ·æœ¬ï¼Œæ‰å¼€å§‹åšè§¦å‘æœ‰æ•ˆåˆ¤æ–­ */
 		if (pAdcBuf[20] != 0 || pAdcBuf[21] != 0)
 		//if (g_tDSO.DmaTransCplt > 2)
 		{
@@ -419,14 +419,14 @@ void IRQ_WatchDog(void)
 			}
 			avg_last = adc_sum / 10;
 			
-			/* ÏÂ½µÑØ»òÉÏÉıÑØ */
+			/* ä¸‹é™æ²¿æˆ–ä¸Šå‡æ²¿ */
 			if ((avg_last > g_tDSO.TrigLevel && avg_now <= g_tDSO.TrigLevel && g_tDSO.TrigEdge == TRIG_EDGE_FALLING) ||
 				(avg_last < g_tDSO.TrigLevel && avg_now >= g_tDSO.TrigLevel && g_tDSO.TrigEdge == TRIG_EDGE_RISING))				
 			{
 				/* Disable the ADC Analog watchdog interrupt */
 				__HAL_ADC_DISABLE_IT(hadc, ADC_IT_AWD1);
 				
-				/* ²ÉÑùÉî¶È */
+				/* é‡‡æ ·æ·±åº¦ */
 				if (g_tDSO.SampleSizeID < BUFF_SIZE_NUM)
 				{
 					TransBuffSize = TabelBufSize[g_tDSO.SampleSizeID];
@@ -436,7 +436,7 @@ void IRQ_WatchDog(void)
 					TransBuffSize = 1 * 1024;
 				}
 				
-				/* ¼ÆËãÊ£Óà²É¼¯Ê±¼ä usµ¥Î» */
+				/* è®¡ç®—å‰©ä½™é‡‡é›†æ—¶é—´ uså•ä½ */
 				rem_time = ((int64_t)(TransBuffSize * (100 - g_tDSO.TrigPos) / 100) * 1000000) / TabelFreq[g_tDSO.FreqID];
 				if (rem_time == 0)
 				{
@@ -446,14 +446,14 @@ void IRQ_WatchDog(void)
 				{
 					bsp_StartHardTimer(1, rem_time, DSO_TrigFinished);	
 				}
-				/* ¼ÇÂ¼²ÉÑùÎ»ÖÃ */
+				/* è®°å½•é‡‡æ ·ä½ç½® */
 				BeginPos = DmaPos - TransBuffSize * g_tDSO.TrigPos / 100;
 				if (BeginPos < 0)
 				{
 					BeginPos = ADC_BUFFER_SIZE + BeginPos;
 				}
 		
-				g_tDSO.DmaPos = BeginPos;	/* ±£´æ´¥·¢Ç°µÄÎ»ÖÃ */				
+				g_tDSO.DmaPos = BeginPos;	/* ä¿å­˜è§¦å‘å‰çš„ä½ç½® */				
 			}
 		}
 	}		
@@ -470,10 +470,10 @@ void ADC3_IRQHandler(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_InitHard
-*	¹¦ÄÜËµÃ÷: ÅäÖÃ¿ØÖÆÓÃÍ¨µÀñîºÏºÍÔöÒæµÄGPIO, ÅäÖÃADC
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_InitHard
+*	åŠŸèƒ½è¯´æ˜: é…ç½®æ§åˆ¶ç”¨é€šé“è€¦åˆå’Œå¢ç›Šçš„GPIO, é…ç½®ADC
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_InitHard(void)
@@ -502,43 +502,43 @@ void DSO_InitHard(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_ConfigCtrlGPIO
-*	¹¦ÄÜËµÃ÷: ÅäÖÃ¿ØÖÆÓÃÍ¨µÀñîºÏºÍÔöÒæµÄGPIO
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_ConfigCtrlGPIO
+*	åŠŸèƒ½è¯´æ˜: é…ç½®æ§åˆ¶ç”¨é€šé“è€¦åˆå’Œå¢ç›Šçš„GPIO
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_ConfigCtrlGPIO(void)
 {
-	/* ÅäÖÃ¿ØÖÆÔöÒæºÍñîºÏµÄGPIO */
+	/* é…ç½®æ§åˆ¶å¢ç›Šå’Œè€¦åˆçš„GPIO */
 	GPIO_InitTypeDef gpio_init;
 
-	/* ´ò¿ªGPIOÊ±ÖÓ */
+	/* æ‰“å¼€GPIOæ—¶é’Ÿ */
 	GC_CLK_ENABLE();
 	
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* ÉèÖÃÍÆÍìÊä³ö */
-	gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */	
+	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+	gpio_init.Pull = GPIO_NOPULL;				/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOé€Ÿåº¦ç­‰çº§ */	
 	
 
 	gpio_init.Pin = GC_PIN;	
 	HAL_GPIO_Init(GC_GPIO, &gpio_init);	
 
-	DSO_SetDC(1, 0);	/* CH1Ñ¡ÔñACñîºÏ */
-	DSO_SetDC(2, 0);	/* CH1Ñ¡ÔñACñîºÏ */
-	DSO_SetGain(1, 0);	/* CH1Ñ¡ÔñĞ¡ÔöÒæ Ë¥¼õ1/5, µÚ2¸ö²ÎÊı1±íÊ¾²»Ë¥¼õ1;1 */
-	DSO_SetGain(2, 0);	/* CH2Ñ¡ÔñĞ¡ÔöÒæ Ë¥¼õ1/5, µÚ2¸ö²ÎÊı1±íÊ¾²»Ë¥¼õ1;1 */
+	DSO_SetDC(1, 0);	/* CH1é€‰æ‹©ACè€¦åˆ */
+	DSO_SetDC(2, 0);	/* CH1é€‰æ‹©ACè€¦åˆ */
+	DSO_SetGain(1, 0);	/* CH1é€‰æ‹©å°å¢ç›Š è¡°å‡1/5, ç¬¬2ä¸ªå‚æ•°1è¡¨ç¤ºä¸è¡°å‡1;1 */
+	DSO_SetGain(2, 0);	/* CH2é€‰æ‹©å°å¢ç›Š è¡°å‡1/5, ç¬¬2ä¸ªå‚æ•°1è¡¨ç¤ºä¸è¡°å‡1;1 */
 
-	DSO_SetCurrGain(1);	/* µçÁ÷¼ì²âÁ¿³ÌÉèÖÃÎª 2A */
+	DSO_SetCurrGain(1);	/* ç”µæµæ£€æµ‹é‡ç¨‹è®¾ç½®ä¸º 2A */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetDC
-*	¹¦ÄÜËµÃ÷: ¿ØÖÆAC DCñîºÏÄ£Ê½
-*	ĞÎ    ²Î: _ch : Í¨µÀ1»ò2
-*			  _mode : 0»ò1.  1±íÊ¾DCñîºÏ 0±íÊ¾ACñîºÏ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetDC
+*	åŠŸèƒ½è¯´æ˜: æ§åˆ¶AC DCè€¦åˆæ¨¡å¼
+*	å½¢    å‚: _ch : é€šé“1æˆ–2
+*			  _mode : 0æˆ–1.  1è¡¨ç¤ºDCè€¦åˆ 0è¡¨ç¤ºACè€¦åˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetDC(uint8_t _ch, uint8_t _mode)
@@ -570,11 +570,11 @@ void DSO_SetDC(uint8_t _ch, uint8_t _mode)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetGain
-*	¹¦ÄÜËµÃ÷: ¿ØÖÆÔöÒæÄ£Ê½
-*	ĞÎ    ²Î: _ch : Í¨µÀ1»ò2
-*			  _gain : 0-7.  7×î´ó
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetGain
+*	åŠŸèƒ½è¯´æ˜: æ§åˆ¶å¢ç›Šæ¨¡å¼
+*	å½¢    å‚: _ch : é€šé“1æˆ–2
+*			  _gain : 0-7.  7æœ€å¤§
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetGain(uint8_t _ch, uint8_t _gain)
@@ -607,24 +607,24 @@ void DSO_SetGain(uint8_t _ch, uint8_t _gain)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetOffset
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÖ±Á÷Æ«Öµ
-*	ĞÎ    ²Î: _ch : Í¨µÀ1»ò2
-*			  _OffsetVolt : Ö±Á÷Æ«ÖµµçÑ¹ -1250 , +1250
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetOffset
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®ç›´æµåå€¼
+*	å½¢    å‚: _ch : é€šé“1æˆ–2
+*			  _OffsetVolt : ç›´æµåå€¼ç”µå‹ -1250 , +1250
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetOffset(uint8_t _ch, int16_t _OffsetVolt)
 {	
 #if	1
-	;	/* Ó²¼ş²»Ö§³ÖÖ±Á÷Æ«ÖµÉèÖÃ */
+	;	/* ç¡¬ä»¶ä¸æ”¯æŒç›´æµåå€¼è®¾ç½® */
 #else	
-	if (_ch == 1)	/* Í¨µÀ1 */
+	if (_ch == 1)	/* é€šé“1 */
 	{
 		//MCP4725_SetVolt(0, _OffsetVolt + 1250);
 		STM8_WritePWM(1, _OffsetVolt + 1250);
 	}
-	else	/* Í¨µÀ2 */
+	else	/* é€šé“2 */
 	{
 		//MCP4725_SetVolt(1, _OffsetVolt + 1250);
 		STM8_WritePWM(2, _OffsetVolt + 1250);
@@ -634,10 +634,10 @@ void DSO_SetOffset(uint8_t _ch, int16_t _OffsetVolt)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetCurrGain
-*	¹¦ÄÜËµÃ÷: ¿ØÖÆµçÁ÷ÔöÒæ
-*	ĞÎ    ²Î: _gain : 0±íÊ¾200mA, 1±íÊ¾2A
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetCurrGain
+*	åŠŸèƒ½è¯´æ˜: æ§åˆ¶ç”µæµå¢ç›Š
+*	å½¢    å‚: _gain : 0è¡¨ç¤º200mA, 1è¡¨ç¤º2A
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetCurrGain(uint8_t _gain)
@@ -654,20 +654,20 @@ void DSO_SetCurrGain(uint8_t _gain)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetTriger
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÓ²¼ş´¥·¢¡£ÀûÓÃADC¿´ÃÅ¹·ÊµÏÖ. 
-*	ĞÎ    ²Î: g_tDSO.TrigMode   ´¥·¢Ä£Ê½
-*			  g_tDSO.TrigLevel  ´¥·¢µçÆ½£¨0-65535£©
-*			  g_tDSO.TrigPos    ´¥·¢Î»ÖÃ£¨0-100£©
-*			  g_tDSO.TrigChan   ´¥·¢Í¨µÀ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetTriger
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®ç¡¬ä»¶è§¦å‘ã€‚åˆ©ç”¨ADCçœ‹é—¨ç‹—å®ç°. 
+*	å½¢    å‚: g_tDSO.TrigMode   è§¦å‘æ¨¡å¼
+*			  g_tDSO.TrigLevel  è§¦å‘ç”µå¹³ï¼ˆ0-65535ï¼‰
+*			  g_tDSO.TrigPos    è§¦å‘ä½ç½®ï¼ˆ0-100ï¼‰
+*			  g_tDSO.TrigChan   è§¦å‘é€šé“
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetTriger(void)
 {	
 	ADC_AnalogWDGConfTypeDef WdgCfg;	
 
-	/* ADC Í¨µÀ1Ä£Äâ¿´ÃÅ¹·ÅäÖÃ */
+	/* ADC é€šé“1æ¨¡æ‹Ÿçœ‹é—¨ç‹—é…ç½® */
 	WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
 	WdgCfg.Channel = ADCH1_CHANNEL;			
 	WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;	// ADC_ANALOGWATCHDOG_ALL_REG;
@@ -693,7 +693,7 @@ void DSO_SetTriger(void)
 			WdgCfg.LowThreshold = g_tDSO.TrigLevel;
 		}
 	}
-	else	/* ×Ô¶¯´¥·¢£¬¹Ø±Õ¿´ÃÅ¹· */
+	else	/* è‡ªåŠ¨è§¦å‘ï¼Œå…³é—­çœ‹é—¨ç‹— */
 	{
 		WdgCfg.HighThreshold = 65535;
 		WdgCfg.LowThreshold = 0;
@@ -701,7 +701,7 @@ void DSO_SetTriger(void)
 
 	HAL_ADC_AnalogWDGConfig(&AdcHandle1, &WdgCfg);	
 
-	/* ADC Í¨µÀ2Ä£Äâ¿´ÃÅ¹·ÅäÖÃ */
+	/* ADC é€šé“2æ¨¡æ‹Ÿçœ‹é—¨ç‹—é…ç½® */
 	WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
 	WdgCfg.Channel = ADCH2_CHANNEL;			
 	WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;	// ADC_ANALOGWATCHDOG_ALL_REG;
@@ -726,7 +726,7 @@ void DSO_SetTriger(void)
 			WdgCfg.LowThreshold = g_tDSO.TrigLevel;
 		}
 	}
-	else	/* ×Ô¶¯´¥·¢£¬¹Ø±Õ¿´ÃÅ¹· */
+	else	/* è‡ªåŠ¨è§¦å‘ï¼Œå…³é—­çœ‹é—¨ç‹— */
 	{
 		WdgCfg.HighThreshold = 65535;
 		WdgCfg.LowThreshold = 0;
@@ -744,20 +744,20 @@ void DSO_SetTriger(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_CloseTriger
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕÓ²¼ş´¥·¢¡£¹Ø±ÕADC¿´ÃÅ¹·ÊµÏÖ. 
-*	ĞÎ    ²Î: g_tDSO.TrigMode   ´¥·¢Ä£Ê½
-*			  g_tDSO.TrigLevel  ´¥·¢µçÆ½£¨0-65535£©
-*			  g_tDSO.TrigPos    ´¥·¢Î»ÖÃ£¨0-100£©
-*			  g_tDSO.TrigChan   ´¥·¢Í¨µÀ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_CloseTriger
+*	åŠŸèƒ½è¯´æ˜: å…³é—­ç¡¬ä»¶è§¦å‘ã€‚å…³é—­ADCçœ‹é—¨ç‹—å®ç°. 
+*	å½¢    å‚: g_tDSO.TrigMode   è§¦å‘æ¨¡å¼
+*			  g_tDSO.TrigLevel  è§¦å‘ç”µå¹³ï¼ˆ0-65535ï¼‰
+*			  g_tDSO.TrigPos    è§¦å‘ä½ç½®ï¼ˆ0-100ï¼‰
+*			  g_tDSO.TrigChan   è§¦å‘é€šé“
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_CloseTriger(void)
 {	
 	ADC_AnalogWDGConfTypeDef WdgCfg;	
 
-	/* ADC Í¨µÀ1Ä£Äâ¿´ÃÅ¹·ÅäÖÃ */
+	/* ADC é€šé“1æ¨¡æ‹Ÿçœ‹é—¨ç‹—é…ç½® */
 	WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
 	WdgCfg.Channel = ADCH1_CHANNEL;			
 	WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;	// ADC_ANALOGWATCHDOG_ALL_REG;
@@ -766,7 +766,7 @@ void DSO_CloseTriger(void)
 	WdgCfg.LowThreshold = 0;
 	HAL_ADC_AnalogWDGConfig(&AdcHandle1, &WdgCfg);	
 
-	/* ADC Í¨µÀ2Ä£Äâ¿´ÃÅ¹·ÅäÖÃ */
+	/* ADC é€šé“2æ¨¡æ‹Ÿçœ‹é—¨ç‹—é…ç½® */
 	WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
 	WdgCfg.Channel = ADCH2_CHANNEL;			
 	WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;	// ADC_ANALOGWATCHDOG_ALL_REG;
@@ -787,10 +787,10 @@ void DSO_CloseTriger(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartAdcCH1
-*	¹¦ÄÜËµÃ÷: ÅäÖÃCH1Í¨µÀµÄGPIO, ADC, DMA
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartAdcCH1
+*	åŠŸèƒ½è¯´æ˜: é…ç½®CH1é€šé“çš„GPIO, ADC, DMA
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StartAdcCH1(void)
@@ -829,9 +829,9 @@ void bsp_StartAdcCH1(void)
 
 
 		/* ### - 2 - Start calibration ############################################ */
-	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* µ¥¶ËÄ£Ê½ */	
+	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* å•ç«¯æ¨¡å¼ */	
 		if (HAL_ADCEx_Calibration_Start(&AdcHandle1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
-	#else	/* ²î·ÖÄ£Ê½ */
+	#else	/* å·®åˆ†æ¨¡å¼ */
 		HAL_ADC_Stop(&AdcHandle1);
 		if (HAL_ADCEx_Calibration_Start(&AdcHandle1, ADC_CALIB_OFFSET, ADC_DIFFERENTIAL_ENDED) != HAL_OK)		
 	#endif		
@@ -844,9 +844,9 @@ void bsp_StartAdcCH1(void)
 		sConfig1.Channel      = ADCH1_CHANNEL;                /* Sampled channel number */
 		sConfig1.Rank         = ADC_REGULAR_RANK_1;          /* Rank of sampled channel number ADCH1_CHANNEL */
 		sConfig1.SamplingTime = H7_ADC_SAMPLETIME_1CYCLE_5;   /* Sampling time (number of clock cycles unit) */
-	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* µ¥¶ËÄ£Ê½ */			
+	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* å•ç«¯æ¨¡å¼ */			
 		sConfig1.SingleDiff   = ADC_SINGLE_ENDED;            /* Single-ended input channel */
-	#else	/* ²î·ÖÄ£Ê½ */
+	#else	/* å·®åˆ†æ¨¡å¼ */
 		sConfig1.SingleDiff   = ADC_DIFFERENTIAL_ENDED;
 	#endif
 		sConfig1.OffsetNumber = ADC_OFFSET_NONE;             /* No offset subtraction */ 
@@ -860,7 +860,7 @@ void bsp_StartAdcCH1(void)
 		}
 		
 		
-		DSO_SetTriger();	/* ÉèÖÃ´¥·¢£¬´ò¿ª¿´ÃÅ¹· */
+		DSO_SetTriger();	/* è®¾ç½®è§¦å‘ï¼Œæ‰“å¼€çœ‹é—¨ç‹— */
 
 		/* ### - 4 - Start conversion in DMA mode ################################# */
 		if (HAL_ADC_Start_DMA(&AdcHandle1,
@@ -871,7 +871,7 @@ void bsp_StartAdcCH1(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 1)	/* µçÁ÷¼ì²âÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 1)	/* ç”µæµæ£€æµ‹æ¨¡å¼ */
 	{
 		/* ### - 1 - Initialize ADC peripheral #################################### */
 		AdcHandle1.Instance          = CT_ADCH1;
@@ -921,7 +921,7 @@ void bsp_StartAdcCH1(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 		
-		DSO_SetTriger();	/* ÉèÖÃ´¥·¢£¬´ò¿ª¿´ÃÅ¹· */
+		DSO_SetTriger();	/* è®¾ç½®è§¦å‘ï¼Œæ‰“å¼€çœ‹é—¨ç‹— */
 
 		/* ### - 4 - Start conversion in DMA mode ################################# */
 		if (HAL_ADC_Start_DMA(&AdcHandle1,
@@ -932,10 +932,10 @@ void bsp_StartAdcCH1(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 2)	/* µÍËÙ¶àÍ¨µÀÉ¨ÃèÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 2)	/* ä½é€Ÿå¤šé€šé“æ‰«ææ¨¡å¼ */
 	{
 		bsp_StopAdcCH1();
-		DSO_CloseTriger();	/* ¹Ø±ÕADC¿´ÃÅ¹·ÖĞ¶Ï */		
+		DSO_CloseTriger();	/* å…³é—­ADCçœ‹é—¨ç‹—ä¸­æ–­ */		
 		
 		/* ### - 1 - Initialize ADC peripheral #################################### */
 		AdcHandle1.Instance          = ADC1;
@@ -946,16 +946,16 @@ void bsp_StartAdcCH1(void)
 		}
 
 		/*
-			PF11/ADC1_INP2	---- CH1µçÑ¹
-			PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+			PF11/ADC1_INP2	---- CH1ç”µå‹
+			PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 		
-			PC3_C/ADC3_INP1	---- CH2µçÑ¹
-			PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-			PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-			PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-			PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-			PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-			PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+			PC3_C/ADC3_INP1	---- CH2ç”µå‹
+			PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+			PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+			PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+			PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+			PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+			PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 		*/		
 		AdcHandle1.Init.ClockPrescaler           = ADC_CLOCK_SYNC_PCLK_DIV4;        /* Synchronous clock mode, input ADC clock divided by 4*/
 		AdcHandle1.Init.Resolution               = ADC_RESOLUTION_16B;              /* 16-bit resolution for converted data */
@@ -998,8 +998,8 @@ void bsp_StartAdcCH1(void)
 		sConfig1.SingleDiff   = ADC_SINGLE_ENDED;            /* Single-ended input channel */
 		sConfig1.OffsetNumber = ADC_OFFSET_NONE;             /* No offset subtraction */ 
 		sConfig1.Offset = 0;                                 /* Parameter discarded because offset correction is disabled */
-		sConfig1.OffsetRightShift       = DISABLE;           /* ½ûÖ¹ÓÒÒÆ */
-		sConfig1.OffsetSignedSaturation = DISABLE;           /* ½ûÖ¹ÓĞ·ûºÅ±¥ºÍ */		
+		sConfig1.OffsetRightShift       = DISABLE;           /* ç¦æ­¢å³ç§» */
+		sConfig1.OffsetSignedSaturation = DISABLE;           /* ç¦æ­¢æœ‰ç¬¦å·é¥±å’Œ */		
 		if (HAL_ADC_ConfigChannel(&AdcHandle1, &sConfig1) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
@@ -1025,10 +1025,10 @@ void bsp_StartAdcCH1(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartAdcCH2
-*	¹¦ÄÜËµÃ÷: ÅäÖÃCH2Í¨µÀµÄGPIO, ADC, DMA
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartAdcCH2
+*	åŠŸèƒ½è¯´æ˜: é…ç½®CH2é€šé“çš„GPIO, ADC, DMA
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StartAdcCH2(void)
@@ -1067,9 +1067,9 @@ void bsp_StartAdcCH2(void)
 
 
 		/* ### - 2 - Start calibration ############################################ */
-	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* µ¥¶ËÄ£Ê½ */			
+	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* å•ç«¯æ¨¡å¼ */			
 		if (HAL_ADCEx_Calibration_Start(&AdcHandle2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
-	#else	/* ²î·ÖÄ£Ê½ */
+	#else	/* å·®åˆ†æ¨¡å¼ */
 		HAL_ADC_Stop(&AdcHandle2);
 		if (HAL_ADCEx_Calibration_Start(&AdcHandle2, ADC_CALIB_OFFSET, ADC_DIFFERENTIAL_ENDED) != HAL_OK)
 	#endif
@@ -1081,9 +1081,9 @@ void bsp_StartAdcCH2(void)
 		sConfig2.Channel      = ADCH2_CHANNEL;                /* Sampled channel number */
 		sConfig2.Rank         = ADC_REGULAR_RANK_1;          /* Rank of sampled channel number ADCH1_CHANNEL */
 		sConfig2.SamplingTime = H7_ADC_SAMPLETIME_1CYCLE_5  ;   /* Sampling time (number of clock cycles unit) */
-	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* µ¥¶ËÄ£Ê½ */			
+	#if ENABLE_DIFFERENTIAL_ENDED == 0	/* å•ç«¯æ¨¡å¼ */			
 		sConfig2.SingleDiff   = ADC_SINGLE_ENDED;            /* Single-ended input channel */
-	#else	/* ²î·ÖÄ£Ê½ */
+	#else	/* å·®åˆ†æ¨¡å¼ */
 		sConfig2.SingleDiff   = ADC_DIFFERENTIAL_ENDED;
 	#endif		
 		sConfig2.OffsetNumber = ADC_OFFSET_NONE;             /* No offset subtraction */ 
@@ -1095,7 +1095,7 @@ void bsp_StartAdcCH2(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 		
-		DSO_SetTriger();	/* ÉèÖÃ´¥·¢£¬´ò¿ª¿´ÃÅ¹· */
+		DSO_SetTriger();	/* è®¾ç½®è§¦å‘ï¼Œæ‰“å¼€çœ‹é—¨ç‹— */
 
 		/* ### - 4 - Start conversion in DMA mode ################################# */
 		if (HAL_ADC_Start_DMA(&AdcHandle2,
@@ -1106,7 +1106,7 @@ void bsp_StartAdcCH2(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 1)	/* µçÁ÷¼ì²âÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 1)	/* ç”µæµæ£€æµ‹æ¨¡å¼ */
 	{
 		/* ### - 1 - Initialize ADC peripheral #################################### */
 		AdcHandle2.Instance          = CT_ADCH2;
@@ -1156,7 +1156,7 @@ void bsp_StartAdcCH2(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 		
-		DSO_SetTriger();	/* ÉèÖÃ´¥·¢£¬´ò¿ª¿´ÃÅ¹· */
+		DSO_SetTriger();	/* è®¾ç½®è§¦å‘ï¼Œæ‰“å¼€çœ‹é—¨ç‹— */
 
 		/* ### - 4 - Start conversion in DMA mode ################################# */
 		if (HAL_ADC_Start_DMA(&AdcHandle2,
@@ -1167,10 +1167,10 @@ void bsp_StartAdcCH2(void)
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 2)	/* ¶àÍ¨µÀÉ¨ÃèÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 2)	/* å¤šé€šé“æ‰«ææ¨¡å¼ */
 	{
 		bsp_StopAdcCH2();
-		DSO_CloseTriger();	/* ¹Ø±ÕADC¿´ÃÅ¹·ÖĞ¶Ï */
+		DSO_CloseTriger();	/* å…³é—­ADCçœ‹é—¨ç‹—ä¸­æ–­ */
 		
 		/* ### - 1 - Initialize ADC peripheral #################################### */
 		AdcHandle2.Instance          = ADC3;
@@ -1181,16 +1181,16 @@ void bsp_StartAdcCH2(void)
 		}
 
 		/*
-			PF11/ADC1_INP2	---- CH1µçÑ¹
-			PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+			PF11/ADC1_INP2	---- CH1ç”µå‹
+			PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 		
-			PC3_C/ADC3_INP1	---- CH2µçÑ¹
-			PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-			PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-			PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-			PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-			PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-			PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+			PC3_C/ADC3_INP1	---- CH2ç”µå‹
+			PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+			PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+			PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+			PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+			PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+			PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 		*/		
 		AdcHandle2.Init.ClockPrescaler           = ADC_CLOCK_SYNC_PCLK_DIV4;        /* Synchronous clock mode, input ADC clock divided by 4*/
 		AdcHandle2.Init.Resolution               = ADC_RESOLUTION_16B;              /* 16-bit resolution for converted data */
@@ -1293,10 +1293,10 @@ void bsp_StartAdcCH2(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StopAdcCH1
-*	¹¦ÄÜËµÃ÷: ¸´Î»CH1Í¨µÀÅäÖÃ£¬Í£Ö¹ADC²É¼¯.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StopAdcCH1
+*	åŠŸèƒ½è¯´æ˜: å¤ä½CH1é€šé“é…ç½®ï¼Œåœæ­¢ADCé‡‡é›†.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StopAdcCH1(void)
@@ -1335,10 +1335,10 @@ void bsp_StopAdcCH1(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StopAdcCH2
-*	¹¦ÄÜËµÃ÷: ¸´Î»CH2Í¨µÀÅäÖÃ£¬Í£Ö¹ADC²É¼¯.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StopAdcCH2
+*	åŠŸèƒ½è¯´æ˜: å¤ä½CH2é€šé“é…ç½®ï¼Œåœæ­¢ADCé‡‡é›†.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StopAdcCH2(void)
@@ -1377,10 +1377,10 @@ void bsp_StopAdcCH2(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TIM3_Config
-*	¹¦ÄÜËµÃ÷: ÅäÖÃTIM3×÷ÎªADC´¥·¢Ô´
-*	ĞÎ    ²Î: _freq : ²ÉÑùÆµÂÊ£¬µ¥Î»Hz
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TIM3_Config
+*	åŠŸèƒ½è¯´æ˜: é…ç½®TIM3ä½œä¸ºADCè§¦å‘æº
+*	å½¢    å‚: _freq : é‡‡æ ·é¢‘ç‡ï¼Œå•ä½Hz
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void TIM3_Config(uint32_t _freq)
@@ -1422,14 +1422,14 @@ static void TIM3_Config(uint32_t _freq)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_StartADC
-*	¹¦ÄÜËµÃ÷: Ö÷ÒªÍê³ÉÄ£ÄâÁ¿GPIOµÄÅäÖÃ¡¢ADCµÄÅäÖÃ¡¢¶¨Ê±Æ÷µÄÅäÖÃÒÔ¼°DMAµÄÅäÖÃ¡£
-*			- Á½¸öADC¹¤×÷ÔÚ¶ÀÁ¢Ä£Ê½
-*			- ¾ßÓĞÏàÍ¬µÄÍâ²¿´¥·¢£¬ ADC_EXTERNALTRIG_T4_CC4
-*			- TIM1µÄCC1ÆµÂÊµÄ¾ö¶¨ÁË²ÉÑùÆµÂÊ
+*	å‡½ æ•° å: DSO_StartADC
+*	åŠŸèƒ½è¯´æ˜: ä¸»è¦å®Œæˆæ¨¡æ‹Ÿé‡GPIOçš„é…ç½®ã€ADCçš„é…ç½®ã€å®šæ—¶å™¨çš„é…ç½®ä»¥åŠDMAçš„é…ç½®ã€‚
+*			- ä¸¤ä¸ªADCå·¥ä½œåœ¨ç‹¬ç«‹æ¨¡å¼
+*			- å…·æœ‰ç›¸åŒçš„å¤–éƒ¨è§¦å‘ï¼Œ ADC_EXTERNALTRIG_T4_CC4
+*			- TIM1çš„CC1é¢‘ç‡çš„å†³å®šäº†é‡‡æ ·é¢‘ç‡
 *
-*	ĞÎ    ²Î: _uiFreq : ²ÉÑùÆµÂÊ£¬ Hz
-*	·µ »Ø Öµ: ÎŞ
+*	å½¢    å‚: _uiFreq : é‡‡æ ·é¢‘ç‡ï¼Œ Hz
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_StartADC( uint32_t _uiFreq)
@@ -1456,16 +1456,16 @@ void DSO_StartADC( uint32_t _uiFreq)
 	bsp_StartAdcCH1();
 	bsp_StartAdcCH2();
 	
-	/* ÅäÖÃ²ÉÑù´¥·¢¶¨Ê±Æ÷£¬Ê¹ÓÃTIM1 CC1 */
-	DSO_SetSampRate(_uiFreq);	/* ĞŞ¸Ä²ÉÑùÆµÂÊ£¬²¢Æô¶¯TIM */
+	/* é…ç½®é‡‡æ ·è§¦å‘å®šæ—¶å™¨ï¼Œä½¿ç”¨TIM1 CC1 */
+	DSO_SetSampRate(_uiFreq);	/* ä¿®æ”¹é‡‡æ ·é¢‘ç‡ï¼Œå¹¶å¯åŠ¨TIM */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_StopADC
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕADC²ÉÑùËùÓĞµÄÍâÉè¡£ADC, DMA, TIM
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_StopADC
+*	åŠŸèƒ½è¯´æ˜: å…³é—­ADCé‡‡æ ·æ‰€æœ‰çš„å¤–è®¾ã€‚ADC, DMA, TIM
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_StopADC(void)
@@ -1476,10 +1476,10 @@ void DSO_StopADC(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PauseADC
-*	¹¦ÄÜËµÃ÷: ÔİÍ£ADC²ÉÑù¡£×¼±¸´¦ÀíÊı¾İ¡£±£Ö¤ÏÂ´ÎDMAÕı³£Æô¶¯¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PauseADC
+*	åŠŸèƒ½è¯´æ˜: æš‚åœADCé‡‡æ ·ã€‚å‡†å¤‡å¤„ç†æ•°æ®ã€‚ä¿è¯ä¸‹æ¬¡DMAæ­£å¸¸å¯åŠ¨ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_PauseADC(void)
@@ -1609,7 +1609,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 			HAL_NVIC_EnableIRQ(CH2_DMA_Stream_IRQn);  	 
 		}	
 	}
-	else if (g_tDSO.MeasuteMode == 1)	/* ¸ß¶ËµçÁ÷²âÊÔÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 1)	/* é«˜ç«¯ç”µæµæµ‹è¯•æ¨¡å¼ */
 	{
 		if (hadc->Instance == CT_ADCH1)
 		{	
@@ -1724,19 +1724,19 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 			HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);  	 
 		}	
 	}
-	else if (g_tDSO.MeasuteMode == 2)	/* µÍËÙÉ¨Ãè¶àÍ¨µÀÄ£Ê½ - 1024¹ı²ÉÑù */	
+	else if (g_tDSO.MeasuteMode == 2)	/* ä½é€Ÿæ‰«æå¤šé€šé“æ¨¡å¼ - 1024è¿‡é‡‡æ · */	
 	{
 		/*
-			PF11/ADC1_INP2	---- CH1µçÑ¹
-			PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+			PF11/ADC1_INP2	---- CH1ç”µå‹
+			PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 		
-			PC3_C/ADC3_INP1	---- CH2µçÑ¹
-			PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-			PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-			PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-			PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-			PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-			PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+			PC3_C/ADC3_INP1	---- CH2ç”µå‹
+			PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+			PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+			PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+			PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+			PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+			PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 		*/
 		if (hadc->Instance == ADC1)
 		{
@@ -1891,7 +1891,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 			HAL_GPIO_DeInit(ADCH2_N_GPIO_PORT, ADCH2_N_PIN);
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 1)	/* µçÁ÷²âÁ¿Ä£Ê½ */
+	else if (g_tDSO.MeasuteMode == 1)	/* ç”µæµæµ‹é‡æ¨¡å¼ */
 	{
 		if (hadc->Instance == CT_ADCH1)
 		{
@@ -1922,7 +1922,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 			HAL_GPIO_DeInit(CT_ADCH2_N_GPIO_PORT, CT_ADCH2_N_PIN);
 		}		
 	}
-	else if (g_tDSO.MeasuteMode == 2)	/* ¶àÍ¨µÀÉ¨ÃèÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 2)	/* å¤šé€šé“æ‰«ææ¨¡å¼ */
 	{
 		if (hadc->Instance == ADC1)
 		{
@@ -1934,16 +1934,16 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 			(automatically reset all ADC instances of the ADC common group) */
 			__HAL_RCC_ADC12_CLK_DISABLE();
 		/*
-			PF11/ADC1_INP2	---- CH1µçÑ¹
-			PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+			PF11/ADC1_INP2	---- CH1ç”µå‹
+			PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 		
-			PC3_C/ADC3_INP1	---- CH2µçÑ¹
-			PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-			PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-			PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-			PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-			PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-			PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+			PC3_C/ADC3_INP1	---- CH2ç”µå‹
+			PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+			PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+			PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+			PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+			PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+			PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 		*/
 			/*##-2- Disable peripherals and GPIO Clocks ################################*/
 			/* De-initialize the ADC Channel GPIO pin */
@@ -1975,10 +1975,10 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_SetSampRate
-*	¹¦ÄÜËµÃ÷: ĞŞ¸Ä²ÉÑùÆµÂÊ. Ê¹ÓÃTIM4_CC4´¥·¢
-*	ĞÎ    ²Î: freq : ²ÉÑùÆµÂÊ µ¥Î»Hz
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_SetSampRate
+*	åŠŸèƒ½è¯´æ˜: ä¿®æ”¹é‡‡æ ·é¢‘ç‡. ä½¿ç”¨TIM4_CC4è§¦å‘
+*	å½¢    å‚: freq : é‡‡æ ·é¢‘ç‡ å•ä½Hz
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_SetSampRate(uint32_t _ulFreq)
@@ -1988,10 +1988,10 @@ void DSO_SetSampRate(uint32_t _ulFreq)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CH1_DMA_STREAM_IRQHANDLER
-*	¹¦ÄÜËµÃ÷: CH1 DAMÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CH1_DMA_STREAM_IRQHANDLER
+*	åŠŸèƒ½è¯´æ˜: CH1 DAMä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void CH1_DMA_Stream_IRQHandle(void)
@@ -2001,10 +2001,10 @@ void CH1_DMA_Stream_IRQHandle(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CH1_DMA_STREAM_IRQHANDLER
-*	¹¦ÄÜËµÃ÷: CH2 DAMÖĞ¶Ï·şÎñ³ÌĞò,
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CH1_DMA_STREAM_IRQHANDLER
+*	åŠŸèƒ½è¯´æ˜: CH2 DAMä¸­æ–­æœåŠ¡ç¨‹åº,
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void CH2_DMA_Stream_IRQHandle(void)
@@ -2014,10 +2014,10 @@ void CH2_DMA_Stream_IRQHandle(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_ADC_ConvHalfCpltCallback
-*	¹¦ÄÜËµÃ÷: DAMÖĞ¶Ï·şÎñ³ÌĞò»Øµ÷º¯Êı£¬ÓÃÓÚcacheÊı¾İË¢ĞÂµ½ÄÚ´æ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_ADC_ConvHalfCpltCallback
+*	åŠŸèƒ½è¯´æ˜: DAMä¸­æ–­æœåŠ¡ç¨‹åºå›è°ƒå‡½æ•°ï¼Œç”¨äºcacheæ•°æ®åˆ·æ–°åˆ°å†…å­˜
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
@@ -2036,10 +2036,10 @@ void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_ADC_ConvCpltCallback
-*	¹¦ÄÜËµÃ÷: DAMÖĞ¶Ï·şÎñ³ÌĞò»Øµ÷º¯Êı£¬ÓÃÓÚcacheÊı¾İË¢ĞÂµ½ÄÚ´æ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_ADC_ConvCpltCallback
+*	åŠŸèƒ½è¯´æ˜: DAMä¸­æ–­æœåŠ¡ç¨‹åºå›è°ƒå‡½æ•°ï¼Œç”¨äºcacheæ•°æ®åˆ·æ–°åˆ°å†…å­˜
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
@@ -2060,10 +2060,10 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_LockWave
-*	¹¦ÄÜËµÃ÷: Ëø´æ²¨ĞÎ£¬µÈµ½PC¶ÁÈ¡
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_LockWave
+*	åŠŸèƒ½è¯´æ˜: é”å­˜æ³¢å½¢ï¼Œç­‰åˆ°PCè¯»å–
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_LockWave(void)
@@ -2078,14 +2078,14 @@ void DSO_LockWave(void)
 	pos = g_tDSO.DmaPos;
 	TransSize = TabelBufSize[g_tDSO.SampleSizeID];
 	
-	if (g_tDSO.MeasuteMode == 0)	/* CH1 CH2Ê¾²¨Æ÷µçÑ¹Í¨µÀ */
+	if (g_tDSO.MeasuteMode == 0)	/* CH1 CH2ç¤ºæ³¢å™¨ç”µå‹é€šé“ */
 	{
 		for (i = 0; i < TransSize; i++)
 		{
-			#if 0	/* ´«ËÍADCÔ­Ê¼Êı¾İ */
+			#if 0	/* ä¼ é€ADCåŸå§‹æ•°æ® */
 				g_Ch1WaveBuf[i] = aADCH1ConvertedData[pos];
 				g_Ch2WaveBuf[i] = aADCH2ConvertedData[pos];		
-			#else	/* ´«ËÍĞ£×¼ºóµÄÊı¾İ. Vµ¥Î» */
+			#else	/* ä¼ é€æ ¡å‡†åçš„æ•°æ®. Vå•ä½ */
 				g_Ch1WaveBuf[i] = bsp_AdcToCH1Volt(aADCH1ConvertedData[pos]);
 				g_Ch2WaveBuf[i] = bsp_AdcToCH2Volt(aADCH2ConvertedData[pos]);
 			#endif
@@ -2095,14 +2095,14 @@ void DSO_LockWave(void)
 			}	
 		}
 	}
-	else if (g_tDSO.MeasuteMode == 1)	/*¸ß²àµçÁ÷¼ì²âÄ£Ê½ */
+	else if (g_tDSO.MeasuteMode == 1)	/*é«˜ä¾§ç”µæµæ£€æµ‹æ¨¡å¼ */
 	{
 		for (i = 0; i < TransSize; i++)
 		{
-			#if 0	/* ´«ËÍADCÔ­Ê¼Êı¾İ */
+			#if 0	/* ä¼ é€ADCåŸå§‹æ•°æ® */
 				g_Ch1WaveBuf[i] = aADCH1ConvertedData[pos];
 				g_Ch2WaveBuf[i] = aADCH2ConvertedData[pos];		
-			#else	/* ´«ËÍĞ£×¼ºóµÄÊı¾İ. mAµ¥Î» Vµ¥Î»  */
+			#else	/* ä¼ é€æ ¡å‡†åçš„æ•°æ®. mAå•ä½ Vå•ä½  */
 				g_Ch1WaveBuf[i] = bsp_AdcToHighSideCurr(aADCH1ConvertedData[pos]);
 				g_Ch2WaveBuf[i] = bsp_AdcToHighSideVolt(aADCH2ConvertedData[pos]);		
 			#endif
@@ -2116,7 +2116,7 @@ void DSO_LockWave(void)
 
 
 /**
- * Ñ¡ÔñÅÅĞòËã·¨
+ * é€‰æ‹©æ’åºç®—æ³•
  */
 static void SelectionSort(float *a, int len)
 {
@@ -2127,7 +2127,7 @@ static void SelectionSort(float *a, int len)
 	{
         min = i;
 		
-        /* Õâ¸öforÑ­»·ÊÇÎªÁËÕÒ³ö×îĞ¡µÄÖµ */
+        /* è¿™ä¸ªforå¾ªç¯æ˜¯ä¸ºäº†æ‰¾å‡ºæœ€å°çš„å€¼ */
         for (int j = i + 1; j < len; j++) 
 		{
             if (a[min] > a[j])
@@ -2136,10 +2136,10 @@ static void SelectionSort(float *a, int len)
             }
         }
 		
-        /* Èç¹ûµÚÒ»¸öÈ¡³öµÄÔªËØ²»ÊÇ×îĞ¡Öµ£¬¾Í½øĞĞ½»»» */
+        /* å¦‚æœç¬¬ä¸€ä¸ªå–å‡ºçš„å…ƒç´ ä¸æ˜¯æœ€å°å€¼ï¼Œå°±è¿›è¡Œäº¤æ¢ */
         if (min != i)
 		{
-            // ½øĞĞ½»»»
+            // è¿›è¡Œäº¤æ¢
 			tmp = a[i];
 			a[i] = a[min];
 			a[min] = tmp;
@@ -2149,16 +2149,16 @@ static void SelectionSort(float *a, int len)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AdcSumAvg
-*	¹¦ÄÜËµÃ÷: Èí¼şÇóºÍÆ½¾ù
-*	ĞÎ    ²Î: _AdcNo : adcÍ¨µÀºÅ£¬0 =ADC1  1=ADC3
-*			  _Offset : Æ«ÒÆ£¨rank£©
-*	·µ »Ø Öµ: ¸¡µãĞÍ
+*	å‡½ æ•° å: AdcSumAvg
+*	åŠŸèƒ½è¯´æ˜: è½¯ä»¶æ±‚å’Œå¹³å‡
+*	å½¢    å‚: _AdcNo : adcé€šé“å·ï¼Œ0 =ADC1  1=ADC3
+*			  _Offset : åç§»ï¼ˆrankï¼‰
+*	è¿” å› å€¼: æµ®ç‚¹å‹
 *********************************************************************************************************
 */
 static float AdcSumAvg(uint8_t _AdcNo, uint8_t _Offset)
 {
-	/* 2019-10-20 Ôö¼ÓÂË²¨Ëã·¨ */
+	/* 2019-10-20 å¢åŠ æ»¤æ³¢ç®—æ³• */
 #if 1
 	float sum;
 	uint16_t i;
@@ -2180,19 +2180,19 @@ static float AdcSumAvg(uint8_t _AdcNo, uint8_t _Offset)
 		}
 	}
 	
-	/* ÅÅĞò */
+	/* æ’åº */
 	SelectionSort(buf, SCAN_MODE_SAMPLE_SIZE);
 	
-	/* ÇóºÍÖ»ÒªÆäÖĞµÄ1/3£¬Á½Í·µÄ¶ªµô */
+	/* æ±‚å’Œåªè¦å…¶ä¸­çš„1/3ï¼Œä¸¤å¤´çš„ä¸¢æ‰ */
 	sum = 0;
 	for (i = 0; i < SCAN_MODE_SAMPLE_SIZE / 3; i++)
 	{
 		sum += buf[i + SCAN_MODE_SAMPLE_SIZE / 3];
 	}	
-	sum = sum / (SCAN_MODE_SAMPLE_SIZE / 3);	/* ¼ÆËãÆ½¾ùÖµ */
+	sum = sum / (SCAN_MODE_SAMPLE_SIZE / 3);	/* è®¡ç®—å¹³å‡å€¼ */
 	
 	return sum;
-#else	/* ³£¹æ´¦Àí */
+#else	/* å¸¸è§„å¤„ç† */
 	float sum;
 	uint16_t i;
 	
@@ -2212,7 +2212,7 @@ static float AdcSumAvg(uint8_t _AdcNo, uint8_t _Offset)
 		}
 	}
 	
-	sum = sum / SCAN_MODE_SAMPLE_SIZE;	/* ¼ÆËãÆ½¾ùÖµ */
+	sum = sum / SCAN_MODE_SAMPLE_SIZE;	/* è®¡ç®—å¹³å‡å€¼ */
 	
 	return sum;
 #endif
@@ -2220,64 +2220,64 @@ static float AdcSumAvg(uint8_t _AdcNo, uint8_t _Offset)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_GetAdcAvg
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Í¨µÀµÄADC¾ùÖµ
-*	ĞÎ    ²Î: Ä£ÄâÍ¨µÀºÅ
-*	·µ »Ø Öµ: ¸¡µãĞÍ
+*	å‡½ æ•° å: bsp_GetAdcAvg
+*	åŠŸèƒ½è¯´æ˜: è¯»å–é€šé“çš„ADCå‡å€¼
+*	å½¢    å‚: æ¨¡æ‹Ÿé€šé“å·
+*	è¿” å› å€¼: æµ®ç‚¹å‹
 *********************************************************************************************************
 */
 float bsp_GetAdcAvg(uint8_t _ch)
 {
 	/*
-		PF11/ADC1_INP2	---- CH1µçÑ¹
-		PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+		PF11/ADC1_INP2	---- CH1ç”µå‹
+		PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 	
-		PC3_C/ADC3_INP1	---- CH2µçÑ¹
-		PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-		PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-		PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-		PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-		PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-		PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+		PC3_C/ADC3_INP1	---- CH2ç”µå‹
+		PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+		PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+		PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+		PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+		PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+		PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 	*/
 	float ff;
 	
-	/* ADC1 É¨Ãè2¸öÍ¨µÀ */
-	if (_ch == AN_CH1)			/* CH1µçÑ¹ */
+	/* ADC1 æ‰«æ2ä¸ªé€šé“ */
+	if (_ch == AN_CH1)			/* CH1ç”µå‹ */
 	{
 		ff = AdcSumAvg(1, 0);
 	}
-	else if (_ch == AN_HIGH_SIDE_CURR)	/* ¸ß¶Ë¸ºÔØµçÁ÷ */
+	else if (_ch == AN_HIGH_SIDE_CURR)	/* é«˜ç«¯è´Ÿè½½ç”µæµ */
 	{
 		ff = AdcSumAvg(1, 1);
 	}	
 	
-	/* ADC3 É¨Ãè7¸öÍ¨µÀ */
-	else if (_ch == AN_CH2)		/* CH2µçÑ¹ */
+	/* ADC3 æ‰«æ7ä¸ªé€šé“ */
+	else if (_ch == AN_CH2)		/* CH2ç”µå‹ */
 	{
 		ff = AdcSumAvg(2, 0);
 	}	
-	else if (_ch == AN_TVCC_CURR)	/* TVCCÊä³öµçÁ÷¼ì²â */
+	else if (_ch == AN_TVCC_CURR)	/* TVCCè¾“å‡ºç”µæµæ£€æµ‹ */
 	{
 		ff = AdcSumAvg(2, 1);
 	}
-	else if (_ch == AN_NTC_RES)		/* NTCÈÈÃôµç×è×èÖµ¼ì²â */
+	else if (_ch == AN_NTC_RES)		/* NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹ */
 	{
 		ff = AdcSumAvg(2, 2);
 	}	
-	else if (_ch == AN_HIGH_SIDE_VOLT)	/* ¸ß¶Ë¸ºÔØµçÑ¹ */
+	else if (_ch == AN_HIGH_SIDE_VOLT)	/* é«˜ç«¯è´Ÿè½½ç”µå‹ */
 	{
 		ff = AdcSumAvg(2, 3);
 	}	
-	else if (_ch == AN_TVCC_VOLT)	/* TVCCµçÑ¹¼ì²â	*/
+	else if (_ch == AN_TVCC_VOLT)	/* TVCCç”µå‹æ£€æµ‹	*/
 	{
 		ff = AdcSumAvg(2, 4);
 	}
-	else if (_ch == AN_12V_VOLT)	/* 12V¹©µçµçÑ¹¼ì²â */
+	else if (_ch == AN_12V_VOLT)	/* 12Vä¾›ç”µç”µå‹æ£€æµ‹ */
 	{
 		ff = AdcSumAvg(2, 5);
 	}
-	else if (_ch == AN_USB_VOLT)	/* USB¹©µçµçÑ¹¼ì²â */
+	else if (_ch == AN_USB_VOLT)	/* USBä¾›ç”µç”µå‹æ£€æµ‹ */
 	{
 		ff = AdcSumAvg(2, 6);
 	}	
@@ -2291,10 +2291,10 @@ float bsp_GetAdcAvg(uint8_t _ch)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_AdcToHighSideCurr
-*	¹¦ÄÜËµÃ÷: ¸ù¾İADC¡¢Ğ£×¼²ÎÊı×ª»»Îª¸ß²àµçÁ÷Öµ£¬
-*	ĞÎ    ²Î: _adc : ADCÖµ
-*	·µ »Ø Öµ: Ğ£×¼ºóµÄµçÁ÷Öµ£¬µ¥Î»mA
+*	å‡½ æ•° å: bsp_AdcToHighSideCurr
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®ADCã€æ ¡å‡†å‚æ•°è½¬æ¢ä¸ºé«˜ä¾§ç”µæµå€¼ï¼Œ
+*	å½¢    å‚: _adc : ADCå€¼
+*	è¿” å› å€¼: æ ¡å‡†åçš„ç”µæµå€¼ï¼Œå•ä½mA
 *********************************************************************************************************
 */
 float bsp_AdcToHighSideCurr(float _adc)
@@ -2324,7 +2324,7 @@ float bsp_AdcToHighSideCurr(float _adc)
 		y2 = g_tCalib.LoadCurr[g_tDSO.CurrGain].y4;			
 	}
 	curr = CaculTwoPointFloat(x1, y1, x2, y2, _adc);	
-	if (curr < (float)0.5)		/* 0.5mAÒÔÏÂÈÏÎª0 */
+	if (curr < (float)0.5)		/* 0.5mAä»¥ä¸‹è®¤ä¸º0 */
 	{
 		curr = 0;
 	}	
@@ -2333,10 +2333,10 @@ float bsp_AdcToHighSideCurr(float _adc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_AdcToHighSideVolt
-*	¹¦ÄÜËµÃ÷: ¸ù¾İADC¡¢Ğ£×¼²ÎÊı×ª»»Îª¸ß²àµçÑ¹Öµ
-*	ĞÎ    ²Î: _adc : ADCÖµ
-*	·µ »Ø Öµ: Ğ£×¼ºóµÄµçÑ¹Öµ£¬µ¥Î»V
+*	å‡½ æ•° å: bsp_AdcToHighSideVolt
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®ADCã€æ ¡å‡†å‚æ•°è½¬æ¢ä¸ºé«˜ä¾§ç”µå‹å€¼
+*	å½¢    å‚: _adc : ADCå€¼
+*	è¿” å› å€¼: æ ¡å‡†åçš„ç”µå‹å€¼ï¼Œå•ä½V
 *********************************************************************************************************
 */
 float bsp_AdcToHighSideVolt(float _adc)
@@ -2347,7 +2347,7 @@ float bsp_AdcToHighSideVolt(float _adc)
 			g_tCalib.LoadVolt.x1, g_tCalib.LoadVolt.y1, 
 			g_tCalib.LoadVolt.x2, g_tCalib.LoadVolt.y2, _adc);	
 	
-	if (volt < (float)0.3)		/* 0.3VÒÔÏÂÈÏÎª0 */
+	if (volt < (float)0.3)		/* 0.3Vä»¥ä¸‹è®¤ä¸º0 */
 	{
 		volt = 0;
 	}	
@@ -2356,10 +2356,10 @@ float bsp_AdcToHighSideVolt(float _adc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_AdcToCH1Volt
-*	¹¦ÄÜËµÃ÷: ¸ù¾İĞ£×¼²ÎÊı½«CH1µÄADCÖµ×ª»»ÎªµçÑ¹Öµ
-*	ĞÎ    ²Î: _adc : ADCÖµ
-*	·µ »Ø Öµ: Ğ£×¼ºóµÄµçÑ¹Öµ£¬µ¥Î»V
+*	å‡½ æ•° å: bsp_AdcToCH1Volt
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®æ ¡å‡†å‚æ•°å°†CH1çš„ADCå€¼è½¬æ¢ä¸ºç”µå‹å€¼
+*	å½¢    å‚: _adc : ADCå€¼
+*	è¿” å› å€¼: æ ¡å‡†åçš„ç”µå‹å€¼ï¼Œå•ä½V
 *********************************************************************************************************
 */
 float bsp_AdcToCH1Volt(float _adc)
@@ -2370,7 +2370,7 @@ float bsp_AdcToCH1Volt(float _adc)
 			g_tCalib.CH1[g_tDSO.Gain1].x1, g_tCalib.CH1[g_tDSO.Gain1].y1, 
 			g_tCalib.CH1[g_tDSO.Gain1].x2, g_tCalib.CH1[g_tDSO.Gain1].y2, 
 			_adc);
-//	if (volt > (float)-0.020 && volt < (float)0.020)	/* 0Öµ.Õı¸º20mVÒÔÄÚ×Ô¶¯¹éÁã */
+//	if (volt > (float)-0.020 && volt < (float)0.020)	/* 0å€¼.æ­£è´Ÿ20mVä»¥å†…è‡ªåŠ¨å½’é›¶ */
 //	{
 //		volt = 0;
 //	}		
@@ -2379,10 +2379,10 @@ float bsp_AdcToCH1Volt(float _adc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_AdcToCH2Volt
-*	¹¦ÄÜËµÃ÷: ¸ù¾İĞ£×¼²ÎÊı½«CH2µÄADCÖµ×ª»»ÎªµçÑ¹Öµ
-*	ĞÎ    ²Î: _adc : ADCÖµ
-*	·µ »Ø Öµ: Ğ£×¼ºóµÄµçÑ¹Öµ£¬µ¥Î»V
+*	å‡½ æ•° å: bsp_AdcToCH2Volt
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®æ ¡å‡†å‚æ•°å°†CH2çš„ADCå€¼è½¬æ¢ä¸ºç”µå‹å€¼
+*	å½¢    å‚: _adc : ADCå€¼
+*	è¿” å› å€¼: æ ¡å‡†åçš„ç”µå‹å€¼ï¼Œå•ä½V
 *********************************************************************************************************
 */
 float bsp_AdcToCH2Volt(float _adc)
@@ -2393,7 +2393,7 @@ float bsp_AdcToCH2Volt(float _adc)
 			g_tCalib.CH2[g_tDSO.Gain2].x1, g_tCalib.CH2[g_tDSO.Gain2].y1, 
 			g_tCalib.CH2[g_tDSO.Gain2].x2, g_tCalib.CH2[g_tDSO.Gain2].y2, 
 			_adc);
-//	if (volt > (float)-0.020 && volt < (float)0.020)	/* 0Öµ.Õı¸º20mVÒÔÄÚ×Ô¶¯¹éÁã */
+//	if (volt > (float)-0.020 && volt < (float)0.020)	/* 0å€¼.æ­£è´Ÿ20mVä»¥å†…è‡ªåŠ¨å½’é›¶ */
 //	{
 //		volt = 0;
 //	}		
@@ -2402,10 +2402,10 @@ float bsp_AdcToCH2Volt(float _adc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_AdcTask
-*	¹¦ÄÜËµÃ÷: É¨ÃèADCÈÎÎñ.  ²åÈë10msÖĞ¶ÏÖ´ĞĞ. Ã¿´Î¸üĞÂ1¸öÍ¨µÀ. 90msË¢ĞÂÒ»´ÎÈ«¾Ö±äÁ¿
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_AdcTask
+*	åŠŸèƒ½è¯´æ˜: æ‰«æADCä»»åŠ¡.  æ’å…¥10msä¸­æ–­æ‰§è¡Œ. æ¯æ¬¡æ›´æ–°1ä¸ªé€šé“. 90msåˆ·æ–°ä¸€æ¬¡å…¨å±€å˜é‡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_AdcTask10ms(void)
@@ -2426,22 +2426,22 @@ void bsp_AdcTask10ms(void)
 		return;
 	}
 	
-	if (s_idx == 0)		/* CH1 µçÑ¹ */
+	if (s_idx == 0)		/* CH1 ç”µå‹ */
 	{
 		g_tVar.ADC_CH1Volt = bsp_GetAdcAvg(AN_CH1);
 		g_tVar.CH1Volt = bsp_AdcToCH1Volt(g_tVar.ADC_CH1Volt);
 	}
-	else if (s_idx == 1)	/* CH2 µçÑ¹ */
+	else if (s_idx == 1)	/* CH2 ç”µå‹ */
 	{
 		g_tVar.ADC_CH2Volt = bsp_GetAdcAvg(AN_CH2);
 		g_tVar.CH2Volt = bsp_AdcToCH2Volt(g_tVar.ADC_CH2Volt);		
 	}	
-	else if (s_idx == 2)	/* ¸ß²àµçÑ¹ */
+	else if (s_idx == 2)	/* é«˜ä¾§ç”µå‹ */
 	{
 		g_tVar.ADC_HighSideVolt = bsp_GetAdcAvg(AN_HIGH_SIDE_VOLT);
 		g_tVar.HighSideVolt = bsp_AdcToHighSideVolt(g_tVar.ADC_HighSideVolt);
 	}
-	else if (s_idx == 3)	/* ¸ß²àµçÁ÷ */
+	else if (s_idx == 3)	/* é«˜ä¾§ç”µæµ */
 	{
 		g_tVar.ADC_HighSideCurr = bsp_GetAdcAvg(AN_HIGH_SIDE_CURR);;		
 		g_tVar.HighSideCurr = bsp_AdcToHighSideCurr(g_tVar.ADC_HighSideCurr);
@@ -2470,7 +2470,7 @@ void bsp_AdcTask10ms(void)
 			g_tCalib.TVCCVolt.x2, g_tCalib.TVCCVolt.y2, 
 			g_tVar.ADC_TVCCVolt);		
 	}	
-	else if (s_idx == 7)	/* TVCC µçÁ÷ */
+	else if (s_idx == 7)	/* TVCC ç”µæµ */
 	{
 		float adc;
 		float x1,y1,x2,y2;
@@ -2500,7 +2500,7 @@ void bsp_AdcTask10ms(void)
 			y2 = g_tCalib.TVCCCurr.y4;			
 		}
 		g_tVar.TVCCCurr = CaculTwoPointFloat(x1, y1, x2, y2, adc);	
-		if (g_tVar.TVCCCurr < (float)0.05)	/* 0.05mAÒÔÏÂÈÏÎª0 */
+		if (g_tVar.TVCCCurr < (float)0.05)	/* 0.05mAä»¥ä¸‹è®¤ä¸º0 */
 		{
 			g_tVar.TVCCCurr = 0;
 		}		
@@ -2508,8 +2508,8 @@ void bsp_AdcTask10ms(void)
 	else if (s_idx == 8)
 	{
 		g_tVar.ADC_NTCRes = bsp_GetAdcAvg(AN_NTC_RES);		
-		g_tVar.NTCRes = CalculNtcRes(g_tVar.ADC_NTCRes);	/* ¸ù¾İADC¼ÆËãµç×è */		
-		g_tVar.NTCTemp = CalculNtcTemperFloat(g_tVar.NTCRes);	/* ¸ù¾İµç×è²é±íµÃµ½ÎÂ¶È */
+		g_tVar.NTCRes = CalculNtcRes(g_tVar.ADC_NTCRes);	/* æ ¹æ®ADCè®¡ç®—ç”µé˜» */		
+		g_tVar.NTCTemp = CalculNtcTemperFloat(g_tVar.NTCRes);	/* æ ¹æ®ç”µé˜»æŸ¥è¡¨å¾—åˆ°æ¸©åº¦ */
 	}	
 	
 	if (++s_idx > 8)
@@ -2518,4 +2518,4 @@ void bsp_AdcTask10ms(void)
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

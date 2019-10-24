@@ -1,22 +1,22 @@
 /*
 *********************************************************************************************************
 *
-	Ä£¿éÃû³Æ : µç×èÊ½´¥ÃşĞ¾Æ¬STMPE811Çı¶¯Ä£¿é
-	ÎÄ¼şÃû³Æ : TOUCH_STMPE811.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : STMPE811 Çı¶¯³ÌĞò¡£I2C½Ó¿Ú. H7-TOOL ÓÃ¸ÃĞ¾Æ¬×öÆÕÍ¨Êä³öIOÊ¹ÓÃ¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß    ËµÃ÷
-*		V1.0    2014-06-08  armfly  Ê×·¢¡£°²¸»À³µç×ÓÔ­´´¡£
-*		V1.1	2019-04-26	armfly	Ôö¼ÓGPIOÊä³ö¿ØÖÆº¯Êı
+	æ¨¡å—åç§° : ç”µé˜»å¼è§¦æ‘¸èŠ¯ç‰‡STMPE811é©±åŠ¨æ¨¡å—
+	æ–‡ä»¶åç§° : TOUCH_STMPE811.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : STMPE811 é©±åŠ¨ç¨‹åºã€‚I2Cæ¥å£. H7-TOOL ç”¨è¯¥èŠ¯ç‰‡åšæ™®é€šè¾“å‡ºIOä½¿ç”¨ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…    è¯´æ˜
+*		V1.0    2014-06-08  armfly  é¦–å‘ã€‚å®‰å¯Œè±ç”µå­åŸåˆ›ã€‚
+*		V1.1	2019-04-26	armfly	å¢åŠ GPIOè¾“å‡ºæ§åˆ¶å‡½æ•°
 *
-*	Copyright (C), 2014-2015, Îäºº°²¸»À³µç×ÓÓĞÏŞ¹«Ë¾ www.armfly.com
+*	Copyright (C), 2014-2015, æ­¦æ±‰å®‰å¯Œè±ç”µå­æœ‰é™å…¬å¸ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 /*
-	Ó¦ÓÃËµÃ÷£º·ÃÎÊSTMPE811Ç°£¬ÇëÏÈµ÷ÓÃÒ»´Î bsp_InitI2C()º¯ÊıÅäÖÃºÃI2CÏà¹ØµÄGPIO.
+	åº”ç”¨è¯´æ˜ï¼šè®¿é—®STMPE811å‰ï¼Œè¯·å…ˆè°ƒç”¨ä¸€æ¬¡ bsp_InitI2C()å‡½æ•°é…ç½®å¥½I2Cç›¸å…³çš„GPIO.
 */
 
 #include "bsp.h"
@@ -29,31 +29,30 @@ static uint16_t s_AdcX, s_AdcY;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_InitHardForGPIO
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSTMPE811¼Ä´æÆ÷, 8¸öIOÈ«²¿×÷ÎªÊä³ö¿Ú
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: STMPE811_InitHardForGPIO
+*	åŠŸèƒ½è¯´æ˜: é…ç½®STMPE811å¯„å­˜å™¨, 8ä¸ªIOå…¨éƒ¨ä½œä¸ºè¾“å‡ºå£
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void STMPE811_InitHardForGPIO(void)
-{	
+{
 	STMPE811_Reset();
-	
-	
-	#if 1
+
+#if 1
 	{
 		static uint16_t id;
-		
+
 		id = STMPE811_ReadID();
-		
+
 		//printf("id = \r\n", id);
 	}
-	#endif
-	
-	/* STMPE811.pdf µÚ 45Ò³, ÍÆ¼öµÄ±à³Ì²½Öè: 
+#endif
+
+	/* STMPE811.pdf ç¬¬ 45é¡µ, æ¨èçš„ç¼–ç¨‹æ­¥éª¤: 
 	The following are the steps to configure the touch screen controller (TSC):
 	a)  Disable the clock gating for the touch screen controller and ADC in the SYS_CFG2 register.		
-	¡¾SYS_CFG2¡¿
+	ã€SYS_CFG2ã€‘
 		[7:4] RESERVED
 		[3] TS_OFF: Switch off the clock supply to the temperature sensor
 			1: Switches off the clock supply to the temperature sensor
@@ -64,15 +63,14 @@ void STMPE811_InitHardForGPIO(void)
 		[0] ADC_OFF: Switch off the clock supply to the ADC
 			1: Switches off the clock supply to the ADC	
 	*/
-	STMPE811_WriteReg1(REG811_SYS_CTRL2, 0x00);		/* ×¢Òâ1ÊÇ±íÊ¾¹Ø±ÕÊ±ÖÓ£¬ ´Ë´¦ÊÇ´ò¿ªËùÓĞµÄÊ±ÖÓ */
-	
+	STMPE811_WriteReg1(REG811_SYS_CTRL2, 0x00); /* æ³¨æ„1æ˜¯è¡¨ç¤ºå…³é—­æ—¶é’Ÿï¼Œ æ­¤å¤„æ˜¯æ‰“å¼€æ‰€æœ‰çš„æ—¶é’Ÿ */
 
 	/* Select Sample Time, bit number and ADC Reference */
-	
-	/* Ñ¡Ôñ²ÉÑùÊ±¼ä£¬ADC·Ö±æÂÊ£¬ADC²Î¿¼µçÔ´
-	¡¾ADC_CTRL1¡¿
+
+	/* é€‰æ‹©é‡‡æ ·æ—¶é—´ï¼ŒADCåˆ†è¾¨ç‡ï¼ŒADCå‚è€ƒç”µæº
+	ã€ADC_CTRL1ã€‘
 		[7] RESERVED
-		[6:4] SAMPLE_TIMEn: ADC conversion time in number of clock   --- ADC×ª»»Ê±¼ä£¨¶àÉÙ¸öÊ±ÖÓ£©
+		[6:4] SAMPLE_TIMEn: ADC conversion time in number of clock   --- ADCè½¬æ¢æ—¶é—´ï¼ˆå¤šå°‘ä¸ªæ—¶é’Ÿï¼‰
 			000: 36
 			001: 44
 			010: 56
@@ -82,21 +80,21 @@ void STMPE811_InitHardForGPIO(void)
 			110: 124
 			111: Not valid
 		[3] MOD_12B: Selects 10 or 12-bit ADC operation
-			1: 12 bit ADC              ¡¾Ñ¡Ôñ12Î»¡¿
+			1: 12 bit ADC              ã€é€‰æ‹©12ä½ã€‘
 			0: 10 bit ADC
 		[2] RESERVED
 		[1] REF_SEL: Selects between internal or external reference for the ADC
 			1: External reference
-			0: Internal reference      ¡¾Ñ¡ÔñÄÚ²¿²Î¿¼¡¿
+			0: Internal reference      ã€é€‰æ‹©å†…éƒ¨å‚è€ƒã€‘
 		[0] RESERVED
 	*/
 	STMPE811_WriteReg1(REG811_ADC_CTRL1, (4 << 4) | (1 << 3) | (0 << 1));
-	
-	/* µÈ´ı20ms */
-	bsp_DelayMS(20);  
-	
-	/* Ñ¡ÔñADCÊ±ÖÓËÙ¶È : 3.25 MHz 
-	¡¾ADC_CTRL2¡¿
+
+	/* ç­‰å¾…20ms */
+	bsp_DelayMS(20);
+
+	/* é€‰æ‹©ADCæ—¶é’Ÿé€Ÿåº¦ : 3.25 MHz 
+	ã€ADC_CTRL2ã€‘
 		[7] RESERVED
 		[6] RESERVED
 		[5] RESERVED
@@ -110,56 +108,56 @@ void STMPE811_InitHardForGPIO(void)
 			11: 6.5 MHz typ.	
 	*/
 	STMPE811_WriteReg1(REG811_ADC_CTRL2, 0x01);
-		
-	/* ÅäÖÃ8¸ö¹Ü½ÅµÄ¹¤×÷Ä£Ê½¡£ 1±íÊ¾GPIOÄ£Ê½£¬0±íÊ¾Îª´¥ÃşÆÁ¿ØÖÆÆ÷/ADC			
-	¡¾GPIO_ALT_FUNCT¡¿
+
+	/* é…ç½®8ä¸ªç®¡è„šçš„å·¥ä½œæ¨¡å¼ã€‚ 1è¡¨ç¤ºGPIOæ¨¡å¼ï¼Œ0è¡¨ç¤ºä¸ºè§¦æ‘¸å±æ§åˆ¶å™¨/ADC			
+	ã€GPIO_ALT_FUNCTã€‘
 		Reset: 0x0F
-		Description: Alternate function register. "¡®0¡¯ sets the corresponding pin to function as touch 
-			screen/ADC, and ¡®1¡¯ sets it into GPIO mode.	
-	*/  
-	STMPE811_WriteReg1(REG811_GPIO_AF, 0xFF);	/* È«²¿ÓÃÓÚGPIO */
-	
+		Description: Alternate function register. "â€˜0â€™ sets the corresponding pin to function as touch 
+			screen/ADC, and â€˜1â€™ sets it into GPIO mode.	
+	*/
+	STMPE811_WriteReg1(REG811_GPIO_AF, 0xFF); /* å…¨éƒ¨ç”¨äºGPIO */
+
 	/* Select 2 nF filter capacitor 
-	¡¾TSC_CFG¡¿
+	ã€TSC_CFGã€‘
 		Description: Touch screen controller configuration register.
-		[7:6] [AVE_CTRL_1/0: Average control   ---- Ñù±¾Æ½¾ùµÄ¸öÊı£¬ Ñ¡Ôñ4¸öÑù±¾Æ½¾ù
+		[7:6] [AVE_CTRL_1/0: Average control   ---- æ ·æœ¬å¹³å‡çš„ä¸ªæ•°ï¼Œ é€‰æ‹©4ä¸ªæ ·æœ¬å¹³å‡
 			00=1 sample
 			01=2 samples
 			10=4 samples 
 			11=8 samples
-		[5:3] TOUCH_DET_DELAY_2/1/0: Touch detect delay  ---- ´¥Ãş¼ì²âÑÓ³Ù£¬ Ñ¡Ôñ 500us
-			000 - 10 ¦Ìs
-			001 - 50 ¦Ìs
-			010 = 100¦Ìs
-			011 = 500¦Ìs
+		[5:3] TOUCH_DET_DELAY_2/1/0: Touch detect delay  ---- è§¦æ‘¸æ£€æµ‹å»¶è¿Ÿï¼Œ é€‰æ‹© 500us
+			000 - 10 Î¼s
+			001 - 50 Î¼s
+			010 = 100Î¼s
+			011 = 500Î¼s
 			100 = 1ms
 			101 = 5ms
 			110 = 10 ms
 			111 = 50 ms
-		[2:0] SETTLING: Panel driver settling time     ----- ´¥Ãş°åÇı¶¯½¨Á¢Ê±¼ä£¬  Ñ¡Ôñ 5ms
-			000 = 10¦Ìs
-			001 = 100¦Ìs
-			010 = 500¦ÌS
+		[2:0] SETTLING: Panel driver settling time     ----- è§¦æ‘¸æ¿é©±åŠ¨å»ºç«‹æ—¶é—´ï¼Œ  é€‰æ‹© 5ms
+			000 = 10Î¼s
+			001 = 100Î¼s
+			010 = 500Î¼S
 			011 = 1ms
 			100 = 5ms
 			101 = 10 ms
 			110 = 50 ms
 			111=100ms
 			
-		1. For large panels (> 6¡±), a capacitor of 10 nF is recommended at the touch screen terminals for noise filtering. 
+		1. For large panels (> 6â€), a capacitor of 10 nF is recommended at the touch screen terminals for noise filtering. 
 		In this case, settling time of 1 ms or more is recommended.	
 	*/
-	STMPE811_WriteReg1(REG811_TSC_CFG, (2 << 6) | (3 << 3) | (4 << 0));   
-	
-	/* ÉèÖÃ´¥·¢ÖĞ¶ÏµÄÑù±¾¸öÊı¡£ ´Ë´¦ÉèÖÃÎª1£¬¼´Ö»ÒªÓĞ´¥Ãş¾Í´¥·¢ÖĞ¶Ï
-	¡¾FIFO_TH¡¿
+	STMPE811_WriteReg1(REG811_TSC_CFG, (2 << 6) | (3 << 3) | (4 << 0));
+
+	/* è®¾ç½®è§¦å‘ä¸­æ–­çš„æ ·æœ¬ä¸ªæ•°ã€‚ æ­¤å¤„è®¾ç½®ä¸º1ï¼Œå³åªè¦æœ‰è§¦æ‘¸å°±è§¦å‘ä¸­æ–­
+	ã€FIFO_THã€‘
 	Description: Triggers an interrupt upon reaching or exceeding the threshold value. This field must not be set as zero.
 		[7:0] FIFO_TH: touch screen controller FIFO threshold	
 	*/
-	STMPE811_WriteReg1(REG811_FIFO_TH, 0x00);		/* ²»ÒªÖĞ¶Ï */
-	
+	STMPE811_WriteReg1(REG811_FIFO_TH, 0x00); /* ä¸è¦ä¸­æ–­ */
+
 	/* Write 0x01 to clear the FIFO memory content. 
-	¡¾FIFO_STA¡¿
+	ã€FIFO_STAã€‘
 		Description: Current status of FIFO..
 		[7] FIFO_OFLOW: 
 			Reads 1 if FIFO is overflow
@@ -174,13 +172,13 @@ void STMPE811_InitHardForGPIO(void)
 		[0] FIFO_RESET:
 			Write '0' : FIFO put out of reset mode
 			Write '1' : Resets FIFO. All data in FIFO will be cleared.
-			When TSC is enabled, FIFOresets automatically.	---- µ± TSCÊ¹ÄÜÊ±£¬FIFOÊÇ×Ô¶¯Çå¿ÕµÄ	
+			When TSC is enabled, FIFOresets automatically.	---- å½“ TSCä½¿èƒ½æ—¶ï¼ŒFIFOæ˜¯è‡ªåŠ¨æ¸…ç©ºçš„	
 	*/
-	STMPE811_WriteReg1(REG811_FIFO_STA, 0x01);	/* ¸´Î»FIFO */
-	STMPE811_WriteReg1(REG811_FIFO_STA, 0x00);	/* ÍË³öFIFO¸´Î»×´Ì¬ */
-	
+	STMPE811_WriteReg1(REG811_FIFO_STA, 0x01); /* å¤ä½FIFO */
+	STMPE811_WriteReg1(REG811_FIFO_STA, 0x00); /* é€€å‡ºFIFOå¤ä½çŠ¶æ€ */
+
 	/* set the data format for Z value: 7 fractional part and 1 whole part 
-	¡¾TSC_FRACTION_Z¡¿
+	ã€TSC_FRACTION_Zã€‘
 		Reset: 0x00
 		Description: This register allows to select the range and accuracy of the pressure measurement
 		[7:3] RESERVED
@@ -195,28 +193,28 @@ void STMPE811_InitHardForGPIO(void)
 			111: Fractional part is 7, whole part is 1	
 	*/
 	STMPE811_WriteReg1(REG811_TSC_FRACT_XYZ, 0x01);
-	
+
 	/* set the driving capability of the device for TSC pins: 50mA 
-	¡¾TSC_I_DRIVE¡¿
+	ã€TSC_I_DRIVEã€‘
 		Description: This register sets the current limit value of the touch screen drivers
 		[7:1] RESERVED
 		[0] DRIVE: maximum current on the touch screen controller (TSC) driving channel
 			0: 20 mA typical, 35 mA max
 			1: 50 mA typical, 80 mA max	
 	*/
-	STMPE811_WriteReg1(REG811_TSC_I_DRIVE, 0x01);		/* Ñ¡Ôñ50msÇı¶¯µçÁ÷ */
-	
+	STMPE811_WriteReg1(REG811_TSC_I_DRIVE, 0x01); /* é€‰æ‹©50msé©±åŠ¨ç”µæµ */
+
 	/* Use no tracking index, touch-panel controller operation mode (XYZ) and 
 	 enable the TSC
-	¡¾TSC_CTRL¡¿
+	ã€TSC_CTRLã€‘
 		Description: 4-wire touch screen controller (TSC) setup.
 		[7] TSC_STA: TSC status
 			Reads '1' when touch is detected
 			Reads '0' when touch is not detected
 			Writing to this register has no effect
 		[6:4] TRACK: Tracking index  
-		  --- ÔË¶¯×·×Ù¡£Èç¹ûµ±Ç°×ø±êµãºÍÉÏ¸ö×ø±êµãµÄÎ»ÒÆ³¬¹ıÉè¶¨Öµ²Å»áÉÏ±¨
-		  ¹«Ê½: (Current X - Previously Reported X) + (Current Y - Previously Reported Y) > Tracking Index
+		  --- è¿åŠ¨è¿½è¸ªã€‚å¦‚æœå½“å‰åæ ‡ç‚¹å’Œä¸Šä¸ªåæ ‡ç‚¹çš„ä½ç§»è¶…è¿‡è®¾å®šå€¼æ‰ä¼šä¸ŠæŠ¥
+		  å…¬å¼: (Current X - Previously Reported X) + (Current Y - Previously Reported Y) > Tracking Index
 			000: No window tracking
 			001: 4
 			010: 8
@@ -227,17 +225,17 @@ void STMPE811_InitHardForGPIO(void)
 			111: 127
 		[3:1] OP_MOD: TSC operating mode
 			000: X, Y, Z acquisition
-			001: X, Y only			----- Ñ¡Ôñ X Y Êı¾İÄ£Ê½£¬²»ĞèÒªZÖáÑ¹Á¦
+			001: X, Y only			----- é€‰æ‹© X Y æ•°æ®æ¨¡å¼ï¼Œä¸éœ€è¦Zè½´å‹åŠ›
 			010: X only
 			011: Y only
 			100: Z only
 			This field cannot be written on, when EN = 1
 		[0] EN: Enable TSC			 
 	*/
-	STMPE811_WriteReg1(REG811_TSC_CTRL, (0 << 4) | (0 << 1) | (0 << 0));		/* ½ûÖ¹TSC */
-	
+	STMPE811_WriteReg1(REG811_TSC_CTRL, (0 << 4) | (0 << 1) | (0 << 0)); /* ç¦æ­¢TSC */
+
 	/*  Clear all the status pending bits 
-	¡¾INT_STA¡¿
+	ã€INT_STAã€‘
 		Type: R
 		Reset: 0x10
 		Description: The interrupt status register monitors the status of the interruption from a particular 
@@ -256,38 +254,37 @@ void STMPE811_InitHardForGPIO(void)
 			level drops to < threshold value, and increased back to threshold value.
 		[0] TOUCH_DET: Touch is detected	
 	*/
-	STMPE811_WriteReg1(REG811_INT_STA, 0xFF); 
-	
-	STMPE811_WriteReg1(REG811_INT_EN, 0x01); 
-	
-	STMPE811_WriteReg1(REG811_INT_CTRL, 0x01); 
-	
-	
-	/*  ÉèÖÃGPIO·½Ïò
-	¡¾GPIO_DIR¡¿
+	STMPE811_WriteReg1(REG811_INT_STA, 0xFF);
+
+	STMPE811_WriteReg1(REG811_INT_EN, 0x01);
+
+	STMPE811_WriteReg1(REG811_INT_CTRL, 0x01);
+
+	/*  è®¾ç½®GPIOæ–¹å‘
+	ã€GPIO_DIRã€‘
 	Description: GPIO set pin direction register. 
-		Writing ¡®0¡¯ sets the corresponding GPIO to input state, and ¡®1¡¯ sets it to output state. 
-		All bits are ¡®0¡¯ on reset.
+		Writing â€˜0â€™ sets the corresponding GPIO to input state, and â€˜1â€™ sets it to output state. 
+		All bits are â€˜0â€™ on reset.
 	*/
-	STMPE811_WriteReg1(REG811_GPIO_DIR, 0xFC);		/* bit7:2ÊÇÊä³ö£¬ bit1:0ÊÇÊäÈë */
+	STMPE811_WriteReg1(REG811_GPIO_DIR, 0xFC); /* bit7:2æ˜¯è¾“å‡ºï¼Œ bit1:0æ˜¯è¾“å…¥ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_InitHard
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSTMPE811¼Ä´æÆ÷
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: STMPE811_InitHard
+*	åŠŸèƒ½è¯´æ˜: é…ç½®STMPE811å¯„å­˜å™¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void STMPE811_InitHard(void)
-{	
+{
 	STMPE811_Reset();
-	
-	/* STMPE811.pdf µÚ 45Ò³, ÍÆ¼öµÄ±à³Ì²½Öè: 
+
+	/* STMPE811.pdf ç¬¬ 45é¡µ, æ¨èçš„ç¼–ç¨‹æ­¥éª¤: 
 	The following are the steps to configure the touch screen controller (TSC):
 	a)  Disable the clock gating for the touch screen controller and ADC in the SYS_CFG2 register.		
-	¡¾SYS_CFG2¡¿
+	ã€SYS_CFG2ã€‘
 		[7:4] RESERVED
 		[3] TS_OFF: Switch off the clock supply to the temperature sensor
 			1: Switches off the clock supply to the temperature sensor
@@ -298,15 +295,14 @@ void STMPE811_InitHard(void)
 		[0] ADC_OFF: Switch off the clock supply to the ADC
 			1: Switches off the clock supply to the ADC	
 	*/
-	STMPE811_WriteReg1(REG811_SYS_CTRL2, 0x00);		/* ×¢Òâ1ÊÇ±íÊ¾¹Ø±ÕÊ±ÖÓ£¬ ´Ë´¦ÊÇ´ò¿ªËùÓĞµÄÊ±ÖÓ */
-	
+	STMPE811_WriteReg1(REG811_SYS_CTRL2, 0x00); /* æ³¨æ„1æ˜¯è¡¨ç¤ºå…³é—­æ—¶é’Ÿï¼Œ æ­¤å¤„æ˜¯æ‰“å¼€æ‰€æœ‰çš„æ—¶é’Ÿ */
 
 	/* Select Sample Time, bit number and ADC Reference */
-	
-	/* Ñ¡Ôñ²ÉÑùÊ±¼ä£¬ADC·Ö±æÂÊ£¬ADC²Î¿¼µçÔ´
-	¡¾ADC_CTRL1¡¿
+
+	/* é€‰æ‹©é‡‡æ ·æ—¶é—´ï¼ŒADCåˆ†è¾¨ç‡ï¼ŒADCå‚è€ƒç”µæº
+	ã€ADC_CTRL1ã€‘
 		[7] RESERVED
-		[6:4] SAMPLE_TIMEn: ADC conversion time in number of clock   --- ADC×ª»»Ê±¼ä£¨¶àÉÙ¸öÊ±ÖÓ£©
+		[6:4] SAMPLE_TIMEn: ADC conversion time in number of clock   --- ADCè½¬æ¢æ—¶é—´ï¼ˆå¤šå°‘ä¸ªæ—¶é’Ÿï¼‰
 			000: 36
 			001: 44
 			010: 56
@@ -316,21 +312,21 @@ void STMPE811_InitHard(void)
 			110: 124
 			111: Not valid
 		[3] MOD_12B: Selects 10 or 12-bit ADC operation
-			1: 12 bit ADC              ¡¾Ñ¡Ôñ12Î»¡¿
+			1: 12 bit ADC              ã€é€‰æ‹©12ä½ã€‘
 			0: 10 bit ADC
 		[2] RESERVED
 		[1] REF_SEL: Selects between internal or external reference for the ADC
 			1: External reference
-			0: Internal reference      ¡¾Ñ¡ÔñÄÚ²¿²Î¿¼¡¿
+			0: Internal reference      ã€é€‰æ‹©å†…éƒ¨å‚è€ƒã€‘
 		[0] RESERVED
 	*/
 	STMPE811_WriteReg1(REG811_ADC_CTRL1, (4 << 4) | (1 << 3) | (0 << 1));
-	
-	/* µÈ´ı20ms */
-	bsp_DelayMS(20);  
-	
-	/* Ñ¡ÔñADCÊ±ÖÓËÙ¶È : 3.25 MHz 
-	¡¾ADC_CTRL2¡¿
+
+	/* ç­‰å¾…20ms */
+	bsp_DelayMS(20);
+
+	/* é€‰æ‹©ADCæ—¶é’Ÿé€Ÿåº¦ : 3.25 MHz 
+	ã€ADC_CTRL2ã€‘
 		[7] RESERVED
 		[6] RESERVED
 		[5] RESERVED
@@ -344,56 +340,56 @@ void STMPE811_InitHard(void)
 			11: 6.5 MHz typ.	
 	*/
 	STMPE811_WriteReg1(REG811_ADC_CTRL2, 0x01);
-		
-	/* ÅäÖÃ8¸ö¹Ü½ÅµÄ¹¤×÷Ä£Ê½¡£ 1±íÊ¾GPIOÄ£Ê½£¬0±íÊ¾Îª´¥ÃşÆÁ¿ØÖÆÆ÷/ADC			
-	¡¾GPIO_ALT_FUNCT¡¿
+
+	/* é…ç½®8ä¸ªç®¡è„šçš„å·¥ä½œæ¨¡å¼ã€‚ 1è¡¨ç¤ºGPIOæ¨¡å¼ï¼Œ0è¡¨ç¤ºä¸ºè§¦æ‘¸å±æ§åˆ¶å™¨/ADC			
+	ã€GPIO_ALT_FUNCTã€‘
 		Reset: 0x0F
-		Description: Alternate function register. "¡®0¡¯ sets the corresponding pin to function as touch 
-			screen/ADC, and ¡®1¡¯ sets it into GPIO mode.	
-	*/  
-	STMPE811_WriteReg1(REG811_GPIO_AF, 0x0F);	/* ¸ß4Î»ÓÃÓÚTSC, µÍ4Î»ÓÃÓÚGPIO */
-	
+		Description: Alternate function register. "â€˜0â€™ sets the corresponding pin to function as touch 
+			screen/ADC, and â€˜1â€™ sets it into GPIO mode.	
+	*/
+	STMPE811_WriteReg1(REG811_GPIO_AF, 0x0F); /* é«˜4ä½ç”¨äºTSC, ä½4ä½ç”¨äºGPIO */
+
 	/* Select 2 nF filter capacitor 
-	¡¾TSC_CFG¡¿
+	ã€TSC_CFGã€‘
 		Description: Touch screen controller configuration register.
-		[7:6] [AVE_CTRL_1/0: Average control   ---- Ñù±¾Æ½¾ùµÄ¸öÊı£¬ Ñ¡Ôñ4¸öÑù±¾Æ½¾ù
+		[7:6] [AVE_CTRL_1/0: Average control   ---- æ ·æœ¬å¹³å‡çš„ä¸ªæ•°ï¼Œ é€‰æ‹©4ä¸ªæ ·æœ¬å¹³å‡
 			00=1 sample
 			01=2 samples
 			10=4 samples 
 			11=8 samples
-		[5:3] TOUCH_DET_DELAY_2/1/0: Touch detect delay  ---- ´¥Ãş¼ì²âÑÓ³Ù£¬ Ñ¡Ôñ 500us
-			000 - 10 ¦Ìs
-			001 - 50 ¦Ìs
-			010 = 100¦Ìs
-			011 = 500¦Ìs
+		[5:3] TOUCH_DET_DELAY_2/1/0: Touch detect delay  ---- è§¦æ‘¸æ£€æµ‹å»¶è¿Ÿï¼Œ é€‰æ‹© 500us
+			000 - 10 Î¼s
+			001 - 50 Î¼s
+			010 = 100Î¼s
+			011 = 500Î¼s
 			100 = 1ms
 			101 = 5ms
 			110 = 10 ms
 			111 = 50 ms
-		[2:0] SETTLING: Panel driver settling time     ----- ´¥Ãş°åÇı¶¯½¨Á¢Ê±¼ä£¬  Ñ¡Ôñ 5ms
-			000 = 10¦Ìs
-			001 = 100¦Ìs
-			010 = 500¦ÌS
+		[2:0] SETTLING: Panel driver settling time     ----- è§¦æ‘¸æ¿é©±åŠ¨å»ºç«‹æ—¶é—´ï¼Œ  é€‰æ‹© 5ms
+			000 = 10Î¼s
+			001 = 100Î¼s
+			010 = 500Î¼S
 			011 = 1ms
 			100 = 5ms
 			101 = 10 ms
 			110 = 50 ms
 			111=100ms
 			
-		1. For large panels (> 6¡±), a capacitor of 10 nF is recommended at the touch screen terminals for noise filtering. 
+		1. For large panels (> 6â€), a capacitor of 10 nF is recommended at the touch screen terminals for noise filtering. 
 		In this case, settling time of 1 ms or more is recommended.	
 	*/
-	STMPE811_WriteReg1(REG811_TSC_CFG, (2 << 6) | (3 << 3) | (4 << 0));   
-	
-	/* ÉèÖÃ´¥·¢ÖĞ¶ÏµÄÑù±¾¸öÊı¡£ ´Ë´¦ÉèÖÃÎª1£¬¼´Ö»ÒªÓĞ´¥Ãş¾Í´¥·¢ÖĞ¶Ï
-	¡¾FIFO_TH¡¿
+	STMPE811_WriteReg1(REG811_TSC_CFG, (2 << 6) | (3 << 3) | (4 << 0));
+
+	/* è®¾ç½®è§¦å‘ä¸­æ–­çš„æ ·æœ¬ä¸ªæ•°ã€‚ æ­¤å¤„è®¾ç½®ä¸º1ï¼Œå³åªè¦æœ‰è§¦æ‘¸å°±è§¦å‘ä¸­æ–­
+	ã€FIFO_THã€‘
 	Description: Triggers an interrupt upon reaching or exceeding the threshold value. This field must not be set as zero.
 		[7:0] FIFO_TH: touch screen controller FIFO threshold	
 	*/
 	STMPE811_WriteReg1(REG811_FIFO_TH, 0x01);
-	
+
 	/* Write 0x01 to clear the FIFO memory content. 
-	¡¾FIFO_STA¡¿
+	ã€FIFO_STAã€‘
 		Description: Current status of FIFO..
 		[7] FIFO_OFLOW: 
 			Reads 1 if FIFO is overflow
@@ -408,13 +404,13 @@ void STMPE811_InitHard(void)
 		[0] FIFO_RESET:
 			Write '0' : FIFO put out of reset mode
 			Write '1' : Resets FIFO. All data in FIFO will be cleared.
-			When TSC is enabled, FIFOresets automatically.	---- µ± TSCÊ¹ÄÜÊ±£¬FIFOÊÇ×Ô¶¯Çå¿ÕµÄ	
+			When TSC is enabled, FIFOresets automatically.	---- å½“ TSCä½¿èƒ½æ—¶ï¼ŒFIFOæ˜¯è‡ªåŠ¨æ¸…ç©ºçš„	
 	*/
-	STMPE811_WriteReg1(REG811_FIFO_STA, 0x01);	/* ¸´Î»FIFO */
-	STMPE811_WriteReg1(REG811_FIFO_STA, 0x00);	/* ÍË³öFIFO¸´Î»×´Ì¬ */
-	
+	STMPE811_WriteReg1(REG811_FIFO_STA, 0x01); /* å¤ä½FIFO */
+	STMPE811_WriteReg1(REG811_FIFO_STA, 0x00); /* é€€å‡ºFIFOå¤ä½çŠ¶æ€ */
+
 	/* set the data format for Z value: 7 fractional part and 1 whole part 
-	¡¾TSC_FRACTION_Z¡¿
+	ã€TSC_FRACTION_Zã€‘
 		Reset: 0x00
 		Description: This register allows to select the range and accuracy of the pressure measurement
 		[7:3] RESERVED
@@ -429,28 +425,28 @@ void STMPE811_InitHard(void)
 			111: Fractional part is 7, whole part is 1	
 	*/
 	STMPE811_WriteReg1(REG811_TSC_FRACT_XYZ, 0x01);
-	
+
 	/* set the driving capability of the device for TSC pins: 50mA 
-	¡¾TSC_I_DRIVE¡¿
+	ã€TSC_I_DRIVEã€‘
 		Description: This register sets the current limit value of the touch screen drivers
 		[7:1] RESERVED
 		[0] DRIVE: maximum current on the touch screen controller (TSC) driving channel
 			0: 20 mA typical, 35 mA max
 			1: 50 mA typical, 80 mA max	
 	*/
-	STMPE811_WriteReg1(REG811_TSC_I_DRIVE, 0x01);		/* Ñ¡Ôñ50msÇı¶¯µçÁ÷ */
-	
+	STMPE811_WriteReg1(REG811_TSC_I_DRIVE, 0x01); /* é€‰æ‹©50msé©±åŠ¨ç”µæµ */
+
 	/* Use no tracking index, touch-panel controller operation mode (XYZ) and 
 	 enable the TSC
-	¡¾TSC_CTRL¡¿
+	ã€TSC_CTRLã€‘
 		Description: 4-wire touch screen controller (TSC) setup.
 		[7] TSC_STA: TSC status
 			Reads '1' when touch is detected
 			Reads '0' when touch is not detected
 			Writing to this register has no effect
 		[6:4] TRACK: Tracking index  
-		  --- ÔË¶¯×·×Ù¡£Èç¹ûµ±Ç°×ø±êµãºÍÉÏ¸ö×ø±êµãµÄÎ»ÒÆ³¬¹ıÉè¶¨Öµ²Å»áÉÏ±¨
-		  ¹«Ê½: (Current X - Previously Reported X) + (Current Y - Previously Reported Y) > Tracking Index
+		  --- è¿åŠ¨è¿½è¸ªã€‚å¦‚æœå½“å‰åæ ‡ç‚¹å’Œä¸Šä¸ªåæ ‡ç‚¹çš„ä½ç§»è¶…è¿‡è®¾å®šå€¼æ‰ä¼šä¸ŠæŠ¥
+		  å…¬å¼: (Current X - Previously Reported X) + (Current Y - Previously Reported Y) > Tracking Index
 			000: No window tracking
 			001: 4
 			010: 8
@@ -461,7 +457,7 @@ void STMPE811_InitHard(void)
 			111: 127
 		[3:1] OP_MOD: TSC operating mode
 			000: X, Y, Z acquisition
-			001: X, Y only			----- Ñ¡Ôñ X Y Êı¾İÄ£Ê½£¬²»ĞèÒªZÖáÑ¹Á¦
+			001: X, Y only			----- é€‰æ‹© X Y æ•°æ®æ¨¡å¼ï¼Œä¸éœ€è¦Zè½´å‹åŠ›
 			010: X only
 			011: Y only
 			100: Z only
@@ -469,9 +465,9 @@ void STMPE811_InitHard(void)
 		[0] EN: Enable TSC			 
 	*/
 	STMPE811_WriteReg1(REG811_TSC_CTRL, (0 << 4) | (1 << 1) | (1 << 0));
-	
+
 	/*  Clear all the status pending bits 
-	¡¾INT_STA¡¿
+	ã€INT_STAã€‘
 		Type: R
 		Reset: 0x10
 		Description: The interrupt status register monitors the status of the interruption from a particular 
@@ -490,59 +486,59 @@ void STMPE811_InitHard(void)
 			level drops to < threshold value, and increased back to threshold value.
 		[0] TOUCH_DET: Touch is detected	
 	*/
-	STMPE811_WriteReg1(REG811_INT_STA, 0xFF); 
-	
-	STMPE811_WriteReg1(REG811_INT_EN, 0x01); 
-	
-	STMPE811_WriteReg1(REG811_INT_CTRL, 0x01); 
+	STMPE811_WriteReg1(REG811_INT_STA, 0xFF);
+
+	STMPE811_WriteReg1(REG811_INT_EN, 0x01);
+
+	STMPE811_WriteReg1(REG811_INT_CTRL, 0x01);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ClearInt
-*	¹¦ÄÜËµÃ÷: Çå³ş´¥±ÊÖĞ¶Ï
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: STMPE811_ClearInt
+*	åŠŸèƒ½è¯´æ˜: æ¸…æ¥šè§¦ç¬”ä¸­æ–­
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void STMPE811_ClearInt(void)
 {
-	STMPE811_WriteReg1(REG811_INT_STA, 0xFF); 
+	STMPE811_WriteReg1(REG811_INT_STA, 0xFF);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_Reset
-*	¹¦ÄÜËµÃ÷: Èí¼ş¸´Î»STMPE811Ğ¾Æ¬
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: STMPE811_Reset
+*	åŠŸèƒ½è¯´æ˜: è½¯ä»¶å¤ä½STMPE811èŠ¯ç‰‡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void STMPE811_Reset(void)
 {
 	/* 
-	¡¾SYS_CTRL1¡¿
+	ã€SYS_CTRL1ã€‘
 		[7:2] RESERVED
 		[1] SOFT_RESET: Reset the STMPE811 using the serial communication interface
 		[0] HIBERNATE: Force the device into hibernation mode.
-			Forcing the device into hibernation mode by writing ¡®1¡¯ to this bit would disable the h
+			Forcing the device into hibernation mode by writing â€˜1â€™ to this bit would disable the h
 				feature. If the hot-key feature is required, use the default auto-hibernation mode.
 	*/
 	STMPE811_WriteReg1(REG811_SYS_CTRL1, 0x02);
-	
-	/* µÈ´ıĞ¾Æ¬¸´Î» */
-	bsp_DelayMS(20); 
-	
-	/* ÍË³ö¸´Î»×´Ì¬£¬ËùÓĞµÄ¼Ä´æÆ÷»Ö¸´È±Ê¡Öµ */
+
+	/* ç­‰å¾…èŠ¯ç‰‡å¤ä½ */
+	bsp_DelayMS(20);
+
+	/* é€€å‡ºå¤ä½çŠ¶æ€ï¼Œæ‰€æœ‰çš„å¯„å­˜å™¨æ¢å¤ç¼ºçœå€¼ */
 	STMPE811_WriteReg1(REG811_SYS_CTRL1, 0x00);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadID
-*	¹¦ÄÜËµÃ÷: ¶ÁĞ¾Æ¬ID. Ó¦¸Ã·µ»Ø
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ·µ»ØID. 0x0811
+*	å‡½ æ•° å: STMPE811_ReadID
+*	åŠŸèƒ½è¯´æ˜: è¯»èŠ¯ç‰‡ID. åº”è¯¥è¿”å›
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: è¿”å›ID. 0x0811
 *********************************************************************************************************
 */
 uint16_t STMPE811_ReadID(void)
@@ -552,135 +548,135 @@ uint16_t STMPE811_ReadID(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadBytes
-*	¹¦ÄÜËµÃ÷: Á¬Ğø¶ÁÈ¡Èô¸ÉÊı¾İ
-*	ĞÎ    ²Î: 
-*			 _pReadBuf : ´æ·Å¶Áµ½µÄÊı¾İµÄ»º³åÇøÖ¸Õë
-*			 _ucAddress : ÆğÊ¼µØÖ·
-*			 _ucSize : Êı¾İ³¤¶È£¬µ¥Î»Îª×Ö½Ú
-*	·µ »Ø Öµ: 0 ±íÊ¾Ê§°Ü£¬1±íÊ¾³É¹¦
+*	å‡½ æ•° å: STMPE811_ReadBytes
+*	åŠŸèƒ½è¯´æ˜: è¿ç»­è¯»å–è‹¥å¹²æ•°æ®
+*	å½¢    å‚: 
+*			 _pReadBuf : å­˜æ”¾è¯»åˆ°çš„æ•°æ®çš„ç¼“å†²åŒºæŒ‡é’ˆ
+*			 _ucAddress : èµ·å§‹åœ°å€
+*			 _ucSize : æ•°æ®é•¿åº¦ï¼Œå•ä½ä¸ºå­—èŠ‚
+*	è¿” å› å€¼: 0 è¡¨ç¤ºå¤±è´¥ï¼Œ1è¡¨ç¤ºæˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t STMPE811_ReadBytes(uint8_t *_pReadBuf, uint8_t _ucAddress, uint8_t _ucSize)
 {
 	uint8_t i;
 
-	/* µÚ1²½£º·¢ÆğI2C×ÜÏßÆô¶¯ĞÅºÅ */
+	/* ç¬¬1æ­¥ï¼šå‘èµ·I2Cæ€»çº¿å¯åŠ¨ä¿¡å· */
 	i2c_Start();
 
-	/* µÚ2²½£º·¢Æğ¿ØÖÆ×Ö½Ú£¬¸ß7bitÊÇµØÖ·£¬bit0ÊÇ¶ÁĞ´¿ØÖÆÎ»£¬0±íÊ¾Ğ´£¬1±íÊ¾¶Á */
-	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_WR);	/* ´Ë´¦ÊÇĞ´Ö¸Áî */
+	/* ç¬¬2æ­¥ï¼šå‘èµ·æ§åˆ¶å­—èŠ‚ï¼Œé«˜7bitæ˜¯åœ°å€ï¼Œbit0æ˜¯è¯»å†™æ§åˆ¶ä½ï¼Œ0è¡¨ç¤ºå†™ï¼Œ1è¡¨ç¤ºè¯» */
+	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_WR); /* æ­¤å¤„æ˜¯å†™æŒ‡ä»¤ */
 
-	/* µÚ3²½£º·¢ËÍACK */
+	/* ç¬¬3æ­¥ï¼šå‘é€ACK */
 	if (i2c_WaitAck() != 0)
 	{
-		goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+		goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 	}
 
-	/* µÚ4²½£º·¢ËÍ¼Ä´æÆ÷µØÖ· */
+	/* ç¬¬4æ­¥ï¼šå‘é€å¯„å­˜å™¨åœ°å€ */
 	i2c_SendByte((uint8_t)_ucAddress);
 	if (i2c_WaitAck() != 0)
 	{
-		goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+		goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 	}
 
-	/* µÚ6²½£ºÖØĞÂÆô¶¯I2C×ÜÏß¡£ÏÂÃæ¿ªÊ¼¶ÁÈ¡Êı¾İ */
+	/* ç¬¬6æ­¥ï¼šé‡æ–°å¯åŠ¨I2Cæ€»çº¿ã€‚ä¸‹é¢å¼€å§‹è¯»å–æ•°æ® */
 	i2c_Start();
 
-	/* µÚ7²½£º·¢Æğ¿ØÖÆ×Ö½Ú£¬¸ß7bitÊÇµØÖ·£¬bit0ÊÇ¶ÁĞ´¿ØÖÆÎ»£¬0±íÊ¾Ğ´£¬1±íÊ¾¶Á */
-	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_RD);	/* ´Ë´¦ÊÇ¶ÁÖ¸Áî */
+	/* ç¬¬7æ­¥ï¼šå‘èµ·æ§åˆ¶å­—èŠ‚ï¼Œé«˜7bitæ˜¯åœ°å€ï¼Œbit0æ˜¯è¯»å†™æ§åˆ¶ä½ï¼Œ0è¡¨ç¤ºå†™ï¼Œ1è¡¨ç¤ºè¯» */
+	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_RD); /* æ­¤å¤„æ˜¯è¯»æŒ‡ä»¤ */
 
-	/* µÚ8²½£º·¢ËÍACK */
+	/* ç¬¬8æ­¥ï¼šå‘é€ACK */
 	if (i2c_WaitAck() != 0)
 	{
-		goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+		goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 	}
 
-	/* µÚ9²½£ºÑ­»·¶ÁÈ¡Êı¾İ */
+	/* ç¬¬9æ­¥ï¼šå¾ªç¯è¯»å–æ•°æ® */
 	for (i = 0; i < _ucSize; i++)
 	{
-		_pReadBuf[i] = i2c_ReadByte();	/* ¶Á1¸ö×Ö½Ú */
+		_pReadBuf[i] = i2c_ReadByte(); /* è¯»1ä¸ªå­—èŠ‚ */
 
-		/* Ã¿¶ÁÍê1¸ö×Ö½Úºó£¬ĞèÒª·¢ËÍAck£¬ ×îºóÒ»¸ö×Ö½Ú²»ĞèÒªAck£¬·¢Nack */
+		/* æ¯è¯»å®Œ1ä¸ªå­—èŠ‚åï¼Œéœ€è¦å‘é€Ackï¼Œ æœ€åä¸€ä¸ªå­—èŠ‚ä¸éœ€è¦Ackï¼Œå‘Nack */
 		if (i != _ucSize - 1)
 		{
-			i2c_Ack();	/* ÖĞ¼ä×Ö½Ú¶ÁÍêºó£¬CPU²úÉúACKĞÅºÅ(Çı¶¯SDA = 0) */
+			i2c_Ack(); /* ä¸­é—´å­—èŠ‚è¯»å®Œåï¼ŒCPUäº§ç”ŸACKä¿¡å·(é©±åŠ¨SDA = 0) */
 		}
 		else
 		{
-			i2c_NAck();	/* ×îºó1¸ö×Ö½Ú¶ÁÍêºó£¬CPU²úÉúNACKĞÅºÅ(Çı¶¯SDA = 1) */
+			i2c_NAck(); /* æœ€å1ä¸ªå­—èŠ‚è¯»å®Œåï¼ŒCPUäº§ç”ŸNACKä¿¡å·(é©±åŠ¨SDA = 1) */
 		}
 	}
-	/* ·¢ËÍI2C×ÜÏßÍ£Ö¹ĞÅºÅ */
+	/* å‘é€I2Cæ€»çº¿åœæ­¢ä¿¡å· */
 	i2c_Stop();
-	return 1;	/* Ö´ĞĞ³É¹¦ */
+	return 1; /* æ‰§è¡ŒæˆåŠŸ */
 
-cmd_fail: /* ÃüÁîÖ´ĞĞÊ§°Üºó£¬ÇĞ¼Ç·¢ËÍÍ£Ö¹ĞÅºÅ£¬±ÜÃâÓ°ÏìI2C×ÜÏßÉÏÆäËûÉè±¸ */
-	/* ·¢ËÍI2C×ÜÏßÍ£Ö¹ĞÅºÅ */
+cmd_fail: /* å‘½ä»¤æ‰§è¡Œå¤±è´¥åï¼Œåˆ‡è®°å‘é€åœæ­¢ä¿¡å·ï¼Œé¿å…å½±å“I2Cæ€»çº¿ä¸Šå…¶ä»–è®¾å¤‡ */
+	/* å‘é€I2Cæ€»çº¿åœæ­¢ä¿¡å· */
 	i2c_Stop();
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_WriteBytes
-*	¹¦ÄÜËµÃ÷: Á¬ĞøĞ´ÈëÈô¸ÉÊı¾İ
-*	ĞÎ    ²Î: 
-*			 _pWriteBuf : ½«ÒªĞ´Èëµ½Ğ¾Æ¬µÄÊı¾İµÄ»º³åÇøÖ¸Õë
-*			 _ucAddress : ÆğÊ¼µØÖ·
-*			 _ucSize : Êı¾İ³¤¶È£¬µ¥Î»Îª×Ö½Ú
-*	·µ »Ø Öµ: 0 ±íÊ¾Ê§°Ü£¬1±íÊ¾³É¹¦
+*	å‡½ æ•° å: STMPE811_WriteBytes
+*	åŠŸèƒ½è¯´æ˜: è¿ç»­å†™å…¥è‹¥å¹²æ•°æ®
+*	å½¢    å‚: 
+*			 _pWriteBuf : å°†è¦å†™å…¥åˆ°èŠ¯ç‰‡çš„æ•°æ®çš„ç¼“å†²åŒºæŒ‡é’ˆ
+*			 _ucAddress : èµ·å§‹åœ°å€
+*			 _ucSize : æ•°æ®é•¿åº¦ï¼Œå•ä½ä¸ºå­—èŠ‚
+*	è¿” å› å€¼: 0 è¡¨ç¤ºå¤±è´¥ï¼Œ1è¡¨ç¤ºæˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t STMPE811_WriteBytes(uint8_t *_pWriteBuf, uint8_t _ucAddress, uint8_t _ucSize)
 {
 	uint8_t i;
 
-	/* µÚ1²½£º·¢ÆğI2C×ÜÏßÆô¶¯ĞÅºÅ */
+	/* ç¬¬1æ­¥ï¼šå‘èµ·I2Cæ€»çº¿å¯åŠ¨ä¿¡å· */
 	i2c_Start();
 
-	/* µÚ2²½£º·¢Æğ¿ØÖÆ×Ö½Ú£¬¸ß7bitÊÇµØÖ·£¬bit0ÊÇ¶ÁĞ´¿ØÖÆÎ»£¬0±íÊ¾Ğ´£¬1±íÊ¾¶Á */
-	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_WR);	/* ´Ë´¦ÊÇĞ´Ö¸Áî */
+	/* ç¬¬2æ­¥ï¼šå‘èµ·æ§åˆ¶å­—èŠ‚ï¼Œé«˜7bitæ˜¯åœ°å€ï¼Œbit0æ˜¯è¯»å†™æ§åˆ¶ä½ï¼Œ0è¡¨ç¤ºå†™ï¼Œ1è¡¨ç¤ºè¯» */
+	i2c_SendByte(STMPE811_I2C_ADDRESS | I2C_WR); /* æ­¤å¤„æ˜¯å†™æŒ‡ä»¤ */
 
-	/* µÚ3²½£º·¢ËÍACK */
+	/* ç¬¬3æ­¥ï¼šå‘é€ACK */
 	if (i2c_WaitAck() != 0)
 	{
-		goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+		goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 	}
 
-	/* µÚ4²½£º·¢ËÍ¼Ä´æÆ÷µØÖ· */
+	/* ç¬¬4æ­¥ï¼šå‘é€å¯„å­˜å™¨åœ°å€ */
 	i2c_SendByte((uint8_t)_ucAddress);
 	if (i2c_WaitAck() != 0)
 	{
-		goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+		goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 	}
 
-	/* µÚ5²½£ºÑ­»·Ğ´Êı¾İ */
+	/* ç¬¬5æ­¥ï¼šå¾ªç¯å†™æ•°æ® */
 	for (i = 0; i < _ucSize; i++)
 	{
 		i2c_SendByte(_pWriteBuf[i]);
 		if (i2c_WaitAck() != 0)
 		{
-			goto cmd_fail;	/* EEPROMÆ÷¼şÎŞÓ¦´ğ */
+			goto cmd_fail; /* EEPROMå™¨ä»¶æ— åº”ç­” */
 		}
 	}
-	/* ·¢ËÍI2C×ÜÏßÍ£Ö¹ĞÅºÅ */
+	/* å‘é€I2Cæ€»çº¿åœæ­¢ä¿¡å· */
 	i2c_Stop();
-	return 1;	/* Ö´ĞĞ³É¹¦ */
+	return 1; /* æ‰§è¡ŒæˆåŠŸ */
 
-cmd_fail: /* ÃüÁîÖ´ĞĞÊ§°Üºó£¬ÇĞ¼Ç·¢ËÍÍ£Ö¹ĞÅºÅ£¬±ÜÃâÓ°ÏìI2C×ÜÏßÉÏÆäËûÉè±¸ */
-	/* ·¢ËÍI2C×ÜÏßÍ£Ö¹ĞÅºÅ */
+cmd_fail: /* å‘½ä»¤æ‰§è¡Œå¤±è´¥åï¼Œåˆ‡è®°å‘é€åœæ­¢ä¿¡å·ï¼Œé¿å…å½±å“I2Cæ€»çº¿ä¸Šå…¶ä»–è®¾å¤‡ */
+	/* å‘é€I2Cæ€»çº¿åœæ­¢ä¿¡å· */
 	i2c_Stop();
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_WriteReg1
-*	¹¦ÄÜËµÃ÷: Ğ´1¸ö×Ö½Úµ½¼Ä´æÆ÷
-*	ĞÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*			 _ucValue    : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: 0 ±íÊ¾Ê§°Ü£¬1±íÊ¾³É¹¦
+*	å‡½ æ•° å: STMPE811_WriteReg1
+*	åŠŸèƒ½è¯´æ˜: å†™1ä¸ªå­—èŠ‚åˆ°å¯„å­˜å™¨
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*			 _ucValue    : å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: 0 è¡¨ç¤ºå¤±è´¥ï¼Œ1è¡¨ç¤ºæˆåŠŸ
 *********************************************************************************************************
 */
 void STMPE811_WriteReg1(uint8_t _ucRegAddr, uint8_t _ucValue)
@@ -690,17 +686,17 @@ void STMPE811_WriteReg1(uint8_t _ucRegAddr, uint8_t _ucValue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_WriteReg1
-*	¹¦ÄÜËµÃ÷: Ğ´2¸ö×Ö½Úµ½¼Ä´æÆ÷
-*	ĞÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*			 _ucValue    : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: 0 ±íÊ¾Ê§°Ü£¬1±íÊ¾³É¹¦
+*	å‡½ æ•° å: STMPE811_WriteReg1
+*	åŠŸèƒ½è¯´æ˜: å†™2ä¸ªå­—èŠ‚åˆ°å¯„å­˜å™¨
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*			 _ucValue    : å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: 0 è¡¨ç¤ºå¤±è´¥ï¼Œ1è¡¨ç¤ºæˆåŠŸ
 *********************************************************************************************************
 */
 void STMPE811_WriteReg2(uint8_t _ucRegAddr, uint16_t _usValue)
 {
 	uint8_t buf[2];
-	
+
 	buf[0] = _usValue >> 8;
 	buf[1] = _usValue;
 	STMPE811_WriteBytes(buf, _ucRegAddr, 2);
@@ -708,69 +704,69 @@ void STMPE811_WriteReg2(uint8_t _ucRegAddr, uint16_t _usValue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadReg1
-*	¹¦ÄÜËµÃ÷: ¶Á¼Ä´æÆ÷1×Ö½Ú
-*	ĞÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*			 _ucValue    : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: STMPE811_ReadReg1
+*	åŠŸèƒ½è¯´æ˜: è¯»å¯„å­˜å™¨1å­—èŠ‚
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*			 _ucValue    : å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
 *********************************************************************************************************
 */
 uint8_t STMPE811_ReadReg1(uint8_t _ucRegAddr)
 {
 	uint8_t read;
-	
+
 	STMPE811_ReadBytes(&read, _ucRegAddr, 1);
-	
+
 	return read;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadReg2
-*	¹¦ÄÜËµÃ÷: ¶Á2¸ö×Ö½Ú
-*	ĞÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: STMPE811_ReadReg2
+*	åŠŸèƒ½è¯´æ˜: è¯»2ä¸ªå­—èŠ‚
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
 *********************************************************************************************************
 */
 uint16_t STMPE811_ReadReg2(uint8_t _ucRegAddr)
 {
 	uint8_t buf[2];
-	
+
 	STMPE811_ReadBytes(buf, _ucRegAddr, 2);
-	
+
 	return (((uint16_t)buf[0] << 8) | buf[1]);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadX
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡X×ø±êadc
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: X×ø±êÖµadc
+*	å‡½ æ•° å: STMPE811_ReadX
+*	åŠŸèƒ½è¯´æ˜: è¯»å–Xåæ ‡adc
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: Xåæ ‡å€¼adc
 *********************************************************************************************************
 */
 uint16_t STMPE811_ReadX(void)
 {
-	/* °´ÕÕ XY ¶ÁÈ¡Ä£Ê½£¬Á¬Ğø¶ÁÈ¡3×Ö½ÚÊı¾İ£¬È»ºó·Ö½â³öX,Y 	
+	/* æŒ‰ç…§ XY è¯»å–æ¨¡å¼ï¼Œè¿ç»­è¯»å–3å­—èŠ‚æ•°æ®ï¼Œç„¶ååˆ†è§£å‡ºX,Y 	
 	 |  byte0   |     byte1      |   byte2  |  
 	 | X[11:4], | X[3:0],Y[11:8] | Y[7:0]   |
 	*/
 	uint8_t buf[3];
-	
+
 #if 0
 	STMPE811_ReadBytes(buf, REG811_TSC_DATA1, 3);
 	
 	s_AdcX = ((uint16_t)buf[0] << 4) | (buf[1] >> 4);
-	s_AdcY = ((uint16_t)(buf[1] & 0xF) << 8) | buf[2];	
+	s_AdcY = ((uint16_t)(buf[1] & 0xF) << 8) | buf[2];
 #else
 	if (STMPE811_ReadReg1(REG811_TSC_CTRL) & 0x80)
-	{	
+	{
 		STMPE811_ReadBytes(buf, REG811_TSC_DATA1, 3);
-		
+
 		s_AdcX = ((uint16_t)buf[0] << 4) | (buf[1] >> 4);
 		s_AdcY = ((uint16_t)(buf[1] & 0xF) << 8) | buf[2];
-		
-		#if 0
+
+#if 0
 		/* for debug */
 		{
 			static int32_t s_t1 = 0;
@@ -784,7 +780,7 @@ uint16_t STMPE811_ReadX(void)
 			}
 			printf("(%7d) %5d %5d\r\n", tt, s_AdcX, s_AdcY);
 		}
-		#endif
+#endif
 	}
 	else
 	{
@@ -792,51 +788,51 @@ uint16_t STMPE811_ReadX(void)
 		s_AdcY = 0;
 	}
 #endif
-	
+
 	return s_AdcX;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadX
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Y×ø±êadc
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: Y×ø±êÖµadc
+*	å‡½ æ•° å: STMPE811_ReadX
+*	åŠŸèƒ½è¯´æ˜: è¯»å–Yåæ ‡adc
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: Yåæ ‡å€¼adc
 *********************************************************************************************************
 */
 uint16_t STMPE811_ReadY(void)
 {
-	return  s_AdcY;
+	return s_AdcY;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadGPIO
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡GPIO×´Ì¬
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: GPIO×´Ì¬×Ö
+*	å‡½ æ•° å: STMPE811_ReadGPIO
+*	åŠŸèƒ½è¯´æ˜: è¯»å–GPIOçŠ¶æ€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: GPIOçŠ¶æ€å­—
 *********************************************************************************************************
 */
 uint8_t STMPE811_ReadGPIO(void)
 {
-	/*  ÉèÖÃGPIO·½Ïò
-	¡¾GPIO_DIR¡¿
+	/*  è®¾ç½®GPIOæ–¹å‘
+	ã€GPIO_DIRã€‘
 	Description: GPIO set pin direction register. 
-		Writing ¡®0¡¯ sets the corresponding GPIO to input state, and ¡®1¡¯ sets it to output state. 
-		All bits are ¡®0¡¯ on reset.
+		Writing â€˜0â€™ sets the corresponding GPIO to input state, and â€˜1â€™ sets it to output state. 
+		All bits are â€˜0â€™ on reset.
 	*/
-	STMPE811_WriteReg1(REG811_GPIO_DIR, 0);		/* È«²¿ÊÇÊäÈë */
-	
-	return STMPE811_ReadReg1(REG811_GPIO_MP_STA);		/* ¶ÁGPIO×´Ì¬ */	
+	STMPE811_WriteReg1(REG811_GPIO_DIR, 0); /* å…¨éƒ¨æ˜¯è¾“å…¥ */
+
+	return STMPE811_ReadReg1(REG811_GPIO_MP_STA); /* è¯»GPIOçŠ¶æ€ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_WriteGPIO
-*	¹¦ÄÜËµÃ÷: ÉèÖÃGPIOÊä³öÖµ
-*	ĞÎ    ²Î: _pin : 0-7
-*			  _vlaue : 0»ò1
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: STMPE811_WriteGPIO
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®GPIOè¾“å‡ºå€¼
+*	å½¢    å‚: _pin : 0-7
+*			  _vlaue : 0æˆ–1
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void STMPE811_WriteGPIO(uint8_t _pin, uint8_t _vlaue)
@@ -853,23 +849,23 @@ void STMPE811_WriteGPIO(uint8_t _pin, uint8_t _vlaue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: STMPE811_ReadIO
-*	¹¦ÄÜËµÃ÷: ¸ù¾İGPIOµÄ BIT3£¬BIT2£¬BIT0 Èı¸ùIOµÄµçÆ½×´Ì¬Ê¶±ğÏÔÊ¾Æ÷ÀàĞÍ¡£ ½öÓÃÓÚ°²¸»À³µç×ÓÉú²úµÄÏÔÊ¾Ä£¿é¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: IO×´Ì¬
+*	å‡½ æ•° å: STMPE811_ReadIO
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®GPIOçš„ BIT3ï¼ŒBIT2ï¼ŒBIT0 ä¸‰æ ¹IOçš„ç”µå¹³çŠ¶æ€è¯†åˆ«æ˜¾ç¤ºå™¨ç±»å‹ã€‚ ä»…ç”¨äºå®‰å¯Œè±ç”µå­ç”Ÿäº§çš„æ˜¾ç¤ºæ¨¡å—ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: IOçŠ¶æ€
 *********************************************************************************************************
 */
 uint8_t STMPE811_ReadIO(void)
 {
 	uint8_t gpio;
 	uint8_t type;
-	
+
 	gpio = STMPE811_ReadGPIO();
-	
+
 	/* BIT3  BIT2 BIT0 */
 	type = ((gpio >> 1) & 0x6) | (gpio & 0x01);
-	
+
 	return type;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

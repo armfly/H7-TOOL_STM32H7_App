@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : AM/FMÊÕÒô»úSi4730 Çý¶¯Ä£¿é
-*	ÎÄ¼þÃû³Æ : bsp_Si730.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Çý¶¯Si4730  Si4704ÊÕÒô»úÐ¾Æ¬£¬Í¨¹ýI2C×ÜÏß¿ØÖÆ¸ÃÐ¾Æ¬£¬ÊµÏÖAM/FM½ÓÊÕ¡£
-*				Si4730ºÍSi4704Èí¼þ¼æÈÝµÄ¡£Si4704Ö§³ÖFM,²»Ö§³ÖAM;  Si4730Ö§³ÖAM£¬²»Ö§³ÖFM,
+*	æ¨¡å—åç§° : AM/FMæ”¶éŸ³æœºSi4730 é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_Si730.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜Ž : é©±åŠ¨Si4730  Si4704æ”¶éŸ³æœºèŠ¯ç‰‡ï¼Œé€šè¿‡I2Cæ€»çº¿æŽ§åˆ¶è¯¥èŠ¯ç‰‡ï¼Œå®žçŽ°AM/FMæŽ¥æ”¶ã€‚
+*				Si4730å’ŒSi4704è½¯ä»¶å…¼å®¹çš„ã€‚Si4704æ”¯æŒFM,ä¸æ”¯æŒAM;  Si4730æ”¯æŒAMï¼Œä¸æ”¯æŒFM,
 *
-*	ÐÞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕýÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜Ž
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,59 +19,59 @@
 #include "bsp.h"
 
 /*
-	²Î¿¼ÎÄµµ:
-		AN332 Si47xx Programming Guide.pdf		Èí¼þ±à³ÌÖ¸ÄÏ
-		Si4730-31-34-35-D60.pdf					Ð¾Æ¬Êý¾ÝÊÖ²á£¨²»º¬Èí¼þ²¿·Ö£©
+	å‚è€ƒæ–‡æ¡£:
+		AN332 Si47xx Programming Guide.pdf		è½¯ä»¶ç¼–ç¨‹æŒ‡å—
+		Si4730-31-34-35-D60.pdf					èŠ¯ç‰‡æ•°æ®æ‰‹å†Œï¼ˆä¸å«è½¯ä»¶éƒ¨åˆ†ï¼‰
 
-	°²¸»À³STM32-V5 ¿ª·¢°åSi4730¿ÚÏß·ÖÅä£º
+	å®‰å¯ŒèŽ±STM32-V5 å¼€å‘æ¿Si4730å£çº¿åˆ†é…ï¼š
 
-	I2C×ÜÏß¿ØÖÆSi4730, µØÖ·Îª £¨0x22£©, Í¨¹ýºê I2C_ADDR_SI4730 ¶¨Òå
+	I2Cæ€»çº¿æŽ§åˆ¶Si4730, åœ°å€ä¸º ï¼ˆ0x22ï¼‰, é€šè¿‡å® I2C_ADDR_SI4730 å®šä¹‰
 		PH4/I2C2_SCL
  		PH5/I2C2_SDA
 
-	I2C×ÜÏßµ×²ãÇý¶¯ÔÚ bsp_i2c_gpio.c
-	ÐèÒªµ÷ÓÃ bsp_InitI2C() º¯ÊýÅäÖÃI2CµÄGPIO
+	I2Cæ€»çº¿åº•å±‚é©±åŠ¨åœ¨ bsp_i2c_gpio.c
+	éœ€è¦è°ƒç”¨ bsp_InitI2C() å‡½æ•°é…ç½®I2Cçš„GPIO
 
 
-	¼ì²éSi4730ÊÇ·ñ¾ÍÐ÷£¬¿ÉÒÔµ÷ÓÃ i2c_CheckDevice(I2C_ADDR_SI4730)º¯Êý£¬·µ»Ø0±íÊ¾Ð¾Æ¬Õý³£¡£
+	æ£€æŸ¥Si4730æ˜¯å¦å°±ç»ªï¼Œå¯ä»¥è°ƒç”¨ i2c_CheckDevice(I2C_ADDR_SI4730)å‡½æ•°ï¼Œè¿”å›ž0è¡¨ç¤ºèŠ¯ç‰‡æ­£å¸¸ã€‚
 */
 
 /*
-	FM (64¨C108 MHz)
-	AM (520¨C1710 kHz)
+	FM (64â€“108 MHz)
+	AM (520â€“1710 kHz)
 
 */
 
 /*
-	i2c ×ÜÏßÊ±Ðò£¬¼û AN332 page = 226
+	i2c æ€»çº¿æ—¶åºï¼Œè§ AN332 page = 226
 
-	Ã¿¸öÃüÁî±ØÐëÓÐÍêÕûµÄSTART + STOPÐÅºÅ£¬ÀýÈç: [] ±íÊ¾¶ÁÈ¡Æ÷¼þ·µ»Ø
+	æ¯ä¸ªå‘½ä»¤å¿…é¡»æœ‰å®Œæ•´çš„START + STOPä¿¡å·ï¼Œä¾‹å¦‚: [] è¡¨ç¤ºè¯»å–å™¨ä»¶è¿”å›ž
 	START ADDR+W [ACK] CMD  [ACK] ARG1 [ACK] ARG2 [ACK] ARG3 [ACK] STOP
 	START  0x22    0  0x30    0   0x00   0   0x27   0   0x7E   0  STOP
 
-	Ñ­»·¶ÁÈ¡Æ÷¼þ·µ»ØµÄ×´Ì¬£¬Ö»µ½ STARTUS = 0x80
+	å¾ªçŽ¯è¯»å–å™¨ä»¶è¿”å›žçš„çŠ¶æ€ï¼Œåªåˆ° STARTUS = 0x80
 	START ADDR+R [ACK] [STATUS] NACK STOP
 	START  0x23    0    0x00    1   STOP
 
-	¶ÁÈ¡Æ÷¼þ·µ»ØµÄÊý¾Ý
+	è¯»å–å™¨ä»¶è¿”å›žçš„æ•°æ®
 	START ADDR+R [ACK] STATUS ACK RESP1 ACK RESP2 ACK RESP3 NACK STOP
 	START  0x23    0   0x80   0  0x00   0  0x00   0  0x00   1   STOP
 
-	±¸×¢: [ACK] ÊÇCPU·¢ËÍÒ»¸öSCL, È»ºó¶ÁÈ¡SDA
-		  ACK   ÊÇCPUÉèÖÃSDA=0 ,È»ºó·¢ËÍÒ»¸öSCL
+	å¤‡æ³¨: [ACK] æ˜¯CPUå‘é€ä¸€ä¸ªSCL, ç„¶åŽè¯»å–SDA
+		  ACK   æ˜¯CPUè®¾ç½®SDA=0 ,ç„¶åŽå‘é€ä¸€ä¸ªSCL
 */
 
 /*
-	AN223 page = 271    FM ÊÕÒô»úÄ£Ê½ÅäÖÃÁ÷³Ì
+	AN223 page = 271    FM æ”¶éŸ³æœºæ¨¡å¼é…ç½®æµç¨‹
 	12.2. Programming Example for the FM/RDS Receiver
 */
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: bsp_InitSi4730
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSi4703¹¤×÷Ä£Ê½
-*	ÐÎ    ²Î:ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: bsp_InitSi4730
+*	åŠŸèƒ½è¯´æ˜Ž: é…ç½®Si4703å·¥ä½œæ¨¡å¼
+*	å½¢    å‚:æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitSi4730(void)
@@ -81,26 +81,27 @@ void bsp_InitSi4730(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_Delay
-*	¹¦ÄÜËµÃ÷: ÑÓ³ÙÒ»¶ÎÊ±¼ä
-*	ÐÎ    ²Î: n Ñ­»·´ÎÊý
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: SI4730_Delay
+*	åŠŸèƒ½è¯´æ˜Ž: å»¶è¿Ÿä¸€æ®µæ—¶é—´
+*	å½¢    å‚: n å¾ªçŽ¯æ¬¡æ•°
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void SI4730_Delay(uint32_t n)
 {
 	uint32_t i;
 
-	for (i = 0; i < n; i++);
+	for (i = 0; i < n; i++)
+		;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SendCmd
-*	¹¦ÄÜËµÃ÷: ÏòSi4730·¢ËÍCMD
-*	ÐÎ    ²Î: _pCmdBuf : ÃüÁîÊý×é
-*			 _CmdLen : ÃüÁî´®×Ö½ÚÊý
-*	·µ »Ø Öµ: 0 Ê§°Ü(Æ÷¼þÎÞÓ¦´ð)£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SendCmd
+*	åŠŸèƒ½è¯´æ˜Ž: å‘Si4730å‘é€CMD
+*	å½¢    å‚: _pCmdBuf : å‘½ä»¤æ•°ç»„
+*			 _CmdLen : å‘½ä»¤ä¸²å­—èŠ‚æ•°
+*	è¿” å›ž å€¼: 0 å¤±è´¥(å™¨ä»¶æ— åº”ç­”)ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SendCmd(uint8_t *_pCmdBuf, uint8_t _ucCmdLen)
@@ -136,11 +137,11 @@ err:
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_WaitStatus80
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Si4730µÄ×´Ì¬£¬µÈÓÚ0x80Ê±·µ»Ø¡£
-*	ÐÎ    ²Î: _uiTimeOut : ÂÖÑ¯´ÎÊý
-*			  _ucStopEn : ×´Ì¬0x80¼ì²â³É¹¦ºó£¬ÊÇ·ñ·¢ËÍSTOP
-*	·µ »Ø Öµ: 0 Ê§°Ü(Æ÷¼þÎÞÓ¦´ð)£¬ > 1 ³É¹¦, Êý×Ö±íÊ¾Êµ¼ÊÂÖÑ¯´ÎÊý
+*	å‡½ æ•° å: SI4730_WaitStatus80
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–Si4730çš„çŠ¶æ€ï¼Œç­‰äºŽ0x80æ—¶è¿”å›žã€‚
+*	å½¢    å‚: _uiTimeOut : è½®è¯¢æ¬¡æ•°
+*			  _ucStopEn : çŠ¶æ€0x80æ£€æµ‹æˆåŠŸåŽï¼Œæ˜¯å¦å‘é€STOP
+*	è¿” å›ž å€¼: 0 å¤±è´¥(å™¨ä»¶æ— åº”ç­”)ï¼Œ > 1 æˆåŠŸ, æ•°å­—è¡¨ç¤ºå®žé™…è½®è¯¢æ¬¡æ•°
 *********************************************************************************************************
 */
 uint32_t SI4730_WaitStatus80(uint32_t _uiTimeOut, uint8_t _ucStopEn)
@@ -149,20 +150,20 @@ uint32_t SI4730_WaitStatus80(uint32_t _uiTimeOut, uint8_t _ucStopEn)
 	uint8_t status;
 	uint32_t i;
 
-	/* µÈ´ýÆ÷¼þ×´Ì¬Îª 0x80 */
+	/* ç­‰å¾…å™¨ä»¶çŠ¶æ€ä¸º 0x80 */
 	for (i = 0; i < _uiTimeOut; i++)
 	{
 		i2c_Start();
-		i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+		i2c_SendByte(I2C_ADDR_SI4730_R); /* è¯» */
 		ack = i2c_WaitAck();
 		if (ack == 1)
 		{
 			i2c_NAck();
 			i2c_Stop();
-			return 0;	/* Æ÷¼þÎÞÓ¦´ð£¬Ê§°Ü */
+			return 0; /* å™¨ä»¶æ— åº”ç­”ï¼Œå¤±è´¥ */
 		}
 		status = i2c_ReadByte();
-		if ((status == 0x80) || (status == 0x81))	/* 0x81 ÊÇÎªÁËÖ´ÐÐ0x23Ö¸Áî ¶ÁÈ¡ÐÅºÅÖÊÁ¿ */
+		if ((status == 0x80) || (status == 0x81)) /* 0x81 æ˜¯ä¸ºäº†æ‰§è¡Œ0x23æŒ‡ä»¤ è¯»å–ä¿¡å·è´¨é‡ */
 		{
 			break;
 		}
@@ -171,18 +172,17 @@ uint32_t SI4730_WaitStatus80(uint32_t _uiTimeOut, uint8_t _ucStopEn)
 	{
 		i2c_NAck();
 		i2c_Stop();
-		return 0;	/* ³¬Ê±ÁË£¬Ê§°Ü */
+		return 0; /* è¶…æ—¶äº†ï¼Œå¤±è´¥ */
 	}
 
-	/* ³É¹¦ÁË£¬ ´¦ÀíÒ»ÏÂµÚ1´Î¾Í³É¹¦µÄÇé¿ö */
+	/* æˆåŠŸäº†ï¼Œ å¤„ç†ä¸€ä¸‹ç¬¬1æ¬¡å°±æˆåŠŸçš„æƒ…å†µ */
 	if (i == 0)
 	{
 		i = 1;
-
 	}
 
-	/* ÒòÎªÓÐÐ©ÃüÁî»¹ÐèÒª¶ÁÈ¡·µ»ØÖµ£¬Òò´Ë´Ë´¦¸ù¾ÝÐÎ²Î¾ö¶¨ÊÇ·ñ·¢ËÍSTOP */
-	if  (_ucStopEn == 1)
+	/* å› ä¸ºæœ‰äº›å‘½ä»¤è¿˜éœ€è¦è¯»å–è¿”å›žå€¼ï¼Œå› æ­¤æ­¤å¤„æ ¹æ®å½¢å‚å†³å®šæ˜¯å¦å‘é€STOP */
+	if (_ucStopEn == 1)
 	{
 		i2c_NAck();
 		i2c_Stop();
@@ -192,11 +192,11 @@ uint32_t SI4730_WaitStatus80(uint32_t _uiTimeOut, uint8_t _ucStopEn)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SetProperty
-*	¹¦ÄÜËµÃ÷: ÉèÖÃSi4730ÊôÐÔ²ÎÊý
-*	ÐÎ    ²Î: _usPropNumber : ²ÎÊýºÅ
-*			  _usPropValue : ²ÎÊýÖµ
-*	·µ »Ø Öµ: 0 Ê§°Ü(Æ÷¼þÎÞÓ¦´ð)£¬ > 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SetProperty
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®Si4730å±žæ€§å‚æ•°
+*	å½¢    å‚: _usPropNumber : å‚æ•°å·
+*			  _usPropValue : å‚æ•°å€¼
+*	è¿” å›ž å€¼: 0 å¤±è´¥(å™¨ä»¶æ— åº”ç­”)ï¼Œ > 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
@@ -223,14 +223,14 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 	return 1;
 }
 
-/* ÏÂÃæ2¸öº¯ÊýÊÇ°´I2C×ÜÏßÊ±ÐòÊéÐ´¡£¿ÉÒÔ·¢ÏÖºÜ¶à´úÂëÊÇ¿ÉÒÔ¹²ÓÃµÄ¡£Òò´ËÎÒÃÇ¶Ô²¿·Ö´úÂë½øÐÐ·â×°£¬ÒÑ±ãÓÚÊµÏÖÆäËûÃüÁî */
+/* ä¸‹é¢2ä¸ªå‡½æ•°æ˜¯æŒ‰I2Cæ€»çº¿æ—¶åºä¹¦å†™ã€‚å¯ä»¥å‘çŽ°å¾ˆå¤šä»£ç æ˜¯å¯ä»¥å…±ç”¨çš„ã€‚å› æ­¤æˆ‘ä»¬å¯¹éƒ¨åˆ†ä»£ç è¿›è¡Œå°è£…ï¼Œå·²ä¾¿äºŽå®žçŽ°å…¶ä»–å‘½ä»¤ */
 #if 0
 	/*
 	*********************************************************************************************************
-	*	º¯ Êý Ãû: SI4730_PowerUp_FM_Revice
-	*	¹¦ÄÜËµÃ÷: ÅäÖÃSi4703ÎªFM½ÓÊÕÄ£Ê½£¬ Ä£ÄâÄ£Ê½£¨·ÇÊý×ÖÄ£Ê½)
-	*	ÐÎ    ²Î:ÎÞ
-	*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+	*	å‡½ æ•° å: SI4730_PowerUp_FM_Revice
+	*	åŠŸèƒ½è¯´æ˜Ž: é…ç½®Si4703ä¸ºFMæŽ¥æ”¶æ¨¡å¼ï¼Œ æ¨¡æ‹Ÿæ¨¡å¼ï¼ˆéžæ•°å­—æ¨¡å¼)
+	*	å½¢    å‚:æ— 
+	*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 	*********************************************************************************************************
 	*/
 	uint8_t SI4730_PowerUp_FM_Revice(void)
@@ -243,7 +243,7 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 			CMD      0x01     POWER_UP
 			ARG1     0xC0     Set to FM Receive. Enable interrupts.
 			ARG2     0x05     Set to Analog Audio Output
-			STATUS   ¡ú0x80   Reply Status. Clear-to-send high.
+			STATUS   â†’0x80   Reply Status. Clear-to-send high.
 		*/
 		i2c_Start();
 		i2c_SendByte(I2C_ADDR_SI4730_W);
@@ -256,14 +256,14 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 		ack = i2c_WaitAck();
 		i2c_Stop();
 
-		/* µÈ´ýÆ÷¼þ·µ»Ø×´Ì¬ 0x80 */
+		/* ç­‰å¾…å™¨ä»¶è¿”å›žçŠ¶æ€ 0x80 */
 		{
 			uint32_t i;
 
 			for (i = 0; i < 2500; i++)
 			{
 				i2c_Start();
-				i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+				i2c_SendByte(I2C_ADDR_SI4730_R);	/* è¯» */
 				ack = i2c_WaitAck();
 				status = i2c_ReadByte();
 				i2c_NAck();
@@ -275,7 +275,7 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 				}
 			}
 
-			/* Êµ²â 535 ´ÎÑ­»·Ó¦¸ÃÕý³£ÍË³ö */
+			/* å®žæµ‹ 535 æ¬¡å¾ªçŽ¯åº”è¯¥æ­£å¸¸é€€å‡º */
 			if (i == 2500)
 			{
 				return 0;
@@ -287,10 +287,10 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 
 	/*
 	*********************************************************************************************************
-	*	º¯ Êý Ãû: SI4730_GetRevision
-	*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Æ÷¼þ¡¢¹Ì¼þÐÅÏ¢¡£ ·µ»Ø8×Ö½ÚÊý¾Ý
-	*	ÐÎ    ²Î:_ReadBuf  ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ8
-	*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+	*	å‡½ æ•° å: SI4730_GetRevision
+	*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–å™¨ä»¶ã€å›ºä»¶ä¿¡æ¯ã€‚ è¿”å›ž8å­—èŠ‚æ•°æ®
+	*	å½¢    å‚:_ReadBuf  è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ8
+	*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 	*********************************************************************************************************
 	*/
 	uint8_t SI4730_GetRevision(uint8_t *_ReadBuf)
@@ -301,7 +301,7 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 
 		/* AN223 page = 67 */
 
-		/* ·¢ËÍ 0x10 ÃüÁî */
+		/* å‘é€ 0x10 å‘½ä»¤ */
 		i2c_Start();
 		i2c_SendByte(I2C_ADDR_SI4730_W);
 		ack = i2c_WaitAck();
@@ -309,11 +309,11 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 		ack = i2c_WaitAck();
 		i2c_Stop();
 
-		/* µÈ´ýÆ÷¼þ×´Ì¬Îª 0x80 */
+		/* ç­‰å¾…å™¨ä»¶çŠ¶æ€ä¸º 0x80 */
 		for (i = 0; i < 50; i++)
 		{
 			i2c_Start();
-			i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+			i2c_SendByte(I2C_ADDR_SI4730_R);	/* è¯» */
 			ack = i2c_WaitAck();
 			status = i2c_ReadByte();
 			if (status == 0x80)
@@ -321,7 +321,7 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 				break;
 			}
 		}
-		/* Êµ²â 2 ´ÎÑ­»·Ó¦¸ÃÕý³£ÍË³ö */
+		/* å®žæµ‹ 2 æ¬¡å¾ªçŽ¯åº”è¯¥æ­£å¸¸é€€å‡º */
 		if (i == 50)
 		{
 			i2c_NAck();
@@ -329,7 +329,7 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 			return 0;
 		}
 
-		/* Á¬Ðø¶ÁÈ¡8¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+		/* è¿žç»­è¯»å–8ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 		for (i = 0; i < 8; i++)
 		{
 			i2c_Ack();
@@ -343,10 +343,10 @@ uint8_t SI4730_SetProperty(uint16_t _usPropNumber, uint16_t _usPropValue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_PowerUp_FM_Revice
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSi4703ÎªFM½ÓÊÕÄ£Ê½£¬ Ä£ÄâÄ£Ê½£¨·ÇÊý×ÖÄ£Ê½)
-*	ÐÎ    ²Î:ÎÞ
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_PowerUp_FM_Revice
+*	åŠŸèƒ½è¯´æ˜Ž: é…ç½®Si4703ä¸ºFMæŽ¥æ”¶æ¨¡å¼ï¼Œ æ¨¡æ‹Ÿæ¨¡å¼ï¼ˆéžæ•°å­—æ¨¡å¼)
+*	å½¢    å‚:æ— 
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_PowerUp_FM_Revice(void)
@@ -356,7 +356,7 @@ uint8_t SI4730_PowerUp_FM_Revice(void)
 		CMD      0x01     POWER_UP
 		ARG1     0xC0     Set to FM Receive. Enable interrupts.
 		ARG2     0x05     Set to Analog Audio Output
-		STATUS   ¡ú0x80   Reply Status. Clear-to-send high.
+		STATUS   â†’0x80   Reply Status. Clear-to-send high.
 	*/
 
 	uint8_t ucCmdBuf[3];
@@ -368,8 +368,8 @@ uint8_t SI4730_PowerUp_FM_Revice(void)
 	SI4730_SendCmd(ucCmdBuf, 3);
 
 	/*
-		µÚ1¸öÐÎ²Î±íÊ¾×î´óÂÖÑ¯´ÎÊý£» Èç¹û³É¹¦£¬·µ»ØÖµuiTimeOut > 0 ±íÊ¾Êµ¼ÊÂÖÑ¯´ÎÊý
-		µÚ2¸öÐÎ²Î1±íÊ¾½áÊøºó·¢ËÍSTOP
+		ç¬¬1ä¸ªå½¢å‚è¡¨ç¤ºæœ€å¤§è½®è¯¢æ¬¡æ•°ï¼› å¦‚æžœæˆåŠŸï¼Œè¿”å›žå€¼uiTimeOut > 0 è¡¨ç¤ºå®žé™…è½®è¯¢æ¬¡æ•°
+		ç¬¬2ä¸ªå½¢å‚1è¡¨ç¤ºç»“æŸåŽå‘é€STOP
 	*/
 	uiTimeOut = SI4730_WaitStatus80(1000, 1);
 	if (uiTimeOut > 0)
@@ -382,10 +382,10 @@ uint8_t SI4730_PowerUp_FM_Revice(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_PowerUp_AM_Revice
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSi4703ÎªAM½ÓÊÕÄ£Ê½£¬ Ä£ÄâÄ£Ê½£¨·ÇÊý×ÖÄ£Ê½)
-*	ÐÎ    ²Î:ÎÞ
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_PowerUp_AM_Revice
+*	åŠŸèƒ½è¯´æ˜Ž: é…ç½®Si4703ä¸ºAMæŽ¥æ”¶æ¨¡å¼ï¼Œ æ¨¡æ‹Ÿæ¨¡å¼ï¼ˆéžæ•°å­—æ¨¡å¼)
+*	å½¢    å‚:æ— 
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_PowerUp_AM_Revice(void)
@@ -395,7 +395,7 @@ uint8_t SI4730_PowerUp_AM_Revice(void)
 		CMD      0x01     POWER_UP
 		ARG1     0xC0     Set to FM Receive. Enable interrupts.
 		ARG2     0x05     Set to Analog Audio Output
-		STATUS   ¡ú0x80   Reply Status. Clear-to-send high.
+		STATUS   â†’0x80   Reply Status. Clear-to-send high.
 	*/
 
 	uint8_t ucCmdBuf[3];
@@ -407,8 +407,8 @@ uint8_t SI4730_PowerUp_AM_Revice(void)
 	SI4730_SendCmd(ucCmdBuf, 3);
 
 	/*
-		µÚ1¸öÐÎ²Î±íÊ¾×î´óÂÖÑ¯´ÎÊý£» Èç¹û³É¹¦£¬·µ»ØÖµuiTimeOut > 0 ±íÊ¾Êµ¼ÊÂÖÑ¯´ÎÊý
-		µÚ2¸öÐÎ²Î1±íÊ¾½áÊøºó·¢ËÍSTOP
+		ç¬¬1ä¸ªå½¢å‚è¡¨ç¤ºæœ€å¤§è½®è¯¢æ¬¡æ•°ï¼› å¦‚æžœæˆåŠŸï¼Œè¿”å›žå€¼uiTimeOut > 0 è¡¨ç¤ºå®žé™…è½®è¯¢æ¬¡æ•°
+		ç¬¬2ä¸ªå½¢å‚1è¡¨ç¤ºç»“æŸåŽå‘é€STOP
 	*/
 	uiTimeOut = SI4730_WaitStatus80(1000, 1);
 	if (uiTimeOut > 0)
@@ -416,23 +416,22 @@ uint8_t SI4730_PowerUp_AM_Revice(void)
 		return 1;
 	}
 
+	SI4730_SetProperty(0x3403, 5);
+	SI4730_SetProperty(0x3404, 25);
 
-    SI4730_SetProperty(0x3403, 5);
-    SI4730_SetProperty(0x3404, 25);
-
-    SI4730_SetProperty(0x3402, 10); // Set spacing to 10kHz
-    SI4730_SetProperty(0x3400, 520); // Set the band bottom to 520kHz
-    SI4730_SetProperty(0x3401, 1710);   // Set the band top to 1710kHz
+	SI4730_SetProperty(0x3402, 10);		// Set spacing to 10kHz
+	SI4730_SetProperty(0x3400, 520);	// Set the band bottom to 520kHz
+	SI4730_SetProperty(0x3401, 1710); // Set the band top to 1710kHz
 
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_PowerDown
-*	¹¦ÄÜËµÃ÷: ¹Ø±Õ Si470µçÔ´£¬Ä£ÄâÊä³ö¹Ø±Õ
-*	ÐÎ    ²Î:ÎÞ
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_PowerDown
+*	åŠŸèƒ½è¯´æ˜Ž: å…³é—­ Si470ç”µæºï¼Œæ¨¡æ‹Ÿè¾“å‡ºå…³é—­
+*	å½¢    å‚:æ— 
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_PowerDown(void)
@@ -451,8 +450,8 @@ uint8_t SI4730_PowerDown(void)
 	SI4730_SendCmd(ucCmdBuf, 1);
 
 	/*
-		µÚ1¸öÐÎ²Î±íÊ¾×î´óÂÖÑ¯´ÎÊý£» Èç¹û³É¹¦£¬·µ»ØÖµuiTimeOut > 0 ±íÊ¾Êµ¼ÊÂÖÑ¯´ÎÊý
-		µÚ2¸öÐÎ²Î1±íÊ¾½áÊøºó·¢ËÍSTOP
+		ç¬¬1ä¸ªå½¢å‚è¡¨ç¤ºæœ€å¤§è½®è¯¢æ¬¡æ•°ï¼› å¦‚æžœæˆåŠŸï¼Œè¿”å›žå€¼uiTimeOut > 0 è¡¨ç¤ºå®žé™…è½®è¯¢æ¬¡æ•°
+		ç¬¬2ä¸ªå½¢å‚1è¡¨ç¤ºç»“æŸåŽå‘é€STOP
 	*/
 	uiTimeOut = SI4730_WaitStatus80(1000, 1);
 	if (uiTimeOut > 0)
@@ -463,13 +462,12 @@ uint8_t SI4730_PowerDown(void)
 	return 0;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_GetRevision
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Æ÷¼þ¡¢¹Ì¼þÐÅÏ¢¡£ ·µ»Ø8×Ö½ÚÊý¾Ý
-*	ÐÎ    ²Î:_ReadBuf  ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ8
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_GetRevision
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–å™¨ä»¶ã€å›ºä»¶ä¿¡æ¯ã€‚ è¿”å›ž8å­—èŠ‚æ•°æ®
+*	å½¢    å‚:_ReadBuf  è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ8
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_GetRevision(uint8_t *_ReadBuf)
@@ -480,13 +478,13 @@ uint8_t SI4730_GetRevision(uint8_t *_ReadBuf)
 
 	/* AN223 page = 67 */
 
-	/* ·¢ËÍ 0x10 ÃüÁî */
+	/* å‘é€ 0x10 å‘½ä»¤ */
 	ucCmdBuf[0] = 0x10;
 	SI4730_SendCmd(ucCmdBuf, 1);
 
 	/*
-		µÚ1¸öÐÎ²Î±íÊ¾×î´óÂÖÑ¯´ÎÊý£» Èç¹û³É¹¦£¬·µ»ØÖµuiTimeOut > 0 ±íÊ¾Êµ¼ÊÂÖÑ¯´ÎÊý
-		µÚ2¸öÐÎ²Î0±íÊ¾½áÊøºó²»·¢ËÍSTOP£¬ ÒòÎª»¹ÐèÒª¶ÁÈ¡Æ÷¼þ·µ»ØÊý¾Ý
+		ç¬¬1ä¸ªå½¢å‚è¡¨ç¤ºæœ€å¤§è½®è¯¢æ¬¡æ•°ï¼› å¦‚æžœæˆåŠŸï¼Œè¿”å›žå€¼uiTimeOut > 0 è¡¨ç¤ºå®žé™…è½®è¯¢æ¬¡æ•°
+		ç¬¬2ä¸ªå½¢å‚0è¡¨ç¤ºç»“æŸåŽä¸å‘é€STOPï¼Œ å› ä¸ºè¿˜éœ€è¦è¯»å–å™¨ä»¶è¿”å›žæ•°æ®
 	*/
 	uiTimeOut = SI4730_WaitStatus80(10, 0);
 	if (uiTimeOut == 0)
@@ -494,7 +492,7 @@ uint8_t SI4730_GetRevision(uint8_t *_ReadBuf)
 		return 0;
 	}
 
-	/* Á¬Ðø¶ÁÈ¡8¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+	/* è¿žç»­è¯»å–8ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 	for (i = 0; i < 8; i++)
 	{
 		i2c_Ack();
@@ -507,10 +505,10 @@ uint8_t SI4730_GetRevision(uint8_t *_ReadBuf)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4704_SetFMAntIntput
-*	¹¦ÄÜËµÃ÷: ÉèÖÃFMÌìÏßÊäÈë
-*	ÐÎ    ²Î: _ch : 0 ±íÊ¾FMÒý½ÅÊäÈë(³¤ÌìÏß)  1 ±íÊ¾LPIÌìÏßÊäÈë(PCB¶ÌÌìÏß)
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4704_SetFMAntIntput
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®FMå¤©çº¿è¾“å…¥
+*	å½¢    å‚: _ch : 0 è¡¨ç¤ºFMå¼•è„šè¾“å…¥(é•¿å¤©çº¿)  1 è¡¨ç¤ºLPIå¤©çº¿è¾“å…¥(PCBçŸ­å¤©çº¿)
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4704_SetFMIntput(uint8_t _ch)
@@ -518,15 +516,15 @@ uint8_t SI4704_SetFMIntput(uint8_t _ch)
 	/* AN332 - PAGE 91 
 		Property 0x1107. FM_ANTENNA_INPUT */
 
-	return SI4730_SetProperty(0x1107, _ch);	
+	return SI4730_SetProperty(0x1107, _ch);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SetFMFreq
-*	¹¦ÄÜËµÃ÷: ÉèÖÃFMµ÷Ð³ÆµÂÊ
-*	ÐÎ    ²Î:_uiFreq : ÆµÂÊÖµ, µ¥Î» 10kHz
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SetFMFreq
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®FMè°ƒè°é¢‘çŽ‡
+*	å½¢    å‚:_uiFreq : é¢‘çŽ‡å€¼, å•ä½ 10kHz
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SetFMFreq(uint32_t _uiFreq)
@@ -562,9 +560,7 @@ uint8_t SI4730_SetFMFreq(uint32_t _uiFreq)
 		return 0;
 	}
 
-
-
-	/* µÈ´ýÆ÷¼þ×´Ì¬Îª 0x81 */
+	/* ç­‰å¾…å™¨ä»¶çŠ¶æ€ä¸º 0x81 */
 	for (i = 0; i < 5000; i++)
 	{
 		/* 0x14. GET_INT_STATUS */
@@ -574,7 +570,7 @@ uint8_t SI4730_SetFMFreq(uint32_t _uiFreq)
 		SI4730_Delay(10000);
 
 		i2c_Start();
-		i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+		i2c_SendByte(I2C_ADDR_SI4730_R); /* è¯» */
 		i2c_WaitAck();
 		status = i2c_ReadByte();
 		i2c_Stop();
@@ -586,17 +582,17 @@ uint8_t SI4730_SetFMFreq(uint32_t _uiFreq)
 
 	if (i == 5000)
 	{
-		return 0;	/* Ê§°Ü */
+		return 0; /* å¤±è´¥ */
 	}
 	return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SetAMFreq
-*	¹¦ÄÜËµÃ÷: ÉèÖÃAMµ÷Ð³ÆµÂÊ
-*	ÐÎ    ²Î:_uiFreq : ÆµÂÊÖµ, µ¥Î» 10kHz
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SetAMFreq
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®AMè°ƒè°é¢‘çŽ‡
+*	å½¢    å‚:_uiFreq : é¢‘çŽ‡å€¼, å•ä½ 10kHz
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SetAMFreq(uint32_t _uiFreq)
@@ -634,9 +630,7 @@ uint8_t SI4730_SetAMFreq(uint32_t _uiFreq)
 		return 0;
 	}
 
-
-
-	/* µÈ´ýÆ÷¼þ×´Ì¬Îª 0x81 */
+	/* ç­‰å¾…å™¨ä»¶çŠ¶æ€ä¸º 0x81 */
 	for (i = 0; i < 5000; i++)
 	{
 		/* 0x14. GET_INT_STATUS */
@@ -646,7 +640,7 @@ uint8_t SI4730_SetAMFreq(uint32_t _uiFreq)
 		SI4730_Delay(10000);
 
 		i2c_Start();
-		i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+		i2c_SendByte(I2C_ADDR_SI4730_R); /* è¯» */
 		i2c_WaitAck();
 		status = i2c_ReadByte();
 		i2c_Stop();
@@ -658,17 +652,17 @@ uint8_t SI4730_SetAMFreq(uint32_t _uiFreq)
 
 	if (i == 5000)
 	{
-		return 0;	/* Ê§°Ü */
+		return 0; /* å¤±è´¥ */
 	}
 	return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SetAMFreqCap
-*	¹¦ÄÜËµÃ÷: ÉèÖÃAMµ÷Ð³ÆµÂÊ
-*	ÐÎ    ²Î:_uiFreq : ÆµÂÊÖµ, µ¥Î» 10kHz    _usCap : µ÷Ð³µçÈÝ
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SetAMFreqCap
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®AMè°ƒè°é¢‘çŽ‡
+*	å½¢    å‚:_uiFreq : é¢‘çŽ‡å€¼, å•ä½ 10kHz    _usCap : è°ƒè°ç”µå®¹
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SetAMFreqCap(uint32_t _uiFreq, uint16_t _usCap)
@@ -706,7 +700,7 @@ uint8_t SI4730_SetAMFreqCap(uint32_t _uiFreq, uint16_t _usCap)
 		return 0;
 	}
 
-	/* µÈ´ýÆ÷¼þ×´Ì¬Îª 0x81 */
+	/* ç­‰å¾…å™¨ä»¶çŠ¶æ€ä¸º 0x81 */
 	for (i = 0; i < 5000; i++)
 	{
 		/* 0x14. GET_INT_STATUS */
@@ -716,7 +710,7 @@ uint8_t SI4730_SetAMFreqCap(uint32_t _uiFreq, uint16_t _usCap)
 		SI4730_Delay(10000);
 
 		i2c_Start();
-		i2c_SendByte(I2C_ADDR_SI4730_R);	/* ¶Á */
+		i2c_SendByte(I2C_ADDR_SI4730_R); /* è¯» */
 		i2c_WaitAck();
 		status = i2c_ReadByte();
 		i2c_Stop();
@@ -728,17 +722,17 @@ uint8_t SI4730_SetAMFreqCap(uint32_t _uiFreq, uint16_t _usCap)
 
 	if (i == 5000)
 	{
-		return 0;	/* Ê§°Ü */
+		return 0; /* å¤±è´¥ */
 	}
 	return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_GetAMTuneStatus
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡AMµ÷Ð³×´Ì¬
-*	ÐÎ    ²Î: ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ7
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_GetAMTuneStatus
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–AMè°ƒè°çŠ¶æ€
+*	å½¢    å‚: è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ7
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_GetAMTuneStatus(uint8_t *_ReadBuf)
@@ -751,12 +745,12 @@ uint8_t SI4730_GetAMTuneStatus(uint8_t *_ReadBuf)
 		RESP1     ?0x01          Channel is valid, AFC is not railed, and seek did not wrap at AM band boundary
 		RESP2     ?0x03
 		RESP3     ?0xE8          Frequency = 0x03E8 = 1000 kHz
-		RESP4     ?0x2A          RSSI = 0x2A = 42d = 42 dB¦ÌV
+		RESP4     ?0x2A          RSSI = 0x2A = 42d = 42 dBÎ¼V
 		RESP5     ?0x1A          SNR = 0x1A = 26d = 26 dB
 		RESP6     ?0x0D          Value the antenna tuning capacitor is set to.
 		RESP7     ?0x95          0x0D95 = 3477 dec.
 	
-		µçÈÝ¼ÆËã The tuning capacitance is 95 fF x READANTCAP + 7 pF	
+		ç”µå®¹è®¡ç®— The tuning capacitance is 95 fF x READANTCAP + 7 pF	
 	*/
 	uint8_t ucCmdBuf[32];
 	uint32_t uiTimeOut;
@@ -772,7 +766,7 @@ uint8_t SI4730_GetAMTuneStatus(uint8_t *_ReadBuf)
 		return 0;
 	}
 
-	/* Á¬Ðø¶ÁÈ¡7¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+	/* è¿žç»­è¯»å–7ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 	for (i = 0; i < 7; i++)
 	{
 		i2c_Ack();
@@ -781,15 +775,14 @@ uint8_t SI4730_GetAMTuneStatus(uint8_t *_ReadBuf)
 	i2c_NAck();
 	i2c_Stop();
 	return 1;
-
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_GetFMTuneStatus
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡FMµ÷Ð³×´Ì¬
-*	ÐÎ    ²Î: ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ7
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_GetFMTuneStatus
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–FMè°ƒè°çŠ¶æ€
+*	å½¢    å‚: è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ7
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_GetFMTuneStatus(uint8_t *_ReadBuf)
@@ -802,10 +795,10 @@ uint8_t SI4730_GetFMTuneStatus(uint8_t *_ReadBuf)
 		RESP1    ?0x01    Valid Frequency.
 		RESP2    ?0x27    Frequency = 0x27F6 = 102.3 MHz
 		RESP3    ?0xF6
-		RESP4    ?0x2D    RSSI = 45 dB¦ÌV
+		RESP4    ?0x2D    RSSI = 45 dBÎ¼V
 		RESP5    ?0x33    SNR = 51 dB
 		RESP6    ?0x00    MULT[7:0]
-		RESP7    ?0x00    Antenna tuning capacitor = 0 (range = 0¨C191)  READANTCAP[7:0] (Si4704/05/06/2x only)
+		RESP7    ?0x00    Antenna tuning capacitor = 0 (range = 0â€“191)  READANTCAP[7:0] (Si4704/05/06/2x only)
 	*/
 	uint8_t ucCmdBuf[32];
 	uint32_t uiTimeOut;
@@ -821,7 +814,7 @@ uint8_t SI4730_GetFMTuneStatus(uint8_t *_ReadBuf)
 		return 0;
 	}
 
-	/* Á¬Ðø¶ÁÈ¡7¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+	/* è¿žç»­è¯»å–7ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 	for (i = 0; i < 7; i++)
 	{
 		i2c_Ack();
@@ -830,15 +823,14 @@ uint8_t SI4730_GetFMTuneStatus(uint8_t *_ReadBuf)
 	i2c_NAck();
 	i2c_Stop();
 	return 1;
-
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_GetAMSignalQuality
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡AM½ÓÊÕÐÅºÅÖÊÁ¿
-*	ÐÎ    ²Î: _ReadBuf ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ5
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_GetAMSignalQuality
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–AMæŽ¥æ”¶ä¿¡å·è´¨é‡
+*	å½¢    å‚: _ReadBuf è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ5
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_GetAMSignalQuality(uint8_t *_ReadBuf)
@@ -855,7 +847,7 @@ uint8_t SI4730_GetAMSignalQuality(uint8_t *_ReadBuf)
 		RESP1      ?0x00     No SNR high, low, RSSI high, or low interrupts.
 		RESP2      ?0x01     Channel is valid, soft mute is not activated, and AFC is not railed
 		RESP3      ?0x00
-		RESP4      ?0x2A     RSSI = 0x2A = 42d = 42 dB¦ÌV
+		RESP4      ?0x2A     RSSI = 0x2A = 42d = 42 dBÎ¼V
 		RESP5      ?0x1A     SNR = 0x1A = 26d = 26 dB
 	*/
 	uint8_t ucCmdBuf[32];
@@ -872,7 +864,7 @@ uint8_t SI4730_GetAMSignalQuality(uint8_t *_ReadBuf)
 		return 0;
 	}
 
-	/* Á¬Ðø¶ÁÈ¡5¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+	/* è¿žç»­è¯»å–5ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 	for (i = 0; i < 5; i++)
 	{
 		i2c_Ack();
@@ -885,10 +877,10 @@ uint8_t SI4730_GetAMSignalQuality(uint8_t *_ReadBuf)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_GetFMSignalQuality
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡FM½ÓÊÕÐÅºÅÖÊÁ¿
-*	ÐÎ    ²Î: _ReadBuf ·µ»Ø½á¹û´æ·ÅÔÚ´Ë»º³åÇø£¬Çë±£Ö¤»º³åÇø´óÐ¡´óÓÚµÈÓÚ7
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_GetFMSignalQuality
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–FMæŽ¥æ”¶ä¿¡å·è´¨é‡
+*	å½¢    å‚: _ReadBuf è¿”å›žç»“æžœå­˜æ”¾åœ¨æ­¤ç¼“å†²åŒºï¼Œè¯·ä¿è¯ç¼“å†²åŒºå¤§å°å¤§äºŽç­‰äºŽ7
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_GetFMSignalQuality(uint8_t *_ReadBuf)
@@ -904,7 +896,7 @@ uint8_t SI4730_GetFMSignalQuality(uint8_t *_ReadBuf)
 		RESP1    ?0x00   No blend, SNR high, low, RSSI high or low interrupts.
 		RESP2    ?0x01   Soft mute is not engaged, no AFC rail, valid frequency.
 		RESP3    ?0xD9   Pilot presence, 89% blend
-		RESP4    ?0x2D   RSSI = 45 dB¦ÌV
+		RESP4    ?0x2D   RSSI = 45 dBÎ¼V
 		RESP5    ?0x33   SNR = 51 dB
 		RESP6    ?0x00
 		RESP7    ?0x00   Freq offset = 0 kHz
@@ -923,7 +915,7 @@ uint8_t SI4730_GetFMSignalQuality(uint8_t *_ReadBuf)
 		return 0;
 	}
 
-	/* Á¬Ðø¶ÁÈ¡7¸ö×Ö½ÚµÄÆ÷¼þ·µ»ØÐÅÏ¢ */
+	/* è¿žç»­è¯»å–7ä¸ªå­—èŠ‚çš„å™¨ä»¶è¿”å›žä¿¡æ¯ */
 	for (i = 0; i < 7; i++)
 	{
 		i2c_Ack();
@@ -936,10 +928,10 @@ uint8_t SI4730_GetFMSignalQuality(uint8_t *_ReadBuf)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: SI4730_SetOutVlomue
-*	¹¦ÄÜËµÃ÷: ÉèÖÃSi4730Êä³öÒôÁ¿
-*	ÐÎ    ²Î: _ucVolume; ÖµÓò[0-63];
-*	·µ »Ø Öµ: 0 Ê§°Ü£¬ 1 ³É¹¦
+*	å‡½ æ•° å: SI4730_SetOutVlomue
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®Si4730è¾“å‡ºéŸ³é‡
+*	å½¢    å‚: _ucVolume; å€¼åŸŸ[0-63];
+*	è¿” å›ž å€¼: 0 å¤±è´¥ï¼Œ 1 æˆåŠŸ
 *********************************************************************************************************
 */
 uint8_t SI4730_SetOutVolume(uint8_t _ucVolume)
@@ -960,4 +952,4 @@ uint8_t SI4730_SetOutVolume(uint8_t _ucVolume)
 	return SI4730_SetProperty(0x4000, _ucVolume);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

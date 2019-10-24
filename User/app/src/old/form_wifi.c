@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ²âÊÔWIFIÄ£¿é
-*	ÎÄ¼şÃû³Æ : wifi_test.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔ´®¿ÚWiFiÄ£¿é. Ê¹ÓÃ´®¿Ú³¬¼¶ÖÕ¶Ë¹¤¾ß¿ÉÒÔ²Ù×÷±¾Àı×Ó¡£ÎªÁË²âÊÔATÖ¸Áî
-*				SecureCRT £¬ĞèÒªÅäÖÃÎª: ²Ëµ¥Ñ¡Ïî -> »á»°Ñ¡Ïî -> ×ó²àÀ¸ÖÕ¶Ë -> ·ÂÕæ -> Ä£Ê½
-*					ÓÒ²à´°¿Ú£¬µ±Ç°Ä£Ê½ÖĞ¹´Ñ¡"ĞÂĞĞÄ£Ê½"
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-07-16 armfly  Ê×·¢
+*	æ¨¡å—åç§° : æµ‹è¯•WIFIæ¨¡å—
+*	æ–‡ä»¶åç§° : wifi_test.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•ä¸²å£WiFiæ¨¡å—. ä½¿ç”¨ä¸²å£è¶…çº§ç»ˆç«¯å·¥å…·å¯ä»¥æ“ä½œæœ¬ä¾‹å­ã€‚ä¸ºäº†æµ‹è¯•ATæŒ‡ä»¤
+*				SecureCRT ï¼Œéœ€è¦é…ç½®ä¸º: èœå•é€‰é¡¹ -> ä¼šè¯é€‰é¡¹ -> å·¦ä¾§æ ç»ˆç«¯ -> ä»¿çœŸ -> æ¨¡å¼
+*					å³ä¾§çª—å£ï¼Œå½“å‰æ¨¡å¼ä¸­å‹¾é€‰"æ–°è¡Œæ¨¡å¼"
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-07-16 armfly  é¦–å‘
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,104 +20,106 @@
 #include "form_wifi.h"
 #include "num_pad.h"
 
-#define AP_MAX_NUM	30
+#define AP_MAX_NUM 30
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
 	FONT_T FontRed;
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBtn; /* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox; /* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
-	LABEL_T Label7; LABEL_T Label8;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
+	LABEL_T Label7;
+	LABEL_T Label8;
 
 	LABEL_T Label9;
 
-	EDIT_T Edit1;		/* WIFIÃÜÂë */
+	EDIT_T Edit1; /* WIFIå¯†ç  */
 
-	BUTTON_T Btn1;		/* ÁĞ¾ÙAP */
-	BUTTON_T Btn2;		/* ¼ÓÈëAP */
-	BUTTON_T Btn3;		/*   */
-	BUTTON_T Btn4;		/*   */
+	BUTTON_T Btn1; /* åˆ—ä¸¾AP */
+	BUTTON_T Btn2; /* åŠ å…¥AP */
+	BUTTON_T Btn3; /*   */
+	BUTTON_T Btn4; /*   */
 
-	BUTTON_T BtnRet;	/* ·µ»Ø */
-	
-	
-	WIFI_AP_T APList[AP_MAX_NUM];	/* AP ÁĞ±í */	
+	BUTTON_T BtnRet; /* è¿”å› */
 
-}FormWIFI_T;
+	WIFI_AP_T APList[AP_MAX_NUM]; /* AP åˆ—è¡¨ */
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+} FormWIFI_T;
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"ESP8266 WiFiÄ£¿é²âÊÔ³ÌĞò."
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "ESP8266 WiFiæ¨¡å—æµ‹è¯•ç¨‹åº."
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(g_LcdHeight - 28)
-#define LABEL1_TEXT	"--- "
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-/* °´Å¥ */
-#define BTN1_H		32
-#define BTN1_W		120
-#define	BTN1_X		(g_LcdWidth - BTN1_W - 10)
-#define	BTN1_Y		20
-#define	BTN1_TEXT	"ÁĞ¾ÙAP"
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (g_LcdHeight - 28)
+#define LABEL1_TEXT "--- "
+
+/* æŒ‰é’® */
+#define BTN1_H 32
+#define BTN1_W 120
+#define BTN1_X (g_LcdWidth - BTN1_W - 10)
+#define BTN1_Y 20
+#define BTN1_TEXT "åˆ—ä¸¾AP"
 
 /* Edit */
-#define	EDIT1_X		BTN1_X
-#define	EDIT1_Y	 	(BTN1_Y + (BTN1_H + 2))
-#define EDIT1_H		BTN1_H
-#define EDIT1_W		BTN1_W
+#define EDIT1_X BTN1_X
+#define EDIT1_Y (BTN1_Y + (BTN1_H + 2))
+#define EDIT1_H BTN1_H
+#define EDIT1_W BTN1_W
 
-#define LABEL2_X  	EDIT1_X - 45
-#define LABEL2_Y	EDIT1_Y + 4
-#define LABEL2_TEXT	"ÃÜÂë:"
+#define LABEL2_X EDIT1_X - 45
+#define LABEL2_Y EDIT1_Y + 4
+#define LABEL2_TEXT "å¯†ç :"
 
-#define BTN2_H		BTN1_H
-#define BTN2_W		BTN1_W
-#define	BTN2_X		BTN1_X
-#define	BTN2_Y		(BTN1_Y + (BTN1_H + 2) * 2)
-#define	BTN2_TEXT	"¼ÓÈëAP"
+#define BTN2_H BTN1_H
+#define BTN2_W BTN1_W
+#define BTN2_X BTN1_X
+#define BTN2_Y (BTN1_Y + (BTN1_H + 2) * 2)
+#define BTN2_TEXT "åŠ å…¥AP"
 
-#define BTN3_H		BTN1_H
-#define BTN3_W		BTN1_W
-#define	BTN3_X		BTN1_X
-#define	BTN3_Y		(BTN1_Y + (BTN1_H + 2) * 3)
-#define	BTN3_TEXT	"²é¿´±¾»úIP"
+#define BTN3_H BTN1_H
+#define BTN3_W BTN1_W
+#define BTN3_X BTN1_X
+#define BTN3_Y (BTN1_Y + (BTN1_H + 2) * 3)
+#define BTN3_TEXT "æŸ¥çœ‹æœ¬æœºIP"
 
-#define BTN4_H		BTN1_H
-#define BTN4_W		BTN1_W
-#define	BTN4_X		BTN1_X
-#define	BTN4_Y		(BTN1_Y + (BTN1_H + 2) * 4)
-#define	BTN4_TEXT	"´´½¨TCP·şÎñ"
+#define BTN4_H BTN1_H
+#define BTN4_W BTN1_W
+#define BTN4_X BTN1_X
+#define BTN4_Y (BTN1_Y + (BTN1_H + 2) * 4)
+#define BTN4_TEXT "åˆ›å»ºTCPæœåŠ¡"
 
-	
 static void InitFormWIFI(void);
 static void DispFormWIFI(void);
 static void DispInfoWiFi(char *_str);
 
 FormWIFI_T *FormWIFI;
 
-int16_t g_APCount = 0;	
+int16_t g_APCount = 0;
 uint8_t g_TCPServerOk = 0;
 
 static void ScanAP(void);
@@ -126,16 +128,16 @@ void AnlyzeHostCmd(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestWIFI
-*	¹¦ÄÜËµÃ÷: ²âÊÔ´®¿ÚWiFiÄ£¿é
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestWIFI
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•ä¸²å£WiFiæ¨¡å—
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestWIFI(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	uint8_t ucValue;
@@ -148,37 +150,36 @@ void TestWIFI(void)
 
 	InitFormWIFI();
 	DispFormWIFI();
-	
+
 	bsp_InitESP8266();
-	
+
 	//WiFiDispHelp();
-		
-	DispInfoWiFi("¡¾1¡¿ÕıÔÚ¸øESP8266Ä£¿éÉÏµç...(²¨ÌØÂÊ: 74880bsp)");
-	printf("\r\n¡¾1¡¿ÕıÔÚ¸øESP8266Ä£¿éÉÏµç...(²¨ÌØÂÊ: 74880bsp)\r\n");
-	
+
+	DispInfoWiFi("ã€1ã€‘æ­£åœ¨ç»™ESP8266æ¨¡å—ä¸Šç”µ...(æ³¢ç‰¹ç‡: 74880bsp)");
+	printf("\r\nã€1ã€‘æ­£åœ¨ç»™ESP8266æ¨¡å—ä¸Šç”µ...(æ³¢ç‰¹ç‡: 74880bsp)\r\n");
+
 	ESP8266_PowerOn();
 
-	DispInfoWiFi("¡¾2¡¿ÉÏµçÍê³É¡£²¨ÌØÂÊ: 115200bsp");
-	printf("\r\n¡¾2¡¿ÉÏµçÍê³É¡£²¨ÌØÂÊ: 115200bsp\r\n");
-	
-	// 
-	DispInfoWiFi("¡¾3¡¿²âÊÔATÖ¸Áî");
+	DispInfoWiFi("ã€2ã€‘ä¸Šç”µå®Œæˆã€‚æ³¢ç‰¹ç‡: 115200bsp");
+	printf("\r\nã€2ã€‘ä¸Šç”µå®Œæˆã€‚æ³¢ç‰¹ç‡: 115200bsp\r\n");
+
+	//
+	DispInfoWiFi("ã€3ã€‘æµ‹è¯•ATæŒ‡ä»¤");
 	ESP8266_SendAT("AT");
 	if (ESP8266_WaitResponse("OK", 50) == 1)
 	{
-		DispInfoWiFi("¡¾3¡¿Ä£¿éÓ¦´ğAT³É¹¦");
+		DispInfoWiFi("ã€3ã€‘æ¨¡å—åº”ç­”ATæˆåŠŸ");
 		bsp_DelayMS(1000);
 	}
 	else
 	{
-		DispInfoWiFi("¡¾3¡¿Ä£¿éÎŞÓ¦´ğ, Çë°´K3¼üĞŞ¸ÄÄ£¿éµÄ²¨ÌØÂÊÎª115200");
+		DispInfoWiFi("ã€3ã€‘æ¨¡å—æ— åº”ç­”, è¯·æŒ‰K3é”®ä¿®æ”¹æ¨¡å—çš„æ³¢ç‰¹ç‡ä¸º115200");
 		bsp_DelayMS(1000);
 	}
-	
-	
+
 	g_TCPServerOk = 0;
-	
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -188,14 +189,14 @@ void TestWIFI(void)
 			AnlyzeHostCmd();
 		}
 		else
-		{			
-			/* ´ÓWIFIÊÕµ½µÄÊı¾İ·¢ËÍµ½´®¿Ú1 */
+		{
+			/* ä»WIFIæ”¶åˆ°çš„æ•°æ®å‘é€åˆ°ä¸²å£1 */
 			if (comGetChar(COM_ESP8266, &ucValue))
 			{
 				comSendChar(COM1, ucValue);
 				continue;
 			}
-			/* ½«´®¿Ú1µÄÊı¾İ·¢ËÍµ½MG323Ä£¿é */
+			/* å°†ä¸²å£1çš„æ•°æ®å‘é€åˆ°MG323æ¨¡å— */
 			if (comGetChar(COM1, &ucValue))
 			{
 				comSendChar(COM_ESP8266, ucValue);
@@ -208,175 +209,175 @@ void TestWIFI(void)
 			fRefresh = 0;
 
 			LCD_ClrScr(CL_BTN_FACE);
-			DispFormWIFI();	/* Ë¢ĞÂËùÓĞ¿Ø¼ş */
+			DispFormWIFI(); /* åˆ·æ–°æ‰€æœ‰æ§ä»¶ */
 			DispAP();
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */			
-					LCD_ButtonTouchDown(&FormWIFI->BtnRet, tpX, tpY);
-					LCD_ButtonTouchDown(&FormWIFI->Btn1, tpX, tpY);
-					LCD_ButtonTouchDown(&FormWIFI->Btn2, tpX, tpY);
-					LCD_ButtonTouchDown(&FormWIFI->Btn3, tpX, tpY);
-					LCD_ButtonTouchDown(&FormWIFI->Btn4, tpX, tpY);			
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				LCD_ButtonTouchDown(&FormWIFI->BtnRet, tpX, tpY);
+				LCD_ButtonTouchDown(&FormWIFI->Btn1, tpX, tpY);
+				LCD_ButtonTouchDown(&FormWIFI->Btn2, tpX, tpY);
+				LCD_ButtonTouchDown(&FormWIFI->Btn3, tpX, tpY);
+				LCD_ButtonTouchDown(&FormWIFI->Btn4, tpX, tpY);
 
-					/* ±à¼­¿ò */
-					if (TOUCH_InRect(tpX, tpY, EDIT1_X, EDIT1_Y, EDIT1_H, EDIT1_W))
+				/* ç¼–è¾‘æ¡† */
+				if (TOUCH_InRect(tpX, tpY, EDIT1_X, EDIT1_Y, EDIT1_H, EDIT1_W))
+				{
 					{
+						uint8_t len = 30;
+
+						if (InputNumber(NUMPAD_STR, "è¾“å…¥WiFiå¯†ç ", &len, (void *)FormWIFI->Edit1.Text))
 						{
-							uint8_t len = 30;
-							
-							if (InputNumber(NUMPAD_STR, "ÊäÈëWiFiÃÜÂë", &len, (void *)FormWIFI->Edit1.Text))
-							{
-								;
-							}							
-							fRefresh = 1;
+							;
+						}
+						fRefresh = 1;
+					}
+				}
+				break;
+
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&FormWIFI->BtnRet, tpX, tpY))
+				{
+					fQuit = 1; /* è¿”å› */
+				}
+				else if (LCD_ButtonTouchRelease(&FormWIFI->Btn1, tpX, tpY))
+				{
+					ScanAP(); /* æ‰«æAP */
+					DispAP();
+				}
+				else if (LCD_ButtonTouchRelease(&FormWIFI->Btn2, tpX, tpY))
+				{
+					int32_t sn = 0;
+					char buf[64];
+
+					if (InputInt("é€‰æ‹©APåºå·", 0, 20, &sn))
+					{
+						LCD_ClrScr(CL_BTN_FACE);
+						DispFormWIFI(); /* åˆ·æ–°æ‰€æœ‰æ§ä»¶ */
+						DispAP();
+
+						if (sn > 1)
+						{
+							sn--;
+						}
+
+						sprintf(buf, "æ­£åœ¨åŠ å…¥AP... è¯·ç­‰å¾… %s", FormWIFI->APList[sn].ssid);
+						DispInfoWiFi(buf);
+						/* åŠ å…¥AP è¶…æ—¶æ—¶é—´ 10000msï¼Œ10ç§’ */
+						if (ESP8266_JoinAP(FormWIFI->APList[sn].ssid, FormWIFI->Edit1.Text, 15000))
+						{
+							DispInfoWiFi("æ¥å…¥APæˆåŠŸ");
+						}
+						else
+						{
+							DispInfoWiFi("æ¥å…¥APå¤±è´¥");
 						}
 					}
-					break;
-
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&FormWIFI->BtnRet, tpX, tpY))
+					else
 					{
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else if (LCD_ButtonTouchRelease(&FormWIFI->Btn1, tpX, tpY))
-					{
-						ScanAP();	/* É¨ÃèAP */
+						LCD_ClrScr(CL_BTN_FACE);
+						DispFormWIFI(); /* åˆ·æ–°æ‰€æœ‰æ§ä»¶ */
 						DispAP();
 					}
-					else if (LCD_ButtonTouchRelease(&FormWIFI->Btn2, tpX, tpY))
-					{
-						int32_t sn = 0;
-						char buf[64];
-						
-						if (InputInt("Ñ¡ÔñAPĞòºÅ", 0, 20, &sn))
-						{		
-							LCD_ClrScr(CL_BTN_FACE);
-							DispFormWIFI();	/* Ë¢ĞÂËùÓĞ¿Ø¼ş */
-							DispAP();
-							
-							if (sn > 1)
-							{
-								sn--;
-							}			
+				}
+				else if (LCD_ButtonTouchRelease(&FormWIFI->Btn3, tpX, tpY)) /* æŸ¥çœ‹æœ¬æœºIP */
+				{
+					char ip[20];
+					char mac[32];
+					char buf[128];
 
-							sprintf(buf, "ÕıÔÚ¼ÓÈëAP... ÇëµÈ´ı %s", FormWIFI->APList[sn].ssid);
-							DispInfoWiFi(buf);							
-							/* ¼ÓÈëAP ³¬Ê±Ê±¼ä 10000ms£¬10Ãë */
-							if (ESP8266_JoinAP(FormWIFI->APList[sn].ssid, FormWIFI->Edit1.Text, 15000))
-							{
-								DispInfoWiFi("½ÓÈëAP³É¹¦");
-							}
-							else
-							{
-								DispInfoWiFi("½ÓÈëAPÊ§°Ü");
-							}
-						}	
+					if (ESP8266_GetLocalIP(ip, mac) == 1)
+					{
+						sprintf(buf, "%s, %s", ip, mac);
+						DispInfoWiFi(buf);
+					}
+					else
+					{
+						DispInfoWiFi("æŸ¥è¯¢IPå¤±è´¥");
+					}
+				}
+				else if (LCD_ButtonTouchRelease(&FormWIFI->Btn4, tpX, tpY)) /* æ‹¨æ‰“10086 */
+				{
+					if (g_TCPServerOk == 0)
+					{
+						if (ESP8266_CreateTCPServer(1000) == 1)
+						{
+							DispInfoWiFi("æ­£åœ¨ç›‘å¬1000ç«¯å£...");
+							g_TCPServerOk = 1;
+						}
 						else
 						{
-							LCD_ClrScr(CL_BTN_FACE);
-							DispFormWIFI();	/* Ë¢ĞÂËùÓĞ¿Ø¼ş */
-							DispAP();
+							DispInfoWiFi("åˆ›å»ºTCPæœåŠ¡å¤±è´¥!");
 						}
 					}
-					else if (LCD_ButtonTouchRelease(&FormWIFI->Btn3, tpX, tpY))	/* ²é¿´±¾»úIP */
+					else
 					{
-						char ip[20];
-						char mac[32];
-						char buf[128];
-						
-						if (ESP8266_GetLocalIP(ip, mac) == 1)
-						{
-							sprintf(buf, "%s, %s", ip, mac);
-							DispInfoWiFi(buf);
-						}
-						else
-						{
-							DispInfoWiFi("²éÑ¯IPÊ§°Ü");
-						}
+						ESP8266_CloseTcpUdp(0);
+						g_TCPServerOk = 0;
+						DispInfoWiFi("å…³é—­å½“å‰TCPè¿æ¥!");
 					}
-					else if (LCD_ButtonTouchRelease(&FormWIFI->Btn4, tpX, tpY))	/* ²¦´ò10086 */
-					{
-						if (g_TCPServerOk == 0)
-						{
-							if (ESP8266_CreateTCPServer(1000) == 1)
-							{
-								DispInfoWiFi("ÕıÔÚ¼àÌı1000¶Ë¿Ú...");
-								g_TCPServerOk = 1;
-							}
-							else
-							{
-								DispInfoWiFi("´´½¨TCP·şÎñÊ§°Ü!");
-							}							
-						}
-						else
-						{
-							ESP8266_CloseTcpUdp(0);
-							g_TCPServerOk = 0;
-							DispInfoWiFi("¹Ø±Õµ±Ç°TCPÁ¬½Ó!");
-						}
-					}				
-					break;
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
-			{			
-				case KEY_DOWN_K1:			/* K1¼ü°´ÏÂ */
-					//ESP8266_SendAT("AT+CWLAP");	/* ÁĞ¾ÙAP */
-					break;
+			{
+			case KEY_DOWN_K1: /* K1é”®æŒ‰ä¸‹ */
+				//ESP8266_SendAT("AT+CWLAP");	/* åˆ—ä¸¾AP */
+				break;
 
-				case KEY_DOWN_K2:			/* K2¼ü°´ÏÂ */
-					//ESP8266_SendAT("AT+CWJAP=\"Tenda_5BD8A8\",\"123456887af\"");	/* ¼ÓÈëÄ³¸öWIFI ÍøÂç */
-					//ESP8266_JoinAP("Tenda_5BD8A8", "123456887af");
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				//ESP8266_SendAT("AT+CWJAP=\"Tenda_5BD8A8\",\"123456887af\"");	/* åŠ å…¥æŸä¸ªWIFI ç½‘ç»œ */
+				//ESP8266_JoinAP("Tenda_5BD8A8", "123456887af");
+				break;
 
-				case KEY_DOWN_K3:			/* K3¼ü-9600²¨ÌØÂÊÇĞ»»µ½115200 */
-					comSetBaud(COM_ESP8266, 9600);			/* Ä£¿éÈ±Ê¡ÊÇ9600bps */
-					ESP8266_SendAT("AT+CIOBAUD=115200");	/* °´ 9600bps ·¢ËÍÖ¸ÁîÇĞ»»Îª 115200 */
-					ESP8266_WaitResponse("OK", 2000);		/* Õâ¸ö OK ÊÇÄ£¿é°´ 9600 Ó¦´ğµÄ */
-					comSetBaud(COM_ESP8266, 115200);		/* ÇĞ»»STM32µÄ²¨ÌØÂÊÎª 115200 */
+			case KEY_DOWN_K3:											 /* K3é”®-9600æ³¢ç‰¹ç‡åˆ‡æ¢åˆ°115200 */
+				comSetBaud(COM_ESP8266, 9600);			 /* æ¨¡å—ç¼ºçœæ˜¯9600bps */
+				ESP8266_SendAT("AT+CIOBAUD=115200"); /* æŒ‰ 9600bps å‘é€æŒ‡ä»¤åˆ‡æ¢ä¸º 115200 */
+				ESP8266_WaitResponse("OK", 2000);		 /* è¿™ä¸ª OK æ˜¯æ¨¡å—æŒ‰ 9600 åº”ç­”çš„ */
+				comSetBaud(COM_ESP8266, 115200);		 /* åˆ‡æ¢STM32çš„æ³¢ç‰¹ç‡ä¸º 115200 */
 
-					/* ÇĞ»»Îª StationÄ£Ê½ */
-					bsp_DelayMS(100);
-					ESP8266_SendAT("AT+CWMODE=1");
-					ESP8266_WaitResponse("OK", 2000);
-					bsp_DelayMS(1500);
-					ESP8266_SendAT("AT+RST");
-					break;
+				/* åˆ‡æ¢ä¸º Stationæ¨¡å¼ */
+				bsp_DelayMS(100);
+				ESP8266_SendAT("AT+CWMODE=1");
+				ESP8266_WaitResponse("OK", 2000);
+				bsp_DelayMS(1500);
+				ESP8266_SendAT("AT+RST");
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËÉÏ¼ü£¬ AT+CIFSR»ñÈ¡±¾µØIPµØÖ· */
-					ESP8266_SendAT("AT+CIFSR");
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†ä¸Šé”®ï¼Œ AT+CIFSRè·å–æœ¬åœ°IPåœ°å€ */
+				ESP8266_SendAT("AT+CIFSR");
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü AT+CIPSTATUS»ñµÃIPÁ¬½Ó×´Ì¬ */
-					ESP8266_SendAT("AT+CIPSTATUS");
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”® AT+CIPSTATUSè·å¾—IPè¿æ¥çŠ¶æ€ */
+				ESP8266_SendAT("AT+CIPSTATUS");
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ   AT+CIPSTART ½¨Á¢TCPÁ¬½Ó. ·ÃÎÊwww,armfly.com http·şÎñ¶Ë¿Ú */
-					ESP8266_SendAT("AT+CIPSTART=\"TCP\",\"WWW.ARMFLY.COM\",80");
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹   AT+CIPSTART å»ºç«‹TCPè¿æ¥. è®¿é—®www,armfly.com httpæœåŠ¡ç«¯å£ */
+				ESP8266_SendAT("AT+CIPSTART=\"TCP\",\"WWW.ARMFLY.COM\",80");
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ  AT+CIPCLOSE¹Ø±Õµ±Ç°µÄTCP»òUDPÁ¬½Ó  */
-					ESP8266_SendAT("AT+CIPCLOSE");
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹  AT+CIPCLOSEå…³é—­å½“å‰çš„TCPæˆ–UDPè¿æ¥  */
+				ESP8266_SendAT("AT+CIPCLOSE");
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ  */
-					//printf("\r\n½øÈë¹Ì¼şÉı¼¶Ä£Ê½\r\n");
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹  */
+				//printf("\r\nè¿›å…¥å›ºä»¶å‡çº§æ¨¡å¼\r\n");
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -384,27 +385,27 @@ void TestWIFI(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AnlyzeHostCmd
-*	¹¦ÄÜËµÃ÷: ·ÖÎöTCP¿Í»§¶Ë·¢À´µÄÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AnlyzeHostCmd
+*	åŠŸèƒ½è¯´æ˜: åˆ†æTCPå®¢æˆ·ç«¯å‘æ¥çš„æ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-		
+
 void AnlyzeHostCmd(void)
 {
-	uint8_t cmd_buf[2048];	
+	uint8_t cmd_buf[2048];
 	//uint8_t *cmd_buf;
 	uint8_t cmd_len;
 	static uint8_t s_test = 0;
 
-	//cmd_buf = (uint8_t *)EXT_SRAM_ADDR;	/* Ö¸ÏòÍâ²¿SRAM */
+	//cmd_buf = (uint8_t *)EXT_SRAM_ADDR;	/* æŒ‡å‘å¤–éƒ¨SRAM */
 	cmd_len = ESP8266_RxNew(cmd_buf);
 	if (cmd_len == 0)
 	{
 		return;
 	}
-	
+
 	if (s_test == 1)
 	{
 		if ((cmd_len == 1) && (memcmp(cmd_buf, "A", 1)) == 0)
@@ -416,7 +417,7 @@ void AnlyzeHostCmd(void)
 	{
 		ESP8266_SendTcpUdp("OK", 2);
 	}
-	
+
 	if ((cmd_len == 6) && (memcmp(cmd_buf, "txtest", 6)) == 0)
 	{
 		s_test = 1;
@@ -430,8 +431,8 @@ void AnlyzeHostCmd(void)
 	else if ((cmd_len == 4) && (memcmp(cmd_buf, "stop", 4)) == 0)
 	{
 		s_test = 0;
-	}	
-	else 
+	}
+	else
 	{
 		if (cmd_len == 7)
 		{
@@ -484,53 +485,52 @@ void AnlyzeHostCmd(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ScanAP
-*	¹¦ÄÜËµÃ÷: É¨ÃèAP£¬²¢ÏÔÊ¾³öÀ´.
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ScanAP
+*	åŠŸèƒ½è¯´æ˜: æ‰«æAPï¼Œå¹¶æ˜¾ç¤ºå‡ºæ¥.
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ScanAP(void)
 {
-	/* É¨Ãè APÁĞ±í, ·µ»ØAP¸öÊı */
+	/* æ‰«æ APåˆ—è¡¨, è¿”å›APä¸ªæ•° */
 	g_APCount = ESP8266_ScanAP(FormWIFI->APList, AP_MAX_NUM);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispAP
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾É¨Ãèµ½µÄAP
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispAP
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰«æåˆ°çš„AP
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispAP(void)
 {
 	char buf[48];
 	FONT_T tFont;
-	uint16_t x, y;	
+	uint16_t x, y;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_GREY;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BTN_FACE;		/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_GREY;		 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
-	
+
 	x = 10;
-	y = 25;	
-	
-	
+	y = 25;
+
 	LCD_Fill_Rect(x, y, 234, 280, CL_BTN_FACE);
-	
-	sprintf(buf, "¹²É¨Ãèµ½%d¸öWiFi AP", g_APCount);
+
+	sprintf(buf, "å…±æ‰«æåˆ°%dä¸ªWiFi AP", g_APCount);
 	DispInfoWiFi(buf);
-	
+
 	{
 		uint8_t i;
 		uint8_t m;
-		//const char *ecn_name[5] = 
+		//const char *ecn_name[5] =
 		//{
 		//	"OPEN", "WEP", "WPA_PSK", "WPA2_PSK", "WPA_WPA2_PSK"
 		//};
@@ -540,41 +540,41 @@ static void DispAP(void)
 			m = 13;
 		}
 		for (i = 0; i < m; i++)
-		{			
+		{
 			//sprintf(buf, "  %02d=%s, rssi=%d, [%s]\r\n", i+1, g_APList[i].ssid, g_APList[i].rssi,
 			//	ecn_name[g_APList[i].ecn]);
-			
-			sprintf(buf, "%02d=%s, %ddBm", i+1, FormWIFI->APList[i].ssid, FormWIFI->APList[i].rssi);
-			
-			LCD_DispStr(x , y, buf, &tFont);	
+
+			sprintf(buf, "%02d=%s, %ddBm", i + 1, FormWIFI->APList[i].ssid, FormWIFI->APList[i].rssi);
+
+			LCD_DispStr(x, y, buf, &tFont);
 			y += 17;
 		}
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormWIFI
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormWIFI
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormWIFI(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormWIFI->FontBox.FontCode = FC_ST_16;
-	FormWIFI->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormWIFI->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormWIFI->FontBox.FrontColor = CL_BLACK;
 	FormWIFI->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormWIFI->FontBlack.FontCode = FC_ST_16;
-	FormWIFI->FontBlack.BackColor = CL_BTN_FACE;		/* Í¸Ã÷É« */
+	FormWIFI->FontBlack.BackColor = CL_BTN_FACE; /* é€æ˜è‰² */
 	FormWIFI->FontBlack.FrontColor = CL_BLACK;
 	FormWIFI->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormWIFI->FontBlue.FontCode = FC_ST_16;
 	FormWIFI->FontBlue.BackColor = CL_BTN_FACE;
 	FormWIFI->FontBlue.FrontColor = CL_BLUE;
@@ -585,13 +585,13 @@ static void InitFormWIFI(void)
 	FormWIFI->FontRed.FrontColor = CL_RED;
 	FormWIFI->FontRed.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormWIFI->FontBtn.FontCode = FC_ST_16;
-	FormWIFI->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormWIFI->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormWIFI->FontBtn.FrontColor = CL_BLACK;
 	FormWIFI->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormWIFI->Box1.Left = BOX1_X;
 	FormWIFI->Box1.Top = BOX1_Y;
 	FormWIFI->Box1.Height = BOX1_H;
@@ -599,7 +599,7 @@ static void InitFormWIFI(void)
 	FormWIFI->Box1.pCaption = BOX1_TEXT;
 	FormWIFI->Box1.Font = &FormWIFI->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormWIFI->Label1.Left = LABEL1_X;
 	FormWIFI->Label1.Top = LABEL1_Y;
 	FormWIFI->Label1.MaxLen = 0;
@@ -612,7 +612,7 @@ static void InitFormWIFI(void)
 	FormWIFI->Label2.pCaption = LABEL2_TEXT;
 	FormWIFI->Label2.Font = &FormWIFI->FontBlack;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormWIFI->BtnRet.Left = BTN_RET_X;
 	FormWIFI->BtnRet.Top = BTN_RET_Y;
 	FormWIFI->BtnRet.Height = BTN_RET_H;
@@ -653,7 +653,7 @@ static void InitFormWIFI(void)
 	FormWIFI->Btn4.Font = &FormWIFI->FontBtn;
 	FormWIFI->Btn4.Focus = 0;
 
-	/* ±à¼­¿ò */
+	/* ç¼–è¾‘æ¡† */
 	FormWIFI->Edit1.Left = EDIT1_X;
 	FormWIFI->Edit1.Top = EDIT1_Y;
 	FormWIFI->Edit1.Height = EDIT1_H;
@@ -665,10 +665,10 @@ static void InitFormWIFI(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispInfoWiFi
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ĞÅÏ¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispInfoWiFi
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºä¿¡æ¯
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispInfoWiFi(char *_str)
@@ -679,36 +679,35 @@ static void DispInfoWiFi(char *_str)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormWIFI
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormWIFI
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormWIFI(void)
 {
 	//LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormWIFI->Box1);
 
-	/* ±êÇ© */
+	/* æ ‡ç­¾ */
 	LCD_DrawLabel(&FormWIFI->Label1);
 	LCD_DrawLabel(&FormWIFI->Label2);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormWIFI->BtnRet);
 	LCD_DrawButton(&FormWIFI->Btn1);
 	LCD_DrawButton(&FormWIFI->Btn2);
 	LCD_DrawButton(&FormWIFI->Btn3);
-	LCD_DrawButton(&FormWIFI->Btn4);	
+	LCD_DrawButton(&FormWIFI->Btn4);
 
-	/* ±à¼­¿ò */
+	/* ç¼–è¾‘æ¡† */
 	LCD_DrawEdit(&FormWIFI->Edit1);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormWIFI->Label2);
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : SPI◊‹œﬂ«˝∂Ø
-*	Œƒº˛√˚≥∆ : bsp_spi_bus.h
-*	∞Ê    ±æ : V1.0
-*	Àµ    √˜ : Õ∑Œƒº˛
+*	Ê®°ÂùóÂêçÁß∞ : SPIÊÄªÁ∫øÈ©±Âä®
+*	Êñá‰ª∂ÂêçÁß∞ : bsp_spi_bus.h
+*	Áâà    Êú¨ : V1.0
+*	ËØ¥    Êòé : Â§¥Êñá‰ª∂
 *
-*	Copyright (C), 2014-2015, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2014-2015, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,30 +14,29 @@
 #ifndef __BSP_SPI_BUS_H
 #define __BSP_SPI_BUS_H
 
-#define	USE_SPI1_EN		0
-#define	USE_SPI2_EN		1
-#define	USE_SPI3_EN		1
-#define	USE_SPI4_EN		1
-#define	USE_SPI5_EN		1
-#define	USE_SPI6_EN		0
+#define USE_SPI1_EN 0
+#define USE_SPI2_EN 1
+#define USE_SPI3_EN 1
+#define USE_SPI4_EN 1
+#define USE_SPI5_EN 1
+#define USE_SPI6_EN 0
 
-#define	SPI1_BUFFER_SIZE	(4 * 1024)
-#define	SPI2_BUFFER_SIZE	(4 * 1024)
-#define	SPI3_BUFFER_SIZE	(4 * 1024)
-#define	SPI4_BUFFER_SIZE	(4 * 1024)
-#define	SPI5_BUFFER_SIZE	(4 * 1024)
-#define	SPI6_BUFFER_SIZE	(4 * 1024)
+#define SPI1_BUFFER_SIZE (4 * 1024)
+#define SPI2_BUFFER_SIZE (4 * 1024)
+#define SPI3_BUFFER_SIZE (4 * 1024)
+#define SPI4_BUFFER_SIZE (4 * 1024)
+#define SPI5_BUFFER_SIZE (4 * 1024)
+#define SPI6_BUFFER_SIZE (4 * 1024)
 
-
-/* ÷ÿ∂®“Âœ¬SPI SCK ±÷”£¨∑Ω±„“∆÷≤ */
-#define SPI_BAUDRATEPRESCALER_100M      SPI_BAUDRATEPRESCALER_2			/* 100M */
-#define SPI_BAUDRATEPRESCALER_50M       SPI_BAUDRATEPRESCALER_4			/* 50M */
-#define SPI_BAUDRATEPRESCALER_12_5M     SPI_BAUDRATEPRESCALER_8			/* 12.5M */
-#define SPI_BAUDRATEPRESCALER_6_25M     SPI_BAUDRATEPRESCALER_16		/* 6.25M */
-#define SPI_BAUDRATEPRESCALER_3_125M    SPI_BAUDRATEPRESCALER_32		/* 3.125M */
-#define SPI_BAUDRATEPRESCALER_1_5625M   SPI_BAUDRATEPRESCALER_64		/* 1.5625M */
-#define SPI_BAUDRATEPRESCALER_781_25K   SPI_BAUDRATEPRESCALER_128		/* 781.25K */
-#define SPI_BAUDRATEPRESCALER_390_625K  SPI_BAUDRATEPRESCALER_256		/* 390.625K */
+/* ÈáçÂÆö‰πâ‰∏ãSPI SCKÊó∂ÈíüÔºåÊñπ‰æøÁßªÊ§ç */
+#define SPI_BAUDRATEPRESCALER_100M SPI_BAUDRATEPRESCALER_2       /* 100M */
+#define SPI_BAUDRATEPRESCALER_50M SPI_BAUDRATEPRESCALER_4        /* 50M */
+#define SPI_BAUDRATEPRESCALER_12_5M SPI_BAUDRATEPRESCALER_8      /* 12.5M */
+#define SPI_BAUDRATEPRESCALER_6_25M SPI_BAUDRATEPRESCALER_16     /* 6.25M */
+#define SPI_BAUDRATEPRESCALER_3_125M SPI_BAUDRATEPRESCALER_32    /* 3.125M */
+#define SPI_BAUDRATEPRESCALER_1_5625M SPI_BAUDRATEPRESCALER_64   /* 1.5625M */
+#define SPI_BAUDRATEPRESCALER_781_25K SPI_BAUDRATEPRESCALER_128  /* 781.25K */
+#define SPI_BAUDRATEPRESCALER_390_625K SPI_BAUDRATEPRESCALER_256 /* 390.625K */
 
 void bsp_InitSPIBus(void);
 void bsp_spiTransfer(SPI_TypeDef *_spi);
@@ -47,8 +46,6 @@ void bsp_SpiBusEnter(void);
 void bsp_SpiBusExit(void);
 uint8_t bsp_SpiBusBusy(void);
 
-
-
 //extern uint8_t g_spiTxBuf[SPI_BUFFER_SIZE];
 //extern uint8_t g_spiRxBuf[SPI_BUFFER_SIZE];
 //extern uint32_t g_spiLen;
@@ -57,8 +54,8 @@ uint8_t bsp_SpiBusBusy(void);
 
 extern uint32_t spi2_len;
 extern uint8_t spi2_TxBuf[SPI2_BUFFER_SIZE];
-extern	ALIGN_32BYTES(uint8_t spi2_RxBuf[SPI2_BUFFER_SIZE]);	/* ±ÿ–Î32◊÷Ω⁄∂‘∆Î */
+extern ALIGN_32BYTES(uint8_t spi2_RxBuf[SPI2_BUFFER_SIZE]); /* ÂøÖÈ°ª32Â≠óËäÇÂØπÈΩê */
 
 #endif
 
-/***************************** ∞≤∏ª¿≥µÁ◊” www.armfly.com (END OF FILE) *********************************/
+/***************************** ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com (END OF FILE) *********************************/

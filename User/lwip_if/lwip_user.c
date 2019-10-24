@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : lwip Ğ­ÒéÕ»ÓÃ»§½Ó¿Ú
-*	ÎÄ¼şÃû³Æ : lwip_user.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ìá¹©WEB·şÎñÆ÷¹¦ÄÜ¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-12-05  armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : lwip åè®®æ ˆç”¨æˆ·æ¥å£
+*	æ–‡ä»¶åç§° : lwip_user.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æä¾›WEBæœåŠ¡å™¨åŠŸèƒ½ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-12-05  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -48,18 +48,18 @@ static void Netif_Config(void)
 	ip_addr_t netmask;
 	ip_addr_t gw;
 
-	#if LWIP_DHCP 
-		ip_addr_set_zero_ip4(&ipaddr);
-		ip_addr_set_zero_ip4(&netmask);
-		ip_addr_set_zero_ip4(&gw);
-	#else	
-		/* IP address default setting */
-		IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
-		IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-		IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3); 
-	#endif
+#if LWIP_DHCP
+	ip_addr_set_zero_ip4(&ipaddr);
+	ip_addr_set_zero_ip4(&netmask);
+	ip_addr_set_zero_ip4(&gw);
+#else
+	/* IP address default setting */
+	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+#endif
 
-	/* add the network interface */    
+	/* add the network interface */
 	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 
 	/*  Registers the default network interface */
@@ -67,18 +67,18 @@ static void Netif_Config(void)
 
 	ethernet_link_status_updated(&gnetif);
 
-	#if LWIP_NETIF_LINK_CALLBACK  
-		netif_set_link_callback(&gnetif, ethernet_link_status_updated);
-	#endif
+#if LWIP_NETIF_LINK_CALLBACK
+	netif_set_link_callback(&gnetif, ethernet_link_status_updated);
+#endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lwip_start
-*	¹¦ÄÜËµÃ÷: Æô¶¯lwip_start,  ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.lwip_ip, g_tParam.lwip_net_mask, 
+*	å‡½ æ•° å: lwip_start
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨lwip_start,  ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.lwip_ip, g_tParam.lwip_net_mask, 
 *			  g_tParam.lwip_gateway 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lwip_start(void)
@@ -91,21 +91,21 @@ void lwip_start(void)
 
 	/* Http webserver Init */
 	http_server_init();
-	
+
 	/* tcp server init */
 	tcp_echoserver_init();
-	
-	udp_server_init();	/* ¿ªÆôUDP¼àÌı */
-	
+
+	udp_server_init(); /* å¼€å¯UDPç›‘å¬ */
+
 	s_init_lwip_ok = 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lwip_pro
-*	¹¦ÄÜËµÃ÷: lwip ÂÖÑ¯£¬²åÈëµ½Ö÷Ñ­»·ÖĞ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lwip_pro
+*	åŠŸèƒ½è¯´æ˜: lwip è½®è¯¢ï¼Œæ’å…¥åˆ°ä¸»å¾ªç¯ä¸­
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lwip_pro(void)
@@ -114,23 +114,21 @@ void lwip_pro(void)
 	{
 		return;
 	}
-	
-    /* Read a received packet from the Ethernet buffers and send it 
+
+	/* Read a received packet from the Ethernet buffers and send it 
        to the lwIP for handling */
 	ethernetif_input(&gnetif);
 
-    /* Handle timeouts */
-    sys_check_timeouts();
+	/* Handle timeouts */
+	sys_check_timeouts();
 
-#if LWIP_NETIF_LINK_CALLBACK     
-    Ethernet_Link_Periodic_Handle(&gnetif);
+#if LWIP_NETIF_LINK_CALLBACK
+	Ethernet_Link_Periodic_Handle(&gnetif);
 #endif
-    
-#if LWIP_DHCP   
-    DHCP_Periodic_Handle(&gnetif);
-#endif 
+
+#if LWIP_DHCP
+	DHCP_Periodic_Handle(&gnetif);
+#endif
 }
 
-
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

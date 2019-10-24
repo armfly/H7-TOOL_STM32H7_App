@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ±à³ÌÆ÷½Ó¿ÚÎÄ¼ş
-*	ÎÄ¼şÃû³Æ : prog_if.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : 
+*	æ¨¡å—åç§° : ç¼–ç¨‹å™¨æ¥å£æ–‡ä»¶
+*	æ–‡ä»¶åç§° : prog_if.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : 
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-03-19  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-03-19  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,38 +19,38 @@
 #include "modbus_slave.h"
 #include "prog_if.h"
 
-#define PG_INST_MAX_LEN  32 * 1024
-static uint16_t s_prog_buf[PG_INST_MAX_LEN];	/* ½Å±¾³ÌĞòÊı¾İ */
-static uint32_t s_prog_len;						/* ³ÌĞò³¤¶È */
-static uint32_t s_prog_pc = 0;				/* ³ÌĞòÖ¸Õë */
-static uint8_t s_prog_param_len = 0;		/* Ö¸Áî²ÎÊı³¤¶È */
-static uint8_t s_prog_state = 0;			/* Ö¸ÁîÖ´ĞĞ×´Ì¬£¬0±íÊ¾È¡cmd£¬1±íÊ¾È¡²ÎÊı£¬2±íÊ¾µÈ´ıÖ´ĞĞ */
+#define PG_INST_MAX_LEN 32 * 1024
+static uint16_t s_prog_buf[PG_INST_MAX_LEN]; /* è„šæœ¬ç¨‹åºæ•°æ® */
+static uint32_t s_prog_len;									 /* ç¨‹åºé•¿åº¦ */
+static uint32_t s_prog_pc = 0;							 /* ç¨‹åºæŒ‡é’ˆ */
+static uint8_t s_prog_param_len = 0;				 /* æŒ‡ä»¤å‚æ•°é•¿åº¦ */
+static uint8_t s_prog_state = 0;						 /* æŒ‡ä»¤æ‰§è¡ŒçŠ¶æ€ï¼Œ0è¡¨ç¤ºå–cmdï¼Œ1è¡¨ç¤ºå–å‚æ•°ï¼Œ2è¡¨ç¤ºç­‰å¾…æ‰§è¡Œ */
 static uint8_t s_prog_cmd = 0;
 uint8_t s_prog_ack_buf[2 * 1024];
 uint16_t s_prog_ack_len;
 
 static uint8_t s_prog_run_flag = 0;
-	
+
 void PG_AnalyzeInst(void);
 uint8_t PG_AnalyzeI2C(uint16_t _inst);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PG_ReadInst
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡Ò»ÌõÖ¸Áî»òÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PG_ReadInst
+*	åŠŸèƒ½è¯´æ˜: è¯»å–ä¸€æ¡æŒ‡ä»¤æˆ–æ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint16_t PG_ReadInst(void)
 {
 	uint16_t inst;
-	
+
 	if (s_prog_pc < PG_INST_MAX_LEN)
 	{
 		inst = s_prog_buf[s_prog_pc];
 		s_prog_pc++;
-		
+
 		if (s_prog_pc >= s_prog_len)
 		{
 			s_prog_run_flag = 2;
@@ -60,16 +60,16 @@ uint16_t PG_ReadInst(void)
 	{
 		inst = 0;
 	}
-	
+
 	return inst;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PG_Run
-*	¹¦ÄÜËµÃ÷: ÔËĞĞÖ¸Áî
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PG_Run
+*	åŠŸèƒ½è¯´æ˜: è¿è¡ŒæŒ‡ä»¤
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void PG_Poll(void)
@@ -82,10 +82,10 @@ void PG_Poll(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PG_Stop
-*	¹¦ÄÜËµÃ÷: Í£Ö¹³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PG_Stop
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void PG_Stop(void)
@@ -96,17 +96,17 @@ void PG_Stop(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PG_WaitRunCompleted
-*	¹¦ÄÜËµÃ÷: Ö´ĞĞĞ¡³ÌĞò£¬²¢µÈ´ıÖ¸Áî½áÊø
-*	ĞÎ    ²Î: _usTimeout,µÈ´ıÊ±¼äms£¬×î´ó65Ãë.
-*	·µ »Ø Öµ: 0 ±íÊ¾³¬Ê±£¬1±íÊ¾OK
+*	å‡½ æ•° å: PG_WaitRunCompleted
+*	åŠŸèƒ½è¯´æ˜: æ‰§è¡Œå°ç¨‹åºï¼Œå¹¶ç­‰å¾…æŒ‡ä»¤ç»“æŸ
+*	å½¢    å‚: _usTimeout,ç­‰å¾…æ—¶é—´msï¼Œæœ€å¤§65ç§’.
+*	è¿” å› å€¼: 0 è¡¨ç¤ºè¶…æ—¶ï¼Œ1è¡¨ç¤ºOK
 *********************************************************************************************************
 */
 uint8_t PG_WaitRunCompleted(uint16_t _usTimeout)
 {
 	int32_t time1;
 	uint8_t re;
-	
+
 	s_prog_run_flag = 1;
 	s_prog_pc = 0;
 	s_prog_ack_len = 0;
@@ -115,13 +115,13 @@ uint8_t PG_WaitRunCompleted(uint16_t _usTimeout)
 	while (1)
 	{
 		bsp_Idle();
-		
+
 		if (s_prog_run_flag == 2)
 		{
 			re = 1;
 			break;
 		}
-		
+
 		if (bsp_CheckRunTime(time1) > _usTimeout)
 		{
 			re = 0;
@@ -132,19 +132,19 @@ uint8_t PG_WaitRunCompleted(uint16_t _usTimeout)
 }
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PG_Install
-*	¹¦ÄÜËµÃ÷: °²×°³ÌĞò
-*	ĞÎ    ²Î: 
-*		_addr : Æ«ÒÆµØÖ·
-*		_buf :  »º³åÇø
-*		_len :  ³ÌĞò³¤¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PG_Install
+*	åŠŸèƒ½è¯´æ˜: å®‰è£…ç¨‹åº
+*	å½¢    å‚: 
+*		_addr : åç§»åœ°å€
+*		_buf :  ç¼“å†²åŒº
+*		_len :  ç¨‹åºé•¿åº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void PG_Install(uint16_t _addr, uint8_t *_buf, uint16_t _len, uint16_t _total_len)
 {
 	uint32_t i;
-	
+
 	for (i = 0; i < _len; i++)
 	{
 		if (_addr < PG_INST_MAX_LEN)
@@ -152,14 +152,14 @@ void PG_Install(uint16_t _addr, uint8_t *_buf, uint16_t _len, uint16_t _total_le
 			s_prog_buf[_addr++] = (_buf[2 * i] << 8) + _buf[2 * i + 1];
 		}
 	}
-	
+
 	s_prog_len = _total_len;
 }
-	
+
 void PG_AnalyzeInst(void)
 {
 	uint16_t inst;
-	
+
 	if (s_prog_state == 0)
 	{
 		inst = PG_ReadInst();
@@ -173,42 +173,42 @@ void PG_AnalyzeInst(void)
 	{
 		inst = 0;
 	}
-	
+
 	switch (s_prog_cmd >> 8)
 	{
-		case DEV_SYS:
-			break;
-		
-		case DEV_GPIO:
-			break;
-		
-		case DEV_TIM:
-			break;
-		
-		case DEV_DAC:
-			break;
-		
-		case DEV_ADC:
-			break;
-		
-		case DEV_I2C:
-			PG_AnalyzeI2C(inst);
-			break;
-		
-		case DEV_SPI:
-			break;
-		
-		case DEV_UART:
-			break;
-		
-		case DEV_485:
-			break;
-		
-		case DEV_CAN:
-			break;
-		
-		case DEV_SWD:
-			break;
+	case DEV_SYS:
+		break;
+
+	case DEV_GPIO:
+		break;
+
+	case DEV_TIM:
+		break;
+
+	case DEV_DAC:
+		break;
+
+	case DEV_ADC:
+		break;
+
+	case DEV_I2C:
+		PG_AnalyzeI2C(inst);
+		break;
+
+	case DEV_SPI:
+		break;
+
+	case DEV_UART:
+		break;
+
+	case DEV_485:
+		break;
+
+	case DEV_CAN:
+		break;
+
+	case DEV_SWD:
+		break;
 	}
 }
 
@@ -216,103 +216,101 @@ uint8_t PG_AnalyzeI2C(uint16_t _inst)
 {
 	static uint16_t s_len = 0;
 	static uint16_t s_cmd = 0;
-	
-	if (s_prog_state == 0)		/* È¡Ö¸Áî */
+
+	if (s_prog_state == 0) /* å–æŒ‡ä»¤ */
 	{
 		switch (_inst)
 		{
-			case I2C_START:
-				i2c_Start();
-				break;
-			
-			case I2C_STOP:
-				i2c_Stop();
-				break;
-			
-			case I2C_SEND_BYTE:
-				s_prog_state = 1;
-				s_prog_param_len = 1;
-				s_len = 0;					
-				break;
+		case I2C_START:
+			i2c_Start();
+			break;
 
-			case I2C_SEND_BYTES:
-				s_prog_state = 1;
-				s_prog_param_len = PG_ReadInst();	/* È¡³¤¶È×Ö¶Î */
-				s_len = 0;					
-				break;
-			
-			case I2C_READ_BYTES:
-				s_prog_state = 1;
-				s_prog_ack_len = PG_ReadInst();		/* È¡³¤¶È×Ö¶Î */
-				s_len = 0;					
-				break;
-		}	
+		case I2C_STOP:
+			i2c_Stop();
+			break;
+
+		case I2C_SEND_BYTE:
+			s_prog_state = 1;
+			s_prog_param_len = 1;
+			s_len = 0;
+			break;
+
+		case I2C_SEND_BYTES:
+			s_prog_state = 1;
+			s_prog_param_len = PG_ReadInst(); /* å–é•¿åº¦å­—æ®µ */
+			s_len = 0;
+			break;
+
+		case I2C_READ_BYTES:
+			s_prog_state = 1;
+			s_prog_ack_len = PG_ReadInst(); /* å–é•¿åº¦å­—æ®µ */
+			s_len = 0;
+			break;
+		}
 		s_cmd = _inst;
 	}
-	else if (s_prog_state == 1)		/* Ö´ĞĞÖ¸Áî */
+	else if (s_prog_state == 1) /* æ‰§è¡ŒæŒ‡ä»¤ */
 	{
 		switch (s_cmd)
 		{
-			case I2C_SEND_BYTE:				
+		case I2C_SEND_BYTE:
+			i2c_SendByte(_inst >> 8);
+			i2c_WaitAck();
+			s_prog_state = 2; /* æ‰§è¡Œå®Œæ¯• */
+			break;
+
+		case I2C_SEND_BYTES: /* æ­¤çŠ¶æ€ä¼šè¿›å…¥ s_prog_param_len æ¬¡æ•° */
+			if (s_len < s_prog_param_len)
+			{
 				i2c_SendByte(_inst >> 8);
 				i2c_WaitAck();
-				s_prog_state = 2;	/* Ö´ĞĞÍê±Ï */
-				break;
-			
-			case I2C_SEND_BYTES:	/* ´Ë×´Ì¬»á½øÈë s_prog_param_len ´ÎÊı */
-				if (s_len < s_prog_param_len)	
+				s_len++;
+			}
+			else /* æ‰§è¡Œå®Œæ¯• */
+			{
+				s_prog_state = 2;
+			}
+			break;
+
+		case I2C_READ_BYTES:
+			if (s_len <= s_prog_ack_len)
+			{
+				s_prog_ack_buf[s_len] = i2c_ReadByte(); /* è¯»1ä¸ªå­—èŠ‚ */
+				s_len++;
+				if (s_len == s_prog_ack_len)
 				{
-					i2c_SendByte(_inst >> 8);
-					i2c_WaitAck();					
-					s_len++;
-				}
-				else	/* Ö´ĞĞÍê±Ï */
-				{
-					s_prog_state = 2;
-				}
-				break;
-			
-			case I2C_READ_BYTES:
-				if (s_len <= s_prog_ack_len)
-				{
-					s_prog_ack_buf[s_len] = i2c_ReadByte();		/* ¶Á1¸ö×Ö½Ú */
-					s_len++;
-					if (s_len == s_prog_ack_len)
-					{
-						i2c_Ack();	/* ÖĞ¼ä×Ö½Ú¶ÁÍêºó£¬CPU²úÉúACKĞÅºÅ(Çı¶¯SDA = 0) */
-					}
-					else
-					{
-						i2c_Ack();		/* ÖĞ¼ä×Ö½Ú¶ÁÍêºó£¬CPU²úÉúACKĞÅºÅ(Çı¶¯SDA = 0) */
-					}
+					i2c_Ack(); /* ä¸­é—´å­—èŠ‚è¯»å®Œåï¼ŒCPUäº§ç”ŸACKä¿¡å·(é©±åŠ¨SDA = 0) */
 				}
 				else
 				{
-					s_prog_state = 2;	/* Òì³£·ÖÖ® */
+					i2c_Ack(); /* ä¸­é—´å­—èŠ‚è¯»å®Œåï¼ŒCPUäº§ç”ŸACKä¿¡å·(é©±åŠ¨SDA = 0) */
 				}
-				break;				
+			}
+			else
+			{
+				s_prog_state = 2; /* å¼‚å¸¸åˆ†ä¹‹ */
+			}
+			break;
 		}
 	}
 	else if (s_prog_state == 2)
 	{
 		s_prog_state = 0;
-//		switch (s_cmd)
-//		{
-//			case I2C_SEND_BYTE:	
-//				/* µÈ´ıÊı¾İ´«ÊäÍê±Ï */
-//				s_prog_state = 0;
-//				break;
-//			
-//			case I2C_SEND_BYTES:	
-//				/* µÈ´ıÊı¾İ´«ÊäÍê±Ï */
-//				s_prog_state = 0;				
-//				break;
-//		}		
+		//		switch (s_cmd)
+		//		{
+		//			case I2C_SEND_BYTE:
+		//				/* ç­‰å¾…æ•°æ®ä¼ è¾“å®Œæ¯• */
+		//				s_prog_state = 0;
+		//				break;
+		//
+		//			case I2C_SEND_BYTES:
+		//				/* ç­‰å¾…æ•°æ®ä¼ è¾“å®Œæ¯• */
+		//				s_prog_state = 0;
+		//				break;
+		//		}
 	}
-	
+
 	return 0;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
-
-
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

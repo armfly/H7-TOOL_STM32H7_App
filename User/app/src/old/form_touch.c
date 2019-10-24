@@ -1,237 +1,236 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ´¥Ãş²âÊÔ½çÃæ¡£
-*	ÎÄ¼şÃû³Æ : touch_test.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : ²âÊÔÆÁÊÇ·ñÓĞÈ±Ïİ£¬´¥ÃşÊÇ·ñ×¼È·
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-01-01 armfly  ÕıÊ½·¢²¼
-*		V1.1    2014-09-06 armfly  Ôö¼ÓÍ¼Æ¬ÏÔÊ¾ËÙ¶È²âÊÔ¹¦ÄÜ
+*	æ¨¡å—åç§° : è§¦æ‘¸æµ‹è¯•ç•Œé¢ã€‚
+*	æ–‡ä»¶åç§° : touch_test.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : æµ‹è¯•å±æ˜¯å¦æœ‰ç¼ºé™·ï¼Œè§¦æ‘¸æ˜¯å¦å‡†ç¡®
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-01-01 armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2014-09-06 armfly  å¢åŠ å›¾ç‰‡æ˜¾ç¤ºé€Ÿåº¦æµ‹è¯•åŠŸèƒ½
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h"			/* printfº¯Êı¶¨ÏòÊä³öµ½´®¿Ú£¬ËùÒÔ±ØĞë°üº¬Õâ¸öÎÄ¼ş */
+#include "bsp.h" /* printfå‡½æ•°å®šå‘è¾“å‡ºåˆ°ä¸²å£ï¼Œæ‰€ä»¥å¿…é¡»åŒ…å«è¿™ä¸ªæ–‡ä»¶ */
 
 #include "form_main_menu.h"
 #include "images.h"
 #include "param.h"
-#include "ff.h"				/* FatFS ÎÄ¼şÏµÍ³Í·ÎÄ¼ş */
-#include "usbh_usr.h"		/* usb host uÅÌÖ§³Ö */
+#include "ff.h"				/* FatFS æ–‡ä»¶ç³»ç»Ÿå¤´æ–‡ä»¶ */
+#include "usbh_usr.h" /* usb host uç›˜æ”¯æŒ */
 #include "ff_gen_drv.h"
 #include "sd_diskio_dma.h"
 #include "usbh_diskio.h"
 #include "nand_diskio.h"
 
-//#define PIC_DISK	FS_NAND		/* Ñ¡ÔñÈ±Ê¡¶ÁÈ¡µÄ´ÅÅÌ£º FS_NAND, FS_SD, FS_USB */
-#define PIC_PATH	"/Pic"		/* MP3ÎÄ¼ş´æ·ÅµÄÈ±Ê¡ÎÄ¼ş¼Ğ£¬ ¸ùÄ¿Â¼ÏÂµÄPIC */
+//#define PIC_DISK	FS_NAND		/* é€‰æ‹©ç¼ºçœè¯»å–çš„ç£ç›˜ï¼š FS_NAND, FS_SD, FS_USB */
+#define PIC_PATH "/Pic" /* MP3æ–‡ä»¶å­˜æ”¾çš„ç¼ºçœæ–‡ä»¶å¤¹ï¼Œ æ ¹ç›®å½•ä¸‹çš„PIC */
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
 
-	BUTTON_T Btn1;		/* ²¦ºÅ */
-	BUTTON_T Btn2;		/* ¹Ò»ú */
-	BUTTON_T Btn3;		/* ÇĞ»»ÒôÆµÍ¨µÀ */
+	BUTTON_T Btn1; /* æ‹¨å· */
+	BUTTON_T Btn2; /* æŒ‚æœº */
+	BUTTON_T Btn3; /* åˆ‡æ¢éŸ³é¢‘é€šé“ */
 
-	BUTTON_T BtnRet;	/* ·µ»Ø */
+	BUTTON_T BtnRet; /* è¿”å› */
 
-	char strHardInfo[32];		/* Ä£¿éÓ²¼şĞÅÏ¢ */
-	uint8_t ucNetStatus;	/* ÍøÂç×´Ì¬ */
-	uint8_t ucAudioCh;		/* µ±Ç°ÒôÆµÍ¨µÀ 0£¬ 1 */
-	uint8_t ucEarVolume;	/* ¶ú»úÒôÁ¿ 0 - 5 */
-	int16_t ucMicGain;		/* MICÒôÁ¿  -12£º×îĞ¡ÔöÒæ  12£º×î´óÔöÒæ  13£º¾²Òô*/
+	char strHardInfo[32]; /* æ¨¡å—ç¡¬ä»¶ä¿¡æ¯ */
+	uint8_t ucNetStatus;	/* ç½‘ç»œçŠ¶æ€ */
+	uint8_t ucAudioCh;		/* å½“å‰éŸ³é¢‘é€šé“ 0ï¼Œ 1 */
+	uint8_t ucEarVolume;	/* è€³æœºéŸ³é‡ 0 - 5 */
+	int16_t ucMicGain;		/* MICéŸ³é‡  -12ï¼šæœ€å°å¢ç›Š  12ï¼šæœ€å¤§å¢ç›Š  13ï¼šé™éŸ³*/
 
-}FormGPRS_T;
+} FormGPRS_T;
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BUTTON_RET_H	32
-#define BUTTON_RET_W	60
-#define	BUTTON_RET_X	(g_LcdWidth - BUTTON_RET_W - 4)
-#define	BUTTON_RET_Y	(g_LcdHeight - BUTTON_RET_H - 4)
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BUTTON_RET_H 32
+#define BUTTON_RET_W 60
+#define BUTTON_RET_X (g_LcdWidth - BUTTON_RET_W - 4)
+#define BUTTON_RET_Y (g_LcdHeight - BUTTON_RET_H - 4)
 
-static LABEL_T Label1;		/* ÏÔÊ¾PS2Éè±¸×´Ì¬ */
-static LABEL_T Label2;		/* ÏÔÊ¾PS2¼üÅÌºÍÊó±ê·¢³öµÄ¼üÖµ */
-static LABEL_T Label3;		/* ÏÔÊ¾Ò¡¸Ë£¬ºìÍâ£¬°´Å¥ÊÂ¼ş */
+static LABEL_T Label1; /* æ˜¾ç¤ºPS2è®¾å¤‡çŠ¶æ€ */
+static LABEL_T Label2; /* æ˜¾ç¤ºPS2é”®ç›˜å’Œé¼ æ ‡å‘å‡ºçš„é”®å€¼ */
+static LABEL_T Label3; /* æ˜¾ç¤ºæ‘‡æ†ï¼Œçº¢å¤–ï¼ŒæŒ‰é’®äº‹ä»¶ */
 
 static FONT_T FontLabel;
 
-
-/* Í¼Æ¬µØÖ· RA8875Í¼Æ¬Ğ¾Æ¬Æ«ÒÆµØÖ· */
+/* å›¾ç‰‡åœ°å€ RA8875å›¾ç‰‡èŠ¯ç‰‡åç§»åœ°å€ */
 const uint32_t g_RA8875Addr_480x272[3] =
-{
-	0x00200000,	/* 480x272 É³Ì²±³¾° */
-	0x0023FC00,	/* 480x272 Ê÷Ò¶±³¾° */
-	0x0027F800,	/* 480x272 Ë®Öé±³¾° */
+		{
+				0x00200000, /* 480x272 æ²™æ»©èƒŒæ™¯ */
+				0x0023FC00, /* 480x272 æ ‘å¶èƒŒæ™¯ */
+				0x0027F800, /* 480x272 æ°´ç èƒŒæ™¯ */
 };
 const uint32_t g_RA8875Addr_800x480[3] =
-{
-	0x002BF400,	/* 800x480 É³Ì²±³¾° */
-	0x0037AC00,	/* 800x480 Ê÷Ò¶±³¾° */
-	0x00436400	/* 800x480 Ë®Öé±³¾° */
+		{
+				0x002BF400, /* 800x480 æ²™æ»©èƒŒæ™¯ */
+				0x0037AC00, /* 800x480 æ ‘å¶èƒŒæ™¯ */
+				0x00436400	/* 800x480 æ°´ç èƒŒæ™¯ */
 };
 
-/* NOR FLASHÖĞ´æ´¢µÄÍ¼Æ¬µØÖ· */
+/* NOR FLASHä¸­å­˜å‚¨çš„å›¾ç‰‡åœ°å€ */
 const uint32_t g_NorAddr_480x272[3] =
-{
-	(0x64000000 + 0x00200000),	/* 480x272 É³Ì²±³¾° */
-	(0x64000000 + 0x0023FC00),	/* 480x272 Ê÷Ò¶±³¾° */
-	(0x64000000 + 0x0027F800),	/* 480x272 Ë®Öé±³¾° */
+		{
+				(0x64000000 + 0x00200000), /* 480x272 æ²™æ»©èƒŒæ™¯ */
+				(0x64000000 + 0x0023FC00), /* 480x272 æ ‘å¶èƒŒæ™¯ */
+				(0x64000000 + 0x0027F800), /* 480x272 æ°´ç èƒŒæ™¯ */
 };
 const uint32_t g_NorAddr_800x480[3] =
-{
-	(0x64000000 + 0x002BF400),	/* 800x480 É³Ì²±³¾° */
-	(0x64000000 + 0x0037AC00), 	/* 800x480 Ê÷Ò¶±³¾° */
-	(0x64000000 + 0x00436400)	/* 800x480 Ë®Öé±³¾° */
+		{
+				(0x64000000 + 0x002BF400), /* 800x480 æ²™æ»©èƒŒæ™¯ */
+				(0x64000000 + 0x0037AC00), /* 800x480 æ ‘å¶èƒŒæ™¯ */
+				(0x64000000 + 0x00436400)	/* 800x480 æ°´ç èƒŒæ™¯ */
 };
 
-/* NOR FLASH, PICÄ¿Â¼ÏÂ ´æ´¢µÄÍ¼Æ¬ÎÄ¼şÃû */
-const char * g_NandFileName_480x272[3] =
-{
-	"480272_1.bin",
-	"480272_2.bin",
-	"480272_3.bin",
-	//"480x272_4.bin",
-	//"480x272_5.bin",
-	//"480x272_6.bin"
+/* NOR FLASH, PICç›®å½•ä¸‹ å­˜å‚¨çš„å›¾ç‰‡æ–‡ä»¶å */
+const char *g_NandFileName_480x272[3] =
+		{
+				"480272_1.bin",
+				"480272_2.bin",
+				"480272_3.bin",
+				//"480x272_4.bin",
+				//"480x272_5.bin",
+				//"480x272_6.bin"
 };
 
-const char * g_NandFileName_800x480[3] =
-{
-	"800480_1.bin",
-	"800480_2.bin",
-	"800480_3.bin",
-	//"800x480_4.bin",
-	//"800x480_5.bin",
-	//"800x480_6.bin"
+const char *g_NandFileName_800x480[3] =
+		{
+				"800480_1.bin",
+				"800480_2.bin",
+				"800480_3.bin",
+				//"800x480_4.bin",
+				//"800x480_5.bin",
+				//"800x480_6.bin"
 };
 
 typedef struct
 {
 	uint32_t code;
-	char * str;
-}KB_STR_T;
+	char *str;
+} KB_STR_T;
 
 static const KB_STR_T s_KeyNameTab[] =
-{
-	{0xEEEEEEEE, ""},
+		{
+				{0xEEEEEEEE, ""},
 
-    {KB_A, "A"},
-    {KB_B, "B"},
-    {KB_C, "C"},
-    {KB_D, "D"},
-    {KB_E, "E"},
-    {KB_F, "F"},
-    {KB_G, "G"},
-    {KB_H, "H"},
-    {KB_I, "I"},
-    {KB_J, "J"},
-    {KB_K, "K"},
-    {KB_L, "L"},
-    {KB_M, "M"},
-    {KB_N, "N"},
-    {KB_O, "O"},
-    {KB_P, "P"},
-    {KB_Q, "Q"},
-    {KB_R, "R"},
-    {KB_S, "S"},
-    {KB_T, "T"},
-    {KB_U, "U"},
-    {KB_V, "V"},
-    {KB_W, "W"},
-    {KB_X, "X"},
-    {KB_Y, "Y"},
-    {KB_Z, "Z"},
-    {KB_0, "0"},
-    {KB_1, "1"},
-    {KB_2, "2"},
-    {KB_3, "3"},
-    {KB_4, "4"},
-    {KB_5, "5"},
-    {KB_6, "6"},
-    {KB_7, "7"},
-    {KB_8, "8"},
-    {KB_9, "9"},
-    {KB_PIE, "`"},	/* Æ²£¬¼üÅÌ×óÉÏ½Ç */
-    {KB_SUB, "-"},	/* ÖĞ¸Ü£¬¼õºÅ */
-    {KB_EQU, "="},	/* µÈºÅ */
-    {KB_FXG, "\\"},	/* ·´Ğ±¸Ü */
-    {KB_BKSP,"Backspace"},
-    {KB_SPACE, "Space"},
-    {KB_TAB, "Tab"},
-    {KB_CAPS, "CapsLk"},
-    {KB_L_SHFT, "Shift Left"},
-    {KB_L_CTRL, "Ctrl Left"},
-    {KB_L_GUI, "GUI Left"},
-    {KB_L_ALT, "Alt Left"},
-    {KB_R_SHFT,"Shift Right"},
-    {KB_R_CTRL, "Ctrl Right"},
-    {KB_R_GUI, "Gui Right"},
-    {KB_R_ALT, "Alt Right"},
-    {KB_APPS, "Apps"},
-    {KB_ENTER, "Enter"},
-    {KB_ESC, "ESC"},
-    {KB_F1, "F1"},
-    {KB_F2, "F2"},
-    {KB_F3, "F3"},
-    {KB_F4, "F4"},
-    {KB_F5, "F5"},
-    {KB_F6, "F6"},
-    {KB_F7, "F7"},
-    {KB_F8, "F8"},
-    {KB_F9, "F9"},
-    {KB_F10, "F10"},
-    {KB_F11, "F11"},
-    {KB_F12, "F12"},
-    {KB_PRNT_SCRN, "Print Screen/SysRq"},
-    {KB_SCROLL, "Scroll Lock"},
-    {KB_PAUSE, "Pause/Break"},
-    {KB_ZZKH, "["},
-    {KB_INSERT, "Insert"},
-    {KB_HOME, "Home"},
-    {KB_PGUP, "Page Up"},
-    {KB_DELETE, "Delete"},
-    {KB_END, "End"},
-    {KB_PGDN, "Page Down"},
-    {KB_U_ARROW, "Up Arrow"},
-    {KB_L_ARROW, "Left Arrow"},
-    {KB_D_ARROW, "Down Arrow"},
-    {KB_R_ARROW, "Right Arrow"},
-    {KB_NUM, "Num Lock"},
-    {KB_KP_DIV, "KP /"},    /* Ğ¡¼üÅÌ³ıºÅ  KP ±íÊ¾Ğ¡¼üÅÌ */
-    {KB_KP_MULT, "KP *"},	/* Ğ¡¼üÅÌ³ËºÅ */
-    {KB_KP_SUB, "KP -"},	/* - */
-    {KB_KP_ADD, "KP +"},
-    {KB_KP_ENTER, "KP Enter"},
-    {KB_KP_DOT, "KP ."},	/* Ğ¡Êıµã */
-    {KB_KP_0, "KP 0"},
-    {KB_KP_1, "KP 0"},
-    {KB_KP_2, "KP 0"},
-    {KB_KP_3, "KP 0"},
-    {KB_KP_4, "KP 0"},
-    {KB_KP_5, "KP 0"},
-    {KB_KP_6, "KP 0"},
-    {KB_KP_7, "KP 0"},
-    {KB_KP_8, "KP 0"},
-    {KB_KP_9, "KP 0"},
-    {KB_YZKH, "]"}, 	/* ] ÓÒÖĞÀ¨ºÅ */
-    {KB_SEMICOLON, ";"},/* ; ·ÖºÅ */
-    {KB_QUOTES, "'"},	/* µ¥ÒıºÅ */
-    {KB_COMMA, ","},	/* ¶ººÅ */
-    {KB_DOT, "."},		/* Ğ¡Êıµã */
-    {KB_DIV, "/"},		/* ³ıºÅ */
+				{KB_A, "A"},
+				{KB_B, "B"},
+				{KB_C, "C"},
+				{KB_D, "D"},
+				{KB_E, "E"},
+				{KB_F, "F"},
+				{KB_G, "G"},
+				{KB_H, "H"},
+				{KB_I, "I"},
+				{KB_J, "J"},
+				{KB_K, "K"},
+				{KB_L, "L"},
+				{KB_M, "M"},
+				{KB_N, "N"},
+				{KB_O, "O"},
+				{KB_P, "P"},
+				{KB_Q, "Q"},
+				{KB_R, "R"},
+				{KB_S, "S"},
+				{KB_T, "T"},
+				{KB_U, "U"},
+				{KB_V, "V"},
+				{KB_W, "W"},
+				{KB_X, "X"},
+				{KB_Y, "Y"},
+				{KB_Z, "Z"},
+				{KB_0, "0"},
+				{KB_1, "1"},
+				{KB_2, "2"},
+				{KB_3, "3"},
+				{KB_4, "4"},
+				{KB_5, "5"},
+				{KB_6, "6"},
+				{KB_7, "7"},
+				{KB_8, "8"},
+				{KB_9, "9"},
+				{KB_PIE, "`"},	/* æ’‡ï¼Œé”®ç›˜å·¦ä¸Šè§’ */
+				{KB_SUB, "-"},	/* ä¸­æ ï¼Œå‡å· */
+				{KB_EQU, "="},	/* ç­‰å· */
+				{KB_FXG, "\\"}, /* åæ–œæ  */
+				{KB_BKSP, "Backspace"},
+				{KB_SPACE, "Space"},
+				{KB_TAB, "Tab"},
+				{KB_CAPS, "CapsLk"},
+				{KB_L_SHFT, "Shift Left"},
+				{KB_L_CTRL, "Ctrl Left"},
+				{KB_L_GUI, "GUI Left"},
+				{KB_L_ALT, "Alt Left"},
+				{KB_R_SHFT, "Shift Right"},
+				{KB_R_CTRL, "Ctrl Right"},
+				{KB_R_GUI, "Gui Right"},
+				{KB_R_ALT, "Alt Right"},
+				{KB_APPS, "Apps"},
+				{KB_ENTER, "Enter"},
+				{KB_ESC, "ESC"},
+				{KB_F1, "F1"},
+				{KB_F2, "F2"},
+				{KB_F3, "F3"},
+				{KB_F4, "F4"},
+				{KB_F5, "F5"},
+				{KB_F6, "F6"},
+				{KB_F7, "F7"},
+				{KB_F8, "F8"},
+				{KB_F9, "F9"},
+				{KB_F10, "F10"},
+				{KB_F11, "F11"},
+				{KB_F12, "F12"},
+				{KB_PRNT_SCRN, "Print Screen/SysRq"},
+				{KB_SCROLL, "Scroll Lock"},
+				{KB_PAUSE, "Pause/Break"},
+				{KB_ZZKH, "["},
+				{KB_INSERT, "Insert"},
+				{KB_HOME, "Home"},
+				{KB_PGUP, "Page Up"},
+				{KB_DELETE, "Delete"},
+				{KB_END, "End"},
+				{KB_PGDN, "Page Down"},
+				{KB_U_ARROW, "Up Arrow"},
+				{KB_L_ARROW, "Left Arrow"},
+				{KB_D_ARROW, "Down Arrow"},
+				{KB_R_ARROW, "Right Arrow"},
+				{KB_NUM, "Num Lock"},
+				{KB_KP_DIV, "KP /"},	/* å°é”®ç›˜é™¤å·  KP è¡¨ç¤ºå°é”®ç›˜ */
+				{KB_KP_MULT, "KP *"}, /* å°é”®ç›˜ä¹˜å· */
+				{KB_KP_SUB, "KP -"},	/* - */
+				{KB_KP_ADD, "KP +"},
+				{KB_KP_ENTER, "KP Enter"},
+				{KB_KP_DOT, "KP ."}, /* å°æ•°ç‚¹ */
+				{KB_KP_0, "KP 0"},
+				{KB_KP_1, "KP 0"},
+				{KB_KP_2, "KP 0"},
+				{KB_KP_3, "KP 0"},
+				{KB_KP_4, "KP 0"},
+				{KB_KP_5, "KP 0"},
+				{KB_KP_6, "KP 0"},
+				{KB_KP_7, "KP 0"},
+				{KB_KP_8, "KP 0"},
+				{KB_KP_9, "KP 0"},
+				{KB_YZKH, "]"},			 /* ] å³ä¸­æ‹¬å· */
+				{KB_SEMICOLON, ";"}, /* ; åˆ†å· */
+				{KB_QUOTES, "'"},		 /* å•å¼•å· */
+				{KB_COMMA, ","},		 /* é€—å· */
+				{KB_DOT, "."},			 /* å°æ•°ç‚¹ */
+				{KB_DIV, "/"},			 /* é™¤å· */
 
-	{0, ""}		/* ²é±í½áÊø±êÖ¾ */
+				{0, ""} /* æŸ¥è¡¨ç»“æŸæ ‡å¿— */
 };
 
 static void InitFormTouch(void);
-static const char * GetNameOfKey(uint32_t _code);
+static const char *GetNameOfKey(uint32_t _code);
 static void DispPic(void);
 uint8_t ReadFileDispPic(char *_strFileName, uint16_t _usX, uint16_t _usY, uint16_t usHeight, uint16_t usWidth);
 
@@ -239,19 +238,19 @@ static uint8_t s_pic = 0;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestTouch
-*	¹¦ÄÜËµÃ÷: ´¥Ãş²âÊÔ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestTouch
+*	åŠŸèƒ½è¯´æ˜: è§¦æ‘¸æµ‹è¯•
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestTouch(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint32_t uiPS2Msg;		/* PS2¼üÅÌÊó±êÏûÏ¢ */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
-	uint8_t fRefresh;		/* Ë¢ÆÁÇëÇó±êÖ¾,1±íÊ¾ĞèÒªË¢ĞÂ */
-	FONT_T tFont, tFontBtn;	/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucKeyCode;			/* æŒ‰é”®ä»£ç  */
+	uint32_t uiPS2Msg;			/* PS2é”®ç›˜é¼ æ ‡æ¶ˆæ¯ */
+	uint8_t ucTouch;				/* è§¦æ‘¸äº‹ä»¶ */
+	uint8_t fRefresh;				/* åˆ·å±è¯·æ±‚æ ‡å¿—,1è¡¨ç¤ºéœ€è¦åˆ·æ–° */
+	FONT_T tFont, tFontBtn; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºè®¾ç½®å­—ä½“å‚æ•° */
 	char buf[64];
 	uint16_t usAdcX, usAdcY;
 	int16_t tpX, tpY;
@@ -261,24 +260,24 @@ void TestTouch(void)
 
 	s_pic = 0;
 
-	LCD_ClrScr(CL_BLUE);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+	LCD_ClrScr(CL_BLUE); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BLUE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
 	{
 		tFontBtn.FontCode = FC_ST_16;
-		tFontBtn.BackColor = CL_MASK;		/* ±³¾°Í¸Ã÷ */
+		tFontBtn.BackColor = CL_MASK; /* èƒŒæ™¯é€æ˜ */
 		tFontBtn.FrontColor = CL_BLACK;
 		tFontBtn.Space = 0;
 	}
 
-	LCD_SetBackLight(g_tParam.ucBackLight);			/* ÉèÖÃ±³¹âÁÁ¶È */
+	LCD_SetBackLight(g_tParam.ucBackLight); /* è®¾ç½®èƒŒå…‰äº®åº¦ */
 
 	InitFormTouch();
 
@@ -286,60 +285,60 @@ void TestTouch(void)
 	bsp_InitPS2();
 	PS2_StartWork();
 
-	/* ³õÊ¼»¯PS2Éè±¸. ¼üÅÌ¿ÉÒÔ²»ÅäÖÃ. Êó±ê±ØĞëÅäÖÃºó²Å»áÊä³öÊı¾İ°ü */
+	/* åˆå§‹åŒ–PS2è®¾å¤‡. é”®ç›˜å¯ä»¥ä¸é…ç½®. é¼ æ ‡å¿…é¡»é…ç½®åæ‰ä¼šè¾“å‡ºæ•°æ®åŒ… */
 	{
 		uint8_t ucDevType;
 
 		ucDevType = PS2_GetDevceType();
-		if (ucDevType  == PS2_MOUSE)
+		if (ucDevType == PS2_MOUSE)
 		{
-			Label1.pCaption = "¼ì²âµ½PS2Êó±ê";
+			Label1.pCaption = "æ£€æµ‹åˆ°PS2é¼ æ ‡";
 			LCD_DrawLabel(&Label1);
 
 			PS2_InitMouse();
 		}
 		else if (ucDevType == PS2_KEYBOARD)
 		{
-			Label1.pCaption = "¼ì²âµ½PS2¼üÅÌ";
+			Label1.pCaption = "æ£€æµ‹åˆ°PS2é”®ç›˜";
 			LCD_DrawLabel(&Label1);
 
 			PS2_InitKeyboard();
 		}
 		else
 		{
-			Label1.pCaption = "Î´¼ì²âµ½PS2Éè±¸";
+			Label1.pCaption = "æœªæ£€æµ‹åˆ°PS2è®¾å¤‡";
 			LCD_DrawLabel(&Label1);
 		}
 	}
 #endif
 
-	IRD_StartWork();	/* ¿ªÊ¼ºìÍâ½âÂë */
+	IRD_StartWork(); /* å¼€å§‹çº¢å¤–è§£ç  */
 
-	usbh_OpenMassStorage();	/* ´ò¿ªUSB HOST£¬ Ö§³ÖUÅÌ */
-	
-	fRefresh = 1;	/* 1±íÊ¾ĞèÒªË¢ĞÂLCD */
+	usbh_OpenMassStorage(); /* æ‰“å¼€USB HOSTï¼Œ æ”¯æŒUç›˜ */
+
+	fRefresh = 1; /* 1è¡¨ç¤ºéœ€è¦åˆ·æ–°LCD */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-		usbh_Poll();		/* Ö§³ÖUÅÌ */
+		usbh_Poll(); /* æ”¯æŒUç›˜ */
 
 		if (fRefresh)
 		{
 			fRefresh = 0;
 
-			/* ÊµÊ±Ë¢ĞÂ´¥ÃşADC²ÉÑùÖµºÍ×ª»»ºóµÄ×ø±ê */
+			/* å®æ—¶åˆ·æ–°è§¦æ‘¸ADCé‡‡æ ·å€¼å’Œè½¬æ¢åçš„åæ ‡ */
 			{
-				LCD_DispStr(5, 3, "²âÊÔ´¥ÃşÆÁ¡¢°´¼ü¡¢Ò¡¸Ë¡¢LEDµÆ¡¢PS/S¼üÅÌÊó±ê ºìÍâÒ£¿ØÆ÷", &tFont);			/* ÔÚ(8,3)×ø±ê´¦ÏÔÊ¾Ò»´®ºº×Ö */
+				LCD_DispStr(5, 3, "æµ‹è¯•è§¦æ‘¸å±ã€æŒ‰é”®ã€æ‘‡æ†ã€LEDç¯ã€PS/Sé”®ç›˜é¼ æ ‡ çº¢å¤–é¥æ§å™¨", &tFont); /* åœ¨(8,3)åæ ‡å¤„æ˜¾ç¤ºä¸€ä¸²æ±‰å­— */
 
-				/* ÏÔÊ¾TFT¿ØÖÆÆ÷ĞÍºÅºÍÆÁÄ»·Ö±æÂÊ */
-				//LCD_GetChipDescribe(buf);	/* ¶ÁÈ¡TFTÇı¶¯Ğ¾Æ¬ĞÍºÅ */
+				/* æ˜¾ç¤ºTFTæ§åˆ¶å™¨å‹å·å’Œå±å¹•åˆ†è¾¨ç‡ */
+				//LCD_GetChipDescribe(buf);	/* è¯»å–TFTé©±åŠ¨èŠ¯ç‰‡å‹å· */
 				if (g_TouchType == CT_GT811)
-				{	
+				{
 					strcpy(buf, "STM32H743 + GT811");
 				}
 				else if (g_TouchType == CT_GT911)
-				{	
+				{
 					strcpy(buf, "STM32H743 + GT911");
 				}
 				else if (g_TouchType == CT_FT5X06)
@@ -351,32 +350,32 @@ void TestTouch(void)
 					strcpy(buf, "STM32H743 + STMPE811");
 				}
 				else
-				{					
-					strcpy(buf, "STM32H743 + NoTouch");				
-				}	
+				{
+					strcpy(buf, "STM32H743 + NoTouch");
+				}
 				sprintf(&buf[strlen(buf)], "   %d x %d", LCD_GetWidth(), LCD_GetHeight());
-				LCD_DispStr(5, 23, buf, &tFont);			/* ÔÚ(8,3)×ø±ê´¦ÏÔÊ¾Ò»´®ºº×Ö */
+				LCD_DispStr(5, 23, buf, &tFont); /* åœ¨(8,3)åæ ‡å¤„æ˜¾ç¤ºä¸€ä¸²æ±‰å­— */
 
-				/* ¶ÁÈ¡²¢ÏÔÊ¾µ±Ç°XÖáºÍYÖáµÄADC²ÉÑùÖµ */
+				/* è¯»å–å¹¶æ˜¾ç¤ºå½“å‰Xè½´å’ŒYè½´çš„ADCé‡‡æ ·å€¼ */
 				usAdcX = TOUCH_ReadAdcX();
 				usAdcY = TOUCH_ReadAdcY();
-				sprintf(buf, "´¥ÃşADCÖµ X = %4d, Y = %4d   ", usAdcX, usAdcY);
+				sprintf(buf, "è§¦æ‘¸ADCå€¼ X = %4d, Y = %4d   ", usAdcX, usAdcY);
 				LCD_DispStr(5, 60, buf, &tFont);
 
-				/* ¶ÁÈ¡²¢ÏÔÊ¾µ±Ç°´¥Ãş×ø±ê */
+				/* è¯»å–å¹¶æ˜¾ç¤ºå½“å‰è§¦æ‘¸åæ ‡ */
 				tpX = TOUCH_GetX();
 				tpY = TOUCH_GetY();
-				sprintf(buf, "´¥Ãş×ø±ê  X = %4d, Y = %4d   ", tpX, tpY);
+				sprintf(buf, "è§¦æ‘¸åæ ‡  X = %4d, Y = %4d   ", tpX, tpY);
 				LCD_DispStr(5, 80, buf, &tFont);
 
-				/* ÔÚ´¥±ÊËùÔÚÎ»ÖÃÏÔÊ¾Ò»¸öĞ¡È¦ */
+				/* åœ¨è§¦ç¬”æ‰€åœ¨ä½ç½®æ˜¾ç¤ºä¸€ä¸ªå°åœˆ */
 				if ((tpX > 0) && (tpY > 0))
 				{
 					LCD_DrawCircle(tpX, tpY, 2, CL_YELLOW);
 				}
 			}
 
-			/* ÏÔÊ¾Í¼±êÕóÁĞ */
+			/* æ˜¾ç¤ºå›¾æ ‡é˜µåˆ— */
 			{
 				tBtn.Font = &tFontBtn;
 
@@ -384,334 +383,332 @@ void TestTouch(void)
 				tBtn.Top = BUTTON_RET_Y;
 				tBtn.Height = BUTTON_RET_H;
 				tBtn.Width = BUTTON_RET_W;
-				tBtn.Focus = 0;	/* Ê§È¥½¹µã */
-				tBtn.pCaption = "·µ»Ø";
+				tBtn.Focus = 0; /* å¤±å»ç„¦ç‚¹ */
+				tBtn.pCaption = "è¿”å›";
 				LCD_DrawButton(&tBtn);
 			}
 
-			/* ÔÚÆÁÄ»±ßÑØ»æÖÆ2¸ö¾ØĞÎ¿ò(ÓÃÓÚ¼ì²âÃæ°å±ßÔµÏñËØÊÇ·ñÕı³£) */
+			/* åœ¨å±å¹•è¾¹æ²¿ç»˜åˆ¶2ä¸ªçŸ©å½¢æ¡†(ç”¨äºæ£€æµ‹é¢æ¿è¾¹ç¼˜åƒç´ æ˜¯å¦æ­£å¸¸) */
 			LCD_DrawRect(0, 0, LCD_GetHeight(), LCD_GetWidth(), CL_WHITE);
 			LCD_DrawRect(2, 2, LCD_GetHeight() - 4, LCD_GetWidth() - 4, CL_YELLOW);
 
-			/* ÏÔÊ¾±³¹âÖµ */
-			sprintf(buf, "µ±Ç°±³¹âÁÁ¶È: %3d", g_tParam.ucBackLight);
+			/* æ˜¾ç¤ºèƒŒå…‰å€¼ */
+			sprintf(buf, "å½“å‰èƒŒå…‰äº®åº¦: %3d", g_tParam.ucBackLight);
 			LCD_DispStr(5, 130, buf, &tFont);
 
 			//if (g_ChipID == IC_8875)
 			{
-				/* 3.5´çÆÁ²»Ö§³Ö */
-				LCD_DispStr(5, LCD_GetHeight() - 20, "°´K1 K2 ¼üÏÔÊ¾Í¼Æ¬", &tFont);
+				/* 3.5å¯¸å±ä¸æ”¯æŒ */
+				LCD_DispStr(5, LCD_GetHeight() - 20, "æŒ‰K1 K2 é”®æ˜¾ç¤ºå›¾ç‰‡", &tFont);
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					BEEP_KeyTone();		/* °´¼üÌáÊ¾Òô */
-				
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-					    tBtn.Font = &tFontBtn;
+			case TOUCH_DOWN:	/* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				BEEP_KeyTone(); /* æŒ‰é”®æç¤ºéŸ³ */
 
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 1;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
-					}
-					
-					/* ÔÚ´¥±ÊËùÔÚÎ»ÖÃÏÔÊ¾Ò»¸öĞ¡È¦ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Font = &tFontBtn;
+
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 1; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
+				}
+
+				/* åœ¨è§¦ç¬”æ‰€åœ¨ä½ç½®æ˜¾ç¤ºä¸€ä¸ªå°åœˆ */
+				if ((tpX > 0) && (tpY > 0))
+				{
+					LCD_DrawCircle(tpX, tpY, 3, CL_RED);
+				}
+				break;
+
+			case TOUCH_MOVE: /* è§¦ç¬”ç§»åŠ¨äº‹ä»¶ */
+				/* å®æ—¶åˆ·æ–°è§¦æ‘¸ADCé‡‡æ ·å€¼å’Œè½¬æ¢åçš„åæ ‡ */
+				{
+					/* è¯»å–å¹¶æ˜¾ç¤ºå½“å‰Xè½´å’ŒYè½´çš„ADCé‡‡æ ·å€¼ */
+					usAdcX = TOUCH_ReadAdcX();
+					usAdcY = TOUCH_ReadAdcY();
+					sprintf(buf, "è§¦æ‘¸ADCå€¼ X = %4d, Y = %4d   ", usAdcX, usAdcY);
+					LCD_DispStr(5, 60, buf, &tFont);
+
+					/* è¯»å–å¹¶æ˜¾ç¤ºå½“å‰è§¦æ‘¸åæ ‡ */
+					//tpX = TOUCH_GetX();
+					//tpY = TOUCH_GetY();
+					sprintf(buf, "è§¦æ‘¸åæ ‡  X = %4d, Y = %4d   ", tpX, tpY);
+					LCD_DispStr(5, 80, buf, &tFont);
+
+					/* åœ¨è§¦ç¬”æ‰€åœ¨ä½ç½®æ˜¾ç¤ºä¸€ä¸ªå°åœˆ */
 					if ((tpX > 0) && (tpY > 0))
 					{
-						LCD_DrawCircle(tpX, tpY, 3, CL_RED);
+						LCD_DrawCircle(tpX, tpY, 2, CL_YELLOW);
 					}
-					break;
+				}
+				break;
 
-				case TOUCH_MOVE:		/* ´¥±ÊÒÆ¶¯ÊÂ¼ş */
-					/* ÊµÊ±Ë¢ĞÂ´¥ÃşADC²ÉÑùÖµºÍ×ª»»ºóµÄ×ø±ê */
-					{
-						/* ¶ÁÈ¡²¢ÏÔÊ¾µ±Ç°XÖáºÍYÖáµÄADC²ÉÑùÖµ */
-						usAdcX = TOUCH_ReadAdcX();
-						usAdcY = TOUCH_ReadAdcY();
-						sprintf(buf, "´¥ÃşADCÖµ X = %4d, Y = %4d   ", usAdcX, usAdcY);
-						LCD_DispStr(5, 60, buf, &tFont);
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				/* åœ¨è§¦ç¬”æ‰€åœ¨ä½ç½®æ˜¾ç¤ºä¸€ä¸ªå°åœˆ */
+				if ((tpX > 0) && (tpY > 0))
+				{
+					LCD_DrawCircle(tpX, tpY, 4, CL_WHITE);
+				}
 
-						/* ¶ÁÈ¡²¢ÏÔÊ¾µ±Ç°´¥Ãş×ø±ê */
-						//tpX = TOUCH_GetX();
-						//tpY = TOUCH_GetY();
-						sprintf(buf, "´¥Ãş×ø±ê  X = %4d, Y = %4d   ", tpX, tpY);
-						LCD_DispStr(5, 80, buf, &tFont);
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Font = &tFontBtn;
 
-						/* ÔÚ´¥±ÊËùÔÚÎ»ÖÃÏÔÊ¾Ò»¸öĞ¡È¦ */
-						if ((tpX > 0) && (tpY > 0))
-						{
-							LCD_DrawCircle(tpX, tpY, 2, CL_YELLOW);
-						}
-					}
-					break;
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 1; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					/* ÔÚ´¥±ÊËùÔÚÎ»ÖÃÏÔÊ¾Ò»¸öĞ¡È¦ */
-					if ((tpX > 0) && (tpY > 0))
-					{
-						LCD_DrawCircle(tpX, tpY, 4, CL_WHITE);
-					}
+					SaveParam(); /* ä¿å­˜å‚æ•° */
+					fQuit = 1;
+					break; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					tBtn.Font = &tFontBtn;
 
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-						tBtn.Font = &tFontBtn;
-
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 1;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
-
-						SaveParam();	/* ±£´æ²ÎÊı */
-						fQuit = 1;
-						break;		/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						tBtn.Font = &tFontBtn;
-
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 0;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
-
-					}
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 0; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
+				}
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* Ò£¿Ø°´¼ü·¢ÌáÊ¾Òô */
+			/* é¥æ§æŒ‰é”®å‘æç¤ºéŸ³ */
 			if (ucKeyCode >= IR_KEY_STRAT)
 			{
-				BEEP_KeyTone();		/* °´¼üÌáÊ¾Òô */
+				BEEP_KeyTone(); /* æŒ‰é”®æç¤ºéŸ³ */
 			}
-			
-			/* ÓĞ¼ü°´ÏÂ */
+
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:			/* K1¼ü°´ÏÂ */
-					bsp_LedOn(1);	/* µãÁÁLED1 */
+			case KEY_DOWN_K1: /* K1é”®æŒ‰ä¸‹ */
+				bsp_LedOn(1);		/* ç‚¹äº®LED1 */
+				{
+					if (s_pic > 0)
 					{
-						if (s_pic > 0)
-						{
-							s_pic--;
-						}
-						DispPic();		/* ÏÔÊ¾Í¼Æ¬ */
+						s_pic--;
 					}
-					break;
+					DispPic(); /* æ˜¾ç¤ºå›¾ç‰‡ */
+				}
+				break;
 
-				case KEY_UP_K1:				/* K1¼üËÉ¿ª */
-					bsp_LedOff(1);	/* Ï¨ÃğLED1 */
-					break;
+			case KEY_UP_K1:	/* K1é”®æ¾å¼€ */
+				bsp_LedOff(1); /* ç†„ç­LED1 */
+				break;
 
-				case KEY_DOWN_K2:			/* K2¼ü°´ÏÂ */
-					bsp_LedOn(2);	/* µãÁÁLED2 */
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				bsp_LedOn(2);		/* ç‚¹äº®LED2 */
+				{
+					if (s_pic < 14)
 					{
-						if (s_pic < 14)
-						{
-							s_pic++;
-						}
-						DispPic();		/* ÏÔÊ¾ÉÏÒ»ÕÅÍ¼Æ¬ */
+						s_pic++;
 					}
-					break;
+					DispPic(); /* æ˜¾ç¤ºä¸Šä¸€å¼ å›¾ç‰‡ */
+				}
+				break;
 
-				case KEY_UP_K2:				/* K2¼üËÉ¿ª */
-					//Label3.pCaption = "K2¼üËÉ¿ª";
-					//LCD_DrawLabel(&Label3);
-					bsp_LedOff(2);	/* Ï¨ÃğLED2 */
-					break;
+			case KEY_UP_K2: /* K2é”®æ¾å¼€ */
+				//Label3.pCaption = "K2é”®æ¾å¼€";
+				//LCD_DrawLabel(&Label3);
+				bsp_LedOff(2); /* ç†„ç­LED2 */
+				break;
 
-				case KEY_DOWN_K3:			/* K3¼ü°´ÏÂ */
-					Label3.pCaption = "K3¼ü°´ÏÂ";
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				Label3.pCaption = "K3é”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+				bsp_LedOn(3); /* ç‚¹äº®LED3 */
+				break;
+
+			case KEY_UP_K3: /* K3é”®æ¾å¼€ */
+				Label3.pCaption = "K3é”®æ¾å¼€";
+				LCD_DrawLabel(&Label3);
+				bsp_LedOff(3); /* ç†„ç­LED3 */
+				break;
+
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				Label3.pCaption = "æ‘‡æ†ä¸Šé”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+
+				if (g_tParam.ucBackLight < 255)
+				{
+					g_tParam.ucBackLight++;
+				}
+				LCD_SetBackLight(g_tParam.ucBackLight); /* è®¾ç½®èƒŒå…‰äº®åº¦ */
+				fRefresh = 1;
+				break;
+
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				Label3.pCaption = "æ‘‡æ†ä¸‹é”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+				if (g_tParam.ucBackLight > 0)
+				{
+					g_tParam.ucBackLight--;
+				}
+				LCD_SetBackLight(g_tParam.ucBackLight); /* è®¾ç½®èƒŒå…‰äº®åº¦ */
+				fRefresh = 1;
+				break;
+
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				Label3.pCaption = "æ‘‡æ†å·¦é”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				Label3.pCaption = "æ‘‡æ†å³é”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+				bsp_DelayMS(500);
+				break;
+
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				Label3.pCaption = "æ‘‡æ†OKé”®æŒ‰ä¸‹";
+				LCD_DrawLabel(&Label3);
+				bsp_LedOn(4); /* ç‚¹äº®LED4 */
+				break;
+
+			case JOY_UP_OK: /* æ‘‡æ†OKé”®æ¾å¼€ */
+				Label3.pCaption = "æ‘‡æ†OKé”®æ¾å¼€";
+				LCD_DrawLabel(&Label3);
+				bsp_LedOff(4); /* ç†„ç­LED4 */
+				break;
+
+			/* ä¸‹é¢æ˜¯çº¢å¤–é¥æ§å™¨çš„äº‹ä»¶ */
+			case IR_KEY_POWER:
+				Label3.pCaption = "IR Power";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_MENU:
+				Label3.pCaption = "IR Menu";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_TEST:
+				Label3.pCaption = "IR Test";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_UP:
+				Label3.pCaption = "IR +";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_RETURN:
+				Label3.pCaption = "IR Return";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_LEFT:
+				Label3.pCaption = "IR Left";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_OK:
+				Label3.pCaption = "IR Ok";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_RIGHT:
+				Label3.pCaption = "IR Right";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_0:
+				Label3.pCaption = "IR 0";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_DOWN:
+				Label3.pCaption = "IR -";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_C:
+				Label3.pCaption = "IR C";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_1:
+				Label3.pCaption = "IR 1";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_2:
+				Label3.pCaption = "IR 2";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_3:
+				Label3.pCaption = "IR 3";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_4:
+				Label3.pCaption = "IR 4";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_5:
+				Label3.pCaption = "IR 5";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_6:
+				Label3.pCaption = "IR 6";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_7:
+				Label3.pCaption = "IR 7";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_8:
+				Label3.pCaption = "IR 8";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			case IR_KEY_9:
+				Label3.pCaption = "IR 9";
+				LCD_DrawLabel(&Label3);
+				break;
+
+			default:
+				if (ucKeyCode >= IR_KEY_STRAT)
+				{
+					sprintf(buf, "IR æ— æ³•è¯†åˆ« %02X %02X %02X %02X", g_tIR.RxBuf[0], g_tIR.RxBuf[1],
+									g_tIR.RxBuf[2], g_tIR.RxBuf[3]);
+
+					Label3.pCaption = buf;
 					LCD_DrawLabel(&Label3);
-					bsp_LedOn(3);	/* µãÁÁLED3 */
-					break;
-
-				case KEY_UP_K3:				/* K3¼üËÉ¿ª */
-					Label3.pCaption = "K3¼üËÉ¿ª";
-					LCD_DrawLabel(&Label3);
-					bsp_LedOff(3);	/* Ï¨ÃğLED3 */
-					break;
-
-				case JOY_DOWN_U:			/* Ò¡¸ËUP¼ü°´ÏÂ */
-					Label3.pCaption = "Ò¡¸ËÉÏ¼ü°´ÏÂ";
-					LCD_DrawLabel(&Label3);
-
-					if (g_tParam.ucBackLight < 255)
-					{
-						g_tParam.ucBackLight++;
-					}
-					LCD_SetBackLight(g_tParam.ucBackLight);		/* ÉèÖÃ±³¹âÁÁ¶È */
-					fRefresh = 1;
-					break;
-
-				case JOY_DOWN_D:			/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					Label3.pCaption = "Ò¡¸ËÏÂ¼ü°´ÏÂ";
-					LCD_DrawLabel(&Label3);
-					if (g_tParam.ucBackLight > 0)
-					{
-						g_tParam.ucBackLight--;
-					}
-					LCD_SetBackLight(g_tParam.ucBackLight);		/* ÉèÖÃ±³¹âÁÁ¶È */
-					fRefresh = 1;
-					break;
-
-				case JOY_DOWN_L:			/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					Label3.pCaption = "Ò¡¸Ë×ó¼ü°´ÏÂ";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case JOY_DOWN_R:			/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					Label3.pCaption = "Ò¡¸ËÓÒ¼ü°´ÏÂ";
-					LCD_DrawLabel(&Label3);
-					bsp_DelayMS(500);
-					break;
-
-				case JOY_DOWN_OK:			/* Ò¡¸ËOK¼ü°´ÏÂ */
-					Label3.pCaption = "Ò¡¸ËOK¼ü°´ÏÂ";
-					LCD_DrawLabel(&Label3);
-					bsp_LedOn(4);	/* µãÁÁLED4 */
-					break;
-
-				case JOY_UP_OK:				/* Ò¡¸ËOK¼üËÉ¿ª */
-					Label3.pCaption = "Ò¡¸ËOK¼üËÉ¿ª";
-					LCD_DrawLabel(&Label3);
-					bsp_LedOff(4);	/* Ï¨ÃğLED4 */
-					break;
-
-				/* ÏÂÃæÊÇºìÍâÒ£¿ØÆ÷µÄÊÂ¼ş */
-				case IR_KEY_POWER:
-					Label3.pCaption = "IR Power";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_MENU:
-					Label3.pCaption = "IR Menu";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_TEST:
-					Label3.pCaption = "IR Test";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_UP:
-					Label3.pCaption = "IR +";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_RETURN:
-					Label3.pCaption = "IR Return";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_LEFT:
-					Label3.pCaption = "IR Left";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_OK:
-					Label3.pCaption = "IR Ok";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_RIGHT:
-					Label3.pCaption = "IR Right";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_0:
-					Label3.pCaption = "IR 0";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_DOWN:
-					Label3.pCaption = "IR -";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_C:
-					Label3.pCaption = "IR C";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_1:
-					Label3.pCaption = "IR 1";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_2:
-					Label3.pCaption = "IR 2";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_3:
-					Label3.pCaption = "IR 3";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_4:
-					Label3.pCaption = "IR 4";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_5:
-					Label3.pCaption = "IR 5";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_6:
-					Label3.pCaption = "IR 6";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_7:
-					Label3.pCaption = "IR 7";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_8:
-					Label3.pCaption = "IR 8";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				case IR_KEY_9:
-					Label3.pCaption = "IR 9";
-					LCD_DrawLabel(&Label3);
-					break;
-
-				default:
-					if (ucKeyCode >= IR_KEY_STRAT)
-					{
-						sprintf(buf, "IR ÎŞ·¨Ê¶±ğ %02X %02X %02X %02X", g_tIR.RxBuf[0], g_tIR.RxBuf[1],
-							g_tIR.RxBuf[2], g_tIR.RxBuf[3]);
-
-						Label3.pCaption = buf;
-						LCD_DrawLabel(&Label3);
-					}
-					break;
-
+				}
+				break;
 			}
 		}
 
-		/* PS2°´¼ü¼ì²âÓÉÖĞ¶Ï·şÎñ³ÌĞòÊµÏÖ£¬ÎÒÃÇÖ»ĞèÒªµ÷ÓÃPS2_GetMsg¶ÁÈ¡¼üÖµ¼´¿É¡£ */
+		/* PS2æŒ‰é”®æ£€æµ‹ç”±ä¸­æ–­æœåŠ¡ç¨‹åºå®ç°ï¼Œæˆ‘ä»¬åªéœ€è¦è°ƒç”¨PS2_GetMsgè¯»å–é”®å€¼å³å¯ã€‚ */
 		uiPS2Msg = PS2_GetMsg();
 		if (uiPS2Msg != PS2_NONE)
 		{
@@ -721,34 +718,34 @@ void TestTouch(void)
 
 			if (uiPS2Msg == 0xAA)
 			{
-				Label1.pCaption = "¼ì²âµ½PS2¼üÅÌ";
+				Label1.pCaption = "æ£€æµ‹åˆ°PS2é”®ç›˜";
 				LCD_DrawLabel(&Label1);
 
 				PS2_InitKeyboard();
 			}
 			if (uiPS2Msg == 0xAA00)
 			{
-				Label1.pCaption = "¼ì²âµ½PS2Êó±ê";
+				Label1.pCaption = "æ£€æµ‹åˆ°PS2é¼ æ ‡";
 				LCD_DrawLabel(&Label1);
 
 				PS2_InitMouse();
 			}
 
-			/* ´òÓ¡PS2Êó±êÊı¾İ°ü½âÂë½á¹û */
+			/* æ‰“å°PS2é¼ æ ‡æ•°æ®åŒ…è§£ç ç»“æœ */
 			if (PS2_IsMousePacket(uiPS2Msg))
 			{
 				MOUSE_PACKET_T mouse;
 
 				PS2_DecodeMouse(uiPS2Msg, &mouse);
 
-				sprintf(buf,  "X=%4d, Y=%4d, Z=%2d, ×ó¼ü=%d, ÖĞ¼ü=%d, ÓÒ¼ü=%d",
-					mouse.Xmove, mouse.Ymove, mouse.Zmove,
-					mouse.BtnLeft, mouse.BtnMid, mouse.BtnRight);
+				sprintf(buf, "X=%4d, Y=%4d, Z=%2d, å·¦é”®=%d, ä¸­é”®=%d, å³é”®=%d",
+								mouse.Xmove, mouse.Ymove, mouse.Zmove,
+								mouse.BtnLeft, mouse.BtnMid, mouse.BtnRight);
 
 				Label2.pCaption = buf;
 				LCD_DrawLabel(&Label2);
 			}
-			else	/* ×÷ÎªPS2¼üÅÌÊı¾İ°ü´¦Àí */
+			else /* ä½œä¸ºPS2é”®ç›˜æ•°æ®åŒ…å¤„ç† */
 			{
 				sprintf(buf, "%s", GetNameOfKey(uiPS2Msg));
 				Label2.pCaption = buf;
@@ -757,18 +754,18 @@ void TestTouch(void)
 		}
 	}
 
-	PS2_StopWork();		/* Í£Ö¹PS2ÖĞ¶Ï */
-	IRD_StopWork();	/* Í£Ö¹ºìÍâ½âÂë */
+	PS2_StopWork(); /* åœæ­¢PS2ä¸­æ–­ */
+	IRD_StopWork(); /* åœæ­¢çº¢å¤–è§£ç  */
 
-	usbh_CloseMassStorage();	/* ¹Ø±Õ USB HOST - UÅÌ */
+	usbh_CloseMassStorage(); /* å…³é—­ USB HOST - Uç›˜ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispPic
-*	¹¦ÄÜËµÃ÷: ÒÀ´ÎÏÔÊ¾NAND FlashÍ¼Æ¬£¨3ÕÅ£©¡¢SRAMµ¥É«Í¼Æ¬£¨3ÕÅ£©¡¢SD¿¨Í¼Æ¬£¨3ÕÅ£©¡¢UÅÌÍ¼Æ¬£¨3ÕÅ£©²¢¼ÆËãË¢ÆÁÊ±¼ä
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ×Ö·û´®Ö¸Õë
+*	å‡½ æ•° å: DispPic
+*	åŠŸèƒ½è¯´æ˜: ä¾æ¬¡æ˜¾ç¤ºNAND Flashå›¾ç‰‡ï¼ˆ3å¼ ï¼‰ã€SRAMå•è‰²å›¾ç‰‡ï¼ˆ3å¼ ï¼‰ã€SDå¡å›¾ç‰‡ï¼ˆ3å¼ ï¼‰ã€Uç›˜å›¾ç‰‡ï¼ˆ3å¼ ï¼‰å¹¶è®¡ç®—åˆ·å±æ—¶é—´
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: å­—ç¬¦ä¸²æŒ‡é’ˆ
 *********************************************************************************************************
 */
 static void DispPic(void)
@@ -778,20 +775,19 @@ static void DispPic(void)
 	int32_t time1, time2;
 	FONT_T tFont;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BLUE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
-	
 
-	/* K1¼üÇĞ»»±³¾°Í¼Æ¬ */
-	if (s_pic <= 2)			/* NAND FLASH ÖĞµÄÍ¼Æ¬3ÕÅ */
+	/* K1é”®åˆ‡æ¢èƒŒæ™¯å›¾ç‰‡ */
+	if (s_pic <= 2) /* NAND FLASH ä¸­çš„å›¾ç‰‡3å¼  */
 	{
 		uint16_t color;
-		
+
 		if (s_pic == 0)
 		{
 			color = CL_RED;
@@ -804,45 +800,45 @@ static void DispPic(void)
 		{
 			color = CL_BLUE;
 		}
-			
+
 		time1 = bsp_GetRunTime();
-		
+
 		/* 
-			DMA2DÌî³äÌ«¿ì£¬Ö»ÓĞ¼¸¸öms£¬Òò´ËÓÃÊ¾²¨Æ÷²âÁ¿Ö´ĞĞÊ±¼ä¡£
-			Ê¹ÓÃ J6ÅÅÕëµÄµÚ10½Å --- 5.0VÀ©Õ¹Êä³ö¿Ú×î¸ßbit
-			¿ªÊ¼»æÖÆÇ°ÉèÖÃ Y50_7 = 1; Íê±ÏºóÉèÖÃ Y50_7 = 0.
-			2015-11-19 ²âÊÔ½á¹û:  (ÒÑ¾­½«DMA2D¿âº¯Êı¾ÍµØÕ¹¿ª½øĞĞÓÅ»¯)
+			DMA2Då¡«å……å¤ªå¿«ï¼Œåªæœ‰å‡ ä¸ªmsï¼Œå› æ­¤ç”¨ç¤ºæ³¢å™¨æµ‹é‡æ‰§è¡Œæ—¶é—´ã€‚
+			ä½¿ç”¨ J6æ’é’ˆçš„ç¬¬10è„š --- 5.0Væ‰©å±•è¾“å‡ºå£æœ€é«˜bit
+			å¼€å§‹ç»˜åˆ¶å‰è®¾ç½® Y50_7 = 1; å®Œæ¯•åè®¾ç½® Y50_7 = 0.
+			2015-11-19 æµ‹è¯•ç»“æœ:  (å·²ç»å°†DMA2Dåº“å‡½æ•°å°±åœ°å±•å¼€è¿›è¡Œä¼˜åŒ–)
 			
-			480 * 272 ÆÁ : 1.84ms
-			800 * 480 ÆÁ : 3.68ms
+			480 * 272 å± : 1.84ms
+			800 * 480 å± : 3.68ms
 		*/
-		HC574_SetPin(Y50_7, 1);		/* Y50_7 = 1 */
-		
-		if (LCD_GetWidth() == 480)	/* 4.3´çÆÁ 480x272 */
+		HC574_SetPin(Y50_7, 1); /* Y50_7 = 1 */
+
+		if (LCD_GetWidth() == 480) /* 4.3å¯¸å± 480x272 */
 		{
 			LCD_Fill_Rect(0, 0, g_LcdHeight, g_LcdWidth, color);
 		}
-		else	/* 5´çºÍ7´ç 800*480 ÆÁ */
+		else /* 5å¯¸å’Œ7å¯¸ 800*480 å± */
 		{
 			LCD_Fill_Rect(0, 0, g_LcdHeight, g_LcdWidth, color);
 		}
-		
-		HC574_SetPin(Y50_7, 0);		/* Y50_7 = 0, */
-		
+
+		HC574_SetPin(Y50_7, 0); /* Y50_7 = 0, */
+
 		time2 = bsp_GetRunTime();
-		sprintf(buf, "Í¼Æ¬%d DMA2Dµ¥É«Ìî³ä, ÏÔÊ¾Ê±¼ä: %4dms", s_pic + 1, time2 - time1);
+		sprintf(buf, "å›¾ç‰‡%d DMA2Då•è‰²å¡«å……, æ˜¾ç¤ºæ—¶é—´: %4dms", s_pic + 1, time2 - time1);
 		LCD_DispStrEx(5, 5, buf, &tFont, 300, ALIGN_LEFT);
 	}
-	else if (s_pic >= 3 && s_pic <= 5)	/* SDRAM ÖĞµ¥É«Í¼Æ¬3ÕÅ */
+	else if (s_pic >= 3 && s_pic <= 5) /* SDRAM ä¸­å•è‰²å›¾ç‰‡3å¼  */
 	{
 		uint16_t *p1 = (uint16_t *)SDRAM_APP_BUF;
-		
-		/* Ìî³ä1¸öµ¥É«ÇøÓò */
+
+		/* å¡«å……1ä¸ªå•è‰²åŒºåŸŸ */
 		{
 			uint32_t i;
 			uint16_t *p = (uint16_t *)SDRAM_APP_BUF;
 			uint16_t color;
-			
+
 			if (s_pic == 3)
 			{
 				color = CL_RED;
@@ -855,42 +851,42 @@ static void DispPic(void)
 			{
 				color = CL_BLUE;
 			}
-			
+
 			for (i = 0; i < g_LcdHeight * g_LcdWidth; i++)
 			{
 				*p++ = color;
 			}
 		}
-		
+
 		time1 = bsp_GetRunTime();
-		if (LCD_GetWidth() == 480)	/* 4.3´çÆÁ 480x272 */
+		if (LCD_GetWidth() == 480) /* 4.3å¯¸å± 480x272 */
 		{
 			LCD_DrawBMP(0, 0, g_LcdHeight, g_LcdWidth, p1);
 		}
-		else	/* 5´çºÍ7´ç 800*480 ÆÁ */
+		else /* 5å¯¸å’Œ7å¯¸ 800*480 å± */
 		{
 			LCD_DrawBMP(0, 0, g_LcdHeight, g_LcdWidth, p1);
 		}
 		time2 = bsp_GetRunTime();
-		sprintf(buf, "Í¼Æ¬%d SDRAM, ÏÔÊ¾Ê±¼ä: %4dms", s_pic + 1, time2 - time1);
+		sprintf(buf, "å›¾ç‰‡%d SDRAM, æ˜¾ç¤ºæ—¶é—´: %4dms", s_pic + 1, time2 - time1);
 		LCD_DispStrEx(5, 5, buf, &tFont, 300, ALIGN_LEFT);
-	}	
-	else if (s_pic >= 6 && s_pic <= 8)			/* SD¿¨ÖĞµÄÍ¼Æ¬3ÕÅ */
+	}
+	else if (s_pic >= 6 && s_pic <= 8) /* SDå¡ä¸­çš„å›¾ç‰‡3å¼  */
 	{
-		/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
-		FATFS   fs;
+		/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
+		FATFS fs;
 		char FileName[64];
 		uint8_t err = 0;
-		char DiskPath[4]; /* ±£´æFatFS ´ÅÅÌÂ·¾¶ */		
+		char DiskPath[4]; /* ä¿å­˜FatFS ç£ç›˜è·¯å¾„ */
 
-		/* Ã¿´Î¶Á1ĞĞ */
+		/* æ¯æ¬¡è¯»1è¡Œ */
 		FATFS_LinkDriver(&SD_Driver, DiskPath);
-		
+
 		if (f_mount(&fs, DiskPath, 0) == FR_OK)
 		{
 			time1 = bsp_GetRunTime();
 
-			if (LCD_GetWidth() == 480)	/* 4.3´çÆÁ 480x272 */
+			if (LCD_GetWidth() == 480) /* 4.3å¯¸å± 480x272 */
 			{
 				sprintf(FileName, "%sPic/%s", DiskPath, g_NandFileName_480x272[s_pic - 6]);
 			}
@@ -910,40 +906,39 @@ static void DispPic(void)
 			err = 1;
 		}
 
-
 		if (err == 1)
 		{
 			LCD_ClrScr(CL_BLUE);
-			sprintf(buf, "Í¼Æ¬%d SD¿¨ÎÄ¼ş´íÎó: %s", s_pic + 1, FileName);
+			sprintf(buf, "å›¾ç‰‡%d SDå¡æ–‡ä»¶é”™è¯¯: %s", s_pic + 1, FileName);
 		}
 		else
 		{
-			sprintf(buf, "Í¼Æ¬%d SD¿¨, ÏÔÊ¾Ê±¼ä: %dms", s_pic + 1, time2 - time1);
+			sprintf(buf, "å›¾ç‰‡%d SDå¡, æ˜¾ç¤ºæ—¶é—´: %dms", s_pic + 1, time2 - time1);
 		}
 		LCD_DispStrEx(5, 5, buf, &tFont, 300, ALIGN_LEFT);
 
-		/* Ğ¶ÔØÎÄ¼şÏµÍ³ */
+		/* å¸è½½æ–‡ä»¶ç³»ç»Ÿ */
 		f_mount(NULL, DiskPath, 0);
-		
+
 		FATFS_UnLinkDriver(DiskPath);
 	}
-	else if (s_pic >= 9 && s_pic <= 11)			/* UÅÌÖĞµÄÍ¼Æ¬3ÕÅ */
+	else if (s_pic >= 9 && s_pic <= 11) /* Uç›˜ä¸­çš„å›¾ç‰‡3å¼  */
 	{
-		/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
-		FATFS   fs;
+		/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
+		FATFS fs;
 		char FileName[64];
 		uint8_t err = 0;
-		char DiskPath[4]; /* ±£´æFatFS ´ÅÅÌÂ·¾¶ */		
+		char DiskPath[4]; /* ä¿å­˜FatFS ç£ç›˜è·¯å¾„ */
 
-		/* Ã¿´Î¶Á1ĞĞ */
+		/* æ¯æ¬¡è¯»1è¡Œ */
 		FATFS_LinkDriver(&USBH_Driver, DiskPath);
-		
-		/* Ã¿´Î¶Á1ĞĞ */
+
+		/* æ¯æ¬¡è¯»1è¡Œ */
 		if (f_mount(&fs, DiskPath, 0) == FR_OK)
 		{
 			time1 = bsp_GetRunTime();
 
-			if (LCD_GetWidth() == 480)	/* 4.3´çÆÁ 480x272 */
+			if (LCD_GetWidth() == 480) /* 4.3å¯¸å± 480x272 */
 			{
 				sprintf(FileName, "%sPic/%s", DiskPath, g_NandFileName_480x272[s_pic - 9]);
 			}
@@ -960,43 +955,43 @@ static void DispPic(void)
 		}
 		else
 		{
-			printf("f_mountÎÄ¼şÏµÍ³Ê§°Ü");
+			printf("f_mountæ–‡ä»¶ç³»ç»Ÿå¤±è´¥");
 			err = 1;
 		}
 
 		if (err == 1)
 		{
 			LCD_ClrScr(CL_BLUE);
-			sprintf(buf, "Í¼Æ¬%d UÅÌÎÄ¼ş´íÎó:%s", s_pic + 1, FileName);
+			sprintf(buf, "å›¾ç‰‡%d Uç›˜æ–‡ä»¶é”™è¯¯:%s", s_pic + 1, FileName);
 		}
 		else
 		{
-			sprintf(buf, "Í¼Æ¬%d UÅÌ, ÏÔÊ¾Ê±¼ä: %dms", s_pic + 1, time2 - time1);
+			sprintf(buf, "å›¾ç‰‡%d Uç›˜, æ˜¾ç¤ºæ—¶é—´: %dms", s_pic + 1, time2 - time1);
 		}
 		LCD_DispStrEx(5, 5, buf, &tFont, 300, ALIGN_LEFT);
 
-		/* Ğ¶ÔØÎÄ¼şÏµÍ³ */
+		/* å¸è½½æ–‡ä»¶ç³»ç»Ÿ */
 		f_mount(NULL, DiskPath, 0);
-		
+
 		FATFS_UnLinkDriver(DiskPath);
 	}
-	else if (s_pic >= 12 && s_pic <= 14)			/* NAND FALSHµÄÍ¼Æ¬3ÕÅ */
+	else if (s_pic >= 12 && s_pic <= 14) /* NAND FALSHçš„å›¾ç‰‡3å¼  */
 	{
-		/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
-		FATFS   fs;
+		/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
+		FATFS fs;
 		char FileName[64];
 		uint8_t err = 0;
-		char DiskPath[4]; /* ±£´æFatFS ´ÅÅÌÂ·¾¶ */		
+		char DiskPath[4]; /* ä¿å­˜FatFS ç£ç›˜è·¯å¾„ */
 
-		/* Ã¿´Î¶Á1ĞĞ */
+		/* æ¯æ¬¡è¯»1è¡Œ */
 		FATFS_LinkDriver(&nand_Driver, DiskPath);
-		
-		/* Ã¿´Î¶Á1ĞĞ */
+
+		/* æ¯æ¬¡è¯»1è¡Œ */
 		if (f_mount(&fs, DiskPath, 0) == FR_OK)
 		{
 			time1 = bsp_GetRunTime();
 
-			if (LCD_GetWidth() == 480)	/* 4.3´çÆÁ 480x272 */
+			if (LCD_GetWidth() == 480) /* 4.3å¯¸å± 480x272 */
 			{
 				sprintf(FileName, "%sPic/%s", DiskPath, g_NandFileName_480x272[s_pic - 12]);
 			}
@@ -1013,43 +1008,43 @@ static void DispPic(void)
 		}
 		else
 		{
-			printf("f_mountÎÄ¼şÏµÍ³Ê§°Ü");
+			printf("f_mountæ–‡ä»¶ç³»ç»Ÿå¤±è´¥");
 			err = 1;
 		}
 
 		if (err == 1)
 		{
 			LCD_ClrScr(CL_BLUE);
-			sprintf(buf, "Í¼Æ¬%d NAND FlashÎÄ¼ş´íÎó:%s", s_pic + 1, FileName);
+			sprintf(buf, "å›¾ç‰‡%d NAND Flashæ–‡ä»¶é”™è¯¯:%s", s_pic + 1, FileName);
 		}
 		else
 		{
-			sprintf(buf, "Í¼Æ¬%d NAND Flash, ÏÔÊ¾Ê±¼ä: %dms", s_pic + 1, time2 - time1);
+			sprintf(buf, "å›¾ç‰‡%d NAND Flash, æ˜¾ç¤ºæ—¶é—´: %dms", s_pic + 1, time2 - time1);
 		}
 		LCD_DispStrEx(5, 5, buf, &tFont, 300, ALIGN_LEFT);
 
-		/* Ğ¶ÔØÎÄ¼şÏµÍ³ */
+		/* å¸è½½æ–‡ä»¶ç³»ç»Ÿ */
 		f_mount(NULL, DiskPath, 0);
-		
+
 		FATFS_UnLinkDriver(DiskPath);
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ReadFileDispPic
-*	¹¦ÄÜËµÃ÷: ¶ÁÍ¼Æ¬ÎÄ¼ş£¬²¢ÏÔÊ¾¡£ ÔÚµ÷ÓÃ±¾º¯ÊıÇ°£¬ÇëÈ·±£ ´ÅÅÌÒÑ¾­Ö´ĞĞ f_mount
-*	ĞÎ    ²Î: _strFileName : ÎÄ¼şÈ«Ãû£¬º¬´ÅÅÌºÅºÍÈ«Â·¾¶
-*	·µ »Ø Öµ: 0 ±íÊ¾´íÎó£¬ 1±íÊ¾³É¹¦
+*	å‡½ æ•° å: ReadFileDispPic
+*	åŠŸèƒ½è¯´æ˜: è¯»å›¾ç‰‡æ–‡ä»¶ï¼Œå¹¶æ˜¾ç¤ºã€‚ åœ¨è°ƒç”¨æœ¬å‡½æ•°å‰ï¼Œè¯·ç¡®ä¿ ç£ç›˜å·²ç»æ‰§è¡Œ f_mount
+*	å½¢    å‚: _strFileName : æ–‡ä»¶å…¨åï¼Œå«ç£ç›˜å·å’Œå…¨è·¯å¾„
+*	è¿” å› å€¼: 0 è¡¨ç¤ºé”™è¯¯ï¼Œ 1è¡¨ç¤ºæˆåŠŸ
 *********************************************************************************************************
 */
-uint8_t  ReadFileDispPic(char *_strFileName, uint16_t _usX, uint16_t _usY, uint16_t usHeight, uint16_t usWidth)
+uint8_t ReadFileDispPic(char *_strFileName, uint16_t _usX, uint16_t _usY, uint16_t usHeight, uint16_t usWidth)
 {
-	/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
-//	FATFS   fs;
-	FIL 	file;
+	/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
+	//	FATFS   fs;
+	FIL file;
 	uint32_t bw;
-//	uint16_t data[800];
+	//	uint16_t data[800];
 	uint16_t *pSDRAM = (uint16_t *)SDRAM_APP_BUF;
 
 	if (usWidth > 800)
@@ -1057,87 +1052,86 @@ uint8_t  ReadFileDispPic(char *_strFileName, uint16_t _usX, uint16_t _usY, uint1
 		return 0;
 	}
 
-	#if 1
-			/* ´ò¿ªÎÄ¼ş */
+#if 1
+	/* æ‰“å¼€æ–‡ä»¶ */
+	{
+		FRESULT result;
+
+		//			uint16_t *p = (uint16_t *)(SDRAM_APP_BUF + g_LcdHeight * g_LcdWidth * 2);
+
+		result = f_open(&file, _strFileName, FA_OPEN_EXISTING | FA_READ);
+		if (result != FR_OK)
 		{
-			FRESULT result;
-
-//			uint16_t *p = (uint16_t *)(SDRAM_APP_BUF + g_LcdHeight * g_LcdWidth * 2);	
-			
-			result = f_open(&file, _strFileName, FA_OPEN_EXISTING | FA_READ);
-			if (result !=  FR_OK)
-			{
-				printf("Open file Error, %s\r\n", _strFileName);
-				goto err_ret;
-			}
-
-			memset((uint8_t *)pSDRAM, 0x51, usWidth * usHeight * 2);
-			
-			f_lseek(&file, 0);	/* ĞŞ¸ÄÎÄ¼şµ±Ç°Ö¸Õëµ½ÎÄ¼şÍ·, ´ÓÍ·¿ªÊ¼¶Á¡£ ¿ÉÒÔ²»×ö£¬È±Ê¡¾ÍÊÇ0 */
-			f_read(&file, pSDRAM, usWidth * usHeight * 2, &bw);
-						
-			if (bw != usWidth * usHeight * 2)
-			{
-				printf("Open file Error, %s\r\n", _strFileName);
-				goto err_ret;
-			}
-
-			/* ¹Ø±ÕÎÄ¼ş*/
-			f_close(&file);
-			
-			LCD_DrawBMP(_usX, _usY, usHeight, usWidth, pSDRAM);
+			printf("Open file Error, %s\r\n", _strFileName);
+			goto err_ret;
 		}
 
-	#else
-		/* ´ò¿ªÎÄ¼ş */
-		{
-			FRESULT result;
-			uint16_t i;
+		memset((uint8_t *)pSDRAM, 0x51, usWidth * usHeight * 2);
 
-			result = f_open(&file, _strFileName, FA_OPEN_EXISTING | FA_READ);
-			if (result !=  FR_OK)
+		f_lseek(&file, 0); /* ä¿®æ”¹æ–‡ä»¶å½“å‰æŒ‡é’ˆåˆ°æ–‡ä»¶å¤´, ä»å¤´å¼€å§‹è¯»ã€‚ å¯ä»¥ä¸åšï¼Œç¼ºçœå°±æ˜¯0 */
+		f_read(&file, pSDRAM, usWidth * usHeight * 2, &bw);
+
+		if (bw != usWidth * usHeight * 2)
+		{
+			printf("Open file Error, %s\r\n", _strFileName);
+			goto err_ret;
+		}
+
+		/* å…³é—­æ–‡ä»¶*/
+		f_close(&file);
+
+		LCD_DrawBMP(_usX, _usY, usHeight, usWidth, pSDRAM);
+	}
+
+#else
+	/* æ‰“å¼€æ–‡ä»¶ */
+	{
+		FRESULT result;
+		uint16_t i;
+
+		result = f_open(&file, _strFileName, FA_OPEN_EXISTING | FA_READ);
+		if (result != FR_OK)
+		{
+			printf("Open file Error, %s\r\n", _strFileName);
+			goto err_ret;
+		}
+
+		// f_lseek(&file, 0);	/* ä¿®æ”¹æ–‡ä»¶å½“å‰æŒ‡é’ˆåˆ°æ–‡ä»¶å¤´, ä»å¤´å¼€å§‹è¯»ã€‚ å¯ä»¥ä¸åšï¼Œç¼ºçœå°±æ˜¯0 */
+
+		for (i = 0; i < usHeight; i++)
+		{
+			f_read(&file, &data, usWidth * 2, &bw);
+			if (bw <= 0)
 			{
-				printf("Open file Error, %s\r\n", _strFileName);
 				goto err_ret;
 			}
 
-			// f_lseek(&file, 0);	/* ĞŞ¸ÄÎÄ¼şµ±Ç°Ö¸Õëµ½ÎÄ¼şÍ·, ´ÓÍ·¿ªÊ¼¶Á¡£ ¿ÉÒÔ²»×ö£¬È±Ê¡¾ÍÊÇ0 */
-
-			for (i = 0; i < usHeight; i++)
-			{
-				f_read(&file, &data, usWidth * 2, &bw);
-				if (bw <= 0)
-				{
-					goto err_ret;
-				}
-				
-				LCD_DrawBMP(_usX, _usY + i, 1, usWidth, data);
-			}
+			LCD_DrawBMP(_usX, _usY + i, 1, usWidth, data);
 		}
-	#endif
-	
-	/* ¹Ø±ÕÎÄ¼ş*/
+	}
+#endif
+
+	/* å…³é—­æ–‡ä»¶*/
 	f_close(&file);
-	return 1;	/* ·µ»ØOK */
+	return 1; /* è¿”å›OK */
 
 err_ret:
-	/* ¹Ø±ÕÎÄ¼ş*/
+	/* å…³é—­æ–‡ä»¶*/
 	f_close(&file);
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispKeyBoard
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾°´¼ü¼üÃû×Ö
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ×Ö·û´®Ö¸Õë
+*	å‡½ æ•° å: DispKeyBoard
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæŒ‰é”®é”®åå­—
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: å­—ç¬¦ä¸²æŒ‡é’ˆ
 *********************************************************************************************************
 */
-static const char * GetNameOfKey(uint32_t _code)
+static const char *GetNameOfKey(uint32_t _code)
 {
 	uint16_t i = 0;
-
 
 	while (1)
 	{
@@ -1158,10 +1152,10 @@ static const char * GetNameOfKey(uint32_t _code)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormTouch
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾°´¼ü¼üÃû×Ö
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ×Ö·û´®Ö¸Õë
+*	å‡½ æ•° å: InitFormTouch
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæŒ‰é”®é”®åå­—
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: å­—ç¬¦ä¸²æŒ‡é’ˆ
 *********************************************************************************************************
 */
 static void InitFormTouch(void)
@@ -1190,4 +1184,4 @@ static void InitFormTouch(void)
 	Label2.Font = &FontLabel;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

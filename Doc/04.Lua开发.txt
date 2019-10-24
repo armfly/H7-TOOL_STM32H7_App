@@ -1,31 +1,31 @@
 /* 
-	lua Ôö¼Óµ÷ÊÔ´úÂëµÄ·½·¨:
+	lua å¢åŠ è°ƒè¯•ä»£ç çš„æ–¹æ³•:
 
-lobject.cÎÄ¼ş:
+lobject.cæ–‡ä»¶:
 	const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
 	#if 1		
 	  printf("%s", msg);
 	#endif
 
-ldebug.c ÎÄ¼ş luaG_runerror º¯Êı£¬Ôö¼Óprintf
+ldebug.c æ–‡ä»¶ luaG_runerror å‡½æ•°ï¼Œå¢åŠ printf
 
-lauxlib.c ÎÄ¼ş luaL_errorº¯Êı£¬Ôö¼Óprintf
+lauxlib.c æ–‡ä»¶ luaL_errorå‡½æ•°ï¼Œå¢åŠ printf
 
-ldo.c ÎÄ¼ş luaD_throw º¯Êı	printf("\r\nthrow errcode=%d\r\n", errcode);
+ldo.c æ–‡ä»¶ luaD_throw å‡½æ•°	printf("\r\nthrow errcode=%d\r\n", errcode);
 
-lua.h ¶¨Òå´íÎó´úÂë
+lua.h å®šä¹‰é”™è¯¯ä»£ç 
 #define LUA_ERRRUN	2
 #define LUA_ERRSYNTAX	3
 #define LUA_ERRMEM	4
 #define LUA_ERRGCMM	5
 #define LUA_ERRERR	6
 
-Ò»´Î·ÖÅäÄÚ´æ²»¿ÉÒÔ´óÓÚ MAX_SIZET
+ä¸€æ¬¡åˆ†é…å†…å­˜ä¸å¯ä»¥å¤§äº MAX_SIZET
 
 */
 
 /*
-	luaconf.h ÎÄ¼ş¶Ô¸¡µãºÍÕûÊıµÄ´¦Àí¡£ È±Ê¡64Î»ÕûÊı£¬Ë«¾«¶È¸¡µã
+	luaconf.h æ–‡ä»¶å¯¹æµ®ç‚¹å’Œæ•´æ•°çš„å¤„ç†ã€‚ ç¼ºçœ64ä½æ•´æ•°ï¼ŒåŒç²¾åº¦æµ®ç‚¹
 		default configuration for 64-bit Lua ('long long' and 'double')
 */
 

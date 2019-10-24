@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Áª»ú½çÃæ
-*	ÎÄ¼şÃû³Æ : status_link_mode.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : 
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-10-06 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : è”æœºç•Œé¢
+*	æ–‡ä»¶åç§° : status_link_mode.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : 
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-10-06 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,126 +18,126 @@
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_LinkMode
-*	¹¦ÄÜËµÃ÷: Áª»úÄ£Ê½£¨¹¦ÄÜÓÉÉÏÎ»»ú¿ØÖÆ£©
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_LinkMode
+*	åŠŸèƒ½è¯´æ˜: è”æœºæ¨¡å¼ï¼ˆåŠŸèƒ½ç”±ä¸Šä½æœºæ§åˆ¶ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_LinkMode(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
 	uint8_t fIgnoreKey = 0;
 
-	DispHeader("Áª»úÄ£Ê½");
-	
+	DispHeader("è”æœºæ¨¡å¼");
+
 	usbd_CloseCDC();
-	usbd_OpenCDC(8);		/* ÆôÓÃUSBĞéÄâ´®¿Ú8£¬ ÓÃÓÚºÍPCÈí¼şUSBÍ¨ĞÅ */
-	
+	usbd_OpenCDC(8); /* å¯ç”¨USBè™šæ‹Ÿä¸²å£8ï¼Œ ç”¨äºå’ŒPCè½¯ä»¶USBé€šä¿¡ */
+
 	fRefresh = 1;
 	while (g_MainStatus == MS_LINK_MODE)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
 
 			{
-				FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
+				FONT_T tFont; /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
 				uint16_t x;
 				uint16_t y;
 				char buf[64];
 				uint8_t line_cap = 20;
-				
-				tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-				tFont.FrontColor = CL_YELLOW;	/* ×ÖÌåÑÕÉ« */
-				tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-				tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+
+				tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+				tFont.FrontColor = CL_YELLOW;			 /* å­—ä½“é¢œè‰² */
+				tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+				tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
 				x = 5;
 				y = 2 * line_cap;
-				sprintf(buf, "ÒÔÌ«ÍøMAC:%02X-%02X-%02X-%02X-%02X-%02X",
-					g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
-					g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
+				sprintf(buf, "ä»¥å¤ªç½‘MAC:%02X-%02X-%02X-%02X-%02X-%02X",
+								g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
+								g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
 				LCD_DispStr(x, y, buf, &tFont);
 
 				y = y + line_cap;
 				sprintf(buf, "IP:%d.%d.%d.%d", g_tParam.LocalIPAddr[0], g_tParam.LocalIPAddr[1],
-					g_tParam.LocalIPAddr[2], g_tParam.LocalIPAddr[3]);					
-				LCD_DispStr(x, y, buf, &tFont);	
-				
+								g_tParam.LocalIPAddr[2], g_tParam.LocalIPAddr[3]);
+				LCD_DispStr(x, y, buf, &tFont);
+
 				y = y + line_cap;
-				sprintf(buf, "TCP¶Ë¿ÚºÅ: %d", g_tParam.LocalTCPPort);					
-				LCD_DispStr(x, y, buf, &tFont);	
-				
+				sprintf(buf, "TCPç«¯å£å·: %d", g_tParam.LocalTCPPort);
+				LCD_DispStr(x, y, buf, &tFont);
+
 				y = y + line_cap;
-				sprintf(buf, "UDP¶Ë¿ÚºÅ: %d", g_tParam.LocalTCPPort);					
-				LCD_DispStr(x, y, buf, &tFont);						
-					
-				tFont.FrontColor = CL_BLACK;	/* ºÚ×Ö */
+				sprintf(buf, "UDPç«¯å£å·: %d", g_tParam.LocalTCPPort);
+				LCD_DispStr(x, y, buf, &tFont);
+
+				tFont.FrontColor = CL_BLACK; /* é»‘å­— */
 				y = 10 * line_cap;
-				sprintf(buf, "³¤°´S½øÈëÏµÍ³ÉèÖÃ", &tFont);
-				
-				LCD_DispStr(x, y, buf, &tFont);	
+				sprintf(buf, "é•¿æŒ‰Sè¿›å…¥ç³»ç»Ÿè®¾ç½®", &tFont);
+
+				LCD_DispStr(x, y, buf, &tFont);
 				y = 11 * line_cap;
-				sprintf(buf, "³¤°´CÇĞ»»·½Ïò", &tFont);
-				LCD_DispStr(x, y, buf, &tFont);					
+				sprintf(buf, "é•¿æŒ‰Cåˆ‡æ¢æ–¹å‘", &tFont);
+				LCD_DispStr(x, y, buf, &tFont);
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* S¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_S: /* Sé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_S:			/* S¼üÊÍ·Å */
-					g_MainStatus = NextStatus(MS_LINK_MODE);
-					break;
+			case KEY_UP_S: /* Sé”®é‡Šæ”¾ */
+				g_MainStatus = NextStatus(MS_LINK_MODE);
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü³¤°´ */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
-					break;								
+			case KEY_LONG_S: /* Sé”®é•¿æŒ‰ */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
 
-				case  KEY_DOWN_C:		/* C¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_C: /* Cé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_C:			/* C¼üÊÍ·Å */
-					if (fIgnoreKey == 1)
-					{
-						fIgnoreKey = 0;
-						break;
-					}
-					g_MainStatus = LastStatus(MS_LINK_MODE);
+			case KEY_UP_C: /* Cé”®é‡Šæ”¾ */
+				if (fIgnoreKey == 1)
+				{
+					fIgnoreKey = 0;
 					break;
+				}
+				g_MainStatus = LastStatus(MS_LINK_MODE);
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü */
-					BEEP_KeyTone();	
-					if (++g_tParam.DispDir > 3)
-					{
-						g_tParam.DispDir = 0;
-					}
-					LCD_SetDirection(g_tParam.DispDir);
-					SaveParam();
-					DispHeader("Áª»úÄ£Ê½");
-					fRefresh = 1;
-					fIgnoreKey = 1;	/* ĞèÒªºöÂÔJ¼´½«µ½À´µÄµ¯Æğ°´¼ü */
-					break;	
-					
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”® */
+				BEEP_KeyTone();
+				if (++g_tParam.DispDir > 3)
+				{
+					g_tParam.DispDir = 0;
+				}
+				LCD_SetDirection(g_tParam.DispDir);
+				SaveParam();
+				DispHeader("è”æœºæ¨¡å¼");
+				fRefresh = 1;
+				fIgnoreKey = 1; /* éœ€è¦å¿½ç•¥Jå³å°†åˆ°æ¥çš„å¼¹èµ·æŒ‰é”® */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
 
-	usbd_CloseCDC();	
-	usbd_OpenCDC(1);		/* ÆôÓÃUSBĞéÄâ´®¿Ú1£¬ ÓÃÓÚĞéÄâ´®¿Ú£¬RS232 RS485 TTL-UART */
+	usbd_CloseCDC();
+	usbd_OpenCDC(1); /* å¯ç”¨USBè™šæ‹Ÿä¸²å£1ï¼Œ ç”¨äºè™šæ‹Ÿä¸²å£ï¼ŒRS232 RS485 TTL-UART */
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

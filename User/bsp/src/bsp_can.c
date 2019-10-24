@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : FDCANÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_can.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : CANÇı¶¯. 
+*	æ¨¡å—åç§° : FDCANé©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_can.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : CANé©±åŠ¨. 
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-11-14  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-11-14  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,33 +18,33 @@
 #include "bsp.h"
 
 /*
-	ÆôÓÃCAN1£¬ĞèÒª½«V7Ö÷°åÉÏµÄJ12¡¢J13Á½¸öÌøÏßÃ±¶¼²åµ½1-2½Å¡££¨È±Ê¡ÊÇ²»²å£©
-	ÆôÓÃCNA2£¬Ó²¼şÎŞĞèÌøÏß£¬ÒÔÌ«Íø¹¦ÄÜĞèÒªÆÁ±Î£¨ÓĞÒı½Å¸´ÓÃ£©
+	å¯ç”¨CAN1ï¼Œéœ€è¦å°†V7ä¸»æ¿ä¸Šçš„J12ã€J13ä¸¤ä¸ªè·³çº¿å¸½éƒ½æ’åˆ°1-2è„šã€‚ï¼ˆç¼ºçœæ˜¯ä¸æ’ï¼‰
+	å¯ç”¨CNA2ï¼Œç¡¬ä»¶æ— éœ€è·³çº¿ï¼Œä»¥å¤ªç½‘åŠŸèƒ½éœ€è¦å±è”½ï¼ˆæœ‰å¼•è„šå¤ç”¨ï¼‰
 */
 
-/* FDCAN1 GPIO¶¨Òå */
-#define FDCAN1_TX_PIN       GPIO_PIN_12
+/* FDCAN1 GPIOå®šä¹‰ */
+#define FDCAN1_TX_PIN GPIO_PIN_12
 #define FDCAN1_TX_GPIO_PORT GPIOA
-#define FDCAN1_TX_AF        GPIO_AF9_FDCAN1
+#define FDCAN1_TX_AF GPIO_AF9_FDCAN1
 #define FDCAN1_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
-#define FDCAN1_RX_PIN       GPIO_PIN_11
+#define FDCAN1_RX_PIN GPIO_PIN_11
 #define FDCAN1_RX_GPIO_PORT GPIOA
-#define FDCAN1_RX_AF        GPIO_AF9_FDCAN1
+#define FDCAN1_RX_AF GPIO_AF9_FDCAN1
 #define FDCAN1_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
 FDCAN_HandleTypeDef hfdcan1;
 FDCAN_FilterTypeDef sFilterConfig1;
 
-/* FDCAN1 GPIO¶¨Òå */
-#define FDCAN2_TX_PIN       GPIO_PIN_13
+/* FDCAN1 GPIOå®šä¹‰ */
+#define FDCAN2_TX_PIN GPIO_PIN_13
 #define FDCAN2_TX_GPIO_PORT GPIOB
-#define FDCAN2_TX_AF        GPIO_AF9_FDCAN2
+#define FDCAN2_TX_AF GPIO_AF9_FDCAN2
 #define FDCAN2_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
 
-#define FDCAN2_RX_PIN       GPIO_PIN_12
+#define FDCAN2_RX_PIN GPIO_PIN_12
 #define FDCAN2_RX_GPIO_PORT GPIOB
-#define FDCAN2_RX_AF        GPIO_AF9_FDCAN2
+#define FDCAN2_RX_AF GPIO_AF9_FDCAN2
 #define FDCAN2_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
 
 FDCAN_HandleTypeDef hfdcan2;
@@ -55,17 +55,17 @@ uint8_t g_Can1RxData[8];
 
 FDCAN_RxHeaderTypeDef g_Can2RxHeader;
 uint8_t g_Can2RxData[8];
-	
+
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitCan1
-*	¹¦ÄÜËµÃ÷: ³õÊ¼CAN1
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitCan1
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹CAN1
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitCan1(void)
-{	
+{
 	/*                Bit time configuration:
 		Bit time parameter         | Nominal      |  Data
 		---------------------------|--------------|----------------
@@ -76,11 +76,11 @@ void bsp_InitCan1(void)
 		Phase_segment_1            | 8 tq         | 4 tq
 		Phase_segment_2            | 8 tq         | 4 tq
 		Synchronization_Jump_width | 8 tq         | 4 tq
-		Bit_length                 | 40 tq = 2 µs | 10 tq = 0.5 µs
+		Bit_length                 | 40 tq = 2 ç¥ | 10 tq = 0.5 ç¥
 		Bit_rate                   | 0.5 MBit/s   | 2 MBit/s
 	*/
 	hfdcan1.Instance = FDCAN1;
-	hfdcan1.Init.FrameFormat = FDCAN_FRAME_FD_BRS;	
+	hfdcan1.Init.FrameFormat = FDCAN_FRAME_FD_BRS;
 	hfdcan1.Init.Mode = FDCAN_MODE_NORMAL;
 	hfdcan1.Init.AutoRetransmission = ENABLE;
 	hfdcan1.Init.TransmitPause = DISABLE;
@@ -123,20 +123,19 @@ void bsp_InitCan1(void)
 	HAL_FDCAN_ActivateNotification(&hfdcan1, FDCAN_IT_RX_FIFO0_WATERMARK, 0);
 
 	/* Start the FDCAN module */
-	HAL_FDCAN_Start(&hfdcan1);	
+	HAL_FDCAN_Start(&hfdcan1);
 }
-
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitCan2
-*	¹¦ÄÜËµÃ÷: ³õÊ¼CAN2
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitCan2
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹CAN2
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitCan2(void)
-{	
+{
 	/*                Bit time configuration:
 		Bit time parameter         | Nominal      |  Data
 		---------------------------|--------------|----------------
@@ -147,7 +146,7 @@ void bsp_InitCan2(void)
 		Phase_segment_1            | 8 tq         | 4 tq
 		Phase_segment_2            | 8 tq         | 4 tq
 		Synchronization_Jump_width | 8 tq         | 4 tq
-		Bit_length                 | 40 tq = 2 µs | 10 tq = 0.5 µs
+		Bit_length                 | 40 tq = 2 ç¥ | 10 tq = 0.5 ç¥
 		Bit_rate                   | 0.5 MBit/s   | 2 MBit/s
 	*/
 	hfdcan2.Instance = FDCAN2;
@@ -194,15 +193,15 @@ void bsp_InitCan2(void)
 	HAL_FDCAN_ActivateNotification(&hfdcan2, FDCAN_IT_RX_FIFO0_WATERMARK, 0);
 
 	/* Start the FDCAN module */
-	HAL_FDCAN_Start(&hfdcan2);	
+	HAL_FDCAN_Start(&hfdcan2);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_DeInitCan1
-*	¹¦ÄÜËµÃ÷: ÊÍ·ÅCAN1
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_DeInitCan1
+*	åŠŸèƒ½è¯´æ˜: é‡Šæ”¾CAN1
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_DeInitCan1(void)
@@ -212,10 +211,10 @@ void bsp_DeInitCan1(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_DeInitCan2
-*	¹¦ÄÜËµÃ÷: ÊÍ·ÅCAN2
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_DeInitCan2
+*	åŠŸèƒ½è¯´æ˜: é‡Šæ”¾CAN2
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_DeInitCan2(void)
@@ -225,15 +224,15 @@ void bsp_DeInitCan2(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_FDCAN_MspInit
-*	¹¦ÄÜËµÃ÷: ÅäÖÃCAN gpio
-*	ĞÎ    ²Î: hfdcan
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_FDCAN_MspInit
+*	åŠŸèƒ½è¯´æ˜: é…ç½®CAN gpio
+*	å½¢    å‚: hfdcan
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* hfdcan)
+void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan)
 {
-	GPIO_InitTypeDef  GPIO_InitStruct;
+	GPIO_InitTypeDef GPIO_InitStruct;
 	RCC_PeriphCLKInitTypeDef RCC_PeriphClkInit;
 
 	if (hfdcan == &hfdcan1)
@@ -253,19 +252,19 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* hfdcan)
 
 		/*##-2- Configure peripheral GPIO ##########################################*/
 		/* FDCANx TX GPIO pin configuration  */
-		GPIO_InitStruct.Pin       = FDCAN1_TX_PIN;
-		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLUP;
-		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+		GPIO_InitStruct.Pin = FDCAN1_TX_PIN;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Pull = GPIO_PULLUP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 		GPIO_InitStruct.Alternate = FDCAN1_TX_AF;
 		HAL_GPIO_Init(FDCAN1_TX_GPIO_PORT, &GPIO_InitStruct);
 
 		/* FDCANx RX GPIO pin configuration  */
-		GPIO_InitStruct.Pin       = FDCAN1_RX_PIN;
+		GPIO_InitStruct.Pin = FDCAN1_RX_PIN;
 		GPIO_InitStruct.Alternate = FDCAN1_RX_AF;
 		HAL_GPIO_Init(FDCAN1_RX_GPIO_PORT, &GPIO_InitStruct);
 
-		/*##-3- Configure the NVIC #################################################*/   
+		/*##-3- Configure the NVIC #################################################*/
 		/* NVIC for FDCANx */
 		HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 1);
 		HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 0, 1);
@@ -274,7 +273,7 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* hfdcan)
 		HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
 	}
-	
+
 	if (hfdcan == &hfdcan2)
 	{
 		/*##-1- Enable peripherals and GPIO Clocks #################################*/
@@ -292,42 +291,42 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* hfdcan)
 
 		/*##-2- Configure peripheral GPIO ##########################################*/
 		/* FDCANx TX GPIO pin configuration  */
-		GPIO_InitStruct.Pin       = FDCAN2_TX_PIN;
-		GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull      = GPIO_PULLUP;
-		GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+		GPIO_InitStruct.Pin = FDCAN2_TX_PIN;
+		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+		GPIO_InitStruct.Pull = GPIO_PULLUP;
+		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 		GPIO_InitStruct.Alternate = FDCAN2_TX_AF;
 		HAL_GPIO_Init(FDCAN2_TX_GPIO_PORT, &GPIO_InitStruct);
 
 		/* FDCANx RX GPIO pin configuration  */
-		GPIO_InitStruct.Pin       = FDCAN2_RX_PIN;
+		GPIO_InitStruct.Pin = FDCAN2_RX_PIN;
 		GPIO_InitStruct.Alternate = FDCAN2_RX_AF;
 		HAL_GPIO_Init(FDCAN2_RX_GPIO_PORT, &GPIO_InitStruct);
 
-		/*##-3- Configure the NVIC #################################################*/   
+		/*##-3- Configure the NVIC #################################################*/
 		/* NVIC for FDCANx */
 		HAL_NVIC_SetPriority(FDCAN2_IT0_IRQn, 0, 1);
 		HAL_NVIC_SetPriority(FDCAN2_IT1_IRQn, 0, 1);
 		HAL_NVIC_SetPriority(FDCAN_CAL_IRQn, 0, 0);
-		
+
 		HAL_NVIC_EnableIRQ(FDCAN2_IT0_IRQn);
 		HAL_NVIC_EnableIRQ(FDCAN2_IT1_IRQn);
 		HAL_NVIC_EnableIRQ(FDCAN_CAL_IRQn);
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_FDCAN_MspInit
-*	¹¦ÄÜËµÃ÷: ÅäÖÃCAN gpio, »Ö¸´ÎªÆÕÍ¨GPIO£¬È¡ÏûÖĞ¶Ï
-*	ĞÎ    ²Î: hfdcan
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_FDCAN_MspInit
+*	åŠŸèƒ½è¯´æ˜: é…ç½®CAN gpio, æ¢å¤ä¸ºæ™®é€šGPIOï¼Œå–æ¶ˆä¸­æ–­
+*	å½¢    å‚: hfdcan
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* hfdcan)
+void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef *hfdcan)
 {
 	if (hfdcan == &hfdcan1)
-	{	
+	{
 		/*##-1- Reset peripherals ##################################################*/
 		__HAL_RCC_FDCAN_FORCE_RESET();
 		__HAL_RCC_FDCAN_RELEASE_RESET();
@@ -344,9 +343,9 @@ void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* hfdcan)
 		HAL_NVIC_DisableIRQ(FDCAN1_IT1_IRQn);
 		HAL_NVIC_DisableIRQ(FDCAN_CAL_IRQn);
 	}
-	
+
 	if (hfdcan == &hfdcan2)
-	{	
+	{
 		/*##-1- Reset peripherals ##################################################*/
 		__HAL_RCC_FDCAN_FORCE_RESET();
 		__HAL_RCC_FDCAN_RELEASE_RESET();
@@ -362,15 +361,15 @@ void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* hfdcan)
 		HAL_NVIC_DisableIRQ(FDCAN2_IT0_IRQn);
 		HAL_NVIC_DisableIRQ(FDCAN2_IT1_IRQn);
 		HAL_NVIC_DisableIRQ(FDCAN_CAL_IRQn);
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_FDCAN_RxFifo0Callback
-*	¹¦ÄÜËµÃ÷: CANÖĞ¶Ï·şÎñ³ÌĞò-»Øµ÷º¯Êı
-*	ĞÎ    ²Î: hfdcan
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_FDCAN_RxFifo0Callback
+*	åŠŸèƒ½è¯´æ˜: CANä¸­æ–­æœåŠ¡ç¨‹åº-å›è°ƒå‡½æ•°
+*	å½¢    å‚: hfdcan
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
@@ -384,10 +383,10 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 
 			/* Activate Rx FIFO 0 watermark notification */
 			HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_WATERMARK, 0);
-			
+
 			if (g_Can1RxHeader.Identifier == 0x111 && g_Can1RxHeader.IdType == FDCAN_STANDARD_ID)
 			{
-				bsp_PutMsg(MSG_CAN1_RX, 0);	/* ·¢ÏûÏ¢ÊÕµ½Êı¾İ°ü£¬½á¹ûÔÚg_Can1RxHeader£¬ g_Can1RxData */
+				bsp_PutMsg(MSG_CAN1_RX, 0); /* å‘æ¶ˆæ¯æ”¶åˆ°æ•°æ®åŒ…ï¼Œç»“æœåœ¨g_Can1RxHeaderï¼Œ g_Can1RxData */
 			}
 		}
 	}
@@ -401,10 +400,10 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 
 			/* Activate Rx FIFO 0 watermark notification */
 			HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_WATERMARK, 0);
-			
+
 			if (g_Can2RxHeader.Identifier == 0x222 && g_Can2RxHeader.IdType == FDCAN_STANDARD_ID)
-			{			
-				bsp_PutMsg(MSG_CAN2_RX, 0);	/* ·¢ÏûÏ¢ÊÕµ½Êı¾İ°ü£¬½á¹ûÔÚg_Can1RxHeader£¬ g_Can1RxData */
+			{
+				bsp_PutMsg(MSG_CAN2_RX, 0); /* å‘æ¶ˆæ¯æ”¶åˆ°æ•°æ®åŒ…ï¼Œç»“æœåœ¨g_Can1RxHeaderï¼Œ g_Can1RxData */
 			}
 		}
 	}
@@ -412,22 +411,22 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: can1_SendPacket
-*	¹¦ÄÜËµÃ÷: ·¢ËÍÒ»°üÊı¾İ
-*	ĞÎ    ²Î£º_DataBuf Êı¾İ»º³åÇø
-*			  _Len Êı¾İ³¤¶È, 0-8×Ö½Ú
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: can1_SendPacket
+*	åŠŸèƒ½è¯´æ˜: å‘é€ä¸€åŒ…æ•°æ®
+*	å½¢    å‚ï¼š_DataBuf æ•°æ®ç¼“å†²åŒº
+*			  _Len æ•°æ®é•¿åº¦, 0-8å­—èŠ‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void can1_SendPacket(uint8_t *_DataBuf, uint8_t _Len)
-{		
+{
 	FDCAN_TxHeaderTypeDef TxHeader;
 
 	if (_Len > 8)
 	{
 		return;
 	}
-	
+
 	/* Prepare Tx Header */
 	TxHeader.Identifier = 0x222;
 	TxHeader.IdType = FDCAN_STANDARD_ID;
@@ -438,30 +437,29 @@ void can1_SendPacket(uint8_t *_DataBuf, uint8_t _Len)
 	TxHeader.FDFormat = FDCAN_FD_CAN;
 	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
 	TxHeader.MessageMarker = 0;
-	
-    /* Add messages to TX FIFO */
-    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, _DataBuf);
-}
 
+	/* Add messages to TX FIFO */
+	HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, _DataBuf);
+}
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: can2_SendPacket
-*	¹¦ÄÜËµÃ÷: ·¢ËÍÒ»°üÊı¾İ
-*	ĞÎ    ²Î£º_DataBuf Êı¾İ»º³åÇø
-*			  _Len Êı¾İ³¤¶È, 0-8×Ö½Ú
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: can2_SendPacket
+*	åŠŸèƒ½è¯´æ˜: å‘é€ä¸€åŒ…æ•°æ®
+*	å½¢    å‚ï¼š_DataBuf æ•°æ®ç¼“å†²åŒº
+*			  _Len æ•°æ®é•¿åº¦, 0-8å­—èŠ‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void can2_SendPacket(uint8_t *_DataBuf, uint8_t _Len)
-{		
+{
 	FDCAN_TxHeaderTypeDef TxHeader;
 
 	if (_Len > 8)
 	{
 		return;
 	}
-	
+
 	/* Prepare Tx Header */
 	TxHeader.Identifier = 0x111;
 	TxHeader.IdType = FDCAN_STANDARD_ID;
@@ -472,17 +470,17 @@ void can2_SendPacket(uint8_t *_DataBuf, uint8_t _Len)
 	TxHeader.FDFormat = FDCAN_FD_CAN;
 	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
 	TxHeader.MessageMarker = 0;
-	
-    /* Add messages to TX FIFO */
-    HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &TxHeader, _DataBuf);
+
+	/* Add messages to TX FIFO */
+	HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &TxHeader, _DataBuf);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: FDCAN1_IT0_IRQHandler
-*	¹¦ÄÜËµÃ÷: CANÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î: hfdcan
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: FDCAN1_IT0_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: CANä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚: hfdcan
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void FDCAN1_IT0_IRQHandler(void)
@@ -508,8 +506,8 @@ void FDCAN2_IT1_IRQHandler(void)
 void FDCAN_CAL_IRQHandler(void)
 {
 	HAL_FDCAN_IRQHandler(&hfdcan1);
-	
-	HAL_FDCAN_IRQHandler(&hfdcan2);	// ???
+
+	HAL_FDCAN_IRQHandler(&hfdcan2); // ???
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

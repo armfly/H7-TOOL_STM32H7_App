@@ -1,24 +1,24 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : GPS¶¨Î»Ä£¿éÇý¶¯³ÌÐò
-*	ÎÄ¼þÃû³Æ : bsp_uart_gps.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : ½âÂëGPSÐ­Òé NMEA-0183Ð­Òé, °²¸»À³Ô­´´
+*	æ¨¡å—åç§° : GPSå®šä½æ¨¡å—é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_uart_gps.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜Ž : è§£ç GPSåè®® NMEA-0183åè®®, å®‰å¯ŒèŽ±åŽŸåˆ›
 *
-*	ÐÞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕýÊ½·¢²¼
-*		V1.1    2014-02-04 armfly  Ôö¼ÓÈ«¾Ö±êÖ¾±íÊ¾ GPSÄ£¿é´®¿ÚÕý³£
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜Ž
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2014-02-04 armfly  å¢žåŠ å…¨å±€æ ‡å¿—è¡¨ç¤º GPSæ¨¡å—ä¸²å£æ­£å¸¸
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-/* ¶¨ÒåÏÂÃæÕâ¸öºê£¬±íÊ¾½«GPSÄ£¿éµÄÊý¾Ý×ª·¢µ½COM1¿Ú£¬±ãÓÚÍ¨¹ýµçÄÔ¹Û²ìÔ­Ê¼Êý¾Ý */
+/* å®šä¹‰ä¸‹é¢è¿™ä¸ªå®ï¼Œè¡¨ç¤ºå°†GPSæ¨¡å—çš„æ•°æ®è½¬å‘åˆ°COM1å£ï¼Œä¾¿äºŽé€šè¿‡ç”µè„‘è§‚å¯ŸåŽŸå§‹æ•°æ® */
 //#define DEBUG_GPS_TO_COM1
 
 void Analyze0183(uint8_t *_ucaBuf, uint16_t _usLen);
@@ -30,32 +30,32 @@ GPS_T g_tGPS;
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: bsp_InitGPS
-*	¹¦ÄÜËµÃ÷: ÅäÖÃGPS´®¿Ú
-*	ÐÎ    ²Î:  ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: bsp_InitGPS
+*	åŠŸèƒ½è¯´æ˜Ž: é…ç½®GPSä¸²å£
+*	å½¢    å‚:  æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitGPS(void)
 {
 	/*
-		GPS Ä£¿éÊ¹ÓÃ UART ´®¿Ú·¢ËÍ¶¨Î»Êý¾ÝÖÁ STM32, Ã¿ÃëÖÓ·¢ËÍÒ»×éÊý¾Ý
+		GPS æ¨¡å—ä½¿ç”¨ UART ä¸²å£å‘é€å®šä½æ•°æ®è‡³ STM32, æ¯ç§’é’Ÿå‘é€ä¸€ç»„æ•°æ®
 
-		Òò´Ë£¬Ö»ÐèÒªÅäÖÃ´®¿Ú¼´¿É¡£ bsp_uart_fifo.c ÖÐÒÑ¾­ÅäÖÃºÃ´®¿Ú£¬´Ë´¦²»±ØÔÙÅäÖÃ
+		å› æ­¤ï¼Œåªéœ€è¦é…ç½®ä¸²å£å³å¯ã€‚ bsp_uart_fifo.c ä¸­å·²ç»é…ç½®å¥½ä¸²å£ï¼Œæ­¤å¤„ä¸å¿…å†é…ç½®
 	*/
 
-	g_tGPS.PositionOk = 0;  /* Êý¾ÝÉèÖÃÎªÎÞÐ§ */
-	g_tGPS.TimeOk = 0;  /* Êý¾ÝÉèÖÃÎªÎÞÐ§ */
-	
-	g_tGPS.UartOk = 0;	/* ´®¿ÚÍ¨ÐÅÕý³£µÄ±êÖ¾, Èç¹ûÒÔºóÊÕµ½ÁËÐ£ÑéºÏ¸ñµÄÃüÁî´®ÔòÉèÖÃÎª1 */
+	g_tGPS.PositionOk = 0; /* æ•°æ®è®¾ç½®ä¸ºæ— æ•ˆ */
+	g_tGPS.TimeOk = 0;		 /* æ•°æ®è®¾ç½®ä¸ºæ— æ•ˆ */
+
+	g_tGPS.UartOk = 0; /* ä¸²å£é€šä¿¡æ­£å¸¸çš„æ ‡å¿—, å¦‚æžœä»¥åŽæ”¶åˆ°äº†æ ¡éªŒåˆæ ¼çš„å‘½ä»¤ä¸²åˆ™è®¾ç½®ä¸º1 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gps_pro
-*	¹¦ÄÜËµÃ÷: ÂÖÑ¯GPSÊý¾Ý°ü¡£²åÈëµ½Ö÷³ÌÐòÖÐÖ´ÐÐ¼´¿É¡£·ÖÎö½á¹û´æ·ÅÔÚÈ«¾Ö±äÁ¿ g_tGPS
-*	ÐÎ    ²Î:  ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gps_pro
+*	åŠŸèƒ½è¯´æ˜Ž: è½®è¯¢GPSæ•°æ®åŒ…ã€‚æ’å…¥åˆ°ä¸»ç¨‹åºä¸­æ‰§è¡Œå³å¯ã€‚åˆ†æžç»“æžœå­˜æ”¾åœ¨å…¨å±€å˜é‡ g_tGPS
+*	å½¢    å‚:  æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void gps_pro(void)
@@ -65,15 +65,15 @@ void gps_pro(void)
 	static uint8_t ucaGpsBuf[512];
 	static uint16_t usGpsPos = 0;
 
-	/* ´Ó GPSÄ£¿é´®¿Ú¶ÁÈ¡1¸ö×Ö½Ú comGetChar() º¯ÊýÓÉ bsp_uart_fifo.c ÊµÏÖ */
+	/* ä»Ž GPSæ¨¡å—ä¸²å£è¯»å–1ä¸ªå­—èŠ‚ comGetChar() å‡½æ•°ç”± bsp_uart_fifo.c å®žçŽ° */
 	while (1)
 	{
 		if (comGetChar(COM2, &ucData))
 		{
-			#ifdef DEBUG_GPS_TO_COM1
-				/* ½«ÊÕµ½µÄGPSÄ£¿éÊý¾Ý°´Ô­Ñù ´òÓ¡µ½COM1 ¿Ú£¬±ãÓÚ¸ú×Ùµ÷ÊÔ */
-				comSendChar(COM1, ucData);
-			#endif
+#ifdef DEBUG_GPS_TO_COM1
+			/* å°†æ”¶åˆ°çš„GPSæ¨¡å—æ•°æ®æŒ‰åŽŸæ · æ‰“å°åˆ°COM1 å£ï¼Œä¾¿äºŽè·Ÿè¸ªè°ƒè¯• */
+			comSendChar(COM1, ucData);
+#endif
 
 			if (ucGpsHead == 0)
 			{
@@ -91,33 +91,32 @@ void gps_pro(void)
 
 					if ((ucData == '\r') || (ucData == '\n'))
 					{
-						Analyze0183(ucaGpsBuf, usGpsPos-1);
+						Analyze0183(ucaGpsBuf, usGpsPos - 1);
 						ucGpsHead = 0;
-						
-						g_tGPS.UartOk = 1;	/* ½ÓÊÕµ½ÕýÈ·µÄÃüÁî */
+
+						g_tGPS.UartOk = 1; /* æŽ¥æ”¶åˆ°æ­£ç¡®çš„å‘½ä»¤ */
 					}
 				}
 				else
 				{
 					ucGpsHead = 0;
 				}
-
 			}
 
-			continue;	/* ¿ÉÄÜ»¹ÓÐÊý¾Ý£¬¼ÌÐø·ÖÎö */
+			continue; /* å¯èƒ½è¿˜æœ‰æ•°æ®ï¼Œç»§ç»­åˆ†æž */
 		}
 
-		break;	/* ·ÖÎöÍê±Ï£¬ÍË³öº¯Êý */
+		break; /* åˆ†æžå®Œæ¯•ï¼Œé€€å‡ºå‡½æ•° */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: CheckXor
-*	¹¦ÄÜËµÃ÷: ¼ì²é0183Êý¾Ý°üµÄÐ£ÑéºÍÊÇ·ñÕýÈ·
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: TRUE »ò FALSE.
+*	å‡½ æ•° å: CheckXor
+*	åŠŸèƒ½è¯´æ˜Ž: æ£€æŸ¥0183æ•°æ®åŒ…çš„æ ¡éªŒå’Œæ˜¯å¦æ­£ç¡®
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: TRUE æˆ– FALSE.
 *********************************************************************************************************
 */
 uint8_t CheckXor(uint8_t *_ucaBuf, uint16_t _usLen)
@@ -131,14 +130,13 @@ uint8_t CheckXor(uint8_t *_ucaBuf, uint16_t _usLen)
 		return FALSE;
 	}
 
-	/* Èç¹ûÃ»ÓÐÐ£Ñé×Ö½Ú£¬Ò²ÈÏÎª³ö´í */
+	/* å¦‚æžœæ²¡æœ‰æ ¡éªŒå­—èŠ‚ï¼Œä¹Ÿè®¤ä¸ºå‡ºé”™ */
 	if (_ucaBuf[_usLen - 3] != '*')
 	{
 		return FALSE;
 	}
 
-
-	/* ²»ÔÊÐí³öÏÖ·ÇASCII×Ö·û */
+	/* ä¸å…è®¸å‡ºçŽ°éžASCIIå­—ç¬¦ */
 	for (i = 0; i < _usLen - 3; i++)
 	{
 		if ((_ucaBuf[i] & 0x80) || (_ucaBuf[i] == 0))
@@ -165,29 +163,29 @@ uint8_t CheckXor(uint8_t *_ucaBuf, uint16_t _usLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPGGA
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPGGA ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPGGA
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPGGA å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPGGA,092204.999,4250.5589,S,14718.5084,E,1,04,24.4,19.7,M,,,,0000*1F
-×Ö¶Î0£º$GPGGA£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªGlobal Positioning System Fix Data£¨GGA£©GPS¶¨Î»ÐÅÏ¢
-×Ö¶Î1£ºUTC Ê±¼ä£¬hhmmss.sss£¬Ê±·ÖÃë¸ñÊ½
-×Ö¶Î2£ºÎ³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î3£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©
-×Ö¶Î4£º¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î5£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©
-×Ö¶Î6£ºGPS×´Ì¬£¬0=Î´¶¨Î»£¬1=·Ç²î·Ö¶¨Î»£¬2=²î·Ö¶¨Î»£¬3=ÎÞÐ§PPS£¬6=ÕýÔÚ¹ÀËã
-×Ö¶Î7£ºÕýÔÚÊ¹ÓÃµÄÎÀÐÇÊýÁ¿£¨00 - 12£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î8£ºHDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5 - 99.9£©
-×Ö¶Î9£ºº£°Î¸ß¶È£¨-9999.9 - 99999.9£©
-×Ö¶Î10£ºµØÇòÍÖÇòÃæÏà¶Ô´óµØË®×¼ÃæµÄ¸ß¶È
-×Ö¶Î11£º²î·ÖÊ±¼ä£¨´Ó×î½üÒ»´Î½ÓÊÕµ½²î·ÖÐÅºÅ¿ªÊ¼µÄÃëÊý£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©
-×Ö¶Î12£º²î·ÖÕ¾IDºÅ0000 - 1023£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©
-×Ö¶Î13£ºÐ£ÑéÖµ
+ä¾‹ï¼š$GPGGA,092204.999,4250.5589,S,14718.5084,E,1,04,24.4,19.7,M,,,,0000*1F
+å­—æ®µ0ï¼š$GPGGAï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºGlobal Positioning System Fix Dataï¼ˆGGAï¼‰GPSå®šä½ä¿¡æ¯
+å­—æ®µ1ï¼šUTC æ—¶é—´ï¼Œhhmmss.sssï¼Œæ—¶åˆ†ç§’æ ¼å¼
+å­—æ®µ2ï¼šçº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ3ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰
+å­—æ®µ4ï¼šç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ5ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰
+å­—æ®µ6ï¼šGPSçŠ¶æ€ï¼Œ0=æœªå®šä½ï¼Œ1=éžå·®åˆ†å®šä½ï¼Œ2=å·®åˆ†å®šä½ï¼Œ3=æ— æ•ˆPPSï¼Œ6=æ­£åœ¨ä¼°ç®—
+å­—æ®µ7ï¼šæ­£åœ¨ä½¿ç”¨çš„å«æ˜Ÿæ•°é‡ï¼ˆ00 - 12ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ8ï¼šHDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰
+å­—æ®µ9ï¼šæµ·æ‹”é«˜åº¦ï¼ˆ-9999.9 - 99999.9ï¼‰
+å­—æ®µ10ï¼šåœ°çƒæ¤­çƒé¢ç›¸å¯¹å¤§åœ°æ°´å‡†é¢çš„é«˜åº¦
+å­—æ®µ11ï¼šå·®åˆ†æ—¶é—´ï¼ˆä»Žæœ€è¿‘ä¸€æ¬¡æŽ¥æ”¶åˆ°å·®åˆ†ä¿¡å·å¼€å§‹çš„ç§’æ•°ï¼Œå¦‚æžœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰
+å­—æ®µ12ï¼šå·®åˆ†ç«™IDå·0000 - 1023ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼Œå¦‚æžœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰
+å­—æ®µ13ï¼šæ ¡éªŒå€¼
 */
 void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 {
@@ -196,7 +194,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1 UTC Ê±¼ä£¬hhmmss.sss£¬Ê±·ÖÃë¸ñÊ½ */
+	/* å­—æ®µ1 UTC æ—¶é—´ï¼Œhhmmss.sssï¼Œæ—¶åˆ†ç§’æ ¼å¼ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -210,7 +208,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.Sec = StrToIntFix(p, 2);
 	p += 2;
 
-	/* ×Ö¶Î2 Î³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ2 çº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -224,7 +222,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î3 Î³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£© */
+	/* å­—æ®µ3 çº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -244,7 +242,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 		return;
 	}
 
-	/* ×Ö¶Î4  ¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ4  ç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -258,7 +256,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î5 ¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£© */
+	/* å­—æ®µ5 ç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -274,7 +272,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 		g_tGPS.EW = 'W';
 	}
 
-	/* ×Ö¶Î6 GPS×´Ì¬£¬0=Î´¶¨Î»£¬1=·Ç²î·Ö¶¨Î»£¬2=²î·Ö¶¨Î»£¬3=ÎÞÐ§PPS£¬6=ÕýÔÚ¹ÀËã */
+	/* å­—æ®µ6 GPSçŠ¶æ€ï¼Œ0=æœªå®šä½ï¼Œ1=éžå·®åˆ†å®šä½ï¼Œ2=å·®åˆ†å®šä½ï¼Œ3=æ— æ•ˆPPSï¼Œ6=æ­£åœ¨ä¼°ç®— */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -290,7 +288,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 		g_tGPS.PositionOk = 0;
 	}
 
-	/* ×Ö¶Î7£ºÕýÔÚÊ¹ÓÃµÄÎÀÐÇÊýÁ¿£¨00 - 12£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ7ï¼šæ­£åœ¨ä½¿ç”¨çš„å«æ˜Ÿæ•°é‡ï¼ˆ00 - 12ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -300,7 +298,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.ViewNumber = StrToInt(p);
 	p += 2;
 
-	/* ×Ö¶Î8£ºHDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5 - 99.9£© */
+	/* å­—æ®µ8ï¼šHDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -309,7 +307,7 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.HDOP = StrToInt(p);
 
-	/* ×Ö¶Î9£ºº£°Î¸ß¶È£¨-9999.9 - 99999.9£© */
+	/* å­—æ®µ9ï¼šæµ·æ‹”é«˜åº¦ï¼ˆ-9999.9 - 99999.9ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -318,39 +316,39 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.Altitude = StrToInt(p);
 
-	/* ºóÃæµÄ×Ö¶ÎÐÅÏ¢¶ªÆú */
+	/* åŽé¢çš„å­—æ®µä¿¡æ¯ä¸¢å¼ƒ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPGSA
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPGSA ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPGSA
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPGSA å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPGSA,A,3,01,20,19,13,,,,,,,,,40.4,24.4,32.2*0A
-×Ö¶Î0£º$GPGSA£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªGPS DOP and Active Satellites£¨GSA£©µ±Ç°ÎÀÐÇÐÅÏ¢
-×Ö¶Î1£º¶¨Î»Ä£Ê½£¬A=×Ô¶¯ÊÖ¶¯2D/3D£¬M=ÊÖ¶¯2D/3D
-×Ö¶Î2£º¶¨Î»ÀàÐÍ£¬1=Î´¶¨Î»£¬2=2D¶¨Î»£¬3=3D¶¨Î»
-×Ö¶Î3£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ1ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î4£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ2ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î5£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ3ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î6£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ4ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î7£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ5ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î8£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ6ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î9£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ7ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î10£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ8ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î11£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ9ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î12£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ10ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î13£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ11ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î14£ºPRNÂë£¨Î±Ëæ»úÔëÉùÂë£©£¬µÚ12ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ£¨00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î15£ºPDOP×ÛºÏÎ»ÖÃ¾«¶ÈÒò×Ó£¨0.5 - 99.9£©
-×Ö¶Î16£ºHDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5 - 99.9£©
-×Ö¶Î17£ºVDOP´¹Ö±¾«¶ÈÒò×Ó£¨0.5 - 99.9£©
-×Ö¶Î18£ºÐ£ÑéÖµ
+ä¾‹ï¼š$GPGSA,A,3,01,20,19,13,,,,,,,,,40.4,24.4,32.2*0A
+å­—æ®µ0ï¼š$GPGSAï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºGPS DOP and Active Satellitesï¼ˆGSAï¼‰å½“å‰å«æ˜Ÿä¿¡æ¯
+å­—æ®µ1ï¼šå®šä½æ¨¡å¼ï¼ŒA=è‡ªåŠ¨æ‰‹åŠ¨2D/3Dï¼ŒM=æ‰‹åŠ¨2D/3D
+å­—æ®µ2ï¼šå®šä½ç±»åž‹ï¼Œ1=æœªå®šä½ï¼Œ2=2Då®šä½ï¼Œ3=3Då®šä½
+å­—æ®µ3ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬1ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ4ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬2ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ5ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬3ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ6ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬4ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ7ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬5ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ8ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬6ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ9ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬7ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ10ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬8ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ11ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬9ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ12ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬10ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ13ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬11ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ14ï¼šPRNç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼Œç¬¬12ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å·ï¼ˆ00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ15ï¼šPDOPç»¼åˆä½ç½®ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰
+å­—æ®µ16ï¼šHDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰
+å­—æ®µ17ï¼šVDOPåž‚ç›´ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰
+å­—æ®µ18ï¼šæ ¡éªŒå€¼
 */
 void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 {
@@ -360,7 +358,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1 ¶¨Î»Ä£Ê½£¬A=×Ô¶¯ÊÖ¶¯2D/3D£¬M=ÊÖ¶¯2D/3D */
+	/* å­—æ®µ1 å®šä½æ¨¡å¼ï¼ŒA=è‡ªåŠ¨æ‰‹åŠ¨2D/3Dï¼ŒM=æ‰‹åŠ¨2D/3D */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -369,7 +367,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.ModeAM = *p;
 
-	/* ×Ö¶Î2 ¶¨Î»ÀàÐÍ£¬1=Î´¶¨Î»£¬2=2D¶¨Î»£¬3=3D¶¨Î» */
+	/* å­—æ®µ2 å®šä½ç±»åž‹ï¼Œ1=æœªå®šä½ï¼Œ2=2Då®šä½ï¼Œ3=3Då®šä½ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -378,7 +376,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.Mode2D3D = *p;
 
-	/* ×Ö¶Î3 - ×Ö¶Î14 µÚ1-12ÐÅµÀÕýÔÚÊ¹ÓÃµÄÎÀÐÇPRNÂë±àºÅ */
+	/* å­—æ®µ3 - å­—æ®µ14 ç¬¬1-12ä¿¡é“æ­£åœ¨ä½¿ç”¨çš„å«æ˜ŸPRNç ç¼–å· */
 	for (i = 0; i < 12; i++)
 	{
 		p = strchr(p, ',');
@@ -390,7 +388,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 		g_tGPS.SateID[i] = StrToInt(p);
 	}
 
-	/* ×Ö¶Î15£ºPDOP×ÛºÏÎ»ÖÃ¾«¶ÈÒò×Ó£¨0.5 - 99.9£© */
+	/* å­—æ®µ15ï¼šPDOPç»¼åˆä½ç½®ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -399,7 +397,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.PDOP = StrToInt(p);
 
-	/* ×Ö¶Î16£ºHDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5 - 99.9£© */
+	/* å­—æ®µ16ï¼šHDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -408,7 +406,7 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.HDOP = StrToInt(p);
 
-	/* ×Ö¶Î17£ºVDOP´¹Ö±¾«¶ÈÒò×Ó£¨0.5 - 99.9£© */
+	/* å­—æ®µ17ï¼šVDOPåž‚ç›´ç²¾åº¦å› å­ï¼ˆ0.5 - 99.9ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -420,60 +418,60 @@ void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPGSV
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPGSV ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPGSV
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPGSV å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,32,252,45*70
+ä¾‹ï¼š$GPGSV,3,1,10,20,78,331,45,01,59,235,47,22,41,069,,13,32,252,45*70
 
 $GPGSV,2,1,07,07,79,048,42,02,51,062,43,26,36,256,42,27,27,138,42*71
 $GPGSV,2,2,07,09,23,313,42,04,19,159,41,15,12,041,42*41
 
-×Ö¶Î0£º$GPGSV£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªGPS Satellites in View£¨GSV£©¿É¼ûÎÀÐÇÐÅÏ¢
-×Ö¶Î1£º±¾´ÎGSVÓï¾äµÄ×ÜÊýÄ¿£¨1 - 3£©
-×Ö¶Î2£º±¾ÌõGSVÓï¾äÊÇ±¾´ÎGSVÓï¾äµÄµÚ¼¸Ìõ£¨1 - 3£©
-×Ö¶Î3£ºµ±Ç°¿É¼ûÎÀÐÇ×ÜÊý£¨00 - 12£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
+å­—æ®µ0ï¼š$GPGSVï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºGPS Satellites in Viewï¼ˆGSVï¼‰å¯è§å«æ˜Ÿä¿¡æ¯
+å­—æ®µ1ï¼šæœ¬æ¬¡GSVè¯­å¥çš„æ€»æ•°ç›®ï¼ˆ1 - 3ï¼‰
+å­—æ®µ2ï¼šæœ¬æ¡GSVè¯­å¥æ˜¯æœ¬æ¬¡GSVè¯­å¥çš„ç¬¬å‡ æ¡ï¼ˆ1 - 3ï¼‰
+å­—æ®µ3ï¼šå½“å‰å¯è§å«æ˜Ÿæ€»æ•°ï¼ˆ00 - 12ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
 
-×Ö¶Î4£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨01 - 32£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î5£ºÎÀÐÇÑö½Ç£¨00 - 90£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î6£ºÎÀÐÇ·½Î»½Ç£¨00 - 359£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î7£ºÐÅÔë±È£¨00£­99£©dbHz
+å­—æ®µ4ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ01 - 32ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ5ï¼šå«æ˜Ÿä»°è§’ï¼ˆ00 - 90ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ6ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ00 - 359ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ7ï¼šä¿¡å™ªæ¯”ï¼ˆ00ï¼99ï¼‰dbHz
 
-×Ö¶Î8£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨01 - 32£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î9£ºÎÀÐÇÑö½Ç£¨00 - 90£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î10£ºÎÀÐÇ·½Î»½Ç£¨00 - 359£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î11£ºÐÅÔë±È£¨00£­99£©dbHz
+å­—æ®µ8ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ01 - 32ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ9ï¼šå«æ˜Ÿä»°è§’ï¼ˆ00 - 90ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ10ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ00 - 359ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ11ï¼šä¿¡å™ªæ¯”ï¼ˆ00ï¼99ï¼‰dbHz
 
-×Ö¶Î12£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨01 - 32£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î13£ºÎÀÐÇÑö½Ç£¨00 - 90£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î14£ºÎÀÐÇ·½Î»½Ç£¨00 - 359£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î15£ºÐÅÔë±È£¨00£­99£©dbHz
-×Ö¶Î16£ºÐ£ÑéÖµ
+å­—æ®µ12ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ01 - 32ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ13ï¼šå«æ˜Ÿä»°è§’ï¼ˆ00 - 90ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ14ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ00 - 359ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ15ï¼šä¿¡å™ªæ¯”ï¼ˆ00ï¼99ï¼‰dbHz
+å­—æ®µ16ï¼šæ ¡éªŒå€¼
 */
 void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-//	uint8_t s_total = 0;	/* Óï¾ä×ÜÊýÄ¿ */
-	uint8_t s_no = 0;		/* Óï¾äÐòºÅ */
+	//	uint8_t s_total = 0;	/* è¯­å¥æ€»æ•°ç›® */
+	uint8_t s_no = 0; /* è¯­å¥åºå· */
 	uint8_t i;
 	char *p;
 
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1£º±¾´ÎGSVÓï¾äµÄ×ÜÊýÄ¿£¨1 - 3£© */
+	/* å­—æ®µ1ï¼šæœ¬æ¬¡GSVè¯­å¥çš„æ€»æ•°ç›®ï¼ˆ1 - 3ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
 		return;
 	}
 	p++;
-//	s_total = StrToInt(p);
+	//	s_total = StrToInt(p);
 
-	/* ×Ö¶Î2£º±¾ÌõGSVÓï¾äÊÇ±¾´ÎGSVÓï¾äµÄµÚ¼¸Ìõ£¨1 - 3£© */
+	/* å­—æ®µ2ï¼šæœ¬æ¡GSVè¯­å¥æ˜¯æœ¬æ¬¡GSVè¯­å¥çš„ç¬¬å‡ æ¡ï¼ˆ1 - 3ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -482,7 +480,7 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	s_no = StrToInt(p);
 
-	/* ×Ö¶Î3£ºµ±Ç°¿É¼ûÎÀÐÇ×ÜÊý£¨00 - 12£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ3ï¼šå½“å‰å¯è§å«æ˜Ÿæ€»æ•°ï¼ˆ00 - 12ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -493,7 +491,7 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 
 	for (i = 0; i < 4; i++)
 	{
-		/* ×Ö¶Î4£ºPRN Âë£¨Î±Ëæ»úÔëÉùÂë£©£¨01 - 32£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+		/* å­—æ®µ4ï¼šPRN ç ï¼ˆä¼ªéšæœºå™ªå£°ç ï¼‰ï¼ˆ01 - 32ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 		p = strchr(p, ',');
 		if (p == 0)
 		{
@@ -502,7 +500,7 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 		p++;
 		g_tGPS.SateID[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* ×Ö¶Î5£ºÎÀÐÇÑö½Ç£¨00 - 90£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©*/
+		/* å­—æ®µ5ï¼šå«æ˜Ÿä»°è§’ï¼ˆ00 - 90ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰*/
 		p = strchr(p, ',');
 		if (p == 0)
 		{
@@ -511,7 +509,7 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 		p++;
 		g_tGPS.Elevation[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* ×Ö¶Î6£ºÎÀÐÇ·½Î»½Ç£¨00 - 359£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+		/* å­—æ®µ6ï¼šå«æ˜Ÿæ–¹ä½è§’ï¼ˆ00 - 359ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 		p = strchr(p, ',');
 		if (p == 0)
 		{
@@ -520,7 +518,7 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 		p++;
 		g_tGPS.Azimuth[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* ×Ö¶Î7£ºÐÅÔë±È£¨00£­99£©dbHz */
+		/* å­—æ®µ7ï¼šä¿¡å™ªæ¯”ï¼ˆ00ï¼99ï¼‰dbHz */
 		p = strchr(p, ',');
 		if (p == 0)
 		{
@@ -533,28 +531,28 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPRMC
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPGSV ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPRMC
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPGSV å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPRMC,024813.640,A,3158.4608,N,11848.3737,E,10.05,324.27,150706,,,A*50
-×Ö¶Î0£º$GPRMC£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªRecommended Minimum Specific GPS/TRANSIT Data£¨RMC£©ÍÆ¼ö×îÐ¡¶¨Î»ÐÅÏ¢
-×Ö¶Î1£ºUTCÊ±¼ä£¬hhmmss.sss¸ñÊ½
-×Ö¶Î2£º×´Ì¬£¬A=¶¨Î»£¬V=Î´¶¨Î»
-×Ö¶Î3£ºÎ³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î4£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©
-×Ö¶Î5£º¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î6£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©
-×Ö¶Î7£ºËÙ¶È£¬½Ú£¬Knots
-×Ö¶Î8£º·½Î»½Ç£¬¶È
-×Ö¶Î9£ºUTCÈÕÆÚ£¬DDMMYY¸ñÊ½
-×Ö¶Î10£º´ÅÆ«½Ç£¬£¨000 - 180£©¶È£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î11£º´ÅÆ«½Ç·½Ïò£¬E=¶«W=Î÷
-×Ö¶Î16£ºÐ£ÑéÖµ
+ä¾‹ï¼š$GPRMC,024813.640,A,3158.4608,N,11848.3737,E,10.05,324.27,150706,,,A*50
+å­—æ®µ0ï¼š$GPRMCï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºRecommended Minimum Specific GPS/TRANSIT Dataï¼ˆRMCï¼‰æŽ¨èæœ€å°å®šä½ä¿¡æ¯
+å­—æ®µ1ï¼šUTCæ—¶é—´ï¼Œhhmmss.sssæ ¼å¼
+å­—æ®µ2ï¼šçŠ¶æ€ï¼ŒA=å®šä½ï¼ŒV=æœªå®šä½
+å­—æ®µ3ï¼šçº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ4ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰
+å­—æ®µ5ï¼šç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ6ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰
+å­—æ®µ7ï¼šé€Ÿåº¦ï¼ŒèŠ‚ï¼ŒKnots
+å­—æ®µ8ï¼šæ–¹ä½è§’ï¼Œåº¦
+å­—æ®µ9ï¼šUTCæ—¥æœŸï¼ŒDDMMYYæ ¼å¼
+å­—æ®µ10ï¼šç£åè§’ï¼Œï¼ˆ000 - 180ï¼‰åº¦ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ11ï¼šç£åè§’æ–¹å‘ï¼ŒE=ä¸œW=è¥¿
+å­—æ®µ16ï¼šæ ¡éªŒå€¼
 */
 void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 {
@@ -563,7 +561,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1 UTCÊ±¼ä£¬hhmmss.sss¸ñÊ½ */
+	/* å­—æ®µ1 UTCæ—¶é—´ï¼Œhhmmss.sssæ ¼å¼ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -578,7 +576,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	p += 3;
 	g_tGPS.mSec = StrToIntFix(p, 3);
 
-	/* ×Ö¶Î2 ×´Ì¬£¬A=¶¨Î»£¬V=Î´¶¨Î» */
+	/* å­—æ®µ2 çŠ¶æ€ï¼ŒA=å®šä½ï¼ŒV=æœªå®šä½ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -587,14 +585,14 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	if (*p != 'A')
 	{
-		/* Î´¶¨Î»ÔòÖ±½Ó·µ»Ø */
+		/* æœªå®šä½åˆ™ç›´æŽ¥è¿”å›ž */
 		g_tGPS.PositionOk = 0;
 		return;
 	}
 	g_tGPS.PositionOk = 1;
 	p += 1;
 
-	/* ×Ö¶Î3 Î³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ3 çº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -608,7 +606,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î4 Î³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©*/
+	/* å­—æ®µ4 çº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰*/
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -628,7 +626,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 		return;
 	}
 
-	/* ×Ö¶Î5 ¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ5 ç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -642,7 +640,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î6£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£© */
+	/* å­—æ®µ6ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -658,7 +656,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 		g_tGPS.EW = 'W';
 	}
 
-	/* ×Ö¶Î7£ºËÙ¶È£¬½Ú£¬Knots  10.05,*/
+	/* å­—æ®µ7ï¼šé€Ÿåº¦ï¼ŒèŠ‚ï¼ŒKnots  10.05,*/
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -667,7 +665,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.SpeedKnots = StrToInt(p);
 
-	/* ×Ö¶Î8£º·½Î»½Ç£¬¶È ,324.27 */
+	/* å­—æ®µ8ï¼šæ–¹ä½è§’ï¼Œåº¦ ,324.27 */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -676,7 +674,7 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.TrackDegTrue = StrToInt(p);
 
-	/* ×Ö¶Î9£ºUTCÈÕÆÚ£¬DDMMYY¸ñÊ½  150706 */
+	/* å­—æ®µ9ï¼šUTCæ—¥æœŸï¼ŒDDMMYYæ ¼å¼  150706 */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -693,25 +691,25 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPVTG
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPVTG ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPVTG
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPVTG å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPVTG,89.68,T,,M,0.00,N,0.0,K*5F
-×Ö¶Î0£º$GPVTG£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªTrack Made Good and Ground Speed£¨VTG£©µØÃæËÙ¶ÈÐÅÏ¢
-×Ö¶Î1£ºÔË¶¯½Ç¶È£¬000 - 359£¬£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î2£ºT=Õæ±±²ÎÕÕÏµ
-×Ö¶Î3£ºÔË¶¯½Ç¶È£¬000 - 359£¬£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î4£ºM=´Å±±²ÎÕÕÏµ
-×Ö¶Î5£ºË®Æ½ÔË¶¯ËÙ¶È£¨0.00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î6£ºN=½Ú£¬Knots
-×Ö¶Î7£ºË®Æ½ÔË¶¯ËÙ¶È£¨0.00£©£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î8£ºK=¹«Àï/Ê±£¬km/h
-×Ö¶Î9£ºÐ£ÑéÖµ
+ä¾‹ï¼š$GPVTG,89.68,T,,M,0.00,N,0.0,K*5F
+å­—æ®µ0ï¼š$GPVTGï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºTrack Made Good and Ground Speedï¼ˆVTGï¼‰åœ°é¢é€Ÿåº¦ä¿¡æ¯
+å­—æ®µ1ï¼šè¿åŠ¨è§’åº¦ï¼Œ000 - 359ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ2ï¼šT=çœŸåŒ—å‚ç…§ç³»
+å­—æ®µ3ï¼šè¿åŠ¨è§’åº¦ï¼Œ000 - 359ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ4ï¼šM=ç£åŒ—å‚ç…§ç³»
+å­—æ®µ5ï¼šæ°´å¹³è¿åŠ¨é€Ÿåº¦ï¼ˆ0.00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ6ï¼šN=èŠ‚ï¼ŒKnots
+å­—æ®µ7ï¼šæ°´å¹³è¿åŠ¨é€Ÿåº¦ï¼ˆ0.00ï¼‰ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ8ï¼šK=å…¬é‡Œ/æ—¶ï¼Œkm/h
+å­—æ®µ9ï¼šæ ¡éªŒå€¼
 */
 void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 {
@@ -720,7 +718,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1£ºÔË¶¯½Ç¶È£¬000 - 359£¬£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©*/
+	/* å­—æ®µ1ï¼šè¿åŠ¨è§’åº¦ï¼Œ000 - 359ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰*/
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -729,7 +727,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.TrackDegTrue = StrToInt(p);
 
-	/* ×Ö¶Î2£ºT=Õæ±±²ÎÕÕÏµ */
+	/* å­—æ®µ2ï¼šT=çœŸåŒ—å‚ç…§ç³» */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -737,7 +735,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	}
 	p++;
 
-	/* ×Ö¶Î3£ºÔË¶¯½Ç¶È£¬000 - 359£¬£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ3ï¼šè¿åŠ¨è§’åº¦ï¼Œ000 - 359ï¼Œï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -746,7 +744,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.TrackDegMag = StrToInt(p);
 
-	/* ×Ö¶Î4£ºM=´Å±±²ÎÕÕÏµ */
+	/* å­—æ®µ4ï¼šM=ç£åŒ—å‚ç…§ç³» */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -754,7 +752,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	}
 	p++;
 
-	/* ×Ö¶Î5£ºµØÃæËÙÂÊ£¨000.0~999.9½Ú£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£© */
+	/* å­—æ®µ5ï¼šåœ°é¢é€ŸçŽ‡ï¼ˆ000.0~999.9èŠ‚ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -763,7 +761,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.SpeedKnots = StrToInt(p);
 
-	/* ×Ö¶Î6£ºN=½Ú£¬Knots */
+	/* å­—æ®µ6ï¼šN=èŠ‚ï¼ŒKnots */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -771,7 +769,7 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	}
 	p++;
 
-	/* ×Ö¶Î7£ºµØÃæËÙÂÊ£¨0000.0~1851.8¹«Àï/Ð¡Ê±£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£© */
+	/* å­—æ®µ7ï¼šåœ°é¢é€ŸçŽ‡ï¼ˆ0000.0~1851.8å…¬é‡Œ/å°æ—¶ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -780,28 +778,28 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	g_tGPS.SpeedKM = StrToInt(p);
 
-	/* ×Ö¶Î8£ºK=¹«Àï/Ê±£¬km/h	 */
+	/* å­—æ®µ8ï¼šK=å…¬é‡Œ/æ—¶ï¼Œkm/h	 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gpsGPGLL
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°üÖÐµÄ GPGLL ÃüÁî£¬½á¹û´æ·Åµ½È«¾Ö±äÁ¿
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: gpsGPGLL
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…ä¸­çš„ GPGLL å‘½ä»¤ï¼Œç»“æžœå­˜æ”¾åˆ°å…¨å±€å˜é‡
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-Àý£º$GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D
-×Ö¶Î0£º$GPGLL£¬Óï¾äID£¬±íÃ÷¸ÃÓï¾äÎªGeographic Position£¨GLL£©µØÀí¶¨Î»ÐÅÏ¢
-×Ö¶Î1£ºÎ³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î2£ºÎ³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©
-×Ö¶Î3£º¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£©
-×Ö¶Î4£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£©
-×Ö¶Î5£ºUTCÊ±¼ä£¬hhmmss.sss¸ñÊ½
-×Ö¶Î6£º×´Ì¬£¬A=¶¨Î»£¬V=Î´¶¨Î»
-×Ö¶Î7£ºÐ£ÑéÖµ
+ä¾‹ï¼š$GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D
+å­—æ®µ0ï¼š$GPGLLï¼Œè¯­å¥IDï¼Œè¡¨æ˜Žè¯¥è¯­å¥ä¸ºGeographic Positionï¼ˆGLLï¼‰åœ°ç†å®šä½ä¿¡æ¯
+å­—æ®µ1ï¼šçº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ2ï¼šçº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰
+å­—æ®µ3ï¼šç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰
+å­—æ®µ4ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰
+å­—æ®µ5ï¼šUTCæ—¶é—´ï¼Œhhmmss.sssæ ¼å¼
+å­—æ®µ6ï¼šçŠ¶æ€ï¼ŒA=å®šä½ï¼ŒV=æœªå®šä½
+å­—æ®µ7ï¼šæ ¡éªŒå€¼
 */
 void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 {
@@ -810,7 +808,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 	p = (char *)_ucaBuf;
 	p[_usLen] = 0;
 
-	/* ×Ö¶Î1 Î³¶Èddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ1 çº¬åº¦ddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -824,7 +822,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î2 Î³¶ÈN£¨±±Î³£©»òS£¨ÄÏÎ³£©*/
+	/* å­—æ®µ2 çº¬åº¦Nï¼ˆåŒ—çº¬ï¼‰æˆ–Sï¼ˆå—çº¬ï¼‰*/
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -844,7 +842,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 		return;
 	}
 
-	/* ×Ö¶Î3 ¾­¶Èdddmm.mmmm£¬¶È·Ö¸ñÊ½£¨Ç°µ¼Î»Êý²»×ãÔò²¹0£© */
+	/* å­—æ®µ3 ç»åº¦dddmm.mmmmï¼Œåº¦åˆ†æ ¼å¼ï¼ˆå‰å¯¼ä½æ•°ä¸è¶³åˆ™è¡¥0ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -858,7 +856,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
 	p += 4;
 
-	/* ×Ö¶Î4£º¾­¶ÈE£¨¶«¾­£©»òW£¨Î÷¾­£© */
+	/* å­—æ®µ4ï¼šç»åº¦Eï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -874,7 +872,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 		g_tGPS.EW = 'W';
 	}
 
-	/* ×Ö¶Î5 UTCÊ±¼ä£¬hhmmss.sss¸ñÊ½ */
+	/* å­—æ®µ5 UTCæ—¶é—´ï¼Œhhmmss.sssæ ¼å¼ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -888,7 +886,7 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 	g_tGPS.Sec = StrToIntFix(p, 2);
 	p += 2;
 
-	/* ×Ö¶Î6 ×´Ì¬£¬A=¶¨Î»£¬V=Î´¶¨Î» */
+	/* å­—æ®µ6 çŠ¶æ€ï¼ŒA=å®šä½ï¼ŒV=æœªå®šä½ */
 	p = strchr(p, ',');
 	if (p == 0)
 	{
@@ -897,18 +895,18 @@ void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 	p++;
 	if (*p != 'A')
 	{
-		/* Î´¶¨Î»ÔòÖ±½Ó·µ»Ø */
+		/* æœªå®šä½åˆ™ç›´æŽ¥è¿”å›ž */
 		return;
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: Analyze0183
-*	¹¦ÄÜËµÃ÷: ·ÖÎö0183Êý¾Ý°ü
-*	ÐÎ    ²Î:  _ucaBuf  ÊÕµ½µÄÊý¾Ý
-*			 _usLen    Êý¾Ý³¤¶È
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: Analyze0183
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æž0183æ•°æ®åŒ…
+*	å½¢    å‚:  _ucaBuf  æ”¶åˆ°çš„æ•°æ®
+*			 _usLen    æ•°æ®é•¿åº¦
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void Analyze0183(uint8_t *_ucaBuf, uint16_t _usLen)
@@ -947,10 +945,10 @@ void Analyze0183(uint8_t *_ucaBuf, uint16_t _usLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: StrToInt
-*	¹¦ÄÜËµÃ÷: ½«ASCIIÂë×Ö·û´®×ª»»³ÉÊ®½øÖÆ
-*	ÐÎ    ²Î: _pStr :´ý×ª»»µÄASCIIÂë´®. ¿ÉÒÔÒÔ¶ººÅ»ò0½áÊø
-*	·µ »Ø Öµ: ¶þ½øÖÆÕûÊýÖµ
+*	å‡½ æ•° å: StrToInt
+*	åŠŸèƒ½è¯´æ˜Ž: å°†ASCIIç å­—ç¬¦ä¸²è½¬æ¢æˆåè¿›åˆ¶
+*	å½¢    å‚: _pStr :å¾…è½¬æ¢çš„ASCIIç ä¸². å¯ä»¥ä»¥é€—å·æˆ–0ç»“æŸ
+*	è¿” å›ž å€¼: äºŒè¿›åˆ¶æ•´æ•°å€¼
 *********************************************************************************************************
 */
 int32_t StrToInt(char *_pStr)
@@ -964,7 +962,7 @@ int32_t StrToInt(char *_pStr)
 	p = _pStr;
 	if (*p == '-')
 	{
-		flag = 1;	/* ¸ºÊý */
+		flag = 1; /* è´Ÿæ•° */
 		p++;
 	}
 	else
@@ -976,7 +974,7 @@ int32_t StrToInt(char *_pStr)
 	for (i = 0; i < 15; i++)
 	{
 		ucTemp = *p;
-		if (ucTemp == '.')	/* Óöµ½Ð¡Êýµã£¬×Ô¶¯Ìø¹ý1¸ö×Ö½Ú */
+		if (ucTemp == '.') /* é‡åˆ°å°æ•°ç‚¹ï¼Œè‡ªåŠ¨è·³è¿‡1ä¸ªå­—èŠ‚ */
 		{
 			p++;
 			ucTemp = *p;
@@ -1001,11 +999,11 @@ int32_t StrToInt(char *_pStr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: StrToIntFix
-*	¹¦ÄÜËµÃ÷: ½«ASCIIÂë×Ö·û´®×ª»»³ÉÊ®½øÖÆ, ¸ø¶¨³¤¶È
-*	ÐÎ    ²Î: _pStr :´ý×ª»»µÄASCIIÂë´®. ¿ÉÒÔÒÔ¶ººÅ»ò0½áÊø
-*			 _ucLen : ¹Ì¶¨³¤¶È
-*	·µ »Ø Öµ: ¶þ½øÖÆÕûÊýÖµ
+*	å‡½ æ•° å: StrToIntFix
+*	åŠŸèƒ½è¯´æ˜Ž: å°†ASCIIç å­—ç¬¦ä¸²è½¬æ¢æˆåè¿›åˆ¶, ç»™å®šé•¿åº¦
+*	å½¢    å‚: _pStr :å¾…è½¬æ¢çš„ASCIIç ä¸². å¯ä»¥ä»¥é€—å·æˆ–0ç»“æŸ
+*			 _ucLen : å›ºå®šé•¿åº¦
+*	è¿” å›ž å€¼: äºŒè¿›åˆ¶æ•´æ•°å€¼
 *********************************************************************************************************
 */
 int32_t StrToIntFix(char *_pStr, uint8_t _ucLen)
@@ -1019,7 +1017,7 @@ int32_t StrToIntFix(char *_pStr, uint8_t _ucLen)
 	p = _pStr;
 	if (*p == '-')
 	{
-		flag = 1;	/* ¸ºÊý */
+		flag = 1; /* è´Ÿæ•° */
 		p++;
 		_ucLen--;
 	}
@@ -1032,7 +1030,7 @@ int32_t StrToIntFix(char *_pStr, uint8_t _ucLen)
 	for (i = 0; i < _ucLen; i++)
 	{
 		ucTemp = *p;
-		if (ucTemp == '.')	/* Óöµ½Ð¡Êýµã£¬×Ô¶¯Ìø¹ý1¸ö×Ö½Ú */
+		if (ucTemp == '.') /* é‡åˆ°å°æ•°ç‚¹ï¼Œè‡ªåŠ¨è·³è¿‡1ä¸ªå­—èŠ‚ */
 		{
 			p++;
 			ucTemp = *p;
@@ -1057,12 +1055,12 @@ int32_t StrToIntFix(char *_pStr, uint8_t _ucLen)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: HexToAscii
-*	¹¦ÄÜËµÃ÷: ½«hexÂë0x1f×ª»»³É'1'ºÍ'f'. ½áÎ²Ìî0.
-*	ÐÎ    ²Î: ucpHex ÊäÈë»º³åÇøÖ¸Õë
-*		     _ucpAscII Êä³ö»º³åÇøÖ¸Õë
-*		    _ucLenasc ASCIIµÄ×Ö·û³¤¶È.
-*	·µ »Ø Öµ: ¶þ½øÖÆÕûÊýÖµ
+*	å‡½ æ•° å: HexToAscii
+*	åŠŸèƒ½è¯´æ˜Ž: å°†hexç 0x1fè½¬æ¢æˆ'1'å’Œ'f'. ç»“å°¾å¡«0.
+*	å½¢    å‚: ucpHex è¾“å…¥ç¼“å†²åŒºæŒ‡é’ˆ
+*		     _ucpAscII è¾“å‡ºç¼“å†²åŒºæŒ‡é’ˆ
+*		    _ucLenasc ASCIIçš„å­—ç¬¦é•¿åº¦.
+*	è¿” å›ž å€¼: äºŒè¿›åˆ¶æ•´æ•°å€¼
 *********************************************************************************************************
 */
 void HexToAscii(uint8_t *_ucpHex, uint8_t *_ucpAscII, uint8_t _ucLenasc)
@@ -1073,7 +1071,7 @@ void HexToAscii(uint8_t *_ucpHex, uint8_t *_ucpAscII, uint8_t _ucLenasc)
 	for (i = 0; i < _ucLenasc; i++)
 	{
 		ucTemp = *_ucpHex;
-		if ((i&0x01) == 0x00)
+		if ((i & 0x01) == 0x00)
 			ucTemp = ucTemp >> 4;
 		else
 		{
@@ -1093,37 +1091,37 @@ void HexToAscii(uint8_t *_ucpHex, uint8_t *_ucpAscII, uint8_t _ucLenasc)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gps_FenToDu
-*	¹¦ÄÜËµÃ÷: ½«·Ö×ª»»Îª¶ÈµÄÐ¡Êý²¿·Ö£¬±£Áô6Î»Ð¡Êý¡£ ½«·Ö»»ËãÎª¶È¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ·µ»Ø¶ÈµÄÐ¡Êý²¿·Ö£¨Ê®½øÖÆ£©
+*	å‡½ æ•° å: gps_FenToDu
+*	åŠŸèƒ½è¯´æ˜Ž: å°†åˆ†è½¬æ¢ä¸ºåº¦çš„å°æ•°éƒ¨åˆ†ï¼Œä¿ç•™6ä½å°æ•°ã€‚ å°†åˆ†æ¢ç®—ä¸ºåº¦ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: è¿”å›žåº¦çš„å°æ•°éƒ¨åˆ†ï¼ˆåè¿›åˆ¶ï¼‰
 *********************************************************************************************************
 */
 uint32_t gps_FenToDu(uint32_t _fen)
 {
 	uint32_t du;
-	
-	/* g_tGPS.WeiDu_Fen;	Î³¶È£¬·Ö. 232475£»  Ð¡Êýµãºó4Î»  ±íÊ¾ 23.2475·Ö */
-	
+
+	/* g_tGPS.WeiDu_Fen;	çº¬åº¦ï¼Œåˆ†. 232475ï¼›  å°æ•°ç‚¹åŽ4ä½  è¡¨ç¤º 23.2475åˆ† */
+
 	du = (_fen * 100) / 60;
-	
+
 	return du;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: gps_FenToMiao
-*	¹¦ÄÜËµÃ÷: ½«·ÖµÄÐ¡Êý²¿·Ö×ª»¯Ãë
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: Ãë ÕûÊý²¿·Ö
+*	å‡½ æ•° å: gps_FenToMiao
+*	åŠŸèƒ½è¯´æ˜Ž: å°†åˆ†çš„å°æ•°éƒ¨åˆ†è½¬åŒ–ç§’
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: ç§’ æ•´æ•°éƒ¨åˆ†
 *********************************************************************************************************
 */
 uint16_t gps_FenToMiao(uint32_t _fen)
 {
 	uint32_t miao;
-	
-	/* g_tGPS.WeiDu_Fen;	Î³¶È£¬·Ö. 232475£»  Ð¡Êýµãºó4Î»  ±íÊ¾ 23.2475·Ö 
-		ÆäÖÐÐ¡Êý²¿·Ö 0.2475 * 60 = 14.85 ËÄÉáÎåÈëÎª 15Ãë	
+
+	/* g_tGPS.WeiDu_Fen;	çº¬åº¦ï¼Œåˆ†. 232475ï¼›  å°æ•°ç‚¹åŽ4ä½  è¡¨ç¤º 23.2475åˆ† 
+		å…¶ä¸­å°æ•°éƒ¨åˆ† 0.2475 * 60 = 14.85 å››èˆäº”å…¥ä¸º 15ç§’	
 		
 		
 		2475 * 60 = 148500
@@ -1134,34 +1132,34 @@ uint16_t gps_FenToMiao(uint32_t _fen)
 			miao = 14 + 1
 		}
 	*/
-	
+
 	miao = ((_fen % 10000) * 60);
-	
+
 	if ((miao % 10000) >= 5000)
 	{
-		miao = miao / 10000 + 1;	/* 5Èë */
+		miao = miao / 10000 + 1; /* 5å…¥ */
 	}
 	else
 	{
-		miao = miao / 10000;		/* 4Éá */
+		miao = miao / 10000; /* 4èˆ */
 	}
-		
+
 	return miao;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: StrToIntFix
-*	¹¦ÄÜËµÃ÷: ½«ASCIIÂë×Ö·û´®×ª»»³ÉÊ®½øÖÆ, ¸ø¶¨³¤¶È
-*	ÐÎ    ²Î: _pStr :´ý×ª»»µÄASCIIÂë´®. ¿ÉÒÔÒÔ¶ººÅ»ò0½áÊø
-*			 _ucLen : ¹Ì¶¨³¤¶È
-*	·µ »Ø Öµ: ¶þ½øÖÆÕûÊýÖµ
+*	å‡½ æ•° å: StrToIntFix
+*	åŠŸèƒ½è¯´æ˜Ž: å°†ASCIIç å­—ç¬¦ä¸²è½¬æ¢æˆåè¿›åˆ¶, ç»™å®šé•¿åº¦
+*	å½¢    å‚: _pStr :å¾…è½¬æ¢çš„ASCIIç ä¸². å¯ä»¥ä»¥é€—å·æˆ–0ç»“æŸ
+*			 _ucLen : å›ºå®šé•¿åº¦
+*	è¿” å›ž å€¼: äºŒè¿›åˆ¶æ•´æ•°å€¼
 *********************************************************************************************************
 */
 void UTCDate(void)
 {
-	#if 0
-	/* ´¦ÀíUTCÊ±²î */
+#if 0
+	/* å¤„ç†UTCæ—¶å·® */
 	{
 		uint8_t ucaDays[]={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -1173,7 +1171,7 @@ void UTCDate(void)
 				g_tGPS.Hour = g_tGPS.Hour - 24;
 				g_tGPS.ucDay++;
 
-				/* ÈòÄê2ÔÂ·ÝÎª29Ìì */
+				/* é—°å¹´2æœˆä»½ä¸º29å¤© */
 				if (IsLeapYear(g_tGPS.usYear))
 				{
 					ucaDays[1] = 29;
@@ -1222,7 +1220,7 @@ void UTCDate(void)
 						{
 							g_tGPS.ucMonth = 2;
 
-							/* ÈòÄê2ÔÂ·ÝÎª29Ìì */
+							/* é—°å¹´2æœˆä»½ä¸º29å¤© */
 							if (IsLeapYear(g_tGPS.usYear))
 							{
 								g_tGPS.ucDay = 29;
@@ -1251,111 +1249,109 @@ void UTCDate(void)
 			}
 		}
 	}
-	#endif
+#endif
 }
 
-
 /*
-GPSÉÏµçºó£¬Ã¿¸ôÒ»¶¨µÄÊ±¼ä¾Í»á·µ»ØÒ»¶¨¸ñÊ½µÄÊý¾Ý£¬Êý¾Ý¸ñÊ½Îª£º
+GPSä¸Šç”µåŽï¼Œæ¯éš”ä¸€å®šçš„æ—¶é—´å°±ä¼šè¿”å›žä¸€å®šæ ¼å¼çš„æ•°æ®ï¼Œæ•°æ®æ ¼å¼ä¸ºï¼š
 
-$ÐÅÏ¢ÀàÐÍ£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x£¬x
+$ä¿¡æ¯ç±»åž‹ï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œxï¼Œx
 
-Ã¿ÐÐ¿ªÍ·µÄ×Ö·û¶¼ÊÇ¡®$¡¯£¬½Ó×ÅÊÇÐÅÏ¢ÀàÐÍ£¬ºóÃæÊÇÊý¾Ý£¬ÒÔ¶ººÅ·Ö¸ô¿ª¡£Ò»ÐÐÍêÕûµÄÊý¾ÝÈçÏÂ£º
+æ¯è¡Œå¼€å¤´çš„å­—ç¬¦éƒ½æ˜¯â€˜$â€™ï¼ŒæŽ¥ç€æ˜¯ä¿¡æ¯ç±»åž‹ï¼ŒåŽé¢æ˜¯æ•°æ®ï¼Œä»¥é€—å·åˆ†éš”å¼€ã€‚ä¸€è¡Œå®Œæ•´çš„æ•°æ®å¦‚ä¸‹ï¼š
 
     $GPRMC,080655.00,A,4546.40891,N,12639.65641,E,1.045,328.42,170809,,,A*60
 
 
 
-ÐÅÏ¢ÀàÐÍÎª£º
+ä¿¡æ¯ç±»åž‹ä¸ºï¼š
 
-GPGSV£º¿É¼ûÎÀÐÇÐÅÏ¢
+GPGSVï¼šå¯è§å«æ˜Ÿä¿¡æ¯
 
-GPGLL£ºµØÀí¶¨Î»ÐÅÏ¢
+GPGLLï¼šåœ°ç†å®šä½ä¿¡æ¯
 
-GPRMC£ºÍÆ¼ö×îÐ¡¶¨Î»ÐÅÏ¢
+GPRMCï¼šæŽ¨èæœ€å°å®šä½ä¿¡æ¯
 
-GPVTG£ºµØÃæËÙ¶ÈÐÅÏ¢
+GPVTGï¼šåœ°é¢é€Ÿåº¦ä¿¡æ¯
 
-GPGGA£ºGPS¶¨Î»ÐÅÏ¢
+GPGGAï¼šGPSå®šä½ä¿¡æ¯
 
-GPGSA£ºµ±Ç°ÎÀÐÇÐÅÏ¢
+GPGSAï¼šå½“å‰å«æ˜Ÿä¿¡æ¯
 
 
 
-1¡¢ GPS DOP and Active Satellites£¨GSA£©µ±Ç°ÎÀÐÇÐÅÏ¢
+1ã€ GPS DOP and Active Satellitesï¼ˆGSAï¼‰å½“å‰å«æ˜Ÿä¿¡æ¯
 
 $GPGSA,<1>,<2>,<3>,<3>,,,,,<3>,<3>,<3>,<4>,<5>,<6>,<7>
 
-<1>Ä£Ê½ £ºM = ÊÖ¶¯£¬ A = ×Ô¶¯¡£
-<2>¶¨Î»ÐÍÊ½ 1 = Î´¶¨Î»£¬ 2 = ¶þÎ¬¶¨Î»£¬ 3 = ÈýÎ¬¶¨Î»¡£
-<3>PRN Êý×Ö£º01 ÖÁ 32 ±íÌì¿ÕÊ¹ÓÃÖÐµÄÎÀÐÇ±àºÅ£¬×î¶à¿É½ÓÊÕ12¿ÅÎÀÐÇÐÅÏ¢¡£
-<4> PDOPÎ»ÖÃ¾«¶ÈÒò×Ó£¨0.5~99.9£©
-<5> HDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5~99.9£©
-<6> VDOP´¹Ö±¾«¶ÈÒò×Ó£¨0.5~99.9£©
-<7> Checksum.(¼ì²éÎ»).
+<1>æ¨¡å¼ ï¼šM = æ‰‹åŠ¨ï¼Œ A = è‡ªåŠ¨ã€‚
+<2>å®šä½åž‹å¼ 1 = æœªå®šä½ï¼Œ 2 = äºŒç»´å®šä½ï¼Œ 3 = ä¸‰ç»´å®šä½ã€‚
+<3>PRN æ•°å­—ï¼š01 è‡³ 32 è¡¨å¤©ç©ºä½¿ç”¨ä¸­çš„å«æ˜Ÿç¼–å·ï¼Œæœ€å¤šå¯æŽ¥æ”¶12é¢—å«æ˜Ÿä¿¡æ¯ã€‚
+<4> PDOPä½ç½®ç²¾åº¦å› å­ï¼ˆ0.5~99.9ï¼‰
+<5> HDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5~99.9ï¼‰
+<6> VDOPåž‚ç›´ç²¾åº¦å› å­ï¼ˆ0.5~99.9ï¼‰
+<7> Checksum.(æ£€æŸ¥ä½).
 
-2¡¢ GPS Satellites in View£¨GSV£©¿É¼ûÎÀÐÇÐÅÏ¢
+2ã€ GPS Satellites in Viewï¼ˆGSVï¼‰å¯è§å«æ˜Ÿä¿¡æ¯
 
 $GPGSV, <1>,<2>,<3>,<4>,<5>,<6>,<7>,?<4>,<5>,<6>,<7>,<8>
 
-<1> GSVÓï¾äµÄ×ÜÊý
-<2> ±¾¾äGSVµÄ±àºÅ
-<3> ¿É¼ûÎÀÐÇµÄ×ÜÊý£¬00 ÖÁ 12¡£
-<4> ÎÀÐÇ±àºÅ£¬ 01 ÖÁ 32¡£
-<5>ÎÀÐÇÑö½Ç£¬ 00 ÖÁ 90 ¶È¡£
-<6>ÎÀÐÇ·½Î»½Ç£¬ 000 ÖÁ 359 ¶È¡£Êµ¼ÊÖµ¡£
-<7>Ñ¶ºÅÔëÉù±È£¨C/No£©£¬ 00 ÖÁ 99 dB£»ÎÞ±íÎ´½ÓÊÕµ½Ñ¶ºÅ¡£
-<8>Checksum.(¼ì²éÎ»).
-µÚ<4>,<5>,<6>,<7>Ïî¸ö±ðÎÀÐÇ»áÖØ¸´³öÏÖ£¬Ã¿ÐÐ×î¶àÓÐËÄ¿ÅÎÀÐÇ¡£ÆäÓàÎÀÐÇÐÅÏ¢»áÓÚ´ÎÒ»ÐÐ³öÏÖ£¬ÈôÎ´Ê¹ÓÃ£¬ÕâÐ©×Ö¶Î»á¿Õ°×¡£
+<1> GSVè¯­å¥çš„æ€»æ•°
+<2> æœ¬å¥GSVçš„ç¼–å·
+<3> å¯è§å«æ˜Ÿçš„æ€»æ•°ï¼Œ00 è‡³ 12ã€‚
+<4> å«æ˜Ÿç¼–å·ï¼Œ 01 è‡³ 32ã€‚
+<5>å«æ˜Ÿä»°è§’ï¼Œ 00 è‡³ 90 åº¦ã€‚
+<6>å«æ˜Ÿæ–¹ä½è§’ï¼Œ 000 è‡³ 359 åº¦ã€‚å®žé™…å€¼ã€‚
+<7>è®¯å·å™ªå£°æ¯”ï¼ˆC/Noï¼‰ï¼Œ 00 è‡³ 99 dBï¼›æ— è¡¨æœªæŽ¥æ”¶åˆ°è®¯å·ã€‚
+<8>Checksum.(æ£€æŸ¥ä½).
+ç¬¬<4>,<5>,<6>,<7>é¡¹ä¸ªåˆ«å«æ˜Ÿä¼šé‡å¤å‡ºçŽ°ï¼Œæ¯è¡Œæœ€å¤šæœ‰å››é¢—å«æ˜Ÿã€‚å…¶ä½™å«æ˜Ÿä¿¡æ¯ä¼šäºŽæ¬¡ä¸€è¡Œå‡ºçŽ°ï¼Œè‹¥æœªä½¿ç”¨ï¼Œè¿™äº›å­—æ®µä¼šç©ºç™½ã€‚
 
 
-3¡¢Global Positioning System Fix Data£¨GGA£©GPS¶¨Î»ÐÅÏ¢
+3ã€Global Positioning System Fix Dataï¼ˆGGAï¼‰GPSå®šä½ä¿¡æ¯
 $GPGGA,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,M,<10>,M,<11>,<12>*hh
 
-<1> UTCÊ±¼ä£¬hhmmss£¨Ê±·ÖÃë£©¸ñÊ½
-<2> Î³¶Èddmm.mmmm£¨¶È·Ö£©¸ñÊ½£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<3> Î³¶È°ëÇòN£¨±±°ëÇò£©»òS£¨ÄÏ°ëÇò£©
-<4> ¾­¶Èdddmm.mmmm£¨¶È·Ö£©¸ñÊ½£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<5> ¾­¶È°ëÇòE£¨¶«¾­£©»òW£¨Î÷¾­£©
-<6> GPS×´Ì¬£º0=Î´¶¨Î»£¬1=·Ç²î·Ö¶¨Î»£¬2=²î·Ö¶¨Î»£¬6=ÕýÔÚ¹ÀËã
-<7> ÕýÔÚÊ¹ÓÃ½âËãÎ»ÖÃµÄÎÀÐÇÊýÁ¿£¨00~12£©£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<8> HDOPË®Æ½¾«¶ÈÒò×Ó£¨0.5~99.9£©
-<9> º£°Î¸ß¶È£¨-9999.9~99999.9£©
-<10> µØÇòÍÖÇòÃæÏà¶Ô´óµØË®×¼ÃæµÄ¸ß¶È
-<11> ²î·ÖÊ±¼ä£¨´Ó×î½üÒ»´Î½ÓÊÕµ½²î·ÖÐÅºÅ¿ªÊ¼µÄÃëÊý£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©
-<12> ²î·ÖÕ¾IDºÅ0000~1023£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£¬Èç¹û²»ÊÇ²î·Ö¶¨Î»½«Îª¿Õ£©
+<1> UTCæ—¶é—´ï¼Œhhmmssï¼ˆæ—¶åˆ†ç§’ï¼‰æ ¼å¼
+<2> çº¬åº¦ddmm.mmmmï¼ˆåº¦åˆ†ï¼‰æ ¼å¼ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<3> çº¬åº¦åŠçƒNï¼ˆåŒ—åŠçƒï¼‰æˆ–Sï¼ˆå—åŠçƒï¼‰
+<4> ç»åº¦dddmm.mmmmï¼ˆåº¦åˆ†ï¼‰æ ¼å¼ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<5> ç»åº¦åŠçƒEï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰
+<6> GPSçŠ¶æ€ï¼š0=æœªå®šä½ï¼Œ1=éžå·®åˆ†å®šä½ï¼Œ2=å·®åˆ†å®šä½ï¼Œ6=æ­£åœ¨ä¼°ç®—
+<7> æ­£åœ¨ä½¿ç”¨è§£ç®—ä½ç½®çš„å«æ˜Ÿæ•°é‡ï¼ˆ00~12ï¼‰ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<8> HDOPæ°´å¹³ç²¾åº¦å› å­ï¼ˆ0.5~99.9ï¼‰
+<9> æµ·æ‹”é«˜åº¦ï¼ˆ-9999.9~99999.9ï¼‰
+<10> åœ°çƒæ¤­çƒé¢ç›¸å¯¹å¤§åœ°æ°´å‡†é¢çš„é«˜åº¦
+<11> å·®åˆ†æ—¶é—´ï¼ˆä»Žæœ€è¿‘ä¸€æ¬¡æŽ¥æ”¶åˆ°å·®åˆ†ä¿¡å·å¼€å§‹çš„ç§’æ•°ï¼Œå¦‚æžœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰
+<12> å·®åˆ†ç«™IDå·0000~1023ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼Œå¦‚æžœä¸æ˜¯å·®åˆ†å®šä½å°†ä¸ºç©ºï¼‰
 
 
-4¡¢Recommended Minimum Specific GPS/TRANSIT Data£¨RMC£©ÍÆ¼ö¶¨Î»ÐÅÏ¢
+4ã€Recommended Minimum Specific GPS/TRANSIT Dataï¼ˆRMCï¼‰æŽ¨èå®šä½ä¿¡æ¯
 $GPRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,<12>*hh
 
-<1> UTCÊ±¼ä£¬hhmmss£¨Ê±·ÖÃë£©¸ñÊ½
-<2> ¶¨Î»×´Ì¬£¬A=ÓÐÐ§¶¨Î»£¬V=ÎÞÐ§¶¨Î»
-<3> Î³¶Èddmm.mmmm£¨¶È·Ö£©¸ñÊ½£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<4> Î³¶È°ëÇòN£¨±±°ëÇò£©»òS£¨ÄÏ°ëÇò£©
-<5> ¾­¶Èdddmm.mmmm£¨¶È·Ö£©¸ñÊ½£¨Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<6> ¾­¶È°ëÇòE£¨¶«¾­£©»òW£¨Î÷¾­£©
-<7> µØÃæËÙÂÊ£¨000.0~999.9½Ú£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<8> µØÃæº½Ïò£¨000.0~359.9¶È£¬ÒÔÕæ±±Îª²Î¿¼»ù×¼£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<9> UTCÈÕÆÚ£¬ddmmyy£¨ÈÕÔÂÄê£©¸ñÊ½
-<10> ´ÅÆ«½Ç£¨000.0~180.0¶È£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<11> ´ÅÆ«½Ç·½Ïò£¬E£¨¶«£©»òW£¨Î÷£©
-<12> Ä£Ê½Ö¸Ê¾£¨½öNMEA0183 3.00°æ±¾Êä³ö£¬A=×ÔÖ÷¶¨Î»£¬D=²î·Ö£¬E=¹ÀËã£¬N=Êý¾ÝÎÞÐ§£©
+<1> UTCæ—¶é—´ï¼Œhhmmssï¼ˆæ—¶åˆ†ç§’ï¼‰æ ¼å¼
+<2> å®šä½çŠ¶æ€ï¼ŒA=æœ‰æ•ˆå®šä½ï¼ŒV=æ— æ•ˆå®šä½
+<3> çº¬åº¦ddmm.mmmmï¼ˆåº¦åˆ†ï¼‰æ ¼å¼ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<4> çº¬åº¦åŠçƒNï¼ˆåŒ—åŠçƒï¼‰æˆ–Sï¼ˆå—åŠçƒï¼‰
+<5> ç»åº¦dddmm.mmmmï¼ˆåº¦åˆ†ï¼‰æ ¼å¼ï¼ˆå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<6> ç»åº¦åŠçƒEï¼ˆä¸œç»ï¼‰æˆ–Wï¼ˆè¥¿ç»ï¼‰
+<7> åœ°é¢é€ŸçŽ‡ï¼ˆ000.0~999.9èŠ‚ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<8> åœ°é¢èˆªå‘ï¼ˆ000.0~359.9åº¦ï¼Œä»¥çœŸåŒ—ä¸ºå‚è€ƒåŸºå‡†ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<9> UTCæ—¥æœŸï¼Œddmmyyï¼ˆæ—¥æœˆå¹´ï¼‰æ ¼å¼
+<10> ç£åè§’ï¼ˆ000.0~180.0åº¦ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<11> ç£åè§’æ–¹å‘ï¼ŒEï¼ˆä¸œï¼‰æˆ–Wï¼ˆè¥¿ï¼‰
+<12> æ¨¡å¼æŒ‡ç¤ºï¼ˆä»…NMEA0183 3.00ç‰ˆæœ¬è¾“å‡ºï¼ŒA=è‡ªä¸»å®šä½ï¼ŒD=å·®åˆ†ï¼ŒE=ä¼°ç®—ï¼ŒN=æ•°æ®æ— æ•ˆï¼‰
 
 
-5¡¢ Track Made Good and Ground Speed£¨VTG£©µØÃæËÙ¶ÈÐÅÏ¢
+5ã€ Track Made Good and Ground Speedï¼ˆVTGï¼‰åœ°é¢é€Ÿåº¦ä¿¡æ¯
 $GPVTG,<1>,T,<2>,M,<3>,N,<4>,K,<5>*hh
 
-<1> ÒÔÕæ±±Îª²Î¿¼»ù×¼µÄµØÃæº½Ïò£¨000~359¶È£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<2> ÒÔ´Å±±Îª²Î¿¼»ù×¼µÄµØÃæº½Ïò£¨000~359¶È£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<3> µØÃæËÙÂÊ£¨000.0~999.9½Ú£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<4> µØÃæËÙÂÊ£¨0000.0~1851.8¹«Àï/Ð¡Ê±£¬Ç°ÃæµÄ0Ò²½«±»´«Êä£©
-<5> Ä£Ê½Ö¸Ê¾£¨½öNMEA0183 3.00°æ±¾Êä³ö£¬A=×ÔÖ÷¶¨Î»£¬D=²î·Ö£¬E=¹ÀËã£¬N=Êý¾ÝÎÞÐ§£©
+<1> ä»¥çœŸåŒ—ä¸ºå‚è€ƒåŸºå‡†çš„åœ°é¢èˆªå‘ï¼ˆ000~359åº¦ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<2> ä»¥ç£åŒ—ä¸ºå‚è€ƒåŸºå‡†çš„åœ°é¢èˆªå‘ï¼ˆ000~359åº¦ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<3> åœ°é¢é€ŸçŽ‡ï¼ˆ000.0~999.9èŠ‚ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<4> åœ°é¢é€ŸçŽ‡ï¼ˆ0000.0~1851.8å…¬é‡Œ/å°æ—¶ï¼Œå‰é¢çš„0ä¹Ÿå°†è¢«ä¼ è¾“ï¼‰
+<5> æ¨¡å¼æŒ‡ç¤ºï¼ˆä»…NMEA0183 3.00ç‰ˆæœ¬è¾“å‡ºï¼ŒA=è‡ªä¸»å®šä½ï¼ŒD=å·®åˆ†ï¼ŒE=ä¼°ç®—ï¼ŒN=æ•°æ®æ— æ•ˆï¼‰
 
 */
 
-
-/* Êµ²âÎäººµØÇø GPSÊý¾Ý
+/* å®žæµ‹æ­¦æ±‰åœ°åŒº GPSæ•°æ®
 $GPGGA,064518.046,,,,,0,00,,,M,0.0,M,,0000*5A
 $GPGLL,,,,,064518.046,V,N*76
 $GPGSA,A,1,,,,,,,,,,,,,,,*1E
@@ -1365,7 +1361,7 @@ $GPGSV,3,3,12,21,17,122,,25,13,176,,31,13,054,,20,00,266,*7A
 $GPRMC,064518.046,V,,,,,,,250213,,,N*46
 $GPVTG,,T,,M,,N,,K,N*2C
 
-//²ÌµéÇø
+//è”¡ç”¸åŒº
 $GPGGA,161037.000,3030.6548,N,11402.4568,E,1,04,5.2,51.1,M,-15.5,M,,0000*42
 $GPGSA,A,3,05,12,02,25,,,,,,,,,6.0,5.2,2.9*3B
 $GPGSV,3,1,10,02,49,314,31,05,37,225,41,12,33,291,32,25,09,318,33*7C
@@ -1374,7 +1370,7 @@ $GPGSV,3,3,10,23,14,050,23,40,18,253,33*71
 $GPRMC,161037.000,A,3030.6548,N,11402.4568,E,0.00,,010613,,,A*71
 $GPVTG,,T,,M,0.00,N,0.0,K,A*13
 
-//µÚ2´Î
+//ç¬¬2æ¬¡
 $GPGGA,165538.000,3030.6519,N,11402.4480,E,2,05,1.9,39.5,M,-15.5,M,6.8,0000*68
 $GPGSA,A,3,26,05,25,12,02,,,,,,,,2.7,1.9,2.0*3A
 $GPGSV,3,1,11,10,63,029,18,02,58,344,23,05,55,247,46,04,50,053,26*75
@@ -1385,11 +1381,11 @@ $GPVTG,71.87,T,,M,0.00,N,0.0,K,D*31
 $GPGGA,165539.000,3030.6519,N,11402.4480,E,2,05,1.9,39.5,M,-15.5,M,7.8,0000*68
 $GPRMC,
 
-¶È·ÖÃë »»Ëã: 30¶È 30·Ö 65
+åº¦åˆ†ç§’ æ¢ç®—: 30åº¦ 30åˆ† 65
 
-3030.6519 = 30¶È + 30.6519·Ö£¬ 60½øÖÆ£¬ 
-30.6519 ·Ö  --> 30.6519 / 60 = 0.510865¶È¡£  30.510865¶È
+3030.6519 = 30åº¦ + 30.6519åˆ†ï¼Œ 60è¿›åˆ¶ï¼Œ 
+30.6519 åˆ†  --> 30.6519 / 60 = 0.510865åº¦ã€‚  30.510865åº¦
 
 */
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

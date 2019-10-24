@@ -1,19 +1,19 @@
---H7-TOOL²âÊÔ³ÌĞò
+--H7-TOOLæµ‹è¯•ç¨‹åº
 beep()
 
---²âÊÔGPIOÊäÈëÊä³ö
+--æµ‹è¯•GPIOè¾“å…¥è¾“å‡º
 function test_gpio(void)
 	local err
 	local terr
 	local i
 	print("")
-	print("----¿ªÊ¼²âÊÔ----")
+	print("----å¼€å§‹æµ‹è¯•----")
 	err=0
 	terr=0
---ÉèÖÃTVCCÊä³ö3.3V
+--è®¾ç½®TVCCè¾“å‡º3.3V
 	set_tvcc(3.3)
 
---±ä»»ÊäÈëÊä³ö·½Ïò£¬ÔÙ²âÒ»±é
+--å˜æ¢è¾“å…¥è¾“å‡ºæ–¹å‘ï¼Œå†æµ‹ä¸€é
 	gpio_cfg(0, 0)
 	gpio_cfg(1, 1)
 	gpio_cfg(2, 0)
@@ -45,9 +45,9 @@ function test_gpio(void)
 	gpio_write(9, 0) if (gpio_read(8)==1) then err=err+1 end
 	if (err == 0) then print("D9->D8 ok") else print("D9->D8 Error") terr=terr+1 end	
 		
---4¶ÔGPIO£¬ÊäÈëÊä³ö×Ô¶¯²âÊÔ	
-	gpio_cfg(0, 1)	-- ÅäÖÃD0ÎªÊä³ö
-	gpio_cfg(1, 0)	-- ÅäÖÃD1Î´ÊäÈë
+--4å¯¹GPIOï¼Œè¾“å…¥è¾“å‡ºè‡ªåŠ¨æµ‹è¯•	
+	gpio_cfg(0, 1)	-- é…ç½®D0ä¸ºè¾“å‡º
+	gpio_cfg(1, 0)	-- é…ç½®D1æœªè¾“å…¥
 	gpio_cfg(2, 1)
 	gpio_cfg(3, 0)
 	gpio_cfg(4, 1)
@@ -77,7 +77,7 @@ function test_gpio(void)
 	gpio_write(8, 0) if (gpio_read(9)==1) then err=err+1 end
 	if (err == 0) then print("D8->D9 ok") else print("D8->D9 Error") terr=terr+1 end
 				
---²âÊÔCAN				
+--æµ‹è¯•CAN				
 	gpio_cfg(12, 1)	
 	gpio_cfg(13, 0)	
 	
@@ -90,7 +90,7 @@ function test_gpio(void)
 	end
 	if (err == 0) then print("CANTX->CANRX ok") else print("CANTX->CANRX Error", err) terr=terr+1 end
 
---²âÊÔTTL-UART
+--æµ‹è¯•TTL-UART
 	gpio_cfg(100, 1)	
 	gpio_write(100, 0)
 	
@@ -107,37 +107,37 @@ function test_gpio(void)
 	if (err == 0) then print("TTL UART ok") else print("TTL UART Error", err) terr=terr+1 end
 	
 	if (terr > 0) then
-		print("*****²âÊÔÊ§°Ü terr = ", terr)
+		print("*****æµ‹è¯•å¤±è´¥ terr = ", terr)
 		beep()
 		delayms(100)
 		beep()
 		delayms(100)
 		beep()	
 	else
-		print("*****²âÊÔÍ¨¹ı*****")
+		print("*****æµ‹è¯•é€šè¿‡*****")
 		beep()	
 	end
 end
 
---Æô¶¯Ê¾²¨Æ÷£¬ADC²É¼¯£¬¶àÍ¨µÀÄ£Ê½
+--å¯åŠ¨ç¤ºæ³¢å™¨ï¼ŒADCé‡‡é›†ï¼Œå¤šé€šé“æ¨¡å¼
 function start_dso(void)
-	print("Æô¶¯¶àÍ¨µÀµÍËÙ²âÁ¿Ä£Ê½")
-	write_reg16(0x01FF, 2) --¶àÍ¨µÀµÍËÙ²âÁ¿
-	write_reg16(0x0200, 1) -- CH1Ñ¡DCñîºÏ
-	write_reg16(0x0201, 1) -- CH2Ñ¡DCñîºÏ
-	write_reg16(0x0202, 0) -- CH1Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
-	write_reg16(0x0203, 0) -- CH2Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
-	write_reg16(0x0204, 0) -- CH1Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ
-	write_reg16(0x0205, 0) -- CH2Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ
-	write_reg16(0x0206, 12) --²ÉÑùÆµÂÊ1M
-	write_reg16(0x0207, 0) --²ÉÑùÉî¶È1K
-	write_reg16(0x0208, 0) --´¥·¢µçÆ½
-	write_reg16(0x0209, 50) --´¥·¢Î»ÖÃ
-	write_reg16(0x020A, 0) --´¥·¢Ä£Ê½ 0=×Ô¶¯
-	write_reg16(0x020B, 0) --´¥·¢Í¨µÀCH1
-	write_reg16(0x020C, 0) --´¥·¢±ßÑØ
-	write_reg16(0x020D, 2) --Í¨µÀÊ¹ÄÜ
-	write_reg16(0x020E, 1) --¿ªÊ¼²É¼¯
+	print("å¯åŠ¨å¤šé€šé“ä½é€Ÿæµ‹é‡æ¨¡å¼")
+	write_reg16(0x01FF, 2) --å¤šé€šé“ä½é€Ÿæµ‹é‡
+	write_reg16(0x0200, 1) -- CH1é€‰DCè€¦åˆ
+	write_reg16(0x0201, 1) -- CH2é€‰DCè€¦åˆ
+	write_reg16(0x0202, 0) -- CH1é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
+	write_reg16(0x0203, 0) -- CH2é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
+	write_reg16(0x0204, 0) -- CH1é€šé“ç›´æµåå€¼ï¼Œæœªç”¨
+	write_reg16(0x0205, 0) -- CH2é€šé“ç›´æµåå€¼ï¼Œæœªç”¨
+	write_reg16(0x0206, 12) --é‡‡æ ·é¢‘ç‡1M
+	write_reg16(0x0207, 0) --é‡‡æ ·æ·±åº¦1K
+	write_reg16(0x0208, 0) --è§¦å‘ç”µå¹³
+	write_reg16(0x0209, 50) --è§¦å‘ä½ç½®
+	write_reg16(0x020A, 0) --è§¦å‘æ¨¡å¼ 0=è‡ªåŠ¨
+	write_reg16(0x020B, 0) --è§¦å‘é€šé“CH1
+	write_reg16(0x020C, 0) --è§¦å‘è¾¹æ²¿
+	write_reg16(0x020D, 2) --é€šé“ä½¿èƒ½
+	write_reg16(0x020E, 1) --å¼€å§‹é‡‡é›†
 end
 
 function test_ch1ch2(void)
@@ -146,28 +146,28 @@ function test_ch1ch2(void)
 	local adc
 	local dac
 	local errd
---DAC´óÖÂ¹ØÏµ
+--DACå¤§è‡´å…³ç³»
 --CH1 4095=12.356V  2500=2.75V  2058=95mV
---CH2(µçÁ÷²ÉÑùµç×è200Å·)	
---CH1µÄ8µµÁ¿³ÌÅĞ¾İ
+--CH2(ç”µæµé‡‡æ ·ç”µé˜»200æ¬§)	
+--CH1çš„8æ¡£é‡ç¨‹åˆ¤æ®
 	local dac1 = {2047, -1024, 512, 256, 128, 64, 32, 10}
 	local mid1 = {60760, 4666, 60844, 60785, 60634, 60127, 59042, 46390}
-	local diff1 = {0.02, 0.2, 0.05, 0.06, 0.10, 0.15, 0.18, 0.32} --¹«²îÏµÊı
---CH2µÄ8µµÁ¿³ÌÅĞ¾İ	
+	local diff1 = {0.02, 0.2, 0.05, 0.06, 0.10, 0.15, 0.18, 0.32} --å…¬å·®ç³»æ•°
+--CH2çš„8æ¡£é‡ç¨‹åˆ¤æ®	
 	local dac2 = {4095, 1024, 512, 256, 128, 64, 32, 16}
 	local mid2 = {43121, 41400, 37714, 37575, 37556, 37494, 37633, 40601}
 	local diff2 = {0.2, 0.1, 0.08, 0.08, 0.08, 0.08, 0.12, 0.15}
 		
 	print("")
-	print("----¿ªÊ¼Ê¾²¨Æ÷µçÂ·----")
+	print("----å¼€å§‹ç¤ºæ³¢å™¨ç”µè·¯----")
 	start_dso();
 	err = 0
 	
-	dac_on()	--´ò¿ªDACµçÔ´£¬ÉèÖÃÎªµçÆ½Ä£Ê½
+	dac_on()	--æ‰“å¼€DACç”µæºï¼Œè®¾ç½®ä¸ºç”µå¹³æ¨¡å¼
 	
-	print("ÕıÔÚ²âCH1,DCñîºÏ...")
+	print("æ­£åœ¨æµ‹CH1,DCè€¦åˆ...")
 	for i=1,8,1 do
-		write_reg16(0x0202, i-1) -- CH1Í¨µÀÔöÒæ0-7
+		write_reg16(0x0202, i-1) -- CH1é€šé“å¢ç›Š0-7
 		dac = dac1[i] + 2044
 		dac_write(dac) delayms(500)	
 		adc = read_adc(0)
@@ -180,9 +180,9 @@ function test_ch1ch2(void)
 		end
 	end
 	
-	print("ÕıÔÚ²âCH2,DCñîºÏ...")
+	print("æ­£åœ¨æµ‹CH2,DCè€¦åˆ...")
 	for i=1,8,1 do
-		write_reg16(0x0203, i-1) -- CH2Í¨µÀÔöÒæ0-7
+		write_reg16(0x0203, i-1) -- CH2é€šé“å¢ç›Š0-7
 		dac = dac2[i]
 		dac_write(dac) delayms(500)	
 		adc = read_adc(1)
@@ -195,34 +195,34 @@ function test_ch1ch2(void)
 		end
 	end
 
-	write_reg16(0x0200, 0) -- CH1ñîºÏAC
-	write_reg16(0x0201, 0) -- CH2ñîºÏAC	
-	write_reg16(0x0202, 0) -- CH1Í¨µÀÔöÒæ0
-	write_reg16(0x0203, 0) -- CH2Í¨µÀÔöÒæ0
+	write_reg16(0x0200, 0) -- CH1è€¦åˆAC
+	write_reg16(0x0201, 0) -- CH2è€¦åˆAC	
+	write_reg16(0x0202, 0) -- CH1é€šé“å¢ç›Š0
+	write_reg16(0x0203, 0) -- CH2é€šé“å¢ç›Š0
 	delayms(2000)
 	adc = read_adc(0)
 	if (adc < 32768 - 200 or adc > 32768 + 200) then
-		print("CH1 ACñîºÏ", adc, "errpr") 
+		print("CH1 ACè€¦åˆ", adc, "errpr") 
 		err = err + 1
 	else
-		print("CH1 ACñîºÏ", adc, "ok") 
+		print("CH1 ACè€¦åˆ", adc, "ok") 
 	end
 	
 	adc = read_adc(1)
 	if (adc < 32733 - 200 or adc > 32750 + 200) then
-		print("CH2 ACñîºÏ", adc, "errpr") 
+		print("CH2 ACè€¦åˆ", adc, "errpr") 
 		err = err + 1
 	else
-		print("CH2 ACñîºÏ", adc, "ok") 
+		print("CH2 ACè€¦åˆ", adc, "ok") 
 	end	
 	
 ::quit::
---³É¹¦½ĞÒ»Éù£¬Ê§°Ü½ĞÈıÉù
+--æˆåŠŸå«ä¸€å£°ï¼Œå¤±è´¥å«ä¸‰å£°
 	if (err == 0) then
-		print("*****²âÊÔÍ¨¹ı*****")
+		print("*****æµ‹è¯•é€šè¿‡*****")
 		beep()
 	else
-		print("*****²âÊÔÊ§°Ü*****")
+		print("*****æµ‹è¯•å¤±è´¥*****")
 		beep()
 		delayms(100)
 		beep()
@@ -240,10 +240,10 @@ function test_tvcc(void)
 	local mid2 = {8157, 4809, 46031, 13299, 43391, 11367, 50469}
 	local diff1 = {0.2, 0.2, 0.2, 0.3, 0.1, 0.1, 0.1}
 	local diff2 = {0.1, 0.1, 0.1, 0.2, 0.1, 0.1, 0.1}
-	local name = {"¸ß²àµçÑ¹", "¸ß²àµçÁ÷", "TVCCµçÑ¹", "TVCCµçÁ÷", "NTC µç×è","12V µçÑ¹","USB µçÑ¹"}	
+	local name = {"é«˜ä¾§ç”µå‹", "é«˜ä¾§ç”µæµ", "TVCCç”µå‹", "TVCCç”µæµ", "NTC ç”µé˜»","12V ç”µå‹","USB ç”µå‹"}	
 	
 	print("")
-	print("----¿ªÊ¼²âÊÔTVCC NTC ----")
+	print("----å¼€å§‹æµ‹è¯•TVCC NTC ----")
 --start_dso();	
 	err = 0
 	print("TVCC = 120")
@@ -278,12 +278,12 @@ function test_tvcc(void)
 	end
 
 ::quit::
---³É¹¦½ĞÒ»Éù£¬Ê§°Ü½ĞÈıÉù
+--æˆåŠŸå«ä¸€å£°ï¼Œå¤±è´¥å«ä¸‰å£°
 	if (err == 0) then
-		print("*****²âÊÔÍ¨¹ı*****")
+		print("*****æµ‹è¯•é€šè¿‡*****")
 		beep()
 	else
-		print("*****²âÊÔÊ§°Ü*****")
+		print("*****æµ‹è¯•å¤±è´¥*****")
 		beep()
 		delayms(100)
 		beep()

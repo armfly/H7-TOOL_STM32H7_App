@@ -1,14 +1,14 @@
 
-³ÌÐòÃû×Ö£º H7-TOOL_App
+ç¨‹åºåå­—ï¼š H7-TOOL_App
 
-Í³Ò»Ô´´úÂë¡£Ô´´úÂë¹¦ÄÜ.
+ç»Ÿä¸€æºä»£ç ã€‚æºä»£ç åŠŸèƒ½.
 
-1. Âß¼­·ÖÎöÒÇ¹¦ÄÜ¡¢Ê¾²¨Æ÷¡¢ÐéÄâ´®¿Ú¡¢ÐéÄâCAN¡¢I2C¿ØÖÆÆ÷¡¢SPI¿ØÖÆÆ÷¡¢PWM¿ØÖÆÆ÷¡¢GPIO¿ØÖÆ
-	DAC¿ØÖÆ¡¢µçÁ÷¼ì²â¡¢±àÂëÆ÷ÊäÈë¡¢ÆµÂÊ¼Æ.
+1. é€»è¾‘åˆ†æžä»ªåŠŸèƒ½ã€ç¤ºæ³¢å™¨ã€è™šæ‹Ÿä¸²å£ã€è™šæ‹ŸCANã€I2CæŽ§åˆ¶å™¨ã€SPIæŽ§åˆ¶å™¨ã€PWMæŽ§åˆ¶å™¨ã€GPIOæŽ§åˆ¶
+	DACæŽ§åˆ¶ã€ç”µæµæ£€æµ‹ã€ç¼–ç å™¨è¾“å…¥ã€é¢‘çŽ‡è®¡.
 
-2. CMSIS DAPÏÂÔØÆ÷¹¦ÄÜ¡¢USBÐéÄâ´®¿Ú¹¦ÄÜ
+2. CMSIS DAPä¸‹è½½å™¨åŠŸèƒ½ã€USBè™šæ‹Ÿä¸²å£åŠŸèƒ½
 
-3. ÍÑ»úÏÂÔØÆ÷  
+3. è„±æœºä¸‹è½½å™¨  
 	- STM32
 	- EEPROM
 	- SPI FLASH
@@ -36,15 +36,15 @@ for i=0,512,16 do
   write(i,"8234567890123456")
 end
 
---- ÄÚ´æ²é¿´ ---
+--- å†…å­˜æŸ¥çœ‹ ---
 
---ÎªÁËÓÐ¸É¾»µÄ»·¾³,ÏÈ°Ñ¿ÉÒÔÊÕ¼¯µÄÆäËûÀ¬»ø¸Ï×ßÏÈ
+--ä¸ºäº†æœ‰å¹²å‡€çš„çŽ¯å¢ƒ,å…ˆæŠŠå¯ä»¥æ”¶é›†çš„å…¶ä»–åžƒåœ¾èµ¶èµ°å…ˆ
 collectgarbage("collect");
 
 local  c1 = collectgarbage("count")
-print("×î¿ªÊ¼,LuaµÄÄÚ´æÎª", c1)
+print("æœ€å¼€å§‹,Luaçš„å†…å­˜ä¸º", c1)
 
 local  c2 = collectgarbage("count")
-print("½áÊøºó,LuaµÄÄÚ´æÎª", c2)
+print("ç»“æŸåŽ,Luaçš„å†…å­˜ä¸º", c2)
 
 

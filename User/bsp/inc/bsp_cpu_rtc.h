@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : STM32ÄÚ²¿RTC
-*	ÎÄ¼şÃû³Æ : bsp_cpu_rtc.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : STM32å†…éƒ¨RTC
+*	æ–‡ä»¶åç§° : bsp_cpu_rtc.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-08-08 armfly  Ê×°æ
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-08-08 armfly  é¦–ç‰ˆ
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -22,12 +22,12 @@ typedef struct
 {
 	uint16_t Year;
 	uint8_t Mon;
-	uint8_t Day;	
-	uint8_t Hour;		
-	uint8_t Min;				
-	uint8_t Sec;					
-	uint8_t Week;	
-}RTC_T;
+	uint8_t Day;
+	uint8_t Hour;
+	uint8_t Min;
+	uint8_t Sec;
+	uint8_t Week;
+} RTC_T;
 
 void bsp_InitRTC(void);
 uint8_t RTC_WriteClock(uint16_t _year, uint8_t _mon, uint8_t _day, uint8_t _hour, uint8_t _min, uint8_t _sec);
@@ -37,5 +37,4 @@ uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day);
 extern RTC_T g_tRTC;
 
 #endif
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
-
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

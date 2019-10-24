@@ -1,23 +1,23 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : emmc«˝∂Øƒ£øÈ
-*	Œƒº˛√˚≥∆ : bsp_emmc.c
-*	∞Ê    ±æ : V1.0
-*	Àµ    √˜ : emmc¥Ê¥¢∆˜µ◊≤„«˝∂Ø°£∏˘æ› stm32h750b_discovery_mmc.cŒƒº˛–ﬁ∏ƒ°£
+*	Ê®°ÂùóÂêçÁß∞ : emmcÈ©±Âä®Ê®°Âùó
+*	Êñá‰ª∂ÂêçÁß∞ : bsp_emmc.c
+*	Áâà    Êú¨ : V1.0
+*	ËØ¥    Êòé : emmcÂ≠òÂÇ®Âô®Â∫ïÂ±ÇÈ©±Âä®„ÄÇÊ†πÊçÆ stm32h750b_discovery_mmc.cÊñá‰ª∂‰øÆÊîπ„ÄÇ
 *
-*	–ﬁ∏ƒº«¬º :
-*		∞Ê±æ∫≈  »’∆⁄        ◊˜’ﬂ     Àµ√˜
-*		V1.0    2019-08-13  armfly  ’˝ Ω∑¢≤º
+*	‰øÆÊîπËÆ∞ÂΩï :
+*		ÁâàÊú¨Âè∑  Êó•Êúü        ‰ΩúËÄÖ     ËØ¥Êòé
+*		V1.0    2019-08-13  armfly  Ê≠£ÂºèÂèëÂ∏É
 *
-*	Copyright (C), 2018-2030, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2018-2030, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
 
 /*
-	1. –ﬁ∏ƒø®≤Â»ÎºÏ≤‚GPIOœ‡πÿ≈‰÷√
-	2. void SDMMC1_IRQHandler(void) ’‚∏ˆ÷–∂œ∑˛ŒÒ≥Ã–Ú∑≈µΩ±æŒƒº˛ƒ©Œ≤
+	1. ‰øÆÊîπÂç°ÊèíÂÖ•Ê£ÄÊµãGPIOÁõ∏ÂÖ≥ÈÖçÁΩÆ
+	2. void SDMMC1_IRQHandler(void) Ëøô‰∏™‰∏≠Êñ≠ÊúçÂä°Á®ãÂ∫èÊîæÂà∞Êú¨Êñá‰ª∂Êú´Â∞æ
 */
 
 /**
@@ -90,7 +90,6 @@
   * @{
   */
 
-
 /** @defgroup STM32H750B_DISCOVERY_MMC_Exported_Variables Exported Variables
   * @{
   */
@@ -98,7 +97,6 @@ MMC_HandleTypeDef uSdHandle;
 /**
   * @}
   */
-
 
 /** @defgroup STM32H750B_DISCOVERY_MMC_Exported_Functions  Exported Functions
   * @{
@@ -118,22 +116,22 @@ uint8_t BSP_MMC_Init(void)
   /* if CLKDIV = 0 then SDMMC Clock frequency = SDMMC Kernel Clock
      else SDMMC Clock frequency = SDMMC Kernel Clock / [2 * CLKDIV].
   */
-  uSdHandle.Init.ClockDiv            = 2;
-  uSdHandle.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-  uSdHandle.Init.ClockEdge           = SDMMC_CLOCK_EDGE_RISING;
+  uSdHandle.Init.ClockDiv = 2;
+  uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+  uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  uSdHandle.Init.BusWide             = SDMMC_BUS_WIDE_8B;
+  uSdHandle.Init.BusWide = SDMMC_BUS_WIDE_8B;
 
   /* Msp MMC initialization */
   BSP_MMC_MspInit(&uSdHandle, NULL);
 
   /* HAL MMC initialization */
-  if(HAL_MMC_Init(&uSdHandle) != HAL_OK)
+  if (HAL_MMC_Init(&uSdHandle) != HAL_OK)
   {
     mmc_state = MMC_ERROR;
   }
 
-  return  mmc_state;
+  return mmc_state;
 }
 
 /**
@@ -147,7 +145,7 @@ uint8_t BSP_MMC_DeInit(void)
   uSdHandle.Instance = SDMMC1;
 
   /* HAL MMC deinitialization */
-  if(HAL_MMC_DeInit(&uSdHandle) != HAL_OK)
+  if (HAL_MMC_DeInit(&uSdHandle) != HAL_OK)
   {
     mmc_state = MMC_ERROR;
   }
@@ -156,7 +154,7 @@ uint8_t BSP_MMC_DeInit(void)
   uSdHandle.Instance = SDMMC1;
   BSP_MMC_MspDeInit(&uSdHandle, NULL);
 
-  return  mmc_state;
+  return mmc_state;
 }
 
 /**
@@ -170,7 +168,7 @@ uint8_t BSP_MMC_DeInit(void)
 uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
 
-  if( HAL_MMC_ReadBlocks(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) == HAL_OK)
+  if (HAL_MMC_ReadBlocks(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) == HAL_OK)
   {
     return MMC_OK;
   }
@@ -178,7 +176,6 @@ uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlo
   {
     return MMC_ERROR;
   }
-
 }
 
 /**
@@ -192,7 +189,7 @@ uint8_t BSP_MMC_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlo
 uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
 
-  if( HAL_MMC_WriteBlocks(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) == HAL_OK)
+  if (HAL_MMC_WriteBlocks(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) == HAL_OK)
   {
     return MMC_OK;
   }
@@ -212,7 +209,7 @@ uint8_t BSP_MMC_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfB
 uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
 {
 
-  if( HAL_MMC_ReadBlocks_DMA(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks) == HAL_OK)
+  if (HAL_MMC_ReadBlocks_DMA(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks) == HAL_OK)
   {
     return MMC_OK;
   }
@@ -232,7 +229,7 @@ uint8_t BSP_MMC_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumO
 uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
 {
 
-  if( HAL_MMC_WriteBlocks_DMA(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks) == HAL_OK)
+  if (HAL_MMC_WriteBlocks_DMA(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks) == HAL_OK)
   {
     return MMC_OK;
   }
@@ -240,7 +237,6 @@ uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t Nu
   {
     return MMC_ERROR;
   }
-
 }
 
 /**
@@ -252,7 +248,7 @@ uint8_t BSP_MMC_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t Nu
 uint8_t BSP_MMC_Erase(uint32_t StartAddr, uint32_t EndAddr)
 {
 
-  if( HAL_MMC_Erase(&uSdHandle, StartAddr, EndAddr) == HAL_OK)
+  if (HAL_MMC_Erase(&uSdHandle, StartAddr, EndAddr) == HAL_OK)
   {
     return MMC_OK;
   }
@@ -282,11 +278,10 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-
   /* Common GPIO configuration */
-  gpio_init_structure.Mode      = GPIO_MODE_AF_PP;
-  gpio_init_structure.Pull      = GPIO_PULLUP;
-  gpio_init_structure.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+  gpio_init_structure.Mode = GPIO_MODE_AF_PP;
+  gpio_init_structure.Pull = GPIO_PULLUP;
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   gpio_init_structure.Alternate = GPIO_AF12_SDIO1;
 
   /* SDMMC GPIO CLKIN PB8, D0 PC8, D1 PC9, D2 PC10, D3 PC11, CK PC12, CMD PD2 */
@@ -301,11 +296,9 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   gpio_init_structure.Pin = GPIO_PIN_8 | GPIO_PIN_9;
   HAL_GPIO_Init(GPIOB, &gpio_init_structure);
 
-
   /* NVIC configuration for SDIO interrupts */
   HAL_NVIC_SetPriority(SDMMC1_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
-
 }
 
 /**
@@ -316,16 +309,16 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   */
 __weak void BSP_MMC_MspDeInit(MMC_HandleTypeDef *hmmc, void *Params)
 {
-    /* Disable NVIC for SDIO interrupts */
-    HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
+  /* Disable NVIC for SDIO interrupts */
+  HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
 
-    /* DeInit GPIO pins can be done in the application
+  /* DeInit GPIO pins can be done in the application
        (by surcharging this __weak function) */
 
-    /* Disable SDMMC1 clock */
-    __HAL_RCC_SDMMC1_CLK_DISABLE();
+  /* Disable SDMMC1 clock */
+  __HAL_RCC_SDMMC1_CLK_DISABLE();
 
-    /* GPIO pins clock and DMA clocks can be shut down in the application
+  /* GPIO pins clock and DMA clocks can be shut down in the application
        by surcharging this __weak function */
 }
 
@@ -340,9 +333,8 @@ void BSP_MMC_IRQHandler(void)
 
 void SDMMC1_IRQHandler(void)
 {
-	HAL_MMC_IRQHandler(&uSdHandle);
+  HAL_MMC_IRQHandler(&uSdHandle);
 }
-
 
 /**
   * @brief  Gets the current MMC card data status.
@@ -354,9 +346,8 @@ void SDMMC1_IRQHandler(void)
   */
 uint8_t BSP_MMC_GetCardState(void)
 {
-  return((HAL_MMC_GetCardState(&uSdHandle) == HAL_MMC_CARD_TRANSFER ) ? MMC_TRANSFER_OK : MMC_TRANSFER_BUSY);
+  return ((HAL_MMC_GetCardState(&uSdHandle) == HAL_MMC_CARD_TRANSFER) ? MMC_TRANSFER_OK : MMC_TRANSFER_BUSY);
 }
-
 
 /**
   * @brief  Get MMC information about specific MMC card.
@@ -377,7 +368,6 @@ void HAL_MMC_AbortCallback(MMC_HandleTypeDef *hmmc)
 {
   BSP_MMC_AbortCallback();
 }
-
 
 /**
   * @brief Tx Transfer completed callbacks
@@ -405,7 +395,6 @@ void HAL_MMC_RxCpltCallback(MMC_HandleTypeDef *hmmc)
   */
 __weak void BSP_MMC_AbortCallback(void)
 {
-
 }
 
 /**
@@ -414,7 +403,6 @@ __weak void BSP_MMC_AbortCallback(void)
   */
 __weak void BSP_MMC_WriteCpltCallback(void)
 {
-
 }
 
 /**
@@ -423,7 +411,6 @@ __weak void BSP_MMC_WriteCpltCallback(void)
   */
 __weak void BSP_MMC_ReadCpltCallback(void)
 {
-
 }
 /**
   * @}

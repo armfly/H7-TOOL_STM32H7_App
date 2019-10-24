@@ -1,20 +1,20 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : H7-TOOL À©Õ¹IOÇý¶¯³ÌÐò
-*	ÎÄ¼þÃû³Æ : bsp_fmc_io.h
-*	Ëµ    Ã÷ :
+*	æ¨¡å—åç§° : H7-TOOL æ‰©å±•IOé©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_fmc_io.h
+*	è¯´    æ˜Ž :
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 #ifndef __BSP_FMC_IO_H
 #define __BSP_FMC_IO_H
 
-#define  EIO_READ_FMC()	 *(uint16_t *)0x60001000
+#define EIO_READ_FMC() *(uint16_t *)0x60001000
 
-/* ¹©Íâ²¿µ÷ÓÃµÄº¯ÊýÉùÃ÷ */
+/* ä¾›å¤–éƒ¨è°ƒç”¨çš„å‡½æ•°å£°æ˜Ž */
 enum
 {
 	EIO_D0 = 0,
@@ -25,33 +25,32 @@ enum
 	EIO_D5,
 	EIO_D6,
 	EIO_D7,
-	
-	EIO_D8,		
-	EIO_D9,		
-	
-	EIO_D10,	/* TTL_TX */
-	EIO_D11,	/* TTL_RX */
-	
-	EIO_D12,	/* CAM_TX */
-	EIO_D13,	/* CAM_RX */
-	
-	
-	EIO_485_TXEN = 100,		/* RS485·½Ïò¿ØÖÆ */
+
+	EIO_D8,
+	EIO_D9,
+
+	EIO_D10, /* TTL_TX */
+	EIO_D11, /* TTL_RX */
+
+	EIO_D12, /* CAM_TX */
+	EIO_D13, /* CAM_RX */
+
+	EIO_485_TXEN = 100, /* RS485æ–¹å‘æŽ§åˆ¶ */
 };
 
-/* IO¹¦ÄÜÑ¡Ôñ */
+/* IOåŠŸèƒ½é€‰æ‹© */
 typedef enum
-{	
-	ES_GPIO_IN  = 0,		/* GPIO ÊäÈë£¬ FMCÊäÈë */
-	ES_GPIO_OUT = 1,		/* GPIO Êä³ö£¬ FMCÊäÈë */
-	ES_FMC_OUT  = 2,		/* GPIO ÊäÈë£¬ FMCÊä³ö */
-	
-	ES_FMC_NOE	= 3,		/* D8×¨ÓÃ£¬FMC_D8ºÍFMC_NOE²¢Áª */
-	ES_FMC_NWE	= 4,		/* D9×¨ÓÃ£¬FMC_D9ºÍFMC_NWE²¢Áª */
-	
-	ES_GPIO_UART  = 5,		/* ×÷ÎªGPIO´®¿Ú¹¦ÄÜ */
-	ES_GPIO_CAN = 6,		/* CAN¹¦ÄÜ */
-}EIO_SELECT_E;
+{
+	ES_GPIO_IN = 0,	/* GPIO è¾“å…¥ï¼Œ FMCè¾“å…¥ */
+	ES_GPIO_OUT = 1, /* GPIO è¾“å‡ºï¼Œ FMCè¾“å…¥ */
+	ES_FMC_OUT = 2,	/* GPIO è¾“å…¥ï¼Œ FMCè¾“å‡º */
+
+	ES_FMC_NOE = 3, /* D8ä¸“ç”¨ï¼ŒFMC_D8å’ŒFMC_NOEå¹¶è” */
+	ES_FMC_NWE = 4, /* D9ä¸“ç”¨ï¼ŒFMC_D9å’ŒFMC_NWEå¹¶è” */
+
+	ES_GPIO_UART = 5, /* ä½œä¸ºGPIOä¸²å£åŠŸèƒ½ */
+	ES_GPIO_CAN = 6,	/* CANåŠŸèƒ½ */
+} EIO_SELECT_E;
 
 void bsp_InitExtIO(void);
 void EIO_ConfigPort(uint8_t _eio, EIO_SELECT_E _mode);
@@ -78,4 +77,4 @@ uint16_t EIO_ReadFMC(void);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

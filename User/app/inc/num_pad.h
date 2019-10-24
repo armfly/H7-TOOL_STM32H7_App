@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : mainÄ£¿é
-*	ÎÄ¼şÃû³Æ : main.h
-*	°æ    ±¾ : V1.1
+*	æ¨¡å—åç§° : mainæ¨¡å—
+*	æ–‡ä»¶åç§° : main.h
+*	ç‰ˆ    æœ¬ : V1.1
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,28 +13,27 @@
 #ifndef _MAIN_H_
 #define _MAIN_H
 
-
 typedef enum
 {
-	NUMPAD_IP = 0,			/* IPµØÖ· */
-	NUMPAD_TEL = 1,			/* µç»°ºÅÂë */
-	NUMPAD_INT = 2,			/* ÕûÊı£¨´ø·¶Î§ÅĞ¶Ï£© */
-	NUMPAD_STR = 3			/* ÈÎÒâ×ÖÄ¸Êı×Ö Ğ¡Êıµã */	
-}NUMPAD_MODE_E;
+	NUMPAD_IP = 0,	/* IPåœ°å€ */
+	NUMPAD_TEL = 1, /* ç”µè¯å·ç  */
+	NUMPAD_INT = 2, /* æ•´æ•°ï¼ˆå¸¦èŒƒå›´åˆ¤æ–­ï¼‰ */
+	NUMPAD_STR = 3	/* ä»»æ„å­—æ¯æ•°å­— å°æ•°ç‚¹ */
+} NUMPAD_MODE_E;
 
-/* ĞÎ²ÎÀàĞÍ0£º IPµØÖ· */
+/* å½¢å‚ç±»å‹0ï¼š IPåœ°å€ */
 typedef struct
 {
 	uint8_t ip_buf[4];
-}NUMPAD_IP_T;
+} NUMPAD_IP_T;
 
-/* ĞÎ²ÎÀàĞÍ1£ºÖ§³ÖĞ¡Êıµã */
+/* å½¢å‚ç±»å‹1ï¼šæ”¯æŒå°æ•°ç‚¹ */
 typedef struct
 {
-	int32_t Min;	/* ×îĞ¡Öµ */
-	int32_t Max;	/* ×î´óÖµ */
-	uint8_t DotNum;	/* Ğ¡ÊıµãÎ»Êı */
-}NUMPAD_INT_T;
+	int32_t Min;		/* æœ€å°å€¼ */
+	int32_t Max;		/* æœ€å¤§å€¼ */
+	uint8_t DotNum; /* å°æ•°ç‚¹ä½æ•° */
+} NUMPAD_INT_T;
 
 void DispInvlidInput(void);
 uint8_t InputNumber(NUMPAD_MODE_E _Mode, char *_Caption, void *_pInParam, void *_pOutParam);
@@ -43,5 +42,4 @@ uint8_t InputInt(char *_Caption, int32_t _min, int32_t _max, int32_t *_value);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
-
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

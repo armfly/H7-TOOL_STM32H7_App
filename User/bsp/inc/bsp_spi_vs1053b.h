@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : VS1053B mp3½âÂëÆ÷Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_vs1053b.h
-*	Ëµ    Ã÷ : VS1053BĞ¾Æ¬µ×²ãÇı¶¯¡£
+*	æ¨¡å—åç§° : VS1053B mp3è§£ç å™¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_vs1053b.h
+*	è¯´    æ˜ : VS1053BèŠ¯ç‰‡åº•å±‚é©±åŠ¨ã€‚
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,7 +13,7 @@
 #ifndef __BSP_VS1053B_H
 #define __BSP_VS1053B_H
 
-/* Ğ¾Æ¬°æ±¾£¬Ò²¾ÍÊÇĞ¾Æ¬ĞÍºÅÊ¶±ğ */
+/* èŠ¯ç‰‡ç‰ˆæœ¬ï¼Œä¹Ÿå°±æ˜¯èŠ¯ç‰‡å‹å·è¯†åˆ« */
 enum
 {
 	VS1001 = 0,
@@ -25,46 +25,46 @@ enum
 	VS1103 = 7
 };
 
-#define VS_WRITE_COMMAND 	0x02
-#define VS_READ_COMMAND 	0x03
+#define VS_WRITE_COMMAND 0x02
+#define VS_READ_COMMAND 0x03
 
-/* ¼Ä´æÆ÷¶¨Òå */
-#define SCI_MODE        	0x00
-#define SCI_STATUS      	0x01
-#define SCI_BASS        	0x02
-#define SCI_CLOCKF      	0x03
-#define SCI_DECODE_TIME 	0x04
-#define SCI_AUDATA      	0x05
-#define SCI_WRAM        	0x06
-#define SCI_WRAMADDR    	0x07
-#define SCI_HDAT0       	0x08
-#define SCI_HDAT1       	0x09
+/* å¯„å­˜å™¨å®šä¹‰ */
+#define SCI_MODE 0x00
+#define SCI_STATUS 0x01
+#define SCI_BASS 0x02
+#define SCI_CLOCKF 0x03
+#define SCI_DECODE_TIME 0x04
+#define SCI_AUDATA 0x05
+#define SCI_WRAM 0x06
+#define SCI_WRAMADDR 0x07
+#define SCI_HDAT0 0x08
+#define SCI_HDAT1 0x09
 
-#define SCI_AIADDR      	0x0a
-#define SCI_VOL         	0x0b
-#define SCI_AICTRL0     	0x0c
-#define SCI_AICTRL1     	0x0d
-#define SCI_AICTRL2     	0x0e
-#define SCI_AICTRL3     	0x0f
-#define SM_DIFF         	0x01
-#define SM_JUMP         	0x02
-#define SM_RESET        	0x04
-#define SM_OUTOFWAV     	0x08
-#define SM_PDOWN        	0x10
-#define SM_TESTS        	0x20
-#define SM_STREAM       	0x40
-#define SM_PLUSV        	0x80
-#define SM_DACT         	0x100
-#define SM_SDIORD       	0x200
-#define SM_SDISHARE     	0x400
-#define SM_SDINEW       	0x800
-#define SM_ADPCM        	0x1000
-#define SM_ADPCM_HP     	0x2000
+#define SCI_AIADDR 0x0a
+#define SCI_VOL 0x0b
+#define SCI_AICTRL0 0x0c
+#define SCI_AICTRL1 0x0d
+#define SCI_AICTRL2 0x0e
+#define SCI_AICTRL3 0x0f
+#define SM_DIFF 0x01
+#define SM_JUMP 0x02
+#define SM_RESET 0x04
+#define SM_OUTOFWAV 0x08
+#define SM_PDOWN 0x10
+#define SM_TESTS 0x20
+#define SM_STREAM 0x40
+#define SM_PLUSV 0x80
+#define SM_DACT 0x100
+#define SM_SDIORD 0x200
+#define SM_SDISHARE 0x400
+#define SM_SDINEW 0x800
+#define SM_ADPCM 0x1000
+#define SM_ADPCM_HP 0x2000
 
-/* ÓÃÓÚÒôÁ¿µ÷½Úº¯ÊıĞÎ²ÎµÄºê£¬ÒÑÈ¡254µÄÄ£ */
-#define VS_VOL_MUTE			0    /* ¾²Òô */
-#define VS_VOL_MAX			254  /* ×î´ó */
-#define VS_VOL_MIN			0    /* ×îĞ¡ */
+/* ç”¨äºéŸ³é‡è°ƒèŠ‚å‡½æ•°å½¢å‚çš„å®ï¼Œå·²å–254çš„æ¨¡ */
+#define VS_VOL_MUTE 0	/* é™éŸ³ */
+#define VS_VOL_MAX 254 /* æœ€å¤§ */
+#define VS_VOL_MIN 0	 /* æœ€å° */
 
 void VS1053_Init(void);
 uint8_t VS1053_TestRam(void);
@@ -86,20 +86,3 @@ uint8_t VS1053_WaitTimeOut(void);
 void VS1053_SetBASS(int8_t _cHighAmp, uint16_t _usHighFreqCut, uint8_t _ucLowAmp, uint16_t _usLowFreqCut);
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

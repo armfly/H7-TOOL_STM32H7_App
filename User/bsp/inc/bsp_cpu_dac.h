@@ -1,11 +1,11 @@
-	/*
+/*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : DACÇı¶¯Ä£¿é 
-*	ÎÄ¼şÃû³Æ : bsp_cpu_dac.h
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : DACé©±åŠ¨æ¨¡å— 
+*	æ–‡ä»¶åç§° : bsp_cpu_dac.h
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,10 +19,10 @@ typedef enum
 	DAC_WAVE_SIN,
 	DAC_WAVE_SQUARE,
 	DAC_WAVE_TRI
-}DAC_WAVE_TYPE_E;
+} DAC_WAVE_TYPE_E;
 
-/* ²¨ĞÎ¿ØÖÆ½á¹¹ */
-typedef struct 
+/* æ³¢å½¢æ§åˆ¶ç»“æ„ */
+typedef struct
 {
 	uint8_t Type;
 	uint8_t VoltRange;
@@ -33,16 +33,16 @@ typedef struct
 	uint32_t CycleCount;
 	uint32_t CycleSetting;
 	uint8_t Run;
-}DAC_WAVE_T;
-	
-/* ÕâĞ©º¯ÊıÊÇÍ¨ÓÃµÄÉèÖÃ£¬Èí¼ş¿ØÖÆDACÊı¾İ */
+} DAC_WAVE_T;
+
+/* è¿™äº›å‡½æ•°æ˜¯é€šç”¨çš„è®¾ç½®ï¼Œè½¯ä»¶æ§åˆ¶DACæ•°æ® */
 void bsp_InitDAC1(void);
 void bsp_SetDAC1(uint16_t _dac);
 
 void bsp_InitDAC2(void);
 void bsp_SetDAC2(uint16_t _dac);
 
-/* ÏÂÃæµÄº¯ÊıÓÃÓÚDMA²¨ĞÎ·¢ÉúÆ÷ */
+/* ä¸‹é¢çš„å‡½æ•°ç”¨äºDMAæ³¢å½¢å‘ç”Ÿå™¨ */
 void dac1_InitForDMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq);
 void dac2_SetSinWave(uint16_t _low, uint16_t _high, uint32_t _freq);
 void dac1_SetRectWave(uint16_t _low, uint16_t _high, uint32_t _freq, uint16_t _duty);
@@ -64,6 +64,6 @@ int16_t dac1_CurrToDac(int16_t _curr);
 extern uint16_t g_Wave1[128];
 extern uint16_t g_Wave2[128];
 
-extern DAC_WAVE_T g_tDacWave;	
+extern DAC_WAVE_T g_tDacWave;
 
 #endif

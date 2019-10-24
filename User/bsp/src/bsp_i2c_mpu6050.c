@@ -1,39 +1,39 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÈýÖáÍÓÂÝÒÇMPU-6050Çý¶¯Ä£¿é
-*	ÎÄ¼þÃû³Æ : bsp_mpu6050.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ÊµÏÖMPU-6050µÄ¶ÁÐ´²Ù×÷¡£
+*	æ¨¡å—åç§° : ä¸‰è½´é™€èžºä»ªMPU-6050é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_mpu6050.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜Ž : å®žçŽ°MPU-6050çš„è¯»å†™æ“ä½œã€‚
 *
-*	ÐÞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕýÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜Ž
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 /*
-	Ó¦ÓÃËµÃ÷£º·ÃÎÊMPU-6050Ç°£¬ÇëÏÈµ÷ÓÃÒ»´Î bsp_InitI2C()º¯ÊýÅäÖÃºÃI2CÏà¹ØµÄGPIO.
+	åº”ç”¨è¯´æ˜Žï¼šè®¿é—®MPU-6050å‰ï¼Œè¯·å…ˆè°ƒç”¨ä¸€æ¬¡ bsp_InitI2C()å‡½æ•°é…ç½®å¥½I2Cç›¸å…³çš„GPIO.
 */
 
 #include "bsp.h"
 
-MPU6050_T g_tMPU6050;		/* ¶¨ÒåÒ»¸öÈ«¾Ö±äÁ¿£¬±£´æÊµÊ±Êý¾Ý */
+MPU6050_T g_tMPU6050; /* å®šä¹‰ä¸€ä¸ªå…¨å±€å˜é‡ï¼Œä¿å­˜å®žæ—¶æ•°æ® */
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: bsp_InitMPU6050
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯MPU-6050
-*	ÐÎ    ²Î:  ÎÞ
-*	·µ »Ø Öµ: 1 ±íÊ¾Õý³££¬ 0 ±íÊ¾²»Õý³£
+*	å‡½ æ•° å: bsp_InitMPU6050
+*	åŠŸèƒ½è¯´æ˜Ž: åˆå§‹åŒ–MPU-6050
+*	å½¢    å‚:  æ— 
+*	è¿” å›ž å€¼: 1 è¡¨ç¤ºæ­£å¸¸ï¼Œ 0 è¡¨ç¤ºä¸æ­£å¸¸
 *********************************************************************************************************
 */
 void bsp_InitMPU6050(void)
 {
-	MPU6050_WriteByte(PWR_MGMT_1, 0x00);	//½â³ýÐÝÃß×´Ì¬
+	MPU6050_WriteByte(PWR_MGMT_1, 0x00); //è§£é™¤ä¼‘çœ çŠ¶æ€
 	MPU6050_WriteByte(SMPLRT_DIV, 0x07);
 	MPU6050_WriteByte(CONFIG, 0x06);
 	MPU6050_WriteByte(GYRO_CONFIG, 0xE8);
@@ -42,65 +42,64 @@ void bsp_InitMPU6050(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MPU6050_WriteByte
-*	¹¦ÄÜËµÃ÷: Ïò MPU-6050 ¼Ä´æÆ÷Ð´ÈëÒ»¸öÊý¾Ý
-*	ÐÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*			  _ucRegData : ¼Ä´æÆ÷Êý¾Ý
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MPU6050_WriteByte
+*	åŠŸèƒ½è¯´æ˜Ž: å‘ MPU-6050 å¯„å­˜å™¨å†™å…¥ä¸€ä¸ªæ•°æ®
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*			  _ucRegData : å¯„å­˜å™¨æ•°æ®
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MPU6050_WriteByte(uint8_t _ucRegAddr, uint8_t _ucRegData)
 {
-    i2c_Start();							/* ×ÜÏß¿ªÊ¼ÐÅºÅ */
+	i2c_Start(); /* æ€»çº¿å¼€å§‹ä¿¡å· */
 
-    i2c_SendByte(MPU6050_SLAVE_ADDRESS);	/* ·¢ËÍÉè±¸µØÖ·+Ð´ÐÅºÅ */
+	i2c_SendByte(MPU6050_SLAVE_ADDRESS); /* å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å· */
 	i2c_WaitAck();
 
-    i2c_SendByte(_ucRegAddr);				/* ÄÚ²¿¼Ä´æÆ÷µØÖ· */
+	i2c_SendByte(_ucRegAddr); /* å†…éƒ¨å¯„å­˜å™¨åœ°å€ */
 	i2c_WaitAck();
 
-    i2c_SendByte(_ucRegData);				/* ÄÚ²¿¼Ä´æÆ÷Êý¾Ý */
+	i2c_SendByte(_ucRegData); /* å†…éƒ¨å¯„å­˜å™¨æ•°æ® */
 	i2c_WaitAck();
 
-    i2c_Stop();                   			/* ×ÜÏßÍ£Ö¹ÐÅºÅ */
+	i2c_Stop(); /* æ€»çº¿åœæ­¢ä¿¡å· */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MPU6050_ReadByte
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ MPU-6050 ¼Ä´æÆ÷µÄÊý¾Ý
-*	ÐÎ    ²Î: _ucRegAddr : ¼Ä´æÆ÷µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MPU6050_ReadByte
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å– MPU-6050 å¯„å­˜å™¨çš„æ•°æ®
+*	å½¢    å‚: _ucRegAddr : å¯„å­˜å™¨åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 uint8_t MPU6050_ReadByte(uint8_t _ucRegAddr)
 {
 	uint8_t ucData;
 
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ÐÅºÅ */
-	i2c_SendByte(MPU6050_SLAVE_ADDRESS);	/* ·¢ËÍÉè±¸µØÖ·+Ð´ÐÅºÅ */
+	i2c_Start();												 /* æ€»çº¿å¼€å§‹ä¿¡å· */
+	i2c_SendByte(MPU6050_SLAVE_ADDRESS); /* å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å· */
 	i2c_WaitAck();
-	i2c_SendByte(_ucRegAddr);     			/* ·¢ËÍ´æ´¢µ¥ÔªµØÖ· */
-	i2c_WaitAck();
-
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ÐÅºÅ */
-
-	i2c_SendByte(MPU6050_SLAVE_ADDRESS+1); 	/* ·¢ËÍÉè±¸µØÖ·+¶ÁÐÅºÅ */
+	i2c_SendByte(_ucRegAddr); /* å‘é€å­˜å‚¨å•å…ƒåœ°å€ */
 	i2c_WaitAck();
 
-	ucData = i2c_ReadByte();       			/* ¶Á³ö¼Ä´æÆ÷Êý¾Ý */
+	i2c_Start(); /* æ€»çº¿å¼€å§‹ä¿¡å· */
+
+	i2c_SendByte(MPU6050_SLAVE_ADDRESS + 1); /* å‘é€è®¾å¤‡åœ°å€+è¯»ä¿¡å· */
+	i2c_WaitAck();
+
+	ucData = i2c_ReadByte(); /* è¯»å‡ºå¯„å­˜å™¨æ•°æ® */
 	i2c_NAck();
-	i2c_Stop();                  			/* ×ÜÏßÍ£Ö¹ÐÅºÅ */
+	i2c_Stop(); /* æ€»çº¿åœæ­¢ä¿¡å· */
 	return ucData;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MPU6050_ReadData
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ MPU-6050 Êý¾Ý¼Ä´æÆ÷£¬ ½á¹û±£´æÔÚÈ«¾Ö±äÁ¿ g_tMPU6050.  Ö÷³ÌÐò¿ÉÒÔ¶¨Ê±µ÷ÓÃ¸Ã³ÌÐòË¢ÐÂÊý¾Ý
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MPU6050_ReadData
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å– MPU-6050 æ•°æ®å¯„å­˜å™¨ï¼Œ ç»“æžœä¿å­˜åœ¨å…¨å±€å˜é‡ g_tMPU6050.  ä¸»ç¨‹åºå¯ä»¥å®šæ—¶è°ƒç”¨è¯¥ç¨‹åºåˆ·æ–°æ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MPU6050_ReadData(void)
@@ -109,53 +108,53 @@ void MPU6050_ReadData(void)
 	uint8_t i;
 	uint8_t ack;
 
-#if 1 /* Á¬Ðø¶Á */
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ÐÅºÅ */
-	i2c_SendByte(MPU6050_SLAVE_ADDRESS);	/* ·¢ËÍÉè±¸µØÖ·+Ð´ÐÅºÅ */
+#if 1																	 /* è¿žç»­è¯» */
+	i2c_Start();												 /* æ€»çº¿å¼€å§‹ä¿¡å· */
+	i2c_SendByte(MPU6050_SLAVE_ADDRESS); /* å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å· */
 	ack = i2c_WaitAck();
 	if (ack != 0)
 	{
-		i2c_Stop(); 
+		i2c_Stop();
 		return;
 	}
-	i2c_SendByte(ACCEL_XOUT_H);     		/* ·¢ËÍ´æ´¢µ¥ÔªµØÖ·  */
+	i2c_SendByte(ACCEL_XOUT_H); /* å‘é€å­˜å‚¨å•å…ƒåœ°å€  */
 	ack = i2c_WaitAck();
 	if (ack != 0)
 	{
-		i2c_Stop(); 
+		i2c_Stop();
 		return;
 	}
 
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ÐÅºÅ */
+	i2c_Start(); /* æ€»çº¿å¼€å§‹ä¿¡å· */
 
-	i2c_SendByte(MPU6050_SLAVE_ADDRESS + 1); /* ·¢ËÍÉè±¸µØÖ·+¶ÁÐÅºÅ */
+	i2c_SendByte(MPU6050_SLAVE_ADDRESS + 1); /* å‘é€è®¾å¤‡åœ°å€+è¯»ä¿¡å· */
 	ack = i2c_WaitAck();
 	if (ack != 0)
 	{
-		i2c_Stop(); 
+		i2c_Stop();
 		return;
 	}
 
 	for (i = 0; i < 13; i++)
 	{
-		ucReadBuf[i] = i2c_ReadByte();       			/* ¶Á³ö¼Ä´æÆ÷Êý¾Ý */
+		ucReadBuf[i] = i2c_ReadByte(); /* è¯»å‡ºå¯„å­˜å™¨æ•°æ® */
 		i2c_Ack();
 	}
 
-	/* ¶Á×îºóÒ»¸ö×Ö½Ú£¬Ê±¸ø NAck */
+	/* è¯»æœ€åŽä¸€ä¸ªå­—èŠ‚ï¼Œæ—¶ç»™ NAck */
 	ucReadBuf[13] = i2c_ReadByte();
 	i2c_NAck();
 
-	i2c_Stop();                  			/* ×ÜÏßÍ£Ö¹ÐÅºÅ */
+	i2c_Stop(); /* æ€»çº¿åœæ­¢ä¿¡å· */
 
-#else	/* µ¥×Ö½Ú¶Á */
-	for (i = 0 ; i < 14; i++)
+#else /* å•å­—èŠ‚è¯» */
+	for (i = 0; i < 14; i++)
 	{
 		ucReadBuf[i] = MPU6050_ReadByte(ACCEL_XOUT_H + i);
 	}
 #endif
 
-	/* ½«¶Á³öµÄÊý¾Ý±£´æµ½È«¾Ö½á¹¹Ìå±äÁ¿ */
+	/* å°†è¯»å‡ºçš„æ•°æ®ä¿å­˜åˆ°å…¨å±€ç»“æž„ä½“å˜é‡ */
 	g_tMPU6050.Accel_X = (ucReadBuf[0] << 8) + ucReadBuf[1];
 	g_tMPU6050.Accel_Y = (ucReadBuf[2] << 8) + ucReadBuf[3];
 	g_tMPU6050.Accel_Z = (ucReadBuf[4] << 8) + ucReadBuf[5];
@@ -167,4 +166,4 @@ void MPU6050_ReadData(void)
 	g_tMPU6050.GYRO_Z = (ucReadBuf[12] << 8) + ucReadBuf[13];
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µÈ´ı¿ª·¢µÄ³ÌĞò½çÃæ
-*	ÎÄ¼şÃû³Æ : reserve.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔMPU-6050, HCM5833L, BMP085, BH1750
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
+*	æ¨¡å—åç§° : ç­‰å¾…å¼€å‘çš„ç¨‹åºç•Œé¢
+*	æ–‡ä»¶åç§° : reserve.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•MPU-6050, HCM5833L, BMP085, BH1750
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,72 +17,76 @@
 #include "bsp.h"
 #include "form_reserve.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
-	LABEL_T Label7; LABEL_T Label8;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
+	LABEL_T Label7;
+	LABEL_T Label8;
 
 	BUTTON_T BtnRet;
-}FormRSV_T;
+} FormRSV_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"³ÌĞò¿ª·¢ÖĞ..."
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "ç¨‹åºå¼€å‘ä¸­..."
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"xxxx : "
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "xxxx : "
 
-	#define LABEL2_X  	(LABEL1_X + 64)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"0000.0000"
+#define LABEL2_X (LABEL1_X + 64)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "0000.0000"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"xxxx : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "xxxx : "
 
-	#define LABEL4_X  	(LABEL3_X + 64)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"00000.0000"
+#define LABEL4_X (LABEL3_X + 64)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "00000.0000"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"xxxx : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "xxxx : "
 
-	#define LABEL6_X  	(LABEL5_X + 64)
-	#define LABEL6_Y	LABEL5_Y
-	#define LABEL6_TEXT	"0.0"
+#define LABEL6_X (LABEL5_X + 64)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT "0.0"
 
-#define LABEL7_X  	(LABEL1_X)
-#define LABEL7_Y	(LABEL1_Y + 20 * 3)
-#define LABEL7_TEXT	"xxxx : "
+#define LABEL7_X (LABEL1_X)
+#define LABEL7_Y (LABEL1_Y + 20 * 3)
+#define LABEL7_TEXT "xxxx : "
 
-	#define LABEL8_X  	(LABEL7_X + 64)
-	#define LABEL8_Y	LABEL7_Y
-	#define LABEL8_TEXT	"0.0"
+#define LABEL8_X (LABEL7_X + 64)
+#define LABEL8_Y LABEL7_Y
+#define LABEL8_TEXT "0.0"
 
 static void InitFormRSV(void);
 static void DispFormRSV(void);
@@ -91,93 +95,93 @@ FormRSV_T *FormRSV;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ReserveFunc
-*	¹¦ÄÜËµÃ÷: ±£Áô¹¦ÄÜ¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ReserveFunc
+*	åŠŸèƒ½è¯´æ˜: ä¿ç•™åŠŸèƒ½ã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ReserveFunc(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormRSV_T form;
 
-	FormRSV= &form;
+	FormRSV = &form;
 
 	InitFormRSV();
 
 	DispFormRSV();
 
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormRSV->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormRSV->BtnRet);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormRSV->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormRSV->BtnRet);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormRSV->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormRSV->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormRSV->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormRSV->BtnRet);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormRSV->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormRSV->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormRSV->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormRSV->BtnRet);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -185,39 +189,39 @@ void ReserveFunc(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormRSV
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormRSV
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormRSV(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormRSV->FontBox.FontCode = FC_ST_16;
-	FormRSV->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormRSV->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormRSV->FontBox.FrontColor = CL_BLACK;
 	FormRSV->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormRSV->FontBlack.FontCode = FC_ST_16;
-	FormRSV->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormRSV->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormRSV->FontBlack.FrontColor = CL_BLACK;
 	FormRSV->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormRSV->FontBlue.FontCode = FC_ST_16;
 	FormRSV->FontBlue.BackColor = CL_BTN_FACE;
 	FormRSV->FontBlue.FrontColor = CL_BLUE;
 	FormRSV->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormRSV->FontBtn.FontCode = FC_ST_16;
-	FormRSV->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormRSV->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormRSV->FontBtn.FrontColor = CL_BLACK;
 	FormRSV->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormRSV->Box1.Left = BOX1_X;
 	FormRSV->Box1.Top = BOX1_Y;
 	FormRSV->Box1.Height = BOX1_H;
@@ -225,7 +229,7 @@ static void InitFormRSV(void)
 	FormRSV->Box1.pCaption = BOX1_TEXT;
 	FormRSV->Box1.Font = &FormRSV->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormRSV->Label1.Left = LABEL1_X;
 	FormRSV->Label1.Top = LABEL1_Y;
 	FormRSV->Label1.MaxLen = 0;
@@ -250,7 +254,7 @@ static void InitFormRSV(void)
 	FormRSV->Label7.pCaption = LABEL7_TEXT;
 	FormRSV->Label7.Font = &FormRSV->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormRSV->Label2.Left = LABEL2_X;
 	FormRSV->Label2.Top = LABEL2_Y;
 	FormRSV->Label2.MaxLen = 0;
@@ -275,7 +279,7 @@ static void InitFormRSV(void)
 	FormRSV->Label8.pCaption = LABEL8_TEXT;
 	FormRSV->Label8.Font = &FormRSV->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormRSV->BtnRet.Left = BTN_RET_X;
 	FormRSV->BtnRet.Top = BTN_RET_Y;
 	FormRSV->BtnRet.Height = BTN_RET_H;
@@ -287,33 +291,33 @@ static void InitFormRSV(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormRSV
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormRSV
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormRSV(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormRSV->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormRSV->Label1);
 	LCD_DrawLabel(&FormRSV->Label3);
 	LCD_DrawLabel(&FormRSV->Label5);
 	LCD_DrawLabel(&FormRSV->Label7);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormRSV->Label2);
 	LCD_DrawLabel(&FormRSV->Label4);
 	LCD_DrawLabel(&FormRSV->Label6);
 	LCD_DrawLabel(&FormRSV->Label8);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormRSV->BtnRet);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

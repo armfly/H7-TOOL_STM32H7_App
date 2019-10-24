@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ST7735 TFT SPI½Ó¿ÚÇı¶¯³ÌĞò
-*	ÎÄ¼şÃû³Æ : bsp_tft_st7735.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : SPI½Ó¿Ú£¬ÏÔÊ¾Çı¶¯ICÎªST7735£¬·Ö±æÂÊÎª128*128
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
+*	æ¨¡å—åç§° : ST7735 TFT SPIæ¥å£é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_tft_st7735.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : SPIæ¥å£ï¼Œæ˜¾ç¤ºé©±åŠ¨ICä¸ºST7735ï¼Œåˆ†è¾¨ç‡ä¸º128*128
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
 *		V1.0	2018-12-06 armfly 
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,7 +18,7 @@
 #include "fonts.h"
 
 /*
-	H7-TOOL LCD¿ÚÏß·ÖÅä
+	H7-TOOL LCDå£çº¿åˆ†é…
 	
 	PF3  --->  LCD_RS
 	PG2	 --->  LCD_CS
@@ -27,110 +27,110 @@
 	
 	PH9	 --->  BACK_LIGHT	TIM12_CH2
 	
-	µÚ2°æÔö¼Óreset
+	ç¬¬2ç‰ˆå¢åŠ reset
 	
 	PB6  --->  LCD_RESET
 */
 
+#define ALL_LCD_GPIO_CLK_ENABLE() \
+	__HAL_RCC_GPIOC_CLK_ENABLE();   \
+	__HAL_RCC_GPIOF_CLK_ENABLE();   \
+	__HAL_RCC_GPIOG_CLK_ENABLE();   \
+	__HAL_RCC_GPIOB_CLK_ENABLE();
 
-#define ALL_LCD_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOC_CLK_ENABLE();	\
-									__HAL_RCC_GPIOF_CLK_ENABLE();	\
-									__HAL_RCC_GPIOG_CLK_ENABLE();	\
-									__HAL_RCC_GPIOB_CLK_ENABLE();
+/* LCD_RS å¯„å­˜å™¨é€‰æ‹© */
+#define LCD_RS_GPIO GPIOF
+#define LCD_RS_PIN GPIO_PIN_3
+#define LCD_RS_0() LCD_RS_GPIO->BSRRH = LCD_RS_PIN
+#define LCD_RS_1() LCD_RS_GPIO->BSRRL = LCD_RS_PIN
 
-/* LCD_RS ¼Ä´æÆ÷Ñ¡Ôñ */
-#define LCD_RS_GPIO		GPIOF
-#define LCD_RS_PIN		GPIO_PIN_3
-#define LCD_RS_0()  	LCD_RS_GPIO->BSRRH = LCD_RS_PIN	
-#define LCD_RS_1()  	LCD_RS_GPIO->BSRRL = LCD_RS_PIN
+/* LCD_CS SPIç‰‡é€‰*/
+#define LCD_CS_GPIO GPIOG
+#define LCD_CS_PIN GPIO_PIN_2
+#define LCD_CS_0() LCD_CS_GPIO->BSRRH = LCD_CS_PIN
+#define LCD_CS_1() LCD_CS_GPIO->BSRRL = LCD_CS_PIN
 
-/* LCD_CS SPIÆ¬Ñ¡*/
-#define LCD_CS_GPIO		GPIOG
-#define LCD_CS_PIN		GPIO_PIN_2
-#define LCD_CS_0()  	LCD_CS_GPIO->BSRRH = LCD_CS_PIN	
-#define LCD_CS_1()  	LCD_CS_GPIO->BSRRL = LCD_CS_PIN
+/* SPI æ¥å£ PC12/SPI3_MOSIï¼Œ  PC10/SPI3_SCK */
+#define LCD_SCK_GPIO GPIOC
+#define LCD_SCK_PIN GPIO_PIN_10
+#define LCD_SCK_0() LCD_SCK_GPIO->BSRRH = LCD_SCK_PIN
+#define LCD_SCK_1() LCD_SCK_GPIO->BSRRL = LCD_SCK_PIN
 
-/* SPI ½Ó¿Ú PC12/SPI3_MOSI£¬  PC10/SPI3_SCK */
-#define LCD_SCK_GPIO	GPIOC
-#define LCD_SCK_PIN		GPIO_PIN_10
-#define LCD_SCK_0()  	LCD_SCK_GPIO->BSRRH = LCD_SCK_PIN	
-#define LCD_SCK_1()  	LCD_SCK_GPIO->BSRRL = LCD_SCK_PIN
+#define LCD_SDA_GPIO GPIOC
+#define LCD_SDA_PIN GPIO_PIN_12
+#define LCD_SDA_0() LCD_SDA_GPIO->BSRRH = LCD_SDA_PIN
+#define LCD_SDA_1() LCD_SDA_GPIO->BSRRL = LCD_SDA_PIN
 
-#define LCD_SDA_GPIO	GPIOC
-#define LCD_SDA_PIN		GPIO_PIN_12
-#define LCD_SDA_0()  	LCD_SDA_GPIO->BSRRH = LCD_SDA_PIN	
-#define LCD_SDA_1()  	LCD_SDA_GPIO->BSRRL = LCD_SDA_PIN
-
-/* LCD_RESET ¸´Î» */
-#define LCD_RESET_GPIO	GPIOB
-#define LCD_RESET_PIN	GPIO_PIN_6
-#define LCD_RESET_0()  	LCD_RESET_GPIO->BSRRH = LCD_RESET_PIN	
-#define LCD_RESET_1()  	LCD_RESET_GPIO->BSRRL = LCD_RESET_PIN
+/* LCD_RESET å¤ä½ */
+#define LCD_RESET_GPIO GPIOB
+#define LCD_RESET_PIN GPIO_PIN_6
+#define LCD_RESET_0() LCD_RESET_GPIO->BSRRH = LCD_RESET_PIN
+#define LCD_RESET_1() LCD_RESET_GPIO->BSRRL = LCD_RESET_PIN
 
 static void ST7735_ConfigGPIO(void);
 static void ST7735_initial(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_InitHard
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯LCD
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_InitHard
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–LCD
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_InitHard(void)
 {
-	ST7735_ConfigGPIO();			/* ÅäÖÃ429 CPUÄÚ²¿LTDC */
-	
+	ST7735_ConfigGPIO(); /* é…ç½®429 CPUå†…éƒ¨LTDC */
+
 	ST7735_initial();
-	
-	g_LcdHeight = 128;			/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¸ß¶È */
-	g_LcdWidth = 128;			/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¿í¶È */
+
+	g_LcdHeight = 128; /* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-é«˜åº¦ */
+	g_LcdWidth = 128;	/* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-å®½åº¦ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_ConfigLTDC
-*	¹¦ÄÜËµÃ÷: ÅäÖÃLTDC
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_ConfigLTDC
+*	åŠŸèƒ½è¯´æ˜: é…ç½®LTDC
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ST7735_ConfigGPIO(void)
 {
-	/* ÅäÖÃGPIO */
+	/* é…ç½®GPIO */
 	{
 		GPIO_InitTypeDef gpio_init;
 
-		/* ´ò¿ªGPIOÊ±ÖÓ */
+		/* æ‰“å¼€GPIOæ—¶é’Ÿ */
 		ALL_LCD_GPIO_CLK_ENABLE();
-		
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* ÉèÖÃÍÆÍìÊä³ö */
-		gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */	
-		
-		gpio_init.Pin = LCD_RS_PIN;	
-		HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);	
-		
-		gpio_init.Pin = LCD_CS_PIN;	
-		HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);	
 
-		gpio_init.Pin = LCD_SCK_PIN;	
-		HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);	
+		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+		gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
 
-		gpio_init.Pin = LCD_SDA_PIN;	
-		HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);	
+		gpio_init.Pin = LCD_RS_PIN;
+		HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_RESET_PIN;	
-		HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);	
+		gpio_init.Pin = LCD_CS_PIN;
+		HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_SCK_PIN;
+		HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_SDA_PIN;
+		HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_RESET_PIN;
+		HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
 	}
 }
 
-/*Ğ´Ö¸Áîµ½ LCD Ä£¿é*/
+/*å†™æŒ‡ä»¤åˆ° LCD æ¨¡å—*/
 void transfer_command(int data1)
 {
 	char i;
-	
+
 	LCD_CS_0();
 	LCD_RS_0();
 	for (i = 0; i < 8; i++)
@@ -138,18 +138,18 @@ void transfer_command(int data1)
 		LCD_SCK_0();
 		if (data1 & 0x80)
 			LCD_SDA_1();
-		else 
+		else
 			LCD_SDA_0();
 		LCD_SCK_1();
 		data1 = data1 <<= 1;
 	}
 }
 
-/*Ğ´Êı¾İµ½ LCD Ä£¿é*/
+/*å†™æ•°æ®åˆ° LCD æ¨¡å—*/
 void transfer_data(int data1)
 {
 	char i;
-	
+
 	LCD_CS_0();
 	LCD_RS_1();
 	for (i = 0; i < 8; i++)
@@ -164,23 +164,23 @@ void transfer_data(int data1)
 	}
 }
 
-// Á¬Ğ´2¸ö×Ö½Ú£¨¼´ 16 Î»£©Êı¾İµ½LCDÄ£¿é
+// è¿å†™2ä¸ªå­—èŠ‚ï¼ˆå³ 16 ä½ï¼‰æ•°æ®åˆ°LCDæ¨¡å—
 void transfer_data_16(uint16_t data2)
 {
 	transfer_data(data2 >> 8);
 	transfer_data(data2);
 }
 
-//LCD ³õÊ¼»¯
+//LCD åˆå§‹åŒ–
 static void ST7735_initial(void)
 {
 	bsp_DelayUS(50 * 1000);
-	LCD_RESET_0();	/* µÍµçÆ½£º¸´Î» */
+	LCD_RESET_0(); /* ä½ç”µå¹³ï¼šå¤ä½ */
 	bsp_DelayUS(1000);
-	LCD_RESET_1(); /* ¸ßµçÆ½£º¸´Î»½áÊø */
+	LCD_RESET_1(); /* é«˜ç”µå¹³ï¼šå¤ä½ç»“æŸ */
 	bsp_DelayUS(10 * 1000);
-	
-	//¿ªÊ¼³õÊ¼»¯£º
+
+	//å¼€å§‹åˆå§‹åŒ–ï¼š
 	transfer_command(0x11);
 	transfer_command(0xb1);
 	transfer_data(0x01);
@@ -194,7 +194,7 @@ static void ST7735_initial(void)
 	transfer_data(0x01);
 	transfer_data(0x2c);
 	transfer_data(0x2d);
-		
+
 	transfer_data(0x01);
 	transfer_data(0x2d);
 	transfer_data(0x2d);
@@ -220,14 +220,14 @@ static void ST7735_initial(void)
 	transfer_data(0xee);
 	transfer_command(0xc5);
 	transfer_data(0x0e);
-	transfer_command(0x36); //ĞĞÉ¨ÃèË³Ğò£¬ÁĞÉ¨ÃèË³Ğò£¬ºá·Å/Êú·Å
-	transfer_data(0x08); 
-	//MX = 1£¨ĞĞµØÖ·Ë³Ğò£º´Ó×óµ½ÓÒ£©£¬MY = 1£¨ÁĞµØÖ·Ë³Ğò£º´ÓÉÏµ½ÏÂ£©£¬MV = 0£¨Êú·Å£©£¬ML = 0(×İÏòË¢ĞÂ£º
-	//´ÓÉÏµ½ÏÂ£©£¬RGB = 1£¨ÒÀ´ÎÎª RGB£©£¬MH = 0£¨ºáÏòË¢ĞÂË³Ğò£º´Ó×óµ½ÓÒ£©
-	//¶¨Òå£º"normal"¾ÍÊÇ¡°0xc8¡±---Õı³£Êú·Å;
-	//¶¨Òå£º"CW180"¾ÍÊÇ¡°0x08"---ÔÚÕı³£Êú·Å»ù´¡ÉÏ×ª 180 ¶ÈÊú·Å;
-	//¶¨Òå£º"CCW90¡±¾ÍÊÇ¡°0xa8"---ÔÚÊú·Å»ù´¡ÉÏÄæÊ±Õë×ª 90 ¶Èºá·Å;
-	//¶¨Òå£º¡°CW90¡±¾ÍÊÇ¡°0x68"---ÔÚÊú·Å»ù´¡ÉÏË³×ª 90 ¶Èºá·Å;
+	transfer_command(0x36); //è¡Œæ‰«æé¡ºåºï¼Œåˆ—æ‰«æé¡ºåºï¼Œæ¨ªæ”¾/ç«–æ”¾
+	transfer_data(0x08);
+	//MX = 1ï¼ˆè¡Œåœ°å€é¡ºåºï¼šä»å·¦åˆ°å³ï¼‰ï¼ŒMY = 1ï¼ˆåˆ—åœ°å€é¡ºåºï¼šä»ä¸Šåˆ°ä¸‹ï¼‰ï¼ŒMV = 0ï¼ˆç«–æ”¾ï¼‰ï¼ŒML = 0(çºµå‘åˆ·æ–°ï¼š
+	//ä»ä¸Šåˆ°ä¸‹ï¼‰ï¼ŒRGB = 1ï¼ˆä¾æ¬¡ä¸º RGBï¼‰ï¼ŒMH = 0ï¼ˆæ¨ªå‘åˆ·æ–°é¡ºåºï¼šä»å·¦åˆ°å³ï¼‰
+	//å®šä¹‰ï¼š"normal"å°±æ˜¯â€œ0xc8â€---æ­£å¸¸ç«–æ”¾;
+	//å®šä¹‰ï¼š"CW180"å°±æ˜¯â€œ0x08"---åœ¨æ­£å¸¸ç«–æ”¾åŸºç¡€ä¸Šè½¬ 180 åº¦ç«–æ”¾;
+	//å®šä¹‰ï¼š"CCW90â€å°±æ˜¯â€œ0xa8"---åœ¨ç«–æ”¾åŸºç¡€ä¸Šé€†æ—¶é’ˆè½¬ 90 åº¦æ¨ªæ”¾;
+	//å®šä¹‰ï¼šâ€œCW90â€å°±æ˜¯â€œ0x68"---åœ¨ç«–æ”¾åŸºç¡€ä¸Šé¡ºè½¬ 90 åº¦æ¨ªæ”¾;
 	transfer_command(0xff);
 	transfer_data(0x40);
 	transfer_data(0x03);
@@ -277,61 +277,61 @@ static void ST7735_initial(void)
 
 	transfer_data(0x02);
 	transfer_data(0x0f);
-	transfer_command(0x2a); //¶¨Òå X µØÖ·µÄ¿ªÊ¼¼°½áÊøÎ»ÖÃ
+	transfer_command(0x2a); //å®šä¹‰ X åœ°å€çš„å¼€å§‹åŠç»“æŸä½ç½®
 	transfer_data(0x00);
 	transfer_data(0x00);
 	transfer_data(0x00);
 	transfer_data(0x7F);
-	transfer_command(0x2b); //¶¨Òå Y µØÖ·µÄ¿ªÊ¼¼°½áÊøÎ»ÖÃ
+	transfer_command(0x2b); //å®šä¹‰ Y åœ°å€çš„å¼€å§‹åŠç»“æŸä½ç½®
 	transfer_data(0x00);
 	transfer_data(0x00);
 	transfer_data(0x00);
 	transfer_data(0x7F);
-	transfer_command(0x29); //¿ªÏÔÊ¾
+	transfer_command(0x29); //å¼€æ˜¾ç¤º
 }
 
-//¶¨Òå´°¿Ú×ø±ê£º¿ªÊ¼×ø±ê£¨XS,YS)ÒÔ¼°´°¿Ú´óĞ¡£¨x_total,y_total)
+//å®šä¹‰çª—å£åæ ‡ï¼šå¼€å§‹åæ ‡ï¼ˆXS,YS)ä»¥åŠçª—å£å¤§å°ï¼ˆx_total,y_total)
 //void lcd_address(int XS,int YS, int x_total, int y_total)
 //{
 //	int XE,YE;
-//	
+//
 //	XS = XS+2;
 //	YS = YS+1;
 //	XE = XS + x_total - 1;
 //	YE = YS + y_total - 1;
-//	transfer_command(0x2a); // ÉèÖÃ X ¿ªÊ¼¼°½áÊøµÄµØÖ·
-//	transfer_data_16(XS); // X ¿ªÊ¼µØÖ·(16 Î»£©
-//	transfer_data_16(XE); // X ½áÊøµØÖ·(16 Î»£©
-//	transfer_command(0x2b); // ÉèÖÃ Y ¿ªÊ¼¼°½áÊøµÄµØÖ·
-//	transfer_data_16(YS); // Y ¿ªÊ¼µØÖ·(16 Î»£©
-//	transfer_data_16(YE); // Y ½áÊøµØÖ·(16 Î»
-//	transfer_command(0x2c); // Ğ´Êı¾İ¿ªÊ¼
+//	transfer_command(0x2a); // è®¾ç½® X å¼€å§‹åŠç»“æŸçš„åœ°å€
+//	transfer_data_16(XS); // X å¼€å§‹åœ°å€(16 ä½ï¼‰
+//	transfer_data_16(XE); // X ç»“æŸåœ°å€(16 ä½ï¼‰
+//	transfer_command(0x2b); // è®¾ç½® Y å¼€å§‹åŠç»“æŸçš„åœ°å€
+//	transfer_data_16(YS); // Y å¼€å§‹åœ°å€(16 ä½ï¼‰
+//	transfer_data_16(YE); // Y ç»“æŸåœ°å€(16 ä½
+//	transfer_command(0x2c); // å†™æ•°æ®å¼€å§‹
 //}
 
-////½«µ¥É«µÄ 8 Î»µÄÊı¾İ£¨´ú±í 8 ¸öÏñËØµã£©×ª»»³É²ÊÉ«µÄÊı¾İ´«Êä¸øÒº¾§ÆÁ
+////å°†å•è‰²çš„ 8 ä½çš„æ•°æ®ï¼ˆä»£è¡¨ 8 ä¸ªåƒç´ ç‚¹ï¼‰è½¬æ¢æˆå½©è‰²çš„æ•°æ®ä¼ è¾“ç»™æ¶²æ™¶å±
 //void mono_transfer_data(int mono_data,int font_color,int back_color)
 //{
 //	int i;
-//	
+//
 //	for(i = 0; i < 8; i++)
 //	{
 //		if(mono_data&0x80)
 //		{
-//			transfer_data_16(font_color); //µ±Êı¾İÊÇ 1 Ê±£¬ÏÔÊ¾×ÖÌåÑÕÉ«
+//			transfer_data_16(font_color); //å½“æ•°æ®æ˜¯ 1 æ—¶ï¼Œæ˜¾ç¤ºå­—ä½“é¢œè‰²
 //		}
-//		else	
+//		else
 //		{
-//			transfer_data_16(back_color); //µ±Êı¾İÊÇ 0 Ê±£¬ÏÔÊ¾µ×É«
+//			transfer_data_16(back_color); //å½“æ•°æ®æ˜¯ 0 æ—¶ï¼Œæ˜¾ç¤ºåº•è‰²
 //		}
 //		mono_data <<= 1;
 //	}
 //}
 
-////ÏÔÊ¾µ¥Ò»É«²Ê
+////æ˜¾ç¤ºå•ä¸€è‰²å½©
 //void display_color(int XS,int YS,int x_total,int y_total,int color)
 //{
 //	int i,j;
-//	
+//
 //	lcd_address(XS,YS,x_total,y_total);
 //	for (i = 0; i < 128; i++)
 //	{
@@ -342,26 +342,25 @@ static void ST7735_initial(void)
 //	}
 //}
 
-////ÏÔÊ¾Ò»·ùÈ«ÆÁ²ÊÍ¼
+////æ˜¾ç¤ºä¸€å¹…å…¨å±å½©å›¾
 //void display_image(uint8_t *dp)
 //{
 //	uint8_t i,j;
-//	
+//
 //	lcd_address(0,0,128,128);
 //	for (i = 0; i < 128; i++)
 //	{
 //		for(j = 0;j<128;j++)
 //		{
-//			transfer_data(*dp); //´«Ò»¸öÏñËØµÄÍ¼Æ¬Êı¾İµÄ¸ßÎ»
+//			transfer_data(*dp); //ä¼ ä¸€ä¸ªåƒç´ çš„å›¾ç‰‡æ•°æ®çš„é«˜ä½
 //			dp++;
-//			transfer_data(*dp); //´«Ò»¸öÏñËØµÄÍ¼Æ¬Êı¾İµÄµÍÎ»
+//			transfer_data(*dp); //ä¼ ä¸€ä¸ªåƒç´ çš„å›¾ç‰‡æ•°æ®çš„ä½ä½
 //			dp++;
 //		}
 //	}
 //}
 
-
-// Á¬Ğ´2¸ö×Ö½Ú£¨¼´ 16 Î»£©Êı¾İµ½LCDÄ£¿é
+// è¿å†™2ä¸ªå­—èŠ‚ï¼ˆå³ 16 ä½ï¼‰æ•°æ®åˆ°LCDæ¨¡å—
 void ST7735_WriteData16(uint16_t data2)
 {
 	transfer_data(data2 >> 8);
@@ -370,10 +369,10 @@ void ST7735_WriteData16(uint16_t data2)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_GetChipDescribe
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡LCDÇı¶¯Ğ¾Æ¬µÄÃèÊö·ûºÅ£¬ÓÃÓÚÏÔÊ¾
-*	ĞÎ    ²Î: char *_str : ÃèÊö·û×Ö·û´®ÌîÈë´Ë»º³åÇø
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_GetChipDescribe
+*	åŠŸèƒ½è¯´æ˜: è¯»å–LCDé©±åŠ¨èŠ¯ç‰‡çš„æè¿°ç¬¦å·ï¼Œç”¨äºæ˜¾ç¤º
+*	å½¢    å‚: char *_str : æè¿°ç¬¦å­—ç¬¦ä¸²å¡«å…¥æ­¤ç¼“å†²åŒº
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_GetChipDescribe(char *_str)
@@ -383,37 +382,37 @@ void ST7735_GetChipDescribe(char *_str)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_SetDispWin
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÏÔÊ¾´°¿Ú£¬½øÈë´°¿ÚÏÔÊ¾Ä£Ê½¡£
-*	ĞÎ    ²Î:  
-*		_usX : Ë®Æ½×ø±ê
-*		_usY : ´¹Ö±×ø±ê
-*		_usHeight: ´°¿Ú¸ß¶È
-*		_usWidth : ´°¿Ú¿í¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_SetDispWin
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®æ˜¾ç¤ºçª—å£ï¼Œè¿›å…¥çª—å£æ˜¾ç¤ºæ¨¡å¼ã€‚
+*	å½¢    å‚:  
+*		_usX : æ°´å¹³åæ ‡
+*		_usY : å‚ç›´åæ ‡
+*		_usHeight: çª—å£é«˜åº¦
+*		_usWidth : çª—å£å®½åº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth)
 {
-	/* ÉèÖÃ X ¿ªÊ¼¼°½áÊøµÄµØÖ· */
-	transfer_command(0x2a); 	
+	/* è®¾ç½® X å¼€å§‹åŠç»“æŸçš„åœ°å€ */
+	transfer_command(0x2a);
 	transfer_data_16(_usX + 2);
 	transfer_data_16(_usX + 2 + _usWidth - 1);
-	
-	/* ÉèÖÃ Y¿ªÊ¼¼°½áÊøµÄµØÖ· */
+
+	/* è®¾ç½® Yå¼€å§‹åŠç»“æŸçš„åœ°å€ */
 	transfer_command(0x2b);
 	transfer_data_16(_usY + 1);
 	transfer_data_16(_usY + 1 + _usHeight - 1);
-	
-	transfer_command(0x2c); /* Ğ´Êı¾İ¿ªÊ¼ */
+
+	transfer_command(0x2c); /* å†™æ•°æ®å¼€å§‹ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_QuitWinMode
-*	¹¦ÄÜËµÃ÷: ÍË³ö´°¿ÚÏÔÊ¾Ä£Ê½£¬±äÎªÈ«ÆÁÏÔÊ¾Ä£Ê½
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_QuitWinMode
+*	åŠŸèƒ½è¯´æ˜: é€€å‡ºçª—å£æ˜¾ç¤ºæ¨¡å¼ï¼Œå˜ä¸ºå…¨å±æ˜¾ç¤ºæ¨¡å¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_QuitWinMode(void)
@@ -423,10 +422,10 @@ void ST7735_QuitWinMode(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DispOn
-*	¹¦ÄÜËµÃ÷: ´ò¿ªÏÔÊ¾
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DispOn
+*	åŠŸèƒ½è¯´æ˜: æ‰“å¼€æ˜¾ç¤º
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DispOn(void)
@@ -435,10 +434,10 @@ void ST7735_DispOn(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DispOff
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕÏÔÊ¾
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DispOff
+*	åŠŸèƒ½è¯´æ˜: å…³é—­æ˜¾ç¤º
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DispOff(void)
@@ -447,10 +446,10 @@ void ST7735_DispOff(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_ClrScr
-*	¹¦ÄÜËµÃ÷: ¸ù¾İÊäÈëµÄÑÕÉ«ÖµÇåÆÁ
-*	ĞÎ    ²Î: _usColor : ±³¾°É«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_ClrScr
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®è¾“å…¥çš„é¢œè‰²å€¼æ¸…å±
+*	å½¢    å‚: _usColor : èƒŒæ™¯è‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_ClrScr(uint16_t _usColor)
@@ -460,12 +459,12 @@ void ST7735_ClrScr(uint16_t _usColor)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_PutPixel
-*	¹¦ÄÜËµÃ÷: »­1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY : ÏñËØ×ø±ê
-*			_usColor  : ÏñËØÑÕÉ« ( RGB = 565 ¸ñÊ½)
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_PutPixel
+*	åŠŸèƒ½è¯´æ˜: ç”»1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY : åƒç´ åæ ‡
+*			_usColor  : åƒç´ é¢œè‰² ( RGB = 565 æ ¼å¼)
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
@@ -476,12 +475,12 @@ void ST7735_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_GetPixel
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY : ÏñËØ×ø±ê
-*			_usColor  : ÏñËØÑÕÉ«
-*	·µ »Ø Öµ: RGBÑÕÉ«Öµ
+*	å‡½ æ•° å: ST7735_GetPixel
+*	åŠŸèƒ½è¯´æ˜: è¯»å–1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY : åƒç´ åæ ‡
+*			_usColor  : åƒç´ é¢œè‰²
+*	è¿” å› å€¼: RGBé¢œè‰²å€¼
 *********************************************************************************************************
 */
 uint16_t ST7735_GetPixel(uint16_t _usX, uint16_t _usY)
@@ -489,37 +488,36 @@ uint16_t ST7735_GetPixel(uint16_t _usX, uint16_t _usY)
 	return CL_BLUE;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawLine
-*	¹¦ÄÜËµÃ÷: ²ÉÓÃ Bresenham Ëã·¨£¬ÔÚ2µã¼ä»­Ò»ÌõÖ±Ïß¡£
-*	ĞÎ    ²Î:
-*			_usX1, _usY1 : ÆğÊ¼µã×ø±ê
-*			_usX2, _usY2 : ÖÕÖ¹µãY×ø±ê
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawLine
+*	åŠŸèƒ½è¯´æ˜: é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œåœ¨2ç‚¹é—´ç”»ä¸€æ¡ç›´çº¿ã€‚
+*	å½¢    å‚:
+*			_usX1, _usY1 : èµ·å§‹ç‚¹åæ ‡
+*			_usX2, _usY2 : ç»ˆæ­¢ç‚¹Yåæ ‡
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7735_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t _usY2 , uint16_t _usColor)
+void ST7735_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor)
 {
-	int32_t dx , dy ;
-	int32_t tx , ty ;
-	int32_t inc1 , inc2 ;
-	int32_t d , iTag ;
-	int32_t x , y ;
+	int32_t dx, dy;
+	int32_t tx, ty;
+	int32_t inc1, inc2;
+	int32_t d, iTag;
+	int32_t x, y;
 
-	/* ²ÉÓÃ Bresenham Ëã·¨£¬ÔÚ2µã¼ä»­Ò»ÌõÖ±Ïß */
+	/* é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œåœ¨2ç‚¹é—´ç”»ä¸€æ¡ç›´çº¿ */
 
-	ST7735_PutPixel(_usX1 , _usY1 , _usColor);
+	ST7735_PutPixel(_usX1, _usY1, _usColor);
 
-	/* Èç¹ûÁ½µãÖØºÏ£¬½áÊøºóÃæµÄ¶¯×÷¡£*/
-	if ( _usX1 == _usX2 && _usY1 ==  _usY2 )
+	/* å¦‚æœä¸¤ç‚¹é‡åˆï¼Œç»“æŸåé¢çš„åŠ¨ä½œã€‚*/
+	if (_usX1 == _usX2 && _usY1 == _usY2)
 	{
 		return;
 	}
 
-	iTag = 0 ;
+	iTag = 0;
 	/* dx = abs ( _usX2 - _usX1 ); */
 	if (_usX2 >= _usX1)
 	{
@@ -531,7 +529,7 @@ void ST7735_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t
 	}
 
 	/* dy = abs ( _usY2 - _usY1 ); */
-	if (_usY2 >=  _usY1)
+	if (_usY2 >= _usY1)
 	{
 		dy = _usY2 - _usY1;
 	}
@@ -540,109 +538,115 @@ void ST7735_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t
 		dy = _usY1 - _usY2;
 	}
 
-	if ( dx < dy )   /*Èç¹ûdyÎª¼Æ³¤·½Ïò£¬Ôò½»»»×İºá×ø±ê¡£*/
+	if (dx < dy) /*å¦‚æœdyä¸ºè®¡é•¿æ–¹å‘ï¼Œåˆ™äº¤æ¢çºµæ¨ªåæ ‡ã€‚*/
 	{
 		uint16_t temp;
 
-		iTag = 1 ;
-		temp = _usX1; _usX1 = _usY1; _usY1 = temp;
-		temp = _usX2; _usX2 = _usY2; _usY2 = temp;
-		temp = dx; dx = dy; dy = temp;
+		iTag = 1;
+		temp = _usX1;
+		_usX1 = _usY1;
+		_usY1 = temp;
+		temp = _usX2;
+		_usX2 = _usY2;
+		_usY2 = temp;
+		temp = dx;
+		dx = dy;
+		dy = temp;
 	}
-	tx = _usX2 > _usX1 ? 1 : -1 ;    /* È·¶¨ÊÇÔö1»¹ÊÇ¼õ1 */
-	ty = _usY2 > _usY1 ? 1 : -1 ;
-	x = _usX1 ;
-	y = _usY1 ;
-	inc1 = 2 * dy ;
-	inc2 = 2 * ( dy - dx );
-	d = inc1 - dx ;
-	while ( x != _usX2 )     /* Ñ­»·»­µã */
+	tx = _usX2 > _usX1 ? 1 : -1; /* ç¡®å®šæ˜¯å¢1è¿˜æ˜¯å‡1 */
+	ty = _usY2 > _usY1 ? 1 : -1;
+	x = _usX1;
+	y = _usY1;
+	inc1 = 2 * dy;
+	inc2 = 2 * (dy - dx);
+	d = inc1 - dx;
+	while (x != _usX2) /* å¾ªç¯ç”»ç‚¹ */
 	{
-		if (d < 0 )
+		if (d < 0)
 		{
-			d +=  inc1 ;
+			d += inc1;
 		}
 		else
 		{
-			y +=  ty ;
-			d +=  inc2 ;
+			y += ty;
+			d += inc2;
 		}
-		if (iTag )
+		if (iTag)
 		{
-			ST7735_PutPixel(y , x , _usColor) ;
+			ST7735_PutPixel(y, x, _usColor);
 		}
 		else
 		{
-			ST7735_PutPixel(x , y , _usColor) ;
+			ST7735_PutPixel(x, y, _usColor);
 		}
-		x +=  tx ;
-	}	
+		x += tx;
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawHLine
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»ÌõË®Æ½Ïß. Ê¹ÓÃSTM32F429 DMA2DÓ²¼ş»æÖÆ.
-*	ĞÎ    ²Î:
-*			_usX1, _usY1 : ÆğÊ¼µã×ø±ê
-*			_usLen       : ÏßµÄ³¤¶È
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawHLine
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€æ¡æ°´å¹³çº¿. ä½¿ç”¨STM32F429 DMA2Dç¡¬ä»¶ç»˜åˆ¶.
+*	å½¢    å‚:
+*			_usX1, _usY1 : èµ·å§‹ç‚¹åæ ‡
+*			_usLen       : çº¿çš„é•¿åº¦
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen , uint16_t _usColor)
+void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
 	ST7735_FillRect(_usX, _usY, 1, _usLen, _usColor);
-#else	
+#else
 	uint16_t i;
-	
+
 	for (i = 0; i < _usLen; i++)
-	{	
-		ST7735_PutPixel(_usX + i , _usY , _usColor);
+	{
+		ST7735_PutPixel(_usX + i, _usY, _usColor);
 	}
-#endif	
+#endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawVLine
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»Ìõ´¹Ö±Ïß¡£ Ê¹ÓÃSTM32F429 DMA2DÓ²¼ş»æÖÆ.
-*	ĞÎ    ²Î:
-*			_usX, _usY : ÆğÊ¼µã×ø±ê
-*			_usLen       : ÏßµÄ³¤¶È
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawVLine
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€æ¡å‚ç›´çº¿ã€‚ ä½¿ç”¨STM32F429 DMA2Dç¡¬ä»¶ç»˜åˆ¶.
+*	å½¢    å‚:
+*			_usX, _usY : èµ·å§‹ç‚¹åæ ‡
+*			_usLen       : çº¿çš„é•¿åº¦
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7735_DrawVLine(uint16_t _usX , uint16_t _usY , uint16_t _usLen , uint16_t _usColor)
+void ST7735_DrawVLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
 	ST7735_FillRect(_usX, _usY, _usLen, 1, _usColor);
-#else	
+#else
 	uint16_t i;
-	
+
 	for (i = 0; i < _usLen; i++)
-	{	
+	{
 		ST7735_PutPixel(_usX, _usY + i, _usColor);
 	}
-#endif	
+#endif
 }
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawPoints
-*	¹¦ÄÜËµÃ÷: ²ÉÓÃ Bresenham Ëã·¨£¬»æÖÆÒ»×éµã£¬²¢½«ÕâĞ©µãÁ¬½ÓÆğÀ´¡£¿ÉÓÃÓÚ²¨ĞÎÏÔÊ¾¡£
-*	ĞÎ    ²Î:
-*			x, y     : ×ø±êÊı×é
-*			_usColor : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawPoints
+*	åŠŸèƒ½è¯´æ˜: é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œç»˜åˆ¶ä¸€ç»„ç‚¹ï¼Œå¹¶å°†è¿™äº›ç‚¹è¿æ¥èµ·æ¥ã€‚å¯ç”¨äºæ³¢å½¢æ˜¾ç¤ºã€‚
+*	å½¢    å‚:
+*			x, y     : åæ ‡æ•°ç»„
+*			_usColor : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor)
 {
 	uint16_t i;
 
-	for (i = 0 ; i < _usSize - 1; i++)
+	for (i = 0; i < _usSize - 1; i++)
 	{
 		ST7735_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
 	}
@@ -650,77 +654,76 @@ void ST7735_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usC
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawRect
-*	¹¦ÄÜËµÃ÷: »æÖÆË®Æ½·ÅÖÃµÄ¾ØĞÎ¡£
-*	ĞÎ    ²Î:
-*			_usX,_usY: ¾ØĞÎ×óÉÏ½ÇµÄ×ø±ê
-*			_usHeight : ¾ØĞÎµÄ¸ß¶È
-*			_usWidth  : ¾ØĞÎµÄ¿í¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawRect
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶æ°´å¹³æ”¾ç½®çš„çŸ©å½¢ã€‚
+*	å½¢    å‚:
+*			_usX,_usY: çŸ©å½¢å·¦ä¸Šè§’çš„åæ ‡
+*			_usHeight : çŸ©å½¢çš„é«˜åº¦
+*			_usWidth  : çŸ©å½¢çš„å®½åº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
 	/*
 	 ---------------->---
-	|(_usX£¬_usY)        |
+	|(_usXï¼Œ_usY)        |
 	V                    V  _usHeight
 	|                    |
 	 ---------------->---
 		  _usWidth
 	*/
 	ST7735_DrawHLine(_usX, _usY, _usWidth, _usColor);
-	ST7735_DrawVLine(_usX +_usWidth - 1, _usY, _usHeight, _usColor);
+	ST7735_DrawVLine(_usX + _usWidth - 1, _usY, _usHeight, _usColor);
 	ST7735_DrawHLine(_usX, _usY + _usHeight - 1, _usWidth, _usColor);
 	ST7735_DrawVLine(_usX, _usY, _usHeight, _usColor);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_FillRect
-*	¹¦ÄÜËµÃ÷: ÓÃÒ»¸öÑÕÉ«ÖµÌî³äÒ»¸ö¾ØĞÎ¡£Ê¹ÓÃSTM32F429ÄÚ²¿DMA2DÓ²¼ş»æÖÆ¡£
-*	ĞÎ    ²Î:
-*			_usX,_usY: ¾ØĞÎ×óÉÏ½ÇµÄ×ø±ê
-*			_usHeight : ¾ØĞÎµÄ¸ß¶È
-*			_usWidth  : ¾ØĞÎµÄ¿í¶È
-*			_usColor  : ÑÕÉ«´úÂë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_FillRect
+*	åŠŸèƒ½è¯´æ˜: ç”¨ä¸€ä¸ªé¢œè‰²å€¼å¡«å……ä¸€ä¸ªçŸ©å½¢ã€‚ä½¿ç”¨STM32F429å†…éƒ¨DMA2Dç¡¬ä»¶ç»˜åˆ¶ã€‚
+*	å½¢    å‚:
+*			_usX,_usY: çŸ©å½¢å·¦ä¸Šè§’çš„åæ ‡
+*			_usHeight : çŸ©å½¢çš„é«˜åº¦
+*			_usWidth  : çŸ©å½¢çš„å®½åº¦
+*			_usColor  : é¢œè‰²ä»£ç 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
 	uint32_t i;
-	
+
 	ST7735_SetDispWin(_usX, _usY, _usHeight, _usWidth);
-	
+
 	for (i = 0; i < _usHeight * _usWidth; i++)
 	{
 		transfer_data_16(_usColor);
 	}
-	
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawCircle
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»¸öÔ²£¬±Ê¿íÎª1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY  : Ô²ĞÄµÄ×ø±ê
-*			_usRadius  : Ô²µÄ°ë¾¶
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawCircle
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€ä¸ªåœ†ï¼Œç¬”å®½ä¸º1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY  : åœ†å¿ƒçš„åæ ‡
+*			_usRadius  : åœ†çš„åŠå¾„
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor)
 {
-	int32_t  D;			/* Decision Variable */
-	uint32_t  CurX;		/* µ±Ç° X Öµ */
-	uint32_t  CurY;		/* µ±Ç° Y Öµ */
+	int32_t D;		 /* Decision Variable */
+	uint32_t CurX; /* å½“å‰ X å€¼ */
+	uint32_t CurY; /* å½“å‰ Y å€¼ */
 
 	D = 3 - (_usRadius << 1);
 	CurX = 0;
 	CurY = _usRadius;
 
-	while (CurX <=  CurY)
+	while (CurX <= CurY)
 	{
 		ST7735_PutPixel(_usX + CurX, _usY + CurY, _usColor);
 		ST7735_PutPixel(_usX + CurX, _usY - CurY, _usColor);
@@ -733,11 +736,11 @@ void ST7735_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_
 
 		if (D < 0)
 		{
-			D +=  (CurX << 2) + 6;
+			D += (CurX << 2) + 6;
 		}
 		else
 		{
-			D +=  ((CurX - CurY) << 2) + 10;
+			D += ((CurX - CurY) << 2) + 10;
 			CurY--;
 		}
 		CurX++;
@@ -746,14 +749,14 @@ void ST7735_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_DrawBMP
-*	¹¦ÄÜËµÃ÷: ÔÚLCDÉÏÏÔÊ¾Ò»¸öBMPÎ»Í¼£¬Î»Í¼µãÕóÉ¨Ãè´ÎĞò£º´Ó×óµ½ÓÒ£¬´ÓÉÏµ½ÏÂ
-*	ĞÎ    ²Î:  
-*			_usX, _usY : Í¼Æ¬µÄ×ø±ê
-*			_usHeight  £ºÍ¼Æ¬¸ß¶È
-*			_usWidth   £ºÍ¼Æ¬¿í¶È
-*			_ptr       £ºÍ¼Æ¬µãÕóÖ¸Õë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_DrawBMP
+*	åŠŸèƒ½è¯´æ˜: åœ¨LCDä¸Šæ˜¾ç¤ºä¸€ä¸ªBMPä½å›¾ï¼Œä½å›¾ç‚¹é˜µæ‰«ææ¬¡åºï¼šä»å·¦åˆ°å³ï¼Œä»ä¸Šåˆ°ä¸‹
+*	å½¢    å‚:  
+*			_usX, _usY : å›¾ç‰‡çš„åæ ‡
+*			_usHeight  ï¼šå›¾ç‰‡é«˜åº¦
+*			_usWidth   ï¼šå›¾ç‰‡å®½åº¦
+*			_ptr       ï¼šå›¾ç‰‡ç‚¹é˜µæŒ‡é’ˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t *_ptr)
@@ -769,42 +772,41 @@ void ST7735_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _
 		{
 			ST7735_PutPixel(_usX + k, y, *p++);
 		}
-		
+
 		y++;
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7735_SetDirection
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÏÔÊ¾ÆÁÏÔÊ¾·½Ïò£¨ºáÆÁ ÊúÆÁ£©
-*	ĞÎ    ²Î: ÏÔÊ¾·½Ïò´úÂë 0 ºáÆÁÕı³£, 1 = ºáÆÁ180¶È·­×ª, 2 = ÊúÆÁ, 3 = ÊúÆÁ180¶È·­×ª
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7735_SetDirection
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®æ˜¾ç¤ºå±æ˜¾ç¤ºæ–¹å‘ï¼ˆæ¨ªå± ç«–å±ï¼‰
+*	å½¢    å‚: æ˜¾ç¤ºæ–¹å‘ä»£ç  0 æ¨ªå±æ­£å¸¸, 1 = æ¨ªå±180åº¦ç¿»è½¬, 2 = ç«–å±, 3 = ç«–å±180åº¦ç¿»è½¬
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7735_SetDirection(uint8_t _dir)
 {
 	uint16_t temp;
-	
-	if (_dir ==  0 || _dir ==  1)		/* ºáÆÁ£¬ ºáÆÁ180¶È */
+
+	if (_dir == 0 || _dir == 1) /* æ¨ªå±ï¼Œ æ¨ªå±180åº¦ */
 	{
 		if (g_LcdWidth < g_LcdHeight)
 		{
 			temp = g_LcdWidth;
 			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;			
+			g_LcdHeight = temp;
 		}
 	}
-	else if (_dir ==  2 || _dir ==  3)	/* ÊúÆÁ, ÊúÆÁ180¡ã*/
+	else if (_dir == 2 || _dir == 3) /* ç«–å±, ç«–å±180Â°*/
 	{
 		if (g_LcdWidth > g_LcdHeight)
 		{
 			temp = g_LcdWidth;
 			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;			
+			g_LcdHeight = temp;
 		}
 	}
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

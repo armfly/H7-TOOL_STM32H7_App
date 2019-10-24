@@ -1,30 +1,30 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : °²¸»À³LED-485-XXXÏµÁÐÊýÂë¹ÜµÄÇý¶¯³ÌÐò
-*	ÎÄ¼þÃû³Æ : bsp_rs485_led.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Çý¶¯°²¸»À³µç×ÓÉú²úµÄRS485 LEDÊýÂë¹ÜÏÔÊ¾ÆÁ¡£ Ê¹ÓÃÁË bsp_modbus.c ÎÄ¼þ¡£
-*			  ÐÍºÅ: LED-485-043	 ÈýÎ»0.4´çÊýÂë¹Ü
-*				    LED-485-034  ËÄÎ»0.3´çÊýÂë¹Ü
-*				    LED-485-083  ÈýÎ»0.8´çÊýÂë¹Ü
-*				    LED-485-054  ËÄÎ»0.56´çÊýÂë¹Ü
+*	æ¨¡å—åç§° : å®‰å¯ŒèŽ±LED-485-XXXç³»åˆ—æ•°ç ç®¡çš„é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_rs485_led.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜Ž : é©±åŠ¨å®‰å¯ŒèŽ±ç”µå­ç”Ÿäº§çš„RS485 LEDæ•°ç ç®¡æ˜¾ç¤ºå±ã€‚ ä½¿ç”¨äº† bsp_modbus.c æ–‡ä»¶ã€‚
+*			  åž‹å·: LED-485-043	 ä¸‰ä½0.4å¯¸æ•°ç ç®¡
+*				    LED-485-034  å››ä½0.3å¯¸æ•°ç ç®¡
+*				    LED-485-083  ä¸‰ä½0.8å¯¸æ•°ç ç®¡
+*				    LED-485-054  å››ä½0.56å¯¸æ•°ç ç®¡
 *
-*			  Ö§³ÖASCIIÐ­Òé ºÍ Modbus RTUÐ­Òé¡£¿ÉÒÔÍ¨¹ý485Ö¸Áî½øÐÐÇÐ»»¡£
+*			  æ”¯æŒASCIIåè®® å’Œ Modbus RTUåè®®ã€‚å¯ä»¥é€šè¿‡485æŒ‡ä»¤è¿›è¡Œåˆ‡æ¢ã€‚
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-/* RTU Ó¦´ð´úÂë */
-#define RSP_OK				0		/* ³É¹¦ */
-#define RSP_ERR_CMD			0x01	/* ²»Ö§³ÖµÄ¹¦ÄÜÂë */
-#define RSP_ERR_REG_ADDR	0x02	/* ¼Ä´æÆ÷µØÖ·´íÎó */
-#define RSP_ERR_VALUE		0x03	/* Êý¾ÝÖµÓò´íÎó */
-#define RSP_ERR_WRITE		0x04	/* Ð´ÈëÊ§°Ü */
+/* RTU åº”ç­”ä»£ç  */
+#define RSP_OK 0							/* æˆåŠŸ */
+#define RSP_ERR_CMD 0x01			/* ä¸æ”¯æŒçš„åŠŸèƒ½ç  */
+#define RSP_ERR_REG_ADDR 0x02 /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
+#define RSP_ERR_VALUE 0x03		/* æ•°æ®å€¼åŸŸé”™è¯¯ */
+#define RSP_ERR_WRITE 0x04		/* å†™å…¥å¤±è´¥ */
 
 static void MODH_RxTimeOut(void);
 static uint8_t g_rtu_timeout = 0;
@@ -35,11 +35,11 @@ extern void MODBUS_AnalyzeApp(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_SendWithCRC
-*	¹¦ÄÜËµÃ÷: ·¢ËÍÒ»´®Êý¾Ý, ×Ô¶¯×·¼Ó2×Ö½ÚCRC
-*	ÐÎ    ²Î: g_tModH.TxBuf : Êý¾Ý
-*			  g_tModH.TxLen : Êý¾Ý³¤¶È£¨²»´øCRC£©
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_SendWithCRC
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€ä¸€ä¸²æ•°æ®, è‡ªåŠ¨è¿½åŠ 2å­—èŠ‚CRC
+*	å½¢    å‚: g_tModH.TxBuf : æ•°æ®
+*			  g_tModH.TxLen : æ•°æ®é•¿åº¦ï¼ˆä¸å¸¦CRCï¼‰
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODH_SendWithCRC(void)
@@ -54,50 +54,50 @@ void MODH_SendWithCRC(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_Send06H
-*	¹¦ÄÜËµÃ÷: ·¢ËÍ06HÖ¸Áî£¬Ð´Ò»¸ö¼Ä´æÆ÷
-*	ÐÎ    ²Î: _RS485Addr : 485µØÖ·
-*			  _RegAddr : ¼Ä´æÆ÷µØÖ·
-*			  _RegValue : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_Send06H
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€06HæŒ‡ä»¤ï¼Œå†™ä¸€ä¸ªå¯„å­˜å™¨
+*	å½¢    å‚: _RS485Addr : 485åœ°å€
+*			  _RegAddr : å¯„å­˜å™¨åœ°å€
+*			  _RegValue : å¯„å­˜å™¨å€¼
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODH_Send06H(uint8_t _RS485Addr, uint16_t _RegAddr, uint16_t _RegValue)
 {
 	g_tModH.TxLen = 0;
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RS485Addr;			/* 485µØÖ· */
-	g_tModH.TxBuf[g_tModH.TxLen++] = 0x06;			/* ¹¦ÄÜÂë */
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr >> 8;		/* ¼Ä´æÆ÷µØÖ·*/
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RS485Addr;		/* 485åœ°å€ */
+	g_tModH.TxBuf[g_tModH.TxLen++] = 0x06;					/* åŠŸèƒ½ç  */
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr >> 8; /* å¯„å­˜å™¨åœ°å€*/
 	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr;
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegValue >> 8;	/* ¼Ä´æÆ÷Öµ */
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegValue;	
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegValue >> 8; /* å¯„å­˜å™¨å€¼ */
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegValue;
 	MODH_SendWithCRC();
 	g_tModH.fAckOK = 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_Send06H
-*	¹¦ÄÜËµÃ÷: ·¢ËÍ06HÖ¸Áî£¬Ð´Ò»¸ö¼Ä´æÆ÷
-*	ÐÎ    ²Î: _RS485Addr : 485µØÖ·
-*			  _RegAddr : ¼Ä´æÆ÷ÆðÊ¼µØÖ·
-*			  _RegNum : ¼Ä´æÆ÷¸öÊý
-*			  _RegValue : ¼Ä´æÆ÷ÖµÊý×é
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_Send06H
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€06HæŒ‡ä»¤ï¼Œå†™ä¸€ä¸ªå¯„å­˜å™¨
+*	å½¢    å‚: _RS485Addr : 485åœ°å€
+*			  _RegAddr : å¯„å­˜å™¨èµ·å§‹åœ°å€
+*			  _RegNum : å¯„å­˜å™¨ä¸ªæ•°
+*			  _RegValue : å¯„å­˜å™¨å€¼æ•°ç»„
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODH_Send10H(uint8_t _RS485Addr, uint16_t _RegAddr, uint16_t _RegNum, uint16_t *_RegValue)
 {
 	uint8_t i;
-	
+
 	g_tModH.TxLen = 0;
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RS485Addr;			/* 485µØÖ· */
-	g_tModH.TxBuf[g_tModH.TxLen++] = 0x10;			/* ¹¦ÄÜÂë */
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr >> 8;	/* ¼Ä´æÆ÷ÆðÊ¼µØÖ·*/
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RS485Addr;		/* 485åœ°å€ */
+	g_tModH.TxBuf[g_tModH.TxLen++] = 0x10;					/* åŠŸèƒ½ç  */
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr >> 8; /* å¯„å­˜å™¨èµ·å§‹åœ°å€*/
 	g_tModH.TxBuf[g_tModH.TxLen++] = _RegAddr;
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum >> 8;	/* ¼Ä´æÆ÷¸öÊý */
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum;	
-	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum * 2;	/* Êý¾ÝÇø×Ö½ÚÊý */
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum >> 8; /* å¯„å­˜å™¨ä¸ªæ•° */
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum;
+	g_tModH.TxBuf[g_tModH.TxLen++] = _RegNum * 2; /* æ•°æ®åŒºå­—èŠ‚æ•° */
 	for (i = 0; i < _RegNum; i++)
 	{
 		g_tModH.TxBuf[g_tModH.TxLen++] = _RegValue[i] >> 8;
@@ -109,25 +109,25 @@ void MODH_Send10H(uint8_t _RS485Addr, uint16_t _RegAddr, uint16_t _RegNum, uint1
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_ReciveNew
-*	¹¦ÄÜËµÃ÷: ´®¿Ú½ÓÊÕÖÐ¶Ï·þÎñ³ÌÐò»áµ÷ÓÃ±¾º¯Êý¡£µ±ÊÕµ½Ò»¸ö×Ö½ÚÊ±£¬Ö´ÐÐÒ»´Î±¾º¯Êý¡£MODBUS HOST£¬
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_ReciveNew
+*	åŠŸèƒ½è¯´æ˜Ž: ä¸²å£æŽ¥æ”¶ä¸­æ–­æœåŠ¡ç¨‹åºä¼šè°ƒç”¨æœ¬å‡½æ•°ã€‚å½“æ”¶åˆ°ä¸€ä¸ªå­—èŠ‚æ—¶ï¼Œæ‰§è¡Œä¸€æ¬¡æœ¬å‡½æ•°ã€‚MODBUS HOSTï¼Œ
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODH_ReciveNew(uint8_t _byte)
 {
 	/*
-		3.5¸ö×Ö·ûµÄÊ±¼ä¼ä¸ô£¬Ö»ÊÇÓÃÔÚRTUÄ£Ê½ÏÂÃæ£¬ÒòÎªRTUÄ£Ê½Ã»ÓÐ¿ªÊ¼·ûºÍ½áÊø·û£¬
-		Á½¸öÊý¾Ý°üÖ®¼äÖ»ÄÜ¿¿Ê±¼ä¼ä¸ôÀ´Çø·Ö£¬Modbus¶¨ÒåÔÚ²»Í¬µÄ²¨ÌØÂÊÏÂ£¬¼ä¸ôÊ±¼äÊÇ²»Ò»ÑùµÄ£¬
-		ËùÒÔ¾ÍÊÇ3.5¸ö×Ö·ûµÄÊ±¼ä£¬²¨ÌØÂÊ¸ß£¬Õâ¸öÊ±¼ä¼ä¸ô¾ÍÐ¡£¬²¨ÌØÂÊµÍ£¬Õâ¸öÊ±¼ä¼ä¸ôÏàÓ¦¾Í´ó
+		3.5ä¸ªå­—ç¬¦çš„æ—¶é—´é—´éš”ï¼Œåªæ˜¯ç”¨åœ¨RTUæ¨¡å¼ä¸‹é¢ï¼Œå› ä¸ºRTUæ¨¡å¼æ²¡æœ‰å¼€å§‹ç¬¦å’Œç»“æŸç¬¦ï¼Œ
+		ä¸¤ä¸ªæ•°æ®åŒ…ä¹‹é—´åªèƒ½é æ—¶é—´é—´éš”æ¥åŒºåˆ†ï¼ŒModbuså®šä¹‰åœ¨ä¸åŒçš„æ³¢ç‰¹çŽ‡ä¸‹ï¼Œé—´éš”æ—¶é—´æ˜¯ä¸ä¸€æ ·çš„ï¼Œ
+		æ‰€ä»¥å°±æ˜¯3.5ä¸ªå­—ç¬¦çš„æ—¶é—´ï¼Œæ³¢ç‰¹çŽ‡é«˜ï¼Œè¿™ä¸ªæ—¶é—´é—´éš”å°±å°ï¼Œæ³¢ç‰¹çŽ‡ä½Žï¼Œè¿™ä¸ªæ—¶é—´é—´éš”ç›¸åº”å°±å¤§
 
-        ²¨ÌØÂÊ	ÑÓÊ±3.5×Ö·û(ms)
+        æ³¢ç‰¹çŽ‡	å»¶æ—¶3.5å­—ç¬¦(ms)
         1200	29.16666667
         2400	14.58333333
         4800	7.291666667
         
-        ----- ÒÔÏÂ¶¼È¡4ms ----
+        ----- ä»¥ä¸‹éƒ½å–4ms ----
         
         9600	3.645833333
         19200	1.822916667
@@ -141,20 +141,20 @@ void MODH_ReciveNew(uint8_t _byte)
 	uint32_t timeout;
 
 	g_rtu_timeout = 0;
-	
+
 	if (g_tModH.Baud >= 9600)
 	{
-		timeout = 4000;		/* 4000us */
+		timeout = 4000; /* 4000us */
 	}
 	else
 	{
-		timeout =  35000000 / g_tModH.Baud;	/* ¼ÆËã³¬Ê±Ê±¼ä£¬µ¥Î»us */
+		timeout = 35000000 / g_tModH.Baud; /* è®¡ç®—è¶…æ—¶æ—¶é—´ï¼Œå•ä½us */
 	}
 
-	/* H743Ö§³Ö´®¿Ú¿ÕÏÐÖÐ¶Ï£¬LINE TIMEOUTÖÐ¶ÏÊµÏÖ ³¬Ê±¼ì²â. ´Ë´¦¿ÉÒÔÓÅ»¯ */
-	/* Ó²¼þ¶¨Ê±ÖÐ¶Ï£¬¶¨Ê±¾«¶Èus ¶¨Ê±Æ÷4ÓÃÓÚModbus */
+	/* H743æ”¯æŒä¸²å£ç©ºé—²ä¸­æ–­ï¼ŒLINE TIMEOUTä¸­æ–­å®žçŽ° è¶…æ—¶æ£€æµ‹. æ­¤å¤„å¯ä»¥ä¼˜åŒ– */
+	/* ç¡¬ä»¶å®šæ—¶ä¸­æ–­ï¼Œå®šæ—¶ç²¾åº¦us å®šæ—¶å™¨4ç”¨äºŽModbus */
 	bsp_StartHardTimer(1, timeout, (void *)MODH_RxTimeOut);
-	
+
 	if (g_tModH.RxCount < MODH_RX_SIZE)
 	{
 		g_tModH.RxBuf[g_tModH.RxCount++] = _byte;
@@ -163,10 +163,10 @@ void MODH_ReciveNew(uint8_t _byte)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_Poll
-*	¹¦ÄÜËµÃ÷: ½âÎöÊý¾Ý°ü. ÔÚÖ÷³ÌÐòÖÐÂÖÁ÷µ÷ÓÃ¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_Poll
+*	åŠŸèƒ½è¯´æ˜Ž: è§£æžæ•°æ®åŒ…. åœ¨ä¸»ç¨‹åºä¸­è½®æµè°ƒç”¨ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODH_Poll(void)
@@ -175,17 +175,17 @@ void MODH_Poll(void)
 
 	if (g_rtu_timeout == 0)
 	{
-		/* Ã»ÓÐ³¬Ê±£¬¼ÌÐø½ÓÊÕ¡£²»ÒªÇåÁã g_tModH.RxCount */
+		/* æ²¡æœ‰è¶…æ—¶ï¼Œç»§ç»­æŽ¥æ”¶ã€‚ä¸è¦æ¸…é›¶ g_tModH.RxCount */
 		return;
 	}
 
-	/* ÊÕµ½ÃüÁî
-		05 06 00 88 04 57 3B70 (8 ×Ö½Ú)
-			05    :  ÊýÂë¹ÜÆÁµÄºÅÕ¾£¬
-			06    :  Ö¸Áî
-			00 88 :  ÊýÂë¹ÜÆÁµÄÏÔÊ¾¼Ä´æÆ÷
-			04 57 :  Êý¾Ý,,,×ª»»³É 10 ½øÖÆÊÇ 1111.¸ßÎ»ÔÚÇ°,
-			3B70  :  ¶þ¸ö×Ö½Ú CRC Âë	´Ó05µ½ 57µÄÐ£Ñé
+	/* æ”¶åˆ°å‘½ä»¤
+		05 06 00 88 04 57 3B70 (8 å­—èŠ‚)
+			05    :  æ•°ç ç®¡å±çš„å·ç«™ï¼Œ
+			06    :  æŒ‡ä»¤
+			00 88 :  æ•°ç ç®¡å±çš„æ˜¾ç¤ºå¯„å­˜å™¨
+			04 57 :  æ•°æ®,,,è½¬æ¢æˆ 10 è¿›åˆ¶æ˜¯ 1111.é«˜ä½åœ¨å‰,
+			3B70  :  äºŒä¸ªå­—èŠ‚ CRC ç 	ä»Ž05åˆ° 57çš„æ ¡éªŒ
 	*/
 	g_rtu_timeout = 0;
 
@@ -194,33 +194,33 @@ void MODH_Poll(void)
 		goto err_ret;
 	}
 
-	/* ¼ÆËãCRCÐ£ÑéºÍ */
+	/* è®¡ç®—CRCæ ¡éªŒå’Œ */
 	crc1 = CRC16_Modbus(g_tModH.RxBuf, g_tModH.RxCount);
 	if (crc1 != 0)
 	{
-		/* ½«½ÓÊÕµÄÊý¾Ý¸´ÖÆµ½ÁíÍâÒ»¸ö»º³åÇø£¬µÈ´ýAPP³ÌÐò¶ÁÈ¡ */
+		/* å°†æŽ¥æ”¶çš„æ•°æ®å¤åˆ¶åˆ°å¦å¤–ä¸€ä¸ªç¼“å†²åŒºï¼Œç­‰å¾…APPç¨‹åºè¯»å– */
 		memcpy(g_tModH.AppRxBuf, g_tModH.RxBuf, g_tModH.RxCount);
-		g_tModH.AppRxCount = g_tModH.RxCount;		
-		bsp_PutKey(MSG_485_RX_NOT_RTU);		/* ½èÓÃ°´¼üFIFO£¬·¢ËÍÒ»¸öÊÕµ½485Êý¾ÝÖ¡µÄÏûÏ¢ */
+		g_tModH.AppRxCount = g_tModH.RxCount;
+		bsp_PutKey(MSG_485_RX_NOT_RTU); /* å€Ÿç”¨æŒ‰é”®FIFOï¼Œå‘é€ä¸€ä¸ªæ”¶åˆ°485æ•°æ®å¸§çš„æ¶ˆæ¯ */
 		goto err_ret;
 	}
 	else
 	{
-		/* ½«½ÓÊÕµÄÊý¾Ý¸´ÖÆµ½ÁíÍâÒ»¸ö»º³åÇø£¬µÈ´ýAPP³ÌÐò¶ÁÈ¡ */
+		/* å°†æŽ¥æ”¶çš„æ•°æ®å¤åˆ¶åˆ°å¦å¤–ä¸€ä¸ªç¼“å†²åŒºï¼Œç­‰å¾…APPç¨‹åºè¯»å– */
 		memcpy(g_tModH.AppRxBuf, g_tModH.RxBuf, g_tModH.RxCount);
 		g_tModH.AppRxCount = g_tModH.RxCount;
-		bsp_PutKey(MSG_485_RX_RTU);		/* ½èÓÃ°´¼üFIFO£¬·¢ËÍÒ»¸öÊÕµ½485Êý¾ÝÖ¡µÄÏûÏ¢ */
+		bsp_PutKey(MSG_485_RX_RTU); /* å€Ÿç”¨æŒ‰é”®FIFOï¼Œå‘é€ä¸€ä¸ªæ”¶åˆ°485æ•°æ®å¸§çš„æ¶ˆæ¯ */
 	}
 err_ret:
-	g_tModH.RxCount = 0;	/* ±ØÐëÇåÁã¼ÆÊýÆ÷£¬·½±ãÏÂ´ÎÖ¡Í¬²½ */
+	g_tModH.RxCount = 0; /* å¿…é¡»æ¸…é›¶è®¡æ•°å™¨ï¼Œæ–¹ä¾¿ä¸‹æ¬¡å¸§åŒæ­¥ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODH_RxTimeOut
-*	¹¦ÄÜËµÃ÷: ³¬¹ý3.5¸ö×Ö·ûÊ±¼äºóÖ´ÐÐ±¾º¯Êý¡£ ÉèÖÃÈ«¾Ö±äÁ¿ g_rtu_timeout = 1; Í¨ÖªÖ÷³ÌÐò¿ªÊ¼½âÂë¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODH_RxTimeOut
+*	åŠŸèƒ½è¯´æ˜Ž: è¶…è¿‡3.5ä¸ªå­—ç¬¦æ—¶é—´åŽæ‰§è¡Œæœ¬å‡½æ•°ã€‚ è®¾ç½®å…¨å±€å˜é‡ g_rtu_timeout = 1; é€šçŸ¥ä¸»ç¨‹åºå¼€å§‹è§£ç ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODH_RxTimeOut(void)
@@ -230,10 +230,10 @@ static void MODH_RxTimeOut(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_TestOk
-*	¹¦ÄÜËµÃ÷: ²âÊÔÊýÂë¹ÜÓ¦´ð. ÊýÂë¹Ü»áÓ¦´ðOK¡£ ÐèÒªÏÈÇÐ»»µ½ASCIIÐ­Òé¡£
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_TestOk
+*	åŠŸèƒ½è¯´æ˜Ž: æµ‹è¯•æ•°ç ç®¡åº”ç­”. æ•°ç ç®¡ä¼šåº”ç­”OKã€‚ éœ€è¦å…ˆåˆ‡æ¢åˆ°ASCIIåè®®ã€‚
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_TestOk(uint8_t _addr)
@@ -246,11 +246,11 @@ void LED485_TestOk(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_ReadModel
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ÊýÂë¹ÜÐÍºÅ. ÐèÒªÏÈÇÐ»»µ½ASCIIÐ­Òé¡£ ¸ÄÃüÁîÖ»ÊÇ·¢ËÍÖ¸Áî£¬Ö÷³ÌÐò¸ù¾Ý MSG_485_RX ÏûÏ¢»ñµÃ
-*			  ½á¹û
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_ReadModel
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–æ•°ç ç®¡åž‹å·. éœ€è¦å…ˆåˆ‡æ¢åˆ°ASCIIåè®®ã€‚ æ”¹å‘½ä»¤åªæ˜¯å‘é€æŒ‡ä»¤ï¼Œä¸»ç¨‹åºæ ¹æ® MSG_485_RX æ¶ˆæ¯èŽ·å¾—
+*			  ç»“æžœ
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_ReadModel(uint8_t _addr)
@@ -263,11 +263,11 @@ void LED485_ReadModel(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_ReadVersion
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ÊýÂë¹Ü¹Ì¼þ°æ±¾. ÐèÒªÏÈÇÐ»»µ½ASCIIÐ­Òé¡£ ±¾º¯ÊýÖ»ÊÇ·¢ËÍÖ¸Áî£¬Ö÷³ÌÐò¸ù¾Ý MSG_485_RX ÏûÏ¢»ñµÃ
-*			  ½á¹û
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_ReadVersion
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–æ•°ç ç®¡å›ºä»¶ç‰ˆæœ¬. éœ€è¦å…ˆåˆ‡æ¢åˆ°ASCIIåè®®ã€‚ æœ¬å‡½æ•°åªæ˜¯å‘é€æŒ‡ä»¤ï¼Œä¸»ç¨‹åºæ ¹æ® MSG_485_RX æ¶ˆæ¯èŽ·å¾—
+*			  ç»“æžœ
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_ReadVersion(uint8_t _addr)
@@ -280,11 +280,11 @@ void LED485_ReadVersion(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_ReadBright
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ÊýÂë¹ÜÁÁ¶È²ÎÊý¡£ÐèÒªÏÈÇÐ»»µ½ASCIIÐ­Òé¡£ ±¾º¯ÊýÖ»ÊÇ·¢ËÍÖ¸Áî£¬Ö÷³ÌÐò¸ù¾Ý MSG_485_RX ÏûÏ¢»ñµÃ
-*			  ½á¹û
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_ReadBright
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–æ•°ç ç®¡äº®åº¦å‚æ•°ã€‚éœ€è¦å…ˆåˆ‡æ¢åˆ°ASCIIåè®®ã€‚ æœ¬å‡½æ•°åªæ˜¯å‘é€æŒ‡ä»¤ï¼Œä¸»ç¨‹åºæ ¹æ® MSG_485_RX æ¶ˆæ¯èŽ·å¾—
+*			  ç»“æžœ
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_ReadBright(uint8_t _addr)
@@ -297,11 +297,11 @@ void LED485_ReadBright(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_SetBrightA
-*	¹¦ÄÜËµÃ÷: ÉèÖÃLEDÊýÂë¹ÜµÄÁÁ¶È £¨²ÉÓÃASCIIÐ­Òé)
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _bright : ÁÁ¶ÈÖµ 0 - 7
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_SetBrightA
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®LEDæ•°ç ç®¡çš„äº®åº¦ ï¼ˆé‡‡ç”¨ASCIIåè®®)
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _bright : äº®åº¦å€¼ 0 - 7
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_SetBrightA(uint8_t _addr, uint8_t _bright)
@@ -314,11 +314,11 @@ void LED485_SetBrightA(uint8_t _addr, uint8_t _bright)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_ModifyAddrA
-*	¹¦ÄÜËµÃ÷: ÐÞ¸ÄLEDÊýÂë¹ÜµÄµØÖ·. £¨²ÉÓÃASCIIÐ­Òé)
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _NewAddr : ÐÂµØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_ModifyAddrA
+*	åŠŸèƒ½è¯´æ˜Ž: ä¿®æ”¹LEDæ•°ç ç®¡çš„åœ°å€. ï¼ˆé‡‡ç”¨ASCIIåè®®)
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _NewAddr : æ–°åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_ModifyAddrA(uint8_t _addr, uint8_t _NewAddr)
@@ -331,11 +331,11 @@ void LED485_ModifyAddrA(uint8_t _addr, uint8_t _NewAddr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_DispNumberA
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾1¸öÕûÊý.  Ê¹ÓÃASCIIÐ­Òé¡£
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _iNumber : ÕûÊý£¬¸ºÊýÓÃ²¹Âë±íÊ¾
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_DispNumberA
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤º1ä¸ªæ•´æ•°.  ä½¿ç”¨ASCIIåè®®ã€‚
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _iNumber : æ•´æ•°ï¼Œè´Ÿæ•°ç”¨è¡¥ç è¡¨ç¤º
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_DispNumberA(uint8_t _addr, int16_t _iNumber)
@@ -348,11 +348,11 @@ void LED485_DispNumberA(uint8_t _addr, int16_t _iNumber)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_DispStrA
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾1¸öASCII×Ö·û´®£» Ê¹ÓÃASCIIÐ­Òé¡£
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _iNumber : ÕûÊý£¬¸ºÊýÓÃ²¹Âë±íÊ¾
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_DispStrA
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤º1ä¸ªASCIIå­—ç¬¦ä¸²ï¼› ä½¿ç”¨ASCIIåè®®ã€‚
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _iNumber : æ•´æ•°ï¼Œè´Ÿæ•°ç”¨è¡¥ç è¡¨ç¤º
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_DispStrA(uint8_t _addr, char *_str)
@@ -365,10 +365,10 @@ void LED485_DispStrA(uint8_t _addr, char *_str)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_SetProtRTU
-*	¹¦ÄÜËµÃ÷: ÉèÖÃ´Ó»úµÄÍ¨ÐÅÐ­ÒéÎª Modbus RTU
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_SetProtRTU
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®ä»Žæœºçš„é€šä¿¡åè®®ä¸º Modbus RTU
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_SetProtRTU(uint8_t _addr)
@@ -381,10 +381,10 @@ void LED485_SetProtRTU(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_SetProtAscii
-*	¹¦ÄÜËµÃ÷: ÉèÖÃ´Ó»úµÄÍ¨ÐÅÐ­ÒéÎª ASCII
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_SetProtAscii
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®ä»Žæœºçš„é€šä¿¡åè®®ä¸º ASCII
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_SetProtAscii(uint8_t _addr)
@@ -397,11 +397,11 @@ void LED485_SetProtAscii(uint8_t _addr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_DispNumber
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾1¸öÕûÊý. ²»µÈ´ýÓ¦´ð
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _iNumber : ÕûÊý£¬¸ºÊýÓÃ²¹Âë±íÊ¾
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_DispNumber
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤º1ä¸ªæ•´æ•°. ä¸ç­‰å¾…åº”ç­”
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _iNumber : æ•´æ•°ï¼Œè´Ÿæ•°ç”¨è¡¥ç è¡¨ç¤º
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_DispNumber(uint8_t _addr, int16_t _iNumber)
@@ -411,11 +411,11 @@ void LED485_DispNumber(uint8_t _addr, int16_t _iNumber)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_SetDispDot
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÐ¡ÊýµãÎ»Êý
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _dot : Ð¡ÊýµãÎ»Êý¡£ÊýÂë¹ÜÉÏµçºóÈ±Ê¡ÊÇ0£¬±íÊ¾ÎÞÐ¡Êýµã¡£
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_SetDispDot
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®å°æ•°ç‚¹ä½æ•°
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _dot : å°æ•°ç‚¹ä½æ•°ã€‚æ•°ç ç®¡ä¸Šç”µåŽç¼ºçœæ˜¯0ï¼Œè¡¨ç¤ºæ— å°æ•°ç‚¹ã€‚
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_SetDispDot(uint8_t _addr, uint8_t _dot)
@@ -425,11 +425,11 @@ void LED485_SetDispDot(uint8_t _addr, uint8_t _dot)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_SetBright
-*	¹¦ÄÜËµÃ÷: ÉèÖÃLEDÊýÂë¹ÜµÄÁÁ¶È
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _bright : ÁÁ¶ÈÖµ 0 - 7
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_SetBright
+*	åŠŸèƒ½è¯´æ˜Ž: è®¾ç½®LEDæ•°ç ç®¡çš„äº®åº¦
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _bright : äº®åº¦å€¼ 0 - 7
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_SetBright(uint8_t _addr, uint8_t _bright)
@@ -439,11 +439,11 @@ void LED485_SetBright(uint8_t _addr, uint8_t _bright)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_ModifyAddr
-*	¹¦ÄÜËµÃ÷: ÐÞ¸ÄLEDÊýÂë¹ÜµÄµØÖ·
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _NewAddr : ÐÂµØÖ·
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_ModifyAddr
+*	åŠŸèƒ½è¯´æ˜Ž: ä¿®æ”¹LEDæ•°ç ç®¡çš„åœ°å€
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _NewAddr : æ–°åœ°å€
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_ModifyAddr(uint8_t _addr, uint8_t _NewAddr)
@@ -453,33 +453,33 @@ void LED485_ModifyAddr(uint8_t _addr, uint8_t _NewAddr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_DispNumberWithDot
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾´øÐ¡ÊýµãµÄÕûÊý
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _iNumber : ÒªÏÔÊ¾µÄÕûÊý
-*			  _dot : Ð¡ÊýµãÎ»Êý
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_DispNumberWithDot
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤ºå¸¦å°æ•°ç‚¹çš„æ•´æ•°
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _iNumber : è¦æ˜¾ç¤ºçš„æ•´æ•°
+*			  _dot : å°æ•°ç‚¹ä½æ•°
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_DispNumberWithDot(uint8_t _addr, int16_t _iNumber, uint8_t _dot)
 {
-/*
-	PLC·¢ËÍ  :0110 00 90 00 02 04 00 0201 EA DB 1C
-	?  01:   ÊýÂë¹ÜÆÁµÄÕ¾ºÅ£¨RS485µØÖ·£©
-	?  10 :   ¹¦ÄÜÂë£¬±íÊ¾Ð´¶à¸ö¼Ä´æÆ÷
-	?  00 90 :   ÊýÂë¹ÜÆÁµÄÏÔÊ¾¼Ä´æÆ÷(´øÐ¡ÊýµãºÍÕý¸ººÅµÄÕûÊý)
-	?  00 02:  ¼Ä´æÆ÷¸öÊý
-	?  04:  Êý¾Ý¸öÊý£¨×Ö½ÚÊý£©
-	?  00 02£º  00 ±íÊ¾Õý¸ººÅ£¨00=ÕýÊý£»01=¸ºÊý£¬Êý×ÖÇ°ÏÔÊ¾-£©
-				02 ±íÊ¾Ð¡ÊýµãÎ»Êý£¬0±íÊ¾ÎÞÐ¡Êýµã¡£2±íÊ¾Ð¡ÊýµãºóÓÐ2Î»Êý×Ö
-	?  01 EA:   2Î»ÕûÊý£¬¸ß×Ö½ÚÔÚÇ°¡£01 EA±íÊ¾Ê®½øÖÆ 490
-	?  DB 1C  :   ¶þ¸ö×Ö½ÚCRCÂë
-	´ËÃüÁî½«ÏÔÊ¾¡°4.90¡±
-	ÊýÂë¹ÜÆÁ·µ»Ø £º01 10 00 90 00 02 41 E5
+	/*
+	PLCå‘é€  :0110 00 90 00 02 04 00 0201 EA DB 1C
+	?  01:   æ•°ç ç®¡å±çš„ç«™å·ï¼ˆRS485åœ°å€ï¼‰
+	?  10 :   åŠŸèƒ½ç ï¼Œè¡¨ç¤ºå†™å¤šä¸ªå¯„å­˜å™¨
+	?  00 90 :   æ•°ç ç®¡å±çš„æ˜¾ç¤ºå¯„å­˜å™¨(å¸¦å°æ•°ç‚¹å’Œæ­£è´Ÿå·çš„æ•´æ•°)
+	?  00 02:  å¯„å­˜å™¨ä¸ªæ•°
+	?  04:  æ•°æ®ä¸ªæ•°ï¼ˆå­—èŠ‚æ•°ï¼‰
+	?  00 02ï¼š  00 è¡¨ç¤ºæ­£è´Ÿå·ï¼ˆ00=æ­£æ•°ï¼›01=è´Ÿæ•°ï¼Œæ•°å­—å‰æ˜¾ç¤º-ï¼‰
+				02 è¡¨ç¤ºå°æ•°ç‚¹ä½æ•°ï¼Œ0è¡¨ç¤ºæ— å°æ•°ç‚¹ã€‚2è¡¨ç¤ºå°æ•°ç‚¹åŽæœ‰2ä½æ•°å­—
+	?  01 EA:   2ä½æ•´æ•°ï¼Œé«˜å­—èŠ‚åœ¨å‰ã€‚01 EAè¡¨ç¤ºåè¿›åˆ¶ 490
+	?  DB 1C  :   äºŒä¸ªå­—èŠ‚CRCç 
+	æ­¤å‘½ä»¤å°†æ˜¾ç¤ºâ€œ4.90â€
+	æ•°ç ç®¡å±è¿”å›ž ï¼š01 10 00 90 00 02 41 E5
 */
 	uint16_t buf[2];
 
-	if (_iNumber < 0)			/* ÏÔÊ¾Õý¸ººÅ */
+	if (_iNumber < 0) /* æ˜¾ç¤ºæ­£è´Ÿå· */
 	{
 		buf[0] = 0x0100 | _dot;
 	}
@@ -492,35 +492,35 @@ void LED485_DispNumberWithDot(uint8_t _addr, int16_t _iNumber, uint8_t _dot)
 		_iNumber = -_iNumber;
 	}
 	buf[1] = _iNumber;
-	
-	MODH_Send10H(_addr,0x0090, 2, buf);
+
+	MODH_Send10H(_addr, 0x0090, 2, buf);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: LED485_DispStr
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾×Ö·û´®
-*	ÐÎ    ²Î: _addr : ´Ó»úµÄ485µØÖ·
-*			  _str : ÒªÏÔÊ¾µÄ×Ö·û´®
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: LED485_DispStr
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤ºå­—ç¬¦ä¸²
+*	å½¢    å‚: _addr : ä»Žæœºçš„485åœ°å€
+*			  _str : è¦æ˜¾ç¤ºçš„å­—ç¬¦ä¸²
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void LED485_DispStr(uint8_t _addr, char *_str)
 {
-/*
-	PLC·¢ËÍ  :
+	/*
+	PLCå‘é€  :
 	0110 00 70 00 06 0C 50 32 2E 33 00 00 00 00 00 00 00 00 3B 25
-	?  01:   ÊýÂë¹ÜÆÁµÄÕ¾ºÅ£¨RS485µØÖ·£©
-	?  10 :   ¹¦ÄÜÂë£¬±íÊ¾Ð´¶à¸ö¼Ä´æÆ÷
-	?  0070 :   ÊýÂë¹ÜÆÁµÄÏÔÊ¾¼Ä´æÆ÷(ASCII)
-	?  00 06:  ¼Ä´æÆ÷¸öÊý
-	?  0C:   Êý¾Ý¶ÎµÄ×Ö½ÚÊý
+	?  01:   æ•°ç ç®¡å±çš„ç«™å·ï¼ˆRS485åœ°å€ï¼‰
+	?  10 :   åŠŸèƒ½ç ï¼Œè¡¨ç¤ºå†™å¤šä¸ªå¯„å­˜å™¨
+	?  0070 :   æ•°ç ç®¡å±çš„æ˜¾ç¤ºå¯„å­˜å™¨(ASCII)
+	?  00 06:  å¯„å­˜å™¨ä¸ªæ•°
+	?  0C:   æ•°æ®æ®µçš„å­—èŠ‚æ•°
 	?  50 32 2E 33 00 00 00 00 00 00 00 00  :
-	ASCII×Ö·û´®¡£¹Ì¶¨³¤¶È12×Ö½Ú£¬³¤¶È²»×ã12Î»µÄ×Ö·û´®ÓÒ±ß±ØÐëÌî00¡£±¾Àý
-	±íÊ¾ASCII×Ö·û´®¡±P2.3¡±
-	?  3B 25  :   ¶þ¸ö×Ö½ÚCRCÂë
-	´ËÃüÁî½«ÏÔÊ¾¡°P2.3¡±
-	ÊýÂë¹ÜÆÁ·µ»Ø £º01 10 00 70 00 06 41 D0
+	ASCIIå­—ç¬¦ä¸²ã€‚å›ºå®šé•¿åº¦12å­—èŠ‚ï¼Œé•¿åº¦ä¸è¶³12ä½çš„å­—ç¬¦ä¸²å³è¾¹å¿…é¡»å¡«00ã€‚æœ¬ä¾‹
+	è¡¨ç¤ºASCIIå­—ç¬¦ä¸²â€P2.3â€
+	?  3B 25  :   äºŒä¸ªå­—èŠ‚CRCç 
+	æ­¤å‘½ä»¤å°†æ˜¾ç¤ºâ€œP2.3â€
+	æ•°ç ç®¡å±è¿”å›ž ï¼š01 10 00 70 00 06 41 D0
 */
 	uint16_t buf[6];
 	uint8_t i;
@@ -529,14 +529,14 @@ void LED485_DispStr(uint8_t _addr, char *_str)
 	{
 		buf[i] = 0;
 	}
-	
+
 	for (i = 0; i < 12; i++)
 	{
 		if (_str[i] == 0)
 		{
 			break;
 		}
-		
+
 		if (i % 2)
 		{
 			buf[i / 2] += _str[i] << 8;
@@ -546,9 +546,8 @@ void LED485_DispStr(uint8_t _addr, char *_str)
 			buf[i / 2] = _str[i];
 		}
 	}
-	
+
 	MODH_Send10H(_addr, 0x0070, 2, buf);
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,104 +1,106 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : MP3²¥·ÅÆ÷½çÃæ
-*	ÎÄ¼şÃû³Æ : "mp3_player.h"
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : ²âÊÔVS1053 MP3Ä£¿é
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		V1.0    2013-02-01 armfly  Ê×·¢
-*		V1.1    2015-10-17 armfly  f_opendirºó±ØĞëf_closedir
+*	æ¨¡å—åç§° : MP3æ’­æ”¾å™¨ç•Œé¢
+*	æ–‡ä»¶åç§° : "mp3_player.h"
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : æµ‹è¯•VS1053 MP3æ¨¡å—
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		V1.0    2013-02-01 armfly  é¦–å‘
+*		V1.1    2015-10-17 armfly  f_opendiråå¿…é¡»f_closedir
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 #include "form_mp3_player.h"
-#include "ff.h"				/* FatFS ÎÄ¼şÏµÍ³Í·ÎÄ¼ş */
+#include "ff.h" /* FatFS æ–‡ä»¶ç³»ç»Ÿå¤´æ–‡ä»¶ */
 #include "ff_gen_drv.h"
 #include "sd_diskio_dma.h"
 
-/* ×Ô¶¯²¥·ÅÖ¸¶¨´ÅÅÌÖ¸¶¨Ä¿Â¼ÏÂµÄMP3ÎÄ¼ş */
-#define MP3_FOLDER	"/Music"			/* MP3ÎÄ¼ş¼Ğ, ²»º¬´ÅÅÌÅÌ·û */
+/* è‡ªåŠ¨æ’­æ”¾æŒ‡å®šç£ç›˜æŒ‡å®šç›®å½•ä¸‹çš„MP3æ–‡ä»¶ */
+#define MP3_FOLDER "/Music" /* MP3æ–‡ä»¶å¤¹, ä¸å«ç£ç›˜ç›˜ç¬¦ */
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
-	LABEL_T Label7; LABEL_T Label8;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
+	LABEL_T Label7;
+	LABEL_T Label8;
 
 	LABEL_T Label9;
 	BUTTON_T BtnRet;
-}FormMP3_T;
+} FormMP3_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"MP3Ä£¿é²âÊÔ³ÌĞò"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "MP3æ¨¡å—æµ‹è¯•ç¨‹åº"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Ğ¾Æ¬ĞÍºÅ :"
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "èŠ¯ç‰‡å‹å· :"
 
-	#define LABEL2_X  	(LABEL1_X + 90)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"  "
+#define LABEL2_X (LABEL1_X + 90)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "  "
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"Êä³öÒôÁ¿ :"
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "è¾“å‡ºéŸ³é‡ :"
 
-	#define LABEL4_X  	(LABEL3_X + 90)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	" "
+#define LABEL4_X (LABEL3_X + 90)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT " "
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"²¥·Å½ø¶È : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "æ’­æ”¾è¿›åº¦ : "
 
-	#define LABEL6_X  	(LABEL5_X + 90)
-	#define LABEL6_Y	LABEL5_Y
-	#define LABEL6_TEXT	" "
+#define LABEL6_X (LABEL5_X + 90)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT " "
 
-#define LABEL7_X  	(LABEL1_X)
-#define LABEL7_Y	(LABEL1_Y + 20 * 3)
-#define LABEL7_TEXT	"ÎÄ¼şÃû   : "
+#define LABEL7_X (LABEL1_X)
+#define LABEL7_Y (LABEL1_Y + 20 * 3)
+#define LABEL7_TEXT "æ–‡ä»¶å   : "
 
-	#define LABEL8_X  	(LABEL7_X + 90)
-	#define LABEL8_Y	LABEL7_Y
-	#define LABEL8_TEXT	"---"
+#define LABEL8_X (LABEL7_X + 90)
+#define LABEL8_Y LABEL7_Y
+#define LABEL8_TEXT "---"
 
+#define LABEL9_X LABEL1_X
+#define LABEL9_Y 120
+#define LABEL9_TEXT "è¯·å°†MP3æ–‡ä»¶æ”¾åˆ°SDå¡Musicç›®å½•ä¸‹"
 
-#define LABEL9_X  	LABEL1_X
-#define LABEL9_Y	120
-#define LABEL9_TEXT	"Çë½«MP3ÎÄ¼ş·Åµ½SD¿¨MusicÄ¿Â¼ÏÂ"
-
-#define SONG_LIST_MAX	10			/* ¸èÇúÁĞ±í×î´óÊıÄ¿ */
-
+#define SONG_LIST_MAX 10 /* æ­Œæ›²åˆ—è¡¨æœ€å¤§æ•°ç›® */
 
 static void InitFormMP3(void);
 static void DispFormMP3(void);
@@ -113,303 +115,303 @@ FormMP3_T *FormMP3;
 MP3_T g_tMP3;
 PLAY_LIST_T g_tPlayList[SONG_LIST_MAX];
 
-/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
-FATFS   g_fs;
-FIL 	g_Mp3File;
+/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
+FATFS g_fs;
+FIL g_Mp3File;
 
-char DiskPath[4]; /* ±£´æFatFS ´ÅÅÌÂ·¾¶ */
+char DiskPath[4]; /* ä¿å­˜FatFS ç£ç›˜è·¯å¾„ */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ReserveFunc
-*	¹¦ÄÜËµÃ÷: ±£Áô¹¦ÄÜ¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ReserveFunc
+*	åŠŸèƒ½è¯´æ˜: ä¿ç•™åŠŸèƒ½ã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void MP3Player(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormMP3_T form;
 	uint8_t ucRefresh;
 	uint8_t ucNextSong;
 
-	FormMP3= &form;
+	FormMP3 = &form;
 
 	InitFormMP3();
 	DispFormMP3();
-	MP3HardInit();		/* ÅäÖÃVS1053BÓ²¼şºÍWM8978Ó²¼ş */
-	
+	MP3HardInit(); /* é…ç½®VS1053Bç¡¬ä»¶å’ŒWM8978ç¡¬ä»¶ */
+
 	//FATFS_LinkDriver(&USBH_Driver, DiskPath);
 	FATFS_LinkDriver(&SD_Driver, DiskPath);
-	
-	/* ¹ÒÔØÎÄ¼şÏµÍ³ */
+
+	/* æŒ‚è½½æ–‡ä»¶ç³»ç»Ÿ */
 	if (f_mount(&g_fs, DiskPath, 0) != FR_OK)
 	{
-		printf("f_mountÎÄ¼şÏµÍ³Ê§°Ü");
+		printf("f_mountæ–‡ä»¶ç³»ç»Ÿå¤±è´¥");
 	}
 
 #if 1
-	/* ´òÓ¡NAND Flash ¸ùÄ¿Â¼ºÍMP3Ä¿Â¼ÏÂµÄÎÄ¼ş */
+	/* æ‰“å°NAND Flash æ ¹ç›®å½•å’ŒMP3ç›®å½•ä¸‹çš„æ–‡ä»¶ */
 	{
 		char path[60];
 
-		sprintf(path, "%s", DiskPath);		/* ¸ùÄ¿Â¼ */
+		sprintf(path, "%s", DiskPath); /* æ ¹ç›®å½• */
 		ViewDir(path);
 
-		sprintf(path, "%s%s", DiskPath, MP3_FOLDER);	/* ÒôÀÖÄ¿Â¼ */
+		sprintf(path, "%s%s", DiskPath, MP3_FOLDER); /* éŸ³ä¹ç›®å½• */
 		ViewDir(path);
 	}
 #endif
-	
-	FillSongList();		/* ËÑË÷NAND Flash ¸ùÄ¿Â¼ÏÂµÄMP3ÎÄ¼ş£¬²¢Ìî³äµ½²¥·ÅÁĞ±íÊı×é */
+
+	FillSongList(); /* æœç´¢NAND Flash æ ¹ç›®å½•ä¸‹çš„MP3æ–‡ä»¶ï¼Œå¹¶å¡«å……åˆ°æ’­æ”¾åˆ—è¡¨æ•°ç»„ */
 
 	ucRefresh = 1;
-	g_tMP3.ucPauseEn = 0;	/* È±Ê¡¿ªÊ¼²¥·Å */
+	g_tMP3.ucPauseEn = 0; /* ç¼ºçœå¼€å§‹æ’­æ”¾ */
 
 	if (g_tMP3.ListCount > 0)
 	{
-		ucNextSong = 1;			/* ¶¨Î»ÏÂÒ»Ê×¸èÇúµÄ±êÖ¾ */
+		ucNextSong = 1; /* å®šä½ä¸‹ä¸€é¦–æ­Œæ›²çš„æ ‡å¿— */
 	}
 	else
 	{
 		ucNextSong = 0;
 	}
 	g_tMP3.ListIndex = 0;
-	bsp_StartAutoTimer(0, 100);		/* 100ms Ë¢ĞÂ½ø¶ÈÌõ */
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	bsp_StartAutoTimer(0, 100); /* 100ms åˆ·æ–°è¿›åº¦æ¡ */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-		/* ´ò¿ª¸èÇúÎÄ¼ş */
+		/* æ‰“å¼€æ­Œæ›²æ–‡ä»¶ */
 		if (ucNextSong == 1)
 		{
 			ucNextSong = 0;
 
-			/* ¹Ø±ÕÉÏÒ»¸öÎÄ¼ş*/
+			/* å…³é—­ä¸Šä¸€ä¸ªæ–‡ä»¶*/
 			f_close(&g_Mp3File);
 
-			printf("\r\n\r\n");		/* »»Ò»ĞĞÏÔÊ¾ */
+			printf("\r\n\r\n"); /* æ¢ä¸€è¡Œæ˜¾ç¤º */
 
-			/* ´ò¿ªMUSICÄ¿Â¼ÏÂµÄmp3 ÎÄ¼ş */
+			/* æ‰“å¼€MUSICç›®å½•ä¸‹çš„mp3 æ–‡ä»¶ */
 			{
 				char FileName[256];
 				FRESULT result;
 
 				sprintf(FileName, "%s%s/%s", DiskPath, MP3_FOLDER, g_tPlayList[g_tMP3.ListIndex].FileName);
 				result = f_open(&g_Mp3File, FileName, FA_OPEN_EXISTING | FA_READ);
-				if (result !=  FR_OK)
+				if (result != FR_OK)
 				{
 					printf("Open MP3 file Error, %s\r\n", g_tPlayList[g_tMP3.ListIndex].FileName);
-					FormMP3->Label8.pCaption = "´ò¿ªMP3ÎÄ¼şÊ§°Ü";
+					FormMP3->Label8.pCaption = "æ‰“å¼€MP3æ–‡ä»¶å¤±è´¥";
 					LCD_DrawLabel(&FormMP3->Label8);
 				}
 				else
 				{
-					printf("ÕıÔÚ²¥·Å: %s\r\n", g_tPlayList[g_tMP3.ListIndex].FileName);
+					printf("æ­£åœ¨æ’­æ”¾: %s\r\n", g_tPlayList[g_tMP3.ListIndex].FileName);
 
-					/* ÏÔÊ¾ÎÄ¼şÃû */
+					/* æ˜¾ç¤ºæ–‡ä»¶å */
 					FormMP3->Label8.pCaption = g_tPlayList[g_tMP3.ListIndex].FileName;
 					LCD_DrawLabel(&FormMP3->Label8);
 				}
 			}
 
-			g_tMP3.uiProgress = 0;	/* ½ø¶È */
+			g_tMP3.uiProgress = 0; /* è¿›åº¦ */
 		}
 
 		if (g_tMP3.ucPauseEn == 0)
 		{
 			if (Mp3Pro() == 1)
 			{
-				/* ¸èÇú²¥·ÅÍê±Ï£¬×Ô¶¯ÇĞ»»µ½ÏÂÒ»Ê×¸è */
+				/* æ­Œæ›²æ’­æ”¾å®Œæ¯•ï¼Œè‡ªåŠ¨åˆ‡æ¢åˆ°ä¸‹ä¸€é¦–æ­Œ */
 
-				if (g_tMP3.ListCount > 0)			
+				if (g_tMP3.ListCount > 0)
 				{
-					/* Ä£ÄâÒ»¸öÒ¡¸ËÓÒ¼ü°´ÏÂ£¬Ö´ĞĞ»»¸è²Ù×÷ */
+					/* æ¨¡æ‹Ÿä¸€ä¸ªæ‘‡æ†å³é”®æŒ‰ä¸‹ï¼Œæ‰§è¡Œæ¢æ­Œæ“ä½œ */
 					bsp_PutKey(JOY_DOWN_R);
 				}
 			}
 		}
 
-		/* Ë¢ĞÂ×´Ì¬À¸ */
+		/* åˆ·æ–°çŠ¶æ€æ  */
 		if ((ucRefresh == 1) || (bsp_CheckTimer(0)))
 		{
 			ucRefresh = 0;
-			Mp3DispStatus();		/* ÏÔÊ¾µ±Ç°×´Ì¬£¬ÒôÁ¿µÈ */
+			Mp3DispStatus(); /* æ˜¾ç¤ºå½“å‰çŠ¶æ€ï¼ŒéŸ³é‡ç­‰ */
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormMP3->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormMP3->BtnRet);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormMP3->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormMP3->BtnRet);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormMP3->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormMP3->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormMP3->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormMP3->BtnRet);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormMP3->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormMP3->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormMP3->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormMP3->BtnRet);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:			/* K1¼ü°´ÏÂ */
-					if (g_tMP3.ucPauseEn == 0)
-					{
-						g_tMP3.ucPauseEn = 1;
-					}
-					else
-					{
-						g_tMP3.ucPauseEn = 0;
-					}
+			case KEY_DOWN_K1: /* K1é”®æŒ‰ä¸‹ */
+				if (g_tMP3.ucPauseEn == 0)
+				{
+					g_tMP3.ucPauseEn = 1;
+				}
+				else
+				{
+					g_tMP3.ucPauseEn = 0;
+				}
+				ucRefresh = 1;
+				break;
+
+			case KEY_DOWN_K2:					/* K2é”®æŒ‰ä¸‹ */
+				f_lseek(&g_Mp3File, 0); /* ä¿®æ”¹æ–‡ä»¶å½“å‰æŒ‡é’ˆåˆ°æ–‡ä»¶å¤´, ä»å¤´å¼€å§‹æ’­æ”¾ */
+				g_tMP3.uiProgress = 0;	/* è¿›åº¦ */
+				ucRefresh = 1;
+				break;
+
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				if (g_tMP3.ucMuteOn == 1)
+				{
+					g_tMP3.ucMuteOn = 0;
+					VS1053_SetBASS(0, 0, 0, 0); /* åŸéŸ³,ä½éŸ³ä¸å¢å¼º */
+				}
+				else
+				{
+					g_tMP3.ucMuteOn = 1;
+					VS1053_SetBASS(0, 0, 10, 100); /* è®¾ç½®ä½éŸ³å¢å¼º(æˆªæ­¢é¢‘ç‡100Hz)ï¼Œé«˜éŸ³ä¸å˜ */
+				}
+				ucRefresh = 1;
+				break;
+
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				if (g_tMP3.ucVolume > VS_VOL_MIN)
+				{
+					g_tMP3.ucVolume--;
+					VS1053_SetVolume(g_tMP3.ucVolume);
 					ucRefresh = 1;
-					break;
+				}
+				break;
 
-				case KEY_DOWN_K2:			/* K2¼ü°´ÏÂ */
-					f_lseek(&g_Mp3File, 0);	/* ĞŞ¸ÄÎÄ¼şµ±Ç°Ö¸Õëµ½ÎÄ¼şÍ·, ´ÓÍ·¿ªÊ¼²¥·Å */
-					g_tMP3.uiProgress = 0;	/* ½ø¶È */
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				if (g_tMP3.ucVolume < VS_VOL_MAX)
+				{
+					g_tMP3.ucVolume++;
+					VS1053_SetVolume(g_tMP3.ucVolume);
 					ucRefresh = 1;
-					break;
+				}
+				break;
 
-				case KEY_DOWN_K3:			/* K3¼ü°´ÏÂ */
-					if (g_tMP3.ucMuteOn == 1)
-					{
-						g_tMP3.ucMuteOn = 0;
-						VS1053_SetBASS(0, 0, 0, 0);		/* Ô­Òô,µÍÒô²»ÔöÇ¿ */
-					}
-					else
-					{
-						g_tMP3.ucMuteOn = 1;
-						VS1053_SetBASS(0, 0, 10, 100);	/* ÉèÖÃµÍÒôÔöÇ¿(½ØÖ¹ÆµÂÊ100Hz)£¬¸ßÒô²»±ä */
-					}
-					ucRefresh = 1;
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				if (g_tMP3.ListIndex > 0)
+				{
+					g_tMP3.ListIndex--; /* å‰ä¸€é¦–æ­Œ */
+				}
+				else
+				{
+					g_tMP3.ListIndex = g_tMP3.ListCount - 1; /* å¾ªç¯ */
+				}
+				ucRefresh = 1;
+				ucNextSong = 1; /* æ‰“å¼€ä¸‹ä¸€é¦–æ­Œæ›² */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					if (g_tMP3.ucVolume > VS_VOL_MIN)
-					{
-						g_tMP3.ucVolume--;
-						VS1053_SetVolume(g_tMP3.ucVolume);
-						ucRefresh = 1;
-					}
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				if (g_tMP3.ListIndex < g_tMP3.ListCount - 1)
+				{
+					g_tMP3.ListIndex++; /* ä¸‹ä¸€é¦–æ­Œ */
+				}
+				else
+				{
+					g_tMP3.ListIndex = 0; /* å¾ªç¯ */
+				}
+				ucRefresh = 1;
+				ucNextSong = 1; /* æ‰“å¼€ä¸‹ä¸€é¦–æ­Œæ›² */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					if (g_tMP3.ucVolume < VS_VOL_MAX)
-					{
-						g_tMP3.ucVolume++;
-						VS1053_SetVolume(g_tMP3.ucVolume);
-						ucRefresh = 1;
-					}
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				ucRefresh = 1;
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					if (g_tMP3.ListIndex > 0)
-					{
-						g_tMP3.ListIndex--;		/* Ç°Ò»Ê×¸è */
-					}
-					else
-					{
-						g_tMP3.ListIndex = g_tMP3.ListCount - 1;	/* Ñ­»· */
-					}
-					ucRefresh = 1;
-					ucNextSong = 1;	 /* ´ò¿ªÏÂÒ»Ê×¸èÇú */
-					break;
-
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					if (g_tMP3.ListIndex < g_tMP3.ListCount - 1)
-					{
-						g_tMP3.ListIndex++;	/* ÏÂÒ»Ê×¸è */
-					}
-					else
-					{
-						g_tMP3.ListIndex = 0;	/* Ñ­»· */
-					}
-					ucRefresh = 1;
-					ucNextSong = 1;	 /* ´ò¿ªÏÂÒ»Ê×¸èÇú */
-					break;
-
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					ucRefresh = 1;
-					break;
-
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
 
-	bsp_StopTimer(0);	/* ¹Ø±Õ×Ô¶¯¶¨Ê±Æ÷ */
+	bsp_StopTimer(0); /* å…³é—­è‡ªåŠ¨å®šæ—¶å™¨ */
 
-	/* ¹Ø±ÕÎÄ¼ş*/
+	/* å…³é—­æ–‡ä»¶*/
 	f_close(&g_Mp3File);
 
-	/* Ğ¶ÔØÎÄ¼şÏµÍ³ */
+	/* å¸è½½æ–‡ä»¶ç³»ç»Ÿ */
 	f_mount(NULL, DiskPath, 0);
-	
-	FATFS_UnLinkDriver(DiskPath);	/* Ğ¶ÔØÇı¶¯ */
+
+	FATFS_UnLinkDriver(DiskPath); /* å¸è½½é©±åŠ¨ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormMP3
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormMP3
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormMP3(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormMP3->FontBox.FontCode = FC_ST_16;
-	FormMP3->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormMP3->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormMP3->FontBox.FrontColor = CL_BLACK;
 	FormMP3->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormMP3->FontBlack.FontCode = FC_ST_16;
-	FormMP3->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormMP3->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormMP3->FontBlack.FrontColor = CL_BLACK;
 	FormMP3->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormMP3->FontBlue.FontCode = FC_ST_16;
 	FormMP3->FontBlue.BackColor = CL_BTN_FACE;
 	FormMP3->FontBlue.FrontColor = CL_BLUE;
 	FormMP3->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormMP3->FontBtn.FontCode = FC_ST_16;
-	FormMP3->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormMP3->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormMP3->FontBtn.FrontColor = CL_BLACK;
 	FormMP3->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormMP3->Box1.Left = BOX1_X;
 	FormMP3->Box1.Top = BOX1_Y;
 	FormMP3->Box1.Height = BOX1_H;
@@ -417,7 +419,7 @@ static void InitFormMP3(void)
 	FormMP3->Box1.pCaption = BOX1_TEXT;
 	FormMP3->Box1.Font = &FormMP3->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormMP3->Label1.Left = LABEL1_X;
 	FormMP3->Label1.Top = LABEL1_Y;
 	FormMP3->Label1.MaxLen = 0;
@@ -448,7 +450,7 @@ static void InitFormMP3(void)
 	FormMP3->Label9.pCaption = LABEL9_TEXT;
 	FormMP3->Label9.Font = &FormMP3->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormMP3->Label2.Left = LABEL2_X;
 	FormMP3->Label2.Top = LABEL2_Y;
 	FormMP3->Label2.MaxLen = 0;
@@ -473,7 +475,7 @@ static void InitFormMP3(void)
 	FormMP3->Label8.pCaption = LABEL8_TEXT;
 	FormMP3->Label8.Font = &FormMP3->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormMP3->BtnRet.Left = BTN_RET_X;
 	FormMP3->BtnRet.Top = BTN_RET_Y;
 	FormMP3->BtnRet.Height = BTN_RET_H;
@@ -485,164 +487,162 @@ static void InitFormMP3(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormMP3
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormMP3
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormMP3(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormMP3->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormMP3->Label1);
 	LCD_DrawLabel(&FormMP3->Label3);
 	LCD_DrawLabel(&FormMP3->Label5);
 	LCD_DrawLabel(&FormMP3->Label7);
 
-	LCD_DrawLabel(&FormMP3->Label9);	
+	LCD_DrawLabel(&FormMP3->Label9);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormMP3->Label2);
 	LCD_DrawLabel(&FormMP3->Label4);
 	LCD_DrawLabel(&FormMP3->Label6);
 	LCD_DrawLabel(&FormMP3->Label8);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormMP3->BtnRet);
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: MP3HardInit
-*	¹¦ÄÜËµÃ÷: ÅäÖÃMP3²¥·ÅÏà¹ØµÄÓ²¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: MP3HardInit
+*	åŠŸèƒ½è¯´æ˜: é…ç½®MP3æ’­æ”¾ç›¸å…³çš„ç¡¬ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void MP3HardInit(void)
 {
-	/* ÅäÖÃVS1053Ó²¼ş */
+	/* é…ç½®VS1053ç¡¬ä»¶ */
 	{
 		VS1053_Init();
-		
-		/* µÈ´ıĞ¾Æ¬ÄÚ²¿²Ù×÷Íê³É */
+
+		/* ç­‰å¾…èŠ¯ç‰‡å†…éƒ¨æ“ä½œå®Œæˆ */
 		if (VS1053_WaitTimeOut())
 		{
-			/* Èç¹ûÃ»ÓĞ²åVS1053BÄ£¿é£¬DREQ¿ÚÏß½«·µ»ØµÍµçÆ½£¬ÕâÊÇÒ»ÖÖÒì³£Çé¿ö */
-			FormMP3->Label2.pCaption = "Ã»ÓĞ¼ì²âµ½MP3Ä£¿éÓ²¼ş";
-			LCD_DrawLabel(&FormMP3->Label2);		/* ÏÔÊ¾Ğ¾Æ¬ĞÍºÅ */
+			/* å¦‚æœæ²¡æœ‰æ’VS1053Bæ¨¡å—ï¼ŒDREQå£çº¿å°†è¿”å›ä½ç”µå¹³ï¼Œè¿™æ˜¯ä¸€ç§å¼‚å¸¸æƒ…å†µ */
+			FormMP3->Label2.pCaption = "æ²¡æœ‰æ£€æµ‹åˆ°MP3æ¨¡å—ç¡¬ä»¶";
+			LCD_DrawLabel(&FormMP3->Label2); /* æ˜¾ç¤ºèŠ¯ç‰‡å‹å· */
 
 			return;
 		}
 
-		
 		VS1053_SoftReset();
 
-		/* ´òÓ¡MP3½âÂëĞ¾Æ¬ĞÍºÅ */
+		/* æ‰“å°MP3è§£ç èŠ¯ç‰‡å‹å· */
 		{
 			char *pModel;
 
 			switch (VS1053_ReadChipID())
 			{
-				case VS1001:
-					pModel = "VS1001";
-					break;
+			case VS1001:
+				pModel = "VS1001";
+				break;
 
-				case VS1011:
-					pModel = "VS1011";
-					break;
+			case VS1011:
+				pModel = "VS1011";
+				break;
 
-				case VS1002:
-					pModel = "VS1002";
-					break;
+			case VS1002:
+				pModel = "VS1002";
+				break;
 
-				case VS1003:
-					pModel = "VS1003";
-					break;
+			case VS1003:
+				pModel = "VS1003";
+				break;
 
-				case VS1053:
-					pModel = "VS1053";
-					break;
+			case VS1053:
+				pModel = "VS1053";
+				break;
 
-				case VS1033:
-					pModel = "VS1033";
-					break;
+			case VS1033:
+				pModel = "VS1033";
+				break;
 
-				case VS1103:
-					pModel = "VS1103";
-					break;
+			case VS1103:
+				pModel = "VS1103";
+				break;
 
-				default:
-					pModel = "unknow";
-					break;
+			default:
+				pModel = "unknow";
+				break;
 			}
 			FormMP3->Label2.pCaption = pModel;
-			LCD_DrawLabel(&FormMP3->Label2);		/* ÏÔÊ¾Ğ¾Æ¬ĞÍºÅ */
+			LCD_DrawLabel(&FormMP3->Label2); /* æ˜¾ç¤ºèŠ¯ç‰‡å‹å· */
 		}
 
-		g_tMP3.ucVolume = 200; 			/* È±Ê¡ÒôÁ¿,Ô½´óÉùÒôÔ½Ğ¡ */
+		g_tMP3.ucVolume = 200; /* ç¼ºçœéŸ³é‡,è¶Šå¤§å£°éŸ³è¶Šå° */
 		VS1053_SetVolume(g_tMP3.ucVolume);
 
-		VS1053_SetBASS(0, 0, 0, 0);		/* ¸ßÆµºÍµÍÒô²»ÔöÇ¿ */
+		VS1053_SetBASS(0, 0, 0, 0); /* é«˜é¢‘å’Œä½éŸ³ä¸å¢å¼º */
 	}
 
-	/* ÅäÖÃWM8978ÒôÆµÍ¨µÀ, ¿ÉÒÔ½«VS1053BµÄÊä³öÒôÆµ½ÓÈëWM8978µÄLineÊäÈë²å×ù£¬ Çı¶¯°å×ÓÉÏµÄÑïÉùÆ÷·ÅÒô */
+	/* é…ç½®WM8978éŸ³é¢‘é€šé“, å¯ä»¥å°†VS1053Bçš„è¾“å‡ºéŸ³é¢‘æ¥å…¥WM8978çš„Lineè¾“å…¥æ’åº§ï¼Œ é©±åŠ¨æ¿å­ä¸Šçš„æ‰¬å£°å™¨æ”¾éŸ³ */
 	{
-		/* bsp.c ÖĞÒÑ¾­³õÊ¼»¯I2C×ÜÏß */
-		wm8978_Init();		/* ¸´Î»WM8978µ½¸´Î»×´Ì¬ */
+		/* bsp.c ä¸­å·²ç»åˆå§‹åŒ–I2Cæ€»çº¿ */
+		wm8978_Init(); /* å¤ä½WM8978åˆ°å¤ä½çŠ¶æ€ */
 
-		wm8978_SetSpkVolume(0);	/* ÁÙÊ±¾²ÒôÑïÉùÆ÷ */
+		wm8978_SetSpkVolume(0); /* ä¸´æ—¶é™éŸ³æ‰¬å£°å™¨ */
 
-		/* ÅäÖÃWM8978Ğ¾Æ¬£¬ÊäÈëÎªLINE IN£¬Êä³öÎª¶ú»úºÍÑïÉùÆ÷ */
+		/* é…ç½®WM8978èŠ¯ç‰‡ï¼Œè¾“å…¥ä¸ºLINE INï¼Œè¾“å‡ºä¸ºè€³æœºå’Œæ‰¬å£°å™¨ */
 		wm8978_CfgAudioPath(LINE_ON, EAR_LEFT_ON | EAR_RIGHT_ON | SPK_ON);
-		/* µ÷½Ú·ÅÒôÒôÁ¿£¬×óÓÒÏàÍ¬ÒôÁ¿ */
-		wm8978_SetEarVolume(30);	/* ÉèÖÃ¶ú»úÒôÁ¿£¬×î´ó63 */
-		wm8978_SetSpkVolume(60);	/* ÉèÖÃÑïÉùÆ÷ÒôÁ¿£¬×î´ó63 */
-		wm8978_SetLineGain(6);		/* ÉèÖÃLineÊäÈëÔöÒæ£¬ 0-7 */
+		/* è°ƒèŠ‚æ”¾éŸ³éŸ³é‡ï¼Œå·¦å³ç›¸åŒéŸ³é‡ */
+		wm8978_SetEarVolume(30); /* è®¾ç½®è€³æœºéŸ³é‡ï¼Œæœ€å¤§63 */
+		wm8978_SetSpkVolume(60); /* è®¾ç½®æ‰¬å£°å™¨éŸ³é‡ï¼Œæœ€å¤§63 */
+		wm8978_SetLineGain(6);	 /* è®¾ç½®Lineè¾“å…¥å¢ç›Šï¼Œ 0-7 */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: FillSongList
-*	¹¦ÄÜËµÃ÷: Ìî³ä¸èÇú²¥·ÅÁĞ±í¡£ËÑË÷NAND Flash¸ùÄ¿Â¼ÏÂµÄ¸èÇú£¬×î¶à10¸ö
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: FillSongList
+*	åŠŸèƒ½è¯´æ˜: å¡«å……æ­Œæ›²æ’­æ”¾åˆ—è¡¨ã€‚æœç´¢NAND Flashæ ¹ç›®å½•ä¸‹çš„æ­Œæ›²ï¼Œæœ€å¤š10ä¸ª
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void FillSongList(void)
 {
-	/* ·ÃÎÊFatfsÓÃµ½µÄÈ«¾Ö±äÁ¿ */
+	/* è®¿é—®Fatfsç”¨åˆ°çš„å…¨å±€å˜é‡ */
 	FRESULT result;
 	FILINFO FileInf;
 	DIR DirInf;
 	char path[128];
 
-	/* ´ò¿ª¸èÇúÄ¿Â¼ */
+	/* æ‰“å¼€æ­Œæ›²ç›®å½• */
 	sprintf(path, "%s%s", DiskPath, MP3_FOLDER);
-	result = f_opendir(&DirInf, path); 	/* path¿ÉÒÔ´øÅÌ·û£¬×îºóÒ»¸ö×Ö·û²»ÄÜÊÇ/ */
+	result = f_opendir(&DirInf, path); /* pathå¯ä»¥å¸¦ç›˜ç¬¦ï¼Œæœ€åä¸€ä¸ªå­—ç¬¦ä¸èƒ½æ˜¯/ */
 	if (result != FR_OK)
 	{
 		printf("Open Root Directory Error (%d)\r\n", result);
 	}
 
 	g_tMP3.ListIndex = 0;
-	g_tMP3.ListCount = 0;	/* ¸èÇú¸öÊı */
-	for(;;)
+	g_tMP3.ListCount = 0; /* æ­Œæ›²ä¸ªæ•° */
+	for (;;)
 	{
-		result = f_readdir(&DirInf,&FileInf); 		/* ¶ÁÈ¡Ä¿Â¼Ïî£¬Ë÷Òı»á×Ô¶¯ÏÂÒÆ */
+		result = f_readdir(&DirInf, &FileInf); /* è¯»å–ç›®å½•é¡¹ï¼Œç´¢å¼•ä¼šè‡ªåŠ¨ä¸‹ç§» */
 		if (result != FR_OK || FileInf.fname[0] == 0)
 		{
 			break;
 		}
 
-		if (FileInf.fname[0] == '.')	/* ±íÊ¾Ä¿Â¼ */
+		if (FileInf.fname[0] == '.') /* è¡¨ç¤ºç›®å½• */
 		{
 			continue;
 		}
@@ -656,17 +656,16 @@ static void FillSongList(void)
 			{
 				if (memcmp(&FileInf.altname[Len - 3], "MP3", 3) == 0)
 				{
-					/* ¸´ÖÆMP3ÎÄ¼şÃûµ½²¥·ÅÁĞ±í */
+					/* å¤åˆ¶MP3æ–‡ä»¶ååˆ°æ’­æ”¾åˆ—è¡¨ */
 					strcpy(g_tPlayList[g_tMP3.ListCount].FileName, FileInf.altname);
 					g_tPlayList[g_tMP3.ListCount].FileSize = FileInf.fsize;
-					g_tMP3.ListCount++;		/* ¸èÇú¸öÊı */
+					g_tMP3.ListCount++; /* æ­Œæ›²ä¸ªæ•° */
 
-					/* Èç¹ûMP3ÎÄ¼şÒÑÌîÂú£¬ÔòÍË³ö */
+					/* å¦‚æœMP3æ–‡ä»¶å·²å¡«æ»¡ï¼Œåˆ™é€€å‡º */
 					if (g_tMP3.ListCount > SONG_LIST_MAX)
 					{
 						break;
 					}
-
 				}
 			}
 		}
@@ -674,24 +673,24 @@ static void FillSongList(void)
 
 	if (g_tMP3.ListCount == 0)
 	{
-		printf("Ã»ÓĞÔÚ¸ùÄ¿Â¼ÏÂÕÒµ½ MP3 ÎÄ¼ş\r\n");
+		printf("æ²¡æœ‰åœ¨æ ¹ç›®å½•ä¸‹æ‰¾åˆ° MP3 æ–‡ä»¶\r\n");
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: Mp3Pro
-*	¹¦ÄÜËµÃ÷: MP3ÎÄ¼ş²¥·Å£¬ÔÚÖ÷³ÌĞòwhileÑ­»·ÖĞµ÷ÓÃ. Ã¿´ÎÏòVS105B·¢ËÍ32×Ö½Ú¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾Õı³£²¥·Å; 1 ±íÊ¾ÎÄ¼ş²¥·ÅÍê±Ï,Ö÷³ÌĞò¾İ´ËÇĞ»»µ½ÏÂÒ»Ê×¸èÇú
+*	å‡½ æ•° å: Mp3Pro
+*	åŠŸèƒ½è¯´æ˜: MP3æ–‡ä»¶æ’­æ”¾ï¼Œåœ¨ä¸»ç¨‹åºwhileå¾ªç¯ä¸­è°ƒç”¨. æ¯æ¬¡å‘VS105Bå‘é€32å­—èŠ‚ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºæ­£å¸¸æ’­æ”¾; 1 è¡¨ç¤ºæ–‡ä»¶æ’­æ”¾å®Œæ¯•,ä¸»ç¨‹åºæ®æ­¤åˆ‡æ¢åˆ°ä¸‹ä¸€é¦–æ­Œæ›²
 *********************************************************************************************************
 */
 static uint8_t Mp3Pro(void)
 {
-	uint32_t bw,i;
+	uint32_t bw, i;
 	char buf[32];
 
-	/* Èç¹ûVS1003¿ÕÏĞ£¬ÔòĞ´ÈëĞÂµÄÊı¾İ */
+	/* å¦‚æœVS1003ç©ºé—²ï¼Œåˆ™å†™å…¥æ–°çš„æ•°æ® */
 	if (VS1053_ReqNewData())
 	{
 		f_read(&g_Mp3File, &buf, 32, &bw);
@@ -700,10 +699,10 @@ static uint8_t Mp3Pro(void)
 			return 1;
 		}
 
-		/* ¼ÆËã½ø¶È */
+		/* è®¡ç®—è¿›åº¦ */
 		g_tMP3.uiProgress += bw;
 
-		VS1053_PreWriteData();	/* Ğ´Êı¾İ×¼±¸£¬ÉèÖÃºÃÆ¬Ñ¡ */
+		VS1053_PreWriteData(); /* å†™æ•°æ®å‡†å¤‡ï¼Œè®¾ç½®å¥½ç‰‡é€‰ */
 		for (i = 0; i < bw; i++)
 		{
 			VS1053_WriteData(buf[i]);
@@ -714,22 +713,22 @@ static uint8_t Mp3Pro(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: Mp3DispStatus
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾µ±Ç°×´Ì¬
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: Mp3DispStatus
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºå½“å‰çŠ¶æ€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void Mp3DispStatus(void)
 {
 	char buf[5];
 
-	/* ÏÔÊ¾ÒôÁ¿ */
+	/* æ˜¾ç¤ºéŸ³é‡ */
 	sprintf(buf, "%3d ", g_tMP3.ucVolume);
 	FormMP3->Label4.pCaption = buf;
 	LCD_DrawLabel(&FormMP3->Label4);
 
-	/* ÏÔÊ¾½ø¶È */
+	/* æ˜¾ç¤ºè¿›åº¦ */
 	sprintf(buf, "%3d%%", g_tMP3.uiProgress * 100 / g_tPlayList[g_tMP3.ListIndex].FileSize);
 	FormMP3->Label6.pCaption = buf;
 	LCD_DrawLabel(&FormMP3->Label6);
@@ -737,35 +736,35 @@ static void Mp3DispStatus(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ViewDir
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾¸ùÄ¿Â¼ÏÂµÄÎÄ¼şÃû
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ViewDir
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ ¹ç›®å½•ä¸‹çš„æ–‡ä»¶å
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ViewDir(char *_path)
 {
-	/* ±¾º¯ÊıÊ¹ÓÃµÄ¾Ö²¿±äÁ¿Õ¼ÓÃ½Ï¶à£¬ÇëĞŞ¸ÄÆô¶¯ÎÄ¼ş£¬±£Ö¤¶ÑÕ»¿Õ¼ä¹»ÓÃ */
+	/* æœ¬å‡½æ•°ä½¿ç”¨çš„å±€éƒ¨å˜é‡å ç”¨è¾ƒå¤šï¼Œè¯·ä¿®æ”¹å¯åŠ¨æ–‡ä»¶ï¼Œä¿è¯å †æ ˆç©ºé—´å¤Ÿç”¨ */
 	FRESULT result;
 	DIR DirInf;
 	FILINFO FileInf;
 	uint32_t cnt = 0;
 
-	/* ´ò¿ª¸ùÎÄ¼ş¼Ğ - ÓÃÍêºóĞèÒª f_closedir  */
-	result = f_opendir(&DirInf, _path); /* 1: ±íÊ¾ÅÌ·û */
+	/* æ‰“å¼€æ ¹æ–‡ä»¶å¤¹ - ç”¨å®Œåéœ€è¦ f_closedir  */
+	result = f_opendir(&DirInf, _path); /* 1: è¡¨ç¤ºç›˜ç¬¦ */
 	if (result != FR_OK)
 	{
-		printf("´ò¿ª¸ùÄ¿Â¼Ê§°Ü (%d)\r\n", result);
+		printf("æ‰“å¼€æ ¹ç›®å½•å¤±è´¥ (%d)\r\n", result);
 		return;
 	}
 
-	printf("\r\nµ±Ç°Ä¿Â¼£º%s\r\n", _path);
+	printf("\r\nå½“å‰ç›®å½•ï¼š%s\r\n", _path);
 
-	/* ¶ÁÈ¡µ±Ç°ÎÄ¼ş¼ĞÏÂµÄÎÄ¼şºÍÄ¿Â¼ */
-	printf("ÊôĞÔ        |  ÎÄ¼ş´óĞ¡ | ¶ÌÎÄ¼şÃû | ³¤ÎÄ¼şÃû\r\n");
-	for (cnt = 0; ;cnt++)
+	/* è¯»å–å½“å‰æ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶å’Œç›®å½• */
+	printf("å±æ€§        |  æ–‡ä»¶å¤§å° | çŸ­æ–‡ä»¶å | é•¿æ–‡ä»¶å\r\n");
+	for (cnt = 0;; cnt++)
 	{
-		result = f_readdir(&DirInf,&FileInf); 		/* ¶ÁÈ¡Ä¿Â¼Ïî£¬Ë÷Òı»á×Ô¶¯ÏÂÒÆ */
+		result = f_readdir(&DirInf, &FileInf); /* è¯»å–ç›®å½•é¡¹ï¼Œç´¢å¼•ä¼šè‡ªåŠ¨ä¸‹ç§» */
 		if (result != FR_OK || FileInf.fname[0] == 0)
 		{
 			break;
@@ -776,25 +775,25 @@ static void ViewDir(char *_path)
 			continue;
 		}
 
-		/* ÅĞ¶ÏÊÇÎÄ¼ş»¹ÊÇ×ÓÄ¿Â¼ */
+		/* åˆ¤æ–­æ˜¯æ–‡ä»¶è¿˜æ˜¯å­ç›®å½• */
 		if (FileInf.fattrib & AM_DIR)
 		{
-			printf("(0x%02d)Ä¿Â¼  ", FileInf.fattrib);
+			printf("(0x%02d)ç›®å½•  ", FileInf.fattrib);
 		}
 		else
 		{
-			printf("(0x%02d)ÎÄ¼ş  ", FileInf.fattrib);
+			printf("(0x%02d)æ–‡ä»¶  ", FileInf.fattrib);
 		}
 
-		/* ´òÓ¡ÎÄ¼ş´óĞ¡, ×î´ó4G */
+		/* æ‰“å°æ–‡ä»¶å¤§å°, æœ€å¤§4G */
 		printf(" %10d", FileInf.fsize);
 
-		printf("  %s |", FileInf.altname);	/* ¶ÌÎÄ¼şÃû */
+		printf("  %s |", FileInf.altname); /* çŸ­æ–‡ä»¶å */
 
-		printf("  %s\r\n", (char *)FileInf.fname);	/* ³¤ÎÄ¼şÃû */
+		printf("  %s\r\n", (char *)FileInf.fname); /* é•¿æ–‡ä»¶å */
 	}
-	
-	f_closedir(&DirInf);	/*¡¡¹Ø±Õ´ò¿ªµÄÄ¿Â¼ */
+
+	f_closedir(&DirInf); /*ã€€å…³é—­æ‰“å¼€çš„ç›®å½• */
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

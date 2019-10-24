@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : RS485≤‚ ‘ΩÁ√Ê
-*	Œƒº˛√˚≥∆ : form_rs485.c
-*	∞Ê    ±æ : V1.0
-*	Àµ    √˜ : «˝∂Ø∞≤∏ª¿≥LED-485œµ¡– ˝¬Îπ‹œ‘ æ∆¡°£
-*	–ﬁ∏ƒº«¬º :
-*		∞Ê±æ∫≈  »’∆⁄       ◊˜’ﬂ    Àµ√˜
-*		v1.0    2014-10-15 armfly   ◊∑¢
+*	Ê®°ÂùóÂêçÁß∞ : RS485ÊµãËØïÁïåÈù¢
+*	Êñá‰ª∂ÂêçÁß∞ : form_rs485.c
+*	Áâà    Êú¨ : V1.0
+*	ËØ¥    Êòé : È©±Âä®ÂÆâÂØåËé±LED-485Á≥ªÂàóÊï∞Á†ÅÁÆ°ÊòæÁ§∫Â±è„ÄÇ
+*	‰øÆÊîπËÆ∞ÂΩï :
+*		ÁâàÊú¨Âè∑  Êó•Êúü       ‰ΩúËÄÖ    ËØ¥Êòé
+*		v1.0    2014-10-15 armfly  È¶ñÂèë
 *
-*	Copyright (C), 2013-2014, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2013-2014, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,21 +17,24 @@
 #include "bsp.h"
 #include "form_rs485.h"
 
-/* ∂®“ÂΩÁ√ÊΩ·ππ */
+/* ÂÆö‰πâÁïåÈù¢ÁªìÊûÑ */
 typedef struct
 {
-	FONT_T FontBlack;	/* æ≤Ã¨µƒŒƒ◊÷ */
-	FONT_T FontBlue;	/* ±‰ªØµƒŒƒ◊÷◊÷ÃÂ */
-	FONT_T FontBtn;		/* ∞¥≈•µƒ◊÷ÃÂ */
-	FONT_T FontBox;		/* ∑÷◊ÈøÚ±ÍÃ‚◊÷ÃÂ */
+	FONT_T FontBlack; /* ÈùôÊÄÅÁöÑÊñáÂ≠ó */
+	FONT_T FontBlue;	/* ÂèòÂåñÁöÑÊñáÂ≠óÂ≠ó‰Ωì */
+	FONT_T FontBtn;		/* ÊåâÈíÆÁöÑÂ≠ó‰Ωì */
+	FONT_T FontBox;		/* ÂàÜÁªÑÊ°ÜÊ†áÈ¢òÂ≠ó‰Ωì */
 
 	GROUP_T Box1;
 	GROUP_T Box2;
 	GROUP_T Box3;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
 
 	BUTTON_T BtnRet;
 
@@ -42,7 +45,7 @@ typedef struct
 	BUTTON_T Btn5;
 	BUTTON_T Btn6;
 
-	BUTTON_T BtnBright[8];	/* …Ë÷√¡¡∂» */
+	BUTTON_T BtnBright[8]; /* ËÆæÁΩÆ‰∫ÆÂ∫¶ */
 
 	LABEL_T LabelOldAddr;
 	LABEL_T LabelNewAddr;
@@ -50,139 +53,139 @@ typedef struct
 	EDIT_T EditNewAddr;
 	BUTTON_T BtnSetAddr;
 
-	LABEL_T LblInfo1; LABEL_T LblInfo2;
-}FormRS485_T;
+	LABEL_T LblInfo1;
+	LABEL_T LblInfo2;
+} FormRS485_T;
 
-/* ¥∞ÃÂ±≥æ∞…´ */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* Á™ó‰ΩìËÉåÊôØËâ≤ */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* øÚµƒ◊¯±Í∫Õ¥Û–° */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	100
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"RS485 LED ˝¬Îπ‹"
+/* Ê°ÜÁöÑÂùêÊ†áÂíåÂ§ßÂ∞è */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H 100
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "RS485 LEDÊï∞Á†ÅÁÆ°"
 
-	/* µ⁄1∏ˆøÚƒ⁄µƒ∞¥≈• */
-	#define BTN1_H	32
-	#define BTN1_W	100
-	#define	BTN1_X	(BOX1_X + 10)
-	#define	BTN1_Y	(BOX1_Y + 20)
-	#define	BTN1_TEXT	"ASCII–≠“È"
+/* Á¨¨1‰∏™Ê°ÜÂÜÖÁöÑÊåâÈíÆ */
+#define BTN1_H 32
+#define BTN1_W 100
+#define BTN1_X (BOX1_X + 10)
+#define BTN1_Y (BOX1_Y + 20)
+#define BTN1_TEXT "ASCIIÂçèËÆÆ"
 
-	#define BTN2_H	BTN1_H
-	#define BTN2_W	BTN1_W
-	#define	BTN2_X	(BTN1_X +  BTN1_W + 10)
-	#define	BTN2_Y	BTN1_Y
-	#define	BTN2_TEXT	"Modbus–≠“È"
+#define BTN2_H BTN1_H
+#define BTN2_W BTN1_W
+#define BTN2_X (BTN1_X + BTN1_W + 10)
+#define BTN2_Y BTN1_Y
+#define BTN2_TEXT "ModbusÂçèËÆÆ"
 
-	#define BTN3_H	BTN1_H
-	#define BTN3_W	BTN1_W
-	#define	BTN3_X	BTN1_X
-	#define	BTN3_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN3_TEXT	"∂¡…Ë±∏–Õ∫≈"
+#define BTN3_H BTN1_H
+#define BTN3_W BTN1_W
+#define BTN3_X BTN1_X
+#define BTN3_Y (BTN1_Y + BTN1_H + 10)
+#define BTN3_TEXT "ËØªËÆæÂ§áÂûãÂè∑"
 
-	#define BTN4_H	BTN1_H
-	#define BTN4_W	BTN1_W
-	#define	BTN4_X	(BTN1_X +  BTN1_W + 10)
-	#define	BTN4_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN4_TEXT	"∂¡πÃº˛∞Ê±æ"
+#define BTN4_H BTN1_H
+#define BTN4_W BTN1_W
+#define BTN4_X (BTN1_X + BTN1_W + 10)
+#define BTN4_Y (BTN1_Y + BTN1_H + 10)
+#define BTN4_TEXT "ËØªÂõ∫‰ª∂ÁâàÊú¨"
 
-	#define BTN5_H	BTN1_H
-	#define BTN5_W	BTN1_W
-	#define	BTN5_X	(BTN1_X +  2 * (BTN1_W + 10))
-	#define	BTN5_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN5_TEXT	"≤‚ ‘”¶¥"
+#define BTN5_H BTN1_H
+#define BTN5_W BTN1_W
+#define BTN5_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN5_Y (BTN1_Y + BTN1_H + 10)
+#define BTN5_TEXT "ÊµãËØïÂ∫îÁ≠î"
 
-	#define BTN6_H	BTN1_H
-	#define BTN6_W	BTN1_W
-	#define	BTN6_X	(BTN1_X +  3 * (BTN1_W + 10))
-	#define	BTN6_Y	(BTN1_Y + BTN1_H + 10)
-	#define	BTN6_TEXT	"∂¡¡¡∂»≤Œ ˝"
+#define BTN6_H BTN1_H
+#define BTN6_W BTN1_W
+#define BTN6_X (BTN1_X + 3 * (BTN1_W + 10))
+#define BTN6_Y (BTN1_Y + BTN1_H + 10)
+#define BTN6_TEXT "ËØª‰∫ÆÂ∫¶ÂèÇÊï∞"
 
-	#define LABEL1_X  	(BTN5_X + 10)
-	#define LABEL1_Y	BTN2_Y
-	#define LABEL1_TEXT	"µÿ÷∑: "
+#define LABEL1_X (BTN5_X + 10)
+#define LABEL1_Y BTN2_Y
+#define LABEL1_TEXT "Âú∞ÂùÄ: "
 
-		#define LABEL2_X  	(LABEL1_X + 48)
-		#define LABEL2_Y	LABEL1_Y
-		#define LABEL2_TEXT	"0"
+#define LABEL2_X (LABEL1_X + 48)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "0"
 
-	#define LABEL3_X  	(LABEL2_X + 32)
-	#define LABEL3_Y	LABEL1_Y
-	#define LABEL3_TEXT	"≤®Ãÿ¬ : "
+#define LABEL3_X (LABEL2_X + 32)
+#define LABEL3_Y LABEL1_Y
+#define LABEL3_TEXT "Ê≥¢ÁâπÁéá: "
 
-		#define LABEL4_X  	(LABEL3_X + 64)
-		#define LABEL4_Y	(LABEL3_Y)
-		#define LABEL4_TEXT	"0"
+#define LABEL4_X (LABEL3_X + 64)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "0"
 
-	#define LABEL5_X  	(LABEL1_X)
-	#define LABEL5_Y	(LABEL1_Y + 20)
-	#define LABEL5_TEXT	"Ω” ’:"
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20)
+#define LABEL5_TEXT "Êé•Êî∂:"
 
-		#define LABEL6_X  	(LABEL5_X + 48)
-		#define LABEL6_Y	LABEL5_Y
-		#define LABEL6_TEXT	" "
+#define LABEL6_X (LABEL5_X + 48)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT " "
 
-/* µ⁄2∏ˆøÚ */
-#define BOX2_X	BOX1_X
-#define BOX2_Y	(BOX1_Y + BOX1_H + 10)
-#define BOX2_H	60
-#define BOX2_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX2_TEXT	"…Ë÷√¡¡∂»"
+/* Á¨¨2‰∏™Ê°Ü */
+#define BOX2_X BOX1_X
+#define BOX2_Y (BOX1_Y + BOX1_H + 10)
+#define BOX2_H 60
+#define BOX2_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX2_TEXT "ËÆæÁΩÆ‰∫ÆÂ∫¶"
 
-	#define BTNB_H	32
-	#define BTNB_W	45
-	#define	BTNB_X	(BOX2_X + 10)
-	#define	BTNB_Y	(BOX2_Y + 20)
+#define BTNB_H 32
+#define BTNB_W 45
+#define BTNB_X (BOX2_X + 10)
+#define BTNB_Y (BOX2_Y + 20)
 
-/* µ⁄3∏ˆøÚ */
-#define BOX3_X	BOX1_X
-#define BOX3_Y	(BOX2_Y + BOX2_H + 10)
-#define BOX3_H	72
-#define BOX3_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX3_TEXT	"–ﬁ∏ƒ485µÿ÷∑"
+/* Á¨¨3‰∏™Ê°Ü */
+#define BOX3_X BOX1_X
+#define BOX3_Y (BOX2_Y + BOX2_H + 10)
+#define BOX3_H 72
+#define BOX3_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX3_TEXT "‰øÆÊîπ485Âú∞ÂùÄ"
 
-	#define	LABEL_OLDADDR_X		(BOX3_X + 10)
-	#define	LABEL_OLDADDR_Y		(BOX3_Y + 20)
-	#define	LABEL_OLDADDR_TEXT "µ±«∞µÿ÷∑:"
+#define LABEL_OLDADDR_X (BOX3_X + 10)
+#define LABEL_OLDADDR_Y (BOX3_Y + 20)
+#define LABEL_OLDADDR_TEXT "ÂΩìÂâçÂú∞ÂùÄ:"
 
-	#define	EDIT_OLDADDR_X		(LABEL_OLDADDR_X + 80)
-	#define	EDIT_OLDADDR_Y		LABEL_OLDADDR_Y
-	#define	EDIT_OLDADDR_H		20
-	#define	EDIT_OLDADDR_W		50
+#define EDIT_OLDADDR_X (LABEL_OLDADDR_X + 80)
+#define EDIT_OLDADDR_Y LABEL_OLDADDR_Y
+#define EDIT_OLDADDR_H 20
+#define EDIT_OLDADDR_W 50
 
-	#define	LABEL_NEWADDR_X		LABEL_OLDADDR_X
-	#define	LABEL_NEWADDR_Y		(LABEL_OLDADDR_Y + 30)
-	#define	LABEL_NEWADDR_TEXT	"  –¬µÿ÷∑:"
+#define LABEL_NEWADDR_X LABEL_OLDADDR_X
+#define LABEL_NEWADDR_Y (LABEL_OLDADDR_Y + 30)
+#define LABEL_NEWADDR_TEXT "  Êñ∞Âú∞ÂùÄ:"
 
-	#define	EDIT_NEWADDR_X		EDIT_OLDADDR_X
-	#define	EDIT_NEWADDR_Y		LABEL_NEWADDR_Y
-	#define	EDIT_NEWDDR_H 		EDIT_OLDADDR_H
-	#define	EDIT_NEWADDR_W		EDIT_OLDADDR_W
+#define EDIT_NEWADDR_X EDIT_OLDADDR_X
+#define EDIT_NEWADDR_Y LABEL_NEWADDR_Y
+#define EDIT_NEWDDR_H EDIT_OLDADDR_H
+#define EDIT_NEWADDR_W EDIT_OLDADDR_W
 
-	#define BTN_SETADDR_H		50
-	#define BTN_SETADDR_W		100
-	#define	BTN_SETADDR_X		(EDIT_NEWADDR_X + EDIT_NEWADDR_W + 10)
-	#define	BTN_SETADDR_Y		EDIT_OLDADDR_Y
-	#define	BTN_SETADDR_TEXT	"–ﬁ∏ƒ485µÿ÷∑"
+#define BTN_SETADDR_H 50
+#define BTN_SETADDR_W 100
+#define BTN_SETADDR_X (EDIT_NEWADDR_X + EDIT_NEWADDR_W + 10)
+#define BTN_SETADDR_Y EDIT_OLDADDR_Y
+#define BTN_SETADDR_TEXT "‰øÆÊîπ485Âú∞ÂùÄ"
 
-	#define	LBL_INFO1_X		(BOX3_X + 270)
-	#define	LBL_INFO1_Y		(BOX3_Y + 11)
-	#define	LBL_INFO1_TEXT "“°∏À…œœ¬º¸: –ﬁ∏ƒ–¬µÿ÷∑"
+#define LBL_INFO1_X (BOX3_X + 270)
+#define LBL_INFO1_Y (BOX3_Y + 11)
+#define LBL_INFO1_TEXT "ÊëáÊùÜ‰∏ä‰∏ãÈîÆ: ‰øÆÊîπÊñ∞Âú∞ÂùÄ"
 
-	#define	LBL_INFO2_X		LBL_INFO1_X
-	#define	LBL_INFO2_Y		(LBL_INFO1_Y + 20)
-	#define	LBL_INFO2_TEXT "“°∏À◊Û”“º¸: –ﬁ∏ƒµ±«∞µÿ÷∑"
+#define LBL_INFO2_X LBL_INFO1_X
+#define LBL_INFO2_Y (LBL_INFO1_Y + 20)
+#define LBL_INFO2_TEXT "ÊëáÊùÜÂ∑¶Âè≥ÈîÆ: ‰øÆÊîπÂΩìÂâçÂú∞ÂùÄ"
 
-/* ∞¥≈• */
-/* ∑µªÿ∞¥≈•µƒ◊¯±Í(∆¡ƒª”“œ¬Ω«) */
-#define BTN_RET_H	32
-#define BTN_RET_W	80
-#define	BTN_RET_X	(g_LcdWidth - BTN_RET_W - 8)
-#define	BTN_RET_Y	(g_LcdHeight - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"∑µªÿ"
-
+/* ÊåâÈíÆ */
+/* ËøîÂõûÊåâÈíÆÁöÑÂùêÊ†á(Â±èÂπïÂè≥‰∏ãËßí) */
+#define BTN_RET_H 32
+#define BTN_RET_W 80
+#define BTN_RET_X (g_LcdWidth - BTN_RET_W - 8)
+#define BTN_RET_Y (g_LcdHeight - BTN_RET_H - 4)
+#define BTN_RET_TEXT "ËøîÂõû"
 
 static void InitFormRS485(void);
 static void DispFormRS485(void);
@@ -191,20 +194,19 @@ static void DispLabelAddr(uint8_t _addr1, uint8_t _addr2);
 static void DispLabelBaud(uint32_t _Baud);
 static void DispLabelRx(uint8_t *_buf, uint8_t _len);
 
-
 FormRS485_T *FormRS485;
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: FormMainRS485
-*	π¶ƒ‹Àµ√˜: RS485≤‚ ‘÷˜≥Ã–Ú
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: FormMainRS485
+*	ÂäüËÉΩËØ¥Êòé: RS485ÊµãËØï‰∏ªÁ®ãÂ∫è
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 void FormMainRS485(void)
 {
-	uint8_t ucKeyCode;		/* ∞¥º¸¥˙¬Î */
-	uint8_t ucTouch;		/* ¥•√˛ ¬º˛ */
+	uint8_t ucKeyCode; /* ÊåâÈîÆ‰ª£Á†Å */
+	uint8_t ucTouch;	 /* Ëß¶Êë∏‰∫ã‰ª∂ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormRS485_T form;
@@ -227,9 +229,9 @@ void FormMainRS485(void)
 	NewAddr = 1;
 	baud = 9600;
 
-	DispLabelBaud (baud);
+	DispLabelBaud(baud);
 
-	/* Ω¯»Î÷˜≥Ã–Ú—≠ª∑ÃÂ */
+	/* ËøõÂÖ•‰∏ªÁ®ãÂ∫èÂæ™ÁéØ‰Ωì */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -247,154 +249,154 @@ void FormMainRS485(void)
 		{
 			fUpdateCount = 0;
 
-			LED485_DispNumberA(OldAddr, count);	/* √¸¡ÓLED ˝¬Îπ‹œ‘ æº∆ ˝÷µ */
+			LED485_DispNumberA(OldAddr, count); /* ÂëΩ‰ª§LEDÊï∞Á†ÅÁÆ°ÊòæÁ§∫ËÆ°Êï∞ÂÄº */
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ∂¡»°¥•√˛ ¬º˛ */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* ËØªÂèñËß¶Êë∏‰∫ã‰ª∂ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ¥•± ∞¥œ¬ ¬º˛ */
-					if (LCD_ButtonTouchDown(&FormRS485->BtnRet, tpX, tpY))
+			case TOUCH_DOWN: /* Ëß¶Á¨îÊåâ‰∏ã‰∫ã‰ª∂ */
+				if (LCD_ButtonTouchDown(&FormRS485->BtnRet, tpX, tpY))
+				{
+					//fQuit = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn1, tpX, tpY))
+				{
+					LED485_SetProtAscii(OldAddr); /* ËÆæÁΩÆ‰∏∫ASCIIÂçèËÆÆ */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn2, tpX, tpY))
+				{
+					LED485_SetProtRTU(OldAddr); /* ËÆæÁΩÆ‰∏∫Modbus RTU ÂçèËÆÆ */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn3, tpX, tpY))
+				{
+					LED485_ReadModel(OldAddr); /* ËØªËÆæÂ§áÂûãÂè∑ */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn4, tpX, tpY))
+				{
+					LED485_ReadVersion(OldAddr); /* ËØªÂõ∫‰ª∂ÁâàÊú¨ */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn5, tpX, tpY))
+				{
+					LED485_TestOk(OldAddr); /* ÊµãËØïOKÂ∫îÁ≠î */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->Btn6, tpX, tpY))
+				{
+					LED485_ReadBright(OldAddr); /* ËØª‰∫ÆÂ∫¶ÂèÇÊï∞ */
+				}
+				else if (LCD_ButtonTouchDown(&FormRS485->BtnSetAddr, tpX, tpY))
+				{
+					/* ‰øÆÊîπÂú∞ÂùÄ */
+					LED485_ModifyAddrA(OldAddr, NewAddr);
+				}
+				else
+				{
+					for (i = 0; i < 8; i++)
 					{
-						//fQuit = 1;
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn1, tpX, tpY))
-					{
-						LED485_SetProtAscii(OldAddr);	/* …Ë÷√Œ™ASCII–≠“È */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn2, tpX, tpY))
-					{
-						LED485_SetProtRTU(OldAddr);	/* …Ë÷√Œ™Modbus RTU –≠“È */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn3, tpX, tpY))
-					{
-						LED485_ReadModel(OldAddr);	/* ∂¡…Ë±∏–Õ∫≈ */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn4, tpX, tpY))
-					{
-						LED485_ReadVersion(OldAddr);	/* ∂¡πÃº˛∞Ê±æ */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn5, tpX, tpY))
-					{
-						LED485_TestOk(OldAddr);	/* ≤‚ ‘OK”¶¥ */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->Btn6, tpX, tpY))
-					{
-						LED485_ReadBright(OldAddr);	/* ∂¡¡¡∂»≤Œ ˝ */
-					}
-					else if (LCD_ButtonTouchDown(&FormRS485->BtnSetAddr, tpX, tpY))
-					{
-						/* –ﬁ∏ƒµÿ÷∑ */
-						LED485_ModifyAddrA(OldAddr, NewAddr);
-					}
-					else
-					{
-						for (i = 0; i < 8; i++)
+						if (LCD_ButtonTouchDown(&FormRS485->BtnBright[i], tpX, tpY))
 						{
-							if (LCD_ButtonTouchDown(&FormRS485->BtnBright[i], tpX, tpY))
-							{
-								LED485_SetBrightA(OldAddr, i);	/* …Ë÷√¡¡∂»≤Œ ˝(ASCII–≠“È) */
-							}
+							LED485_SetBrightA(OldAddr, i); /* ËÆæÁΩÆ‰∫ÆÂ∫¶ÂèÇÊï∞(ASCIIÂçèËÆÆ) */
 						}
 					}
-					break;
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ¥•±  Õ∑≈ ¬º˛ */
-					if (LCD_ButtonTouchRelease(&FormRS485->BtnRet, tpX, tpY))
+			case TOUCH_RELEASE: /* Ëß¶Á¨îÈáäÊîæ‰∫ã‰ª∂ */
+				if (LCD_ButtonTouchRelease(&FormRS485->BtnRet, tpX, tpY))
+				{
+					fQuit = 1; /* ËøîÂõû */
+				}
+				else
+				{
+					LCD_ButtonTouchRelease(&FormRS485->BtnRet, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn1, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn2, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn3, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn4, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn5, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->Btn6, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormRS485->BtnSetAddr, tpX, tpY);
+					for (i = 0; i < 8; i++)
 					{
-						fQuit = 1;	/* ∑µªÿ */
+						LCD_ButtonTouchRelease(&FormRS485->BtnBright[i], tpX, tpY);
 					}
-					else
-					{
-						LCD_ButtonTouchRelease(&FormRS485->BtnRet, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn1, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn2, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn3, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn4, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn5, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->Btn6, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormRS485->BtnSetAddr, tpX, tpY);
-						for (i = 0; i < 8; i++)
-						{
-							LCD_ButtonTouchRelease(&FormRS485->BtnBright[i], tpX, tpY);
-						}
-					}
-					break;
+				}
+				break;
 			}
 		}
 
-		/* ¥¶¿Ì∞¥º¸ ¬º˛ */
+		/* Â§ÑÁêÜÊåâÈîÆ‰∫ã‰ª∂ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ”–º¸∞¥œ¬ */
+			/* ÊúâÈîÆÊåâ‰∏ã */
 			switch (ucKeyCode)
 			{
-				case MSG_485_RX_NOT_RTU:		/* Ω” ’µΩ485…Ë±∏µƒ”¶¥ */
-					DispLabelRx(g_tModH.AppRxBuf, g_tModH.AppRxCount);
-					break;
+			case MSG_485_RX_NOT_RTU: /* Êé•Êî∂Âà∞485ËÆæÂ§áÁöÑÂ∫îÁ≠î */
+				DispLabelRx(g_tModH.AppRxBuf, g_tModH.AppRxCount);
+				break;
 
-				case KEY_DOWN_K1:		/* K1º¸ + 1*/
-					count++;
-					fUpdateCount = 1;
-					break;
+			case KEY_DOWN_K1: /* K1ÈîÆ + 1*/
+				count++;
+				fUpdateCount = 1;
+				break;
 
-				case KEY_DOWN_K2:		/* K2º¸ - 1 */
-					if (count > 0)
-					{
-						count--;
-					}
-					fUpdateCount = 1;
-					break;
+			case KEY_DOWN_K2: /* K2ÈîÆ - 1 */
+				if (count > 0)
+				{
+					count--;
+				}
+				fUpdateCount = 1;
+				break;
 
-				case KEY_DOWN_K3:		/* K3º¸ - «Â0 */
-					count = 0;
-					fUpdateCount = 1;
-					break;
+			case KEY_DOWN_K3: /* K3ÈîÆ - Ê∏Ö0 */
+				count = 0;
+				fUpdateCount = 1;
+				break;
 
-				case JOY_DOWN_U:		/* “°∏ÀUPº¸∞¥œ¬ */
-					NewAddr++;
-					fUpdateAddr = 1;
-					break;
+			case JOY_DOWN_U: /* ÊëáÊùÜUPÈîÆÊåâ‰∏ã */
+				NewAddr++;
+				fUpdateAddr = 1;
+				break;
 
-				case JOY_DOWN_D:		/* “°∏ÀDOWNº¸∞¥œ¬ */
-					NewAddr--;
-					fUpdateAddr = 1;
-					break;
+			case JOY_DOWN_D: /* ÊëáÊùÜDOWNÈîÆÊåâ‰∏ã */
+				NewAddr--;
+				fUpdateAddr = 1;
+				break;
 
-				case JOY_DOWN_L:		/* “°∏ÀLEFTº¸∞¥œ¬ */
-					OldAddr++;
-					fUpdateAddr = 1;
-					break;
+			case JOY_DOWN_L: /* ÊëáÊùÜLEFTÈîÆÊåâ‰∏ã */
+				OldAddr++;
+				fUpdateAddr = 1;
+				break;
 
-				case JOY_DOWN_R:		/* “°∏ÀRIGHTº¸∞¥œ¬ */
-					OldAddr--;
-					fUpdateAddr = 1;
-					break;
+			case JOY_DOWN_R: /* ÊëáÊùÜRIGHTÈîÆÊåâ‰∏ã */
+				OldAddr--;
+				fUpdateAddr = 1;
+				break;
 
-				case JOY_DOWN_OK:		/* “°∏ÀOKº¸∞¥œ¬ */
-					/* ◊‘∂Ø≤‚ ‘ */
-					if (fLed888 == 0)
-					{
-						fLed888 = 1;
-						LED485_DispStrA(OldAddr, "8.8.8.");
-					}
-					else if (fLed888 == 1)
-					{
-						fLed888 = 2;
-						LED485_DispStrA(OldAddr, "8.8.8.8");
-					}
-					else
-					{
-						fLed888 = 0;
-						LED485_DispStrA(OldAddr, "   ");						
-					}
-					break;
+			case JOY_DOWN_OK: /* ÊëáÊùÜOKÈîÆÊåâ‰∏ã */
+				/* Ëá™Âä®ÊµãËØï */
+				if (fLed888 == 0)
+				{
+					fLed888 = 1;
+					LED485_DispStrA(OldAddr, "8.8.8.");
+				}
+				else if (fLed888 == 1)
+				{
+					fLed888 = 2;
+					LED485_DispStrA(OldAddr, "8.8.8.8");
+				}
+				else
+				{
+					fLed888 = 0;
+					LED485_DispStrA(OldAddr, "   ");
+				}
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -402,39 +404,39 @@ void FormMainRS485(void)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: InitFormRS485
-*	π¶ƒ‹Àµ√˜: ≥ı ºªØøÿº˛ Ù–‘
-*	–Œ    ≤Œ£∫Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: InitFormRS485
+*	ÂäüËÉΩËØ¥Êòé: ÂàùÂßãÂåñÊéß‰ª∂Â±ûÊÄß
+*	ÂΩ¢    ÂèÇÔºöÊó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void InitFormRS485(void)
 {
-	/* ∑÷◊ÈøÚ±ÍÃ‚◊÷ÃÂ */
+	/* ÂàÜÁªÑÊ°ÜÊ†áÈ¢òÂ≠ó‰Ωì */
 	FormRS485->FontBox.FontCode = FC_ST_16;
-	FormRS485->FontBox.BackColor = CL_BTN_FACE;	/* ∫Õ±≥æ∞…´œ‡Õ¨ */
+	FormRS485->FontBox.BackColor = CL_BTN_FACE; /* ÂíåËÉåÊôØËâ≤Áõ∏Âêå */
 	FormRS485->FontBox.FrontColor = CL_BLACK;
 	FormRS485->FontBox.Space = 0;
 
-	/* ◊÷ÃÂ1 ”√”⁄æ≤÷π±Í«© */
+	/* Â≠ó‰Ωì1 Áî®‰∫éÈùôÊ≠¢Ê†áÁ≠æ */
 	FormRS485->FontBlack.FontCode = FC_ST_16;
-	FormRS485->FontBlack.BackColor = CL_MASK;		/* Õ∏√˜…´ */
+	FormRS485->FontBlack.BackColor = CL_MASK; /* ÈÄèÊòéËâ≤ */
 	FormRS485->FontBlack.FrontColor = CL_BLACK;
 	FormRS485->FontBlack.Space = 0;
 
-	/* ◊÷ÃÂ2 ”√”⁄±‰ªØµƒŒƒ◊÷ */
+	/* Â≠ó‰Ωì2 Áî®‰∫éÂèòÂåñÁöÑÊñáÂ≠ó */
 	FormRS485->FontBlue.FontCode = FC_ST_16;
 	FormRS485->FontBlue.BackColor = CL_BTN_FACE;
 	FormRS485->FontBlue.FrontColor = CL_BLUE;
 	FormRS485->FontBlue.Space = 0;
 
-	/* ∞¥≈•◊÷ÃÂ */
+	/* ÊåâÈíÆÂ≠ó‰Ωì */
 	FormRS485->FontBtn.FontCode = FC_ST_16;
-	FormRS485->FontBtn.BackColor = CL_MASK;		/* Õ∏√˜±≥æ∞ */
+	FormRS485->FontBtn.BackColor = CL_MASK; /* ÈÄèÊòéËÉåÊôØ */
 	FormRS485->FontBtn.FrontColor = CL_BLACK;
 	FormRS485->FontBtn.Space = 0;
 
-	/* ∑÷◊ÈøÚ */
+	/* ÂàÜÁªÑÊ°Ü */
 	FormRS485->Box1.Left = BOX1_X;
 	FormRS485->Box1.Top = BOX1_Y;
 	FormRS485->Box1.Height = BOX1_H;
@@ -449,7 +451,7 @@ static void InitFormRS485(void)
 	FormRS485->Box2.pCaption = BOX2_TEXT;
 	FormRS485->Box2.Font = &FormRS485->FontBox;
 
-	/* æ≤Ã¨±Í«© */
+	/* ÈùôÊÄÅÊ†áÁ≠æ */
 	FormRS485->Label1.Left = LABEL1_X;
 	FormRS485->Label1.Top = LABEL1_Y;
 	FormRS485->Label1.MaxLen = 0;
@@ -468,7 +470,7 @@ static void InitFormRS485(void)
 	FormRS485->Label5.pCaption = LABEL5_TEXT;
 	FormRS485->Label5.Font = &FormRS485->FontBlack;
 
-	/* ∂ØÃ¨±Í«© */
+	/* Âä®ÊÄÅÊ†áÁ≠æ */
 	FormRS485->Label2.Left = LABEL2_X;
 	FormRS485->Label2.Top = LABEL2_Y;
 	FormRS485->Label2.MaxLen = 0;
@@ -487,7 +489,7 @@ static void InitFormRS485(void)
 	FormRS485->Label6.pCaption = LABEL6_TEXT;
 	FormRS485->Label6.Font = &FormRS485->FontBlue;
 
-	/* ∞¥≈• */
+	/* ÊåâÈíÆ */
 	FormRS485->BtnRet.Left = BTN_RET_X;
 	FormRS485->BtnRet.Top = BTN_RET_Y;
 	FormRS485->BtnRet.Height = BTN_RET_H;
@@ -546,14 +548,20 @@ static void InitFormRS485(void)
 
 	{
 		uint8_t i;
-		char * BrightStr[8] = {
-			"0","1","2","3",
-			"4","5","6","7",
+		char *BrightStr[8] = {
+				"0",
+				"1",
+				"2",
+				"3",
+				"4",
+				"5",
+				"6",
+				"7",
 		};
 
 		for (i = 0; i < 8; i++)
 		{
-			FormRS485->BtnBright[i].Left = BTNB_X +(BTNB_W + 10) * i;
+			FormRS485->BtnBright[i].Left = BTNB_X + (BTNB_W + 10) * i;
 			FormRS485->BtnBright[i].Top = BTNB_Y;
 			FormRS485->BtnBright[i].Height = BTNB_H;
 			FormRS485->BtnBright[i].Width = BTNB_W;
@@ -624,17 +632,17 @@ static void InitFormRS485(void)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: DispFormRS485
-*	π¶ƒ‹Àµ√˜: œ‘ æÀ˘”–µƒæ≤Ã¨øÿº˛
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: DispFormRS485
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫ÊâÄÊúâÁöÑÈùôÊÄÅÊéß‰ª∂
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void DispFormRS485(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ∑÷◊ÈøÚ */
+	/* ÂàÜÁªÑÊ°Ü */
 	LCD_DrawGroupBox(&FormRS485->Box1);
 	LCD_DrawGroupBox(&FormRS485->Box2);
 
@@ -646,7 +654,7 @@ static void DispFormRS485(void)
 	LCD_DrawLabel(&FormRS485->Label4);
 	LCD_DrawLabel(&FormRS485->Label6);
 
-	/* ∞¥≈• */
+	/* ÊåâÈíÆ */
 	LCD_DrawButton(&FormRS485->Btn1);
 	LCD_DrawButton(&FormRS485->Btn2);
 	LCD_DrawButton(&FormRS485->Btn3);
@@ -677,10 +685,10 @@ static void DispFormRS485(void)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: DispLabelAddr
-*	π¶ƒ‹Àµ√˜: œ‘ æ485µÿ÷∑
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: DispLabelAddr
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫485Âú∞ÂùÄ
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void DispLabelAddr(uint8_t _addr1, uint8_t _addr2)
@@ -689,7 +697,7 @@ static void DispLabelAddr(uint8_t _addr1, uint8_t _addr2)
 
 	sprintf(buf, "%d", _addr1);
 
-	/* ∂ØÃ¨±Í«© */
+	/* Âä®ÊÄÅÊ†áÁ≠æ */
 	FormRS485->Label2.pCaption = buf;
 	LCD_DrawLabel(&FormRS485->Label2);
 
@@ -702,11 +710,11 @@ static void DispLabelAddr(uint8_t _addr1, uint8_t _addr2)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: DispLabelTx
-*	π¶ƒ‹Àµ√˜: œ‘ æ∑¢ÀÕµƒ ˝æ›
-*	–Œ    ≤Œ: _Baud ≤®Ãÿ¬ 
+*	ÂáΩ Êï∞ Âêç: DispLabelTx
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫ÂèëÈÄÅÁöÑÊï∞ÊçÆ
+*	ÂΩ¢    ÂèÇ: _Baud Ê≥¢ÁâπÁéá
 *			  _
-*	∑µ ªÿ ÷µ: Œﬁ
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void DispLabelBaud(uint32_t _Baud)
@@ -715,18 +723,18 @@ static void DispLabelBaud(uint32_t _Baud)
 
 	sprintf(buf, "%d", _Baud);
 
-	/* ∂ØÃ¨±Í«© */
+	/* Âä®ÊÄÅÊ†áÁ≠æ */
 	FormRS485->Label4.pCaption = buf;
 	LCD_DrawLabel(&FormRS485->Label4);
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: DispLabelRx
-*	π¶ƒ‹Àµ√˜: œ‘ æΩ” ’µΩµƒ ˝æ›
-*	–Œ    ≤Œ: _buf “™∑¢ÀÕµƒ ˝æ›
+*	ÂáΩ Êï∞ Âêç: DispLabelRx
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫Êé•Êî∂Âà∞ÁöÑÊï∞ÊçÆ
+*	ÂΩ¢    ÂèÇ: _buf Ë¶ÅÂèëÈÄÅÁöÑÊï∞ÊçÆ
 *			  _
-*	∑µ ªÿ ÷µ: Œﬁ
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void DispLabelRx(uint8_t *_buf, uint8_t _len)
@@ -736,9 +744,9 @@ static void DispLabelRx(uint8_t *_buf, uint8_t _len)
 	_buf[_len] = 0;
 	sprintf(buf, "%d | %s", _len, _buf);
 
-	/* ∂ØÃ¨±Í«© */
+	/* Âä®ÊÄÅÊ†áÁ≠æ */
 	FormRS485->Label6.pCaption = buf;
 	LCD_DrawLabel(&FormRS485->Label6);
 }
 
-/***************************** ∞≤∏ª¿≥µÁ◊” www.armfly.com (END OF FILE) *********************************/
+/***************************** ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com (END OF FILE) *********************************/

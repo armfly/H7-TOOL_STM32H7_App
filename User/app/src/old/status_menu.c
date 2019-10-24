@@ -1,175 +1,175 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ³ÌĞò¹¦ÄÜÑ¡Ôñ
-*	ÎÄ¼şÃû³Æ : status_MenuMain.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : 
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-12-06 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : ç¨‹åºåŠŸèƒ½é€‰æ‹©
+*	æ–‡ä»¶åç§° : status_MenuMain.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : 
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-12-06 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 #include "bsp.h"
 #include "param.h"
 #include "main.h"
-#include "images.h"		/* Í¼±êÎÄ¼ş */
+#include "images.h" /* å›¾æ ‡æ–‡ä»¶ */
 #include "status_menu.h"
 #include "modbus_reg_addr.h"
 
-#define FORM_BACK_COLOR	CL_BLUE
+#define FORM_BACK_COLOR CL_BLUE
 
-#define ICON_HEIGHT	48				/* ¾ØĞÎÍ¼±ê¸ß¶È */
-#define ICON_WIDTH	48				/* ¾ØĞÎÍ¼±ê¿í¶È */
+#define ICON_HEIGHT 48 /* çŸ©å½¢å›¾æ ‡é«˜åº¦ */
+#define ICON_WIDTH 48	/* çŸ©å½¢å›¾æ ‡å®½åº¦ */
 
-#define ICON_STEP_X 80		/* Í¼±êÖ®¼äµÄ¼ä¸ô */
-#define ICON_STEP_Y	70		/* Í¼±êÖ®¼äµÄ¼ä¸ô */
+#define ICON_STEP_X 80 /* å›¾æ ‡ä¹‹é—´çš„é—´éš” */
+#define ICON_STEP_Y 70 /* å›¾æ ‡ä¹‹é—´çš„é—´éš” */
 
-#define MENU_COUNT	5
+#define MENU_COUNT 5
 static const ICON_T s_tMainIcons[MENU_COUNT] =
-{
-	{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "1.Áª»úÄ£Ê½"},
-	{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acLCD, "2.µçÑ¹±í"},
-	{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRadio, "3.NTC²âÎÂ"},
-	{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRecorder, "4.µç×è±í"},
-	{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "5.¸ºÔØµçÁ÷"},
+		{
+				{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "1.è”æœºæ¨¡å¼"},
+				{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acLCD, "2.ç”µå‹è¡¨"},
+				{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRadio, "3.NTCæµ‹æ¸©"},
+				{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRecorder, "4.ç”µé˜»è¡¨"},
+				{ID_ICON, 40, 20, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "5.è´Ÿè½½ç”µæµ"},
 };
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_MenuMain
-*	¹¦ÄÜËµÃ÷: ¹¦ÄÜ²Ëµ¥
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_MenuMain
+*	åŠŸèƒ½è¯´æ˜: åŠŸèƒ½èœå•
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_MenuMain(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	FONT_T tIconFont;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÍ¼±êÎÄ±¾ */
+	FONT_T tFont;			/* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+	FONT_T tIconFont; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºå›¾æ ‡æ–‡æœ¬ */
 	static uint8_t s_menu_idx = 0;
-	uint8_t ucIgnoreKey = 0;	
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucIgnoreKey = 0;
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
 		uint16_t x;
 		uint16_t y;
 		char buf[64];
-		
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_YELLOW;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_YELLOW;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
 		x = 5;
-		
+
 		y = 3;
-		LCD_DispStr(x, y, "Ñ¡Ôñ¹¦ÄÜ", &tFont);
-		
+		LCD_DispStr(x, y, "é€‰æ‹©åŠŸèƒ½", &tFont);
+
 		y = y + 20;
 		sprintf(buf, "MAC:%02X-%02X-%02X-%02X-%02X-%02X",
-			g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
-			g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
-		LCD_DispStr(x, y, buf, &tFont);		
+						g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
+						g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
+		LCD_DispStr(x, y, buf, &tFont);
 
 		y = y + 20;
 		sprintf(buf, "IP:%d.%d.%d.%d",
-			g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
-			g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
-		LCD_DispStr(x, y, buf, &tFont);		
-		
-		LCD_SetBackLight(BRIGHT_DEFAULT);	 /* ´ò¿ª±³¹â£¬ÉèÖÃÎªÈ±Ê¡ÁÁ¶È */
-		
-		/* ÉèÖÃ×ÖÌå²ÎÊı */
-		{
-			tIconFont.FontCode = FC_ST_16;			/* ×ÖÌå´úÂë 16µãÕó */
-			tIconFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-			tIconFont.BackColor = CL_BLUE;			/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tIconFont.Space = 1;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		}		
-	}
-	
-	bsp_ClearKey();		/* Çå»º´æµÄ°´¼ü */
+						g_tVar.MACaddr[0], g_tVar.MACaddr[1], g_tVar.MACaddr[2],
+						g_tVar.MACaddr[3], g_tVar.MACaddr[4], g_tVar.MACaddr[5]);
+		LCD_DispStr(x, y, buf, &tFont);
 
-	/* ´ÓÆäËû½çÃæ·µ»ØºóĞèÒªºöÂÔµÚ1¸öC¼üµ¯ÆğÊÂ¼ş */
+		LCD_SetBackLight(BRIGHT_DEFAULT); /* æ‰“å¼€èƒŒå…‰ï¼Œè®¾ç½®ä¸ºç¼ºçœäº®åº¦ */
+
+		/* è®¾ç½®å­—ä½“å‚æ•° */
+		{
+			tIconFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tIconFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+			tIconFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tIconFont.Space = 1;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+		}
+	}
+
+	bsp_ClearKey(); /* æ¸…ç¼“å­˜çš„æŒ‰é”® */
+
+	/* ä»å…¶ä»–ç•Œé¢è¿”å›åéœ€è¦å¿½ç•¥ç¬¬1ä¸ªCé”®å¼¹èµ·äº‹ä»¶ */
 	if (bsp_GetKeyState(KID_S) || bsp_GetKeyState(KID_C))
 	{
 		ucIgnoreKey = 1;
 	}
-	
+
 	fRefresh = 1;
 	while (g_MainStatus == MS_MAIN_MENU)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
-			LCD_DrawIcon32(&s_tMainIcons[s_menu_idx], &tIconFont, 0);			
+			LCD_DrawIcon32(&s_tMainIcons[s_menu_idx], &tIconFont, 0);
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
-		{			
-			/* ÓĞ¼ü°´ÏÂ */
+		{
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);
-					if (++s_menu_idx >= MENU_COUNT)
-					{
-						s_menu_idx = 0;		
-					}
-					fRefresh = 1;
-					break;
+			case KEY_UP_S: /* Sé”® */
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				if (++s_menu_idx >= MENU_COUNT)
+				{
+					s_menu_idx = 0;
+				}
+				fRefresh = 1;
+				break;
 
-				case  KEY_UP_C:		/* C¼ü */
-					if (ucIgnoreKey == 1)
-					{
-						ucIgnoreKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}					
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);
-					if (s_menu_idx > 0)
-					{
-						s_menu_idx--;
-					}
-					else
-					{
-						s_menu_idx = MENU_COUNT - 1;
-					}						
-					fRefresh = 1;
-					break;					
-
-				case  KEY_LONG_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
+			case KEY_UP_C: /* Cé”® */
+				if (ucIgnoreKey == 1)
+				{
+					ucIgnoreKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				if (s_menu_idx > 0)
+				{
+					s_menu_idx--;
+				}
+				else
+				{
+					s_menu_idx = MENU_COUNT - 1;
+				}
+				fRefresh = 1;
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü */
-					BEEP_KeyTone();	
-					if (++g_tParam.DispDir > 3)
-					{
-						g_tParam.DispDir = 0;
-					}
-					LCD_SetDirection(g_tParam.DispDir);
-					SaveParam();
-					LCD_ClrScr(CL_BLUE);
-					fRefresh = 1;
-					ucIgnoreKey = 1;					
-					break;				
-				
-				default:
-					break;
+			case KEY_LONG_S: /* Sé”® */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			case KEY_LONG_C: /* Cé”® */
+				BEEP_KeyTone();
+				if (++g_tParam.DispDir > 3)
+				{
+					g_tParam.DispDir = 0;
+				}
+				LCD_SetDirection(g_tParam.DispDir);
+				SaveParam();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				ucIgnoreKey = 1;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -177,105 +177,105 @@ void status_MenuMain(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_LinkMode
-*	¹¦ÄÜËµÃ÷: Áª»úÄ£Ê½£¨¹¦ÄÜÓÉÉÏÎ»»ú¿ØÖÆ£©
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_LinkMode
+*	åŠŸèƒ½è¯´æ˜: è”æœºæ¨¡å¼ï¼ˆåŠŸèƒ½ç”±ä¸Šä½æœºæ§åˆ¶ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_LinkMode(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	FONT_T tIconFont;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÍ¼±êÎÄ±¾ */
+	FONT_T tFont;			/* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+	FONT_T tIconFont; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºå›¾æ ‡æ–‡æœ¬ */
 	static uint8_t s_menu_idx = 0;
-	uint8_t ucIgnoreKey = 0;	
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucIgnoreKey = 0;
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_24;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_24;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "Ö±Á÷µçÑ¹±í", &tFont);	
+		LCD_DispStr(5, 3, "ç›´æµç”µå‹è¡¨", &tFont);
 	}
-	
-	bsp_ClearKey();		/* Çå»º´æµÄ°´¼ü */
 
-	/* ´ÓÆäËû½çÃæ·µ»ØºóĞèÒªºöÂÔµÚ1¸öC¼üµ¯ÆğÊÂ¼ş */
+	bsp_ClearKey(); /* æ¸…ç¼“å­˜çš„æŒ‰é”® */
+
+	/* ä»å…¶ä»–ç•Œé¢è¿”å›åéœ€è¦å¿½ç•¥ç¬¬1ä¸ªCé”®å¼¹èµ·äº‹ä»¶ */
 	if (bsp_GetKeyState(KID_S) || bsp_GetKeyState(KID_C))
 	{
 		ucIgnoreKey = 1;
 	}
-	
-	/* ³õÊ¼»¯DSOÓ²¼şµçÂ· */
+
+	/* åˆå§‹åŒ–DSOç¡¬ä»¶ç”µè·¯ */
 	{
 		DSO_InitHard();
-		DSO_SetDC(1,1);		/* CH1 Ñ¡DCñîºÏ */
-		DSO_SetDC(2,1);		/* CH2 Ñ¡DCñîºÏ */
-		DSO_SetGain(1, 0);	/* CH1 ÔöÒæÑ¡Ôñ×îĞ¡£¨Á¿³Ì×î´ó£© */
-		DSO_SetGain(2, 0);	/* CH2 ÔöÒæÑ¡Ôñ×îĞ¡£¨Á¿³Ì×î´ó£© */
+		DSO_SetDC(1, 1);	 /* CH1 é€‰DCè€¦åˆ */
+		DSO_SetDC(2, 1);	 /* CH2 é€‰DCè€¦åˆ */
+		DSO_SetGain(1, 0); /* CH1 å¢ç›Šé€‰æ‹©æœ€å°ï¼ˆé‡ç¨‹æœ€å¤§ï¼‰ */
+		DSO_SetGain(2, 0); /* CH2 å¢ç›Šé€‰æ‹©æœ€å°ï¼ˆé‡ç¨‹æœ€å¤§ï¼‰ */
 	}
-	
+
 	fRefresh = 1;
-	bsp_StartAutoTimer(0, 100);		/* 100ms Ë¢ĞÂ */
+	bsp_StartAutoTimer(0, 100); /* 100ms åˆ·æ–° */
 	while (g_MainStatus == MS_VOLT_METER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
-			;		
+			;
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
-		{			
-			/* ÓĞ¼ü°´ÏÂ */
+		{
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);
-					fRefresh = 1;
-					break;
+			case KEY_UP_S: /* Sé”® */
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				break;
 
-				case  KEY_UP_C:		/* C¼ü */
-					if (ucIgnoreKey == 1)
-					{
-						ucIgnoreKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}					
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);						
-					fRefresh = 1;
-					break;					
-
-				case  KEY_LONG_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
+			case KEY_UP_C: /* Cé”® */
+				if (ucIgnoreKey == 1)
+				{
+					ucIgnoreKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü */
-					BEEP_KeyTone();	
-					if (++g_tParam.DispDir > 3)
-					{
-						g_tParam.DispDir = 0;
-					}
-					LCD_SetDirection(g_tParam.DispDir);
-					SaveParam();
-					LCD_ClrScr(CL_BLUE);
-					fRefresh = 1;
-					ucIgnoreKey = 1;					
-					break;				
-				
-				default:
-					break;
+			case KEY_LONG_S: /* Sé”® */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			case KEY_LONG_C: /* Cé”® */
+				BEEP_KeyTone();
+				if (++g_tParam.DispDir > 3)
+				{
+					g_tParam.DispDir = 0;
+				}
+				LCD_SetDirection(g_tParam.DispDir);
+				SaveParam();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				ucIgnoreKey = 1;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -283,108 +283,108 @@ void status_LinkMode(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_VoltMeter
-*	¹¦ÄÜËµÃ÷: µçÑ¹±í
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_VoltMeter
+*	åŠŸèƒ½è¯´æ˜: ç”µå‹è¡¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_VoltMeter(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	FONT_T tIconFont;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÍ¼±êÎÄ±¾ */
+	FONT_T tFont;			/* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+	FONT_T tIconFont; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºå›¾æ ‡æ–‡æœ¬ */
 	static uint8_t s_menu_idx = 0;
-	uint8_t ucIgnoreKey = 0;	
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucIgnoreKey = 0;
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_24;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_24;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "Ö±Á÷µçÑ¹±í", &tFont);	
+		LCD_DispStr(5, 3, "ç›´æµç”µå‹è¡¨", &tFont);
 	}
-	
-	bsp_ClearKey();		/* Çå»º´æµÄ°´¼ü */
 
-	/* ´ÓÆäËû½çÃæ·µ»ØºóĞèÒªºöÂÔµÚ1¸öC¼üµ¯ÆğÊÂ¼ş */
+	bsp_ClearKey(); /* æ¸…ç¼“å­˜çš„æŒ‰é”® */
+
+	/* ä»å…¶ä»–ç•Œé¢è¿”å›åéœ€è¦å¿½ç•¥ç¬¬1ä¸ªCé”®å¼¹èµ·äº‹ä»¶ */
 	if (bsp_GetKeyState(KID_S) || bsp_GetKeyState(KID_C))
 	{
 		ucIgnoreKey = 1;
 	}
-	
-	/* ³õÊ¼»¯DSOÓ²¼şµçÂ· */
+
+	/* åˆå§‹åŒ–DSOç¡¬ä»¶ç”µè·¯ */
 	{
 		DSO_InitHard();
-		DSO_SetDC(1,1);		/* CH1 Ñ¡DCñîºÏ */
-		DSO_SetDC(2,1);		/* CH2 Ñ¡DCñîºÏ */
-		DSO_SetGain(1, 0);	/* CH1 ÔöÒæÑ¡Ôñ×îĞ¡£¨Á¿³Ì×î´ó£© */
-		DSO_SetGain(2, 0);	/* CH2 ÔöÒæÑ¡Ôñ×îĞ¡£¨Á¿³Ì×î´ó£© */
+		DSO_SetDC(1, 1);	 /* CH1 é€‰DCè€¦åˆ */
+		DSO_SetDC(2, 1);	 /* CH2 é€‰DCè€¦åˆ */
+		DSO_SetGain(1, 0); /* CH1 å¢ç›Šé€‰æ‹©æœ€å°ï¼ˆé‡ç¨‹æœ€å¤§ï¼‰ */
+		DSO_SetGain(2, 0); /* CH2 å¢ç›Šé€‰æ‹©æœ€å°ï¼ˆé‡ç¨‹æœ€å¤§ï¼‰ */
 	}
-	
+
 	fRefresh = 1;
-	bsp_StartAutoTimer(0, 100);		/* 100ms Ë¢ĞÂ */
+	bsp_StartAutoTimer(0, 100); /* 100ms åˆ·æ–° */
 	while (g_MainStatus == MS_VOLT_METER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
-			;		
+			;
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
-		{			
-			/* ÓĞ¼ü°´ÏÂ */
+		{
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);
-					fRefresh = 1;
-					break;
+			case KEY_UP_S: /* Sé”® */
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				break;
 
-				case  KEY_UP_C:		/* C¼ü */
-					if (ucIgnoreKey == 1)
-					{
-						ucIgnoreKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}					
-					BEEP_KeyTone();	
-					LCD_ClrScr(CL_BLUE);						
-					fRefresh = 1;
-					break;					
-
-				case  KEY_LONG_S:		/* S¼ü */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
+			case KEY_UP_C: /* Cé”® */
+				if (ucIgnoreKey == 1)
+				{
+					ucIgnoreKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+				BEEP_KeyTone();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü */
-					BEEP_KeyTone();	
-					if (++g_tParam.DispDir > 3)
-					{
-						g_tParam.DispDir = 0;
-					}
-					LCD_SetDirection(g_tParam.DispDir);
-					SaveParam();
-					LCD_ClrScr(CL_BLUE);
-					fRefresh = 1;
-					ucIgnoreKey = 1;					
-					break;				
-				
-				default:
-					break;
+			case KEY_LONG_S: /* Sé”® */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			case KEY_LONG_C: /* Cé”® */
+				BEEP_KeyTone();
+				if (++g_tParam.DispDir > 3)
+				{
+					g_tParam.DispDir = 0;
+				}
+				LCD_SetDirection(g_tParam.DispDir);
+				SaveParam();
+				LCD_ClrScr(CL_BLUE);
+				fRefresh = 1;
+				ucIgnoreKey = 1;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

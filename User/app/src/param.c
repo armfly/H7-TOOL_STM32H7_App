@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ó¦ÓÃ³ÌĞò²ÎÊıÄ£¿é
-*	ÎÄ¼şÃû³Æ : param.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ¶ÁÈ¡ºÍ±£´æÓ¦ÓÃ³ÌĞòµÄ²ÎÊı
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-01-01 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : åº”ç”¨ç¨‹åºå‚æ•°æ¨¡å—
+*	æ–‡ä»¶åç§° : param.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : è¯»å–å’Œä¿å­˜åº”ç”¨ç¨‹åºçš„å‚æ•°
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-01-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,29 +18,29 @@
 #include "param.h"
 #include "modbus_reg_addr.h"
 
-PARAM_T g_tParam;			/* »ù±¾²ÎÊı */
-CALIB_T g_tCalib;			/* Ğ£×¼²ÎÊı */
-VAR_T g_tVar;				/* È«¾Ö±äÁ¿ */
+PARAM_T g_tParam;			/* åŸºæœ¬å‚æ•° */
+CALIB_T g_tCalib;			/* æ ¡å‡†å‚æ•° */
+VAR_T g_tVar;				/* å…¨å±€å˜é‡ */
 
 void LoadCalibParam(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LoadParam
-*	¹¦ÄÜËµÃ÷: ´Óeeprom¶Á²ÎÊıµ½g_tParam
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LoadParam
+*	åŠŸèƒ½è¯´æ˜: ä»eepromè¯»å‚æ•°åˆ°g_tParam
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LoadParam(void)
 {
 
-	/* ¶ÁÈ¡EEPROMÖĞµÄ²ÎÊı */
+	/* è¯»å–EEPROMä¸­çš„å‚æ•° */
 	ee_ReadBytes((uint8_t *)&g_tParam, PARAM_ADDR, sizeof(PARAM_T));
 
 	if (sizeof(PARAM_T) > PARAM_SIZE)
 	{
-		/* »ù±¾²ÎÊı·ÖÅä¿Õ¼ä²»×ã */
+		/* åŸºæœ¬å‚æ•°åˆ†é…ç©ºé—´ä¸è¶³ */
 		while(1);
 	}
 	
@@ -49,9 +49,9 @@ void LoadParam(void)
 		InitBaseParam();	
 	}
 		
-	bsp_GetCpuID(g_tVar.CPU_Sn);	/* ¶ÁÈ¡CPU ID */
+	bsp_GetCpuID(g_tVar.CPU_Sn);	/* è¯»å–CPU ID */
 	
-	/* ×Ô¶¯Éú³ÉÒÔÌ«ÍøMAC */
+	/* è‡ªåŠ¨ç”Ÿæˆä»¥å¤ªç½‘MAC */
 	g_tVar.MACaddr[0] = 0xC8;
 	g_tVar.MACaddr[1] = 0xF4;
 	g_tVar.MACaddr[2] = 0x8D;
@@ -64,120 +64,120 @@ void LoadParam(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SaveParam
-*	¹¦ÄÜËµÃ÷: ½«È«¾Ö±äÁ¿g_tParam Ğ´Èëµ½eeprom
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SaveParam
+*	åŠŸèƒ½è¯´æ˜: å°†å…¨å±€å˜é‡g_tParam å†™å…¥åˆ°eeprom
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void SaveParam(void)
 {
-	/* ½«È«¾ÖµÄ²ÎÊı±äÁ¿±£´æµ½EEPROM */
+	/* å°†å…¨å±€çš„å‚æ•°å˜é‡ä¿å­˜åˆ°EEPROM */
 	ee_WriteBytes((uint8_t *)&g_tParam, PARAM_ADDR, sizeof(PARAM_T));
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitBaseParam
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯»ù±¾²ÎÊıÎªÈ±Ê¡Öµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitBaseParam
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–åŸºæœ¬å‚æ•°ä¸ºç¼ºçœå€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void InitBaseParam(void)
 {
-	g_tParam.UpgradeFlag = 0;		/*Éı¼¶±ê¼Ç,0x55AAA55A±íÊ¾ĞèÒª¸üĞÂAPP£¬0xFFFF±íÊ¾¸üĞÂÍê±Ï*/
-	g_tParam.ParamVer = PARAM_VER;			/* ²ÎÊıÇø°æ±¾¿ØÖÆ£¨¿ÉÓÃÓÚ³ÌĞòÉı¼¶Ê±£¬¾ö¶¨ÊÇ·ñ¶Ô²ÎÊıÇø½øĞĞÉı¼¶£© */
+	g_tParam.UpgradeFlag = 0;		/*å‡çº§æ ‡è®°,0x55AAA55Aè¡¨ç¤ºéœ€è¦æ›´æ–°APPï¼Œ0xFFFFè¡¨ç¤ºæ›´æ–°å®Œæ¯•*/
+	g_tParam.ParamVer = PARAM_VER;			/* å‚æ•°åŒºç‰ˆæœ¬æ§åˆ¶ï¼ˆå¯ç”¨äºç¨‹åºå‡çº§æ—¶ï¼Œå†³å®šæ˜¯å¦å¯¹å‚æ•°åŒºè¿›è¡Œå‡çº§ï¼‰ */
 	
-	g_tParam.DispDir = 3;			/* ÏÔÊ¾·½Ïò */
+	g_tParam.DispDir = 3;			/* æ˜¾ç¤ºæ–¹å‘ */
 	
 	g_tParam.Addr485 = 1;
 	
-	g_tParam.LocalIPAddr[0] = 192;		/* ±¾»úIPµØÖ· */
+	g_tParam.LocalIPAddr[0] = 192;		/* æœ¬æœºIPåœ°å€ */
 	g_tParam.LocalIPAddr[1] = 168;
 	g_tParam.LocalIPAddr[2] = 1;
 	g_tParam.LocalIPAddr[3] = 211;
 	
-	g_tParam.NetMask[0] = 255;			/* ×ÓÍøÑÚÂë */
+	g_tParam.NetMask[0] = 255;			/* å­ç½‘æ©ç  */
 	g_tParam.NetMask[1] = 255;
 	g_tParam.NetMask[2] = 255;
 	g_tParam.NetMask[3] = 0;
 	
-	g_tParam.Gateway[0] = 192;			/* Íø¹Ø */
+	g_tParam.Gateway[0] = 192;			/* ç½‘å…³ */
 	g_tParam.Gateway[1] = 168;
 	g_tParam.Gateway[2] = 1;
 	g_tParam.Gateway[3] = 1;
 	
-	g_tParam.LocalTCPPort = 30010;		/* ±¾»úTCP¶Ë¿ÚºÍUDP¶Ë¿ÚºÅ£¬ÏàÍ¬ */	
+	g_tParam.LocalTCPPort = 30010;		/* æœ¬æœºTCPç«¯å£å’ŒUDPç«¯å£å·ï¼Œç›¸åŒ */	
 
-	g_tParam.RemoteIPAddr[0] = 192;	/* Ô¶¶Ë(Ç°ÖÃ£©IPµØÖ· */
+	g_tParam.RemoteIPAddr[0] = 192;	/* è¿œç«¯(å‰ç½®ï¼‰IPåœ°å€ */
 	g_tParam.RemoteIPAddr[1] = 168;
 	g_tParam.RemoteIPAddr[2] = 1;
 	g_tParam.RemoteIPAddr[3] = 213;
 	
-	g_tParam.RemoteTcpPort = 30000;		/* Ô¶¶Ë£¨Ç°ÖÃ£©TCP¶Ë¿Ú */
+	g_tParam.RemoteTcpPort = 30000;		/* è¿œç«¯ï¼ˆå‰ç½®ï¼‰TCPç«¯å£ */
 
-	g_tParam.WorkMode = 0;		/* ¹¤×÷Ä£Ê½ ±£Áô */
+	g_tParam.WorkMode = 0;		/* å·¥ä½œæ¨¡å¼ ä¿ç•™ */
 
-	g_tParam.APSelfEn = 0;			/* 0×÷Îª¿Í»§¶Ë£¬1×÷ÎªAP */
-	memset(g_tParam.AP_SSID, 0, 32 + 1);	/* APÃû×Ö */
-	memset(g_tParam.AP_PASS, 0, 16 + 1);	/* APÃÜÂë */
-	g_tParam.WiFiIPAddr[0] = 192;		/* ¾²Ì¬IPµØÖ·  */
+	g_tParam.APSelfEn = 0;			/* 0ä½œä¸ºå®¢æˆ·ç«¯ï¼Œ1ä½œä¸ºAP */
+	memset(g_tParam.AP_SSID, 0, 32 + 1);	/* APåå­— */
+	memset(g_tParam.AP_PASS, 0, 16 + 1);	/* APå¯†ç  */
+	g_tParam.WiFiIPAddr[0] = 192;		/* é™æ€IPåœ°å€  */
 	g_tParam.WiFiIPAddr[1] = 168;
 	g_tParam.WiFiIPAddr[2] = 1;	
 	g_tParam.WiFiIPAddr[3] = 105;
 	
-	g_tParam.WiFiNetMask[0] = 255;		/* ×ÓÍøÑÚÂë 255.255.255.0 */	
+	g_tParam.WiFiNetMask[0] = 255;		/* å­ç½‘æ©ç  255.255.255.0 */	
 	g_tParam.WiFiNetMask[1] = 255;
 	g_tParam.WiFiNetMask[2] = 255;
 	g_tParam.WiFiNetMask[3] = 0;	
 	
-	g_tParam.WiFiGateway[0] = 192;		/* Íø¹Ø 192.168.1.1 */	
+	g_tParam.WiFiGateway[0] = 192;		/* ç½‘å…³ 192.168.1.1 */	
 	g_tParam.WiFiGateway[1] = 168;
 	g_tParam.WiFiGateway[2] = 1;
 	g_tParam.WiFiGateway[3] = 1;
 	
-	g_tParam.DHCPEn = 0;				/* DHCPÊ¹ÄÜ  */
+	g_tParam.DHCPEn = 0;				/* DHCPä½¿èƒ½  */
 	
-	g_tParam.TestWord = 0;		/*¡¡²âÊÔµ¥Ôª£¬ÓÃÓÚ¼ì²âeepromg¹¦ÄÜ */
-	g_tParam.NtcType = 0;		/* NTCÈÈÃôµç×èÀàĞÍ 0 = 10K_B3950£¬1 = 100K_B3950 */
+	g_tParam.TestWord = 0;		/*ã€€æµ‹è¯•å•å…ƒï¼Œç”¨äºæ£€æµ‹eepromgåŠŸèƒ½ */
+	g_tParam.NtcType = 0;		/* NTCçƒ­æ•ç”µé˜»ç±»å‹ 0 = 10K_B3950ï¼Œ1 = 100K_B3950 */
 	
 	SaveParam();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LoadCalibParam
-*	¹¦ÄÜËµÃ÷: ½«È«¾Ö±äÁ¿g_tParam Ğ´Èëµ½CPUÄÚ²¿Flash
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LoadCalibParam
+*	åŠŸèƒ½è¯´æ˜: å°†å…¨å±€å˜é‡g_tParam å†™å…¥åˆ°CPUå†…éƒ¨Flash
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LoadCalibParam(void)
 {
 	if (sizeof(g_tCalib) > PARAM_CALIB_SIZE)
 	{
-		/* Ğ£×¼²ÎÊı·ÖÅä¿Õ¼ä²»×ã */
+		/* æ ¡å‡†å‚æ•°åˆ†é…ç©ºé—´ä¸è¶³ */
 		while(1);
 	}	
 	
-	/* ¶ÁÈ¡EEPROMÖĞµÄ²ÎÊı */
+	/* è¯»å–EEPROMä¸­çš„å‚æ•° */
 	ee_ReadBytes((uint8_t *)&g_tCalib, PARAM_CALIB_ADDR, sizeof(g_tCalib));	
 
 	if (g_tCalib.CalibVer != CALIB_VER)
 	{
 		g_tCalib.CalibVer = CALIB_VER;
 		
-		InitCalibParam();	/* ³õÊ¼»¯Ğ£×¼²ÎÊı */
+		InitCalibParam();	/* åˆå§‹åŒ–æ ¡å‡†å‚æ•° */
 	}	
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: WriteParamUint16
-*	¹¦ÄÜËµÃ÷: Ğ´²ÎÊı£¬16bit
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: WriteParamUint16
+*	åŠŸèƒ½è¯´æ˜: å†™å‚æ•°ï¼Œ16bit
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void WriteParamUint16(uint16_t _addr, uint16_t _value)
@@ -187,24 +187,24 @@ void WriteParamUint16(uint16_t _addr, uint16_t _value)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SaveCalibParam
-*	¹¦ÄÜËµÃ÷: ½«È«¾Ö±äÁ¿g_tCalibĞ´Èëµ½eeprom
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SaveCalibParam
+*	åŠŸèƒ½è¯´æ˜: å°†å…¨å±€å˜é‡g_tCalibå†™å…¥åˆ°eeprom
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void SaveCalibParam(void)
 {
-	/* ½«È«¾ÖµÄ²ÎÊı±äÁ¿±£´æµ½EEPROM */
+	/* å°†å…¨å±€çš„å‚æ•°å˜é‡ä¿å­˜åˆ°EEPROM */
 	ee_WriteBytes((uint8_t *)&g_tCalib, PARAM_CALIB_ADDR, sizeof(g_tCalib));
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitCalibParam
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯Ğ£×¼²ÎÊıÎªÈ±Ê¡Öµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitCalibParam
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ ¡å‡†å‚æ•°ä¸ºç¼ºçœå€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void InitCalibParam(void)
@@ -230,7 +230,7 @@ void InitCalibParam(void)
 	g_tCalib.LoadVolt.x2 = 9246.938;
 	g_tCalib.LoadVolt.y2 = 4.943;			/*  */
 
-	g_tCalib.LoadCurr[0].x1 = 1321.703;			/* ¸ºÔØµçÁ÷ Ğ¡Á¿³Ì */
+	g_tCalib.LoadCurr[0].x1 = 1321.703;			/* è´Ÿè½½ç”µæµ å°é‡ç¨‹ */
 	g_tCalib.LoadCurr[0].y1 = 0;
 	g_tCalib.LoadCurr[0].x2 = 30302.359;
 	g_tCalib.LoadCurr[0].y2 = 55.24;		/*   */
@@ -239,7 +239,7 @@ void InitCalibParam(void)
 	g_tCalib.LoadCurr[0].x4 = 44583.625;
 	g_tCalib.LoadCurr[0].y4 = 81.58;		/* 65535 = 123.934mA */	
 
-	g_tCalib.LoadCurr[1].x1 = 187.047;			/* ¸ºÔØµçÁ÷ ´óÁ¿³Ì */
+	g_tCalib.LoadCurr[1].x1 = 187.047;			/* è´Ÿè½½ç”µæµ å¤§é‡ç¨‹ */
 	g_tCalib.LoadCurr[1].y1 = 0;
 	g_tCalib.LoadCurr[1].x2 = 2936.438;
 	g_tCalib.LoadCurr[1].y2 = 52.60;		/*  */
@@ -251,7 +251,7 @@ void InitCalibParam(void)
 	g_tCalib.TVCCVolt.x1 = 0;
 	g_tCalib.TVCCVolt.y1 = 0;
 	g_tCalib.TVCCVolt.x2 = 65535;
-	g_tCalib.TVCCVolt.y2 = 6.25;	/* ×î¸ß²âÁ¿6.25V */
+	g_tCalib.TVCCVolt.y2 = 6.25;	/* æœ€é«˜æµ‹é‡6.25V */
 
 	g_tCalib.TVCCCurr.x1 = 50;
 	g_tCalib.TVCCCurr.y1 = 0;
@@ -295,18 +295,18 @@ void InitCalibParam(void)
 	g_tCalib.Dac20mA.x4 = 3500;
 	g_tCalib.Dac20mA.y4 = 18050;	/*  */
 	
-	/* ÏÂÃæ2¸öµçÑ¹ÔİÊ±Î´ÓÃµ½ */
+	/* ä¸‹é¢2ä¸ªç”µå‹æš‚æ—¶æœªç”¨åˆ° */
 	g_tCalib.USBVolt.x1 = 0;
 	g_tCalib.USBVolt.y1 = 0;
 	g_tCalib.USBVolt.x2 = 65535;
-	g_tCalib.USBVolt.y2 = 6.25;	/* ×î¸ß²âÁ¿6.25V */
+	g_tCalib.USBVolt.y2 = 6.25;	/* æœ€é«˜æµ‹é‡6.25V */
 	
 	g_tCalib.ExtPowerVolt.x1 = 0;
 	g_tCalib.ExtPowerVolt.y1 = 0;
 	g_tCalib.ExtPowerVolt.x2 = 65535;
-	g_tCalib.ExtPowerVolt.y2 = 6.25;	/* ×î¸ß²âÁ¿6.25V */		
+	g_tCalib.ExtPowerVolt.y2 = 6.25;	/* æœ€é«˜æµ‹é‡6.25V */		
 	
 	SaveCalibParam();
 }
 		
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

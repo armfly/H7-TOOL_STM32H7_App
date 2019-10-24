@@ -1,40 +1,37 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : STM8 GPIOĞ¾Æ¬Çı¶¯
-*	ÎÄ¼şÃû³Æ : bsp_stm8_gpio.h
-*	°æ    ±¾ : V2.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : STM8 GPIOèŠ¯ç‰‡é©±åŠ¨
+*	æ–‡ä»¶åç§° : bsp_stm8_gpio.h
+*	ç‰ˆ    æœ¬ : V2.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
-
 #ifndef _BSP_I2C_LED8_H
 #define _BSP_I2C_LED8_H
 
-#define I2C_DEV_ADDR			0x94		/* Éè±¸µØÖ· */
-#define I2C_ADDR_BYTES			1			/* µØÖ·×Ö½Ú¸öÊı */
+#define I2C_DEV_ADDR 0x94 /* è®¾å¤‡åœ°å€ */
+#define I2C_ADDR_BYTES 1  /* åœ°å€å­—èŠ‚ä¸ªæ•° */
 
-/* Ğ´µ¥¸ö */
-#define REG_ID					 0x00        /* Ğ¾Æ¬ID, ¹Ì¶¨Öµ 0x75 */
-#define REG_SOFTVER              0x01        /* Èí¼ş°æ±¾ */
-#define REG_CFG1				 0x02		 /* GPIO ·½ÏòÅäÖÃ¼Ä´æÆ÷, 7£º0  */
-#define REG_CFG2				 0x03		 /* GPIO ·½ÏòÅäÖÃ¼Ä´æÆ÷, 10£º8  */
-#define REG_IN1					 0x04		 /* GPIO ÊäÈë×´Ì¬¼Ä´æÆ÷, 7£º0  */
-#define REG_IN2					 0x05		 /* GPIO ÊäÈë×´Ì¬¼Ä´æÆ÷, 10£º8  */
-#define REG_OUT1				 0x06		 /* GPIO Êä³ö×´Ì¬¼Ä´æÆ÷, 7£º0  */
-#define REG_OUT2				 0x07		 /* GPIO Êä³ö×´Ì¬¼Ä´æÆ÷, 10£º8  */
-#define REG_PWM1_H				 0x08		 /* PWM1Õ¼¿Õ±È¸ß×Ö½Ú */
-#define REG_PWM1_L				 0x09		 /* PWM1Õ¼¿Õ±ÈµÍ×Ö½Ú */
-#define REG_PWM2_H				 0x0A		 /* PWM2Õ¼¿Õ±È¸ß×Ö½Ú */
-#define REG_PWM2_L				 0x0B		 /* PWM2Õ¼¿Õ±ÈµÍ×Ö½Ú */
+/* å†™å•ä¸ª */
+#define REG_ID 0x00      /* èŠ¯ç‰‡ID, å›ºå®šå€¼ 0x75 */
+#define REG_SOFTVER 0x01 /* è½¯ä»¶ç‰ˆæœ¬ */
+#define REG_CFG1 0x02    /* GPIO æ–¹å‘é…ç½®å¯„å­˜å™¨, 7ï¼š0  */
+#define REG_CFG2 0x03    /* GPIO æ–¹å‘é…ç½®å¯„å­˜å™¨, 10ï¼š8  */
+#define REG_IN1 0x04     /* GPIO è¾“å…¥çŠ¶æ€å¯„å­˜å™¨, 7ï¼š0  */
+#define REG_IN2 0x05     /* GPIO è¾“å…¥çŠ¶æ€å¯„å­˜å™¨, 10ï¼š8  */
+#define REG_OUT1 0x06    /* GPIO è¾“å‡ºçŠ¶æ€å¯„å­˜å™¨, 7ï¼š0  */
+#define REG_OUT2 0x07    /* GPIO è¾“å‡ºçŠ¶æ€å¯„å­˜å™¨, 10ï¼š8  */
+#define REG_PWM1_H 0x08  /* PWM1å ç©ºæ¯”é«˜å­—èŠ‚ */
+#define REG_PWM1_L 0x09  /* PWM1å ç©ºæ¯”ä½å­—èŠ‚ */
+#define REG_PWM2_H 0x0A  /* PWM2å ç©ºæ¯”é«˜å­—èŠ‚ */
+#define REG_PWM2_L 0x0B  /* PWM2å ç©ºæ¯”ä½å­—èŠ‚ */
 
 uint8_t STM8_InitHard(void);
 void STM8_WriteGPIO(uint8_t _pin, uint8_t _value);
 
 #endif
-
-

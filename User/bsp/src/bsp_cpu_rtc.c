@@ -1,122 +1,122 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : STM32ÄÚ²¿RTCÄ£¿é
-*	ÎÄ¼şÃû³Æ : bsp_cpu_rtc.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : STM32å†…éƒ¨RTCæ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_cpu_rtc.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-08-08 armfly  Ê×°æ.°²¸»À³µç×ÓÔ­´´
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-08-08 armfly  é¦–ç‰ˆ.å®‰å¯Œè±ç”µå­åŸåˆ›
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-#define RTC_INIT_FLAG	0xA5A8
+#define RTC_INIT_FLAG 0xA5A8
 
-#define RTC_ASYNCH_PREDIV  0x7F
-#define RTC_SYNCH_PREDIV   0x00FF
+#define RTC_ASYNCH_PREDIV 0x7F
+#define RTC_SYNCH_PREDIV 0x00FF
 
 RTC_T g_tRTC;
 
-/* Æ½ÄêµÄÃ¿ÔÂÌìÊı±í */
+/* å¹³å¹´çš„æ¯æœˆå¤©æ•°è¡¨ */
 const uint8_t mon_table[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 static void RTC_Config(void);
 
-RTC_HandleTypeDef RtcHandle;	/* ±ØĞëÓÃÈ«¾Ö±äÁ¿ */
+RTC_HandleTypeDef RtcHandle; /* å¿…é¡»ç”¨å…¨å±€å˜é‡ */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitRTC
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯CPUÄÚ²¿RTC
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitRTC
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–CPUå†…éƒ¨RTC
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitRTC(void)
-{	
+{
 	uint32_t back_reg;
 
-	RtcHandle.Instance = RTC;	
-	
-	/* ÓÃÓÚ¼ì²âÊÇ·ñÒÑ¾­ÅäÖÃ¹ıRTC£¬Èç¹ûÅäÖÃ¹ıµÄ»°£¬»áÔÚÅäÖÃ½áÊøÊ± 
-	ÉèÖÃRTC±¸·İ¼Ä´æÆ÷Îª0xA5A5 ¡£Èç¹û¼ì²âRTC±¸·İ¼Ä´æÆ÷²»ÊÇ0xA5A5   ÄÇÃ´±íÊ¾Ã»ÓĞÅäÖÃ¹ı£¬ĞèÒªÅäÖÃRTC.   */
-	back_reg = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR0); 
-	if (back_reg != RTC_INIT_FLAG) 
-	{ 		
-		RTC_Config(); 	/* RTC ÅäÖÃ */ 
-		
-		RTC_WriteClock(2018, 9, 1, 0, 0, 0);	/* ÉèÖÃ³õÊ¼Ê±¼ä */
-		
-		/* ÅäÖÃ±¸·İ¼Ä´æÆ÷£¬±íÊ¾ÒÑ¾­ÉèÖÃ¹ıRTC */
-		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR0, RTC_INIT_FLAG);		
-	} 
-	else 
-	{ 
-		/* ¼ì²âÉÏµç¸´Î»±êÖ¾ÊÇ·ñÉèÖÃ */ 
+	RtcHandle.Instance = RTC;
+
+	/* ç”¨äºæ£€æµ‹æ˜¯å¦å·²ç»é…ç½®è¿‡RTCï¼Œå¦‚æœé…ç½®è¿‡çš„è¯ï¼Œä¼šåœ¨é…ç½®ç»“æŸæ—¶ 
+	è®¾ç½®RTCå¤‡ä»½å¯„å­˜å™¨ä¸º0xA5A5 ã€‚å¦‚æœæ£€æµ‹RTCå¤‡ä»½å¯„å­˜å™¨ä¸æ˜¯0xA5A5   é‚£ä¹ˆè¡¨ç¤ºæ²¡æœ‰é…ç½®è¿‡ï¼Œéœ€è¦é…ç½®RTC.   */
+	back_reg = HAL_RTCEx_BKUPRead(&RtcHandle, RTC_BKP_DR0);
+	if (back_reg != RTC_INIT_FLAG)
+	{
+		RTC_Config(); /* RTC é…ç½® */
+
+		RTC_WriteClock(2018, 9, 1, 0, 0, 0); /* è®¾ç½®åˆå§‹æ—¶é—´ */
+
+		/* é…ç½®å¤‡ä»½å¯„å­˜å™¨ï¼Œè¡¨ç¤ºå·²ç»è®¾ç½®è¿‡RTC */
+		HAL_RTCEx_BKUPWrite(&RtcHandle, RTC_BKP_DR0, RTC_INIT_FLAG);
+	}
+	else
+	{
+		/* æ£€æµ‹ä¸Šç”µå¤ä½æ ‡å¿—æ˜¯å¦è®¾ç½® */
 		if (__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) != 0)
-		{ 
-			/* ·¢ÉúÉÏµç¸´Î» */ 
-		} 
-		/* ¼ì²âÒı½Å¸´Î»±êÖ¾ÊÇ·ñÉèÖÃ */ 
-		else if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) != 0) 
-		{ 
-			/* ·¢ÉúÒı½Å¸´Î» */  
-		} 
-		
-		RTC_Config(); 	/* RTC ÅäÖÃ */ 
+		{
+			/* å‘ç”Ÿä¸Šç”µå¤ä½ */
+		}
+		/* æ£€æµ‹å¼•è„šå¤ä½æ ‡å¿—æ˜¯å¦è®¾ç½® */
+		else if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) != 0)
+		{
+			/* å‘ç”Ÿå¼•è„šå¤ä½ */
+		}
+
+		RTC_Config(); /* RTC é…ç½® */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: RTC_Config
-*	¹¦ÄÜËµÃ÷: 1. Ñ¡Ôñ²»Í¬µÄRTCÊ±ÖÓÔ´LSI»òÕßLSE¡£
-*             2. ÅäÖÃRTCÊ±ÖÓ¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: RTC_Config
+*	åŠŸèƒ½è¯´æ˜: 1. é€‰æ‹©ä¸åŒçš„RTCæ—¶é’ŸæºLSIæˆ–è€…LSEã€‚
+*             2. é…ç½®RTCæ—¶é’Ÿã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void RTC_Config(void)
 {
-	RCC_OscInitTypeDef        RCC_OscInitStruct;
-	RCC_PeriphCLKInitTypeDef  PeriphClkInitStruct;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 
 	/* To enable access on RTC registers */
 	HAL_PWR_EnableBkUpAccess();
-	
+
 	/* Configure LSE/LSI as RTC clock source ###############################*/
-	RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
 	RCC_OscInitStruct.LSEState = RCC_LSE_ON;
 	RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
-	if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-	{ 
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+	{
 		Error_Handler(__FILE__, __LINE__);
 	}
 
 	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
 	PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
-	if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-	{ 
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+	{
 		Error_Handler(__FILE__, __LINE__);
 	}
-	
+
 	/* Configures the External Low Speed oscillator (LSE) drive capability */
-	__HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_HIGH);	
-	
-	/* Enable RTC Clock */ 
-	__HAL_RCC_RTC_ENABLE(); 
-  
-	/* Configure RTC prescaler and RTC data registers */	
+	__HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_HIGH);
+
+	/* Enable RTC Clock */
+	__HAL_RCC_RTC_ENABLE();
+
+	/* Configure RTC prescaler and RTC data registers */
 	{
-	 
+
 		RtcHandle.Instance = RTC;
 
 		/* RTC configured as follows:
@@ -126,135 +126,134 @@ static void RTC_Config(void)
 		  - OutPut         = Output Disable
 		  - OutPutPolarity = High Polarity
 		  - OutPutType     = Open Drain */
-		RtcHandle.Init.HourFormat     = RTC_HOURFORMAT_24;
-		RtcHandle.Init.AsynchPrediv   = RTC_ASYNCH_PREDIV;
-		RtcHandle.Init.SynchPrediv    = RTC_SYNCH_PREDIV;
-		RtcHandle.Init.OutPut         = RTC_OUTPUT_DISABLE;
+		RtcHandle.Init.HourFormat = RTC_HOURFORMAT_24;
+		RtcHandle.Init.AsynchPrediv = RTC_ASYNCH_PREDIV;
+		RtcHandle.Init.SynchPrediv = RTC_SYNCH_PREDIV;
+		RtcHandle.Init.OutPut = RTC_OUTPUT_DISABLE;
 		RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-		RtcHandle.Init.OutPutType     = RTC_OUTPUT_TYPE_OPENDRAIN;
+		RtcHandle.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
 		if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
 		{
 			/* Initialization Error */
 			Error_Handler(__FILE__, __LINE__);
-		}	
+		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: RTC_WriteClock
-*	¹¦ÄÜËµÃ÷: ÉèÖÃRTCÊ±ÖÓ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: 1±íÊ¾³É¹¦ 0±íÊ¾´íÎó
+*	å‡½ æ•° å: RTC_WriteClock
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®RTCæ—¶é’Ÿ
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: 1è¡¨ç¤ºæˆåŠŸ 0è¡¨ç¤ºé”™è¯¯
 *********************************************************************************************************
 */
 uint8_t RTC_WriteClock(uint16_t _year, uint8_t _mon, uint8_t _day, uint8_t _hour, uint8_t _min, uint8_t _sec)
 {
-	RTC_DateTypeDef  date;
-	RTC_TimeTypeDef  time;
+	RTC_DateTypeDef date;
+	RTC_TimeTypeDef time;
 
 	RtcHandle.Instance = RTC;
-	
-	/* ÉèÖÃÄêÔÂÈÕºÍĞÇÆÚ */
+
+	/* è®¾ç½®å¹´æœˆæ—¥å’Œæ˜ŸæœŸ */
 	date.Year = _year - 2000;
 	date.Month = _mon;
 	date.Date = _day;
-	date.WeekDay = RTC_CalcWeek(_year, _mon, _day);	/* ÖÜ5=5£¬ ÖÜÈÕ=7 */
+	date.WeekDay = RTC_CalcWeek(_year, _mon, _day); /* å‘¨5=5ï¼Œ å‘¨æ—¥=7 */
 	if (HAL_RTC_SetDate(&RtcHandle, &date, FORMAT_BIN) != HAL_OK)
 	{
 		Error_Handler(__FILE__, __LINE__);
-	} 
+	}
 
-	/* ÉèÖÃÊ±·ÖÃë£¬ÒÔ¼°ÏÔÊ¾¸ñÊ½ */
-	time.Hours   = _hour;
+	/* è®¾ç½®æ—¶åˆ†ç§’ï¼Œä»¥åŠæ˜¾ç¤ºæ ¼å¼ */
+	time.Hours = _hour;
 	time.Minutes = _min;
-	time.Seconds = _sec; 
+	time.Seconds = _sec;
 	time.TimeFormat = RTC_HOURFORMAT12_AM;
-	time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ;
-	time.StoreOperation = RTC_STOREOPERATION_RESET;	
-	if(HAL_RTC_SetTime(&RtcHandle, &time, FORMAT_BIN) != HAL_OK)
+	time.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	time.StoreOperation = RTC_STOREOPERATION_RESET;
+	if (HAL_RTC_SetTime(&RtcHandle, &time, FORMAT_BIN) != HAL_OK)
 	{
 		Error_Handler(__FILE__, __LINE__);
-	}  
+	}
 
-	return 1;      
+	return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: RTC_ReadClock
-*	¹¦ÄÜËµÃ÷: µÃµ½µ±Ç°Ê±ÖÓ¡£½á¹û´æ·ÅÔÚ g_tRTC¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: RTC_ReadClock
+*	åŠŸèƒ½è¯´æ˜: å¾—åˆ°å½“å‰æ—¶é’Ÿã€‚ç»“æœå­˜æ”¾åœ¨ g_tRTCã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void RTC_ReadClock(void)
 {
-	RTC_DateTypeDef  date;
-	RTC_TimeTypeDef  time;
+	RTC_DateTypeDef date;
+	RTC_TimeTypeDef time;
 
 	RtcHandle.Instance = RTC;
-	
-	/* CPU BUG: ±ØĞëÏÈ¶ÁÈ¡Ê±¼ä£¬ÔÙ¶ÁÈ¡ÈÕÆÚ */
+
+	/* CPU BUG: å¿…é¡»å…ˆè¯»å–æ—¶é—´ï¼Œå†è¯»å–æ—¥æœŸ */
 	if (HAL_RTC_GetTime(&RtcHandle, &time, FORMAT_BIN) != HAL_OK)
 	{
 		Error_Handler(__FILE__, __LINE__);
-	} 	
-	
+	}
+
 	if (HAL_RTC_GetDate(&RtcHandle, &date, FORMAT_BIN) != HAL_OK)
 	{
 		Error_Handler(__FILE__, __LINE__);
-	} 
-	
+	}
+
 	g_tRTC.Year = date.Year + 2000;
 	g_tRTC.Mon = date.Month;
 	g_tRTC.Day = date.Date;
-	
-	g_tRTC.Hour = time.Hours;	/* Ğ¡Ê± */
-	g_tRTC.Min = time.Minutes; 	/* ·ÖÖÓ */
-	g_tRTC.Sec = time.Seconds;	/* Ãë */
 
-	g_tRTC.Week = RTC_CalcWeek(g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day);	/* ¼ÆËãĞÇÆÚ */
-}   
+	g_tRTC.Hour = time.Hours;	/* å°æ—¶ */
+	g_tRTC.Min = time.Minutes; /* åˆ†é’Ÿ */
+	g_tRTC.Sec = time.Seconds; /* ç§’ */
 
+	g_tRTC.Week = RTC_CalcWeek(g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day); /* è®¡ç®—æ˜ŸæœŸ */
+}
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_CalcWeek
-*	¹¦ÄÜËµÃ÷: ¸ù¾İÈÕÆÚ¼ÆËãĞÇÆÚ¼¸
-*	ĞÎ    ²Î: _year _mon _day  ÄêÔÂÈÕ  (ÄêÊÇ2×Ö½ÚÕûÊı£¬ÔÂºÍÈÕÊÇ×Ö½ÚÕûÊı£©
-*	·µ »Ø Öµ: ÖÜ¼¸ £¨1-7£© 7±íÊ¾ÖÜÈÕ
+*	å‡½ æ•° å: bsp_CalcWeek
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®æ—¥æœŸè®¡ç®—æ˜ŸæœŸå‡ 
+*	å½¢    å‚: _year _mon _day  å¹´æœˆæ—¥  (å¹´æ˜¯2å­—èŠ‚æ•´æ•°ï¼Œæœˆå’Œæ—¥æ˜¯å­—èŠ‚æ•´æ•°ï¼‰
+*	è¿” å› å€¼: å‘¨å‡  ï¼ˆ1-7ï¼‰ 7è¡¨ç¤ºå‘¨æ—¥
 *********************************************************************************************************
 */
 uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day)
 {
 	/*
-	²ÌÀÕ£¨Zeller£©¹«Ê½
-		ÀúÊ·ÉÏµÄÄ³Ò»ÌìÊÇĞÇÆÚ¼¸£¿Î´À´µÄÄ³Ò»ÌìÊÇĞÇÆÚ¼¸£¿¹ØÓÚÕâ¸öÎÊÌâ£¬ÓĞºÜ¶à¼ÆËã¹«Ê½£¨Á½¸öÍ¨ÓÃ¼ÆËã¹«Ê½ºÍ
-	Ò»Ğ©·Ö¶Î¼ÆËã¹«Ê½£©£¬ÆäÖĞ×îÖøÃûµÄÊÇ²ÌÀÕ£¨Zeller£©¹«Ê½¡£
-	    ¼´w=y+[y/4]+[c/4]-2c+[26(m+1)/10]+d-1
+	è”¡å‹’ï¼ˆZellerï¼‰å…¬å¼
+		å†å²ä¸Šçš„æŸä¸€å¤©æ˜¯æ˜ŸæœŸå‡ ï¼Ÿæœªæ¥çš„æŸä¸€å¤©æ˜¯æ˜ŸæœŸå‡ ï¼Ÿå…³äºè¿™ä¸ªé—®é¢˜ï¼Œæœ‰å¾ˆå¤šè®¡ç®—å…¬å¼ï¼ˆä¸¤ä¸ªé€šç”¨è®¡ç®—å…¬å¼å’Œ
+	ä¸€äº›åˆ†æ®µè®¡ç®—å…¬å¼ï¼‰ï¼Œå…¶ä¸­æœ€è‘—åçš„æ˜¯è”¡å‹’ï¼ˆZellerï¼‰å…¬å¼ã€‚
+	    å³w=y+[y/4]+[c/4]-2c+[26(m+1)/10]+d-1
 
-		¹«Ê½ÖĞµÄ·ûºÅº¬ÒåÈçÏÂ£¬
-	     w£ºĞÇÆÚ£»
-	     c£ºÄêµÄ¸ß2Î»£¬¼´ÊÀ¼Í-1
-	     y£ºÄê£¨Á½Î»Êı£©£»
-	     m£ºÔÂ£¨m´óÓÚµÈÓÚ3£¬Ğ¡ÓÚµÈÓÚ14£¬¼´ÔÚ²ÌÀÕ¹«Ê½ÖĞ£¬Ä³ÄêµÄ1¡¢2ÔÂÒª¿´×÷ÉÏÒ»ÄêµÄ13¡¢14ÔÂÀ´¼ÆËã£¬
-	  	    ±ÈÈç2003Äê1ÔÂ1ÈÕÒª¿´×÷2002ÄêµÄ13ÔÂ1ÈÕÀ´¼ÆËã£©£»
-	     d£ºÈÕ£»
-	     [ ]´ú±íÈ¡Õû£¬¼´Ö»ÒªÕûÊı²¿·Ö¡£
+		å…¬å¼ä¸­çš„ç¬¦å·å«ä¹‰å¦‚ä¸‹ï¼Œ
+	     wï¼šæ˜ŸæœŸï¼›
+	     cï¼šå¹´çš„é«˜2ä½ï¼Œå³ä¸–çºª-1
+	     yï¼šå¹´ï¼ˆä¸¤ä½æ•°ï¼‰ï¼›
+	     mï¼šæœˆï¼ˆmå¤§äºç­‰äº3ï¼Œå°äºç­‰äº14ï¼Œå³åœ¨è”¡å‹’å…¬å¼ä¸­ï¼ŒæŸå¹´çš„1ã€2æœˆè¦çœ‹ä½œä¸Šä¸€å¹´çš„13ã€14æœˆæ¥è®¡ç®—ï¼Œ
+	  	    æ¯”å¦‚2003å¹´1æœˆ1æ—¥è¦çœ‹ä½œ2002å¹´çš„13æœˆ1æ—¥æ¥è®¡ç®—ï¼‰ï¼›
+	     dï¼šæ—¥ï¼›
+	     [ ]ä»£è¡¨å–æ•´ï¼Œå³åªè¦æ•´æ•°éƒ¨åˆ†ã€‚
 
-	    Ëã³öÀ´µÄW³ıÒÔ7£¬ÓàÊıÊÇ¼¸¾ÍÊÇĞÇÆÚ¼¸¡£Èç¹ûÓàÊıÊÇ0£¬ÔòÎªĞÇÆÚÈÕ¡£
-        Èç¹û½á¹ûÊÇ¸ºÊı£¬¸ºÊıÇóÓàÊıÔòĞèÒªÌØÊâ´¦Àí£º
-            ¸ºÊı²»ÄÜ°´Ï°¹ßµÄÓàÊıµÄ¸ÅÄîÇóÓàÊı£¬Ö»ÄÜ°´ÊıÂÛÖĞµÄÓàÊıµÄ¶¨ÒåÇóÓà¡£ÎªÁË·½±ã
-        ¼ÆËã£¬ÎÒÃÇ¿ÉÒÔ¸øËü¼ÓÉÏÒ»¸ö7µÄÕûÊı±¶£¬Ê¹Ëü±äÎªÒ»¸öÕıÊı£¬È»ºóÔÙÇóÓàÊı
+	    ç®—å‡ºæ¥çš„Wé™¤ä»¥7ï¼Œä½™æ•°æ˜¯å‡ å°±æ˜¯æ˜ŸæœŸå‡ ã€‚å¦‚æœä½™æ•°æ˜¯0ï¼Œåˆ™ä¸ºæ˜ŸæœŸæ—¥ã€‚
+        å¦‚æœç»“æœæ˜¯è´Ÿæ•°ï¼Œè´Ÿæ•°æ±‚ä½™æ•°åˆ™éœ€è¦ç‰¹æ®Šå¤„ç†ï¼š
+            è´Ÿæ•°ä¸èƒ½æŒ‰ä¹ æƒ¯çš„ä½™æ•°çš„æ¦‚å¿µæ±‚ä½™æ•°ï¼Œåªèƒ½æŒ‰æ•°è®ºä¸­çš„ä½™æ•°çš„å®šä¹‰æ±‚ä½™ã€‚ä¸ºäº†æ–¹ä¾¿
+        è®¡ç®—ï¼Œæˆ‘ä»¬å¯ä»¥ç»™å®ƒåŠ ä¸Šä¸€ä¸ª7çš„æ•´æ•°å€ï¼Œä½¿å®ƒå˜ä¸ºä¸€ä¸ªæ­£æ•°ï¼Œç„¶åå†æ±‚ä½™æ•°
 
-		ÒÔ2049Äê10ÔÂ1ÈÕ£¨100ÖÜÄê¹úÇì£©ÎªÀı£¬ÓÃ²ÌÀÕ£¨Zeller£©¹«Ê½½øĞĞ¼ÆËã£¬¹ı³ÌÈçÏÂ£º
-		²ÌÀÕ£¨Zeller£©¹«Ê½£ºw=y+[y/4]+[c/4]-2c+[26(m+1)/10]+d-1
-		=49+[49/4]+[20/4]-2¡Á20+[26¡Á (10+1)/10]+1-1
+		ä»¥2049å¹´10æœˆ1æ—¥ï¼ˆ100å‘¨å¹´å›½åº†ï¼‰ä¸ºä¾‹ï¼Œç”¨è”¡å‹’ï¼ˆZellerï¼‰å…¬å¼è¿›è¡Œè®¡ç®—ï¼Œè¿‡ç¨‹å¦‚ä¸‹ï¼š
+		è”¡å‹’ï¼ˆZellerï¼‰å…¬å¼ï¼šw=y+[y/4]+[c/4]-2c+[26(m+1)/10]+d-1
+		=49+[49/4]+[20/4]-2Ã—20+[26Ã— (10+1)/10]+1-1
 		=49+[12.25]+5-40+[28.6]
 		=49+12+5-40+28
-		=54 (³ıÒÔ7Óà5)
-		¼´2049Äê10ÔÂ1ÈÕ£¨100ÖÜÄê¹úÇì£©ÊÇĞÇÆÚ5¡£
+		=54 (é™¤ä»¥7ä½™5)
+		å³2049å¹´10æœˆ1æ—¥ï¼ˆ100å‘¨å¹´å›½åº†ï¼‰æ˜¯æ˜ŸæœŸ5ã€‚
 	*/
 	uint8_t y, c, m, d;
 	int16_t w;
@@ -266,7 +265,7 @@ uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day)
 		c = _year / 100;
 		d = _day;
 	}
-	else	/* Ä³ÄêµÄ1¡¢2ÔÂÒª¿´×÷ÉÏÒ»ÄêµÄ13¡¢14ÔÂÀ´¼ÆËã */
+	else /* æŸå¹´çš„1ã€2æœˆè¦çœ‹ä½œä¸Šä¸€å¹´çš„13ã€14æœˆæ¥è®¡ç®— */
 	{
 		m = _mon + 12;
 		y = (_year - 1) % 100;
@@ -274,12 +273,12 @@ uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day)
 		d = _day;
 	}
 
-	w = y + y / 4 +  c / 4 - 2 * c + ((uint16_t)26*(m+1))/10 + d - 1;
+	w = y + y / 4 + c / 4 - 2 * c + ((uint16_t)26 * (m + 1)) / 10 + d - 1;
 	if (w == 0)
 	{
-		w = 7;	/* ±íÊ¾ÖÜÈÕ */
+		w = 7; /* è¡¨ç¤ºå‘¨æ—¥ */
 	}
-	else if (w < 0)	/* Èç¹ûwÊÇ¸ºÊı£¬Ôò¼ÆËãÓàÊı·½Ê½²»Í¬ */
+	else if (w < 0) /* å¦‚æœwæ˜¯è´Ÿæ•°ï¼Œåˆ™è®¡ç®—ä½™æ•°æ–¹å¼ä¸åŒ */
 	{
 		w = 7 - (-w) % 7;
 	}
@@ -287,14 +286,14 @@ uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day)
 	{
 		w = w % 7;
 	}
-	
-	/* 2018-10-20 elseµÄÇé¿öÀïÃæ£¬»áÓĞÇé¿ö°Ñw¼ÆËã³É0µÄ */
+
+	/* 2018-10-20 elseçš„æƒ…å†µé‡Œé¢ï¼Œä¼šæœ‰æƒ…å†µæŠŠwè®¡ç®—æˆ0çš„ */
 	if (w == 0)
 	{
-		w = 7;	/* ±íÊ¾ÖÜÈÕ */
+		w = 7; /* è¡¨ç¤ºå‘¨æ—¥ */
 	}
-	
+
 	return w;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

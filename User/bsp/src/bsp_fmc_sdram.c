@@ -1,61 +1,60 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Íâ²¿SDRAMÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_fmc_sdram.c
-*	°æ    ±¾ : V2.4
-*	Ëµ    Ã÷ : °²¸»À³STM32-X6 V6¿ª·¢°å±êÅäµÄ SDRAMÎªÃÀ¹â MT48LC4M32B2TG-7  ÈİÁ¿32M×Ö½Ú£¬32Bit, 7nsËÙ¶È (133MHz)
+*	æ¨¡å—åç§° : å¤–éƒ¨SDRAMé©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_fmc_sdram.c
+*	ç‰ˆ    æœ¬ : V2.4
+*	è¯´    æ˜ : å®‰å¯Œè±STM32-X6 V6å¼€å‘æ¿æ ‡é…çš„ SDRAMä¸ºç¾å…‰ MT48LC4M32B2TG-7  å®¹é‡32Må­—èŠ‚ï¼Œ32Bit, 7nsé€Ÿåº¦ (133MHz)
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2014-05-04 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2014-05-04 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-
 /* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_8  */
 /* #define SDRAM_MEMORY_WIDTH            FMC_SDRAM_MEM_BUS_WIDTH_16 */
-#define SDRAM_MEMORY_WIDTH               FMC_SDRAM_MEM_BUS_WIDTH_32
+#define SDRAM_MEMORY_WIDTH FMC_SDRAM_MEM_BUS_WIDTH_32
 
-#define SDCLOCK_PERIOD                   FMC_SDRAM_CLOCK_PERIOD_2
+#define SDCLOCK_PERIOD FMC_SDRAM_CLOCK_PERIOD_2
 /* #define SDCLOCK_PERIOD                FMC_SDRAM_CLOCK_PERIOD_3 */
 
-#define SDRAM_TIMEOUT                    ((uint32_t)0xFFFF)
-#define REFRESH_COUNT                    ((uint32_t)0x0603)   /* SDRAM refresh counter */  
+#define SDRAM_TIMEOUT ((uint32_t)0xFFFF)
+#define REFRESH_COUNT ((uint32_t)0x0603) /* SDRAM refresh counter */
 
 /* FMC SDRAM Mode definition register defines */
-#define SDRAM_MODEREG_BURST_LENGTH_1             ((uint16_t)0x0000)
-#define SDRAM_MODEREG_BURST_LENGTH_2             ((uint16_t)0x0001)
-#define SDRAM_MODEREG_BURST_LENGTH_4             ((uint16_t)0x0002)
-#define SDRAM_MODEREG_BURST_LENGTH_8             ((uint16_t)0x0004)
-#define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL      ((uint16_t)0x0000)
-#define SDRAM_MODEREG_BURST_TYPE_INTERLEAVED     ((uint16_t)0x0008)
-#define SDRAM_MODEREG_CAS_LATENCY_2              ((uint16_t)0x0020)
-#define SDRAM_MODEREG_CAS_LATENCY_3              ((uint16_t)0x0030)
-#define SDRAM_MODEREG_OPERATING_MODE_STANDARD    ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_LENGTH_1 ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_LENGTH_2 ((uint16_t)0x0001)
+#define SDRAM_MODEREG_BURST_LENGTH_4 ((uint16_t)0x0002)
+#define SDRAM_MODEREG_BURST_LENGTH_8 ((uint16_t)0x0004)
+#define SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL ((uint16_t)0x0000)
+#define SDRAM_MODEREG_BURST_TYPE_INTERLEAVED ((uint16_t)0x0008)
+#define SDRAM_MODEREG_CAS_LATENCY_2 ((uint16_t)0x0020)
+#define SDRAM_MODEREG_CAS_LATENCY_3 ((uint16_t)0x0030)
+#define SDRAM_MODEREG_OPERATING_MODE_STANDARD ((uint16_t)0x0000)
 #define SDRAM_MODEREG_WRITEBURST_MODE_PROGRAMMED ((uint16_t)0x0000)
-#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE     ((uint16_t)0x0200)
+#define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE ((uint16_t)0x0200)
 
 static void SDRAM_GPIOConfig(void);
 static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitExtSDRAM
-*	¹¦ÄÜËµÃ÷: ÅäÖÃÁ¬½ÓÍâ²¿SDRAMµÄGPIOºÍFMC
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitExtSDRAM
+*	åŠŸèƒ½è¯´æ˜: é…ç½®è¿æ¥å¤–éƒ¨SDRAMçš„GPIOå’ŒFMC
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitExtSDRAM(void)
 {
-	SDRAM_HandleTypeDef      hsdram;
-	FMC_SDRAM_TimingTypeDef  SDRAM_Timing;
+	SDRAM_HandleTypeDef hsdram;
+	FMC_SDRAM_TimingTypeDef SDRAM_Timing;
 	FMC_SDRAM_CommandTypeDef command;
 
 	/* GPIO configuration for FMC SDRAM bank */
@@ -70,27 +69,27 @@ void bsp_InitExtSDRAM(void)
 	hsdram.Instance = FMC_SDRAM_DEVICE;
 
 	/* Timing configuration for 100Mhz as SDRAM clock frequency (System clock is up to 200Mhz) */
-	SDRAM_Timing.LoadToActiveDelay    = 2;
+	SDRAM_Timing.LoadToActiveDelay = 2;
 	SDRAM_Timing.ExitSelfRefreshDelay = 7;
-	SDRAM_Timing.SelfRefreshTime      = 4;
-	SDRAM_Timing.RowCycleDelay        = 7;
-	SDRAM_Timing.WriteRecoveryTime    = 2;
-	SDRAM_Timing.RPDelay              = 2;
-	SDRAM_Timing.RCDDelay             = 2;
+	SDRAM_Timing.SelfRefreshTime = 4;
+	SDRAM_Timing.RowCycleDelay = 7;
+	SDRAM_Timing.WriteRecoveryTime = 2;
+	SDRAM_Timing.RPDelay = 2;
+	SDRAM_Timing.RCDDelay = 2;
 
-	hsdram.Init.SDBank             = FMC_SDRAM_BANK1;
-	hsdram.Init.ColumnBitsNumber   = FMC_SDRAM_COLUMN_BITS_NUM_9;
-	hsdram.Init.RowBitsNumber      = FMC_SDRAM_ROW_BITS_NUM_12;
-	hsdram.Init.MemoryDataWidth    = FMC_SDRAM_MEM_BUS_WIDTH_32;	/* 32Î» */
+	hsdram.Init.SDBank = FMC_SDRAM_BANK1;
+	hsdram.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_9;
+	hsdram.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
+	hsdram.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_32; /* 32ä½ */
 	hsdram.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
-	hsdram.Init.CASLatency         = FMC_SDRAM_CAS_LATENCY_3;
-	hsdram.Init.WriteProtection    = FMC_SDRAM_WRITE_PROTECTION_DISABLE;
-	hsdram.Init.SDClockPeriod      = SDCLOCK_PERIOD;
-	hsdram.Init.ReadBurst          = FMC_SDRAM_RBURST_ENABLE;
-	hsdram.Init.ReadPipeDelay      = FMC_SDRAM_RPIPE_DELAY_0;
+	hsdram.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;
+	hsdram.Init.WriteProtection = FMC_SDRAM_WRITE_PROTECTION_DISABLE;
+	hsdram.Init.SDClockPeriod = SDCLOCK_PERIOD;
+	hsdram.Init.ReadBurst = FMC_SDRAM_RBURST_ENABLE;
+	hsdram.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_0;
 
 	/* Initialize the SDRAM controller */
-	if(HAL_SDRAM_Init(&hsdram, &SDRAM_Timing) != HAL_OK)
+	if (HAL_SDRAM_Init(&hsdram, &SDRAM_Timing) != HAL_OK)
 	{
 		/* Initialization Error */
 		Error_Handler(__FILE__, __LINE__);
@@ -102,10 +101,10 @@ void bsp_InitExtSDRAM(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SDRAM_GPIOConfig
-*	¹¦ÄÜËµÃ÷: ÅäÖÃÁ¬½ÓÍâ²¿SDRAMµÄGPIO
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SDRAM_GPIOConfig
+*	åŠŸèƒ½è¯´æ˜: é…ç½®è¿æ¥å¤–éƒ¨SDRAMçš„GPIO
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void SDRAM_GPIOConfig(void)
@@ -121,10 +120,10 @@ static void SDRAM_GPIOConfig(void)
 	__HAL_RCC_GPIOH_CLK_ENABLE();
 	__HAL_RCC_GPIOI_CLK_ENABLE();
 
-	  /* Enable FMC clock */
-	  __HAL_RCC_FMC_CLK_ENABLE();
-		
-	/*-- °²¸»À³STM32-V7·¢°å SDRAM GPIO ¶¨Òå -----------------------------------------------------*/
+	/* Enable FMC clock */
+	__HAL_RCC_FMC_CLK_ENABLE();
+
+	/*-- å®‰å¯Œè±STM32-V7å‘æ¿ SDRAM GPIO å®šä¹‰ -----------------------------------------------------*/
 	/*
 	 +-------------------+--------------------+--------------------+--------------------+
 	 +                       SDRAM pins assignment                                      +
@@ -136,7 +135,7 @@ static void SDRAM_GPIOConfig(void)
 	 | PD10 <-> FMC_D15  | PE9  <-> FMC_D6    | PF4  <-> FMC_A4    | PG8 <-> FC_SDCLK   |
 	 | PD14 <-> FMC_D0   | PE10 <-> FMC_D7    | PF5  <-> FMC_A5    | PG15 <-> FMC_NCAS  |
 	 | PD15 <-> FMC_D1   | PE11 <-> FMC_D8    | PF11 <-> FC_NRAS   |--------------------+
-	 +-------------------| PE12 <-> FMC_D9    | PF12 <-> FMC_A6    | PG2  --- FMC_A12 (Ô¤Áô64M×Ö½ÚÈİÁ¿£¬ºÍÒ¡¸ËÉÏ¼ü¸´ÓÃ£©
+	 +-------------------| PE12 <-> FMC_D9    | PF12 <-> FMC_A6    | PG2  --- FMC_A12 (é¢„ç•™64Må­—èŠ‚å®¹é‡ï¼Œå’Œæ‘‡æ†ä¸Šé”®å¤ç”¨ï¼‰
 	                     | PE13 <-> FMC_D10   | PF13 <-> FMC_A7    |
 	                     | PE14 <-> FMC_D11   | PF14 <-> FMC_A8    |
 	                     | PE15 <-> FMC_D12   | PF15 <-> FMC_A9    |
@@ -169,65 +168,66 @@ static void SDRAM_GPIOConfig(void)
 	*/
 	/*##-2- Configure peripheral GPIO ##########################################*/
 	/* Common GPIO configuration */
-	GPIO_Init_Structure.Mode      = GPIO_MODE_AF_PP;
-	GPIO_Init_Structure.Pull      = GPIO_PULLUP;
-	GPIO_Init_Structure.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+	GPIO_Init_Structure.Mode = GPIO_MODE_AF_PP;
+	GPIO_Init_Structure.Pull = GPIO_PULLUP;
+	GPIO_Init_Structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	GPIO_Init_Structure.Alternate = GPIO_AF12_FMC;
 
 	/* GPIOD configuration */
-	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_8| GPIO_PIN_9 | GPIO_PIN_10 |\
-							  GPIO_PIN_14 | GPIO_PIN_15;
+	GPIO_Init_Structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 |
+														GPIO_PIN_14 | GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOD, &GPIO_Init_Structure);
 
-	/* GPIOE configuration */  
-	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_7| GPIO_PIN_8 | GPIO_PIN_9 |\
-							  GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |\
-							  GPIO_PIN_15;	  
+	/* GPIOE configuration */
+	GPIO_Init_Structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 |
+														GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+														GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOE, &GPIO_Init_Structure);
 
-	/* GPIOF configuration */  
-	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2| GPIO_PIN_3 | GPIO_PIN_4 |\
-							  GPIO_PIN_5 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |\
-							  GPIO_PIN_15;
+	/* GPIOF configuration */
+	GPIO_Init_Structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 |
+														GPIO_PIN_5 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+														GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOF, &GPIO_Init_Structure);
 
-	/* GPIOG configuration */  
-//	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 |\
+	/* GPIOG configuration */
+	//	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 |\
 //							  GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_15;
-	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 |  
-							  GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_15;
+	GPIO_Init_Structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 |
+														GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOG, &GPIO_Init_Structure);
 
-	/* GPIOH configuration */  
-//	GPIO_Init_Structure.Pin   = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 |\
+	/* GPIOH configuration */
+	//	GPIO_Init_Structure.Pin   = GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 |\
 //							  GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |\
 //							  GPIO_PIN_15;
-	GPIO_Init_Structure.Pin   = GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_9 |\
-							  GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |\
-							  GPIO_PIN_15;	
-	HAL_GPIO_Init(GPIOH, &GPIO_Init_Structure); 
+	GPIO_Init_Structure.Pin = GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_9 |
+														GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+														GPIO_PIN_15;
+	HAL_GPIO_Init(GPIOH, &GPIO_Init_Structure);
 
-	/* GPIOI configuration */  
-	GPIO_Init_Structure.Pin   = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 |\
-							  GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10;
-	HAL_GPIO_Init(GPIOI, &GPIO_Init_Structure);  
+	/* GPIOI configuration */
+	GPIO_Init_Structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 |
+														GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10;
+	HAL_GPIO_Init(GPIOI, &GPIO_Init_Structure);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SDRAM_Initialization_Sequence
-*	¹¦ÄÜËµÃ÷: Perform the SDRAM exernal memory inialization sequence
-*	ĞÎ    ²Î: hsdram: SDRAM handle
+*	å‡½ æ•° å: SDRAM_Initialization_Sequence
+*	åŠŸèƒ½è¯´æ˜: Perform the SDRAM exernal memory inialization sequence
+*	å½¢    å‚: hsdram: SDRAM handle
 *			  Command: Pointer to SDRAM command structure
-*	·µ »Ø Öµ: None
+*	è¿” å› å€¼: None
 *********************************************************************************************************
 */
 static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM_CommandTypeDef *Command)
 {
-	__IO uint32_t tmpmrd =0;
+	__IO uint32_t tmpmrd = 0;
 	/* Step 1:  Configure a clock configuration enable command */
 	Command->CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
-	Command->CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;;
+	Command->CommandTarget = FMC_SDRAM_CMD_TARGET_BANK1;
+	;
 	Command->AutoRefreshNumber = 1;
 	Command->ModeRegisterDefinition = 0;
 
@@ -257,9 +257,9 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 	HAL_SDRAM_SendCommand(hsdram, Command, SDRAM_TIMEOUT);
 
 	/* Step 5: Program the external memory mode register */
-	tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1          |
-					 SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL   |
-					 SDRAM_MODEREG_CAS_LATENCY_3           |
+	tmpmrd = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1 |
+					 SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
+					 SDRAM_MODEREG_CAS_LATENCY_3 |
 					 SDRAM_MODEREG_OPERATING_MODE_STANDARD |
 					 SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
 
@@ -273,15 +273,15 @@ static void SDRAM_Initialization_Sequence(SDRAM_HandleTypeDef *hsdram, FMC_SDRAM
 
 	/* Step 6: Set the refresh rate counter */
 	/* Set the device refresh rate */
-	HAL_SDRAM_ProgramRefreshRate(hsdram, REFRESH_COUNT); 
+	HAL_SDRAM_ProgramRefreshRate(hsdram, REFRESH_COUNT);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_TestExtSDRAM
-*	¹¦ÄÜËµÃ÷: É¨Ãè²âÊÔÍâ²¿SRAM, È«²¿µ¥Ôª¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾²âÊÔÍ¨¹ı£» ´óÓÚ0±íÊ¾´íÎóµ¥ÔªµÄ¸öÊı¡£
+*	å‡½ æ•° å: bsp_TestExtSDRAM
+*	åŠŸèƒ½è¯´æ˜: æ‰«ææµ‹è¯•å¤–éƒ¨SRAM, å…¨éƒ¨å•å…ƒã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºæµ‹è¯•é€šè¿‡ï¼› å¤§äº0è¡¨ç¤ºé”™è¯¯å•å…ƒçš„ä¸ªæ•°ã€‚
 *********************************************************************************************************
 */
 uint32_t bsp_TestExtSDRAM1(void)
@@ -292,14 +292,14 @@ uint32_t bsp_TestExtSDRAM1(void)
 	uint32_t err;
 	const uint8_t ByteBuf[4] = {0x55, 0xA5, 0x5A, 0xAA};
 
-	/* Ğ´SRAM */
+	/* å†™SRAM */
 	pSRAM = (uint32_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < EXT_SDRAM_SIZE / 4; i++)
 	{
 		*pSRAM++ = i;
 	}
 
-	/* ¶ÁSRAM */
+	/* è¯»SRAM */
 	err = 0;
 	pSRAM = (uint32_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < EXT_SDRAM_SIZE / 4; i++)
@@ -310,12 +310,12 @@ uint32_t bsp_TestExtSDRAM1(void)
 		}
 	}
 
-	if (err >  0)
+	if (err > 0)
 	{
-		return  (4 * err);
+		return (4 * err);
 	}
 
-	/* ¶ÔSRAM µÄÊı¾İÇó·´²¢Ğ´Èë */
+	/* å¯¹SRAM çš„æ•°æ®æ±‚åå¹¶å†™å…¥ */
 	pSRAM = (uint32_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < EXT_SDRAM_SIZE / 4; i++)
 	{
@@ -323,7 +323,7 @@ uint32_t bsp_TestExtSDRAM1(void)
 		pSRAM++;
 	}
 
-	/* ÔÙ´Î±È½ÏSDRAMµÄÊı¾İ */
+	/* å†æ¬¡æ¯”è¾ƒSDRAMçš„æ•°æ® */
 	err = 0;
 	pSRAM = (uint32_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < EXT_SDRAM_SIZE / 4; i++)
@@ -334,19 +334,19 @@ uint32_t bsp_TestExtSDRAM1(void)
 		}
 	}
 
-	if (err >  0)
+	if (err > 0)
 	{
 		return (4 * err);
 	}
 
-	/* ²âÊÔ°´×Ö½Ú·½Ê½·ÃÎÊ, Ä¿µÄÊÇÑéÖ¤ FSMC_NBL0 ¡¢ FSMC_NBL1 ¿ÚÏß */
+	/* æµ‹è¯•æŒ‰å­—èŠ‚æ–¹å¼è®¿é—®, ç›®çš„æ˜¯éªŒè¯ FSMC_NBL0 ã€ FSMC_NBL1 å£çº¿ */
 	pBytes = (uint8_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < sizeof(ByteBuf); i++)
 	{
 		*pBytes++ = ByteBuf[i];
 	}
 
-	/* ±È½ÏSDRAMµÄÊı¾İ */
+	/* æ¯”è¾ƒSDRAMçš„æ•°æ® */
 	err = 0;
 	pBytes = (uint8_t *)EXT_SDRAM_ADDR;
 	for (i = 0; i < sizeof(ByteBuf); i++)
@@ -356,7 +356,7 @@ uint32_t bsp_TestExtSDRAM1(void)
 			err++;
 		}
 	}
-	if (err >  0)
+	if (err > 0)
 	{
 		return err;
 	}
@@ -365,10 +365,10 @@ uint32_t bsp_TestExtSDRAM1(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_TestExtSDRAM2
-*	¹¦ÄÜËµÃ÷: É¨Ãè²âÊÔÍâ²¿SDRAM. ²»É¨ÃèÇ°Ãæ4M×Ö½ÚµÄÏÔ´æ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾²âÊÔÍ¨¹ı£» ´óÓÚ0±íÊ¾´íÎóµ¥ÔªµÄ¸öÊı¡£
+*	å‡½ æ•° å: bsp_TestExtSDRAM2
+*	åŠŸèƒ½è¯´æ˜: æ‰«ææµ‹è¯•å¤–éƒ¨SDRAM. ä¸æ‰«æå‰é¢4Må­—èŠ‚çš„æ˜¾å­˜ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºæµ‹è¯•é€šè¿‡ï¼› å¤§äº0è¡¨ç¤ºé”™è¯¯å•å…ƒçš„ä¸ªæ•°ã€‚
 *********************************************************************************************************
 */
 uint32_t bsp_TestExtSDRAM2(void)
@@ -379,14 +379,14 @@ uint32_t bsp_TestExtSDRAM2(void)
 	uint32_t err;
 	const uint8_t ByteBuf[4] = {0x55, 0xA5, 0x5A, 0xAA};
 
-	/* Ğ´SRAM */
+	/* å†™SRAM */
 	pSRAM = (uint32_t *)SDRAM_APP_BUF;
 	for (i = 0; i < SDRAM_APP_SIZE / 4; i++)
 	{
 		*pSRAM++ = i;
 	}
 
-	/* ¶ÁSRAM */
+	/* è¯»SRAM */
 	err = 0;
 	pSRAM = (uint32_t *)SDRAM_APP_BUF;
 	for (i = 0; i < SDRAM_APP_SIZE / 4; i++)
@@ -397,13 +397,13 @@ uint32_t bsp_TestExtSDRAM2(void)
 		}
 	}
 
-	if (err >  0)
+	if (err > 0)
 	{
-		return  (4 * err);
+		return (4 * err);
 	}
 
 #if 0
-	/* ¶ÔSRAM µÄÊı¾İÇó·´²¢Ğ´Èë */
+	/* å¯¹SRAM çš„æ•°æ®æ±‚åå¹¶å†™å…¥ */
 	pSRAM = (uint32_t *)SDRAM_APP_BUF;
 	for (i = 0; i < SDRAM_APP_SIZE / 4; i++)
 	{
@@ -411,7 +411,7 @@ uint32_t bsp_TestExtSDRAM2(void)
 		pSRAM++;
 	}
 
-	/* ÔÙ´Î±È½ÏSDRAMµÄÊı¾İ */
+	/* å†æ¬¡æ¯”è¾ƒSDRAMçš„æ•°æ® */
 	err = 0;
 	pSRAM = (uint32_t *)SDRAM_APP_BUF;
 	for (i = 0; i < SDRAM_APP_SIZE / 4; i++)
@@ -426,16 +426,16 @@ uint32_t bsp_TestExtSDRAM2(void)
 	{
 		return (4 * err);
 	}
-#endif	
+#endif
 
-	/* ²âÊÔ°´×Ö½Ú·½Ê½·ÃÎÊ, Ä¿µÄÊÇÑéÖ¤ FSMC_NBL0 ¡¢ FSMC_NBL1 ¿ÚÏß */
+	/* æµ‹è¯•æŒ‰å­—èŠ‚æ–¹å¼è®¿é—®, ç›®çš„æ˜¯éªŒè¯ FSMC_NBL0 ã€ FSMC_NBL1 å£çº¿ */
 	pBytes = (uint8_t *)SDRAM_APP_BUF;
 	for (i = 0; i < sizeof(ByteBuf); i++)
 	{
 		*pBytes++ = ByteBuf[i];
 	}
 
-	/* ±È½ÏSDRAMµÄÊı¾İ */
+	/* æ¯”è¾ƒSDRAMçš„æ•°æ® */
 	err = 0;
 	pBytes = (uint8_t *)SDRAM_APP_BUF;
 	for (i = 0; i < sizeof(ByteBuf); i++)
@@ -445,11 +445,11 @@ uint32_t bsp_TestExtSDRAM2(void)
 			err++;
 		}
 	}
-	if (err >  0)
+	if (err > 0)
 	{
 		return err;
 	}
 	return 0;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ê¾²¨Æ÷Ä£¿éADCµ×²ãµÄÇı¶¯
-*	ÎÄ¼şÃû³Æ : bsp_cpu_adc.h
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : ç¤ºæ³¢å™¨æ¨¡å—ADCåº•å±‚çš„é©±åŠ¨
+*	æ–‡ä»¶åç§° : bsp_cpu_adc.h
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,14 +13,14 @@
 #ifndef __BSP_CPU_ADC_H
 #define __BSP_CPU_ADC_H
 
-#define FREQ_NUM 	17
+#define FREQ_NUM 17
 extern const int32_t TabelFreq[FREQ_NUM];
 
-#define BUFF_SIZE_NUM  10 			/* ²ÉÑùÉî¶È */
+#define BUFF_SIZE_NUM 10 /* é‡‡æ ·æ·±åº¦ */
 extern const int TabelBufSize[BUFF_SIZE_NUM];
 
-/* ADC¿ØÖÆ½á¹¹ */
-typedef struct 
+/* ADCæ§åˆ¶ç»“æ„ */
+typedef struct
 {
 	uint16_t DC1;
 	uint16_t DC2;
@@ -38,71 +38,70 @@ typedef struct
 	uint16_t TrigEdge;
 	uint16_t ChanEnable;
 	uint16_t Run;
-	
-	uint16_t MeasuteMode;	/* 1±íÊ¾µçÁ÷¼ì²âÄ£Ê½ */
-	uint16_t CurrGain;	/* µçÁ÷ÔöÒæ(Á¿³Ì) */
-	
+
+	uint16_t MeasuteMode; /* 1è¡¨ç¤ºç”µæµæ£€æµ‹æ¨¡å¼ */
+	uint16_t CurrGain;		/* ç”µæµå¢ç›Š(é‡ç¨‹) */
+
 	uint32_t DmaPos;
-	
-	uint8_t TrigFlag;	/* ´¥·¢±êÖ¾ */
-	
-	uint8_t DmaTransCplt;	/* DMA´«ÊäÍê³ÉÒ»ÂÖ, ´¥·¢Ê±£¬ÖÁÉÙDMA²É¼¯ÍêÒ»ÂÖ²ÅÓĞĞ§ */
-}DSO_T;
 
-/* ´¥·¢Ä£Ê½ */
+	uint8_t TrigFlag; /* è§¦å‘æ ‡å¿— */
+
+	uint8_t DmaTransCplt; /* DMAä¼ è¾“å®Œæˆä¸€è½®, è§¦å‘æ—¶ï¼Œè‡³å°‘DMAé‡‡é›†å®Œä¸€è½®æ‰æœ‰æ•ˆ */
+} DSO_T;
+
+/* è§¦å‘æ¨¡å¼ */
 enum
 {
-	TRIG_MODE_AUTO = 0,		/* ×Ô¶¯´¥·¢ */
-	TRIG_MODE_NORMAL = 1,	/* ÆÕÍ¨´¥·¢ */	
-	TRIG_MODE_SINGLE = 2,	/* µ¥´Î´¥·¢ */
+	TRIG_MODE_AUTO = 0,		/* è‡ªåŠ¨è§¦å‘ */
+	TRIG_MODE_NORMAL = 1, /* æ™®é€šè§¦å‘ */
+	TRIG_MODE_SINGLE = 2, /* å•æ¬¡è§¦å‘ */
 };
 
-/* ´¥·¢Ä£Ê½ */
+/* è§¦å‘æ¨¡å¼ */
 enum
 {
-	TRIG_EDGE_FALLING = 0,	/* ÏÂ½µÑØ´¥·¢ */	
-	TRIG_EDGE_RISING = 1,	/* ÉÏÉıÑØ´¥·¢ */	
+	TRIG_EDGE_FALLING = 0, /* ä¸‹é™æ²¿è§¦å‘ */
+	TRIG_EDGE_RISING = 1,	/* ä¸Šå‡æ²¿è§¦å‘ */
 };
 
-
-/* ADCÍ¨µÀ¶¨Òå¡£ ÓÃÓÚµÍËÙ¶àÍ¨µÀÉ¨ÃèÄ£Ê½ */
-	/*
-		PF11/ADC1_INP2	---- CH1µçÑ¹
-		PA6/ADC1_INP3	---- ¸ß¶ËµçÁ÷
+/* ADCé€šé“å®šä¹‰ã€‚ ç”¨äºä½é€Ÿå¤šé€šé“æ‰«ææ¨¡å¼ */
+/*
+		PF11/ADC1_INP2	---- CH1ç”µå‹
+		PA6/ADC1_INP3	---- é«˜ç«¯ç”µæµ
 	
-		PC3_C/ADC3_INP1	---- CH2µçÑ¹
-		PF5/ADC3_INP4	---- TVCCÊä³öµçÁ÷¼ì²â
-		PF3/ADC3_INP5	---- NTCÈÈÃôµç×è×èÖµ¼ì²â
-		PF8/ADC3_INP7	---- ¸ºÔØµçÑ¹
-		PH2/ADC3_INP13	---- TVCCµçÑ¹¼ì²â		
-		PH3/ADC3_INP14	---- 12V¹©µçµçÑ¹¼ì²â
-		PH5/ADC3_INP16	---- USB¹©µçµçÑ¹¼ì²â			
+		PC3_C/ADC3_INP1	---- CH2ç”µå‹
+		PF5/ADC3_INP4	---- TVCCè¾“å‡ºç”µæµæ£€æµ‹
+		PF3/ADC3_INP5	---- NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹
+		PF8/ADC3_INP7	---- è´Ÿè½½ç”µå‹
+		PH2/ADC3_INP13	---- TVCCç”µå‹æ£€æµ‹		
+		PH3/ADC3_INP14	---- 12Vä¾›ç”µç”µå‹æ£€æµ‹
+		PH5/ADC3_INP16	---- USBä¾›ç”µç”µå‹æ£€æµ‹			
 	*/
 typedef enum
 {
-	AN_CH1 = 0,			/* CH1µçÑ¹ */
-	AN_CH2 = 1,			/* CH2µçÑ¹ */
-	AN_HIGH_SIDE_VOLT,	/* ¸ß¶Ë¸ºÔØµçÑ¹ */	
-	AN_HIGH_SIDE_CURR,	/* ¸ß¶Ë¸ºÔØµçÁ÷ */
+	AN_CH1 = 0,				 /* CH1ç”µå‹ */
+	AN_CH2 = 1,				 /* CH2ç”µå‹ */
+	AN_HIGH_SIDE_VOLT, /* é«˜ç«¯è´Ÿè½½ç”µå‹ */
+	AN_HIGH_SIDE_CURR, /* é«˜ç«¯è´Ÿè½½ç”µæµ */
 
-	AN_TVCC_VOLT,	/* TVCCµçÑ¹¼ì²â	*/
-	AN_TVCC_CURR,	/* TVCCÊä³öµçÁ÷	*/
-	AN_NTC_RES,		/* NTCÈÈÃôµç×è×èÖµ¼ì²â */
-	AN_12V_VOLT,	/* 12V¹©µçµçÑ¹¼ì²â */
-	AN_USB_VOLT,	/* USB¹©µçµçÑ¹¼ì²â */
-}ADC_CHAN_E;
+	AN_TVCC_VOLT, /* TVCCç”µå‹æ£€æµ‹	*/
+	AN_TVCC_CURR, /* TVCCè¾“å‡ºç”µæµ	*/
+	AN_NTC_RES,		/* NTCçƒ­æ•ç”µé˜»é˜»å€¼æ£€æµ‹ */
+	AN_12V_VOLT,	/* 12Vä¾›ç”µç”µå‹æ£€æµ‹ */
+	AN_USB_VOLT,	/* USBä¾›ç”µç”µå‹æ£€æµ‹ */
+} ADC_CHAN_E;
 
 /* Definition of ADCH1 conversions data table size */
-#define ADC_BUFFER_SIZE   	((uint32_t)  16 * 1024)   /* Size of array aADCH1ConvertedData[], Aligned on cache line size */
-#define DSO_PACKAGE_SIZE	1024
+#define ADC_BUFFER_SIZE ((uint32_t)16 * 1024) /* Size of array aADCH1ConvertedData[], Aligned on cache line size */
+#define DSO_PACKAGE_SIZE 1024
 
 /* Variable containing ADC conversions data */
-extern ALIGN_32BYTES (uint16_t   aADCH1ConvertedData[ADC_BUFFER_SIZE]);
+extern ALIGN_32BYTES(uint16_t aADCH1ConvertedData[ADC_BUFFER_SIZE]);
 
-extern ALIGN_32BYTES (uint16_t   aADCH2ConvertedData[ADC_BUFFER_SIZE]);
+extern ALIGN_32BYTES(uint16_t aADCH2ConvertedData[ADC_BUFFER_SIZE]);
 
 #if 1
-extern float g_Ch1WaveBuf[ADC_BUFFER_SIZE];		/* Ğ£×¼ÒÔºóµÄÖµ */
+extern float g_Ch1WaveBuf[ADC_BUFFER_SIZE]; /* æ ¡å‡†ä»¥åçš„å€¼ */
 extern float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
 #else
 extern uint16_t g_Ch1WaveBuf[ADC_BUFFER_SIZE];
@@ -127,7 +126,7 @@ void DSO_SetSampRate(uint32_t _ulFreq);
 void DSO_LockWave(void);
 
 float bsp_GetAdcAvg(uint8_t _ch);
-void bsp_AdcTask10ms(void);	
+void bsp_AdcTask10ms(void);
 
 float bsp_AdcToHighSideCurr(float _adc);
 float bsp_AdcToHighSideVolt(float _adc);

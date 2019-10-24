@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : MODBUS´Ó»úÄ£¿é
-*	ÎÄ¼þÃû³Æ : modbus_slave.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼þ
+*	æ¨¡å—åç§° : MODBUSä»Žæœºæ¨¡å—
+*	æ–‡ä»¶åç§° : modbus_slave.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜Ž : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -38,7 +38,7 @@ static void MODS_66H(void);
 static void MODS_67H(void);
 static void MODS_68H(void);
 
-static void MODS_60H(void);		/* PC·¢Õâ¸öÖ¸Áî¶ÁÈ¡²¨ÐÎÊý¾Ý */
+static void MODS_60H(void); /* PCå‘è¿™ä¸ªæŒ‡ä»¤è¯»å–æ³¢å½¢æ•°æ® */
 
 void MODS_ReciveNew(uint8_t _byte);
 
@@ -47,10 +47,10 @@ MOD_WAVE_T g_tModWave;
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_Poll
-*	¹¦ÄÜËµÃ÷: ½âÎöÊý¾Ý°ü. ÔÚÖ÷³ÌÐòÖÐÂÖÁ÷µ÷ÓÃ¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_Poll
+*	åŠŸèƒ½è¯´æ˜Ž: è§£æžæ•°æ®åŒ…. åœ¨ä¸»ç¨‹åºä¸­è½®æµè°ƒç”¨ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len)
@@ -60,7 +60,7 @@ uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len)
 
 	g_tModS.RxBuf = _buf;
 	g_tModS.RxCount = _len;
-	
+
 	g_tModS.TxCount = 0;
 	//*_AckBuf = g_tModS.TxBuf;
 
@@ -71,11 +71,11 @@ uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len)
 
 	if (g_tModS.TCP_Flag == 0)
 	{
-		/* ¼ÆËãCRCÐ£ÑéºÍ */
+		/* è®¡ç®—CRCæ ¡éªŒå’Œ */
 		crc1 = CRC16_Modbus(g_tModS.RxBuf, g_tModS.RxCount);
 		if (crc1 != 0)
 		{
-			MODS_SendAckErr(ERR_PACKAGE);		/* ·¢ËÍÁ¬°üÓ¦´ð */
+			MODS_SendAckErr(ERR_PACKAGE); /* å‘é€è¿žåŒ…åº”ç­” */
 			goto err_ret;
 		}
 	}
@@ -84,38 +84,38 @@ uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len)
 		g_tModS.RxCount += 2;
 	}
 
-	/* Õ¾µØÖ· (1×Ö½Ú£© */
-	addr = g_tModS.RxBuf[0];	/* µÚ1×Ö½Ú Õ¾ºÅ */
+	/* ç«™åœ°å€ (1å­—èŠ‚ï¼‰ */
+	addr = g_tModS.RxBuf[0]; /* ç¬¬1å­—èŠ‚ ç«™å· */
 	if (addr != g_tParam.Addr485 && addr != 0xF4)
 	{
 		goto err_ret;
 	}
 
-	/* ·ÖÎöÓ¦ÓÃ²ãÐ­Òé */
+	/* åˆ†æžåº”ç”¨å±‚åè®® */
 	MODS_AnalyzeApp();
-	g_tModS.RxCount = 0;	/* ±ØÐëÇåÁã¼ÆÊýÆ÷£¬·½±ãÏÂ´ÎÖ¡Í¬²½ */
+	g_tModS.RxCount = 0; /* å¿…é¡»æ¸…é›¶è®¡æ•°å™¨ï¼Œæ–¹ä¾¿ä¸‹æ¬¡å¸§åŒæ­¥ */
 	return 1;
-	
+
 err_ret:
-	g_tModS.RxCount = 0;	/* ±ØÐëÇåÁã¼ÆÊýÆ÷£¬·½±ãÏÂ´ÎÖ¡Í¬²½ */
+	g_tModS.RxCount = 0; /* å¿…é¡»æ¸…é›¶è®¡æ•°å™¨ï¼Œæ–¹ä¾¿ä¸‹æ¬¡å¸§åŒæ­¥ */
 	return 0;
 }
 
 #if 0
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_ReciveNew
-*	¹¦ÄÜËµÃ÷: ´®¿Ú½ÓÊÕÖÐ¶Ï·þÎñ³ÌÐò»áµ÷ÓÃ±¾º¯Êý¡£µ±ÊÕµ½Ò»¸ö×Ö½ÚÊ±£¬Ö´ÐÐÒ»´Î±¾º¯Êý¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_ReciveNew
+*	åŠŸèƒ½è¯´æ˜Ž: ä¸²å£æŽ¥æ”¶ä¸­æ–­æœåŠ¡ç¨‹åºä¼šè°ƒç”¨æœ¬å‡½æ•°ã€‚å½“æ”¶åˆ°ä¸€ä¸ªå­—èŠ‚æ—¶ï¼Œæ‰§è¡Œä¸€æ¬¡æœ¬å‡½æ•°ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 //void MODS_ReciveNew(uint8_t _byte)
 //{
 //	/*
-//		3.5¸ö×Ö·ûµÄÊ±¼ä¼ä¸ô£¬Ö»ÊÇÓÃÔÚRTUÄ£Ê½ÏÂÃæ£¬ÒòÎªRTUÄ£Ê½Ã»ÓÐ¿ªÊ¼·ûºÍ½áÊø·û£¬
-//		Á½¸öÊý¾Ý°üÖ®¼äÖ»ÄÜ¿¿Ê±¼ä¼ä¸ôÀ´Çø·Ö£¬Modbus¶¨ÒåÔÚ²»Í¬µÄ²¨ÌØÂÊÏÂ£¬¼ä¸ôÊ±¼äÊÇ²»Ò»ÑùµÄ£¬
-//		ËùÒÔ¾ÍÊÇ3.5¸ö×Ö·ûµÄÊ±¼ä£¬²¨ÌØÂÊ¸ß£¬Õâ¸öÊ±¼ä¼ä¸ô¾ÍÐ¡£¬²¨ÌØÂÊµÍ£¬Õâ¸öÊ±¼ä¼ä¸ôÏàÓ¦¾Í´ó
+//		3.5ä¸ªå­—ç¬¦çš„æ—¶é—´é—´éš”ï¼Œåªæ˜¯ç”¨åœ¨RTUæ¨¡å¼ä¸‹é¢ï¼Œå› ä¸ºRTUæ¨¡å¼æ²¡æœ‰å¼€å§‹ç¬¦å’Œç»“æŸç¬¦ï¼Œ
+//		ä¸¤ä¸ªæ•°æ®åŒ…ä¹‹é—´åªèƒ½é æ—¶é—´é—´éš”æ¥åŒºåˆ†ï¼ŒModbuså®šä¹‰åœ¨ä¸åŒçš„æ³¢ç‰¹çŽ‡ä¸‹ï¼Œé—´éš”æ—¶é—´æ˜¯ä¸ä¸€æ ·çš„ï¼Œ
+//		æ‰€ä»¥å°±æ˜¯3.5ä¸ªå­—ç¬¦çš„æ—¶é—´ï¼Œæ³¢ç‰¹çŽ‡é«˜ï¼Œè¿™ä¸ªæ—¶é—´é—´éš”å°±å°ï¼Œæ³¢ç‰¹çŽ‡ä½Žï¼Œè¿™ä¸ªæ—¶é—´é—´éš”ç›¸åº”å°±å¤§
 
 //		4800  = 7.297ms
 //		9600  = 3.646ms
@@ -126,9 +126,9 @@ err_ret:
 //	
 //	g_rtu_timeout = 0;
 //	
-//	timeout = 35000000 / g_tParam.Baud;		/* ¼ÆËã³¬Ê±Ê±¼ä£¬µ¥Î»us */
+//	timeout = 35000000 / g_tParam.Baud;		/* è®¡ç®—è¶…æ—¶æ—¶é—´ï¼Œå•ä½us */
 //	
-//	/* Ó²¼þ¶¨Ê±ÖÐ¶Ï£¬¶¨Ê±¾«¶Èus Ó²¼þ¶¨Ê±Æ÷1ÓÃÓÚADC, ¶¨Ê±Æ÷2ÓÃÓÚModbus */
+//	/* ç¡¬ä»¶å®šæ—¶ä¸­æ–­ï¼Œå®šæ—¶ç²¾åº¦us ç¡¬ä»¶å®šæ—¶å™¨1ç”¨äºŽADC, å®šæ—¶å™¨2ç”¨äºŽModbus */
 //	bsp_StartHardTimer(2, timeout, (void *)MODS_RxTimeOut);
 
 //	if (g_tModS.RxCount < RX_BUF_SIZE)
@@ -139,10 +139,10 @@ err_ret:
 
 ///*
 //*********************************************************************************************************
-//*	º¯ Êý Ãû: MODS_RxTimeOut
-//*	¹¦ÄÜËµÃ÷: ³¬¹ý3.5¸ö×Ö·ûÊ±¼äºóÖ´ÐÐ±¾º¯Êý¡£ ÉèÖÃÈ«¾Ö±äÁ¿ g_rtu_timeout = 1; Í¨ÖªÖ÷³ÌÐò¿ªÊ¼½âÂë¡£
-//*	ÐÎ    ²Î: ÎÞ
-//*	·µ »Ø Öµ: ÎÞ
+//*	å‡½ æ•° å: MODS_RxTimeOut
+//*	åŠŸèƒ½è¯´æ˜Ž: è¶…è¿‡3.5ä¸ªå­—ç¬¦æ—¶é—´åŽæ‰§è¡Œæœ¬å‡½æ•°ã€‚ è®¾ç½®å…¨å±€å˜é‡ g_rtu_timeout = 1; é€šçŸ¥ä¸»ç¨‹åºå¼€å§‹è§£ç ã€‚
+//*	å½¢    å‚: æ— 
+//*	è¿” å›ž å€¼: æ— 
 //*********************************************************************************************************
 //*/
 //static void MODS_RxTimeOut(void)
@@ -151,14 +151,13 @@ err_ret:
 //}
 #endif
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_SendWithCRC
-*	¹¦ÄÜËµÃ÷: ·¢ËÍÒ»´®Êý¾Ý, ×Ô¶¯×·¼Ó2×Ö½ÚCRC¡£Êý¾ÝÔÚÈ«¾Ö±äÁ¿: g_tModS.TxBuf, g_tModS.TxCount
-*	ÐÎ    ²Î: ÎÞ
-*			  _ucLen Êý¾Ý³¤¶È£¨²»´øCRC£©
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_SendWithCRC
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€ä¸€ä¸²æ•°æ®, è‡ªåŠ¨è¿½åŠ 2å­—èŠ‚CRCã€‚æ•°æ®åœ¨å…¨å±€å˜é‡: g_tModS.TxBuf, g_tModS.TxCount
+*	å½¢    å‚: æ— 
+*			  _ucLen æ•°æ®é•¿åº¦ï¼ˆä¸å¸¦CRCï¼‰
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODS_SendWithCRC(void)
@@ -172,28 +171,28 @@ void MODS_SendWithCRC(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_SendAckErr
-*	¹¦ÄÜËµÃ÷: ·¢ËÍ´íÎóÓ¦´ð
-*	ÐÎ    ²Î: _ucErrCode : ´íÎó´úÂë
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_SendAckErr
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€é”™è¯¯åº”ç­”
+*	å½¢    å‚: _ucErrCode : é”™è¯¯ä»£ç 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODS_SendAckErr(uint8_t _ucErrCode)
 {
 	g_tModS.TxCount = 0;
-	g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];		/* 485µØÖ· */
-	g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1] | 0x80;	/* Òì³£µÄ¹¦ÄÜÂë */
-	g_tModS.TxBuf[g_tModS.TxCount++] = _ucErrCode;				/* ´íÎó´úÂë(01,02,03,04) */
+	g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];				/* 485åœ°å€ */
+	g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1] | 0x80; /* å¼‚å¸¸çš„åŠŸèƒ½ç  */
+	g_tModS.TxBuf[g_tModS.TxCount++] = _ucErrCode;							/* é”™è¯¯ä»£ç (01,02,03,04) */
 
 	MODS_SendWithCRC();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_SendAckOk
-*	¹¦ÄÜËµÃ÷: ·¢ËÍÕýÈ·µÄÓ¦´ð.
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_SendAckOk
+*	åŠŸèƒ½è¯´æ˜Ž: å‘é€æ­£ç¡®çš„åº”ç­”.
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void MODS_SendAckOk(void)
@@ -210,79 +209,78 @@ void MODS_SendAckOk(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_AnalyzeApp
-*	¹¦ÄÜËµÃ÷: ·ÖÎöÓ¦ÓÃ²ãÐ­Òé
-*	ÐÎ    ²Î:
-*		     _DispBuf  ´æ´¢½âÎöµ½µÄÏÔÊ¾Êý¾ÝASCII×Ö·û´®£¬0½áÊø
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_AnalyzeApp
+*	åŠŸèƒ½è¯´æ˜Ž: åˆ†æžåº”ç”¨å±‚åè®®
+*	å½¢    å‚:
+*		     _DispBuf  å­˜å‚¨è§£æžåˆ°çš„æ˜¾ç¤ºæ•°æ®ASCIIå­—ç¬¦ä¸²ï¼Œ0ç»“æŸ
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_AnalyzeApp(void)
 {
-	switch (g_tModS.RxBuf[1])			/* µÚ2¸ö×Ö½Ú ¹¦ÄÜÂë */
+	switch (g_tModS.RxBuf[1]) /* ç¬¬2ä¸ªå­—èŠ‚ åŠŸèƒ½ç  */
 	{
-		case 0x01:	/* ¶ÁÈ¡ÏßÈ¦×´Ì¬*/
-			MODS_01H();
-			break;
+	case 0x01: /* è¯»å–çº¿åœˆçŠ¶æ€*/
+		MODS_01H();
+		break;
 
-		case 0x02:	/* ¶ÁÈ¡ÊäÈë×´Ì¬ */
-			MODS_02H();
-			break;
-		
-		case 0x03:	/* ¶ÁÈ¡1¸ö»ò¶à¸ö²ÎÊý±£³Ö¼Ä´æÆ÷ ÔÚÒ»¸ö»ò¶à¸ö±£³Ö¼Ä´æÆ÷ÖÐÈ¡µÃµ±Ç°µÄ¶þ½øÖÆÖµ*/
-			MODS_03H();
-			break;
-		
-		case 0x04:	/* ¶ÁÈ¡1¸ö»ò¶à¸öÄ£ÄâÁ¿ÊäÈë¼Ä´æÆ÷ */
-			MODS_04H();
-			break;
-		
-		case 0x05:	/* Ç¿ÖÆµ¥ÏßÈ¦£¨£© */
-			MODS_05H();
-			break;
-		
-		case 0x06:	/* Ð´µ¥¸ö²ÎÊý±£³Ö¼Ä´æÆ÷ (´æ´¢ÔÚCPUµÄFLASHÖÐ£¬»òEEPROMÖÐµÄ²ÎÊý)*/
-			MODS_06H();			
-			break;
-			
-		case 0x10:	/* Ð´¶à¸ö²ÎÊý±£³Ö¼Ä´æÆ÷ (´æ´¢ÔÚCPUµÄFLASHÖÐ£¬»òEEPROMÖÐµÄ²ÎÊý)*/
-			MODS_10H();
-			break;
-		
-		case 0x0F:
-			MODS_0FH();	/* Ç¿ÖÆ¶à¸öÏßÈ¦£¨¶ÔÓ¦D01/D02/D03£© */
-			break;
-		
-//		case 0x15:	/* Ð´ÎÄ¼þ¼Ä´æÆ÷ */
-//			MODS_15H();
-//			break;
-		
-		case 0x60:		/* ¶ÁÈ¡²¨ÐÎÊý¾Ý×¨ÓÃ¹¦ÄÜÂë */
-			MODS_60H();
-			break;
-		
-		case 0x64:	/* Ð¡³ÌÐòÏÂÔØ½Ó¿Ú */
-			MODS_64H();
-			break;
+	case 0x02: /* è¯»å–è¾“å…¥çŠ¶æ€ */
+		MODS_02H();
+		break;
 
-		case 0x65:	/* ÁÙÊ±Ö´ÐÐÐ¡³ÌÐò */
-			MODS_65H();
-			break;		
-		
-		default:
-			g_tModS.RspCode = RSP_ERR_CMD;
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
-			break;
+	case 0x03: /* è¯»å–1ä¸ªæˆ–å¤šä¸ªå‚æ•°ä¿æŒå¯„å­˜å™¨ åœ¨ä¸€ä¸ªæˆ–å¤šä¸ªä¿æŒå¯„å­˜å™¨ä¸­å–å¾—å½“å‰çš„äºŒè¿›åˆ¶å€¼*/
+		MODS_03H();
+		break;
+
+	case 0x04: /* è¯»å–1ä¸ªæˆ–å¤šä¸ªæ¨¡æ‹Ÿé‡è¾“å…¥å¯„å­˜å™¨ */
+		MODS_04H();
+		break;
+
+	case 0x05: /* å¼ºåˆ¶å•çº¿åœˆï¼ˆï¼‰ */
+		MODS_05H();
+		break;
+
+	case 0x06: /* å†™å•ä¸ªå‚æ•°ä¿æŒå¯„å­˜å™¨ (å­˜å‚¨åœ¨CPUçš„FLASHä¸­ï¼Œæˆ–EEPROMä¸­çš„å‚æ•°)*/
+		MODS_06H();
+		break;
+
+	case 0x10: /* å†™å¤šä¸ªå‚æ•°ä¿æŒå¯„å­˜å™¨ (å­˜å‚¨åœ¨CPUçš„FLASHä¸­ï¼Œæˆ–EEPROMä¸­çš„å‚æ•°)*/
+		MODS_10H();
+		break;
+
+	case 0x0F:
+		MODS_0FH(); /* å¼ºåˆ¶å¤šä¸ªçº¿åœˆï¼ˆå¯¹åº”D01/D02/D03ï¼‰ */
+		break;
+
+		//		case 0x15:	/* å†™æ–‡ä»¶å¯„å­˜å™¨ */
+		//			MODS_15H();
+		//			break;
+
+	case 0x60: /* è¯»å–æ³¢å½¢æ•°æ®ä¸“ç”¨åŠŸèƒ½ç  */
+		MODS_60H();
+		break;
+
+	case 0x64: /* å°ç¨‹åºä¸‹è½½æŽ¥å£ */
+		MODS_64H();
+		break;
+
+	case 0x65: /* ä¸´æ—¶æ‰§è¡Œå°ç¨‹åº */
+		MODS_65H();
+		break;
+
+	default:
+		g_tModS.RspCode = RSP_ERR_CMD;
+		MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
+		break;
 	}
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_03H
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡±£³Ö¼Ä´æÆ÷ ÔÚÒ»¸ö»ò¶à¸ö±£³Ö¼Ä´æÆ÷ÖÐÈ¡µÃµ±Ç°µÄ¶þ½øÖÆÖµ
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_03H
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–ä¿æŒå¯„å­˜å™¨ åœ¨ä¸€ä¸ªæˆ–å¤šä¸ªä¿æŒå¯„å­˜å™¨ä¸­å–å¾—å½“å‰çš„äºŒè¿›åˆ¶å€¼
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_03H(void)
@@ -291,45 +289,45 @@ static void MODS_03H(void)
 	uint16_t num;
 	uint16_t value;
 	uint16_t i;
-	
+
 	g_tModS.RspCode = RSP_OK;
 
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
-	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]); 
+	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]);
 	num = BEBufToUint16(&g_tModS.RxBuf[4]);
 	if (num > (TX_BUF_SIZE - 5) / 2)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
-		goto err_ret;		
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
+		goto err_ret;
 	}
 
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
 			g_tModS.TxCount = 0;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
 			g_tModS.TxBuf[g_tModS.TxCount++] = num * 2;
-			
-			/* ÌØÊâ´¦Àí£¬²¨ÐÎ¶ÁÈ¡ ADC_BUFFER_SIZE */
-			if (regaddr >= REG03_CH1_WAVE_0 && regaddr <= REG03_CH1_WAVE_END) 
+
+			/* ç‰¹æ®Šå¤„ç†ï¼Œæ³¢å½¢è¯»å– ADC_BUFFER_SIZE */
+			if (regaddr >= REG03_CH1_WAVE_0 && regaddr <= REG03_CH1_WAVE_END)
 			{
 				uint16_t m;
 				uint32_t idx;
 				uint8_t *p;
-				
+
 				m = regaddr - REG03_CH1_WAVE_0;
 				idx = m * DSO_PACKAGE_SIZE / 4;
 				for (i = 0; i < num / 2; i++)
 				{
-					
+
 					p = (uint8_t *)&g_Ch1WaveBuf[idx++];
 					g_tModS.TxBuf[g_tModS.TxCount++] = p[3];
 					g_tModS.TxBuf[g_tModS.TxCount++] = p[2];
@@ -342,9 +340,10 @@ err_ret:
 				uint16_t m;
 				uint32_t idx;
 				uint8_t *p;
-				
+
 				m = regaddr - REG03_CH2_WAVE_0;
-				idx = m * DSO_PACKAGE_SIZE / 4;;
+				idx = m * DSO_PACKAGE_SIZE / 4;
+				;
 				for (i = 0; i < num / 2; i++)
 				{
 					p = (uint8_t *)&g_Ch2WaveBuf[idx++];
@@ -353,38 +352,36 @@ err_ret:
 					g_tModS.TxBuf[g_tModS.TxCount++] = p[1];
 					g_tModS.TxBuf[g_tModS.TxCount++] = p[0];
 				}
-			}			
+			}
 			else
 			{
 				for (i = 0; i < num; i++)
 				{
 					if (ReadRegValue_03H(regaddr++, &value) == 0)
 					{
-						g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+						g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 						goto err_ret;
 					}
 					g_tModS.TxBuf[g_tModS.TxCount++] = value >> 8;
 					g_tModS.TxBuf[g_tModS.TxCount++] = value;
 				}
 			}
-			
+
 			MODS_SendWithCRC();
-		
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_04H
-*	¹¦ÄÜËµÃ÷: ¶ÁÒ»¸ö»ò¶à¸öÄ£ÄâÁ¿¼Ä´æÆ÷¡£ ½á¹¹ºÍ03HÖ¸ÁîÏàÍ¬¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_04H
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»ä¸€ä¸ªæˆ–å¤šä¸ªæ¨¡æ‹Ÿé‡å¯„å­˜å™¨ã€‚ ç»“æž„å’Œ03HæŒ‡ä»¤ç›¸åŒã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_04H(void)
@@ -393,314 +390,313 @@ static void MODS_04H(void)
 	uint16_t num;
 	uint16_t value;
 	uint8_t i;
-	
+
 	g_tModS.RspCode = RSP_OK;
 
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
-	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]); 
+	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]);
 	num = BEBufToUint16(&g_tModS.RxBuf[4]);
 	if (num > (TX_BUF_SIZE - 5) / 2)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
-		goto err_ret;		
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
+		goto err_ret;
 	}
 
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
 			g_tModS.TxCount = 0;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
 			g_tModS.TxBuf[g_tModS.TxCount++] = num * 2;
-			
+
 			for (i = 0; i < num; i++)
 			{
 				if (ReadRegValue_04H(regaddr++, &value) == 0)
 				{
-					g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+					g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 					goto err_ret;
 				}
 				g_tModS.TxBuf[g_tModS.TxCount++] = value >> 8;
 				g_tModS.TxBuf[g_tModS.TxCount++] = value;
 			}
-			
+
 			MODS_SendWithCRC();
-		
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_06H
-*	¹¦ÄÜËµÃ÷: Ð´µ¥¸ö¼Ä´æÆ÷
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_06H
+*	åŠŸèƒ½è¯´æ˜Ž: å†™å•ä¸ªå¯„å­˜å™¨
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_06H(void)
 {
 
 	/*
-		Ð´±£³Ö¼Ä´æÆ÷¡£×¢Òâ06Ö¸ÁîÖ»ÄÜ²Ù×÷µ¥¸ö±£³Ö¼Ä´æÆ÷£¬16Ö¸Áî¿ÉÒÔÉèÖÃµ¥¸ö»ò¶à¸ö±£³Ö¼Ä´æÆ÷
+		å†™ä¿æŒå¯„å­˜å™¨ã€‚æ³¨æ„06æŒ‡ä»¤åªèƒ½æ“ä½œå•ä¸ªä¿æŒå¯„å­˜å™¨ï¼Œ16æŒ‡ä»¤å¯ä»¥è®¾ç½®å•ä¸ªæˆ–å¤šä¸ªä¿æŒå¯„å­˜å™¨
 
-		Ö÷»ú·¢ËÍ:
-			11 ´Ó»úµØÖ·
-			06 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			01 ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			00 Êý¾Ý1¸ß×Ö½Ú
-			01 Êý¾Ý1µÍ×Ö½Ú
-			9A CRCÐ£Ñé¸ß×Ö½Ú
-			9B CRCÐ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€:
+			11 ä»Žæœºåœ°å€
+			06 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			01 å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			00 æ•°æ®1é«˜å­—èŠ‚
+			01 æ•°æ®1ä½Žå­—èŠ‚
+			9A CRCæ ¡éªŒé«˜å­—èŠ‚
+			9B CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		´Ó»úÏìÓ¦:
-			11 ´Ó»úµØÖ·
-			06 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			01 ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			00 Êý¾Ý1¸ß×Ö½Ú
-			01 Êý¾Ý1µÍ×Ö½Ú
-			1B CRCÐ£Ñé¸ß×Ö½Ú
-			5A	CRCÐ£ÑéµÍ×Ö½Ú
+		ä»Žæœºå“åº”:
+			11 ä»Žæœºåœ°å€
+			06 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			01 å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			00 æ•°æ®1é«˜å­—èŠ‚
+			01 æ•°æ®1ä½Žå­—èŠ‚
+			1B CRCæ ¡éªŒé«˜å­—èŠ‚
+			5A	CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		Àý×Ó:
-			01 06 30 06 00 25  A710    ---- ´¥·¢µçÁ÷ÉèÖÃÎª 2.5
-			01 06 30 06 00 10  6707    ---- ´¥·¢µçÁ÷ÉèÖÃÎª 1.0
+		ä¾‹å­:
+			01 06 30 06 00 25  A710    ---- è§¦å‘ç”µæµè®¾ç½®ä¸º 2.5
+			01 06 30 06 00 10  6707    ---- è§¦å‘ç”µæµè®¾ç½®ä¸º 1.0
 
 
-			01 06 30 1B 00 00  F6CD    ---- SMA ÂË²¨ÏµÊý = 0 ¹Ø±ÕÂË²¨
-			01 06 30 1B 00 01  370D    ---- SMA ÂË²¨ÏµÊý = 1
-			01 06 30 1B 00 02  770C    ---- SMA ÂË²¨ÏµÊý = 2
-			01 06 30 1B 00 05  36CE    ---- SMA ÂË²¨ÏµÊý = 5
+			01 06 30 1B 00 00  F6CD    ---- SMA æ»¤æ³¢ç³»æ•° = 0 å…³é—­æ»¤æ³¢
+			01 06 30 1B 00 01  370D    ---- SMA æ»¤æ³¢ç³»æ•° = 1
+			01 06 30 1B 00 02  770C    ---- SMA æ»¤æ³¢ç³»æ•° = 2
+			01 06 30 1B 00 05  36CE    ---- SMA æ»¤æ³¢ç³»æ•° = 5
 
-			01 06 30 07 00 01  F6CB    ---- ²âÊÔÄ£Ê½ÐÞ¸ÄÎª T1
-			01 06 30 07 00 02  B6CA    ---- ²âÊÔÄ£Ê½ÐÞ¸ÄÎª T2
+			01 06 30 07 00 01  F6CB    ---- æµ‹è¯•æ¨¡å¼ä¿®æ”¹ä¸º T1
+			01 06 30 07 00 02  B6CA    ---- æµ‹è¯•æ¨¡å¼ä¿®æ”¹ä¸º T2
 
-			01 06 31 00 00 00  8736    ---- ²Á³ýÀËÓ¿¼ÇÂ¼Çø
-			01 06 31 01 00 00  D6F6    ---- ²Á³ý¸æ¾¯¼ÇÂ¼Çø
+			01 06 31 00 00 00  8736    ---- æ“¦é™¤æµªæ¶Œè®°å½•åŒº
+			01 06 31 01 00 00  D6F6    ---- æ“¦é™¤å‘Šè­¦è®°å½•åŒº
 
 */
 
 	uint16_t reg;
 	uint16_t value;
-//	uint8_t i;
-	
+	//	uint8_t i;
+
 	g_tModS.RspCode = RSP_OK;
 
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
-	reg = BEBufToUint16(&g_tModS.RxBuf[2]); 	/* ¼Ä´æÆ÷ºÅ */
-	value = BEBufToUint16(&g_tModS.RxBuf[4]);	/* ¼Ä´æÆ÷Öµ */
+	reg = BEBufToUint16(&g_tModS.RxBuf[2]);		/* å¯„å­˜å™¨å· */
+	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* å¯„å­˜å™¨å€¼ */
 
-	fResetReq_06H = 0;	
-	fSaveReq_06H = 0;		/* ÐèÒª±£´æ²ÎÊý */
+	fResetReq_06H = 0;
+	fSaveReq_06H = 0; /* éœ€è¦ä¿å­˜å‚æ•° */
 	fSaveCalibParam = 0;
 	if (WriteRegValue_06H(reg, value) == 0)
 	{
-		g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 	}
 	else
 	{
-		if (fSaveReq_06H == 1)		/* ÐèÒªÏÈ·¢ */
+		if (fSaveReq_06H == 1) /* éœ€è¦å…ˆå‘ */
 		{
 			fSaveReq_06H = 1;
 			SaveParam();
 		}
-		
+
 		if (fSaveCalibParam == 1)
 		{
 			fSaveCalibParam = 0;
-			SaveCalibParam();		/* ±£´æÐ£×¼²ÎÊý */
+			SaveCalibParam(); /* ä¿å­˜æ ¡å‡†å‚æ•° */
 		}
 
 		if (fResetReq_06H == 1)
 		{
 			fResetReq_06H = 0;
 			{
-				/* ¸´Î»½øÈëAPP */
+				/* å¤ä½è¿›å…¥APP */
 				*(uint32_t *)0x20000000 = 0;
-				NVIC_SystemReset();	/* ¸´Î»CPU */	
+				NVIC_SystemReset(); /* å¤ä½CPU */
 			}
-		}	
+		}
 	}
-	
+
 err_ret:
-	if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 	{
 		MODS_SendAckOk();
 	}
 	else
 	{
-		MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+		MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_10H
-*	¹¦ÄÜËµÃ÷: Á¬ÐøÐ´¶à¸ö¼Ä´æÆ÷.  ½øÓÃÓÚ¸ÄÐ´Ê±ÖÓ
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_10H
+*	åŠŸèƒ½è¯´æ˜Ž: è¿žç»­å†™å¤šä¸ªå¯„å­˜å™¨.  è¿›ç”¨äºŽæ”¹å†™æ—¶é’Ÿ
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_10H(void)
 {
 	/*
-		´Ó»úµØÖ·Îª11H¡£±£³Ö¼Ä´æÆ÷µÄÆäÊµµØÖ·Îª0001H£¬¼Ä´æÆ÷µÄ½áÊøµØÖ·Îª0002H¡£×Ü¹²·ÃÎÊ2¸ö¼Ä´æÆ÷¡£
-		±£³Ö¼Ä´æÆ÷0001HµÄÄÚÈÝÎª000AH£¬±£³Ö¼Ä´æÆ÷0002HµÄÄÚÈÝÎª0102H¡£
+		ä»Žæœºåœ°å€ä¸º11Hã€‚ä¿æŒå¯„å­˜å™¨çš„å…¶å®žåœ°å€ä¸º0001Hï¼Œå¯„å­˜å™¨çš„ç»“æŸåœ°å€ä¸º0002Hã€‚æ€»å…±è®¿é—®2ä¸ªå¯„å­˜å™¨ã€‚
+		ä¿æŒå¯„å­˜å™¨0001Hçš„å†…å®¹ä¸º000AHï¼Œä¿æŒå¯„å­˜å™¨0002Hçš„å†…å®¹ä¸º0102Hã€‚
 
-		Ö÷»ú·¢ËÍ:
-			11 ´Ó»úµØÖ·
-			10 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷ÆðÊ¼µØÖ·¸ß×Ö½Ú
-			01 ¼Ä´æÆ÷ÆðÊ¼µØÖ·µÍ×Ö½Ú
-			00 ¼Ä´æÆ÷ÊýÁ¿¸ß×Ö½Ú
-			02 ¼Ä´æÆ÷ÊýÁ¿µÍ×Ö½Ú
-			04 ×Ö½ÚÊý
-			00 Êý¾Ý1¸ß×Ö½Ú
-			0A Êý¾Ý1µÍ×Ö½Ú
-			01 Êý¾Ý2¸ß×Ö½Ú
-			02 Êý¾Ý2µÍ×Ö½Ú
-			C6 CRCÐ£Ñé¸ß×Ö½Ú
-			F0 CRCÐ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€:
+			11 ä»Žæœºåœ°å€
+			10 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨èµ·å§‹åœ°å€é«˜å­—èŠ‚
+			01 å¯„å­˜å™¨èµ·å§‹åœ°å€ä½Žå­—èŠ‚
+			00 å¯„å­˜å™¨æ•°é‡é«˜å­—èŠ‚
+			02 å¯„å­˜å™¨æ•°é‡ä½Žå­—èŠ‚
+			04 å­—èŠ‚æ•°
+			00 æ•°æ®1é«˜å­—èŠ‚
+			0A æ•°æ®1ä½Žå­—èŠ‚
+			01 æ•°æ®2é«˜å­—èŠ‚
+			02 æ•°æ®2ä½Žå­—èŠ‚
+			C6 CRCæ ¡éªŒé«˜å­—èŠ‚
+			F0 CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		´Ó»úÏìÓ¦:
-			11 ´Ó»úµØÖ·
-			06 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			01 ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			00 Êý¾Ý1¸ß×Ö½Ú
-			01 Êý¾Ý1µÍ×Ö½Ú
-			1B CRCÐ£Ñé¸ß×Ö½Ú
-			5A	CRCÐ£ÑéµÍ×Ö½Ú
+		ä»Žæœºå“åº”:
+			11 ä»Žæœºåœ°å€
+			06 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			01 å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			00 æ•°æ®1é«˜å­—èŠ‚
+			01 æ•°æ®1ä½Žå­—èŠ‚
+			1B CRCæ ¡éªŒé«˜å­—èŠ‚
+			5A	CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		Àý×Ó:
-			01 10 30 00 00 06 0C  07 DE  00 0A  00 01  00 08  00 0C  00 00     389A    ---- Ð´Ê±ÖÓ 2014-10-01 08:12:00
-			01 10 30 00 00 06 0C  07 DF  00 01  00 1F  00 17  00 3B  00 39     5549    ---- Ð´Ê±ÖÓ 2015-01-31 23:59:57
+		ä¾‹å­:
+			01 10 30 00 00 06 0C  07 DE  00 0A  00 01  00 08  00 0C  00 00     389A    ---- å†™æ—¶é’Ÿ 2014-10-01 08:12:00
+			01 10 30 00 00 06 0C  07 DF  00 01  00 1F  00 17  00 3B  00 39     5549    ---- å†™æ—¶é’Ÿ 2015-01-31 23:59:57
 
 	*/
 	uint16_t reg_addr;
 	uint16_t reg_num;
-//	uint8_t byte_num;
+	//	uint8_t byte_num;
 	uint16_t value;
 	uint8_t i;
-	uint8_t *_pBuf;	
-	
+	uint8_t *_pBuf;
+
 	g_tModS.RspCode = RSP_OK;
 
 	if (g_tModS.RxCount < 11)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
 	fSaveReq_06H = 0;
 	fSaveCalibParam = 0;
 	fResetReq_06H = 0;
-	
-	reg_addr = BEBufToUint16(&g_tModS.RxBuf[2]); 	/* ¼Ä´æÆ÷ºÅ */
-	reg_num = BEBufToUint16(&g_tModS.RxBuf[4]);	/* ¼Ä´æÆ÷¸öÊý */
-//	byte_num = g_tModS.RxBuf[6];	/* ºóÃæµÄÊý¾ÝÌå×Ö½ÚÊý */
+
+	reg_addr = BEBufToUint16(&g_tModS.RxBuf[2]); /* å¯„å­˜å™¨å· */
+	reg_num = BEBufToUint16(&g_tModS.RxBuf[4]);	/* å¯„å­˜å™¨ä¸ªæ•° */
+																							 //	byte_num = g_tModS.RxBuf[6];	/* åŽé¢çš„æ•°æ®ä½“å­—èŠ‚æ•° */
 	_pBuf = &g_tModS.RxBuf[7];
 
 	for (i = 0; i < reg_num; i++)
 	{
 		value = BEBufToUint16(_pBuf);
-		
+
 		if (WriteRegValue_06H(reg_addr + i, value) == 0)
 		{
-			g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 			break;
 		}
-		
+
 		_pBuf += 2;
 	}
-		
-	if (fSaveReq_06H == 1)		/* ÐèÒªÏÈ·¢ */
+
+	if (fSaveReq_06H == 1) /* éœ€è¦å…ˆå‘ */
 	{
 		fSaveReq_06H = 1;
 		SaveParam();
 	}
-	
+
 	if (fSaveCalibParam == 1)
 	{
 		fSaveCalibParam = 0;
-		SaveCalibParam();		/* ±£´æÐ£×¼²ÎÊý */
+		SaveCalibParam(); /* ä¿å­˜æ ¡å‡†å‚æ•° */
 	}
 
 	if (fResetReq_06H == 1)
 	{
 		fResetReq_06H = 0;
 		{
-			/* ¸´Î»½øÈëAPP */
+			/* å¤ä½è¿›å…¥APP */
 			*(uint32_t *)0x20000000 = 0;
-			NVIC_SystemReset();	/* ¸´Î»CPU */	
+			NVIC_SystemReset(); /* å¤ä½CPU */
 		}
-	}	
-		
+	}
+
 err_ret:
-	if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 	{
-		MODS_SendAckOk();	
+		MODS_SendAckOk();
 	}
 	else
 	{
-		MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+		MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_01H
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡ÏßÈ¦×´Ì¬£¨¶ÔÓ¦Ô¶³Ì¿ª¹ØD01/D02/D03£©
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_01H
+*	åŠŸèƒ½è¯´æ˜Ž: è¯»å–çº¿åœˆçŠ¶æ€ï¼ˆå¯¹åº”è¿œç¨‹å¼€å…³D01/D02/D03ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_01H(void)
 {
 	/*
-		Ö÷»ú·¢ËÍ:
-			11 ´Ó»úµØÖ·
-			01 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷ÆðÊ¼µØÖ·¸ß×Ö½Ú
-			13 ¼Ä´æÆ÷ÆðÊ¼µØÖ·µÍ×Ö½Ú
-			00 ¼Ä´æÆ÷ÊýÁ¿¸ß×Ö½Ú
-			25 ¼Ä´æÆ÷ÊýÁ¿µÍ×Ö½Ú
-			0E CRCÐ£Ñé¸ß×Ö½Ú
-			84 CRCÐ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€:
+			11 ä»Žæœºåœ°å€
+			01 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨èµ·å§‹åœ°å€é«˜å­—èŠ‚
+			13 å¯„å­˜å™¨èµ·å§‹åœ°å€ä½Žå­—èŠ‚
+			00 å¯„å­˜å™¨æ•°é‡é«˜å­—èŠ‚
+			25 å¯„å­˜å™¨æ•°é‡ä½Žå­—èŠ‚
+			0E CRCæ ¡éªŒé«˜å­—èŠ‚
+			84 CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		´Ó»úÓ¦´ð: 	1´ú±íON£¬0´ú±íOFF¡£Èô·µ»ØµÄÏßÈ¦Êý²»Îª8µÄ±¶Êý£¬ÔòÔÚ×îºóÊý¾Ý×Ö½ÚÎ´Î²Ê¹ÓÃ0´úÌæ. BIT0¶ÔÓ¦µÚ1¸ö
-			11 ´Ó»úµØÖ·
-			01 ¹¦ÄÜÂë
-			05 ·µ»Ø×Ö½ÚÊý
-			CD Êý¾Ý1(ÏßÈ¦0013H-ÏßÈ¦001AH)
-			6B Êý¾Ý2(ÏßÈ¦001BH-ÏßÈ¦0022H)
-			B2 Êý¾Ý3(ÏßÈ¦0023H-ÏßÈ¦002AH)
-			0E Êý¾Ý4(ÏßÈ¦0032H-ÏßÈ¦002BH)
-			1B Êý¾Ý5(ÏßÈ¦0037H-ÏßÈ¦0033H)
-			45 CRCÐ£Ñé¸ß×Ö½Ú
-			E6 CRCÐ£ÑéµÍ×Ö½Ú
+		ä»Žæœºåº”ç­”: 	1ä»£è¡¨ONï¼Œ0ä»£è¡¨OFFã€‚è‹¥è¿”å›žçš„çº¿åœˆæ•°ä¸ä¸º8çš„å€æ•°ï¼Œåˆ™åœ¨æœ€åŽæ•°æ®å­—èŠ‚æœªå°¾ä½¿ç”¨0ä»£æ›¿. BIT0å¯¹åº”ç¬¬1ä¸ª
+			11 ä»Žæœºåœ°å€
+			01 åŠŸèƒ½ç 
+			05 è¿”å›žå­—èŠ‚æ•°
+			CD æ•°æ®1(çº¿åœˆ0013H-çº¿åœˆ001AH)
+			6B æ•°æ®2(çº¿åœˆ001BH-çº¿åœˆ0022H)
+			B2 æ•°æ®3(çº¿åœˆ0023H-çº¿åœˆ002AH)
+			0E æ•°æ®4(çº¿åœˆ0032H-çº¿åœˆ002BH)
+			1B æ•°æ®5(çº¿åœˆ0037H-çº¿åœˆ0033H)
+			45 CRCæ ¡éªŒé«˜å­—èŠ‚
+			E6 CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		Àý×Ó:
-			01 01 10 01 00 03   29 0B	--- ²éÑ¯D01¿ªÊ¼µÄ3¸ö¼ÌµçÆ÷×´Ì¬
-			01 01 10 03 00 01   09 0A   --- ²éÑ¯D03¼ÌµçÆ÷µÄ×´Ì¬
+		ä¾‹å­:
+			01 01 10 01 00 03   29 0B	--- æŸ¥è¯¢D01å¼€å§‹çš„3ä¸ªç»§ç”µå™¨çŠ¶æ€
+			01 01 10 03 00 01   09 0A   --- æŸ¥è¯¢D03ç»§ç”µå™¨çš„çŠ¶æ€
 	*/
 	uint16_t reg;
 	uint16_t num;
@@ -710,70 +706,70 @@ static void MODS_01H(void)
 
 	g_tModS.RspCode = RSP_OK;
 
-	/* Ã»ÓÐÍâ²¿¼ÌµçÆ÷£¬Ö±½ÓÓ¦´ð´íÎó */
+	/* æ²¡æœ‰å¤–éƒ¨ç»§ç”µå™¨ï¼Œç›´æŽ¥åº”ç­”é”™è¯¯ */
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;	/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
-	reg = BEBufToUint16(&g_tModS.RxBuf[2]); 	/* ¼Ä´æÆ÷ºÅ */
-	num = BEBufToUint16(&g_tModS.RxBuf[4]);	/* ¼Ä´æÆ÷¸öÊý */
+	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* å¯„å­˜å™¨å· */
+	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* å¯„å­˜å™¨ä¸ªæ•° */
 
 	if (num > MODS_DO_NUM)
 	{
-		g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 		goto err_ret;
 	}
-	
-	m = (num + 7) / 8;	
+
+	m = (num + 7) / 8;
 	if (m < sizeof(status))
-	{	
+	{
 		for (i = 0; i < m; i++)
 		{
 			status[i] = 0;
 		}
 		for (i = 0; i < num; i++)
-		{					
+		{
 			uint8_t value;
-			
+
 			if (MODS_GetDIState(i + reg, &value))
 			{
 				if (value == 1)
 				{
 					status[i / 8] |= (1 << (i % 8));
 				}
-			}	
+			}
 			else
 			{
-				g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+				g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 			}
 		}
 	}
 	else
 	{
-		g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 	}
 
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
 	{
-		if (g_tModS.RspCode == RSP_OK)		/* ÕýÈ·Ó¦´ð */
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
 			g_tModS.TxCount = 0;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
-			g_tModS.TxBuf[g_tModS.TxCount++] = m;			/* ·µ»Ø×Ö½ÚÊý */
+			g_tModS.TxBuf[g_tModS.TxCount++] = m; /* è¿”å›žå­—èŠ‚æ•° */
 
 			for (i = 0; i < m; i++)
 			{
-				g_tModS.TxBuf[g_tModS.TxCount++] = status[i];	/* ¼ÌµçÆ÷×´Ì¬ */
+				g_tModS.TxBuf[g_tModS.TxCount++] = status[i]; /* ç»§ç”µå™¨çŠ¶æ€ */
 			}
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
@@ -781,33 +777,33 @@ err_ret:
 static void MODS_02H(void)
 {
 	/*
-		Ö÷»ú·¢ËÍ:
-			11 ´Ó»úµØÖ·
-			02 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			C4 ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			00 ¼Ä´æÆ÷ÊýÁ¿¸ß×Ö½Ú
-			16 ¼Ä´æÆ÷ÊýÁ¿µÍ×Ö½Ú
-			BA CRCÐ£Ñé¸ß×Ö½Ú
-			A9 CRCÐ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€:
+			11 ä»Žæœºåœ°å€
+			02 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			C4 å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			00 å¯„å­˜å™¨æ•°é‡é«˜å­—èŠ‚
+			16 å¯„å­˜å™¨æ•°é‡ä½Žå­—èŠ‚
+			BA CRCæ ¡éªŒé«˜å­—èŠ‚
+			A9 CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		´Ó»úÓ¦´ð:  ÏìÓ¦¸÷ÀëÉ¢ÊäÈë¼Ä´æÆ÷×´Ì¬£¬·Ö±ð¶ÔÓ¦Êý¾ÝÇøÖÐµÄÃ¿Î»Öµ£¬1 ´ú±íON£»0 ´ú±íOFF¡£
-		           µÚÒ»¸öÊý¾Ý×Ö½ÚµÄLSB(×îµÍ×Ö½Ú)Îª²éÑ¯µÄÑ°Ö·µØÖ·£¬ÆäËûÊäÈë¿Ú°´Ë³ÐòÔÚ¸Ã×Ö½ÚÖÐÓÉµÍ×Ö½Ú
-		           Ïò¸ß×Ö½ÚÅÅÁÐ£¬Ö±µ½Ìî³äÂú8Î»¡£ÏÂÒ»¸ö×Ö½ÚÖÐµÄ8¸öÊäÈëÎ»Ò²ÊÇ´ÓµÍ×Ö½Úµ½¸ß×Ö½ÚÅÅÁÐ¡£
-		           Èô·µ»ØµÄÊäÈëÎ»Êý²»ÊÇ8µÄ±¶Êý£¬ÔòÔÚ×îºóµÄÊý¾Ý×Ö½ÚÖÐµÄÊ£ÓàÎ»ÖÁ¸Ã×Ö½ÚµÄ×î¸ßÎ»Ê¹ÓÃ0Ìî³ä¡£
-			11 ´Ó»úµØÖ·
-			02 ¹¦ÄÜÂë
-			03 ·µ»Ø×Ö½ÚÊý
-			AC Êý¾Ý1(00C4H-00CBH)
-			DB Êý¾Ý2(00CCH-00D3H)
-			35 Êý¾Ý3(00D4H-00D9H)
-			20 CRCÐ£Ñé¸ß×Ö½Ú
-			18 CRCÐ£ÑéµÍ×Ö½Ú
+		ä»Žæœºåº”ç­”:  å“åº”å„ç¦»æ•£è¾“å…¥å¯„å­˜å™¨çŠ¶æ€ï¼Œåˆ†åˆ«å¯¹åº”æ•°æ®åŒºä¸­çš„æ¯ä½å€¼ï¼Œ1 ä»£è¡¨ONï¼›0 ä»£è¡¨OFFã€‚
+		           ç¬¬ä¸€ä¸ªæ•°æ®å­—èŠ‚çš„LSB(æœ€ä½Žå­—èŠ‚)ä¸ºæŸ¥è¯¢çš„å¯»å€åœ°å€ï¼Œå…¶ä»–è¾“å…¥å£æŒ‰é¡ºåºåœ¨è¯¥å­—èŠ‚ä¸­ç”±ä½Žå­—èŠ‚
+		           å‘é«˜å­—èŠ‚æŽ’åˆ—ï¼Œç›´åˆ°å¡«å……æ»¡8ä½ã€‚ä¸‹ä¸€ä¸ªå­—èŠ‚ä¸­çš„8ä¸ªè¾“å…¥ä½ä¹Ÿæ˜¯ä»Žä½Žå­—èŠ‚åˆ°é«˜å­—èŠ‚æŽ’åˆ—ã€‚
+		           è‹¥è¿”å›žçš„è¾“å…¥ä½æ•°ä¸æ˜¯8çš„å€æ•°ï¼Œåˆ™åœ¨æœ€åŽçš„æ•°æ®å­—èŠ‚ä¸­çš„å‰©ä½™ä½è‡³è¯¥å­—èŠ‚çš„æœ€é«˜ä½ä½¿ç”¨0å¡«å……ã€‚
+			11 ä»Žæœºåœ°å€
+			02 åŠŸèƒ½ç 
+			03 è¿”å›žå­—èŠ‚æ•°
+			AC æ•°æ®1(00C4H-00CBH)
+			DB æ•°æ®2(00CCH-00D3H)
+			35 æ•°æ®3(00D4H-00D9H)
+			20 CRCæ ¡éªŒé«˜å­—èŠ‚
+			18 CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		Àý×Ó:
-		01 02 20 01 00 08  23CC  ---- ¶ÁÈ¡T01-08µÄ×´Ì¬
-		01 02 20 04 00 02  B3CA  ---- ¶ÁÈ¡T04-05µÄ×´Ì¬
-		01 02 20 01 00 12  A207   ---- ¶Á T01-18
+		ä¾‹å­:
+		01 02 20 01 00 08  23CC  ---- è¯»å–T01-08çš„çŠ¶æ€
+		01 02 20 04 00 02  B3CA  ---- è¯»å–T04-05çš„çŠ¶æ€
+		01 02 20 01 00 12  A207   ---- è¯» T01-18
 	*/
 
 	uint16_t reg;
@@ -820,12 +816,12 @@ static void MODS_02H(void)
 
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;	/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		return;
 	}
 
-	reg = BEBufToUint16(&g_tModS.RxBuf[2]); 	/* ¼Ä´æÆ÷ºÅ */
-	num = BEBufToUint16(&g_tModS.RxBuf[4]);		/* ¼Ä´æÆ÷¸öÊý */
+	reg = BEBufToUint16(&g_tModS.RxBuf[2]); /* å¯„å­˜å™¨å· */
+	num = BEBufToUint16(&g_tModS.RxBuf[4]); /* å¯„å­˜å™¨ä¸ªæ•° */
 
 	m = (num + 7) / 8;
 	if (m > 0 && m < sizeof(status))
@@ -837,7 +833,7 @@ static void MODS_02H(void)
 		for (i = 0; i < num; i++)
 		{
 			uint8_t state;
-			
+
 			if (MODS_GetDIState(reg + i, &state))
 			{
 				if (state == 1)
@@ -847,134 +843,133 @@ static void MODS_02H(void)
 			}
 			else
 			{
-				g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+				g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 				break;
 			}
 		}
 	}
 	else
 	{
-		g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 	}
 
-	if (g_tModS.RspCode == RSP_OK)		/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 	{
 		g_tModS.TxCount = 0;
 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[0];
 		g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
-		g_tModS.TxBuf[g_tModS.TxCount++] = m;			/* ·µ»Ø×Ö½ÚÊý */
+		g_tModS.TxBuf[g_tModS.TxCount++] = m; /* è¿”å›žå­—èŠ‚æ•° */
 
 		for (i = 0; i < m; i++)
 		{
-			g_tModS.TxBuf[g_tModS.TxCount++] = status[i];	/* T01-02×´Ì¬ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = status[i]; /* T01-02çŠ¶æ€ */
 		}
 		MODS_SendWithCRC();
 	}
 	else
 	{
-		MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+		MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 	}
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_05H
-*	¹¦ÄÜËµÃ÷: 
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_05H
+*	åŠŸèƒ½è¯´æ˜Ž: 
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_05H(void)
 {
 	/*
-		Ö÷»ú·¢ËÍ: Ð´µ¥¸öÏßÈ¦¼Ä´æÆ÷¡£FF00HÖµÇëÇóÏßÈ¦´¦ÓÚON×´Ì¬£¬0000HÖµÇëÇóÏßÈ¦´¦ÓÚOFF×´Ì¬
-		¡£05HÖ¸ÁîÉèÖÃµ¥¸öÏßÈ¦µÄ×´Ì¬£¬15HÖ¸Áî¿ÉÒÔÉèÖÃ¶à¸öÏßÈ¦µÄ×´Ì¬¡£
-			11 ´Ó»úµØÖ·
-			05 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			AC ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			FF Êý¾Ý1¸ß×Ö½Ú
-			00 Êý¾Ý2µÍ×Ö½Ú
-			4E CRCÐ£Ñé¸ß×Ö½Ú
-			8B CRCÐ£ÑéµÍ×Ö½Ú
+		ä¸»æœºå‘é€: å†™å•ä¸ªçº¿åœˆå¯„å­˜å™¨ã€‚FF00Hå€¼è¯·æ±‚çº¿åœˆå¤„äºŽONçŠ¶æ€ï¼Œ0000Hå€¼è¯·æ±‚çº¿åœˆå¤„äºŽOFFçŠ¶æ€
+		ã€‚05HæŒ‡ä»¤è®¾ç½®å•ä¸ªçº¿åœˆçš„çŠ¶æ€ï¼Œ15HæŒ‡ä»¤å¯ä»¥è®¾ç½®å¤šä¸ªçº¿åœˆçš„çŠ¶æ€ã€‚
+			11 ä»Žæœºåœ°å€
+			05 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			AC å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			FF æ•°æ®1é«˜å­—èŠ‚
+			00 æ•°æ®2ä½Žå­—èŠ‚
+			4E CRCæ ¡éªŒé«˜å­—èŠ‚
+			8B CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		´Ó»úÓ¦´ð:
-			11 ´Ó»úµØÖ·
-			05 ¹¦ÄÜÂë
-			00 ¼Ä´æÆ÷µØÖ·¸ß×Ö½Ú
-			AC ¼Ä´æÆ÷µØÖ·µÍ×Ö½Ú
-			FF ¼Ä´æÆ÷1¸ß×Ö½Ú
-			00 ¼Ä´æÆ÷1µÍ×Ö½Ú
-			4E CRCÐ£Ñé¸ß×Ö½Ú
-			8B CRCÐ£ÑéµÍ×Ö½Ú
+		ä»Žæœºåº”ç­”:
+			11 ä»Žæœºåœ°å€
+			05 åŠŸèƒ½ç 
+			00 å¯„å­˜å™¨åœ°å€é«˜å­—èŠ‚
+			AC å¯„å­˜å™¨åœ°å€ä½Žå­—èŠ‚
+			FF å¯„å­˜å™¨1é«˜å­—èŠ‚
+			00 å¯„å­˜å™¨1ä½Žå­—èŠ‚
+			4E CRCæ ¡éªŒé«˜å­—èŠ‚
+			8B CRCæ ¡éªŒä½Žå­—èŠ‚
 
-		Àý×Ó:
-		01 05 10 01 FF 00   D93A   -- D01´ò¿ª
-		01 05 10 01 00 00   98CA   -- D01¹Ø±Õ
+		ä¾‹å­:
+		01 05 10 01 FF 00   D93A   -- D01æ‰“å¼€
+		01 05 10 01 00 00   98CA   -- D01å…³é—­
 
-		01 05 10 02 FF 00   293A   -- D02´ò¿ª
-		01 05 10 02 00 00   68CA   -- D02¹Ø±Õ
+		01 05 10 02 FF 00   293A   -- D02æ‰“å¼€
+		01 05 10 02 00 00   68CA   -- D02å…³é—­
 
-		01 05 10 03 FF 00   78FA   -- D03´ò¿ª
-		01 05 10 03 00 00   390A   -- D03¹Ø±Õ
+		01 05 10 03 FF 00   78FA   -- D03æ‰“å¼€
+		01 05 10 03 00 00   390A   -- D03å…³é—­
 	*/
 	uint16_t reg;
 	uint16_t value;
 
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount != 8)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 
-	reg = BEBufToUint16(&g_tModS.RxBuf[2]); 	/* ¼Ä´æÆ÷ºÅ */
-	value = BEBufToUint16(&g_tModS.RxBuf[4]);	/* Êý¾Ý */
+	reg = BEBufToUint16(&g_tModS.RxBuf[2]);		/* å¯„å­˜å™¨å· */
+	value = BEBufToUint16(&g_tModS.RxBuf[4]); /* æ•°æ® */
 
 	if (value == 0xff00)
 	{
 		if (MODS_WriteRelay(reg, 1) == 0)
 		{
-			g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 		}
 	}
 	else if (value == 0x0000)
 	{
 		if (MODS_WriteRelay(reg, 0) == 0)
 		{
-			g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+			g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 		}
 	}
 	else
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* ¼Ä´æÆ÷ÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* å¯„å­˜å™¨å€¼åŸŸé”™è¯¯ */
 	}
-	
+
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
 			MODS_SendAckOk();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_0FH
-*	¹¦ÄÜËµÃ÷: Ð´Ò»¸ö»ò¶à¸öÊä³ö¼ÌµçÆ÷£¬¸Ä±äÊä³ö¼ÌµçÆ÷×´Ì¬¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_0FH
+*	åŠŸèƒ½è¯´æ˜Ž: å†™ä¸€ä¸ªæˆ–å¤šä¸ªè¾“å‡ºç»§ç”µå™¨ï¼Œæ”¹å˜è¾“å‡ºç»§ç”µå™¨çŠ¶æ€ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
-static void  MODS_0FH(void)
+static void MODS_0FH(void)
 {
 	uint16_t regaddr;
 	uint16_t num;
@@ -990,7 +985,7 @@ static void  MODS_0FH(void)
 		goto fail;
 	}
 
-	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]); 
+	regaddr = BEBufToUint16(&g_tModS.RxBuf[2]);
 	num = BEBufToUint16(&g_tModS.RxBuf[4]);
 	m = g_tModS.RxBuf[6];
 	if ((m + 9) != g_tModS.RxCount)
@@ -998,26 +993,26 @@ static void  MODS_0FH(void)
 		g_tModS.RspCode = RSP_ERR_VALUE;
 		goto fail;
 	}
-	if ((num + 7) / 8 != m )
+	if ((num + 7) / 8 != m)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 		goto fail;
 	}
 	_pBuf = &g_tModS.RxBuf[7];
-	
+
 	if (m > 0 && m < sizeof(status))
 	{
 		for (i = 0; i < m; i++)
-		{ 	
+		{
 			status[i] = *(_pBuf++);
 		}
-		for(i = 0; i < num; i++)
+		for (i = 0; i < num; i++)
 		{
 			if (status[i / 8] & (1 << (i % 8)))
 			{
 				if (MODS_WriteRelay(regaddr, 1) == 0)
 				{
-					g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+					g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 					break;
 				}
 			}
@@ -1025,7 +1020,7 @@ static void  MODS_0FH(void)
 			{
 				if (MODS_WriteRelay(regaddr, 0) == 0)
 				{
-					g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+					g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 					break;
 				}
 			}
@@ -1034,374 +1029,373 @@ static void  MODS_0FH(void)
 	}
 	else
 	{
-		g_tModS.RspCode = RSP_ERR_REG_ADDR;		/* ¼Ä´æÆ÷µØÖ·´íÎó */
+		g_tModS.RspCode = RSP_ERR_REG_ADDR; /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
 	}
 
-fail:	
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+fail:
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
 			g_tModS.TxCount = 0;
-			
+
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;
-		
+
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[1];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[2];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[3];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[4];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[5];
-			
+
 			MODS_SendWithCRC();
 			return;
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_64H
-*	¹¦ÄÜËµÃ÷: Ð¡³ÌÐòÏÂÔØ½Ó¿Ú
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_64H
+*	åŠŸèƒ½è¯´æ˜Ž: å°ç¨‹åºä¸‹è½½æŽ¥å£
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_64H(void)
 {
 	/*
-		Ö÷»ú·¢ËÍ: Ð¡³ÌÐòÊý¾Ý
-			01  ; Õ¾ºÅ
-			64  ; ¹¦ÄÜÂë
-			0100 0000 ; ×Ü³¤¶È 4×Ö½Ú
-			0000 0000 : Æ«ÒÆµØÖ· 4×Ö½Ú
-			0020 0000 : ±¾°üÊý¾Ý³¤¶È 4×Ö½Ú
-			xx ... xx : ³ÌÐòÊý¾Ý£¬n¸ö
+		ä¸»æœºå‘é€: å°ç¨‹åºæ•°æ®
+			01  ; ç«™å·
+			64  ; åŠŸèƒ½ç 
+			0100 0000 ; æ€»é•¿åº¦ 4å­—èŠ‚
+			0000 0000 : åç§»åœ°å€ 4å­—èŠ‚
+			0020 0000 : æœ¬åŒ…æ•°æ®é•¿åº¦ 4å­—èŠ‚
+			xx ... xx : ç¨‹åºæ•°æ®ï¼Œnä¸ª
 			CCCC      : CRC16
 	
-		´Ó»úÓ¦´ð:
-			01  ; ´Ó»úµØÖ·
-			64  ; ¹¦ÄÜÂë			
-			00  ; Ö´ÐÐ½á¹û£¬0±íÊ¾OK  1±íÊ¾´íÎó
+		ä»Žæœºåº”ç­”:
+			01  ; ä»Žæœºåœ°å€
+			64  ; åŠŸèƒ½ç 			
+			00  ; æ‰§è¡Œç»“æžœï¼Œ0è¡¨ç¤ºOK  1è¡¨ç¤ºé”™è¯¯
 			CCCC : CRC16
 	*/
-	uint32_t total_len;		/* ³ÌÐò³¤¶È */
+	uint32_t total_len; /* ç¨‹åºé•¿åº¦ */
 	uint32_t offset_addr;
-	uint32_t package_len;	/* ±¾°üÊý¾Ý³¤¶È */
-	
+	uint32_t package_len; /* æœ¬åŒ…æ•°æ®é•¿åº¦ */
+
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount < 11)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 	total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
 	offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
 	package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
-	
-	lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len);	/* ½«lua³ÌÐò±£´æµ½ÄÚ´æ */
-	
+
+	lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len); /* å°†luaç¨‹åºä¿å­˜åˆ°å†…å­˜ */
+
 	if (offset_addr + package_len >= total_len)
 	{
 		luaL_dostring(g_Lua, s_lua_prog_buf);
 	}
-	
+
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
-			g_tModS.TxCount = 0;		
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;	/* ¹¦ÄÜÂë */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;	/* Ö´ÐÐ½á¹û 00 */
+			g_tModS.TxCount = 0;
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;						 /* åŠŸèƒ½ç  */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;						 /* æ‰§è¡Œç»“æžœ 00 */
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_65H
-*	¹¦ÄÜËµÃ÷: Ö´ÐÐÁÙÊ±½Å±¾
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_65H
+*	åŠŸèƒ½è¯´æ˜Ž: æ‰§è¡Œä¸´æ—¶è„šæœ¬
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_65H(void)
 {
 	/*
-		65H - Ö´ÐÐÁÙÊ±µÄLUA³ÌÐò£¬ÃüÁîÖ¡´ø³ÌÐò
-			01  ; ´Ó»úµØÖ·
-			65  ; ¹¦ÄÜÂë
-			0100 : ±¾°üÊý¾Ý³¤¶È 2×Ö½Ú
-			xxxx : ½Å±¾Êý¾Ý£¬0½áÊø
+		65H - æ‰§è¡Œä¸´æ—¶çš„LUAç¨‹åºï¼Œå‘½ä»¤å¸§å¸¦ç¨‹åº
+			01  ; ä»Žæœºåœ°å€
+			65  ; åŠŸèƒ½ç 
+			0100 : æœ¬åŒ…æ•°æ®é•¿åº¦ 2å­—èŠ‚
+			xxxx : è„šæœ¬æ•°æ®ï¼Œ0ç»“æŸ
 			CCCC : CRC16
 	
-		´Ó»úÓ¦´ð:
-			01  ; ´Ó»úµØÖ·
-			65  ; ¹¦ÄÜÂë
-			00  ; Ö´ÐÐ½á¹û£¬0±íÊ¾OK  1±íÊ¾´íÎó
+		ä»Žæœºåº”ç­”:
+			01  ; ä»Žæœºåœ°å€
+			65  ; åŠŸèƒ½ç 
+			00  ; æ‰§è¡Œç»“æžœï¼Œ0è¡¨ç¤ºOK  1è¡¨ç¤ºé”™è¯¯
 			CCCC : CRC16	
 			
 	*/
-//	uint16_t lual_len;		/* ³ÌÐò³¤¶È */
-	
+	//	uint16_t lual_len;		/* ç¨‹åºé•¿åº¦ */
+
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount < 11)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
-//	lual_len = BEBufToUint16(&g_tModS.RxBuf[2]);
+	//	lual_len = BEBufToUint16(&g_tModS.RxBuf[2]);
 
 	if (g_Lua > 0)
 	{
 		luaL_dostring(g_Lua, (char *)&g_tModS.RxBuf[4]);
 	}
-		
+
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
-			g_tModS.TxCount = 0;		
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x65;	/* ¹¦ÄÜÂë */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;	/* Ö´ÐÐ½á¹û 00 */
-			
+			g_tModS.TxCount = 0;
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x65;						 /* åŠŸèƒ½ç  */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;						 /* æ‰§è¡Œç»“æžœ 00 */
+
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_66H
-*	¹¦ÄÜËµÃ÷: wirteÎÄ¼þ
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_66H
+*	åŠŸèƒ½è¯´æ˜Ž: wirteæ–‡ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_66H(void)
 {
 	/*
 		66H - write file
-		Ö÷»ú·¢ËÍ:
-			01  ; Õ¾ºÅ
-			66  ; ¹¦ÄÜÂë
-			0100 0000 ; ×Ü³¤¶È 4×Ö½Ú
-			0000 0000 : Æ«ÒÆµØÖ· 4×Ö½Ú
-			0020 0000 : ±¾°üÊý¾Ý³¤¶È 4×Ö½Ú
-			xx ... xx : Êý¾Ý£¬n¸ö
+		ä¸»æœºå‘é€:
+			01  ; ç«™å·
+			66  ; åŠŸèƒ½ç 
+			0100 0000 ; æ€»é•¿åº¦ 4å­—èŠ‚
+			0000 0000 : åç§»åœ°å€ 4å­—èŠ‚
+			0020 0000 : æœ¬åŒ…æ•°æ®é•¿åº¦ 4å­—èŠ‚
+			xx ... xx : æ•°æ®ï¼Œnä¸ª
 			CCCC      : CRC16	
 			
-		´Ó»úÓ¦´ð:
-			01  ; ´Ó»úµØÖ·
-			66  ; ¹¦ÄÜÂë
-			00  ; Ö´ÐÐ½á¹û£¬0±íÊ¾OK  1±íÊ¾´íÎó
+		ä»Žæœºåº”ç­”:
+			01  ; ä»Žæœºåœ°å€
+			66  ; åŠŸèƒ½ç 
+			00  ; æ‰§è¡Œç»“æžœï¼Œ0è¡¨ç¤ºOK  1è¡¨ç¤ºé”™è¯¯
 			CCCC : CRC16	
 	*/
-	uint32_t total_len;		/* ³ÌÐò³¤¶È */
+	uint32_t total_len; /* ç¨‹åºé•¿åº¦ */
 	uint32_t offset_addr;
-	uint32_t package_len;	/* ±¾°üÊý¾Ý³¤¶È */
-	
+	uint32_t package_len; /* æœ¬åŒ…æ•°æ®é•¿åº¦ */
+
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount < 11)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
 	total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
 	offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
 	package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
-	
-	
-	lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len);	/* ½«Êý¾Ý±£´æµ½ÄÚ´æ */
-		
+
+	lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len); /* å°†æ•°æ®ä¿å­˜åˆ°å†…å­˜ */
+
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
-			g_tModS.TxCount = 0;		
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;	/* ¹¦ÄÜÂë */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;	/* Ö´ÐÐ½á¹û 00 */
+			g_tModS.TxCount = 0;
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;						 /* åŠŸèƒ½ç  */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;						 /* æ‰§è¡Œç»“æžœ 00 */
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_67H
-*	¹¦ÄÜËµÃ÷: read file
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_67H
+*	åŠŸèƒ½è¯´æ˜Ž: read file
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_67H(void)
 {
 	/*
 		67H -  read file
-		Ö÷»ú·¢ËÍ:
-			01  ; Õ¾ºÅ
-			67  ; ¹¦ÄÜÂë
-			0100 0000 ; ×Ü³¤¶È 4×Ö½Ú -- ÏÈ±£Áô£¬ºÃÏñÓÃ²»µ½
-			0000 0000 : Æ«ÒÆµØÖ· 4×Ö½Ú
-			0020 0000 : Êý¾Ý³¤¶È 4×Ö½Ú
+		ä¸»æœºå‘é€:
+			01  ; ç«™å·
+			67  ; åŠŸèƒ½ç 
+			0100 0000 ; æ€»é•¿åº¦ 4å­—èŠ‚ -- å…ˆä¿ç•™ï¼Œå¥½åƒç”¨ä¸åˆ°
+			0000 0000 : åç§»åœ°å€ 4å­—èŠ‚
+			0020 0000 : æ•°æ®é•¿åº¦ 4å­—èŠ‚
 			CCCC      : CRC16	
 			
-		´Ó»úÓ¦´ð:
-			01  ; ´Ó»úµØÖ·
-			67  ; ¹¦ÄÜÂë
-			00  ; Ö´ÐÐ½á¹û£¬0±íÊ¾OK  1±íÊ¾´íÎó
-			0000 0000 : Æ«ÒÆµØÖ· 4×Ö½Ú
-			0000 0000 : ºóÐøÊý¾Ý³¤¶È
-			xxx  : Êý¾ÝÌå
+		ä»Žæœºåº”ç­”:
+			01  ; ä»Žæœºåœ°å€
+			67  ; åŠŸèƒ½ç 
+			00  ; æ‰§è¡Œç»“æžœï¼Œ0è¡¨ç¤ºOK  1è¡¨ç¤ºé”™è¯¯
+			0000 0000 : åç§»åœ°å€ 4å­—èŠ‚
+			0000 0000 : åŽç»­æ•°æ®é•¿åº¦
+			xxx  : æ•°æ®ä½“
 			CCCC : CRC16	
 
 	*/
-//	uint32_t total_len;		/* ³ÌÐò³¤¶È */
+	//	uint32_t total_len;		/* ç¨‹åºé•¿åº¦ */
 	uint32_t offset_addr;
-	uint32_t package_len;	/* ±¾°üÊý¾Ý³¤¶È */
-	
+	uint32_t package_len; /* æœ¬åŒ…æ•°æ®é•¿åº¦ */
+
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount < 11)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
-//	total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
+	//	total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
 	offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
 	package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
 
 	lua_67H_Read(offset_addr, &g_tModS.TxBuf[11], package_len);
-	
+
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
-			g_tModS.TxCount = 0;		
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x67;	/* ¹¦ÄÜÂë */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;	/* Ö´ÐÐ½á¹û 00 */
-			
+			g_tModS.TxCount = 0;
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x67;						 /* åŠŸèƒ½ç  */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;						 /* æ‰§è¡Œç»“æžœ 00 */
+
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[6];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[7];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[8];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[9];
-			
+
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[10];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[11];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[12];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[13];
-			
+
 			g_tModS.TxCount += package_len;
-			
+
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MODS_60H
-*	¹¦ÄÜËµÃ÷: PC»ú¶ÁÈ¡²¨ÐÎÊý¾Ý£¨¸¡µã¸ñÊ½£©
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: MODS_60H
+*	åŠŸèƒ½è¯´æ˜Ž: PCæœºè¯»å–æ³¢å½¢æ•°æ®ï¼ˆæµ®ç‚¹æ ¼å¼ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void MODS_60H(void)
 {
 	/*
-		PC·¢ËÍ 60H 
-			01  ; ´Ó»úµØÖ·
-			60  ; ¹¦ÄÜÂë
-			00  : 00±íÊ¾PCÏÂ·¢£¬01±íÊ¾Éè±¸Ó¦´ð £¨½ö½öÓÃÓÚÈË¹¤·ÖÎö£©
-			01 00 00 00  : Í¨µÀºÅÊ¹ÄÜ±êÖ¾ 32bit£¬bit0±íÊ¾CH1£¬bit1±íÊ¾CH2
-			00 00 04 00: Ã¿¸öÍ¨µÀÑù±¾¸öÊý
-			01 00 : Ã¿Í¨ÐÅ°üÑù±¾³¤¶È. µ¥Î»Îª1¸öÑù±¾¡£
-			00 00 00 00 : Í¨µÀÊý¾ÝÆ«ÒÆ £¨Ñù±¾µ¥Î»£¬ÓÃÓÚÖØ·¢£©
+		PCå‘é€ 60H 
+			01  ; ä»Žæœºåœ°å€
+			60  ; åŠŸèƒ½ç 
+			00  : 00è¡¨ç¤ºPCä¸‹å‘ï¼Œ01è¡¨ç¤ºè®¾å¤‡åº”ç­” ï¼ˆä»…ä»…ç”¨äºŽäººå·¥åˆ†æžï¼‰
+			01 00 00 00  : é€šé“å·ä½¿èƒ½æ ‡å¿— 32bitï¼Œbit0è¡¨ç¤ºCH1ï¼Œbit1è¡¨ç¤ºCH2
+			00 00 04 00: æ¯ä¸ªé€šé“æ ·æœ¬ä¸ªæ•°
+			01 00 : æ¯é€šä¿¡åŒ…æ ·æœ¬é•¿åº¦. å•ä½ä¸º1ä¸ªæ ·æœ¬ã€‚
+			00 00 00 00 : é€šé“æ•°æ®åç§» ï¼ˆæ ·æœ¬å•ä½ï¼Œç”¨äºŽé‡å‘ï¼‰
 			CC CC : CRC16
 	
-		´Ó»úÊ×ÏÈÓ¦´ð: 60H -  
+		ä»Žæœºé¦–å…ˆåº”ç­”: 60H -  
 			
-			01  ; ´Ó»úµØÖ·
-			60  ; ¹¦ÄÜÂë
-			01  : 00±íÊ¾PCÏÂ·¢£¬01±íÊ¾Éè±¸Ó¦´ð £¨½ö½öÓÃÓÚÈË¹¤·ÖÎö£©
-			01 00 00 00  : Í¨µÀºÅÊ¹ÄÜ±êÖ¾ 32bit£¬bit0±íÊ¾CH1£¬bit1±íÊ¾CH2
-			00 00 04 00 : Ã¿¸öÍ¨µÀÑù±¾¸öÊý
-			01 00 : Ã¿Í¨ÐÅ°üÑù±¾³¤¶È. µ¥Î»Îª1¸öÑù±¾¡£
-			00 00 00 00 : Í¨µÀÊý¾ÝÆ«ÒÆ £¨Ñù±¾µ¥Î»£¬ÓÃÓÚÖØ·¢£©
+			01  ; ä»Žæœºåœ°å€
+			60  ; åŠŸèƒ½ç 
+			01  : 00è¡¨ç¤ºPCä¸‹å‘ï¼Œ01è¡¨ç¤ºè®¾å¤‡åº”ç­” ï¼ˆä»…ä»…ç”¨äºŽäººå·¥åˆ†æžï¼‰
+			01 00 00 00  : é€šé“å·ä½¿èƒ½æ ‡å¿— 32bitï¼Œbit0è¡¨ç¤ºCH1ï¼Œbit1è¡¨ç¤ºCH2
+			00 00 04 00 : æ¯ä¸ªé€šé“æ ·æœ¬ä¸ªæ•°
+			01 00 : æ¯é€šä¿¡åŒ…æ ·æœ¬é•¿åº¦. å•ä½ä¸º1ä¸ªæ ·æœ¬ã€‚
+			00 00 00 00 : é€šé“æ•°æ®åç§» ï¼ˆæ ·æœ¬å•ä½ï¼Œç”¨äºŽé‡å‘ï¼‰
 			CCCC : CRC16
 	
-		´Ó»úÓ¦´ð: £¨È»ºó¿ªÊ¼¶à°üÁ¬ÐøÓ¦´ð)
-			01  ; ´Ó»úµØÖ·
-			61  ; ¹¦ÄÜÂë
-			00  ; Í¨µÀºÅ£¬00±íÊ¾Í¨µÀ1,01±íÊ¾Í¨µÀ2,
-			00 00 00 00 : Æ«ÒÆµØÖ·£¨Ñù±¾µ¥Î»£©
-			01 00 : ±¾°üÊý¾Ý³¤¶È¡£Ñù±¾µ¥Î»¡£Ã¿¸öÑù±¾4×Ö½Ú¡£0x100±íÊ¾1024×Ö½Ú¡£
-			..... : Êý¾ÝÌå
+		ä»Žæœºåº”ç­”: ï¼ˆç„¶åŽå¼€å§‹å¤šåŒ…è¿žç»­åº”ç­”)
+			01  ; ä»Žæœºåœ°å€
+			61  ; åŠŸèƒ½ç 
+			00  ; é€šé“å·ï¼Œ00è¡¨ç¤ºé€šé“1,01è¡¨ç¤ºé€šé“2,
+			00 00 00 00 : åç§»åœ°å€ï¼ˆæ ·æœ¬å•ä½ï¼‰
+			01 00 : æœ¬åŒ…æ•°æ®é•¿åº¦ã€‚æ ·æœ¬å•ä½ã€‚æ¯ä¸ªæ ·æœ¬4å­—èŠ‚ã€‚0x100è¡¨ç¤º1024å­—èŠ‚ã€‚
+			..... : æ•°æ®ä½“
 			CCCC : CRC16
 	*/
-//	uint16_t lual_len;		/* ³ÌÐò³¤¶È */
-	
+	//	uint16_t lual_len;		/* ç¨‹åºé•¿åº¦ */
+
 	g_tModS.RspCode = RSP_OK;
-	
+
 	if (g_tModS.RxCount != 19)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
 		goto err_ret;
 	}
-	
+
 	if (g_tModS.RxBuf[2] != 00)
 	{
-		g_tModS.RspCode = RSP_ERR_VALUE;		/* Êý¾ÝÖµÓò´íÎó */
-		goto err_ret;		
+		g_tModS.RspCode = RSP_ERR_VALUE; /* æ•°æ®å€¼åŸŸé”™è¯¯ */
+		goto err_ret;
 	}
-		
+
 	g_tModWave.ChEn = BEBufToUint32(&g_tModS.RxBuf[3]);
 	g_tModWave.SampleSize = BEBufToUint32(&g_tModS.RxBuf[7]);
 	g_tModWave.PackageSize = BEBufToUint16(&g_tModS.RxBuf[11]);
 	g_tModWave.SampleOffset = BEBufToUint32(&g_tModS.RxBuf[13]);
-	
-	g_tModWave.TransPos = 0;	/* ´«ÊäµÄÎ»ÖÃ¼ÆÊý */
-	g_tModWave.StartTrans = 1;	/* ¿ªÊ¼´«ÊäµÄ±êÖ¾ */
+
+	g_tModWave.TransPos = 0;	 /* ä¼ è¾“çš„ä½ç½®è®¡æ•° */
+	g_tModWave.StartTrans = 1; /* å¼€å§‹ä¼ è¾“çš„æ ‡å¿— */
 
 err_ret:
-	if (g_tModS.RxBuf[0] != 0x00)	/* 00¹ã²¥µØÖ·²»Ó¦´ð, FFµØÖ·Ó¦´ðg_tParam.Addr485 */
-	{	
-		if (g_tModS.RspCode == RSP_OK)			/* ÕýÈ·Ó¦´ð */
+	if (g_tModS.RxBuf[0] != 0x00) /* 00å¹¿æ’­åœ°å€ä¸åº”ç­”, FFåœ°å€åº”ç­”g_tParam.Addr485 */
+	{
+		if (g_tModS.RspCode == RSP_OK) /* æ­£ç¡®åº”ç­” */
 		{
-			g_tModS.TxCount = 0;		
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-			g_tModS.TxBuf[g_tModS.TxCount++] = 0x60;	/* ¹¦ÄÜÂë */
+			g_tModS.TxCount = 0;
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+			g_tModS.TxBuf[g_tModS.TxCount++] = 0x60;						 /* åŠŸèƒ½ç  */
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[2];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[3];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[4];
@@ -1416,55 +1410,55 @@ err_ret:
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[13];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[14];
 			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[15];
-			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[16];			
-			
+			g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[16];
+
 			MODS_SendWithCRC();
 		}
 		else
 		{
-			MODS_SendAckErr(g_tModS.RspCode);	/* ¸æËßÖ÷»úÃüÁî´íÎó */
+			MODS_SendAckErr(g_tModS.RspCode); /* å‘Šè¯‰ä¸»æœºå‘½ä»¤é”™è¯¯ */
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: Send_61H
-*	¹¦ÄÜËµÃ÷: ´«Êä²¨ÐÎ¡£ ×Ô¶¯Á¬Ðø¶à°ü´«Êä¡£·ÏÆú£¬²»ÎÈ¶¨¡£
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: Send_61H
+*	åŠŸèƒ½è¯´æ˜Ž: ä¼ è¾“æ³¢å½¢ã€‚ è‡ªåŠ¨è¿žç»­å¤šåŒ…ä¼ è¾“ã€‚åºŸå¼ƒï¼Œä¸ç¨³å®šã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
 {
 	/*
-		´Ó»úÓ¦´ð: £¨È»ºó¿ªÊ¼¶à°üÁ¬ÐøÓ¦´ð)
-			01  ; ´Ó»úµØÖ·
-			61  ; ¹¦ÄÜÂë
-			00  ; Í¨µÀºÅ£¬00±íÊ¾Í¨µÀ1,01±íÊ¾Í¨µÀ2,
-			00 00 00 00 : Æ«ÒÆµØÖ·£¨Ñù±¾µ¥Î»£©
-			01 00 : ±¾°üÊý¾Ý³¤¶È¡£Ñù±¾µ¥Î»¡£Ã¿¸öÑù±¾4×Ö½Ú¡£0x100±íÊ¾1024×Ö½Ú¡£
-			..... : Êý¾ÝÌå
+		ä»Žæœºåº”ç­”: ï¼ˆç„¶åŽå¼€å§‹å¤šåŒ…è¿žç»­åº”ç­”)
+			01  ; ä»Žæœºåœ°å€
+			61  ; åŠŸèƒ½ç 
+			00  ; é€šé“å·ï¼Œ00è¡¨ç¤ºé€šé“1,01è¡¨ç¤ºé€šé“2,
+			00 00 00 00 : åç§»åœ°å€ï¼ˆæ ·æœ¬å•ä½ï¼‰
+			01 00 : æœ¬åŒ…æ•°æ®é•¿åº¦ã€‚æ ·æœ¬å•ä½ã€‚æ¯ä¸ªæ ·æœ¬4å­—èŠ‚ã€‚0x100è¡¨ç¤º1024å­—èŠ‚ã€‚
+			..... : æ•°æ®ä½“
 			CRC16
 	*/
 	uint16_t i;
-	uint8_t *p;	
+	uint8_t *p;
 
-	g_tModS.TxCount = 0;		
-	g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485;	/* ±¾»úµØÖ· */
-	g_tModS.TxBuf[g_tModS.TxCount++] = 0x61;	/* ¹¦ÄÜÂë */
+	g_tModS.TxCount = 0;
+	g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* æœ¬æœºåœ°å€ */
+	g_tModS.TxBuf[g_tModS.TxCount++] = 0x61;						 /* åŠŸèƒ½ç  */
 	g_tModS.TxBuf[g_tModS.TxCount++] = _Ch;
 	g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 24;
 	g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 16;
 	g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 8;
-	g_tModS.TxBuf[g_tModS.TxCount++] = _Offset;	
+	g_tModS.TxBuf[g_tModS.TxCount++] = _Offset;
 	g_tModS.TxBuf[g_tModS.TxCount++] = _PackageLen >> 8;
 	g_tModS.TxBuf[g_tModS.TxCount++] = _PackageLen;
-	
+
 	if (_Ch == 0)
 	{
 		for (i = 0; i < _PackageLen; i++)
-		{			
+		{
 			p = (uint8_t *)&g_Ch1WaveBuf[_Offset + i];
 			g_tModS.TxBuf[g_tModS.TxCount++] = p[3];
 			g_tModS.TxBuf[g_tModS.TxCount++] = p[2];
@@ -1483,19 +1477,19 @@ static void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
 			g_tModS.TxBuf[g_tModS.TxCount++] = p[0];
 		}
 	}
-	
+
 	MODS_SendWithCRC();
-	
+
 	USBCom_SendBufNow(0, g_tModS.TxBuf, g_tModS.TxCount);
 }
 
 #if 0
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: TransWaveTask
-*	¹¦ÄÜËµÃ÷: ´«Êä²¨ÐÎÈÎÎñ¡£ ²åÈëbsp_IdleÔËÐÐ. ·ÏÆú
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: TransWaveTask
+*	åŠŸèƒ½è¯´æ˜Ž: ä¼ è¾“æ³¢å½¢ä»»åŠ¡ã€‚ æ’å…¥bsp_Idleè¿è¡Œ. åºŸå¼ƒ
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 void TransWaveTask(void)
@@ -1510,7 +1504,7 @@ void TransWaveTask(void)
 	
 	while (g_tModWave.StartTrans != 0)
 	{
-		lwip_pro();		/* ÒÔÌ«ÍøÐ­ÒéÕ»ÂÖÑ¯ */	
+		lwip_pro();		/* ä»¥å¤ªç½‘åè®®æ ˆè½®è¯¢ */	
 	
 		wifi_task();
 		
@@ -1533,7 +1527,7 @@ void TransWaveTask(void)
 					
 					if (s_ChPos >= 2)
 					{
-						g_tModWave.StartTrans = 100;	/* ´«ÊäÍê±Ï */
+						g_tModWave.StartTrans = 100;	/* ä¼ è¾“å®Œæ¯• */
 					}
 					else
 					{
@@ -1547,7 +1541,7 @@ void TransWaveTask(void)
 				g_tModWave.StartTrans++;
 				break;
 			
-			case 4:	/* µÈ´ý·¢ËÍÍê±Ï - ÔÝÊ±Î´×ö */
+			case 4:	/* ç­‰å¾…å‘é€å®Œæ¯• - æš‚æ—¶æœªåš */
 				g_tModWave.StartTrans++;
 				break;
 			
@@ -1566,11 +1560,11 @@ void TransWaveTask(void)
 				break;
 			
 			case 100:
-				g_tModWave.StartTrans = 0;	/* ´«Êä½áÊø */
+				g_tModWave.StartTrans = 0;	/* ä¼ è¾“ç»“æŸ */
 				break;
 		}
 	}
 }
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

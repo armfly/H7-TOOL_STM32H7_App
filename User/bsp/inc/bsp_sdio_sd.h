@@ -1,9 +1,9 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : SDø®«˝∂Øƒ£øÈ
-*	Œƒº˛√˚≥∆ : bsp_sdio_sd.h
-*	Àµ    √˜ : SDø®µ◊≤„«˝∂Ø°£∏˘æ›stm32h743i_eval_sd.cŒƒº˛–ﬁ∏ƒ°£
+*	Ê®°ÂùóÂêçÁß∞ : SDÂç°È©±Âä®Ê®°Âùó
+*	Êñá‰ª∂ÂêçÁß∞ : bsp_sdio_sd.h
+*	ËØ¥    Êòé : SDÂç°Â∫ïÂ±ÇÈ©±Âä®„ÄÇÊ†πÊçÆstm32h743i_eval_sd.cÊñá‰ª∂‰øÆÊîπ„ÄÇ
 *
 *********************************************************************************************************
 */
@@ -51,7 +51,8 @@
 #define __STM32H743I_EVAL_SD_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -84,80 +85,79 @@
 /**
   * @brief  SD status structure definition
   */
-#define   MSD_OK                        ((uint8_t)0x00)
-#define   MSD_ERROR                     ((uint8_t)0x01)
-#define   MSD_ERROR_SD_NOT_PRESENT      ((uint8_t)0x02)
+#define MSD_OK ((uint8_t)0x00)
+#define MSD_ERROR ((uint8_t)0x01)
+#define MSD_ERROR_SD_NOT_PRESENT ((uint8_t)0x02)
 
 /**
   * @brief  SD transfer state definition
   */
-#define   SD_TRANSFER_OK                ((uint8_t)0x00)
-#define   SD_TRANSFER_BUSY              ((uint8_t)0x01)
+#define SD_TRANSFER_OK ((uint8_t)0x00)
+#define SD_TRANSFER_BUSY ((uint8_t)0x01)
 
 /** @defgroup STM32H743I_EVAL_SD_Exported_Constants SD Exported Constants
   * @{
   */
-#define SD_PRESENT               ((uint8_t)0x01)
-#define SD_NOT_PRESENT           ((uint8_t)0x00)
+#define SD_PRESENT ((uint8_t)0x01)
+#define SD_NOT_PRESENT ((uint8_t)0x00)
 
-#define SD_DATATIMEOUT           ((uint32_t)100000000)
+#define SD_DATATIMEOUT ((uint32_t)100000000)
 
-
-#define SD_DetectIRQHandler()             HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8)
+#define SD_DetectIRQHandler() HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8)
 
 #ifndef USE_SD_TRANSCEIVER
 #define USE_SD_TRANSCEIVER 1
 #endif /* USE_SD_TRANSCEIVER */
-/**
+  /**
   * @}
   */
 
-/** @defgroup STM32H743I_EVAL_SD_Exported_Macro SD Exported Macro
+  /** @defgroup STM32H743I_EVAL_SD_Exported_Macro SD Exported Macro
   * @{
   */
-/**
+  /**
   * @}
   */
 
-/** @defgroup STM32H743I_EVAL_SD_Exported_Functions SD Exported Functions
+  /** @defgroup STM32H743I_EVAL_SD_Exported_Functions SD Exported Functions
   * @{
   */
-uint8_t BSP_SD_Init(void);
-uint8_t BSP_SD_DeInit(void);
-uint8_t BSP_SD_ITConfig(void);
+  uint8_t BSP_SD_Init(void);
+  uint8_t BSP_SD_DeInit(void);
+  uint8_t BSP_SD_ITConfig(void);
 
-uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
-uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks,  uint32_t Timeout);
-uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
-uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
-uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr);
-uint8_t BSP_SD_GetCardState(void);
-void    BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo);
-uint8_t BSP_SD_IsDetected(void);
+  uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+  uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout);
+  uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks);
+  uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks);
+  uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr);
+  uint8_t BSP_SD_GetCardState(void);
+  void BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo);
+  uint8_t BSP_SD_IsDetected(void);
 
-/* These functions can be modified in case the current settings (e.g. DMA stream)
+  /* These functions can be modified in case the current settings (e.g. DMA stream)
    need to be changed for specific application needs */
-void    BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params);
-void    BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params);
-void    BSP_SD_AbortCallback(void);
-void    BSP_SD_WriteCpltCallback(void);
-void    BSP_SD_ReadCpltCallback(void);
-void    BSP_SD_ErrorCallback(void);
-void    BSP_SD_DriveTransciver_1_8V_Callback(FlagStatus status);
+  void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params);
+  void BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params);
+  void BSP_SD_AbortCallback(void);
+  void BSP_SD_WriteCpltCallback(void);
+  void BSP_SD_ReadCpltCallback(void);
+  void BSP_SD_ErrorCallback(void);
+  void BSP_SD_DriveTransciver_1_8V_Callback(FlagStatus status);
 
-/**
+  /**
   * @}
   */
 
-/**
+  /**
   * @}
   */
 
-/**
+  /**
   * @}
   */
 
-/**
+  /**
   * @}
   */
 

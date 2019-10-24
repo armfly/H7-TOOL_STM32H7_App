@@ -1,168 +1,168 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ADS1256 Çı¶¯Ä£¿é(8Í¨µÀ´øPGAµÄ24Î»ADC)
-*	ÎÄ¼şÃû³Æ : bsp_ads1256.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ADS1256Ä£¿éºÍCPUÖ®¼ä²ÉÓÃSPI½Ó¿Ú¡£±¾Çı¶¯³ÌĞòÖ§³ÖÈí¼şSPI½Ó¿Ú¡£
-*			  Í¨¹ıºêÇĞ»»¡£
+*	æ¨¡å—åç§° : ADS1256 é©±åŠ¨æ¨¡å—(8é€šé“å¸¦PGAçš„24ä½ADC)
+*	æ–‡ä»¶åç§° : bsp_ads1256.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ADS1256æ¨¡å—å’ŒCPUä¹‹é—´é‡‡ç”¨SPIæ¥å£ã€‚æœ¬é©±åŠ¨ç¨‹åºæ”¯æŒè½¯ä»¶SPIæ¥å£ã€‚
+*			  é€šè¿‡å®åˆ‡æ¢ã€‚
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ         ×÷Õß     ËµÃ÷
-*		V1.0    2014-01-01  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ         ä½œè€…     è¯´æ˜
+*		V1.0    2014-01-01  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 
-#define SOFT_SPI		/* ¶¨Òå´ËĞĞ±íÊ¾Ê¹ÓÃGPIOÄ£ÄâSPI½Ó¿Ú */
-//#define HARD_SPI		/* ¶¨Òå´ËĞĞ±íÊ¾Ê¹ÓÃCPUµÄÓ²¼şSPI½Ó¿Ú */
+#define SOFT_SPI /* å®šä¹‰æ­¤è¡Œè¡¨ç¤ºä½¿ç”¨GPIOæ¨¡æ‹ŸSPIæ¥å£ */
+//#define HARD_SPI		/* å®šä¹‰æ­¤è¡Œè¡¨ç¤ºä½¿ç”¨CPUçš„ç¡¬ä»¶SPIæ¥å£ */
 
 /*
-    ADS1256Ä£¿é    STM32-V7¿ª·¢°å(Ê¾²¨Æ÷½Ó¿Ú)
-      +5V   <------  5.0V      5V¹©µç
-      GND   -------  GND       µØ
-      DRDY  ------>  PC6       ×¼±¸¾ÍĞ÷
+    ADS1256æ¨¡å—    STM32-V7å¼€å‘æ¿(ç¤ºæ³¢å™¨æ¥å£)
+      +5V   <------  5.0V      5Vä¾›ç”µ
+      GND   -------  GND       åœ°
+      DRDY  ------>  PC6       å‡†å¤‡å°±ç»ª
       CS    <------  PC7       SPI_CS
       DIN   <------  PG10      SPI_MOSI
       DOUT  ------>  PA5       SPI_MISO
-      SCLK  <------  PA4       SPIÊ±ÖÓ
-      GND   -------  GND       µØ
-      PDWN  <------  PB7       µôµç¿ØÖÆ
-      RST   <------  PC3       ¸´Î»ĞÅºÅ
-      NC   ¿Õ½Å
-      NC   ¿Õ½Å
+      SCLK  <------  PA4       SPIæ—¶é’Ÿ
+      GND   -------  GND       åœ°
+      PDWN  <------  PB7       æ‰ç”µæ§åˆ¶
+      RST   <------  PC3       å¤ä½ä¿¡å·
+      NC   ç©ºè„š
+      NC   ç©ºè„š
 */
 
 /*
-	ADS1256»ù±¾ÌØĞÔ:
-	1¡¢Ä£Äâ²¿·Ö¹©µç5V;
-	2¡¢SPIÊı×Ö½Ó¿ÚµçÆ½£º3.3V
-	3¡¢PGAÉèÖÃ·¶Î§£º 1¡¢2¡¢4¡¢8¡¢16¡¢32¡¢64¡¢
-	4¡¢²Î¿¼µçÑ¹2.5V (ÍÆ¼öÈ±Ê¡µÄ£¬ÍâÖÃµÄ£©
-	5¡¢ÊäÈëµçÑ¹·¶Î§£ºPGA = 1 Ê±, ¿ÉÊäÈëÕı¸º5V
-	6. ×Ô¶¯Ğ£×¼ £¨µ±ÉèÖÃÁËPGA,BUFÊ¹ÄÜ¡¢Êı¾İ²ÉÑùÂÊÊ±£¬»áÆô¶¯×ÔĞ£×¼)
-	7. ÊäÈëµÄ»º³åÆ÷¿ÉÉèÖÃÆôÓÃºÍ¹Ø±Õ£¨Ò»°ãÑ¡ÆôÓÃ£©
+	ADS1256åŸºæœ¬ç‰¹æ€§:
+	1ã€æ¨¡æ‹Ÿéƒ¨åˆ†ä¾›ç”µ5V;
+	2ã€SPIæ•°å­—æ¥å£ç”µå¹³ï¼š3.3V
+	3ã€PGAè®¾ç½®èŒƒå›´ï¼š 1ã€2ã€4ã€8ã€16ã€32ã€64ã€
+	4ã€å‚è€ƒç”µå‹2.5V (æ¨èç¼ºçœçš„ï¼Œå¤–ç½®çš„ï¼‰
+	5ã€è¾“å…¥ç”µå‹èŒƒå›´ï¼šPGA = 1 æ—¶, å¯è¾“å…¥æ­£è´Ÿ5V
+	6. è‡ªåŠ¨æ ¡å‡† ï¼ˆå½“è®¾ç½®äº†PGA,BUFä½¿èƒ½ã€æ•°æ®é‡‡æ ·ç‡æ—¶ï¼Œä¼šå¯åŠ¨è‡ªæ ¡å‡†)
+	7. è¾“å…¥çš„ç¼“å†²å™¨å¯è®¾ç½®å¯ç”¨å’Œå…³é—­ï¼ˆä¸€èˆ¬é€‰å¯ç”¨ï¼‰
 
 
-	Íâ²¿¾§ÕñÆµÂÊ = 7.68MHz, 
-		Ê±ÖÓÆµÂÊ tCLK = 1/7.68M = 0.13uS
-		Êä³öÊı¾İÖÜÆÚ tDATA =  1 / 30K = 0.033mS  (°´30Ksps¼ÆËã)
+	å¤–éƒ¨æ™¶æŒ¯é¢‘ç‡ = 7.68MHz, 
+		æ—¶é’Ÿé¢‘ç‡ tCLK = 1/7.68M = 0.13uS
+		è¾“å‡ºæ•°æ®å‘¨æœŸ tDATA =  1 / 30K = 0.033mS  (æŒ‰30Kspsè®¡ç®—)
 	
-	¶ÔSPIµÄÊ±ÖÓËÙ¶ÈÒªÇó: (ads1256.pdf page 6)
-		×î¿ì 4¸ötCLK = 0.52uS
-		×îÂı 10¸ötDATA = 0.3mS (°´ 30Ksps ¼ÆËã)
+	å¯¹SPIçš„æ—¶é’Ÿé€Ÿåº¦è¦æ±‚: (ads1256.pdf page 6)
+		æœ€å¿« 4ä¸ªtCLK = 0.52uS
+		æœ€æ…¢ 10ä¸ªtDATA = 0.3mS (æŒ‰ 30Ksps è®¡ç®—)
 		
-		SCL¸ßµçÆ½ºÍµÍµçÆ½³ÖĞøÊ±¼ä×îĞ¡ 200ns
+		SCLé«˜ç”µå¹³å’Œä½ç”µå¹³æŒç»­æ—¶é—´æœ€å° 200ns
 	
-	RREG, WREG, RDATA ÃüÁîÖ®ºó£¬ĞèÒªÑÓ³Ù 4 * tCLK = 0.52uS;
-	RDATAC, RESET, SYNC ÃüÁîÖ®ºó£¬ĞèÒªÑÓ³Ù 24 * tCLK = 3.12uS;
+	RREG, WREG, RDATA å‘½ä»¤ä¹‹åï¼Œéœ€è¦å»¶è¿Ÿ 4 * tCLK = 0.52uS;
+	RDATAC, RESET, SYNC å‘½ä»¤ä¹‹åï¼Œéœ€è¦å»¶è¿Ÿ 24 * tCLK = 3.12uS;
 	
-	Êµ¼Ê²âÊÔ£¬ÔÚ3.3VÉÏµçºó, ¼°Ê±²»×öÈÎºÎÅäÖÃ£¬ADS125µÄDRDY ¿ÚÏß¼´¿ªÊ¼Êä³öÂö³åĞÅºÅ£¨2.6us¸ß,33.4µÍ£¬ÆµÂÊ30KHz£©
+	å®é™…æµ‹è¯•ï¼Œåœ¨3.3Vä¸Šç”µå, åŠæ—¶ä¸åšä»»ä½•é…ç½®ï¼ŒADS125çš„DRDY å£çº¿å³å¼€å§‹è¾“å‡ºè„‰å†²ä¿¡å·ï¼ˆ2.6usé«˜,33.4ä½ï¼Œé¢‘ç‡30KHzï¼‰
 */
 
 /*
-	µ÷ÊÔ¼ÇÂ¼
-	(1) ÉèÖÃ¼Ä´æÆ÷Ê±£¬SCK¹ı¿ìµ¼ÖÂĞ¾Æ¬²»ÄÜÃ¿´Î¶¼ÊÕµ½Êı¾İ¡£Ô­Òò: ·¢ËÍµÄÏàÁÚµÄ×Ö½ÚÖ®¼äĞèÒªÑÓ³ÙÒ»Ğ¡¶ÎÊ±¼ä.
-	(2) Á¬Ğø¸´Î»CPUÊ±£¬Å¼¶û³öÏÖĞ¾Æ¬Êä³ö²ÉÑùÂÊÒì³£¡£
+	è°ƒè¯•è®°å½•
+	(1) è®¾ç½®å¯„å­˜å™¨æ—¶ï¼ŒSCKè¿‡å¿«å¯¼è‡´èŠ¯ç‰‡ä¸èƒ½æ¯æ¬¡éƒ½æ”¶åˆ°æ•°æ®ã€‚åŸå› : å‘é€çš„ç›¸é‚»çš„å­—èŠ‚ä¹‹é—´éœ€è¦å»¶è¿Ÿä¸€å°æ®µæ—¶é—´.
+	(2) è¿ç»­å¤ä½CPUæ—¶ï¼Œå¶å°”å‡ºç°èŠ¯ç‰‡è¾“å‡ºé‡‡æ ·ç‡å¼‚å¸¸ã€‚
 */
 
-#ifdef SOFT_SPI		/* Èí¼şSPI */
-	/* ¶¨ÒåGPIO¶Ë¿Ú */	
-	#define SCK_CLK_ENABLE() 	__HAL_RCC_GPIOA_CLK_ENABLE()
-	#define SCK_GPIO			GPIOA
-	#define SCK_PIN				GPIO_PIN_4
-	#define SCK_1()				SCK_GPIO->BSRRL = SCK_PIN
-	#define SCK_0()				SCK_GPIO->BSRRH = SCK_PIN	
+#ifdef SOFT_SPI /* è½¯ä»¶SPI */
+/* å®šä¹‰GPIOç«¯å£ */
+#define SCK_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define SCK_GPIO GPIOA
+#define SCK_PIN GPIO_PIN_4
+#define SCK_1() SCK_GPIO->BSRRL = SCK_PIN
+#define SCK_0() SCK_GPIO->BSRRH = SCK_PIN
 
-	#define DIN_CLK_ENABLE() 	__HAL_RCC_GPIOG_CLK_ENABLE()
-	#define DIN_GPIO			GPIOG
-	#define DIN_PIN				GPIO_PIN_10
-	#define DIN_1()				DIN_GPIO->BSRRL = DIN_PIN
-	#define DIN_0()				DIN_GPIO->BSRRH = DIN_PIN		
+#define DIN_CLK_ENABLE() __HAL_RCC_GPIOG_CLK_ENABLE()
+#define DIN_GPIO GPIOG
+#define DIN_PIN GPIO_PIN_10
+#define DIN_1() DIN_GPIO->BSRRL = DIN_PIN
+#define DIN_0() DIN_GPIO->BSRRH = DIN_PIN
 
-	#define CS_CLK_ENABLE() 	__HAL_RCC_GPIOC_CLK_ENABLE()
-	#define CS_GPIO				GPIOC
-	#define CS_PIN				GPIO_PIN_7
-	#define CS_1()				CS_GPIO->BSRRL = CS_PIN
-	#define CS_0()				CS_GPIO->BSRRH = CS_PIN		
+#define CS_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define CS_GPIO GPIOC
+#define CS_PIN GPIO_PIN_7
+#define CS_1() CS_GPIO->BSRRL = CS_PIN
+#define CS_0() CS_GPIO->BSRRH = CS_PIN
 
-	#define DOUT_CLK_ENABLE() 	__HAL_RCC_GPIOA_CLK_ENABLE()
-	#define DOUT_GPIO			GPIOA
-	#define DOUT_PIN			GPIO_PIN_5
-	#define DOUT_IS_HIGH()		((DOUT_GPIO->IDR & DOUT_PIN) != 0)
+#define DOUT_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define DOUT_GPIO GPIOA
+#define DOUT_PIN GPIO_PIN_5
+#define DOUT_IS_HIGH() ((DOUT_GPIO->IDR & DOUT_PIN) != 0)
 
-	#define DRDY_CLK_ENABLE() 	__HAL_RCC_GPIOC_CLK_ENABLE()
-	#define DRDY_GPIO			GPIOC
-	#define DRDY_PIN			GPIO_PIN_6
-	#define DRDY_IS_LOW()		((DRDY_GPIO->IDR & DRDY_PIN) == 0)
-	#define DRDY_IRQn 			EXTI9_5_IRQn
-	#define DRDY_IRQHandler		EXTI9_5_IRQHandler	
+#define DRDY_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define DRDY_GPIO GPIOC
+#define DRDY_PIN GPIO_PIN_6
+#define DRDY_IS_LOW() ((DRDY_GPIO->IDR & DRDY_PIN) == 0)
+#define DRDY_IRQn EXTI9_5_IRQn
+#define DRDY_IRQHandler EXTI9_5_IRQHandler
 
-	/* PDWN  <------  PB7       µôµç¿ØÖÆ */
-	#define PWDN_CLK_ENABLE() 	__HAL_RCC_GPIOB_CLK_ENABLE()
-	#define PWDN_GPIO			GPIOB
-	#define PWDN_PIN			GPIO_PIN_7
-	#define PWDN_1()			PWDN_GPIO->BSRRL = PWDN_PIN
-	#define PWDN_0()			PWDN_GPIO->BSRRH = PWDN_PIN		
-	
-	/*  RST   <------  PC3       ¸´Î»ĞÅºÅ	 */
-	#define RST_CLK_ENABLE() 	__HAL_RCC_GPIOC_CLK_ENABLE()
-	#define RST_GPIO			GPIOC
-	#define RST_PIN				GPIO_PIN_3
-	#define RST_1()				RST_GPIO->BSRRL = RST_PIN
-	#define RST_0()				RST_GPIO->BSRRH = RST_PIN		
+/* PDWN  <------  PB7       æ‰ç”µæ§åˆ¶ */
+#define PWDN_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define PWDN_GPIO GPIOB
+#define PWDN_PIN GPIO_PIN_7
+#define PWDN_1() PWDN_GPIO->BSRRL = PWDN_PIN
+#define PWDN_0() PWDN_GPIO->BSRRH = PWDN_PIN
+
+/*  RST   <------  PC3       å¤ä½ä¿¡å·	 */
+#define RST_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define RST_GPIO GPIOC
+#define RST_PIN GPIO_PIN_3
+#define RST_1() RST_GPIO->BSRRL = RST_PIN
+#define RST_0() RST_GPIO->BSRRH = RST_PIN
 #endif
 
-#ifdef HARD_SPI		/* Ó²¼şSPI */
-	;
+#ifdef HARD_SPI /* ç¡¬ä»¶SPI */
+;
 #endif
 
-#define RCC_DRDY             RCC_AHB1Periph_GPIOC
-#define PORT_DRDY            GPIOC
-#define PIN_DRDY             GPIO_PIN_6
+#define RCC_DRDY RCC_AHB1Periph_GPIOC
+#define PORT_DRDY GPIOC
+#define PIN_DRDY GPIO_PIN_6
 #define EXTI_PortSourceGPIOx EXTI_PortSourceGPIOC
-#define EXTI_PinSourcex      EXTI_PinSource6
-#define EXTI_Linex           EXTI_Line6
-#define EXTI_IRQn			 EXTI9_5_IRQn;
+#define EXTI_PinSourcex EXTI_PinSource6
+#define EXTI_Linex EXTI_Line6
+#define EXTI_IRQn EXTI9_5_IRQn;
 
-/* ¼Ä´æÆ÷¶¨Òå£º Table 23. Register Map --- ADS1256Êı¾İÊÖ²áµÚ30Ò³ */
+/* å¯„å­˜å™¨å®šä¹‰ï¼š Table 23. Register Map --- ADS1256æ•°æ®æ‰‹å†Œç¬¬30é¡µ */
 enum
 {
-	/* ¼Ä´æÆ÷µØÖ·£¬ ºóÃæÊÇ¸´Î»ºóÈ±Ê¡Öµ */
-	REG_STATUS = 0,	// x1H
-	REG_MUX    = 1, // 01H
-	REG_ADCON  = 2, // 20H
-	REG_DRATE  = 3, // F0H
-	REG_IO     = 4, // E0H
-	REG_OFC0   = 5, // xxH
-	REG_OFC1   = 6, // xxH
-	REG_OFC2   = 7, // xxH
-	REG_FSC0   = 8, // xxH
-	REG_FSC1   = 9, // xxH
-	REG_FSC2   = 10, // xxH
+	/* å¯„å­˜å™¨åœ°å€ï¼Œ åé¢æ˜¯å¤ä½åç¼ºçœå€¼ */
+	REG_STATUS = 0, // x1H
+	REG_MUX = 1,		// 01H
+	REG_ADCON = 2,	// 20H
+	REG_DRATE = 3,	// F0H
+	REG_IO = 4,			// E0H
+	REG_OFC0 = 5,		// xxH
+	REG_OFC1 = 6,		// xxH
+	REG_OFC2 = 7,		// xxH
+	REG_FSC0 = 8,		// xxH
+	REG_FSC1 = 9,		// xxH
+	REG_FSC2 = 10,	// xxH
 };
 
-/* ÃüÁî¶¨Òå£º TTable 24. Command Definitions --- ADS1256Êı¾İÊÖ²áµÚ34Ò³ */
+/* å‘½ä»¤å®šä¹‰ï¼š TTable 24. Command Definitions --- ADS1256æ•°æ®æ‰‹å†Œç¬¬34é¡µ */
 enum
 {
-	CMD_WAKEUP  = 0x00,	// Completes SYNC and Exits Standby Mode 0000  0000 (00h)
-	CMD_RDATA   = 0x01, // Read Data 0000  0001 (01h)
-	CMD_RDATAC  = 0x03, // Read Data Continuously 0000   0011 (03h)
-	CMD_SDATAC  = 0x0F, // Stop Read Data Continuously 0000   1111 (0Fh)
-	CMD_RREG    = 0x10, // Read from REG rrr 0001 rrrr (1xh)
-	CMD_WREG    = 0x50, // Write to REG rrr 0101 rrrr (5xh)
-	CMD_SELFCAL = 0xF0, // Offset and Gain Self-Calibration 1111    0000 (F0h)
-	CMD_SELFOCAL= 0xF1, // Offset Self-Calibration 1111    0001 (F1h)
-	CMD_SELFGCAL= 0xF2, // Gain Self-Calibration 1111    0010 (F2h)
-	CMD_SYSOCAL = 0xF3, // System Offset Calibration 1111   0011 (F3h)
-	CMD_SYSGCAL = 0xF4, // System Gain Calibration 1111    0100 (F4h)
-	CMD_SYNC    = 0xFC, // Synchronize the A/D Conversion 1111   1100 (FCh)
-	CMD_STANDBY = 0xFD, // Begin Standby Mode 1111   1101 (FDh)
-	CMD_RESET   = 0xFE, // Reset to Power-Up Values 1111   1110 (FEh)
+	CMD_WAKEUP = 0x00,	 // Completes SYNC and Exits Standby Mode 0000  0000 (00h)
+	CMD_RDATA = 0x01,		 // Read Data 0000  0001 (01h)
+	CMD_RDATAC = 0x03,	 // Read Data Continuously 0000   0011 (03h)
+	CMD_SDATAC = 0x0F,	 // Stop Read Data Continuously 0000   1111 (0Fh)
+	CMD_RREG = 0x10,		 // Read from REG rrr 0001 rrrr (1xh)
+	CMD_WREG = 0x50,		 // Write to REG rrr 0101 rrrr (5xh)
+	CMD_SELFCAL = 0xF0,	// Offset and Gain Self-Calibration 1111    0000 (F0h)
+	CMD_SELFOCAL = 0xF1, // Offset Self-Calibration 1111    0001 (F1h)
+	CMD_SELFGCAL = 0xF2, // Gain Self-Calibration 1111    0010 (F2h)
+	CMD_SYSOCAL = 0xF3,	// System Offset Calibration 1111   0011 (F3h)
+	CMD_SYSGCAL = 0xF4,	// System Gain Calibration 1111    0100 (F4h)
+	CMD_SYNC = 0xFC,		 // Synchronize the A/D Conversion 1111   1100 (FCh)
+	CMD_STANDBY = 0xFD,	// Begin Standby Mode 1111   1101 (FDh)
+	CMD_RESET = 0xFE,		 // Reset to Power-Up Values 1111   1110 (FEh)
 };
 
 static void ADS1256_Send8Bit(uint8_t _data);
@@ -180,46 +180,45 @@ static void ADS1256_SetChannal(uint8_t _ch);
 //static void ADS1256_SetDiffChannal(uint8_t _ch);
 
 ADS1256_VAR_T g_tADS1256;
-static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] = 
-{
-	0xF0,		/* ¸´Î»Ê±È±Ê¡Öµ */
-	0xE0,
-	0xD0,
-	0xC0,
-	0xB0,
-	0xA1,
-	0x92,
-	0x82,
-	0x72,
-	0x63,
-	0x53,
-	0x43,
-	0x33,
-	0x20,
-	0x13,
-	0x03
-};
+static const uint8_t s_tabDataRate[ADS1256_DRATE_MAX] =
+		{
+				0xF0, /* å¤ä½æ—¶ç¼ºçœå€¼ */
+				0xE0,
+				0xD0,
+				0xC0,
+				0xB0,
+				0xA1,
+				0x92,
+				0x82,
+				0x72,
+				0x63,
+				0x53,
+				0x43,
+				0x33,
+				0x20,
+				0x13,
+				0x03};
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitADS1256
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSTM32µÄGPIOºÍSPI½Ó¿Ú£¬ÓÃÓÚÁ¬½Ó ADS1256
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitADS1256
+*	åŠŸèƒ½è¯´æ˜: é…ç½®STM32çš„GPIOå’ŒSPIæ¥å£ï¼Œç”¨äºè¿æ¥ ADS1256
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitADS1256(void)
 {
 #ifdef SOFT_SPI
 	GPIO_InitTypeDef gpio_init;
-	
+
 	RST_1();
 	PWDN_1();
 	CS_1();
-	SCK_0();		/* SPI×ÜÏß¿ÕÏĞÊ±£¬ÖÓÏßÊÇµÍµçÆ½ */
+	SCK_0(); /* SPIæ€»çº¿ç©ºé—²æ—¶ï¼Œé’Ÿçº¿æ˜¯ä½ç”µå¹³ */
 	DIN_1();
 
-	/* ´ò¿ªGPIOÊ±ÖÓ */
+	/* æ‰“å¼€GPIOæ—¶é’Ÿ */
 	SCK_CLK_ENABLE();
 	DIN_CLK_ENABLE();
 	CS_CLK_ENABLE();
@@ -228,62 +227,62 @@ void bsp_InitADS1256(void)
 	PWDN_CLK_ENABLE();
 	RST_CLK_ENABLE();
 
-	/* ÅäÖÃ¼¸¸öÍÆÍêÊä³öIO */
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* ÉèÖÃÍÆÍìÊä³ö */
-	gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */		
-	
-	gpio_init.Pin = SCK_PIN;	
-	HAL_GPIO_Init(SCK_GPIO, &gpio_init);	
+	/* é…ç½®å‡ ä¸ªæ¨å®Œè¾“å‡ºIO */
+	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+	gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
 
-	gpio_init.Pin = DIN_PIN;	
-	HAL_GPIO_Init(DIN_GPIO, &gpio_init);	
-	
-	gpio_init.Pin = CS_PIN;	
-	HAL_GPIO_Init(CS_GPIO, &gpio_init);	
+	gpio_init.Pin = SCK_PIN;
+	HAL_GPIO_Init(SCK_GPIO, &gpio_init);
 
-	gpio_init.Pin = PWDN_PIN;	
-	HAL_GPIO_Init(PWDN_GPIO, &gpio_init);	
+	gpio_init.Pin = DIN_PIN;
+	HAL_GPIO_Init(DIN_GPIO, &gpio_init);
 
-	/* DRDY ÉèÖÃÎªÊäÈë */
-	gpio_init.Mode = GPIO_MODE_INPUT;			/* ÉèÖÃÊäÈë */
-	gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */
-	
-	gpio_init.Pin = DRDY_PIN;	
-	HAL_GPIO_Init(DRDY_GPIO, &gpio_init);	
+	gpio_init.Pin = CS_PIN;
+	HAL_GPIO_Init(CS_GPIO, &gpio_init);
 
-	gpio_init.Pin = DOUT_PIN;	
-	HAL_GPIO_Init(DOUT_GPIO, &gpio_init);	
+	gpio_init.Pin = PWDN_PIN;
+	HAL_GPIO_Init(PWDN_GPIO, &gpio_init);
+
+	/* DRDY è®¾ç½®ä¸ºè¾“å…¥ */
+	gpio_init.Mode = GPIO_MODE_INPUT;				/* è®¾ç½®è¾“å…¥ */
+	gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
+
+	gpio_init.Pin = DRDY_PIN;
+	HAL_GPIO_Init(DRDY_GPIO, &gpio_init);
+
+	gpio_init.Pin = DOUT_PIN;
+	HAL_GPIO_Init(DOUT_GPIO, &gpio_init);
 #endif
-		
-	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* ÅäÖÃADC²ÎÊı£º ÔöÒæ1:1, Êı¾İÊä³öËÙÂÊ 1KHz */
+
+	//ADS1256_CfgADC(ADS1256_GAIN_1, ADS1256_1000SPS);	/* é…ç½®ADCå‚æ•°ï¼š å¢ç›Š1:1, æ•°æ®è¾“å‡ºé€Ÿç‡ 1KHz */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_CfgADC
-*	¹¦ÄÜËµÃ÷: ÅäÖÃADC²ÎÊı£¬ÔöÒæºÍÊı¾İÊä³öËÙÂÊ
-*	ĞÎ    ²Î: _gain : ÔöÒæ
-*			  _drate : Êı¾İÊä³öËÙÂÊ 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_CfgADC
+*	åŠŸèƒ½è¯´æ˜: é…ç½®ADCå‚æ•°ï¼Œå¢ç›Šå’Œæ•°æ®è¾“å‡ºé€Ÿç‡
+*	å½¢    å‚: _gain : å¢ç›Š
+*			  _drate : æ•°æ®è¾“å‡ºé€Ÿç‡ 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
-{	
+{
 	g_tADS1256.Gain = _gain;
 	g_tADS1256.DataRate = _drate;
-	
-	ADS1256_StopScan();			/* ÔİÍ£CPUÖĞ¶Ï */
-	
-	ADS1256_ResetHard();		/* Ó²¼ş¸´Î» */
+
+	ADS1256_StopScan(); /* æš‚åœCPUä¸­æ–­ */
+
+	ADS1256_ResetHard(); /* ç¡¬ä»¶å¤ä½ */
 
 	ADS1256_WaitDRDY();
 
 	{
-		uint8_t buf[4];		/* Ôİ´æADS1256 ¼Ä´æÆ÷ÅäÖÃ²ÎÊı£¬Ö®ºóÁ¬ĞøĞ´4¸ö¼Ä´æÆ÷ */
-		
-		/* ×´Ì¬¼Ä´æÆ÷¶¨Òå
+		uint8_t buf[4]; /* æš‚å­˜ADS1256 å¯„å­˜å™¨é…ç½®å‚æ•°ï¼Œä¹‹åè¿ç»­å†™4ä¸ªå¯„å­˜å™¨ */
+
+		/* çŠ¶æ€å¯„å­˜å™¨å®šä¹‰
 			Bits 7-4 ID3, ID2, ID1, ID0  Factory Programmed Identification Bits (Read Only)
 		
 			Bit 3 ORDER: Data Output Bit Order
@@ -306,12 +305,12 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 			Bit 0 DRDY :  Data Ready (Read Only)	
 				This bit duplicates the state of the DRDY pin.
 
-			ACAL=1Ê¹ÄÜ×ÔĞ£×¼¹¦ÄÜ¡£µ± PGA£¬BUFEEN, DRATE¸Ä±äÊ±»áÆô¶¯×ÔĞ£×¼
+			ACAL=1ä½¿èƒ½è‡ªæ ¡å‡†åŠŸèƒ½ã€‚å½“ PGAï¼ŒBUFEEN, DRATEæ”¹å˜æ—¶ä¼šå¯åŠ¨è‡ªæ ¡å‡†
 		*/
 		buf[0] = (0 << 3) | (1 << 2) | (1 << 1);
 		//ADS1256_WriteReg(REG_STATUS, (0 << 3) | (1 << 2) | (1 << 1));
-		
-		buf[1] = 0x08;	/* ¸ßËÄÎ»0±íÊ¾AINP½Ó AIN0,  µÍËÄÎ»8±íÊ¾ AINN ¹Ì¶¨½Ó AINCOM */
+
+		buf[1] = 0x08; /* é«˜å››ä½0è¡¨ç¤ºAINPæ¥ AIN0,  ä½å››ä½8è¡¨ç¤º AINN å›ºå®šæ¥ AINCOM */
 
 		/*	ADCON: A/D Control Register (Address 02h)
 			Bit 7 Reserved, always 0 (Read Only)
@@ -324,9 +323,9 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 
 			Bits 4-2 SDCS1, SCDS0: Sensor Detect Current Sources
 				00 = Sensor Detect OFF (default)
-				01 = Sensor Detect Current = 0.5 ¦Ì A
-				10 = Sensor Detect Current = 2 ¦Ì A
-				11 = Sensor Detect Current = 10¦Ì A
+				01 = Sensor Detect Current = 0.5 Î¼ A
+				10 = Sensor Detect Current = 2 Î¼ A
+				11 = Sensor Detect Current = 10Î¼ A
 				The Sensor Detect Current Sources can be activated to verify  the integrity of an external sensor supplying a signal to the
 				ADS1255/6. A shorted sensor produces a very small signal while an open-circuit sensor produces a very large signal.
 
@@ -341,32 +340,32 @@ void ADS1256_CfgADC(ADS1256_GAIN_E _gain, ADS1256_DRATE_E _drate)
 				111 = 64
 		*/
 		buf[2] = (0 << 5) | (0 << 2) | (_gain << 1);
-		//ADS1256_WriteReg(REG_ADCON, (0 << 5) | (0 << 2) | (GAIN_1 << 1));	/* Ñ¡Ôñ1;1ÔöÒæ, ÊäÈëÕı¸º5V */
+		//ADS1256_WriteReg(REG_ADCON, (0 << 5) | (0 << 2) | (GAIN_1 << 1));	/* é€‰æ‹©1;1å¢ç›Š, è¾“å…¥æ­£è´Ÿ5V */
 
-		/* ÒòÎªÇĞ»»Í¨µÀºÍ¶ÁÊı¾İºÄÊ± 123uS, Òò´ËÉ¨ÃèÖĞ¶ÏÄ£Ê½¹¤×÷Ê±£¬×î´óËÙÂÊ = DRATE_1000SPS */
-		buf[3] = s_tabDataRate[_drate];	// DRATE_10SPS;	/* Ñ¡ÔñÊı¾İÊä³öËÙÂÊ */
-		
-		CS_0();	/* SPIÆ¬Ñ¡ = 0 */
-		ADS1256_Send8Bit(CMD_WREG | 0);	/* Ğ´¼Ä´æÆ÷µÄÃüÁî, ²¢·¢ËÍ¼Ä´æÆ÷µØÖ· */
-		ADS1256_Send8Bit(0x03);			/* ¼Ä´æÆ÷¸öÊı - 1, ´Ë´¦3±íÊ¾Ğ´4¸ö¼Ä´æÆ÷ */
-		
-		ADS1256_Send8Bit(buf[0]);	/* ÉèÖÃ×´Ì¬¼Ä´æÆ÷ */
-		ADS1256_Send8Bit(buf[1]);	/* ÉèÖÃÊäÈëÍ¨µÀ²ÎÊı */
-		ADS1256_Send8Bit(buf[2]);	/* ÉèÖÃADCON¿ØÖÆ¼Ä´æÆ÷£¬ÔöÒæ */
-		ADS1256_Send8Bit(buf[3]);	/* ÉèÖÃÊä³öÊı¾İËÙÂÊ */
-		
-		CS_1();	/* SPIÆ¬Ñ¡ = 1 */		
+		/* å› ä¸ºåˆ‡æ¢é€šé“å’Œè¯»æ•°æ®è€—æ—¶ 123uS, å› æ­¤æ‰«æä¸­æ–­æ¨¡å¼å·¥ä½œæ—¶ï¼Œæœ€å¤§é€Ÿç‡ = DRATE_1000SPS */
+		buf[3] = s_tabDataRate[_drate]; // DRATE_10SPS;	/* é€‰æ‹©æ•°æ®è¾“å‡ºé€Ÿç‡ */
+
+		CS_0();													/* SPIç‰‡é€‰ = 0 */
+		ADS1256_Send8Bit(CMD_WREG | 0); /* å†™å¯„å­˜å™¨çš„å‘½ä»¤, å¹¶å‘é€å¯„å­˜å™¨åœ°å€ */
+		ADS1256_Send8Bit(0x03);					/* å¯„å­˜å™¨ä¸ªæ•° - 1, æ­¤å¤„3è¡¨ç¤ºå†™4ä¸ªå¯„å­˜å™¨ */
+
+		ADS1256_Send8Bit(buf[0]); /* è®¾ç½®çŠ¶æ€å¯„å­˜å™¨ */
+		ADS1256_Send8Bit(buf[1]); /* è®¾ç½®è¾“å…¥é€šé“å‚æ•° */
+		ADS1256_Send8Bit(buf[2]); /* è®¾ç½®ADCONæ§åˆ¶å¯„å­˜å™¨ï¼Œå¢ç›Š */
+		ADS1256_Send8Bit(buf[3]); /* è®¾ç½®è¾“å‡ºæ•°æ®é€Ÿç‡ */
+
+		CS_1(); /* SPIç‰‡é€‰ = 1 */
 	}
 
-	bsp_DelayUS(50);	
+	bsp_DelayUS(50);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_DelaySCLK
-*	¹¦ÄÜËµÃ÷: CLKÖ®¼äµÄÑÓ³Ù£¬Ê±ĞòÑÓ³Ù. ÓÃÓÚSTM32F407  168MÖ÷Æµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_DelaySCLK
+*	åŠŸèƒ½è¯´æ˜: CLKä¹‹é—´çš„å»¶è¿Ÿï¼Œæ—¶åºå»¶è¿Ÿ. ç”¨äºSTM32F407  168Mä¸»é¢‘
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_DelaySCLK(void)
@@ -374,71 +373,72 @@ static void ADS1256_DelaySCLK(void)
 	uint16_t i;
 
 	/* 
-		È¡ 5 Ê±£¬Êµ²â¸ßµçÆ½200ns, µÍµçÆ½250ns <-- ²»ÎÈ¶¨ 
-		È¡ 10 ÒÔÉÏ£¬¿ÉÒÔÕı³£¹¤×÷£¬ µÍµçÆ½400ns ¸ß¶¨400ns <--- ÎÈ¶¨
+		å– 5 æ—¶ï¼Œå®æµ‹é«˜ç”µå¹³200ns, ä½ç”µå¹³250ns <-- ä¸ç¨³å®š 
+		å– 10 ä»¥ä¸Šï¼Œå¯ä»¥æ­£å¸¸å·¥ä½œï¼Œ ä½ç”µå¹³400ns é«˜å®š400ns <--- ç¨³å®š
 	*/
-	for (i = 0; i < 10; i++);
+	for (i = 0; i < 10; i++)
+		;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_DelayDATA
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡DOUTÖ®Ç°µÄÑÓ³Ù
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_DelayDATA
+*	åŠŸèƒ½è¯´æ˜: è¯»å–DOUTä¹‹å‰çš„å»¶è¿Ÿ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_DelayDATA(void)
 {
 	/*  
 		Delay from last SCLK edge for DIN to first SCLK rising edge for DOUT: RDATA, RDATAC,RREG Commands 
-		×îĞ¡ 50 ¸ötCLK = 50 * 0.13uS = 6.5uS
+		æœ€å° 50 ä¸ªtCLK = 50 * 0.13uS = 6.5uS
 	*/
-	bsp_DelayUS(10);	/* ×îĞ¡ÑÓ³Ù 6.5uS, ´Ë´¦È¡10us */
+	bsp_DelayUS(10); /* æœ€å°å»¶è¿Ÿ 6.5uS, æ­¤å¤„å–10us */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ResetHard
-*	¹¦ÄÜËµÃ÷: Ó²¼ş¸´Î» ADS1256Ğ¾Æ¬.µÍµçÆ½¸´Î»¡£×î¿ì4¸öÊ±ÖÓ£¬Ò²¾ÍÊÇ 4x0.13uS = 0.52uS
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_ResetHard
+*	åŠŸèƒ½è¯´æ˜: ç¡¬ä»¶å¤ä½ ADS1256èŠ¯ç‰‡.ä½ç”µå¹³å¤ä½ã€‚æœ€å¿«4ä¸ªæ—¶é’Ÿï¼Œä¹Ÿå°±æ˜¯ 4x0.13uS = 0.52uS
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_ResetHard(void)
 {
-	/* ADS1256Êı¾İÊÖ²áµÚ7Ò³ */
-	RST_0();			/* ¸´Î» */
+	/* ADS1256æ•°æ®æ‰‹å†Œç¬¬7é¡µ */
+	RST_0(); /* å¤ä½ */
 	bsp_DelayUS(5);
 	RST_1();
 
-	//PWDN_0();			/* ½øÈëµôµç Í¬²½*/
-	//bsp_DelayUS(2);	
-	//PWDN_1();			/* ÍË³öµôµç */
-	
+	//PWDN_0();			/* è¿›å…¥æ‰ç”µ åŒæ­¥*/
+	//bsp_DelayUS(2);
+	//PWDN_1();			/* é€€å‡ºæ‰ç”µ */
+
 	bsp_DelayUS(5);
-	
-	//ADS1256_WaitDRDY();	/* µÈ´ı DRDY±äÎª0, ´Ë¹ı³ÌÊµ²â: 630us */
+
+	//ADS1256_WaitDRDY();	/* ç­‰å¾… DRDYå˜ä¸º0, æ­¤è¿‡ç¨‹å®æµ‹: 630us */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_Send8Bit
-*	¹¦ÄÜËµÃ÷: ÏòSPI×ÜÏß·¢ËÍ8¸öbitÊı¾İ¡£ ²»´øCS¿ØÖÆ¡£
-*	ĞÎ    ²Î: _data : Êı¾İ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_Send8Bit
+*	åŠŸèƒ½è¯´æ˜: å‘SPIæ€»çº¿å‘é€8ä¸ªbitæ•°æ®ã€‚ ä¸å¸¦CSæ§åˆ¶ã€‚
+*	å½¢    å‚: _data : æ•°æ®
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_Send8Bit(uint8_t _data)
 {
 	uint8_t i;
 
-	/* Á¬Ğø·¢ËÍ¶à¸ö×Ö½ÚÊ±£¬ĞèÒªÑÓ³ÙÒ»ÏÂ */
+	/* è¿ç»­å‘é€å¤šä¸ªå­—èŠ‚æ—¶ï¼Œéœ€è¦å»¶è¿Ÿä¸€ä¸‹ */
 	ADS1256_DelaySCLK();
 	ADS1256_DelaySCLK();
 
-	/*¡¡ADS1256 ÒªÇó SCL¸ßµçÆ½ºÍµÍµçÆ½³ÖĞøÊ±¼ä×îĞ¡ 200ns  */
-	for(i = 0; i < 8; i++)
+	/*ã€€ADS1256 è¦æ±‚ SCLé«˜ç”µå¹³å’Œä½ç”µå¹³æŒç»­æ—¶é—´æœ€å° 200ns  */
+	for (i = 0; i < 8; i++)
 	{
 		if (_data & 0x80)
 		{
@@ -448,20 +448,20 @@ static void ADS1256_Send8Bit(uint8_t _data)
 		{
 			DIN_0();
 		}
-		SCK_1();				
-		ADS1256_DelaySCLK();		
-		_data <<= 1;		
-		SCK_0();			/* <----  ADS1256 ÊÇÔÚSCKÏÂ½µÑØ²ÉÑùDINÊı¾İ, Êı¾İ±ØĞëÎ¬³Ö 50nS */
-		ADS1256_DelaySCLK();		
+		SCK_1();
+		ADS1256_DelaySCLK();
+		_data <<= 1;
+		SCK_0(); /* <----  ADS1256 æ˜¯åœ¨SCKä¸‹é™æ²¿é‡‡æ ·DINæ•°æ®, æ•°æ®å¿…é¡»ç»´æŒ 50nS */
+		ADS1256_DelaySCLK();
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_Recive8Bit
-*	¹¦ÄÜËµÃ÷: ´ÓSPI×ÜÏß½ÓÊÕ8¸öbitÊı¾İ¡£ ²»´øCS¿ØÖÆ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_Recive8Bit
+*	åŠŸèƒ½è¯´æ˜: ä»SPIæ€»çº¿æ¥æ”¶8ä¸ªbitæ•°æ®ã€‚ ä¸å¸¦CSæ§åˆ¶ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static uint8_t ADS1256_Recive8Bit(void)
@@ -470,17 +470,17 @@ static uint8_t ADS1256_Recive8Bit(void)
 	uint8_t read = 0;
 
 	ADS1256_DelaySCLK();
-	/*¡¡ADS1256 ÒªÇó SCL¸ßµçÆ½ºÍµÍµçÆ½³ÖĞøÊ±¼ä×îĞ¡ 200ns  */
+	/*ã€€ADS1256 è¦æ±‚ SCLé«˜ç”µå¹³å’Œä½ç”µå¹³æŒç»­æ—¶é—´æœ€å° 200ns  */
 	for (i = 0; i < 8; i++)
 	{
 		SCK_1();
 		ADS1256_DelaySCLK();
-		read = read<<1;
+		read = read << 1;
 		SCK_0();
 		if (DOUT_IS_HIGH())
 		{
 			read++;
-		}		
+		}
 		ADS1256_DelaySCLK();
 	}
 	return read;
@@ -488,69 +488,69 @@ static uint8_t ADS1256_Recive8Bit(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_WriteReg
-*	¹¦ÄÜËµÃ÷: Ğ´Ö¸¶¨µÄ¼Ä´æÆ÷
-*	ĞÎ    ²Î:  _RegID : ¼Ä´æÆ÷ID
-*			  _RegValue : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_WriteReg
+*	åŠŸèƒ½è¯´æ˜: å†™æŒ‡å®šçš„å¯„å­˜å™¨
+*	å½¢    å‚:  _RegID : å¯„å­˜å™¨ID
+*			  _RegValue : å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_WriteReg(uint8_t _RegID, uint8_t _RegValue)
 {
-	CS_0();	/* SPIÆ¬Ñ¡ = 0 */
-	ADS1256_Send8Bit(CMD_WREG | _RegID);	/* Ğ´¼Ä´æÆ÷µÄÃüÁî, ²¢·¢ËÍ¼Ä´æÆ÷µØÖ· */
-	ADS1256_Send8Bit(0x00);		/* ¼Ä´æÆ÷¸öÊı - 1, ´Ë´¦Ğ´1¸ö¼Ä´æÆ÷ */
-	
-	ADS1256_Send8Bit(_RegValue);	/* ·¢ËÍ¼Ä´æÆ÷Öµ */
-	CS_1();	/* SPIÆ¬Ñ¡ = 1 */
+	CS_0();															 /* SPIç‰‡é€‰ = 0 */
+	ADS1256_Send8Bit(CMD_WREG | _RegID); /* å†™å¯„å­˜å™¨çš„å‘½ä»¤, å¹¶å‘é€å¯„å­˜å™¨åœ°å€ */
+	ADS1256_Send8Bit(0x00);							 /* å¯„å­˜å™¨ä¸ªæ•° - 1, æ­¤å¤„å†™1ä¸ªå¯„å­˜å™¨ */
+
+	ADS1256_Send8Bit(_RegValue); /* å‘é€å¯„å­˜å™¨å€¼ */
+	CS_1();											 /* SPIç‰‡é€‰ = 1 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ReadReg
-*	¹¦ÄÜËµÃ÷: Ğ´Ö¸¶¨µÄ¼Ä´æÆ÷
-*	ĞÎ    ²Î:  _RegID : ¼Ä´æÆ÷ID
-*			  _RegValue : ¼Ä´æÆ÷Öµ¡£
-*	·µ »Ø Öµ: ¶Áµ½µÄ¼Ä´æÆ÷Öµ¡£
+*	å‡½ æ•° å: ADS1256_ReadReg
+*	åŠŸèƒ½è¯´æ˜: å†™æŒ‡å®šçš„å¯„å­˜å™¨
+*	å½¢    å‚:  _RegID : å¯„å­˜å™¨ID
+*			  _RegValue : å¯„å­˜å™¨å€¼ã€‚
+*	è¿” å› å€¼: è¯»åˆ°çš„å¯„å­˜å™¨å€¼ã€‚
 *********************************************************************************************************
 */
 static uint8_t ADS1256_ReadReg(uint8_t _RegID)
 {
 	uint8_t read;
 
-	CS_0();	/* SPIÆ¬Ñ¡ = 0 */
-	ADS1256_Send8Bit(CMD_RREG | _RegID);	/* Ğ´¼Ä´æÆ÷µÄÃüÁî, ²¢·¢ËÍ¼Ä´æÆ÷µØÖ· */
-	ADS1256_Send8Bit(0x00);	/* ¼Ä´æÆ÷¸öÊı - 1, ´Ë´¦¶Á1¸ö¼Ä´æÆ÷ */
-	
-	ADS1256_DelayDATA();	/* ±ØĞëÑÓ³Ù²ÅÄÜ¶ÁÈ¡Ğ¾Æ¬·µ»ØÊı¾İ */
-	
-	read = ADS1256_Recive8Bit();	/* ¶Á¼Ä´æÆ÷Öµ */
-	CS_1();	/* SPIÆ¬Ñ¡ = 1 */
+	CS_0();															 /* SPIç‰‡é€‰ = 0 */
+	ADS1256_Send8Bit(CMD_RREG | _RegID); /* å†™å¯„å­˜å™¨çš„å‘½ä»¤, å¹¶å‘é€å¯„å­˜å™¨åœ°å€ */
+	ADS1256_Send8Bit(0x00);							 /* å¯„å­˜å™¨ä¸ªæ•° - 1, æ­¤å¤„è¯»1ä¸ªå¯„å­˜å™¨ */
+
+	ADS1256_DelayDATA(); /* å¿…é¡»å»¶è¿Ÿæ‰èƒ½è¯»å–èŠ¯ç‰‡è¿”å›æ•°æ® */
+
+	read = ADS1256_Recive8Bit(); /* è¯»å¯„å­˜å™¨å€¼ */
+	CS_1();											 /* SPIç‰‡é€‰ = 1 */
 
 	return read;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_WriteCmd
-*	¹¦ÄÜËµÃ÷: ·¢ËÍµ¥×Ö½ÚÃüÁî
-*	ĞÎ    ²Î:  _cmd : ÃüÁî
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_WriteCmd
+*	åŠŸèƒ½è¯´æ˜: å‘é€å•å­—èŠ‚å‘½ä»¤
+*	å½¢    å‚:  _cmd : å‘½ä»¤
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_WriteCmd(uint8_t _cmd)
 {
-	CS_0();	/* SPIÆ¬Ñ¡ = 0 */
+	CS_0(); /* SPIç‰‡é€‰ = 0 */
 	ADS1256_Send8Bit(_cmd);
-	CS_1();	/* SPIÆ¬Ñ¡ = 1 */
+	CS_1(); /* SPIç‰‡é€‰ = 1 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ReadChipID
-*	¹¦ÄÜËµÃ÷: ¶ÁĞ¾Æ¬ID, ¶Á×´Ì¬¼Ä´æÆ÷ÖĞµÄ¸ß4bit
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 8bit×´Ì¬¼Ä´æÆ÷ÖµµÄ¸ß4Î»
+*	å‡½ æ•° å: ADS1256_ReadChipID
+*	åŠŸèƒ½è¯´æ˜: è¯»èŠ¯ç‰‡ID, è¯»çŠ¶æ€å¯„å­˜å™¨ä¸­çš„é«˜4bit
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 8bitçŠ¶æ€å¯„å­˜å™¨å€¼çš„é«˜4ä½
 *********************************************************************************************************
 */
 uint8_t ADS1256_ReadChipID(void)
@@ -564,10 +564,10 @@ uint8_t ADS1256_ReadChipID(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_SetChannal
-*	¹¦ÄÜËµÃ÷: ÅäÖÃÍ¨µÀºÅ¡£¶àÂ·¸´ÓÃ¡£AIN- ¹Ì¶¨½ÓµØ£¨ACOM).
-*	ĞÎ    ²Î: _ch : Í¨µÀºÅ£¬ 0-7
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_SetChannal
+*	åŠŸèƒ½è¯´æ˜: é…ç½®é€šé“å·ã€‚å¤šè·¯å¤ç”¨ã€‚AIN- å›ºå®šæ¥åœ°ï¼ˆACOM).
+*	å½¢    å‚: _ch : é€šé“å·ï¼Œ 0-7
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_SetChannal(uint8_t _ch)
@@ -582,7 +582,7 @@ static void ADS1256_SetChannal(uint8_t _ch)
 		0101 = AIN5 (ADS1256 only)
 		0110 = AIN6 (ADS1256 only)
 		0111 = AIN7 (ADS1256 only)
-		1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are ¡°don¡¯t care¡±)
+		1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are â€œdonâ€™t careâ€)
 
 		NOTE: When using an ADS1255 make sure to only select the available inputs.
 
@@ -595,21 +595,21 @@ static void ADS1256_SetChannal(uint8_t _ch)
 		0101 = AIN5 (ADS1256 only)
 		0110 = AIN6 (ADS1256 only)
 		0111 = AIN7 (ADS1256 only)
-		1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are ¡°don¡¯t care¡±)
+		1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are â€œdonâ€™t careâ€)
 	*/
 	if (_ch > 7)
 	{
 		return;
 	}
-	ADS1256_WriteReg(REG_MUX, (_ch << 4) | (1 << 3));	/* Bit3 = 1, AINN ¹Ì¶¨½Ó AINCOM */
+	ADS1256_WriteReg(REG_MUX, (_ch << 4) | (1 << 3)); /* Bit3 = 1, AINN å›ºå®šæ¥ AINCOM */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_SetDiffChannal
-*	¹¦ÄÜËµÃ÷: ÅäÖÃ²î·ÖÍ¨µÀºÅ¡£¶àÂ·¸´ÓÃ¡£
-*	ĞÎ    ²Î: _ch : Í¨µÀºÅ,0-3£»¹²4¶Ô
-*	·µ »Ø Öµ: 8bit×´Ì¬¼Ä´æÆ÷ÖµµÄ¸ß4Î»
+*	å‡½ æ•° å: ADS1256_SetDiffChannal
+*	åŠŸèƒ½è¯´æ˜: é…ç½®å·®åˆ†é€šé“å·ã€‚å¤šè·¯å¤ç”¨ã€‚
+*	å½¢    å‚: _ch : é€šé“å·,0-3ï¼›å…±4å¯¹
+*	è¿” å› å€¼: 8bitçŠ¶æ€å¯„å­˜å™¨å€¼çš„é«˜4ä½
 *********************************************************************************************************
 */
 #if 0
@@ -625,7 +625,7 @@ static void ADS1256_SetDiffChannal(uint8_t _ch)
 		0101 = AIN5 (ADS1256 only)
 		0110 = AIN6 (ADS1256 only)
 		0111 = AIN7 (ADS1256 only)
-		1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are ¡°don¡¯t care¡±)
+		1xxx = AINCOM (when PSEL3 = 1, PSEL2, PSEL1, PSEL0 are â€œdonâ€™t careâ€)
 
 		NOTE: When using an ADS1255 make sure to only select the available inputs.
 
@@ -638,33 +638,33 @@ static void ADS1256_SetDiffChannal(uint8_t _ch)
 		0101 = AIN5 (ADS1256 only)
 		0110 = AIN6 (ADS1256 only)
 		0111 = AIN7 (ADS1256 only)
-		1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are ¡°don¡¯t care¡±)
+		1xxx = AINCOM (when NSEL3 = 1, NSEL2, NSEL1, NSEL0 are â€œdonâ€™t careâ€)
 	*/
 	if (_ch == 0)
 	{
-		ADS1256_WriteReg(REG_MUX, (0 << 4) | 1);	/* ²î·ÖÊäÈë AIN0£¬ AIN1 */
+		ADS1256_WriteReg(REG_MUX, (0 << 4) | 1);	/* å·®åˆ†è¾“å…¥ AIN0ï¼Œ AIN1 */
 	}
 	else if (_ch == 1)
 	{
-		ADS1256_WriteReg(REG_MUX, (2 << 4) | 3);	/* ²î·ÖÊäÈë AIN2£¬ AIN3 */
+		ADS1256_WriteReg(REG_MUX, (2 << 4) | 3);	/* å·®åˆ†è¾“å…¥ AIN2ï¼Œ AIN3 */
 	}
 	else if (_ch == 2)
 	{
-		ADS1256_WriteReg(REG_MUX, (4 << 4) | 5);	/* ²î·ÖÊäÈë AIN4£¬ AIN5 */
+		ADS1256_WriteReg(REG_MUX, (4 << 4) | 5);	/* å·®åˆ†è¾“å…¥ AIN4ï¼Œ AIN5 */
 	}
 	else if (_ch == 3)
 	{
-		ADS1256_WriteReg(REG_MUX, (6 << 4) | 7);	/* ²î·ÖÊäÈë AIN6£¬ AIN7 */
+		ADS1256_WriteReg(REG_MUX, (6 << 4) | 7);	/* å·®åˆ†è¾“å…¥ AIN6ï¼Œ AIN7 */
 	}
 }
 #endif
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_WaitDRDY
-*	¹¦ÄÜËµÃ÷: µÈ´ıÄÚ²¿²Ù×÷Íê³É¡£ ×ÔĞ£×¼Ê±¼ä½Ï³¤£¬ĞèÒªµÈ´ı¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_WaitDRDY
+*	åŠŸèƒ½è¯´æ˜: ç­‰å¾…å†…éƒ¨æ“ä½œå®Œæˆã€‚ è‡ªæ ¡å‡†æ—¶é—´è¾ƒé•¿ï¼Œéœ€è¦ç­‰å¾…ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ADS1256_WaitDRDY(void)
@@ -680,229 +680,229 @@ static void ADS1256_WaitDRDY(void)
 	}
 	if (i >= 40000000)
 	{
-		printf("ADS1256_WaitDRDY() Time Out ...\r\n");		/* µ÷ÊÔÓï¾ä. ÓÃÓïÅÅ´í */
+		printf("ADS1256_WaitDRDY() Time Out ...\r\n"); /* è°ƒè¯•è¯­å¥. ç”¨è¯­æ’é”™ */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ReadData
-*	¹¦ÄÜËµÃ÷: ¶ÁADCÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_ReadData
+*	åŠŸèƒ½è¯´æ˜: è¯»ADCæ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int32_t ADS1256_ReadData(void)
 {
 	uint32_t read = 0;
 
-	CS_0();	/* SPIÆ¬Ñ¡ = 0 */
+	CS_0(); /* SPIç‰‡é€‰ = 0 */
 
-	ADS1256_Send8Bit(CMD_RDATA);	/* ¶ÁÊı¾İµÄÃüÁî */
-	
-	ADS1256_DelayDATA();	/* ±ØĞëÑÓ³Ù²ÅÄÜ¶ÁÈ¡Ğ¾Æ¬·µ»ØÊı¾İ */
+	ADS1256_Send8Bit(CMD_RDATA); /* è¯»æ•°æ®çš„å‘½ä»¤ */
 
-	/* ¶Á²ÉÑù½á¹û£¬3¸ö×Ö½Ú£¬¸ß×Ö½ÚÔÚÇ° */
+	ADS1256_DelayDATA(); /* å¿…é¡»å»¶è¿Ÿæ‰èƒ½è¯»å–èŠ¯ç‰‡è¿”å›æ•°æ® */
+
+	/* è¯»é‡‡æ ·ç»“æœï¼Œ3ä¸ªå­—èŠ‚ï¼Œé«˜å­—èŠ‚åœ¨å‰ */
 	read = ADS1256_Recive8Bit() << 16;
 	read += ADS1256_Recive8Bit() << 8;
 	read += ADS1256_Recive8Bit() << 0;
 
-	CS_1();	/* SPIÆ¬Ñ¡ = 1 */
-	
-	/* ¸ºÊı½øĞĞÀ©Õ¹¡£24Î»ÓĞ·ûºÅÊıÀ©Õ¹Îª32Î»ÓĞ·ûºÅÊı */
+	CS_1(); /* SPIç‰‡é€‰ = 1 */
+
+	/* è´Ÿæ•°è¿›è¡Œæ‰©å±•ã€‚24ä½æœ‰ç¬¦å·æ•°æ‰©å±•ä¸º32ä½æœ‰ç¬¦å·æ•° */
 	if (read & 0x800000)
 	{
 		read += 0xFF000000;
 	}
-	
+
 	return (int32_t)read;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ReadAdc
-*	¹¦ÄÜËµÃ÷: ¶ÁÖ¸¶¨Í¨µÀµÄADCÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_ReadAdc
+*	åŠŸèƒ½è¯´æ˜: è¯»æŒ‡å®šé€šé“çš„ADCæ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 int32_t ADS1256_ReadAdc(uint8_t _ch)
 {
-	/* ADS1256 Êı¾İÊÖ²áµÚ21Ò³ */
-	
-#if 0	/* ¶ÔÓÚ30Ksps ²ÉÑùËÙÂÊ */
+	/* ADS1256 æ•°æ®æ‰‹å†Œç¬¬21é¡µ */
+
+#if 0 /* å¯¹äº30Ksps é‡‡æ ·é€Ÿç‡ */
 	int32_t read;
 	
-	while (DRDY_IS_LOW());	/* µÈ´ı DRDY ¸ß */			
-	while (!DRDY_IS_LOW());	/* µÈ´ı DRDY µÍ */			
+	while (DRDY_IS_LOW());	/* ç­‰å¾… DRDY é«˜ */			
+	while (!DRDY_IS_LOW());	/* ç­‰å¾… DRDY ä½ */			
 	
-	ADS1256_SetChannal(_ch);	/* ÇĞ»»Ä£ÄâÍ¨µÀ */	
+	ADS1256_SetChannal(_ch);	/* åˆ‡æ¢æ¨¡æ‹Ÿé€šé“ */	
 	bsp_DelayUS(5);
 	
 	ADS1256_WriteCmd(CMD_SYNC);
 	bsp_DelayUS(5);
 	
-	ADS1256_WriteCmd(CMD_WAKEUP);  /* Õı³£Çé¿öÏÂ£¬Õâ¸öÊ±ºò DRDY ÒÑ¾­Îª¸ß */
+	ADS1256_WriteCmd(CMD_WAKEUP);  /* æ­£å¸¸æƒ…å†µä¸‹ï¼Œè¿™ä¸ªæ—¶å€™ DRDY å·²ç»ä¸ºé«˜ */
 	bsp_DelayUS(25);
 			
 	read =  (int32_t)ADS1256_ReadData();
 
-	while (DRDY_IS_LOW());	/* µÈ´ı DRDY ¸ß */			
-	while (!DRDY_IS_LOW());	/* µÈ´ı DRDY µÍ */			
+	while (DRDY_IS_LOW());	/* ç­‰å¾… DRDY é«˜ */			
+	while (!DRDY_IS_LOW());	/* ç­‰å¾… DRDY ä½ */			
 	
 	read =  (int32_t)ADS1256_ReadData();
 
 	return read;
-#else	
+#else
 	//while (DRDY_IS_LOW());
-		
-	/* ADS1256 Êı¾İÊÖ²áµÚ21Ò³ */
-	ADS1256_WaitDRDY();		/* µÈ´ı DRDY = 0 */
-	
-	ADS1256_SetChannal(_ch);	/* ÇĞ»»Ä£ÄâÍ¨µÀ */	
+
+	/* ADS1256 æ•°æ®æ‰‹å†Œç¬¬21é¡µ */
+	ADS1256_WaitDRDY(); /* ç­‰å¾… DRDY = 0 */
+
+	ADS1256_SetChannal(_ch); /* åˆ‡æ¢æ¨¡æ‹Ÿé€šé“ */
 	bsp_DelayUS(5);
-	
+
 	ADS1256_WriteCmd(CMD_SYNC);
 	bsp_DelayUS(5);
-	
+
 	ADS1256_WriteCmd(CMD_WAKEUP);
 	bsp_DelayUS(25);
-	
-	//ADS1256_WaitDRDY();		/* µÈ´ı DRDY = 0 */
-	
+
+	//ADS1256_WaitDRDY();		/* ç­‰å¾… DRDY = 0 */
+
 	return (int32_t)ADS1256_ReadData();
-#endif	
+#endif
 }
 
 /*
 *********************************************************************************************************
-*	ÏÂÃæµÄº¯ÊıÓÃÓÚDRDYÖĞ¶Ï¹¤×÷Ä£Ê½
+*	ä¸‹é¢çš„å‡½æ•°ç”¨äºDRDYä¸­æ–­å·¥ä½œæ¨¡å¼
 *********************************************************************************************************
 */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_StartScan
-*	¹¦ÄÜËµÃ÷: ½« DRDYÒı½Å £¨PH9 £©ÅäÖÃ³ÉÍâ²¿ÖĞ¶Ï´¥·¢·½Ê½£¬ ÖĞ¶Ï·şÎñ³ÌĞòÖĞÉ¨Ãè8¸öÍ¨µÀµÄÊı¾İ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_StartScan
+*	åŠŸèƒ½è¯´æ˜: å°† DRDYå¼•è„š ï¼ˆPH9 ï¼‰é…ç½®æˆå¤–éƒ¨ä¸­æ–­è§¦å‘æ–¹å¼ï¼Œ ä¸­æ–­æœåŠ¡ç¨‹åºä¸­æ‰«æ8ä¸ªé€šé“çš„æ•°æ®ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ADS1256_StartScan(void)
 {
-	/* PC6 Íâ²¿ÖĞ¶Ï£¬BUSY 
-		ÅäÖÃ BUSY ×÷ÎªÖĞ¶ÏÊäÈë¿Ú£¬ÏÂ½µÑØ´¥·¢ */
+	/* PC6 å¤–éƒ¨ä¸­æ–­ï¼ŒBUSY 
+		é…ç½® BUSY ä½œä¸ºä¸­æ–­è¾“å…¥å£ï¼Œä¸‹é™æ²¿è§¦å‘ */
 	{
-		GPIO_InitTypeDef   GPIO_InitStructure;
-		
-		DRDY_CLK_ENABLE();	/* ´ò¿ªGPIOÊ±ÖÓ */
+		GPIO_InitTypeDef GPIO_InitStructure;
 
-		GPIO_InitStructure.Mode = GPIO_MODE_INPUT | GPIO_MODE_IT_FALLING;	/* ÖĞ¶ÏÏÂ½µÑØ´¥·¢ */
+		DRDY_CLK_ENABLE(); /* æ‰“å¼€GPIOæ—¶é’Ÿ */
+
+		GPIO_InitStructure.Mode = GPIO_MODE_INPUT | GPIO_MODE_IT_FALLING; /* ä¸­æ–­ä¸‹é™æ²¿è§¦å‘ */
 		GPIO_InitStructure.Pull = GPIO_NOPULL;
 		GPIO_InitStructure.Pin = DRDY_PIN;
-		HAL_GPIO_Init(DRDY_GPIO, &GPIO_InitStructure);	
+		HAL_GPIO_Init(DRDY_GPIO, &GPIO_InitStructure);
 
 		HAL_NVIC_SetPriority(DRDY_IRQn, 2, 0);
-		HAL_NVIC_EnableIRQ(DRDY_IRQn);	
+		HAL_NVIC_EnableIRQ(DRDY_IRQn);
 	}
-	
-	/* ¿ªÊ¼É¨ÃèÇ°, ÇåÁã½á¹û»º³åÇø */	
+
+	/* å¼€å§‹æ‰«æå‰, æ¸…é›¶ç»“æœç¼“å†²åŒº */
 	{
 		uint8_t i;
-		
+
 		g_tADS1256.Channel = 0;
-		
+
 		for (i = 0; i < 8; i++)
 		{
 			g_tADS1256.AdcNow[i] = 0;
-		}	
+		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_StopScan
-*	¹¦ÄÜËµÃ÷: Í£Ö¹ DRDY ÖĞ¶Ï
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_StopScan
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢ DRDY ä¸­æ–­
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ADS1256_StopScan(void)
 {
-	/* ½ûÖ¹Íâ²¿ÖĞ¶Ï */
-	HAL_NVIC_DisableIRQ(DRDY_IRQn);	
+	/* ç¦æ­¢å¤–éƒ¨ä¸­æ–­ */
+	HAL_NVIC_DisableIRQ(DRDY_IRQn);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_GetAdc
-*	¹¦ÄÜËµÃ÷: ´Ó»º³åÇø¶ÁÈ¡ADC²ÉÑù½á¹û¡£²ÉÑù½á¹¹ÊÇÓÉÖĞ¶Ï·şÎñ³ÌĞòÌî³äµÄ¡£
-*	ĞÎ    ²Î: _ch Í¨µÀºÅ (0 - 7)
-*	·µ »Ø Öµ: ADC²É¼¯½á¹û£¨ÓĞ·ûºÅÊı£©
+*	å‡½ æ•° å: ADS1256_GetAdc
+*	åŠŸèƒ½è¯´æ˜: ä»ç¼“å†²åŒºè¯»å–ADCé‡‡æ ·ç»“æœã€‚é‡‡æ ·ç»“æ„æ˜¯ç”±ä¸­æ–­æœåŠ¡ç¨‹åºå¡«å……çš„ã€‚
+*	å½¢    å‚: _ch é€šé“å· (0 - 7)
+*	è¿” å› å€¼: ADCé‡‡é›†ç»“æœï¼ˆæœ‰ç¬¦å·æ•°ï¼‰
 *********************************************************************************************************
 */
 int32_t ADS1256_GetAdc(uint8_t _ch)
 {
 	int32_t iTemp;
-	
+
 	if (_ch > 7)
 	{
 		return 0;
 	}
-	
-	DISABLE_INT();  			/* ¹ØÖĞ¶Ï */
+
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
 	iTemp = g_tADS1256.AdcNow[_ch];
 
-	ENABLE_INT();  				/* ¿ªÖĞ¶Ï */		
-	
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
+
 	return iTemp;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ADS1256_ISR
-*	¹¦ÄÜËµÃ÷: ¶¨Ê±²É¼¯ÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ADS1256_ISR
+*	åŠŸèƒ½è¯´æ˜: å®šæ—¶é‡‡é›†ä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ADS1256_ISR(void)
 {
-	/* ¶ÁÈ¡²É¼¯½á¹¹£¬±£´æÔÚÈ«¾Ö±äÁ¿ */					
-	ADS1256_SetChannal(g_tADS1256.Channel);	/* ÇĞ»»Ä£ÄâÍ¨µÀ */	
+	/* è¯»å–é‡‡é›†ç»“æ„ï¼Œä¿å­˜åœ¨å…¨å±€å˜é‡ */
+	ADS1256_SetChannal(g_tADS1256.Channel); /* åˆ‡æ¢æ¨¡æ‹Ÿé€šé“ */
 	bsp_DelayUS(5);
-	
+
 	ADS1256_WriteCmd(CMD_SYNC);
 	bsp_DelayUS(5);
-	
+
 	ADS1256_WriteCmd(CMD_WAKEUP);
 	bsp_DelayUS(25);
-	
+
 	if (g_tADS1256.Channel == 0)
 	{
-		g_tADS1256.AdcNow[7] = ADS1256_ReadData();	/* ×¢Òâ±£´æµÄÊÇÉÏÒ»¸öÍ¨µÀµÄÊı¾İ */
+		g_tADS1256.AdcNow[7] = ADS1256_ReadData(); /* æ³¨æ„ä¿å­˜çš„æ˜¯ä¸Šä¸€ä¸ªé€šé“çš„æ•°æ® */
 	}
 	else
 	{
-		g_tADS1256.AdcNow[g_tADS1256.Channel-1] = ADS1256_ReadData();	/* ×¢Òâ±£´æµÄÊÇÉÏÒ»¸öÍ¨µÀµÄÊı¾İ */
+		g_tADS1256.AdcNow[g_tADS1256.Channel - 1] = ADS1256_ReadData(); /* æ³¨æ„ä¿å­˜çš„æ˜¯ä¸Šä¸€ä¸ªé€šé“çš„æ•°æ® */
 	}
-				
+
 	if (++g_tADS1256.Channel >= 8)
 	{
 		g_tADS1256.Channel = 0;
 	}
 }
-	
+
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: EXTI9_5_IRQHandler
-*	¹¦ÄÜËµÃ÷: Íâ²¿ÖĞ¶Ï·şÎñ³ÌĞò.  ´Ë³ÌĞòÖ´ĞĞÊ±¼äÔ¼ 123uS
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: EXTI9_5_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: å¤–éƒ¨ä¸­æ–­æœåŠ¡ç¨‹åº.  æ­¤ç¨‹åºæ‰§è¡Œæ—¶é—´çº¦ 123uS
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-#ifndef EXTI9_5_ISR_MOVE_OUT		/* bsp.h ÖĞ¶¨Òå´ËĞĞ£¬±íÊ¾±¾º¯ÊıÒÆµ½ stam32f4xx_it.c¡£ ±ÜÃâÖØ¸´¶¨Òå */
+#ifndef EXTI9_5_ISR_MOVE_OUT /* bsp.h ä¸­å®šä¹‰æ­¤è¡Œï¼Œè¡¨ç¤ºæœ¬å‡½æ•°ç§»åˆ° stam32f4xx_it.cã€‚ é¿å…é‡å¤å®šä¹‰ */
 void DRDY_IRQHandler(void)
 {
 	HAL_GPIO_EXTI_IRQHandler(DRDY_PIN);
@@ -910,10 +910,10 @@ void DRDY_IRQHandler(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: EXTI9_5_IRQHandler
-*	¹¦ÄÜËµÃ÷: Íâ²¿ÖĞ¶Ï·şÎñ³ÌĞòÈë¿Ú¡£PI6 / AD7606_BUSY ÏÂ½µÑØÖĞ¶Ï´¥·¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: EXTI9_5_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: å¤–éƒ¨ä¸­æ–­æœåŠ¡ç¨‹åºå…¥å£ã€‚PI6 / AD7606_BUSY ä¸‹é™æ²¿ä¸­æ–­è§¦å‘
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -926,4 +926,4 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

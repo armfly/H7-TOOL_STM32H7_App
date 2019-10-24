@@ -1,39 +1,42 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : SD¿¨ºÍNAND FlashÄ£ÄâUÅÌ³ÌĞò¡£
-*	ÎÄ¼şÃû³Æ : usbd_msc_test.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : Ê¹ÓÃUSB Device½Ó¿Ú£¬ÔÚPCÉÏĞéÄâ³ö2¸öUÅÌÉè±¸:SD¿¨ ºÍ NAND Flash
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
-*		V1.1	2015-10-13 armfly  K3¼üÆô¶¯NAND»µ¿éÖØĞÂ±ê¼Ç, Ö®Ç°ÏÈ¹Ø±ÕUSB£¬±ÜÃâPCºÍSTM32Í¬Ê±·ÃÎÊNAND¡£
+*	æ¨¡å—åç§° : SDå¡å’ŒNAND Flashæ¨¡æ‹ŸUç›˜ç¨‹åºã€‚
+*	æ–‡ä»¶åç§° : usbd_msc_test.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : ä½¿ç”¨USB Deviceæ¥å£ï¼Œåœ¨PCä¸Šè™šæ‹Ÿå‡º2ä¸ªUç›˜è®¾å¤‡:SDå¡ å’Œ NAND Flash
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
+*		V1.1	2015-10-13 armfly  K3é”®å¯åŠ¨NANDåå—é‡æ–°æ ‡è®°, ä¹‹å‰å…ˆå…³é—­USBï¼Œé¿å…PCå’ŒSTM32åŒæ—¶è®¿é—®NANDã€‚
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
-#include "usbd_usr.h"	/* usbµ×²ãÇı¶¯ */
+#include "usbd_usr.h" /* usbåº•å±‚é©±åŠ¨ */
 
 #include "form_usbd_msc.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå À¶É« */
-	FONT_T FontRed;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå ºìÉ« */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ è“è‰² */
+	FONT_T FontRed;		/* å˜åŒ–çš„æ–‡å­—å­—ä½“ çº¢è‰² */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;	/* SD¿¨×´Ì¬ */
-	LABEL_T Label3; LABEL_T Label4;	/* NAND×´Ì¬ */
-	LABEL_T Label5; LABEL_T Label6;	/* USBD×´Ì¬ */
+	LABEL_T Label1;
+	LABEL_T Label2; /* SDå¡çŠ¶æ€ */
+	LABEL_T Label3;
+	LABEL_T Label4; /* NANDçŠ¶æ€ */
+	LABEL_T Label5;
+	LABEL_T Label6; /* USBDçŠ¶æ€ */
 
 	BUTTON_T Btn1;
 	BUTTON_T Btn2;
@@ -42,73 +45,73 @@ typedef struct
 
 	BUTTON_T BtnRet;
 
-}FormUSB_T;
+} FormUSB_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* 4¸ö¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"SD¿¨ºÍNAND FlashÄ£ÄâUÅÌ"
+/* 4ä¸ªæ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "SDå¡å’ŒNAND Flashæ¨¡æ‹ŸUç›˜"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define BTN1_H	32
-#define BTN1_W	100
-#define	BTN1_X	(BOX1_X + 5)
-#define	BTN1_Y	(BOX1_Y + 100)
-#define	BTN1_TEXT	"´ò¿ªÄ£ÄâUÅÌ"
+#define BTN1_H 32
+#define BTN1_W 100
+#define BTN1_X (BOX1_X + 5)
+#define BTN1_Y (BOX1_Y + 100)
+#define BTN1_TEXT "æ‰“å¼€æ¨¡æ‹ŸUç›˜"
 
-#define BTN2_H	32
-#define BTN2_W	100
-#define	BTN2_X	(BTN1_X + BTN1_W + 10)
-#define	BTN2_Y	BTN1_Y
-#define	BTN2_TEXT	"¹Ø±ÕÄ£ÄâUÅÌ"
+#define BTN2_H 32
+#define BTN2_W 100
+#define BTN2_X (BTN1_X + BTN1_W + 10)
+#define BTN2_Y BTN1_Y
+#define BTN2_TEXT "å…³é—­æ¨¡æ‹ŸUç›˜"
 
-#define BTN3_H	32
-#define BTN3_W	100
-#define	BTN3_X	BTN1_X
-#define	BTN3_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN3_TEXT	"µÍ¸ñNAND"
+#define BTN3_H 32
+#define BTN3_W 100
+#define BTN3_X BTN1_X
+#define BTN3_Y (BTN1_Y + BTN1_H + 10)
+#define BTN3_TEXT "ä½æ ¼NAND"
 
-#define BTN4_H	32
-#define BTN4_W	100
-#define	BTN4_X	(BTN1_X + BTN1_W + 10)
-#define	BTN4_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN4_TEXT	"É¨Ãè»µ¿é"
+#define BTN4_H 32
+#define BTN4_W 100
+#define BTN4_X (BTN1_X + BTN1_W + 10)
+#define BTN4_Y (BTN1_Y + BTN1_H + 10)
+#define BTN4_TEXT "æ‰«æåå—"
 
-/* ±êÇ© */
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"SD¿¨×´Ì¬ : "
+/* æ ‡ç­¾ */
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "SDå¡çŠ¶æ€ : "
 
-	#define LABEL2_X  	(LABEL1_X + 100)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"--"
+#define LABEL2_X (LABEL1_X + 100)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "--"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"NAND×´Ì¬ : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "NANDçŠ¶æ€ : "
 
-	#define LABEL4_X  	(LABEL3_X + 100)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"--"
+#define LABEL4_X (LABEL3_X + 100)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "--"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"USBD×´Ì¬ : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "USBDçŠ¶æ€ : "
 
-	#define LABEL6_X  	(LABEL5_X + 100)
-	#define LABEL6_Y	(LABEL5_Y)
-	#define LABEL6_TEXT	"--"
+#define LABEL6_X (LABEL5_X + 100)
+#define LABEL6_Y (LABEL5_Y)
+#define LABEL6_TEXT "--"
 
 static void InitFormUSB(void);
 static void DispUSBInitFace(void);
@@ -117,16 +120,16 @@ FormUSB_T *FormUSB;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestUsbdMsc
-*	¹¦ÄÜËµÃ÷: ĞéÄâUÅÌ³ÌĞòÈë¿Ú
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestUsbdMsc
+*	åŠŸèƒ½è¯´æ˜: è™šæ‹ŸUç›˜ç¨‹åºå…¥å£
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestUsbdMsc(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	uint8_t ucNandOk;
@@ -142,12 +145,11 @@ void TestUsbdMsc(void)
 	InitFormUSB();
 	DispUSBInitFace();
 
+	{
+#if 1
+		NAND_DispBadBlockInfo(); /* å‘ä¸²å£1æ‰“å°NAND Flashåå—ä¿¡æ¯ (æ­¤å‡½æ•°å¼€å¤´åˆå§‹FSMC) */
 
-	{	
-	#if 1		
-		NAND_DispBadBlockInfo();	/* Ïò´®¿Ú1´òÓ¡NAND Flash»µ¿éĞÅÏ¢ (´Ëº¯Êı¿ªÍ·³õÊ¼FSMC) */
-
-		/* ÅäÖÃFSMCÓÃÓÚNAND Flash£¬ ¸´Î»NAND Flash£¬ÖØ½¨LUT±í */
+		/* é…ç½®FSMCç”¨äºNAND Flashï¼Œ å¤ä½NAND Flashï¼Œé‡å»ºLUTè¡¨ */
 		if (NAND_Init() == NAND_OK)
 		{
 			printf("NAND_Init() Ok\r\n");
@@ -155,8 +157,8 @@ void TestUsbdMsc(void)
 		}
 		else
 		{
-			/* ½¨ÒéÔÚÕıÊ½µÄ²úÆ·ÖĞ²ÉÓÃÈËÎª¸ÉÔ¤µÄ·½Ê½Æô¶¯µÍ¼¶¸ñÊ½»¯ */
-			/* ×Ô¶¯¼ì²ânand flashÊÇ·ñ½øĞĞÁËµÍ¼¶¸ñÊ½»¯£¬Èç¹ûÃ»ÓĞÔòÖ´ĞĞ¸ñÊ½»¯£¨2Ãë£© */
+			/* å»ºè®®åœ¨æ­£å¼çš„äº§å“ä¸­é‡‡ç”¨äººä¸ºå¹²é¢„çš„æ–¹å¼å¯åŠ¨ä½çº§æ ¼å¼åŒ– */
+			/* è‡ªåŠ¨æ£€æµ‹nand flashæ˜¯å¦è¿›è¡Œäº†ä½çº§æ ¼å¼åŒ–ï¼Œå¦‚æœæ²¡æœ‰åˆ™æ‰§è¡Œæ ¼å¼åŒ–ï¼ˆ2ç§’ï¼‰ */
 			printf("NAND_Init() Error! \r\n");
 			printf("Start Format(Low Level) NAND Flash......\r\n");
 			if (NAND_Format() == NAND_OK)
@@ -174,16 +176,16 @@ void TestUsbdMsc(void)
 		if (NAND_GetBlockInfo(&nand) == 1)
 		{
 			ucNandOk = 1;
-			
-			#if 0
-			NAND_DispParamPage();	/* ÏÔÊ¾NAND Ğ¾Æ¬°æ±¾ĞÅÏ¢ */
-			#endif
+
+#if 0
+			NAND_DispParamPage();	/* æ˜¾ç¤ºNAND èŠ¯ç‰‡ç‰ˆæœ¬ä¿¡æ¯ */
+#endif
 		}
 		else
 		{
 			ucNandOk = 0;
-		}	
-	#endif
+		}
+#endif
 		if (BSP_SD_Init() == MSD_OK)
 		{
 			ucCardOk = 1;
@@ -194,13 +196,12 @@ void TestUsbdMsc(void)
 		}
 	}
 
-
 	ucUsbOk = 1;
-	usbd_OpenMassStorage();		/* ³õÊ¼»¯USB Device£¬ÅäÖÃÎªMass Storage */
+	usbd_OpenMassStorage(); /* åˆå§‹åŒ–USB Deviceï¼Œé…ç½®ä¸ºMass Storage */
 
 	fRefresh = 1;
 
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -225,15 +226,15 @@ void TestUsbdMsc(void)
 			{
 				FormUSB->Label4.pCaption = buf;
 				sprintf(buf, "OK, %s, Bad=%d, Used=%d, Free=%d", nand.ChipName, nand.Bad, nand.Used, nand.Free);
-				
+
 				if (nand.Bad > 30)
 				{
-					/* Èç¹û»µ¿é¸öÊı´óÓÚ30¸ö£¬ÔòÏÔÊ¾ºìÉ« */
+					/* å¦‚æœåå—ä¸ªæ•°å¤§äº30ä¸ªï¼Œåˆ™æ˜¾ç¤ºçº¢è‰² */
 					FormUSB->Label4.Font = &FormUSB->FontRed;
 				}
 				else
 				{
-					/* »µ¿éÊıÁ¿ÔÚÕı³£·¶Î§ÄÚ£¬ÏÔÊ¾À¶É« */
+					/* åå—æ•°é‡åœ¨æ­£å¸¸èŒƒå›´å†…ï¼Œæ˜¾ç¤ºè“è‰² */
 					FormUSB->Label4.Font = &FormUSB->FontBlue;
 				}
 			}
@@ -247,215 +248,214 @@ void TestUsbdMsc(void)
 			if (ucUsbOk)
 			{
 				FormUSB->Label6.Font = &FormUSB->FontBlue;
-				FormUSB->Label6.pCaption = "ÒÑ´ò¿ª ";
+				FormUSB->Label6.pCaption = "å·²æ‰“å¼€ ";
 			}
 			else
 			{
 				FormUSB->Label6.Font = &FormUSB->FontRed;
-				FormUSB->Label6.pCaption = "ÒÑ¹Ø±Õ";
+				FormUSB->Label6.pCaption = "å·²å…³é—­";
 			}
 			LCD_DrawLabel(&FormUSB->Label6);
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */					
-					LCD_ButtonTouchDown(&FormUSB->BtnRet, tpX, tpY);
-					LCD_ButtonTouchDown(&FormUSB->Btn1, tpX, tpY);
-					LCD_ButtonTouchDown(&FormUSB->Btn2, tpX, tpY);
-					LCD_ButtonTouchDown(&FormUSB->Btn3, tpX, tpY);
-					LCD_ButtonTouchDown(&FormUSB->Btn4, tpX, tpY);					
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				LCD_ButtonTouchDown(&FormUSB->BtnRet, tpX, tpY);
+				LCD_ButtonTouchDown(&FormUSB->Btn1, tpX, tpY);
+				LCD_ButtonTouchDown(&FormUSB->Btn2, tpX, tpY);
+				LCD_ButtonTouchDown(&FormUSB->Btn3, tpX, tpY);
+				LCD_ButtonTouchDown(&FormUSB->Btn4, tpX, tpY);
+				break;
 
-				case TOUCH_MOVE:		/* ´¥±ÊÒÆ¶¯ÊÂ¼ş */
-					break;
+			case TOUCH_MOVE: /* è§¦ç¬”ç§»åŠ¨äº‹ä»¶ */
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&FormUSB->BtnRet, tpX, tpY))
-					{
-						FormUSB->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormUSB->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else if (LCD_ButtonTouchRelease(&FormUSB->Btn1, tpX, tpY))
-					{
-						FormUSB->Btn1.Focus = 0;
-						LCD_DrawButton(&FormUSB->Btn1);
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&FormUSB->BtnRet, tpX, tpY))
+				{
+					FormUSB->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormUSB->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else if (LCD_ButtonTouchRelease(&FormUSB->Btn1, tpX, tpY))
+				{
+					FormUSB->Btn1.Focus = 0;
+					LCD_DrawButton(&FormUSB->Btn1);
 
-						if (BSP_SD_Init() == MSD_OK)
-						{
-							ucCardOk = 1;
-						}
-						else
-						{
-							ucCardOk = 0;
-						}
-						usbd_OpenMassStorage();	/* ´ò¿ªUÅÌ */
-						ucUsbOk = 1;
-						fRefresh = 1;
-					}
-					else if (LCD_ButtonTouchRelease(&FormUSB->Btn2, tpX, tpY))
+					if (BSP_SD_Init() == MSD_OK)
 					{
-						usbd_CloseMassStorage();	/* ¹Ø±ÕUÅÌ */
-						ucUsbOk = 0;
-						fRefresh = 1;
+						ucCardOk = 1;
 					}
-					else if (LCD_ButtonTouchRelease(&FormUSB->Btn3, tpX, tpY))
-					{						
-						if (NAND_Format() == NAND_OK)
-						{
-							FormUSB->Label4.pCaption = "µÍ¼¶¸ñÊ½»¯³É¹¦";
-						}
-						else
-						{
-							FormUSB->Label4.pCaption = "µÍ¼¶¸ñÊ½»¯Ê§°Ü";
-						}
-						LCD_DrawLabel(&FormUSB->Label4);
-						
-					}			
-					else if (LCD_ButtonTouchRelease(&FormUSB->Btn4, tpX, tpY))
+					else
 					{
-						if (ucUsbOk == 0)	/* ¹Ø±ÕUSBÁ¬½ÓÊ±²ÅÄÜ·ÃÎÊNAND£¬·ñÔòUSBÖĞ¶Ï³ÌĞò»á¸ÉÈÅÉ¨Ãè¹ı³Ì */
+						ucCardOk = 0;
+					}
+					usbd_OpenMassStorage(); /* æ‰“å¼€Uç›˜ */
+					ucUsbOk = 1;
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchRelease(&FormUSB->Btn2, tpX, tpY))
+				{
+					usbd_CloseMassStorage(); /* å…³é—­Uç›˜ */
+					ucUsbOk = 0;
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchRelease(&FormUSB->Btn3, tpX, tpY))
+				{
+					if (NAND_Format() == NAND_OK)
+					{
+						FormUSB->Label4.pCaption = "ä½çº§æ ¼å¼åŒ–æˆåŠŸ";
+					}
+					else
+					{
+						FormUSB->Label4.pCaption = "ä½çº§æ ¼å¼åŒ–å¤±è´¥";
+					}
+					LCD_DrawLabel(&FormUSB->Label4);
+				}
+				else if (LCD_ButtonTouchRelease(&FormUSB->Btn4, tpX, tpY))
+				{
+					if (ucUsbOk == 0) /* å…³é—­USBè¿æ¥æ—¶æ‰èƒ½è®¿é—®NANDï¼Œå¦åˆ™USBä¸­æ–­ç¨‹åºä¼šå¹²æ‰°æ‰«æè¿‡ç¨‹ */
+					{
+						/* é‡æ–°æ‰«ææµ‹è¯•åå—ï¼Œæ‰§è¡Œæ—¶é—´å¾ˆé•¿ã€‚ ç”¨äºNAND ç£ç›˜ä¿®å¤ */
+						uint32_t i;
+
+						FormUSB->Label4.pCaption = buf;
+						FormUSB->Label4.Font = &FormUSB->FontRed;
+						for (i = 0; i < NAND_BLOCK_COUNT; i++)
 						{
-							/* ÖØĞÂÉ¨Ãè²âÊÔ»µ¿é£¬Ö´ĞĞÊ±¼äºÜ³¤¡£ ÓÃÓÚNAND ´ÅÅÌĞŞ¸´ */						
-							uint32_t i;
-							
-							FormUSB->Label4.pCaption = buf;
-							FormUSB->Label4.Font = &FormUSB->FontRed;
-							for (i = 0; i < NAND_BLOCK_COUNT; i++)
-							{
-								sprintf(buf, "É¨Ãè»µ¿é... %d (%d%%) --- K1¼üÖÕÖ¹", i, (i + 1) * 100 / NAND_BLOCK_COUNT);
-								LCD_DrawLabel(&FormUSB->Label4);
-								
-								if (NAND_ScanBlock(i) == NAND_OK)
-								{
-									;
-								}
-								else
-								{
-									NAND_MarkBadBlock(i);	/* ±ê¼Ç»µ¿é */
-								}
-								
-								/* Èç¹ûÓĞÈÎÒâ¼ü°´ÏÂ£¬ÔòÍË³ö */
-								if (bsp_GetKey() == KEY_DOWN_K1)
-								{
-									sprintf(buf, "É¨ÃèÖÕÖ¹");
-									LCD_DrawLabel(&FormUSB->Label4);
-									break;
-								}
-							}		
-						}
-		
-						else
-						{
-							FormUSB->Label4.Font = &FormUSB->FontRed;
-							FormUSB->Label4.pCaption = buf;
-							sprintf(buf, "ÇëÏÈ¹Ø±ÕÄ£ÄâUÅÌ¹¦ÄÜ");
+							sprintf(buf, "æ‰«æåå—... %d (%d%%) --- K1é”®ç»ˆæ­¢", i, (i + 1) * 100 / NAND_BLOCK_COUNT);
 							LCD_DrawLabel(&FormUSB->Label4);
+
+							if (NAND_ScanBlock(i) == NAND_OK)
+							{
+								;
+							}
+							else
+							{
+								NAND_MarkBadBlock(i); /* æ ‡è®°åå— */
+							}
+
+							/* å¦‚æœæœ‰ä»»æ„é”®æŒ‰ä¸‹ï¼Œåˆ™é€€å‡º */
+							if (bsp_GetKey() == KEY_DOWN_K1)
+							{
+								sprintf(buf, "æ‰«æç»ˆæ­¢");
+								LCD_DrawLabel(&FormUSB->Label4);
+								break;
+							}
 						}
-					}				
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						LCD_ButtonTouchRelease(&FormUSB->BtnRet, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormUSB->Btn1, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormUSB->Btn2, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormUSB->Btn3, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormUSB->Btn4, tpX, tpY);
 					}
-					break;
+
+					else
+					{
+						FormUSB->Label4.Font = &FormUSB->FontRed;
+						FormUSB->Label4.pCaption = buf;
+						sprintf(buf, "è¯·å…ˆå…³é—­æ¨¡æ‹ŸUç›˜åŠŸèƒ½");
+						LCD_DrawLabel(&FormUSB->Label4);
+					}
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					LCD_ButtonTouchRelease(&FormUSB->BtnRet, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormUSB->Btn1, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormUSB->Btn2, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormUSB->Btn3, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormUSB->Btn4, tpX, tpY);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					//printf("¡¾1 - ÒÆ³ıUÅÌ¡¿\r\n");
-					//usbd_CloseMassStorage();
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				//printf("ã€1 - ç§»é™¤Uç›˜ã€‘\r\n");
+				//usbd_CloseMassStorage();
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					/* Ê¹ÄÜUÅÌ£¬Èí¼şÄ£ÄâUÅÌ²åÈë */
-					//printf("¡¾2 - Ê¹ÄÜUÅÌ¡¿\r\n");
-					//usbd_OpenMassStorage();
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				/* ä½¿èƒ½Uç›˜ï¼Œè½¯ä»¶æ¨¡æ‹ŸUç›˜æ’å…¥ */
+				//printf("ã€2 - ä½¿èƒ½Uç›˜ã€‘\r\n");
+				//usbd_OpenMassStorage();
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
 					;
-					break;
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
 
-	usbd_CloseMassStorage();	/* ÒÆ³ıUÅÌ */
+	usbd_CloseMassStorage(); /* ç§»é™¤Uç›˜ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormUSB
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯GPS³õÊ¼½çÃæ¿Ø¼ş
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormUSB
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–GPSåˆå§‹ç•Œé¢æ§ä»¶
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormUSB(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormUSB->FontBox.FontCode = FC_ST_16;
-	FormUSB->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormUSB->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormUSB->FontBox.FrontColor = CL_BLACK;
 	FormUSB->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormUSB->FontBlack.FontCode = FC_ST_16;
-	FormUSB->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormUSB->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormUSB->FontBlack.FrontColor = CL_BLACK;
 	FormUSB->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormUSB->FontBlue.FontCode = FC_ST_16;
 	FormUSB->FontBlue.BackColor = CL_BTN_FACE;
 	FormUSB->FontBlue.FrontColor = CL_BLUE;
 	FormUSB->FontBlue.Space = 0;
 
-	/* ×ÖÌå3 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“3 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormUSB->FontRed.FontCode = FC_ST_16;
 	FormUSB->FontRed.BackColor = CL_BTN_FACE;
 	FormUSB->FontRed.FrontColor = CL_RED;
 	FormUSB->FontRed.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormUSB->FontBtn.FontCode = FC_ST_16;
-	FormUSB->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormUSB->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormUSB->FontBtn.FrontColor = CL_BLACK;
 	FormUSB->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormUSB->Box1.Left = BOX1_X;
 	FormUSB->Box1.Top = BOX1_Y;
 	FormUSB->Box1.Height = BOX1_H;
@@ -463,7 +463,7 @@ static void InitFormUSB(void)
 	FormUSB->Box1.pCaption = BOX1_TEXT;
 	FormUSB->Box1.Font = &FormUSB->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormUSB->Label1.Left = LABEL1_X;
 	FormUSB->Label1.Top = LABEL1_Y;
 	FormUSB->Label1.MaxLen = 0;
@@ -482,7 +482,7 @@ static void InitFormUSB(void)
 	FormUSB->Label5.pCaption = LABEL5_TEXT;
 	FormUSB->Label5.Font = &FormUSB->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormUSB->Label2.Left = LABEL2_X;
 	FormUSB->Label2.Top = LABEL2_Y;
 	FormUSB->Label2.MaxLen = 0;
@@ -501,7 +501,7 @@ static void InitFormUSB(void)
 	FormUSB->Label6.pCaption = LABEL6_TEXT;
 	FormUSB->Label6.Font = &FormUSB->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormUSB->BtnRet.Left = BTN_RET_X;
 	FormUSB->BtnRet.Top = BTN_RET_Y;
 	FormUSB->BtnRet.Height = BTN_RET_H;
@@ -534,7 +534,6 @@ static void InitFormUSB(void)
 	FormUSB->Btn3.Font = &FormUSB->FontBtn;
 	FormUSB->Btn3.Focus = 0;
 
-
 	FormUSB->Btn4.Left = BTN4_X;
 	FormUSB->Btn4.Top = BTN4_Y;
 	FormUSB->Btn4.Height = BTN4_H;
@@ -546,20 +545,20 @@ static void InitFormUSB(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispUSBInitFace
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispUSBInitFace
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispUSBInitFace(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormUSB->Box1);
 
-	/* ±êÇ© */
+	/* æ ‡ç­¾ */
 	LCD_DrawLabel(&FormUSB->Label1);
 	LCD_DrawLabel(&FormUSB->Label2);
 	LCD_DrawLabel(&FormUSB->Label3);
@@ -567,7 +566,7 @@ static void DispUSBInitFace(void)
 	LCD_DrawLabel(&FormUSB->Label5);
 	LCD_DrawLabel(&FormUSB->Label6);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormUSB->BtnRet);
 	LCD_DrawButton(&FormUSB->Btn1);
 	LCD_DrawButton(&FormUSB->Btn2);
@@ -575,4 +574,4 @@ static void DispUSBInitFace(void)
 	LCD_DrawButton(&FormUSB->Btn4);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : Œ¬∂»±Ì
-*	Œƒº˛√˚≥∆ : status_temp_meter.c
-*	∞Ê    ±æ : V1.0
-*	Àµ    √˜ : Œ¬∂»±Ì
-*	–ﬁ∏ƒº«¬º :
-*		∞Ê±æ∫≈  »’∆⁄        ◊˜’ﬂ     Àµ√˜
-*		V1.0    2019-10-06 armfly  ’˝ Ω∑¢≤º
+*	Ê®°ÂùóÂêçÁß∞ : Ê∏©Â∫¶Ë°®
+*	Êñá‰ª∂ÂêçÁß∞ : status_temp_meter.c
+*	Áâà    Êú¨ : V1.0
+*	ËØ¥    Êòé : Ê∏©Â∫¶Ë°®
+*	‰øÆÊîπËÆ∞ÂΩï :
+*		ÁâàÊú¨Âè∑  Êó•Êúü        ‰ΩúËÄÖ     ËØ¥Êòé
+*		V1.0    2019-10-06 armfly  Ê≠£ÂºèÂèëÂ∏É
 *
-*	Copyright (C), 2019-2030, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2019-2030, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,26 +20,26 @@ static void DispTemp(void);
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: status_TempMeter
-*	π¶ƒ‹Àµ√˜: Œ¬∂»±Ì◊¥Ã¨
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: status_TempMeter
+*	ÂäüËÉΩËØ¥Êòé: Ê∏©Â∫¶Ë°®Áä∂ÊÄÅ
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 void status_TempMeter(void)
 {
-	uint8_t ucKeyCode;		/* ∞¥º¸¥˙¬Î */
+	uint8_t ucKeyCode; /* ÊåâÈîÆ‰ª£Á†Å */
 	uint8_t fRefresh;
 
-	DispHeader("Œ¬∂»≤‚¡ø");
-	
+	DispHeader("Ê∏©Â∫¶ÊµãÈáè");
+
 	fRefresh = 1;
-	bsp_StartAutoTimer(0, 200);	
+	bsp_StartAutoTimer(0, 200);
 	while (g_MainStatus == MS_TEMP_METER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* À¢–¬’˚∏ˆΩÁ√Ê */
+		if (fRefresh) /* Âà∑Êñ∞Êï¥‰∏™ÁïåÈù¢ */
 		{
 			fRefresh = 0;
 			DispTemp();
@@ -49,79 +49,79 @@ void status_TempMeter(void)
 		{
 			fRefresh = 1;
 		}
-		
-		ucKeyCode = bsp_GetKey();	/* ∂¡»°º¸÷µ, Œﬁº¸∞¥œ¬ ±∑µªÿ KEY_NONE = 0 */
+
+		ucKeyCode = bsp_GetKey(); /* ËØªÂèñÈîÆÂÄº, Êó†ÈîÆÊåâ‰∏ãÊó∂ËøîÂõû KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ”–º¸∞¥œ¬ */
+			/* ÊúâÈîÆÊåâ‰∏ã */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* Sº¸∞¥œ¬ */
-					break;
+			case KEY_DOWN_S: /* SÈîÆÊåâ‰∏ã */
+				break;
 
-				case  KEY_UP_S:			/* Sº¸ Õ∑≈ */
-					g_MainStatus = NextStatus(MS_TEMP_METER);
-					break;
+			case KEY_UP_S: /* SÈîÆÈáäÊîæ */
+				g_MainStatus = NextStatus(MS_TEMP_METER);
+				break;
 
-				case  KEY_LONG_S:		/* Sº¸≥§∞¥ */
-					break;				
+			case KEY_LONG_S: /* SÈîÆÈïøÊåâ */
+				break;
 
-				case  KEY_DOWN_C:		/* Cº¸∞¥œ¬ */
-					break;
+			case KEY_DOWN_C: /* CÈîÆÊåâ‰∏ã */
+				break;
 
-				case  KEY_UP_C:			/* Cº¸ Õ∑≈ */
-					g_MainStatus = LastStatus(MS_TEMP_METER);					
-					break;
+			case KEY_UP_C: /* CÈîÆÈáäÊîæ */
+				g_MainStatus = LastStatus(MS_TEMP_METER);
+				break;
 
-				case  KEY_LONG_C:		/* Cº¸≥§∞¥ */
-					break;	
-				
-				default:
-					break;
+			case KEY_LONG_C: /* CÈîÆÈïøÊåâ */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
-	
+
 	bsp_StopTimer(0);
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: DispTemp
-*	π¶ƒ‹Àµ√˜: œ‘ æµÁ◊Ë∫ÕŒ¬∂»÷µ
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: DispTemp
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫ÁîµÈòªÂíåÊ∏©Â∫¶ÂÄº
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void DispTemp(void)
 {
 	FONT_T tFont;
 	char buf[64];
-	
-	/* …Ë÷√◊÷ÃÂ≤Œ ˝ */
+
+	/* ËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	{
-		tFont.FontCode = FC_ST_24;			/* ◊÷ÃÂ¥˙¬Î 16µ„’Û */
-		tFont.FrontColor = CL_WHITE;		/* ◊÷ÃÂ—’…´ */
-		tFont.BackColor = HEAD_BAR_COLOR;	/* Œƒ◊÷±≥æ∞—’…´ */
-		tFont.Space = 0;					/* Œƒ◊÷º‰æ‡£¨µ•Œª = œÒÀÿ */
+		tFont.FontCode = FC_ST_24;				/* Â≠ó‰Ωì‰ª£Á†Å 16ÁÇπÈòµ */
+		tFont.FrontColor = CL_WHITE;			/* Â≠ó‰ΩìÈ¢úËâ≤ */
+		tFont.BackColor = HEAD_BAR_COLOR; /* ÊñáÂ≠óËÉåÊôØÈ¢úËâ≤ */
+		tFont.Space = 0;									/* ÊñáÂ≠óÈó¥Ë∑ùÔºåÂçï‰Ωç = ÂÉèÁ¥† */
 	}
-	
+
 	if (g_tVar.NTCRes > 1000)
 	{
-		sprintf(buf, "µÁ◊Ë: ---- K¶∏");
+		sprintf(buf, "ÁîµÈòª: ---- KŒ©");
 		LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 
-		sprintf(buf, "Œ¬∂»: ---- °Ê");
-		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);		
+		sprintf(buf, "Ê∏©Â∫¶: ---- ‚ÑÉ");
+		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
 	}
 	else
 	{
-		sprintf(buf, "µÁ◊Ë: %0.3fK¶∏", g_tVar.NTCRes);
+		sprintf(buf, "ÁîµÈòª: %0.3fKŒ©", g_tVar.NTCRes);
 		LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 
-		sprintf(buf, "Œ¬∂»: %0.2f°Ê", g_tVar.NTCTemp);
-		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);		
+		sprintf(buf, "Ê∏©Â∫¶: %0.2f‚ÑÉ", g_tVar.NTCTemp);
+		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
 	}
 }
 
-/***************************** ∞≤∏ª¿≥µÁ◊” www.armfly.com (END OF FILE) *********************************/
+/***************************** ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com (END OF FILE) *********************************/

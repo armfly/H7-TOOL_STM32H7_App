@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : BSPÄ£¿é(For STM32H7)
-*	ÎÄ¼şÃû³Æ : bsp.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ÕâÊÇÓ²¼şµ×²ãÇı¶¯³ÌĞòµÄÖ÷ÎÄ¼ş¡£Ã¿¸öcÎÄ¼ş¿ÉÒÔ #include "bsp.h" À´°üº¬ËùÓĞµÄÍâÉèÇı¶¯Ä£¿é¡£
-*			   bsp = Borad surport packet °å¼¶Ö§³Ö°ü
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ         ×÷Õß       ËµÃ÷
-*		V1.0    2018-07-29  Eric2013   ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : BSPæ¨¡å—(For STM32H7)
+*	æ–‡ä»¶åç§° : bsp.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : è¿™æ˜¯ç¡¬ä»¶åº•å±‚é©±åŠ¨ç¨‹åºçš„ä¸»æ–‡ä»¶ã€‚æ¯ä¸ªcæ–‡ä»¶å¯ä»¥ #include "bsp.h" æ¥åŒ…å«æ‰€æœ‰çš„å¤–è®¾é©±åŠ¨æ¨¡å—ã€‚
+*			   bsp = Borad surport packet æ¿çº§æ”¯æŒåŒ…
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ         ä½œè€…       è¯´æ˜
+*		V1.0    2018-07-29  Eric2013   æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,30 +18,29 @@
 #ifndef _BSP_H
 #define _BSP_H
 
+/* å®šä¹‰ BSP ç‰ˆæœ¬å· */
+#define __STM32H7_BSP_VERSION "1.1"
 
-/* ¶¨Òå BSP °æ±¾ºÅ */
-#define __STM32H7_BSP_VERSION		"1.1"
-
-/* CPU¿ÕÏĞÊ±Ö´ĞĞµÄº¯Êı */
+/* CPUç©ºé—²æ—¶æ‰§è¡Œçš„å‡½æ•° */
 //#define CPU_IDLE()		bsp_Idle()
 
-/* ¿ª¹ØÈ«¾ÖÖĞ¶ÏµÄºê */
-#define ENABLE_INT()	__set_PRIMASK(0)	/* Ê¹ÄÜÈ«¾ÖÖĞ¶Ï */
-#define DISABLE_INT()	__set_PRIMASK(1)	/* ½ûÖ¹È«¾ÖÖĞ¶Ï */
+/* å¼€å…³å…¨å±€ä¸­æ–­çš„å® */
+#define ENABLE_INT() __set_PRIMASK(0)	/* ä½¿èƒ½å…¨å±€ä¸­æ–­ */
+#define DISABLE_INT() __set_PRIMASK(1) /* ç¦æ­¢å…¨å±€ä¸­æ–­ */
 
-/* Õâ¸öºê½öÓÃÓÚµ÷ÊÔ½×¶ÎÅÅ´í */
-#define BSP_Printf		printf
+/* è¿™ä¸ªå®ä»…ç”¨äºè°ƒè¯•é˜¶æ®µæ’é”™ */
+#define BSP_Printf printf
 //#define BSP_Printf(...)
 
-#define EXTI9_5_ISR_MOVE_OUT		/* bsp.h ÖĞ¶¨Òå´ËĞĞ£¬±íÊ¾±¾º¯ÊıÒÆµ½ stam32f4xx_it.c¡£ ±ÜÃâÖØ¸´¶¨Òå */
+#define EXTI9_5_ISR_MOVE_OUT /* bsp.h ä¸­å®šä¹‰æ­¤è¡Œï¼Œè¡¨ç¤ºæœ¬å‡½æ•°ç§»åˆ° stam32f4xx_it.cã€‚ é¿å…é‡å¤å®šä¹‰ */
 
-#define ERROR_HANDLER()		Error_Handler(__FILE__, __LINE__)
+#define ERROR_HANDLER() Error_Handler(__FILE__, __LINE__)
 
-/* Ä¬ÈÏÊÇ¹Ø±Õ×´Ì¬ */
-#define  Enable_EventRecorder  0
+/* é»˜è®¤æ˜¯å…³é—­çŠ¶æ€ */
+#define Enable_EventRecorder 0
 
 #if Enable_EventRecorder == 1
-	#include "EventRecorder.h"
+#include "EventRecorder.h"
 #endif
 
 #include "stm32h7xx_hal.h"
@@ -51,17 +50,17 @@
 #include <math.h>
 
 #ifndef TRUE
-	#define TRUE  1
+#define TRUE 1
 #endif
 
 #ifndef FALSE
-	#define FALSE 0
+#define FALSE 0
 #endif
 
-/* ¶¨ÒåÓÅÏÈ¼¶·Ö×é */
-#define NVIC_PREEMPT_PRIORITY	4
+/* å®šä¹‰ä¼˜å…ˆçº§åˆ†ç»„ */
+#define NVIC_PREEMPT_PRIORITY 4
 
-/* Í¨¹ıÈ¡Ïû×¢ÊÍ»òÕßÌí¼Ó×¢ÊÍµÄ·½Ê½¿ØÖÆÊÇ·ñ°üº¬µ×²ãÇı¶¯Ä£¿é */
+/* é€šè¿‡å–æ¶ˆæ³¨é‡Šæˆ–è€…æ·»åŠ æ³¨é‡Šçš„æ–¹å¼æ§åˆ¶æ˜¯å¦åŒ…å«åº•å±‚é©±åŠ¨æ¨¡å— */
 #include "bsp_msg.h"
 #include "bsp_user_lib.h"
 #include "bsp_timer.h"
@@ -86,7 +85,6 @@
 #include "bsp_i2c_mcp4725.h"
 #include "bsp_power_tvcc.h"
 
-
 #include "bsp_tft_st7735.h"
 #include "bsp_tft_st7789.h"
 #include "bsp_tft_lcd.h"
@@ -106,11 +104,11 @@
 #include "bsp_ntc.h"
 #include "bsp_ext_io.h"
 
-#define HARD_MODEL		0x0750	
-#define BOOT_VERSION	*(uint16_t *)(0x08000000 + 28)		
-#define APP_VERSION		*(uint16_t *)(0x08020000 + 28)	
+#define HARD_MODEL 0x0750
+#define BOOT_VERSION *(uint16_t *)(0x08000000 + 28)
+#define APP_VERSION *(uint16_t *)(0x08020000 + 28)
 
-/* Ìá¹©¸øÆäËûCÎÄ¼şµ÷ÓÃµÄº¯Êı */
+/* æä¾›ç»™å…¶ä»–Cæ–‡ä»¶è°ƒç”¨çš„å‡½æ•° */
 void bsp_Init(void);
 void bsp_Idle(void);
 
@@ -119,4 +117,4 @@ void Error_Handler(char *file, uint32_t line);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

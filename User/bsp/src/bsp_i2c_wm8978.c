@@ -1,22 +1,22 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : WM8978ÒôÆµĞ¾Æ¬Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_wm8978.h
-*	°æ    ±¾ : V1.5
-*	Ëµ    Ã÷ : WM8978ÒôÆµĞ¾Æ¬ºÍSTM32 I2Sµ×²ãÇı¶¯¡£ÔÚ°²¸»À³STM32-V5¿ª·¢°åÉÏµ÷ÊÔÍ¨¹ı¡£
+*	æ¨¡å—åç§° : WM8978éŸ³é¢‘èŠ¯ç‰‡é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_wm8978.h
+*	ç‰ˆ    æœ¬ : V1.5
+*	è¯´    æ˜ : WM8978éŸ³é¢‘èŠ¯ç‰‡å’ŒSTM32 I2Såº•å±‚é©±åŠ¨ã€‚åœ¨å®‰å¯Œè±STM32-V5å¼€å‘æ¿ä¸Šè°ƒè¯•é€šè¿‡ã€‚
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕıÊ½·¢²¼
-*		V1.1    2013-06-12 armfly  ½â¾öµ¥¶ÀLine ÊäÈë²»ÄÜ·ÅÒôµÄÎÊÌâ¡£ĞŞ¸Ä wm8978_CfgAudioPath() º¯Êı
-*		V1.2    2013-07-14 armfly  Ôö¼ÓÉèÖÃLineÊäÈë½Ó¿ÚÔöÒæµÄº¯Êı£º wm8978_SetLineGain()
-*		V1.3    2015-10-18 armfly  ÒÆÖ²µ½STM32F429£¬¸Ä¶¯ºÜ´ó¡£I2S½Ó¿ÚĞŞ¸ÄÎªSAIÒôÆµ½Ó¿Ú¡£
-*							-  wm8978_CfgAudioIF() º¯ÊıµÄ×Ö³¤ĞÎ²Î£¬Ôö¼Ó20bit
-*		V1.4	2016-01-24 armfly   ¸üÕıAUDIO_Play º¯ÊıÄÚbug£¬±äÁ¿Î´³õÊ¼»¯¾ÍÊ¹ÓÃÁË¡£
-*		V1.5	2016-03-25 armfly   ¸üÕıAUDIO_Recordº¯ÊıÄÚbug£¬±äÁ¿Î´³õÊ¼»¯¾ÍÊ¹ÓÃÁË¡£½â¾öÂ¼ÒôĞèÒª2´ÎµÄÎÊÌâ
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2013-06-12 armfly  è§£å†³å•ç‹¬Line è¾“å…¥ä¸èƒ½æ”¾éŸ³çš„é—®é¢˜ã€‚ä¿®æ”¹ wm8978_CfgAudioPath() å‡½æ•°
+*		V1.2    2013-07-14 armfly  å¢åŠ è®¾ç½®Lineè¾“å…¥æ¥å£å¢ç›Šçš„å‡½æ•°ï¼š wm8978_SetLineGain()
+*		V1.3    2015-10-18 armfly  ç§»æ¤åˆ°STM32F429ï¼Œæ”¹åŠ¨å¾ˆå¤§ã€‚I2Sæ¥å£ä¿®æ”¹ä¸ºSAIéŸ³é¢‘æ¥å£ã€‚
+*							-  wm8978_CfgAudioIF() å‡½æ•°çš„å­—é•¿å½¢å‚ï¼Œå¢åŠ 20bit
+*		V1.4	2016-01-24 armfly   æ›´æ­£AUDIO_Play å‡½æ•°å†…bugï¼Œå˜é‡æœªåˆå§‹åŒ–å°±ä½¿ç”¨äº†ã€‚
+*		V1.5	2016-03-25 armfly   æ›´æ­£AUDIO_Recordå‡½æ•°å†…bugï¼Œå˜é‡æœªåˆå§‹åŒ–å°±ä½¿ç”¨äº†ã€‚è§£å†³å½•éŸ³éœ€è¦2æ¬¡çš„é—®é¢˜
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -26,115 +26,115 @@
 /*
 *********************************************************************************************************
 *
-*	ÖØÒªÌáÊ¾:
-*	1¡¢wm8978_ ¿ªÍ·µÄº¯ÊıÊÇ²Ù×÷WM8978¼Ä´æÆ÷£¬²Ù×÷WM8978¼Ä´æÆ÷ÊÇÍ¨¹ıI2CÄ£Äâ×ÜÏß½øĞĞµÄ
-*	2¡¢I2S_ ¿ªÍ·µÄº¯ÊıÊÇ²Ù×÷STM32  I2SÏà¹Ø¼Ä´æÆ÷
-*	3¡¢ÊµÏÖÂ¼Òô»ò·ÅÒôÓ¦ÓÃ£¬ĞèÒªÍ¬Ê±²Ù×÷WM8978ºÍSTM32µÄI2S¡£
-*	4¡¢²¿·Öº¯ÊıÓÃµ½µÄĞÎ²ÎµÄ¶¨ÒåÔÚST¹Ì¼ş¿âÖĞ£¬±ÈÈç£ºI2S_Standard_Phillips¡¢I2S_Standard_MSB¡¢I2S_Standard_LSB
-*			  I2S_MCLKOutput_Enable¡¢I2S_MCLKOutput_Disable
-*			  I2S_AudioFreq_8K¡¢I2S_AudioFreq_16K¡¢I2S_AudioFreq_22K¡¢I2S_AudioFreq_44K¡¢I2S_AudioFreq_48
-*			  I2S_Mode_MasterTx¡¢I2S_Mode_MasterRx
-*	5¡¢×¢ÊÍÖĞ pdf Ö¸µÄÊÇ wm8978.pdf Êı¾İÊÖ²á£¬wm8978de¼Ä´æÆ÷ºÜ¶à£¬ÓÃµ½µÄ¼Ä´æÆ÷»á×¢ÊÍpdfÎÄ¼şµÄÒ³Âë£¬±ãÓÚ²éÑ¯
+*	é‡è¦æç¤º:
+*	1ã€wm8978_ å¼€å¤´çš„å‡½æ•°æ˜¯æ“ä½œWM8978å¯„å­˜å™¨ï¼Œæ“ä½œWM8978å¯„å­˜å™¨æ˜¯é€šè¿‡I2Cæ¨¡æ‹Ÿæ€»çº¿è¿›è¡Œçš„
+*	2ã€I2S_ å¼€å¤´çš„å‡½æ•°æ˜¯æ“ä½œSTM32  I2Sç›¸å…³å¯„å­˜å™¨
+*	3ã€å®ç°å½•éŸ³æˆ–æ”¾éŸ³åº”ç”¨ï¼Œéœ€è¦åŒæ—¶æ“ä½œWM8978å’ŒSTM32çš„I2Sã€‚
+*	4ã€éƒ¨åˆ†å‡½æ•°ç”¨åˆ°çš„å½¢å‚çš„å®šä¹‰åœ¨STå›ºä»¶åº“ä¸­ï¼Œæ¯”å¦‚ï¼šI2S_Standard_Phillipsã€I2S_Standard_MSBã€I2S_Standard_LSB
+*			  I2S_MCLKOutput_Enableã€I2S_MCLKOutput_Disable
+*			  I2S_AudioFreq_8Kã€I2S_AudioFreq_16Kã€I2S_AudioFreq_22Kã€I2S_AudioFreq_44Kã€I2S_AudioFreq_48
+*			  I2S_Mode_MasterTxã€I2S_Mode_MasterRx
+*	5ã€æ³¨é‡Šä¸­ pdf æŒ‡çš„æ˜¯ wm8978.pdf æ•°æ®æ‰‹å†Œï¼Œwm8978deå¯„å­˜å™¨å¾ˆå¤šï¼Œç”¨åˆ°çš„å¯„å­˜å™¨ä¼šæ³¨é‡Špdfæ–‡ä»¶çš„é¡µç ï¼Œä¾¿äºæŸ¥è¯¢
 *
 *********************************************************************************************************
 */
 
 /* 
-	°²¸»À³STM32-V7¿ª·¢°å---  SAI½Ó¿Ú I2S×ÜÏß´«ÊäÒôÆµÊı¾İ¿ÚÏß
+	å®‰å¯Œè±STM32-V7å¼€å‘æ¿---  SAIæ¥å£ I2Sæ€»çº¿ä¼ è¾“éŸ³é¢‘æ•°æ®å£çº¿
 
 	PE4/SAI1_FS_A/DCMI_D4/NRF24L01_IRQ
 	PE5/SAI1_SCK_B/DCMI_D6/AD7606_BUSY
-	PE6/SAI1_SD_A/DCMI_D7/NRF905_CD		ADC Â¼Òô
-	PE3/SAI1_SD_B/NRF905_AM				DAC ·ÅÒô
+	PE6/SAI1_SD_A/DCMI_D7/NRF905_CD		ADC å½•éŸ³
+	PE3/SAI1_SD_B/NRF905_AM				DAC æ”¾éŸ³
 	PE2/SAI1_MCLK_A
 
 
-	STM32µÄSAIÅäÖÃÎªÖ÷Ä£Ê½¡£SAIT_Block_A ºÍ SAIT_Block_B Í¬²½Ä£Ê½¹¤×÷£¬ÆäÖĞSAIT_Block_B×÷ÎªÖ÷Ä£¿éÊä³öÊ±ÖÓ.
+	STM32çš„SAIé…ç½®ä¸ºä¸»æ¨¡å¼ã€‚SAIT_Block_A å’Œ SAIT_Block_B åŒæ­¥æ¨¡å¼å·¥ä½œï¼Œå…¶ä¸­SAIT_Block_Bä½œä¸ºä¸»æ¨¡å—è¾“å‡ºæ—¶é’Ÿ.
 	
-	Ö÷Ä£¿é SAIT_Block_B µÄ SAI1_SD_B Òı½ÅÓÃÓÚ·ÅÒô£»´ÓÄ£¿é SAIT_Block_AµÄSAI1_SD_AÓÃÓÚÂ¼Òô¡£
+	ä¸»æ¨¡å— SAIT_Block_B çš„ SAI1_SD_B å¼•è„šç”¨äºæ”¾éŸ³ï¼›ä»æ¨¡å— SAIT_Block_Açš„SAI1_SD_Aç”¨äºå½•éŸ³ã€‚
 	
-	²ÉÓÃ±ê×¼I2SĞ­Òé¡£
+	é‡‡ç”¨æ ‡å‡†I2Såè®®ã€‚
 
-    ÒôÆµÄ£¿é¿ÉÉùÃ÷ÎªÓëµÚ¶ş¸öÒôÆµÄ£¿éÍ¬²½¡£ÔÚÕâÖÖÇé¿öÏÂ£¬½«¹²ÓÃÎ»Ê±ÖÓºÍÖ¡Í¬²½ĞÅºÅ£¬ÒÔ¼õÉÙÍ¨ĞÅÊ±Õ¼ÓÃÍâ²¿Òı½ÅµÄÊıÁ¿¡£ÉùÃ÷ÎªÓëÁíÒ»¸öÄ£¿éÍ¬²½µÄÒôÆµÄ£¿é½«ÊÍ·ÅÆä SCK_x¡¢
-FS_x ºÍ MCLK_x Òı½ÅÒÔÓÃ×÷ GPIO
+    éŸ³é¢‘æ¨¡å—å¯å£°æ˜ä¸ºä¸ç¬¬äºŒä¸ªéŸ³é¢‘æ¨¡å—åŒæ­¥ã€‚åœ¨è¿™ç§æƒ…å†µä¸‹ï¼Œå°†å…±ç”¨ä½æ—¶é’Ÿå’Œå¸§åŒæ­¥ä¿¡å·ï¼Œä»¥å‡å°‘é€šä¿¡æ—¶å ç”¨å¤–éƒ¨å¼•è„šçš„æ•°é‡ã€‚å£°æ˜ä¸ºä¸å¦ä¸€ä¸ªæ¨¡å—åŒæ­¥çš„éŸ³é¢‘æ¨¡å—å°†é‡Šæ”¾å…¶ SCK_xã€
+FS_x å’Œ MCLK_x å¼•è„šä»¥ç”¨ä½œ GPIO
 
 */
 
-/* ¶¨ÒåÂ¼Òô·ÅÒô»º³åÇø */
-#define REC_MEM_ADDR	SDRAM_APP_BUF
-#define REC_MEM_SIZE	(2 * 1024 * 1024)
+/* å®šä¹‰å½•éŸ³æ”¾éŸ³ç¼“å†²åŒº */
+#define REC_MEM_ADDR SDRAM_APP_BUF
+#define REC_MEM_SIZE (2 * 1024 * 1024)
 
-#define  EVAL_AUDIO_IRQ_PREPRIO  3
-#define  EVAL_AUDIO_IRQ_SUBRIO	 0
+#define EVAL_AUDIO_IRQ_PREPRIO 3
+#define EVAL_AUDIO_IRQ_SUBRIO 0
 
-/*************** SAI ·ÅÒôÍ¨µÀGPIO DMA¶¨Òå ***************/
-#define SAI_OUT                          SAI1_Block_A
-#define SAI_OUT_CLK_ENABLE()              __HAL_RCC_SAI1_CLK_ENABLE()
+/*************** SAI æ”¾éŸ³é€šé“GPIO DMAå®šä¹‰ ***************/
+#define SAI_OUT SAI1_Block_A
+#define SAI_OUT_CLK_ENABLE() __HAL_RCC_SAI1_CLK_ENABLE()
 
-#define SAI_OUT_FS_GPIO_PORT              GPIOE
-#define SAI_OUT_FS_AF                     GPIO_AF6_SAI1
-#define SAI_OUT_FS_PIN                    GPIO_PIN_4
+#define SAI_OUT_FS_GPIO_PORT GPIOE
+#define SAI_OUT_FS_AF GPIO_AF6_SAI1
+#define SAI_OUT_FS_PIN GPIO_PIN_4
 
-#define SAI_OUT_SCK_GPIO_PORT             GPIOE
-#define SAI_OUT_SCK_AF                    GPIO_AF6_SAI1
-#define SAI_OUT_SCK_PIN                   GPIO_PIN_5
+#define SAI_OUT_SCK_GPIO_PORT GPIOE
+#define SAI_OUT_SCK_AF GPIO_AF6_SAI1
+#define SAI_OUT_SCK_PIN GPIO_PIN_5
 
-#define SAI_OUT_SD_GPIO_PORT              GPIOE
-#define SAI_OUT_SD_AF                     GPIO_AF6_SAI1
-#define SAI_OUT_SD_PIN                    GPIO_PIN_6
+#define SAI_OUT_SD_GPIO_PORT GPIOE
+#define SAI_OUT_SD_AF GPIO_AF6_SAI1
+#define SAI_OUT_SD_PIN GPIO_PIN_6
 
-#define SAI_OUT_MCLK_GPIO_PORT            GPIOE
-#define SAI_OUT_MCLK_AF                   GPIO_AF6_SAI1
-#define SAI_OUT_MCLK_PIN                  GPIO_PIN_2
+#define SAI_OUT_MCLK_GPIO_PORT GPIOE
+#define SAI_OUT_MCLK_AF GPIO_AF6_SAI1
+#define SAI_OUT_MCLK_PIN GPIO_PIN_2
 
-#define SAI_OUT_MCLK_ENABLE()             __HAL_RCC_GPIOE_CLK_ENABLE()
-#define SAI_OUT_SCK_ENABLE()              __HAL_RCC_GPIOE_CLK_ENABLE()
-#define SAI_OUT_FS_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
-#define SAI_OUT_SD_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
+#define SAI_OUT_MCLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define SAI_OUT_SCK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define SAI_OUT_FS_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define SAI_OUT_SD_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
 
-SAI_HandleTypeDef   SaiOutHandle;
-DMA_HandleTypeDef   hSaiOutDma;
+SAI_HandleTypeDef SaiOutHandle;
+DMA_HandleTypeDef hSaiOutDma;
 
-#define SAI_OUT_DMA_STREAM				DMA2_Stream6
-#define SAI_OUT_DMA_STREAM_IRQ			DMA2_Stream6_IRQn
-#define SAI_OUT_DMA_STREAM_IRQHandler	DMA2_Stream6_IRQHandler
+#define SAI_OUT_DMA_STREAM DMA2_Stream6
+#define SAI_OUT_DMA_STREAM_IRQ DMA2_Stream6_IRQn
+#define SAI_OUT_DMA_STREAM_IRQHandler DMA2_Stream6_IRQHandler
 
-#define SAI_OUT_DMA_CLK_ENABLE()		__HAL_RCC_DMA2_CLK_ENABLE()
-#define SAI_OUT_DMA_REQUEST				DMA_REQUEST_SAI1_A
+#define SAI_OUT_DMA_CLK_ENABLE() __HAL_RCC_DMA2_CLK_ENABLE()
+#define SAI_OUT_DMA_REQUEST DMA_REQUEST_SAI1_A
 
-/*************** SAI Â¼ÒôÍ¨µÀGPIO DMA¶¨Òå ***************/
-#define SAI_IN                          SAI1_Block_B
-#define SAI_IN_CLK_ENABLE()              __HAL_RCC_SAI1_CLK_ENABLE()
+/*************** SAI å½•éŸ³é€šé“GPIO DMAå®šä¹‰ ***************/
+#define SAI_IN SAI1_Block_B
+#define SAI_IN_CLK_ENABLE() __HAL_RCC_SAI1_CLK_ENABLE()
 
-#define SAI_IN_SD_GPIO_PORT              GPIOE
-#define SAI_IN_SD_AF                     GPIO_AF6_SAI1
-#define SAI_IN_SD_PIN                    GPIO_PIN_3
+#define SAI_IN_SD_GPIO_PORT GPIOE
+#define SAI_IN_SD_AF GPIO_AF6_SAI1
+#define SAI_IN_SD_PIN GPIO_PIN_3
 
-#define SAI_IN_SD_ENABLE()               __HAL_RCC_GPIOE_CLK_ENABLE()
+#define SAI_IN_SD_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
 
-SAI_HandleTypeDef   SaiInHandle;
-DMA_HandleTypeDef   hSaiInDma;
+SAI_HandleTypeDef SaiInHandle;
+DMA_HandleTypeDef hSaiInDma;
 
-#define SAI_IN_DMA_STREAM				DMA2_Stream4
-#define SAI_IN_DMA_STREAM_IRQ			DMA2_Stream4_IRQn
-#define SAI_IN_DMA_STREAM_IRQHandler	DMA2_Stream4_IRQHandler
+#define SAI_IN_DMA_STREAM DMA2_Stream4
+#define SAI_IN_DMA_STREAM_IRQ DMA2_Stream4_IRQn
+#define SAI_IN_DMA_STREAM_IRQHandler DMA2_Stream4_IRQHandler
 
-#define SAI_IN_DMA_CLK_ENABLE()			__HAL_RCC_DMA2_CLK_ENABLE()
-#define SAI_IN_DMA_REQUEST				DMA_REQUEST_SAI1_B
-	
-/*************** SAI Â¼ÒôÍ¨µÀGPIO DMA¶¨Òå£¨End£© ***************/
+#define SAI_IN_DMA_CLK_ENABLE() __HAL_RCC_DMA2_CLK_ENABLE()
+#define SAI_IN_DMA_REQUEST DMA_REQUEST_SAI1_B
 
-typedef enum 
+/*************** SAI å½•éŸ³é€šé“GPIO DMAå®šä¹‰ï¼ˆEndï¼‰ ***************/
+
+typedef enum
 {
 	DMA_BUFFER_NONE = 0,
 	DMA_BUFFER_HALF,
 	DMA_BUFFER_FULL,
-}DMA_BUFFER_STATE_T;
+} DMA_BUFFER_STATE_T;
 
-/******** ·ÅÒôÓÃÈ«¾Ö±äÁ¿ ********/
-#define PLAY_BUFF_SIZE       4096
+/******** æ”¾éŸ³ç”¨å…¨å±€å˜é‡ ********/
+#define PLAY_BUFF_SIZE 4096
 
-static __IO DMA_BUFFER_STATE_T	s_PlayDmaState = DMA_BUFFER_NONE;
+static __IO DMA_BUFFER_STATE_T s_PlayDmaState = DMA_BUFFER_NONE;
 
 __IO int16_t s_PlayPointer = -1;
 int16_t *s_PlayFileBuf;
@@ -142,58 +142,55 @@ uint32_t s_PlayPos;
 uint32_t s_PlayFileLen;
 
 /* Buffer location should aligned to cache line size (32 bytes) */
-ALIGN_32BYTES (uint16_t s_PlayBuffCache[PLAY_BUFF_SIZE]);
+ALIGN_32BYTES(uint16_t s_PlayBuffCache[PLAY_BUFF_SIZE]);
 
-/********* Â¼ÒôÓÃÈ«¾Ö±äÁ¿ *********/
-#define REC_BUFF_SIZE       4096
+/********* å½•éŸ³ç”¨å…¨å±€å˜é‡ *********/
+#define REC_BUFF_SIZE 4096
 
-static __IO DMA_BUFFER_STATE_T	s_RecDmaState = DMA_BUFFER_NONE;
+static __IO DMA_BUFFER_STATE_T s_RecDmaState = DMA_BUFFER_NONE;
 
 int16_t *s_RecFileBuf;
 uint32_t s_RecPos;
 uint32_t s_RecFileLen;
 
 /* Buffer location should aligned to cache line size (32 bytes) */
-ALIGN_32BYTES (uint16_t s_RecBuffCache[REC_BUFF_SIZE]);
+ALIGN_32BYTES(uint16_t s_RecBuffCache[REC_BUFF_SIZE]);
 
-
-/* ½öÔÚ±¾Ä£¿éÄÚ²¿Ê¹ÓÃµÄ¾Ö²¿º¯Êı */
+/* ä»…åœ¨æœ¬æ¨¡å—å†…éƒ¨ä½¿ç”¨çš„å±€éƒ¨å‡½æ•° */
 static uint16_t wm8978_ReadReg(uint8_t _ucRegAddr);
 static uint8_t wm8978_WriteReg(uint8_t _ucRegAddr, uint16_t _usValue);
 
 static void wm8978_Reset(void);
 
 /*
-	wm8978¼Ä´æÆ÷»º´æ
-	ÓÉÓÚWM8978µÄI2CÁ½Ïß½Ó¿Ú²»Ö§³Ö¶ÁÈ¡²Ù×÷£¬Òò´Ë¼Ä´æÆ÷Öµ»º´æÔÚÄÚ´æÖĞ£¬µ±Ğ´¼Ä´æÆ÷Ê±Í¬²½¸üĞÂ»º´æ£¬¶Á¼Ä´æÆ÷Ê±
-	Ö±½Ó·µ»Ø»º´æÖĞµÄÖµ¡£
-	¼Ä´æÆ÷MAP ÔÚWM8978.pdf µÄµÚ67Ò³£¬¼Ä´æÆ÷µØÖ·ÊÇ7bit£¬ ¼Ä´æÆ÷Êı¾İÊÇ9bit
+	wm8978å¯„å­˜å™¨ç¼“å­˜
+	ç”±äºWM8978çš„I2Cä¸¤çº¿æ¥å£ä¸æ”¯æŒè¯»å–æ“ä½œï¼Œå› æ­¤å¯„å­˜å™¨å€¼ç¼“å­˜åœ¨å†…å­˜ä¸­ï¼Œå½“å†™å¯„å­˜å™¨æ—¶åŒæ­¥æ›´æ–°ç¼“å­˜ï¼Œè¯»å¯„å­˜å™¨æ—¶
+	ç›´æ¥è¿”å›ç¼“å­˜ä¸­çš„å€¼ã€‚
+	å¯„å­˜å™¨MAP åœ¨WM8978.pdf çš„ç¬¬67é¡µï¼Œå¯„å­˜å™¨åœ°å€æ˜¯7bitï¼Œ å¯„å­˜å™¨æ•°æ®æ˜¯9bit
 */
 static uint16_t wm8978_RegCash[] = {
-	0x000, 0x000, 0x000, 0x000, 0x050, 0x000, 0x140, 0x000,
-	0x000, 0x000, 0x000, 0x0FF, 0x0FF, 0x000, 0x100, 0x0FF,
-	0x0FF, 0x000, 0x12C, 0x02C, 0x02C, 0x02C, 0x02C, 0x000,
-	0x032, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
-	0x038, 0x00B, 0x032, 0x000, 0x008, 0x00C, 0x093, 0x0E9,
-	0x000, 0x000, 0x000, 0x000, 0x003, 0x010, 0x010, 0x100,
-	0x100, 0x002, 0x001, 0x001, 0x039, 0x039, 0x039, 0x039,
-	0x001, 0x001
-};
-
+		0x000, 0x000, 0x000, 0x000, 0x050, 0x000, 0x140, 0x000,
+		0x000, 0x000, 0x000, 0x0FF, 0x0FF, 0x000, 0x100, 0x0FF,
+		0x0FF, 0x000, 0x12C, 0x02C, 0x02C, 0x02C, 0x02C, 0x000,
+		0x032, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
+		0x038, 0x00B, 0x032, 0x000, 0x008, 0x00C, 0x093, 0x0E9,
+		0x000, 0x000, 0x000, 0x000, 0x003, 0x010, 0x010, 0x100,
+		0x100, 0x002, 0x001, 0x001, 0x039, 0x039, 0x039, 0x039,
+		0x001, 0x001};
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_Init
-*	¹¦ÄÜËµÃ÷: ÅäÖÃI2C GPIO£¬²¢¼ì²éI2C×ÜÏßÉÏµÄWM8978ÊÇ·ñÕı³£
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: 1 ±íÊ¾³õÊ¼»¯Õı³££¬0±íÊ¾³õÊ¼»¯²»Õı³£
+*	å‡½ æ•° å: wm8978_Init
+*	åŠŸèƒ½è¯´æ˜: é…ç½®I2C GPIOï¼Œå¹¶æ£€æŸ¥I2Cæ€»çº¿ä¸Šçš„WM8978æ˜¯å¦æ­£å¸¸
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: 1 è¡¨ç¤ºåˆå§‹åŒ–æ­£å¸¸ï¼Œ0è¡¨ç¤ºåˆå§‹åŒ–ä¸æ­£å¸¸
 *********************************************************************************************************
 */
 uint8_t wm8978_Init(void)
 {
 	uint8_t re;
 
-	if (i2c_CheckDevice(WM8978_SLAVE_ADDRESS) == 0)	/* Õâ¸öº¯Êı»áÅäÖÃSTM32µÄGPIOÓÃÓÚÈí¼şÄ£ÄâI2CÊ±Ğò */
+	if (i2c_CheckDevice(WM8978_SLAVE_ADDRESS) == 0) /* è¿™ä¸ªå‡½æ•°ä¼šé…ç½®STM32çš„GPIOç”¨äºè½¯ä»¶æ¨¡æ‹ŸI2Cæ—¶åº */
 	{
 		re = 1;
 	}
@@ -201,17 +198,17 @@ uint8_t wm8978_Init(void)
 	{
 		re = 0;
 	}
-	wm8978_Reset();			/* Ó²¼ş¸´Î»WM8978ËùÓĞ¼Ä´æÆ÷µ½È±Ê¡×´Ì¬ */
+	wm8978_Reset(); /* ç¡¬ä»¶å¤ä½WM8978æ‰€æœ‰å¯„å­˜å™¨åˆ°ç¼ºçœçŠ¶æ€ */
 	return re;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_SetEarVolume
-*	¹¦ÄÜËµÃ÷: ĞŞ¸Ä¶ú»úÊä³öÒôÁ¿
-*	ĞÎ    ²Î:  _ucLeftVolume £º×óÉùµÀÒôÁ¿Öµ, 0-63
-*			  _ucLRightVolume : ÓÒÉùµÀÒôÁ¿Öµ,0-63
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_SetEarVolume
+*	åŠŸèƒ½è¯´æ˜: ä¿®æ”¹è€³æœºè¾“å‡ºéŸ³é‡
+*	å½¢    å‚:  _ucLeftVolume ï¼šå·¦å£°é“éŸ³é‡å€¼, 0-63
+*			  _ucLRightVolume : å³å£°é“éŸ³é‡å€¼,0-63
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_SetEarVolume(uint8_t _ucVolume)
@@ -231,20 +228,20 @@ void wm8978_SetEarVolume(uint8_t _ucVolume)
 		R52	LOUT1 Volume control
 		R53	ROUT1 Volume control
 	*/
-	/* ÏÈ¸üĞÂ×óÉùµÀ»º´æÖµ */
+	/* å…ˆæ›´æ–°å·¦å£°é“ç¼“å­˜å€¼ */
 	wm8978_WriteReg(52, regL | 0x00);
 
-	/* ÔÙÍ¬²½¸üĞÂ×óÓÒÉùµÀµÄÒôÁ¿ */
-	wm8978_WriteReg(53, regR | 0x100);	/* 0x180±íÊ¾ ÔÚÒôÁ¿Îª0Ê±ÔÙ¸üĞÂ£¬±ÜÃâµ÷½ÚÒôÁ¿³öÏÖµÄ¡°¸ÂßÕ¡±Éù */
+	/* å†åŒæ­¥æ›´æ–°å·¦å³å£°é“çš„éŸ³é‡ */
+	wm8978_WriteReg(53, regR | 0x100); /* 0x180è¡¨ç¤º åœ¨éŸ³é‡ä¸º0æ—¶å†æ›´æ–°ï¼Œé¿å…è°ƒèŠ‚éŸ³é‡å‡ºç°çš„â€œå˜å“’â€å£° */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_SetSpkVolume
-*	¹¦ÄÜËµÃ÷: ĞŞ¸ÄÑïÉùÆ÷Êä³öÒôÁ¿
-*	ĞÎ    ²Î:  _ucLeftVolume £º×óÉùµÀÒôÁ¿Öµ, 0-63
-*			  _ucLRightVolume : ÓÒÉùµÀÒôÁ¿Öµ,0-63
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_SetSpkVolume
+*	åŠŸèƒ½è¯´æ˜: ä¿®æ”¹æ‰¬å£°å™¨è¾“å‡ºéŸ³é‡
+*	å½¢    å‚:  _ucLeftVolume ï¼šå·¦å£°é“éŸ³é‡å€¼, 0-63
+*			  _ucLRightVolume : å³å£°é“éŸ³é‡å€¼,0-63
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_SetSpkVolume(uint8_t _ucVolume)
@@ -264,52 +261,52 @@ void wm8978_SetSpkVolume(uint8_t _ucVolume)
 		R54	LOUT2 (SPK) Volume control
 		R55	ROUT2 (SPK) Volume control
 	*/
-	/* ÏÈ¸üĞÂ×óÉùµÀ»º´æÖµ */
+	/* å…ˆæ›´æ–°å·¦å£°é“ç¼“å­˜å€¼ */
 	wm8978_WriteReg(54, regL | 0x00);
 
-	/* ÔÙÍ¬²½¸üĞÂ×óÓÒÉùµÀµÄÒôÁ¿ */
-	wm8978_WriteReg(55, regR | 0x100);	/* ÔÚÒôÁ¿Îª0Ê±ÔÙ¸üĞÂ£¬±ÜÃâµ÷½ÚÒôÁ¿³öÏÖµÄ¡°¸ÂßÕ¡±Éù */
+	/* å†åŒæ­¥æ›´æ–°å·¦å³å£°é“çš„éŸ³é‡ */
+	wm8978_WriteReg(55, regR | 0x100); /* åœ¨éŸ³é‡ä¸º0æ—¶å†æ›´æ–°ï¼Œé¿å…è°ƒèŠ‚éŸ³é‡å‡ºç°çš„â€œå˜å“’â€å£° */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_ReadEarVolume
-*	¹¦ÄÜËµÃ÷: ¶Á»Ø¶ú»úÍ¨µÀµÄÒôÁ¿.
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: µ±Ç°ÒôÁ¿Öµ
+*	å‡½ æ•° å: wm8978_ReadEarVolume
+*	åŠŸèƒ½è¯´æ˜: è¯»å›è€³æœºé€šé“çš„éŸ³é‡.
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: å½“å‰éŸ³é‡å€¼
 *********************************************************************************************************
 */
 uint8_t wm8978_ReadEarVolume(void)
 {
-	return (uint8_t)(wm8978_ReadReg(52) & 0x3F );
+	return (uint8_t)(wm8978_ReadReg(52) & 0x3F);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_ReadSpkVolume
-*	¹¦ÄÜËµÃ÷: ¶Á»ØÑïÉùÆ÷Í¨µÀµÄÒôÁ¿.
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: µ±Ç°ÒôÁ¿Öµ
+*	å‡½ æ•° å: wm8978_ReadSpkVolume
+*	åŠŸèƒ½è¯´æ˜: è¯»å›æ‰¬å£°å™¨é€šé“çš„éŸ³é‡.
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: å½“å‰éŸ³é‡å€¼
 *********************************************************************************************************
 */
 uint8_t wm8978_ReadSpkVolume(void)
 {
-	return (uint8_t)(wm8978_ReadReg(54) & 0x3F );
+	return (uint8_t)(wm8978_ReadReg(54) & 0x3F);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_OutMute
-*	¹¦ÄÜËµÃ÷: Êä³ö¾²Òô.
-*	ĞÎ    ²Î:  _ucMute £º1ÊÇ¾²Òô£¬0ÊÇ²»¾²Òô.
-*	·µ »Ø Öµ: µ±Ç°ÒôÁ¿Öµ
+*	å‡½ æ•° å: wm8978_OutMute
+*	åŠŸèƒ½è¯´æ˜: è¾“å‡ºé™éŸ³.
+*	å½¢    å‚:  _ucMute ï¼š1æ˜¯é™éŸ³ï¼Œ0æ˜¯ä¸é™éŸ³.
+*	è¿” å› å€¼: å½“å‰éŸ³é‡å€¼
 *********************************************************************************************************
 */
 void wm8978_OutMute(uint8_t _ucMute)
 {
 	uint16_t usRegValue;
 
-	if (_ucMute == 1) /* ¾²Òô */
+	if (_ucMute == 1) /* é™éŸ³ */
 	{
 		usRegValue = wm8978_ReadReg(52); /* Left Mixer Control */
 		usRegValue |= (1u << 6);
@@ -327,7 +324,7 @@ void wm8978_OutMute(uint8_t _ucMute)
 		usRegValue |= (1u << 6);
 		wm8978_WriteReg(55, usRegValue);
 	}
-	else	/* È¡Ïû¾²Òô */
+	else /* å–æ¶ˆé™éŸ³ */
 	{
 		usRegValue = wm8978_ReadReg(52);
 		usRegValue &= ~(1u << 6);
@@ -349,10 +346,10 @@ void wm8978_OutMute(uint8_t _ucMute)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_SetMicGain
-*	¹¦ÄÜËµÃ÷: ÉèÖÃMICÔöÒæ
-*	ĞÎ    ²Î:  _ucGain £ºÒôÁ¿Öµ, 0-63
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_SetMicGain
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®MICå¢ç›Š
+*	å½¢    å‚:  _ucGain ï¼šéŸ³é‡å€¼, 0-63
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_SetMicGain(uint8_t _ucGain)
@@ -362,11 +359,11 @@ void wm8978_SetMicGain(uint8_t _ucGain)
 		_ucGain = GAIN_MAX;
 	}
 
-	/* PGA ÒôÁ¿¿ØÖÆ  R45£¬ R46   pdf 19Ò³
+	/* PGA éŸ³é‡æ§åˆ¶  R45ï¼Œ R46   pdf 19é¡µ
 		Bit8	INPPGAUPDATE
-		Bit7	INPPGAZCL		¹ıÁãÔÙ¸ü¸Ä
-		Bit6	INPPGAMUTEL		PGA¾²Òô
-		Bit5:0	ÔöÒæÖµ£¬010000ÊÇ0dB
+		Bit7	INPPGAZCL		è¿‡é›¶å†æ›´æ”¹
+		Bit6	INPPGAMUTEL		PGAé™éŸ³
+		Bit5:0	å¢ç›Šå€¼ï¼Œ010000æ˜¯0dB
 	*/
 	wm8978_WriteReg(45, _ucGain);
 	wm8978_WriteReg(46, _ucGain | (1 << 8));
@@ -374,10 +371,10 @@ void wm8978_SetMicGain(uint8_t _ucGain)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_SetLineGain
-*	¹¦ÄÜËµÃ÷: ÉèÖÃLineÊäÈëÍ¨µÀµÄÔöÒæ
-*	ĞÎ    ²Î:  _ucGain £ºÒôÁ¿Öµ, 0-7. 7×î´ó£¬0×îĞ¡¡£ ¿ÉË¥¼õ¿É·Å´ó¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_SetLineGain
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®Lineè¾“å…¥é€šé“çš„å¢ç›Š
+*	å½¢    å‚:  _ucGain ï¼šéŸ³é‡å€¼, 0-7. 7æœ€å¤§ï¼Œ0æœ€å°ã€‚ å¯è¡°å‡å¯æ”¾å¤§ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_SetLineGain(uint8_t _ucGain)
@@ -390,87 +387,88 @@ void wm8978_SetLineGain(uint8_t _ucGain)
 	}
 
 	/*
-		Mic ÊäÈëĞÅµÀµÄÔöÒæÓÉ PGABOOSTL ºÍ PGABOOSTR ¿ØÖÆ
-		Aux ÊäÈëĞÅµÀµÄÊäÈëÔöÒæÓÉ AUXL2BOOSTVO[2:0] ºÍ AUXR2BOOSTVO[2:0] ¿ØÖÆ
-		Line ÊäÈëĞÅµÀµÄÔöÒæÓÉ LIP2BOOSTVOL[2:0] ºÍ RIP2BOOSTVOL[2:0] ¿ØÖÆ
+		Mic è¾“å…¥ä¿¡é“çš„å¢ç›Šç”± PGABOOSTL å’Œ PGABOOSTR æ§åˆ¶
+		Aux è¾“å…¥ä¿¡é“çš„è¾“å…¥å¢ç›Šç”± AUXL2BOOSTVO[2:0] å’Œ AUXR2BOOSTVO[2:0] æ§åˆ¶
+		Line è¾“å…¥ä¿¡é“çš„å¢ç›Šç”± LIP2BOOSTVOL[2:0] å’Œ RIP2BOOSTVOL[2:0] æ§åˆ¶
 	*/
-	/*	pdf 21Ò³£¬R47£¨×óÉùµÀ£©£¬R48£¨ÓÒÉùµÀ£©, MIC ÔöÒæ¿ØÖÆ¼Ä´æÆ÷
-		R47 (R48¶¨ÒåÓë´ËÏàÍ¬)
-		B8		PGABOOSTL	= 1,   0±íÊ¾MICĞÅºÅÖ±Í¨ÎŞÔöÒæ£¬1±íÊ¾MICĞÅºÅ+20dBÔöÒæ£¨Í¨¹ı×Ô¾ÙµçÂ·£©
-		B7		= 0£¬ ±£Áô
-		B6:4	L2_2BOOSTVOL = x£¬ 0±íÊ¾½ûÖ¹£¬1-7±íÊ¾ÔöÒæ-12dB ~ +6dB  £¨¿ÉÒÔË¥¼õÒ²¿ÉÒÔ·Å´ó£©
-		B3		= 0£¬ ±£Áô
-		B2:0`	AUXL2BOOSTVOL = x£¬0±íÊ¾½ûÖ¹£¬1-7±íÊ¾ÔöÒæ-12dB ~ +6dB  £¨¿ÉÒÔË¥¼õÒ²¿ÉÒÔ·Å´ó£©
+	/*	pdf 21é¡µï¼ŒR47ï¼ˆå·¦å£°é“ï¼‰ï¼ŒR48ï¼ˆå³å£°é“ï¼‰, MIC å¢ç›Šæ§åˆ¶å¯„å­˜å™¨
+		R47 (R48å®šä¹‰ä¸æ­¤ç›¸åŒ)
+		B8		PGABOOSTL	= 1,   0è¡¨ç¤ºMICä¿¡å·ç›´é€šæ— å¢ç›Šï¼Œ1è¡¨ç¤ºMICä¿¡å·+20dBå¢ç›Šï¼ˆé€šè¿‡è‡ªä¸¾ç”µè·¯ï¼‰
+		B7		= 0ï¼Œ ä¿ç•™
+		B6:4	L2_2BOOSTVOL = xï¼Œ 0è¡¨ç¤ºç¦æ­¢ï¼Œ1-7è¡¨ç¤ºå¢ç›Š-12dB ~ +6dB  ï¼ˆå¯ä»¥è¡°å‡ä¹Ÿå¯ä»¥æ”¾å¤§ï¼‰
+		B3		= 0ï¼Œ ä¿ç•™
+		B2:0`	AUXL2BOOSTVOL = xï¼Œ0è¡¨ç¤ºç¦æ­¢ï¼Œ1-7è¡¨ç¤ºå¢ç›Š-12dB ~ +6dB  ï¼ˆå¯ä»¥è¡°å‡ä¹Ÿå¯ä»¥æ”¾å¤§ï¼‰
 	*/
 
 	usRegValue = wm8978_ReadReg(47);
-	usRegValue &= 0x8F;/* ½«Bit6:4Çå0   1000 1111*/
+	usRegValue &= 0x8F; /* å°†Bit6:4æ¸…0   1000 1111*/
 	usRegValue |= (_ucGain << 4);
-	wm8978_WriteReg(47, usRegValue);	/* Ğ´×óÉùµÀÊäÈëÔöÒæ¿ØÖÆ¼Ä´æÆ÷ */
+	wm8978_WriteReg(47, usRegValue); /* å†™å·¦å£°é“è¾“å…¥å¢ç›Šæ§åˆ¶å¯„å­˜å™¨ */
 
 	usRegValue = wm8978_ReadReg(48);
-	usRegValue &= 0x8F;/* ½«Bit6:4Çå0   1000 1111*/
+	usRegValue &= 0x8F; /* å°†Bit6:4æ¸…0   1000 1111*/
 	usRegValue |= (_ucGain << 4);
-	wm8978_WriteReg(48, usRegValue);	/* Ğ´ÓÒÉùµÀÊäÈëÔöÒæ¿ØÖÆ¼Ä´æÆ÷ */
+	wm8978_WriteReg(48, usRegValue); /* å†™å³å£°é“è¾“å…¥å¢ç›Šæ§åˆ¶å¯„å­˜å™¨ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_PowerDown
-*	¹¦ÄÜËµÃ÷: ¹Ø±Õwm8978£¬½øÈëµÍ¹¦ºÄÄ£Ê½
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_PowerDown
+*	åŠŸèƒ½è¯´æ˜: å…³é—­wm8978ï¼Œè¿›å…¥ä½åŠŸè€—æ¨¡å¼
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_PowerDown(void)
 {
-	wm8978_Reset();			/* Ó²¼ş¸´Î»WM8978ËùÓĞ¼Ä´æÆ÷µ½È±Ê¡×´Ì¬ */
+	wm8978_Reset(); /* ç¡¬ä»¶å¤ä½WM8978æ‰€æœ‰å¯„å­˜å™¨åˆ°ç¼ºçœçŠ¶æ€ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_CfgAudioIF
-*	¹¦ÄÜËµÃ÷: ÅäÖÃWM8978µÄÒôÆµ½Ó¿Ú(I2S)
-*	ĞÎ    ²Î:
-*			  _usStandard : ½Ó¿Ú±ê×¼£¬I2S_Standard_Phillips, I2S_Standard_MSB »ò I2S_Standard_LSB
-*			  _ucWordLen : ×Ö³¤£¬16¡¢24¡¢32£¬20bit¸ñÊ½£©
-*			  _usMode : CPU I2SµÄ¹¤×÷Ä£Ê½£¬I2S_Mode_MasterTx¡¢I2S_Mode_MasterRx¡¢
-*						°²¸»À³¿ª·¢°åÓ²¼ş²»Ö§³Ö I2S_Mode_SlaveTx¡¢I2S_Mode_SlaveRx Ä£Ê½£¬ÕâĞèÒªWM8978Á¬½Ó
-*						Íâ²¿Õñµ´Æ÷
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_CfgAudioIF
+*	åŠŸèƒ½è¯´æ˜: é…ç½®WM8978çš„éŸ³é¢‘æ¥å£(I2S)
+*	å½¢    å‚:
+*			  _usStandard : æ¥å£æ ‡å‡†ï¼ŒI2S_Standard_Phillips, I2S_Standard_MSB æˆ– I2S_Standard_LSB
+*			  _ucWordLen : å­—é•¿ï¼Œ16ã€24ã€32ï¼Œ20bitæ ¼å¼ï¼‰
+*			  _usMode : CPU I2Sçš„å·¥ä½œæ¨¡å¼ï¼ŒI2S_Mode_MasterTxã€I2S_Mode_MasterRxã€
+*						å®‰å¯Œè±å¼€å‘æ¿ç¡¬ä»¶ä¸æ”¯æŒ I2S_Mode_SlaveTxã€I2S_Mode_SlaveRx æ¨¡å¼ï¼Œè¿™éœ€è¦WM8978è¿æ¥
+*						å¤–éƒ¨æŒ¯è¡å™¨
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_CfgAudioIF(uint16_t _usStandard, uint8_t _ucWordLen)
 {
 	uint16_t usReg;
 
-	/* pdf 67Ò³£¬¼Ä´æÆ÷ÁĞ±í */
+	/* pdf 67é¡µï¼Œå¯„å­˜å™¨åˆ—è¡¨ */
 
-	/*	REG R4, ÒôÆµ½Ó¿Ú¿ØÖÆ¼Ä´æÆ÷
-		B8		BCP	 = X, BCLK¼«ĞÔ£¬0±íÊ¾Õı³££¬1±íÊ¾·´Ïà
-		B7		LRCP = x, LRCÊ±ÖÓ¼«ĞÔ£¬0±íÊ¾Õı³££¬1±íÊ¾·´Ïà
-		B6:5	WL = x£¬ ×Ö³¤£¬00=16bit£¬01=20bit£¬10=24bit£¬11=32bit £¨ÓÒ¶ÔÆëÄ£Ê½Ö»ÄÜ²Ù×÷ÔÚ×î´ó24bit)
-		B4:3	FMT = x£¬ÒôÆµÊı¾İ¸ñÊ½£¬00=ÓÒ¶ÔÆë£¬01=×ó¶ÔÆë£¬10=I2S¸ñÊ½£¬11=PCM
-		B2		DACLRSWAP = x, ¿ØÖÆDACÊı¾İ³öÏÖÔÚLRCÊ±ÖÓµÄ×ó±ß»¹ÊÇÓÒ±ß
-		B1 		ADCLRSWAP = x£¬¿ØÖÆADCÊı¾İ³öÏÖÔÚLRCÊ±ÖÓµÄ×ó±ß»¹ÊÇÓÒ±ß
-		B0		MONO	= 0£¬0±íÊ¾Á¢ÌåÉù£¬1±íÊ¾µ¥ÉùµÀ£¬½ö×óÉùµÀÓĞĞ§
+	/*	REG R4, éŸ³é¢‘æ¥å£æ§åˆ¶å¯„å­˜å™¨
+		B8		BCP	 = X, BCLKææ€§ï¼Œ0è¡¨ç¤ºæ­£å¸¸ï¼Œ1è¡¨ç¤ºåç›¸
+		B7		LRCP = x, LRCæ—¶é’Ÿææ€§ï¼Œ0è¡¨ç¤ºæ­£å¸¸ï¼Œ1è¡¨ç¤ºåç›¸
+		B6:5	WL = xï¼Œ å­—é•¿ï¼Œ00=16bitï¼Œ01=20bitï¼Œ10=24bitï¼Œ11=32bit ï¼ˆå³å¯¹é½æ¨¡å¼åªèƒ½æ“ä½œåœ¨æœ€å¤§24bit)
+		B4:3	FMT = xï¼ŒéŸ³é¢‘æ•°æ®æ ¼å¼ï¼Œ00=å³å¯¹é½ï¼Œ01=å·¦å¯¹é½ï¼Œ10=I2Sæ ¼å¼ï¼Œ11=PCM
+		B2		DACLRSWAP = x, æ§åˆ¶DACæ•°æ®å‡ºç°åœ¨LRCæ—¶é’Ÿçš„å·¦è¾¹è¿˜æ˜¯å³è¾¹
+		B1 		ADCLRSWAP = xï¼Œæ§åˆ¶ADCæ•°æ®å‡ºç°åœ¨LRCæ—¶é’Ÿçš„å·¦è¾¹è¿˜æ˜¯å³è¾¹
+		B0		MONO	= 0ï¼Œ0è¡¨ç¤ºç«‹ä½“å£°ï¼Œ1è¡¨ç¤ºå•å£°é“ï¼Œä»…å·¦å£°é“æœ‰æ•ˆ
 	*/
 	usReg = 0;
-	if (_usStandard == I2S_STANDARD_PHILIPS)	/* I2S·ÉÀûÆÖ±ê×¼ */
+	if (_usStandard == I2S_STANDARD_PHILIPS) /* I2Sé£åˆ©æµ¦æ ‡å‡† */
 	{
 		usReg |= (2 << 3);
 	}
-	else if (_usStandard == I2S_STANDARD_MSB)	/* MSB¶ÔÆë±ê×¼(×ó¶ÔÆë) */
+	else if (_usStandard == I2S_STANDARD_MSB) /* MSBå¯¹é½æ ‡å‡†(å·¦å¯¹é½) */
 	{
 		usReg |= (1 << 3);
 	}
-	else if (_usStandard == I2S_STANDARD_LSB)	/* LSB¶ÔÆë±ê×¼(ÓÒ¶ÔÆë) */
+	else if (_usStandard == I2S_STANDARD_LSB) /* LSBå¯¹é½æ ‡å‡†(å³å¯¹é½) */
 	{
 		usReg |= (0 << 3);
 	}
-	else	/* PCM±ê×¼(16Î»Í¨µÀÖ¡ÉÏ´ø³¤»ò¶ÌÖ¡Í¬²½»òÕß16Î»Êı¾İÖ¡À©Õ¹Îª32Î»Í¨µÀÖ¡) */
+	else /* PCMæ ‡å‡†(16ä½é€šé“å¸§ä¸Šå¸¦é•¿æˆ–çŸ­å¸§åŒæ­¥æˆ–è€…16ä½æ•°æ®å¸§æ‰©å±•ä¸º32ä½é€šé“å¸§) */
 	{
-		usReg |= (3 << 3);;
+		usReg |= (3 << 3);
+		;
 	}
 
 	if (_ucWordLen == 24)
@@ -484,29 +482,28 @@ void wm8978_CfgAudioIF(uint16_t _usStandard, uint8_t _ucWordLen)
 	else if (_ucWordLen == 20)
 	{
 		usReg |= (1 << 5);
-	}	
+	}
 	else
 	{
-		usReg |= (0 << 5);		/* 16bit */
+		usReg |= (0 << 5); /* 16bit */
 	}
 	wm8978_WriteReg(4, usReg);
 
-	/* R5  pdf 57Ò³ */
-
+	/* R5  pdf 57é¡µ */
 
 	/*
-		R6£¬Ê±ÖÓ²úÉú¿ØÖÆ¼Ä´æÆ÷
-		MS = 0,  WM8978±»¶¯Ê±ÖÓ£¬ÓÉMCUÌá¹©MCLKÊ±ÖÓ
+		R6ï¼Œæ—¶é’Ÿäº§ç”Ÿæ§åˆ¶å¯„å­˜å™¨
+		MS = 0,  WM8978è¢«åŠ¨æ—¶é’Ÿï¼Œç”±MCUæä¾›MCLKæ—¶é’Ÿ
 	*/
 	wm8978_WriteReg(6, 0x000);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_ReadReg
-*	¹¦ÄÜËµÃ÷: ´ÓcashÖĞ¶Á»Ø¶Á»Øwm8978¼Ä´æÆ÷
-*	ĞÎ    ²Î:  _ucRegAddr £º ¼Ä´æÆ÷µØÖ·
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_ReadReg
+*	åŠŸèƒ½è¯´æ˜: ä»cashä¸­è¯»å›è¯»å›wm8978å¯„å­˜å™¨
+*	å½¢    å‚:  _ucRegAddr ï¼š å¯„å­˜å™¨åœ°å€
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static uint16_t wm8978_ReadReg(uint8_t _ucRegAddr)
@@ -516,51 +513,51 @@ static uint16_t wm8978_ReadReg(uint8_t _ucRegAddr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_WriteReg
-*	¹¦ÄÜËµÃ÷: Ğ´wm8978¼Ä´æÆ÷
-*	ĞÎ    ²Î:  _ucRegAddr £º ¼Ä´æÆ÷µØÖ·
-*			  _usValue £º¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_WriteReg
+*	åŠŸèƒ½è¯´æ˜: å†™wm8978å¯„å­˜å™¨
+*	å½¢    å‚:  _ucRegAddr ï¼š å¯„å­˜å™¨åœ°å€
+*			  _usValue ï¼šå¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static uint8_t wm8978_WriteReg(uint8_t _ucRegAddr, uint16_t _usValue)
 {
 	uint8_t ucAck;
 
-	/* ·¢ËÍÆğÊ¼Î» */
+	/* å‘é€èµ·å§‹ä½ */
 	i2c_Start();
 
-	/* ·¢ËÍÉè±¸µØÖ·+¶ÁĞ´¿ØÖÆbit£¨0 = w£¬ 1 = r) bit7 ÏÈ´« */
+	/* å‘é€è®¾å¤‡åœ°å€+è¯»å†™æ§åˆ¶bitï¼ˆ0 = wï¼Œ 1 = r) bit7 å…ˆä¼  */
 	i2c_SendByte(WM8978_SLAVE_ADDRESS | I2C_WR);
 
-	/* ¼ì²âACK */
+	/* æ£€æµ‹ACK */
 	ucAck = i2c_WaitAck();
 	if (ucAck == 1)
 	{
 		return 0;
 	}
 
-	/* ·¢ËÍ¿ØÖÆ×Ö½Ú1 */
+	/* å‘é€æ§åˆ¶å­—èŠ‚1 */
 	i2c_SendByte(((_ucRegAddr << 1) & 0xFE) | ((_usValue >> 8) & 0x1));
 
-	/* ¼ì²âACK */
+	/* æ£€æµ‹ACK */
 	ucAck = i2c_WaitAck();
 	if (ucAck == 1)
 	{
 		return 0;
 	}
 
-	/* ·¢ËÍ¿ØÖÆ×Ö½Ú2 */
+	/* å‘é€æ§åˆ¶å­—èŠ‚2 */
 	i2c_SendByte(_usValue & 0xFF);
 
-	/* ¼ì²âACK */
+	/* æ£€æµ‹ACK */
 	ucAck = i2c_WaitAck();
 	if (ucAck == 1)
 	{
 		return 0;
 	}
 
-	/* ·¢ËÍSTOP */
+	/* å‘é€STOP */
 	i2c_Stop();
 
 	wm8978_RegCash[_ucRegAddr] = _usValue;
@@ -569,19 +566,19 @@ static uint8_t wm8978_WriteReg(uint8_t _ucRegAddr, uint16_t _usValue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_CfgInOut
-*	¹¦ÄÜËµÃ÷: ÅäÖÃwm8978ÒôÆµÍ¨µÀ
-*	ĞÎ    ²Î:
-*			_InPath : ÒôÆµÊäÈëÍ¨µÀÅäÖÃ
-*			_OutPath : ÒôÆµÊä³öÍ¨µÀÅäÖÃ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_CfgInOut
+*	åŠŸèƒ½è¯´æ˜: é…ç½®wm8978éŸ³é¢‘é€šé“
+*	å½¢    å‚:
+*			_InPath : éŸ³é¢‘è¾“å…¥é€šé“é…ç½®
+*			_OutPath : éŸ³é¢‘è¾“å‡ºé€šé“é…ç½®
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 {
 	uint16_t usReg;
 
-	/* ²é¿´WM8978Êı¾İÊÖ²áµÄ REGISTER MAP ÕÂ½Ú£¬ µÚ67Ò³ */
+	/* æŸ¥çœ‹WM8978æ•°æ®æ‰‹å†Œçš„ REGISTER MAP ç« èŠ‚ï¼Œ ç¬¬67é¡µ */
 
 	if ((_InPath == IN_PATH_OFF) && (_OutPath == OUT_PATH_OFF))
 	{
@@ -589,20 +586,20 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 		return;
 	}
 
-	/* --------------------------- µÚ1²½£º¸ù¾İÊäÈëÍ¨µÀ²ÎÊıÅäÖÃ¼Ä´æÆ÷ -----------------------*/
+	/* --------------------------- ç¬¬1æ­¥ï¼šæ ¹æ®è¾“å…¥é€šé“å‚æ•°é…ç½®å¯„å­˜å™¨ -----------------------*/
 	/*
-		R1 ¼Ä´æÆ÷ Power manage 1
+		R1 å¯„å­˜å™¨ Power manage 1
 		Bit8    BUFDCOPEN,  Output stage 1.5xAVDD/2 driver enable
  		Bit7    OUT4MIXEN, OUT4 mixer enable
 		Bit6    OUT3MIXEN, OUT3 mixer enable
-		Bit5    PLLEN	.²»ÓÃ
-		Bit4    MICBEN	,Microphone Bias Enable (MICÆ«ÖÃµçÂ·Ê¹ÄÜ)
-		Bit3    BIASEN	,Analogue amplifier bias control ±ØĞëÉèÖÃÎª1Ä£Äâ·Å´óÆ÷²Å¹¤×÷
+		Bit5    PLLEN	.ä¸ç”¨
+		Bit4    MICBEN	,Microphone Bias Enable (MICåç½®ç”µè·¯ä½¿èƒ½)
+		Bit3    BIASEN	,Analogue amplifier bias control å¿…é¡»è®¾ç½®ä¸º1æ¨¡æ‹Ÿæ”¾å¤§å™¨æ‰å·¥ä½œ
 		Bit2    BUFIOEN , Unused input/output tie off buffer enable
-		Bit1:0  VMIDSEL, ±ØĞëÉèÖÃÎª·Ç00ÖµÄ£Äâ·Å´óÆ÷²Å¹¤×÷
+		Bit1:0  VMIDSEL, å¿…é¡»è®¾ç½®ä¸ºé00å€¼æ¨¡æ‹Ÿæ”¾å¤§å™¨æ‰å·¥ä½œ
 	*/
 	usReg = (1 << 3) | (3 << 0);
-	if (_OutPath & OUT3_4_ON) 	/* OUT3ºÍOUT4Ê¹ÄÜÊä³öµ½GSMÄ£¿é */
+	if (_OutPath & OUT3_4_ON) /* OUT3å’ŒOUT4ä½¿èƒ½è¾“å‡ºåˆ°GSMæ¨¡å— */
 	{
 		usReg |= ((1 << 7) | (1 << 6));
 	}
@@ -610,16 +607,16 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	{
 		usReg |= (1 << 4);
 	}
-	wm8978_WriteReg(1, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(1, usReg); /* å†™å¯„å­˜å™¨ */
 
 	/*
-		R2 ¼Ä´æÆ÷ Power manage 2
-		Bit8	ROUT1EN,	ROUT1 output enable ¶ú»úÓÒÉùµÀÊä³öÊ¹ÄÜ
-		Bit7	LOUT1EN,	LOUT1 output enable ¶ú»ú×óÉùµÀÊä³öÊ¹ÄÜ
+		R2 å¯„å­˜å™¨ Power manage 2
+		Bit8	ROUT1EN,	ROUT1 output enable è€³æœºå³å£°é“è¾“å‡ºä½¿èƒ½
+		Bit7	LOUT1EN,	LOUT1 output enable è€³æœºå·¦å£°é“è¾“å‡ºä½¿èƒ½
 		Bit6	SLEEP, 		0 = Normal device operation   1 = Residual current reduced in device standby mode
-		Bit5	BOOSTENR,	Right channel Input BOOST enable ÊäÈëÍ¨µÀ×Ô¾ÙµçÂ·Ê¹ÄÜ. ÓÃµ½PGA·Å´ó¹¦ÄÜÊ±±ØĞëÊ¹ÄÜ
+		Bit5	BOOSTENR,	Right channel Input BOOST enable è¾“å…¥é€šé“è‡ªä¸¾ç”µè·¯ä½¿èƒ½. ç”¨åˆ°PGAæ”¾å¤§åŠŸèƒ½æ—¶å¿…é¡»ä½¿èƒ½
 		Bit4	BOOSTENL,	Left channel Input BOOST enable
-		Bit3	INPGAENR,	Right channel input PGA enable ÓÒÉùµÀÊäÈëPGAÊ¹ÄÜ
+		Bit3	INPGAENR,	Right channel input PGA enable å³å£°é“è¾“å…¥PGAä½¿èƒ½
 		Bit2	INPGAENL,	Left channel input PGA enable
 		Bit1	ADCENR,		Enable ADC right channel
 		Bit0	ADCENL,		Enable ADC left channel
@@ -653,10 +650,10 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	{
 		usReg |= ((1 << 1) | (1 << 0));
 	}
-	wm8978_WriteReg(2, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(2, usReg); /* å†™å¯„å­˜å™¨ */
 
 	/*
-		R3 ¼Ä´æÆ÷ Power manage 3
+		R3 å¯„å­˜å™¨ Power manage 3
 		Bit8	OUT4EN,		OUT4 enable
 		Bit7	OUT3EN,		OUT3 enable
 		Bit6	LOUT2EN,	LOUT2 output enable
@@ -684,10 +681,10 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	{
 		usReg |= ((1 << 1) | (1 << 0));
 	}
-	wm8978_WriteReg(3, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(3, usReg); /* å†™å¯„å­˜å™¨ */
 
 	/*
-		R44 ¼Ä´æÆ÷ Input ctrl
+		R44 å¯„å­˜å™¨ Input ctrl
 
 		Bit8	MBVSEL, 		Microphone Bias Voltage Control   0 = 0.9 * AVDD   1 = 0.6 * AVDD
 		Bit7	0
@@ -712,15 +709,14 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	{
 		usReg |= ((1 << 1) | (1 << 0));
 	}
-	wm8978_WriteReg(44, usReg);	/* Ğ´¼Ä´æÆ÷ */
-
+	wm8978_WriteReg(44, usReg); /* å†™å¯„å­˜å™¨ */
 
 	/*
-		R14 ¼Ä´æÆ÷ ADC Control
-		ÉèÖÃ¸ßÍ¨ÂË²¨Æ÷£¨¿ÉÑ¡µÄ£© pdf 24¡¢25Ò³,
-		Bit8 	HPFEN,	High Pass Filter Enable¸ßÍ¨ÂË²¨Æ÷Ê¹ÄÜ£¬0±íÊ¾½ûÖ¹£¬1±íÊ¾Ê¹ÄÜ
-		BIt7 	HPFAPP,	Select audio mode or application mode Ñ¡ÔñÒôÆµÄ£Ê½»òÓ¦ÓÃÄ£Ê½£¬0±íÊ¾ÒôÆµÄ£Ê½£¬
-		Bit6:4	HPFCUT£¬Application mode cut-off frequency  000-111Ñ¡ÔñÓ¦ÓÃÄ£Ê½µÄ½ØÖ¹ÆµÂÊ
+		R14 å¯„å­˜å™¨ ADC Control
+		è®¾ç½®é«˜é€šæ»¤æ³¢å™¨ï¼ˆå¯é€‰çš„ï¼‰ pdf 24ã€25é¡µ,
+		Bit8 	HPFEN,	High Pass Filter Enableé«˜é€šæ»¤æ³¢å™¨ä½¿èƒ½ï¼Œ0è¡¨ç¤ºç¦æ­¢ï¼Œ1è¡¨ç¤ºä½¿èƒ½
+		BIt7 	HPFAPP,	Select audio mode or application mode é€‰æ‹©éŸ³é¢‘æ¨¡å¼æˆ–åº”ç”¨æ¨¡å¼ï¼Œ0è¡¨ç¤ºéŸ³é¢‘æ¨¡å¼ï¼Œ
+		Bit6:4	HPFCUTï¼ŒApplication mode cut-off frequency  000-111é€‰æ‹©åº”ç”¨æ¨¡å¼çš„æˆªæ­¢é¢‘ç‡
 		Bit3 	ADCOSR,	ADC oversample rate select: 0=64x (lower power) 1=128x (best performance)
 		Bit2   	0
 		Bit1 	ADC right channel polarity adjust:  0=normal  1=inverted
@@ -728,31 +724,31 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	*/
 	if (_InPath & ADC_ON)
 	{
-		usReg = (1 << 3) | (0 << 8) | (4 << 0);		/* ½ûÖ¹ADC¸ßÍ¨ÂË²¨Æ÷, ÉèÖÃ½ØÖÁÆµÂÊ */
+		usReg = (1 << 3) | (0 << 8) | (4 << 0); /* ç¦æ­¢ADCé«˜é€šæ»¤æ³¢å™¨, è®¾ç½®æˆªè‡³é¢‘ç‡ */
 	}
 	else
 	{
 		usReg = 0;
 	}
-	wm8978_WriteReg(14, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(14, usReg); /* å†™å¯„å­˜å™¨ */
 
-	/* ÉèÖÃÏİ²¨ÂË²¨Æ÷£¨notch filter£©£¬Ö÷ÒªÓÃÓÚÒÖÖÆ»°Í²Éù²¨Õı·´À¡£¬±ÜÃâĞ¥½Ğ.  ÔİÊ±¹Ø±Õ
-		R27£¬R28£¬R29£¬R30 ÓÃÓÚ¿ØÖÆÏŞ²¨ÂË²¨Æ÷£¬pdf 26Ò³
-		R7µÄ Bit7 NFEN = 0 ±íÊ¾½ûÖ¹£¬1±íÊ¾Ê¹ÄÜ
+	/* è®¾ç½®é™·æ³¢æ»¤æ³¢å™¨ï¼ˆnotch filterï¼‰ï¼Œä¸»è¦ç”¨äºæŠ‘åˆ¶è¯ç­’å£°æ³¢æ­£åé¦ˆï¼Œé¿å…å•¸å«.  æš‚æ—¶å…³é—­
+		R27ï¼ŒR28ï¼ŒR29ï¼ŒR30 ç”¨äºæ§åˆ¶é™æ³¢æ»¤æ³¢å™¨ï¼Œpdf 26é¡µ
+		R7çš„ Bit7 NFEN = 0 è¡¨ç¤ºç¦æ­¢ï¼Œ1è¡¨ç¤ºä½¿èƒ½
 	*/
 	if (_InPath & ADC_ON)
 	{
 		usReg = (0 << 7);
-		wm8978_WriteReg(27, usReg);	/* Ğ´¼Ä´æÆ÷ */
+		wm8978_WriteReg(27, usReg); /* å†™å¯„å­˜å™¨ */
 		usReg = 0;
-		wm8978_WriteReg(28, usReg);	/* Ğ´¼Ä´æÆ÷,Ìî0£¬ÒòÎªÒÑ¾­½ûÖ¹£¬ËùÒÔÒ²¿É²»×ö */
-		wm8978_WriteReg(29, usReg);	/* Ğ´¼Ä´æÆ÷,Ìî0£¬ÒòÎªÒÑ¾­½ûÖ¹£¬ËùÒÔÒ²¿É²»×ö */
-		wm8978_WriteReg(30, usReg);	/* Ğ´¼Ä´æÆ÷,Ìî0£¬ÒòÎªÒÑ¾­½ûÖ¹£¬ËùÒÔÒ²¿É²»×ö */
+		wm8978_WriteReg(28, usReg); /* å†™å¯„å­˜å™¨,å¡«0ï¼Œå› ä¸ºå·²ç»ç¦æ­¢ï¼Œæ‰€ä»¥ä¹Ÿå¯ä¸åš */
+		wm8978_WriteReg(29, usReg); /* å†™å¯„å­˜å™¨,å¡«0ï¼Œå› ä¸ºå·²ç»ç¦æ­¢ï¼Œæ‰€ä»¥ä¹Ÿå¯ä¸åš */
+		wm8978_WriteReg(30, usReg); /* å†™å¯„å­˜å™¨,å¡«0ï¼Œå› ä¸ºå·²ç»ç¦æ­¢ï¼Œæ‰€ä»¥ä¹Ÿå¯ä¸åš */
 	}
 
-	/* ×Ô¶¯ÔöÒæ¿ØÖÆ ALC, R32  - 34  pdf 19Ò³ */
+	/* è‡ªåŠ¨å¢ç›Šæ§åˆ¶ ALC, R32  - 34  pdf 19é¡µ */
 	{
-		usReg = 0;		/* ½ûÖ¹×Ô¶¯ÔöÒæ¿ØÖÆ */
+		usReg = 0; /* ç¦æ­¢è‡ªåŠ¨å¢ç›Šæ§åˆ¶ */
 		wm8978_WriteReg(32, usReg);
 		wm8978_WriteReg(33, usReg);
 		wm8978_WriteReg(34, usReg);
@@ -762,58 +758,58 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 		Bit3	NGATEN, Noise gate function enable
 		Bit2:0	Noise gate threshold:
 	*/
-	usReg = (3 << 1) | (7 << 0);		/* ½ûÖ¹×Ô¶¯ÔöÒæ¿ØÖÆ */
+	usReg = (3 << 1) | (7 << 0); /* ç¦æ­¢è‡ªåŠ¨å¢ç›Šæ§åˆ¶ */
 	wm8978_WriteReg(35, usReg);
 
 	/*
-		Mic ÊäÈëĞÅµÀµÄÔöÒæÓÉ PGABOOSTL ºÍ PGABOOSTR ¿ØÖÆ
-		Aux ÊäÈëĞÅµÀµÄÊäÈëÔöÒæÓÉ AUXL2BOOSTVO[2:0] ºÍ AUXR2BOOSTVO[2:0] ¿ØÖÆ
-		Line ÊäÈëĞÅµÀµÄÔöÒæÓÉ LIP2BOOSTVOL[2:0] ºÍ RIP2BOOSTVOL[2:0] ¿ØÖÆ
+		Mic è¾“å…¥ä¿¡é“çš„å¢ç›Šç”± PGABOOSTL å’Œ PGABOOSTR æ§åˆ¶
+		Aux è¾“å…¥ä¿¡é“çš„è¾“å…¥å¢ç›Šç”± AUXL2BOOSTVO[2:0] å’Œ AUXR2BOOSTVO[2:0] æ§åˆ¶
+		Line è¾“å…¥ä¿¡é“çš„å¢ç›Šç”± LIP2BOOSTVOL[2:0] å’Œ RIP2BOOSTVOL[2:0] æ§åˆ¶
 	*/
-	/*	pdf 21Ò³£¬R47£¨×óÉùµÀ£©£¬R48£¨ÓÒÉùµÀ£©, MIC ÔöÒæ¿ØÖÆ¼Ä´æÆ÷
-		R47 (R48¶¨ÒåÓë´ËÏàÍ¬)
-		B8		PGABOOSTL	= 1,   0±íÊ¾MICĞÅºÅÖ±Í¨ÎŞÔöÒæ£¬1±íÊ¾MICĞÅºÅ+20dBÔöÒæ£¨Í¨¹ı×Ô¾ÙµçÂ·£©
-		B7		= 0£¬ ±£Áô
-		B6:4	L2_2BOOSTVOL = x£¬ 0±íÊ¾½ûÖ¹£¬1-7±íÊ¾ÔöÒæ-12dB ~ +6dB  £¨¿ÉÒÔË¥¼õÒ²¿ÉÒÔ·Å´ó£©
-		B3		= 0£¬ ±£Áô
-		B2:0`	AUXL2BOOSTVOL = x£¬0±íÊ¾½ûÖ¹£¬1-7±íÊ¾ÔöÒæ-12dB ~ +6dB  £¨¿ÉÒÔË¥¼õÒ²¿ÉÒÔ·Å´ó£©
+	/*	pdf 21é¡µï¼ŒR47ï¼ˆå·¦å£°é“ï¼‰ï¼ŒR48ï¼ˆå³å£°é“ï¼‰, MIC å¢ç›Šæ§åˆ¶å¯„å­˜å™¨
+		R47 (R48å®šä¹‰ä¸æ­¤ç›¸åŒ)
+		B8		PGABOOSTL	= 1,   0è¡¨ç¤ºMICä¿¡å·ç›´é€šæ— å¢ç›Šï¼Œ1è¡¨ç¤ºMICä¿¡å·+20dBå¢ç›Šï¼ˆé€šè¿‡è‡ªä¸¾ç”µè·¯ï¼‰
+		B7		= 0ï¼Œ ä¿ç•™
+		B6:4	L2_2BOOSTVOL = xï¼Œ 0è¡¨ç¤ºç¦æ­¢ï¼Œ1-7è¡¨ç¤ºå¢ç›Š-12dB ~ +6dB  ï¼ˆå¯ä»¥è¡°å‡ä¹Ÿå¯ä»¥æ”¾å¤§ï¼‰
+		B3		= 0ï¼Œ ä¿ç•™
+		B2:0`	AUXL2BOOSTVOL = xï¼Œ0è¡¨ç¤ºç¦æ­¢ï¼Œ1-7è¡¨ç¤ºå¢ç›Š-12dB ~ +6dB  ï¼ˆå¯ä»¥è¡°å‡ä¹Ÿå¯ä»¥æ”¾å¤§ï¼‰
 	*/
 	usReg = 0;
 	if ((_InPath & MIC_LEFT_ON) || (_InPath & MIC_RIGHT_ON))
 	{
-		usReg |= (1 << 8);	/* MICÔöÒæÈ¡+20dB */
+		usReg |= (1 << 8); /* MICå¢ç›Šå–+20dB */
 	}
 	if (_InPath & AUX_ON)
 	{
-		usReg |= (3 << 0);	/* AuxÔöÒæ¹Ì¶¨È¡3£¬ÓÃ»§¿ÉÒÔ×ÔĞĞµ÷Õû */
+		usReg |= (3 << 0); /* Auxå¢ç›Šå›ºå®šå–3ï¼Œç”¨æˆ·å¯ä»¥è‡ªè¡Œè°ƒæ•´ */
 	}
 	if (_InPath & LINE_ON)
 	{
-		usReg |= (3 << 4);	/* LineÔöÒæ¹Ì¶¨È¡3£¬ÓÃ»§¿ÉÒÔ×ÔĞĞµ÷Õû */
+		usReg |= (3 << 4); /* Lineå¢ç›Šå›ºå®šå–3ï¼Œç”¨æˆ·å¯ä»¥è‡ªè¡Œè°ƒæ•´ */
 	}
-	wm8978_WriteReg(47, usReg);	/* Ğ´×óÉùµÀÊäÈëÔöÒæ¿ØÖÆ¼Ä´æÆ÷ */
-	wm8978_WriteReg(48, usReg);	/* Ğ´ÓÒÉùµÀÊäÈëÔöÒæ¿ØÖÆ¼Ä´æÆ÷ */
+	wm8978_WriteReg(47, usReg); /* å†™å·¦å£°é“è¾“å…¥å¢ç›Šæ§åˆ¶å¯„å­˜å™¨ */
+	wm8978_WriteReg(48, usReg); /* å†™å³å£°é“è¾“å…¥å¢ç›Šæ§åˆ¶å¯„å­˜å™¨ */
 
-	/* Êı×ÖADCÒôÁ¿¿ØÖÆ£¬pdf 27Ò³
-		R15 ¿ØÖÆ×óÉùµÀADCÒôÁ¿£¬R16¿ØÖÆÓÒÉùµÀADCÒôÁ¿
-		Bit8 	ADCVU  = 1 Ê±²Å¸üĞÂ£¬ÓÃÓÚÍ¬²½¸üĞÂ×óÓÒÉùµÀµÄADCÒôÁ¿
-		Bit7:0 	ÔöÒæÑ¡Ôñ£» 0000 0000 = ¾²Òô
+	/* æ•°å­—ADCéŸ³é‡æ§åˆ¶ï¼Œpdf 27é¡µ
+		R15 æ§åˆ¶å·¦å£°é“ADCéŸ³é‡ï¼ŒR16æ§åˆ¶å³å£°é“ADCéŸ³é‡
+		Bit8 	ADCVU  = 1 æ—¶æ‰æ›´æ–°ï¼Œç”¨äºåŒæ­¥æ›´æ–°å·¦å³å£°é“çš„ADCéŸ³é‡
+		Bit7:0 	å¢ç›Šé€‰æ‹©ï¼› 0000 0000 = é™éŸ³
 						   0000 0001 = -127dB
-						   0000 0010 = -12.5dB  £¨0.5dB ²½³¤£©
-						   1111 1111 = 0dB  £¨²»Ë¥¼õ£©
+						   0000 0010 = -12.5dB  ï¼ˆ0.5dB æ­¥é•¿ï¼‰
+						   1111 1111 = 0dB  ï¼ˆä¸è¡°å‡ï¼‰
 	*/
 	usReg = 0xFF;
-	wm8978_WriteReg(15, usReg);	/* Ñ¡Ôñ0dB£¬ÏÈ»º´æ×óÉùµÀ */
+	wm8978_WriteReg(15, usReg); /* é€‰æ‹©0dBï¼Œå…ˆç¼“å­˜å·¦å£°é“ */
 	usReg = 0x1FF;
-	wm8978_WriteReg(16, usReg);	/* Í¬²½¸üĞÂ×óÓÒÉùµÀ */
+	wm8978_WriteReg(16, usReg); /* åŒæ­¥æ›´æ–°å·¦å³å£°é“ */
 
-	/* Í¨¹ı wm8978_SetMicGain º¯ÊıÉèÖÃmic PGAÔöÒæ */
+	/* é€šè¿‡ wm8978_SetMicGain å‡½æ•°è®¾ç½®mic PGAå¢ç›Š */
 
-	/*	R43 ¼Ä´æÆ÷  AUXR ¨C ROUT2 BEEP Mixer Function
+	/*	R43 å¯„å­˜å™¨  AUXR â€“ ROUT2 BEEP Mixer Function
 		B8:6 = 0
 
 		B5	 MUTERPGA2INV,	Mute input to INVROUT2 mixer
-		B4	 INVROUT2,  Invert ROUT2 output ÓÃÓÚÑïÉùÆ÷ÍÆÍìÊä³ö
+		B4	 INVROUT2,  Invert ROUT2 output ç”¨äºæ‰¬å£°å™¨æ¨æŒ½è¾“å‡º
 		B3:1 BEEPVOL = 7;	AUXR input to ROUT2 inverter gain
 		B0	 BEEPEN = 1;	Enable AUXR beep input
 
@@ -821,7 +817,7 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	usReg = 0;
 	if (_OutPath & SPK_ON)
 	{
-		usReg |= (1 << 4);	/* ROUT2 ·´Ïà, ÓÃÓÚÇı¶¯ÑïÉùÆ÷ */
+		usReg |= (1 << 4); /* ROUT2 åç›¸, ç”¨äºé©±åŠ¨æ‰¬å£°å™¨ */
 	}
 	if (_InPath & AUX_ON)
 	{
@@ -833,10 +829,10 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 		B8:7	0
 		B6		DACL2RMIX,	Left DAC output to right output mixer
 		B5		DACR2LMIX,	Right DAC output to left output
-		B4		OUT4BOOST,	0 = OUT4 output gain = -1; DC = AVDD / 2£»1 = OUT4 output gain = +1.5£»DC = 1.5 x AVDD / 2
-		B3		OUT3BOOST,	0 = OUT3 output gain = -1; DC = AVDD / 2£»1 = OUT3 output gain = +1.5£»DC = 1.5 x AVDD / 2
+		B4		OUT4BOOST,	0 = OUT4 output gain = -1; DC = AVDD / 2ï¼›1 = OUT4 output gain = +1.5ï¼›DC = 1.5 x AVDD / 2
+		B3		OUT3BOOST,	0 = OUT3 output gain = -1; DC = AVDD / 2ï¼›1 = OUT3 output gain = +1.5ï¼›DC = 1.5 x AVDD / 2
 		B2		SPKBOOST,	0 = Speaker gain = -1;  DC = AVDD / 2 ; 1 = Speaker gain = +1.5; DC = 1.5 x AVDD / 2
-		B1		TSDEN,   Thermal Shutdown Enable  ÑïÉùÆ÷ÈÈ±£»¤Ê¹ÄÜ£¨È±Ê¡1£©
+		B1		TSDEN,   Thermal Shutdown Enable  æ‰¬å£°å™¨çƒ­ä¿æŠ¤ä½¿èƒ½ï¼ˆç¼ºçœ1ï¼‰
 		B0		VROI,	Disabled Outputs to VREF Resistance
 	*/
 	usReg = 0;
@@ -846,18 +842,18 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	}
 	if (_OutPath & SPK_ON)
 	{
-		usReg |=  ((1 << 2) | (1 << 1));	/* SPK 1.5xÔöÒæ,  ÈÈ±£»¤Ê¹ÄÜ */
+		usReg |= ((1 << 2) | (1 << 1)); /* SPK 1.5xå¢ç›Š,  çƒ­ä¿æŠ¤ä½¿èƒ½ */
 	}
 	if (_OutPath & OUT3_4_ON)
 	{
-		usReg |=  ((1 << 4) | (1 << 3));	/* BOOT3  BOOT4  1.5xÔöÒæ */
+		usReg |= ((1 << 4) | (1 << 3)); /* BOOT3  BOOT4  1.5xå¢ç›Š */
 	}
 	wm8978_WriteReg(49, usReg);
 
-	/*	REG 50    (50ÊÇ×óÉùµÀ£¬51ÊÇÓÒÉùµÀ£¬ÅäÖÃ¼Ä´æÆ÷¹¦ÄÜÒ»ÖÂ) pdf 40Ò³
-		B8:6	AUXLMIXVOL = 111	AUXÓÃÓÚFMÊÕÒô»úĞÅºÅÊäÈë
+	/*	REG 50    (50æ˜¯å·¦å£°é“ï¼Œ51æ˜¯å³å£°é“ï¼Œé…ç½®å¯„å­˜å™¨åŠŸèƒ½ä¸€è‡´) pdf 40é¡µ
+		B8:6	AUXLMIXVOL = 111	AUXç”¨äºFMæ”¶éŸ³æœºä¿¡å·è¾“å…¥
 		B5		AUXL2LMIX = 1		Left Auxilliary input to left channel
-		B4:2	BYPLMIXVOL			ÒôÁ¿
+		B4:2	BYPLMIXVOL			éŸ³é‡
 		B1		BYPL2LMIX = 0;		Left bypass path (from the left channel input boost output) to left output mixer
 		B0		DACL2LMIX = 1;		Left DAC output to left output mixer
 	*/
@@ -877,11 +873,11 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	wm8978_WriteReg(50, usReg);
 	wm8978_WriteReg(51, usReg);
 
-	/*	R56 ¼Ä´æÆ÷   OUT3 mixer ctrl
+	/*	R56 å¯„å­˜å™¨   OUT3 mixer ctrl
 		B8:7	0
-		B6		OUT3MUTE,  	0 = Output stage outputs OUT3 mixer;  1 = Output stage muted ¨C drives out VMID.
+		B6		OUT3MUTE,  	0 = Output stage outputs OUT3 mixer;  1 = Output stage muted â€“ drives out VMID.
 		B5:4	0
-		B3		BYPL2OUT3,	OUT4 mixer output to OUT3  (·´Ïà)
+		B3		BYPL2OUT3,	OUT4 mixer output to OUT3  (åç›¸)
 		B4		0
 		B2		LMIX2OUT3,	Left ADC input to OUT3
 		B1		LDAC2OUT3,	Left DAC mixer to OUT3
@@ -894,9 +890,9 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	}
 	wm8978_WriteReg(56, usReg);
 
-	/* R57 ¼Ä´æÆ÷		OUT4 (MONO) mixer ctrl
+	/* R57 å¯„å­˜å™¨		OUT4 (MONO) mixer ctrl
 		B8:7	0
-		B6		OUT4MUTE,	0 = Output stage outputs OUT4 mixer  1 = Output stage muted ¨C drives outVMID.
+		B6		OUT4MUTE,	0 = Output stage outputs OUT4 mixer  1 = Output stage muted â€“ drives outVMID.
 		B5		HALFSIG,	0 = OUT4 normal output	1 = OUT4 attenuated by 6dB
 		B4		LMIX2OUT4,	Left DAC mixer to OUT4
 		B3		LDAC2UT4,	Left DAC to OUT4
@@ -907,12 +903,11 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 	usReg = 0;
 	if (_OutPath & OUT3_4_ON)
 	{
-		usReg |= ((1 << 4) |  (1 << 1));
+		usReg |= ((1 << 4) | (1 << 1));
 	}
 	wm8978_WriteReg(57, usReg);
 
-
-	/* R11, 12 ¼Ä´æÆ÷ DACÊı×ÖÒôÁ¿
+	/* R11, 12 å¯„å­˜å™¨ DACæ•°å­—éŸ³é‡
 		R11		Left DAC Digital Volume
 		R12		Right DAC Digital Volume
 	*/
@@ -927,7 +922,7 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 		wm8978_WriteReg(12, 0 | 0x100);
 	}
 
-	/*	R10 ¼Ä´æÆ÷ DAC Control
+	/*	R10 å¯„å­˜å™¨ DAC Control
 		B8	0
 		B7	0
 		B6	SOFTMUTE,	Softmute enable:
@@ -946,10 +941,10 @@ void wm8978_CfgAudioPath(uint16_t _InPath, uint16_t _OutPath)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_NotchFilter
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÏİ²¨ÂË²¨Æ÷£¨notch filter£©£¬Ö÷ÒªÓÃÓÚÒÖÖÆ»°Í²Éù²¨Õı·´À¡£¬±ÜÃâĞ¥½Ğ
-*	ĞÎ    ²Î:  NFA0[13:0] and NFA1[13:0]
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_NotchFilter
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®é™·æ³¢æ»¤æ³¢å™¨ï¼ˆnotch filterï¼‰ï¼Œä¸»è¦ç”¨äºæŠ‘åˆ¶è¯ç­’å£°æ³¢æ­£åé¦ˆï¼Œé¿å…å•¸å«
+*	å½¢    å‚:  NFA0[13:0] and NFA1[13:0]
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_NotchFilter(uint16_t _NFA0, uint16_t _NFA1)
@@ -963,32 +958,32 @@ void wm8978_NotchFilter(uint16_t _NFA0, uint16_t _NFA1)
 		there is an NFU (Notch Filter Update) flag which should be set only when all four registers are setup.
 	*/
 	usReg = (1 << 7) | (_NFA0 & 0x3F);
-	wm8978_WriteReg(27, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(27, usReg); /* å†™å¯„å­˜å™¨ */
 
 	usReg = ((_NFA0 >> 7) & 0x3F);
-	wm8978_WriteReg(28, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(28, usReg); /* å†™å¯„å­˜å™¨ */
 
 	usReg = (_NFA1 & 0x3F);
-	wm8978_WriteReg(29, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(29, usReg); /* å†™å¯„å­˜å™¨ */
 
 	usReg = (1 << 8) | ((_NFA1 >> 7) & 0x3F);
-	wm8978_WriteReg(30, usReg);	/* Ğ´¼Ä´æÆ÷ */
+	wm8978_WriteReg(30, usReg); /* å†™å¯„å­˜å™¨ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_CtrlGPIO1
-*	¹¦ÄÜËµÃ÷: ¿ØÖÆWM8978µÄGPIO1Òı½ÅÊä³ö0»ò1
-*	ĞÎ    ²Î:  _ucValue £ºGPIO1Êä³öÖµ£¬0»ò1
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_CtrlGPIO1
+*	åŠŸèƒ½è¯´æ˜: æ§åˆ¶WM8978çš„GPIO1å¼•è„šè¾“å‡º0æˆ–1
+*	å½¢    å‚:  _ucValue ï¼šGPIO1è¾“å‡ºå€¼ï¼Œ0æˆ–1
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void wm8978_CtrlGPIO1(uint8_t _ucValue)
 {
 	uint16_t usRegValue;
 
-	/* R8£¬ pdf 62Ò³ */
-	if (_ucValue == 0) /* Êä³ö0 */
+	/* R8ï¼Œ pdf 62é¡µ */
+	if (_ucValue == 0) /* è¾“å‡º0 */
 	{
 		usRegValue = 6; /* B2:0 = 110 */
 	}
@@ -1001,25 +996,24 @@ void wm8978_CtrlGPIO1(uint8_t _ucValue)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: wm8978_Reset
-*	¹¦ÄÜËµÃ÷: ¸´Î»wm8978£¬ËùÓĞµÄ¼Ä´æÆ÷Öµ»Ö¸´µ½È±Ê¡Öµ
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: wm8978_Reset
+*	åŠŸèƒ½è¯´æ˜: å¤ä½wm8978ï¼Œæ‰€æœ‰çš„å¯„å­˜å™¨å€¼æ¢å¤åˆ°ç¼ºçœå€¼
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void wm8978_Reset(void)
 {
-	/* wm8978¼Ä´æÆ÷È±Ê¡Öµ */
+	/* wm8978å¯„å­˜å™¨ç¼ºçœå€¼ */
 	const uint16_t reg_default[] = {
-	0x000, 0x000, 0x000, 0x000, 0x050, 0x000, 0x140, 0x000,
-	0x000, 0x000, 0x000, 0x0FF, 0x0FF, 0x000, 0x100, 0x0FF,
-	0x0FF, 0x000, 0x12C, 0x02C, 0x02C, 0x02C, 0x02C, 0x000,
-	0x032, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
-	0x038, 0x00B, 0x032, 0x000, 0x008, 0x00C, 0x093, 0x0E9,
-	0x000, 0x000, 0x000, 0x000, 0x003, 0x010, 0x010, 0x100,
-	0x100, 0x002, 0x001, 0x001, 0x039, 0x039, 0x039, 0x039,
-	0x001, 0x001
-	};
+			0x000, 0x000, 0x000, 0x000, 0x050, 0x000, 0x140, 0x000,
+			0x000, 0x000, 0x000, 0x0FF, 0x0FF, 0x000, 0x100, 0x0FF,
+			0x0FF, 0x000, 0x12C, 0x02C, 0x02C, 0x02C, 0x02C, 0x000,
+			0x032, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000, 0x000,
+			0x038, 0x00B, 0x032, 0x000, 0x008, 0x00C, 0x093, 0x0E9,
+			0x000, 0x000, 0x000, 0x000, 0x003, 0x010, 0x010, 0x100,
+			0x100, 0x002, 0x001, 0x001, 0x039, 0x039, 0x039, 0x039,
+			0x001, 0x001};
 	uint8_t i;
 
 	wm8978_WriteReg(0x00, 0);
@@ -1032,91 +1026,90 @@ static void wm8978_Reset(void)
 
 /*
 *********************************************************************************************************
-*	                     ÏÂÃæµÄ´úÂëÊÇºÍSTM32 SAIÒôÆµ½Ó¿ÚÓ²¼şÏà¹ØµÄ
+*	                     ä¸‹é¢çš„ä»£ç æ˜¯å’ŒSTM32 SAIéŸ³é¢‘æ¥å£ç¡¬ä»¶ç›¸å…³çš„
 *********************************************************************************************************
 */
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_MakeSine16bit
-*	¹¦ÄÜËµÃ÷: Éú³ÉÕıÏÒ²¨Êı×é£¬ÓÃÓÚ²¥·Åµ¥ÒôÆµ
-*	ĞÎ    ²Î: _outbuf : Êä³ö»º³åÇø£¬int16_t
-*			  _sin_freq : Êä³öµÄ²¨ĞÎÆµÂÊ
-*			  _sample_freq : codec²ÉÑùÆµÂÊ
-*			  _sample_count : Ñù±¾¸öÊı¡£Ë«ÉùµÀ£¬Ã¿ÉùµÀ2×Ö½Ú£¬Ã¿¸öÑù±¾4×Ö½Ú¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_MakeSine16bit
+*	åŠŸèƒ½è¯´æ˜: ç”Ÿæˆæ­£å¼¦æ³¢æ•°ç»„ï¼Œç”¨äºæ’­æ”¾å•éŸ³é¢‘
+*	å½¢    å‚: _outbuf : è¾“å‡ºç¼“å†²åŒºï¼Œint16_t
+*			  _sin_freq : è¾“å‡ºçš„æ³¢å½¢é¢‘ç‡
+*			  _sample_freq : codecé‡‡æ ·é¢‘ç‡
+*			  _sample_count : æ ·æœ¬ä¸ªæ•°ã€‚åŒå£°é“ï¼Œæ¯å£°é“2å­—èŠ‚ï¼Œæ¯ä¸ªæ ·æœ¬4å­—èŠ‚ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void AUDIO_MakeSine16bit(int16_t *_outbuf, uint32_t _sin_freq,  uint32_t _sample_freq, uint32_t _count)
+void AUDIO_MakeSine16bit(int16_t *_outbuf, uint32_t _sin_freq, uint32_t _sample_freq, uint32_t _count)
 {
-#if 0	/* ²âÊÔÊı¾İ */
+#if 0 /* æµ‹è¯•æ•°æ® */
 	for (int i = 0; i < _size / 4; i++)
 	{
 		_outbuf[2 * i] = 0x5555;
 		_outbuf[2 * i + 1] = 0x0505;
 	}
 #else
-	#define PI 3.14159
-	#define AM 3200			/* Éú³ÉµÄ²¨ĞÎÊı×é·ù¶È (0-32767) */
-	
+#define PI 3.14159
+#define AM 3200 /* ç”Ÿæˆçš„æ³¢å½¢æ•°ç»„å¹…åº¦ (0-32767) */
+
 	uint32_t i;
 	double rd;
 	double aa, bb;
 	int16_t dac;
-	
+
 	for (i = 0; i < _count; i++)
 	{
 		rd = i * _sin_freq * PI / _sample_freq;
 		aa = AM * sin(rd);
-		
+
 		rd = i * (_sin_freq / 2) * PI / _sample_freq;
 		bb = AM * sin(rd);
-		
+
 		dac = (int16_t)aa;
 		_outbuf[2 * i] = dac;
-		
-		dac = (int16_t)bb;		/* ×óÓÒÉùµÀÉèÖÃÏàÍ¬ */
+
+		dac = (int16_t)bb; /* å·¦å³å£°é“è®¾ç½®ç›¸åŒ */
 		_outbuf[2 * i + 1] = dac;
 	}
-	
-	s_RecPos = _count;	/* ±£´æ²¨ĞÎÑù±¾¸öÊı£¬ÓÃÓÚ»Ø·Å */
+
+	s_RecPos = _count; /* ä¿å­˜æ³¢å½¢æ ·æœ¬ä¸ªæ•°ï¼Œç”¨äºå›æ”¾ */
 #endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Init
-*	¹¦ÄÜËµÃ÷: ÅäÖÃGPIOÒı½ÅºÍÖĞ¶ÏÍ¨µÀÓÃÓÚcodecÓ¦ÓÃ
-*	ĞÎ    ²Î: _ucMode : 1 ±íÊ¾·ÅÒô£¬2±íÊ¾Â¼Òô£¬ 3±íÊ¾±ßÂ¼±ß·Å(ÔİÎ´Ö§³Ö)
-*			 _usStandard : Î´ÓÃ¡£¹Ì¶¨ÓÃI2S PHILIP¸ñÊ½
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Init
+*	åŠŸèƒ½è¯´æ˜: é…ç½®GPIOå¼•è„šå’Œä¸­æ–­é€šé“ç”¨äºcodecåº”ç”¨
+*	å½¢    å‚: _ucMode : 1 è¡¨ç¤ºæ”¾éŸ³ï¼Œ2è¡¨ç¤ºå½•éŸ³ï¼Œ 3è¡¨ç¤ºè¾¹å½•è¾¹æ”¾(æš‚æœªæ”¯æŒ)
+*			 _usStandard : æœªç”¨ã€‚å›ºå®šç”¨I2S PHILIPæ ¼å¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint32_t _uiAudioFreq)
-{	
+{
 	uint32_t tmpdiv;
-	
-//		¸ù¾İ²ÉÑùÆµÂÊÑ¡ÔñÊ±ÖÓÔ´, ÕâÑù·ÖÆµºó¿ÉÒÔµÃµ½×¼È·µÄÎ»Ê±ÖÓ  ===== ÔİÊ±Î´×ö
-//		#define SAI_ClockPLLSAI             ((uint32_t)11289600)
-//		#define SAI_ClockPLLI2S             ((uint32_t)49152000)
 
-//	*/
-//	if (_uiAudioFreq == SAI_AudioFreq_44_1k || _uiAudioFreq == SAI_AudioFreq_22_05k
-//		|| _uiAudioFreq == SAI_AudioFreq_11_025k)
-//	{
-//		SAI_ClockSrcFreq = SAI_ClockPLLSAI;
-//		
-//		/* ÅäÖÃSAI_Block_AºÍ SAI_Block_BµÄÊ±ÖÓÔ´ */
-//		RCC_SAIBlockACLKConfig(RCC_SAIACLKSource_PLLSAI);
-//		RCC_SAIBlockBCLKConfig(RCC_SAIACLKSource_PLLSAI);		
-//	}
-//	else	/*192k, 96k, 48k, 32k, 16k, 8k */
-//	{
-//  }
+	//		æ ¹æ®é‡‡æ ·é¢‘ç‡é€‰æ‹©æ—¶é’Ÿæº, è¿™æ ·åˆ†é¢‘åå¯ä»¥å¾—åˆ°å‡†ç¡®çš„ä½æ—¶é’Ÿ  ===== æš‚æ—¶æœªåš
+	//		#define SAI_ClockPLLSAI             ((uint32_t)11289600)
+	//		#define SAI_ClockPLLI2S             ((uint32_t)49152000)
 
-	
+	//	*/
+	//	if (_uiAudioFreq == SAI_AudioFreq_44_1k || _uiAudioFreq == SAI_AudioFreq_22_05k
+	//		|| _uiAudioFreq == SAI_AudioFreq_11_025k)
+	//	{
+	//		SAI_ClockSrcFreq = SAI_ClockPLLSAI;
+	//
+	//		/* é…ç½®SAI_Block_Aå’Œ SAI_Block_Bçš„æ—¶é’Ÿæº */
+	//		RCC_SAIBlockACLKConfig(RCC_SAIACLKSource_PLLSAI);
+	//		RCC_SAIBlockBCLKConfig(RCC_SAIACLKSource_PLLSAI);
+	//	}
+	//	else	/*192k, 96k, 48k, 32k, 16k, 8k */
+	//	{
+	//  }
+
 	tmpdiv = 11289600 / (_uiAudioFreq * 256);
-	
-	/* ÅäÖÃÊ±ÖÓÔ´ */
+
+	/* é…ç½®æ—¶é’Ÿæº */
 	{
 		RCC_PeriphCLKInitTypeDef RCC_PeriphCLKInitStruct;
 
@@ -1131,12 +1124,12 @@ void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint
 		RCC_PeriphCLKInitStruct.PLL2.PLL2N = 429;
 		RCC_PeriphCLKInitStruct.PLL2.PLL2M = 25;
 
-		if(HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphCLKInitStruct) != HAL_OK)
+		if (HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphCLKInitStruct) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
 		}
 	}
-	
+
 	/* Initialize SAI */
 	if (_ucMode == 1 || _ucMode == 3)
 	{
@@ -1146,44 +1139,44 @@ void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint
 
 		__HAL_SAI_DISABLE(&SaiOutHandle);
 
-		SaiOutHandle.Init.AudioMode      = SAI_MODEMASTER_TX;		/* ÅäÖÃÖ÷Ä£Ê½·¢ËÍ */
-		SaiOutHandle.Init.Synchro        = SAI_ASYNCHRONOUS;		/* ÉêÃ÷ÎªÒì²½£¬Ê¹ÓÃ±¾Ä£¿éµÄ FS, SCK,MCLK */
-		SaiOutHandle.Init.OutputDrive    = SAI_OUTPUTDRIVE_ENABLE;
-		SaiOutHandle.Init.NoDivider      = SAI_MASTERDIVIDER_ENABLE;
-		
-		SaiOutHandle.Init.Mckdiv       	 = tmpdiv;
-		
-		SaiOutHandle.Init.FIFOThreshold  = SAI_FIFOTHRESHOLD_1QF;
-		SaiOutHandle.Init.AudioFrequency = _uiAudioFreq;			// SAI_AUDIO_FREQUENCY_22K;
-		SaiOutHandle.Init.Protocol       = SAI_FREE_PROTOCOL;		/* ×ÔÓÉĞ­Òé£¬·ÇAC97£¬·ÇSPDIF */
-		SaiOutHandle.Init.DataSize       = _uiWordLen;				/* Ñù±¾×Ö³¤ */
-		SaiOutHandle.Init.FirstBit       = SAI_FIRSTBIT_MSB;		/* bit´ÎĞò£¬¸ßbitÏÈ´« */
-		SaiOutHandle.Init.ClockStrobing  = SAI_CLOCKSTROBING_FALLINGEDGE;
+		SaiOutHandle.Init.AudioMode = SAI_MODEMASTER_TX; /* é…ç½®ä¸»æ¨¡å¼å‘é€ */
+		SaiOutHandle.Init.Synchro = SAI_ASYNCHRONOUS;		 /* ç”³æ˜ä¸ºå¼‚æ­¥ï¼Œä½¿ç”¨æœ¬æ¨¡å—çš„ FS, SCK,MCLK */
+		SaiOutHandle.Init.OutputDrive = SAI_OUTPUTDRIVE_ENABLE;
+		SaiOutHandle.Init.NoDivider = SAI_MASTERDIVIDER_ENABLE;
+
+		SaiOutHandle.Init.Mckdiv = tmpdiv;
+
+		SaiOutHandle.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_1QF;
+		SaiOutHandle.Init.AudioFrequency = _uiAudioFreq; // SAI_AUDIO_FREQUENCY_22K;
+		SaiOutHandle.Init.Protocol = SAI_FREE_PROTOCOL;	/* è‡ªç”±åè®®ï¼ŒéAC97ï¼ŒéSPDIF */
+		SaiOutHandle.Init.DataSize = _uiWordLen;				 /* æ ·æœ¬å­—é•¿ */
+		SaiOutHandle.Init.FirstBit = SAI_FIRSTBIT_MSB;	 /* bitæ¬¡åºï¼Œé«˜bitå…ˆä¼  */
+		SaiOutHandle.Init.ClockStrobing = SAI_CLOCKSTROBING_FALLINGEDGE;
 
 		/* Configure SAI_Block_x Frame 
 			Frame Length : 32
 			Frame active Length: 16
 			FS Definition : Start frame + Channel Side identification
 			FS Polarity: FS active Low
-			FS Offset: FS asserted one bit before the first bit of slot 0 */ 
+			FS Offset: FS asserted one bit before the first bit of slot 0 */
 		/*
-			ÔòÖ¡³¤¶ÈÓ¦Îª 8 µ½ 256 Ö®¼äµÄÒ»¸öµÈÓÚ 2
-			µÄ n ´ÎÃİµÄÊı¡£ÕâÊÇÎªÁËÈ·±£ÒôÆµÖ¡µÄÃ¿¸öÎ»Ê±ÖÓ°üº¬ÕûÊı¸ö MCLK Âö³å£¬ÕâÑù¿ÉÈ·±£½âÂëÆ÷ÄÚµÄÍâ²¿ DAC/ADC ÕıÈ·¹¤×÷¡£	
+			åˆ™å¸§é•¿åº¦åº”ä¸º 8 åˆ° 256 ä¹‹é—´çš„ä¸€ä¸ªç­‰äº 2
+			çš„ n æ¬¡å¹‚çš„æ•°ã€‚è¿™æ˜¯ä¸ºäº†ç¡®ä¿éŸ³é¢‘å¸§çš„æ¯ä¸ªä½æ—¶é’ŸåŒ…å«æ•´æ•°ä¸ª MCLK è„‰å†²ï¼Œè¿™æ ·å¯ç¡®ä¿è§£ç å™¨å†…çš„å¤–éƒ¨ DAC/ADC æ­£ç¡®å·¥ä½œã€‚	
 			
-		*/		
-		SaiOutHandle.FrameInit.FrameLength       = 32;
+		*/
+		SaiOutHandle.FrameInit.FrameLength = 32;
 		SaiOutHandle.FrameInit.ActiveFrameLength = 16;
-		SaiOutHandle.FrameInit.FSDefinition      = SAI_FS_CHANNEL_IDENTIFICATION;	 /* FS¶¨ÒåÎª×óÓÒÉùµÀ */		
-		SaiOutHandle.FrameInit.FSPolarity        = SAI_FS_ACTIVE_LOW;
-		SaiOutHandle.FrameInit.FSOffset          = SAI_FS_BEFOREFIRSTBIT;
+		SaiOutHandle.FrameInit.FSDefinition = SAI_FS_CHANNEL_IDENTIFICATION; /* FSå®šä¹‰ä¸ºå·¦å³å£°é“ */
+		SaiOutHandle.FrameInit.FSPolarity = SAI_FS_ACTIVE_LOW;
+		SaiOutHandle.FrameInit.FSOffset = SAI_FS_BEFOREFIRSTBIT;
 
-		/* ÅäÖÃ SAI Block_x Slot */
+		/* é…ç½® SAI Block_x Slot */
 		SaiOutHandle.SlotInit.FirstBitOffset = 0;
-		SaiOutHandle.SlotInit.SlotSize       = SAI_SLOTSIZE_16B;	// SAI_SLOTSIZE_DATASIZE;
-		SaiOutHandle.SlotInit.SlotNumber     = 2;
-		SaiOutHandle.SlotInit.SlotActive     = (SAI_SLOTACTIVE_0 | SAI_SLOTACTIVE_1);	// SAI_SLOTACTIVE_0;	//
+		SaiOutHandle.SlotInit.SlotSize = SAI_SLOTSIZE_16B; // SAI_SLOTSIZE_DATASIZE;
+		SaiOutHandle.SlotInit.SlotNumber = 2;
+		SaiOutHandle.SlotInit.SlotActive = (SAI_SLOTACTIVE_0 | SAI_SLOTACTIVE_1); // SAI_SLOTACTIVE_0;	//
 
-		if(HAL_OK != HAL_SAI_Init(&SaiOutHandle))
+		if (HAL_OK != HAL_SAI_Init(&SaiOutHandle))
 		{
 			Error_Handler(__FILE__, __LINE__);
 		}
@@ -1191,16 +1184,16 @@ void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint
 		/* Enable SAI to generate clock used by audio driver */
 		__HAL_SAI_ENABLE(&SaiOutHandle);
 	}
-  
-	if (_ucMode == 1)	/* ·ÅÒô */
+
+	if (_ucMode == 1) /* æ”¾éŸ³ */
 	{
 		;
 	}
-	else if (_ucMode == 2)	/* Â¼Òô */
+	else if (_ucMode == 2) /* å½•éŸ³ */
 	{
 		;
 	}
-	else	/* ·ÅÒô + Â¼Òô */
+	else /* æ”¾éŸ³ + å½•éŸ³ */
 	{
 		__HAL_SAI_RESET_HANDLE_STATE(&SaiInHandle);
 
@@ -1208,41 +1201,41 @@ void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint
 
 		__HAL_SAI_DISABLE(&SaiInHandle);
 
-		SaiInHandle.Init.AudioMode      = SAI_MODESLAVE_RX;		/* ÅäÖÃ´ÓÄ£Ê½½ÓËÍ */
-		SaiInHandle.Init.Synchro        = SAI_SYNCHRONOUS;		/* ÉêÃ÷ÎªÒì²½ */
-		SaiInHandle.Init.OutputDrive    = SAI_OUTPUTDRIVE_DISABLE;
-		SaiInHandle.Init.NoDivider      = SAI_MASTERDIVIDER_DISABLE;	// SAI_MASTERDIVIDER_ENABLE;
-		
-		SaiInHandle.Init.Mckdiv       	 = tmpdiv;
-		
-		SaiInHandle.Init.FIFOThreshold  = SAI_FIFOTHRESHOLD_1QF;
-		SaiInHandle.Init.AudioFrequency = _uiAudioFreq;			// SAI_AUDIO_FREQUENCY_22K;
-		SaiInHandle.Init.Protocol       = SAI_FREE_PROTOCOL;		/* ×ÔÓÉĞ­Òé£¬·ÇAC97£¬·ÇSPDIF */
-		SaiInHandle.Init.DataSize       = _uiWordLen;				/* Ñù±¾×Ö³¤ */
-		SaiInHandle.Init.FirstBit       = SAI_FIRSTBIT_MSB;		/* bit´ÎĞò£¬¸ßbitÏÈ´« */
-		SaiInHandle.Init.ClockStrobing  = SAI_CLOCKSTROBING_RISINGEDGE;
+		SaiInHandle.Init.AudioMode = SAI_MODESLAVE_RX; /* é…ç½®ä»æ¨¡å¼æ¥é€ */
+		SaiInHandle.Init.Synchro = SAI_SYNCHRONOUS;		 /* ç”³æ˜ä¸ºå¼‚æ­¥ */
+		SaiInHandle.Init.OutputDrive = SAI_OUTPUTDRIVE_DISABLE;
+		SaiInHandle.Init.NoDivider = SAI_MASTERDIVIDER_DISABLE; // SAI_MASTERDIVIDER_ENABLE;
+
+		SaiInHandle.Init.Mckdiv = tmpdiv;
+
+		SaiInHandle.Init.FIFOThreshold = SAI_FIFOTHRESHOLD_1QF;
+		SaiInHandle.Init.AudioFrequency = _uiAudioFreq; // SAI_AUDIO_FREQUENCY_22K;
+		SaiInHandle.Init.Protocol = SAI_FREE_PROTOCOL;	/* è‡ªç”±åè®®ï¼ŒéAC97ï¼ŒéSPDIF */
+		SaiInHandle.Init.DataSize = _uiWordLen;					/* æ ·æœ¬å­—é•¿ */
+		SaiInHandle.Init.FirstBit = SAI_FIRSTBIT_MSB;		/* bitæ¬¡åºï¼Œé«˜bitå…ˆä¼  */
+		SaiInHandle.Init.ClockStrobing = SAI_CLOCKSTROBING_RISINGEDGE;
 
 		/* Configure SAI_Block_x Frame 
 			Frame Length : 32
 			Frame active Length: 16
 			FS Definition : Start frame + Channel Side identification
 			FS Polarity: FS active Low
-			FS Offset: FS asserted one bit before the first bit of slot 0 */ 
+			FS Offset: FS asserted one bit before the first bit of slot 0 */
 		/*
-			ÔòÖ¡³¤¶ÈÓ¦Îª 8 µ½ 256 Ö®¼äµÄÒ»¸öµÈÓÚ 2
-			µÄ n ´ÎÃİµÄÊı¡£ÕâÊÇÎªÁËÈ·±£ÒôÆµÖ¡µÄÃ¿¸öÎ»Ê±ÖÓ°üº¬ÕûÊı¸ö MCLK Âö³å£¬ÕâÑù¿ÉÈ·±£½âÂëÆ÷ÄÚµÄÍâ²¿ DAC/ADC ÕıÈ·¹¤×÷¡£	
-		*/		
-		SaiInHandle.FrameInit.FrameLength       = 32;
+			åˆ™å¸§é•¿åº¦åº”ä¸º 8 åˆ° 256 ä¹‹é—´çš„ä¸€ä¸ªç­‰äº 2
+			çš„ n æ¬¡å¹‚çš„æ•°ã€‚è¿™æ˜¯ä¸ºäº†ç¡®ä¿éŸ³é¢‘å¸§çš„æ¯ä¸ªä½æ—¶é’ŸåŒ…å«æ•´æ•°ä¸ª MCLK è„‰å†²ï¼Œè¿™æ ·å¯ç¡®ä¿è§£ç å™¨å†…çš„å¤–éƒ¨ DAC/ADC æ­£ç¡®å·¥ä½œã€‚	
+		*/
+		SaiInHandle.FrameInit.FrameLength = 32;
 		SaiInHandle.FrameInit.ActiveFrameLength = 16;
-		SaiInHandle.FrameInit.FSDefinition      = SAI_FS_CHANNEL_IDENTIFICATION;	 /* FS¶¨ÒåÎª×óÓÒÉùµÀ */		
-		SaiInHandle.FrameInit.FSPolarity        = SAI_FS_ACTIVE_LOW;
-		SaiInHandle.FrameInit.FSOffset          = SAI_FS_BEFOREFIRSTBIT;
+		SaiInHandle.FrameInit.FSDefinition = SAI_FS_CHANNEL_IDENTIFICATION; /* FSå®šä¹‰ä¸ºå·¦å³å£°é“ */
+		SaiInHandle.FrameInit.FSPolarity = SAI_FS_ACTIVE_LOW;
+		SaiInHandle.FrameInit.FSOffset = SAI_FS_BEFOREFIRSTBIT;
 
-		/* ÅäÖÃ SAI Block_x Slot */
+		/* é…ç½® SAI Block_x Slot */
 		SaiInHandle.SlotInit.FirstBitOffset = 0;
-		SaiInHandle.SlotInit.SlotSize       = SAI_SLOTSIZE_16B;	// SAI_SLOTSIZE_DATASIZE;
-		SaiInHandle.SlotInit.SlotNumber     = 2;
-		SaiInHandle.SlotInit.SlotActive     = (SAI_SLOTACTIVE_0 | SAI_SLOTACTIVE_1);	// SAI_SLOTACTIVE_0;	//
+		SaiInHandle.SlotInit.SlotSize = SAI_SLOTSIZE_16B; // SAI_SLOTSIZE_DATASIZE;
+		SaiInHandle.SlotInit.SlotNumber = 2;
+		SaiInHandle.SlotInit.SlotActive = (SAI_SLOTACTIVE_0 | SAI_SLOTACTIVE_1); // SAI_SLOTACTIVE_0;	//
 
 		if (HAL_OK != HAL_SAI_Init(&SaiInHandle))
 		{
@@ -1256,10 +1249,10 @@ void AUDIO_Init(uint8_t _ucMode, uint16_t _usStandard, uint32_t _uiWordLen, uint
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SAI_TxCpltCallback
-*	¹¦ÄÜËµÃ÷: Tx Transfer completed callbacks.  DMA·¢ËÍÍê³É»Øµ÷º¯Êı.
-*	ĞÎ    ²Î: hsai : SAI_HandleTypeDef ½á¹¹
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SAI_TxCpltCallback
+*	åŠŸèƒ½è¯´æ˜: Tx Transfer completed callbacks.  DMAå‘é€å®Œæˆå›è°ƒå‡½æ•°.
+*	å½¢    å‚: hsai : SAI_HandleTypeDef ç»“æ„
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
@@ -1269,10 +1262,10 @@ void HAL_SAI_TxCpltCallback(SAI_HandleTypeDef *hsai)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SAI_TxHalfCpltCallback
-*	¹¦ÄÜËµÃ÷: Tx Transfer Half completed callbacks.  DMA·¢ËÍµ½1°ëÊ±µÄ»Øµ÷º¯Êı.
-*	ĞÎ    ²Î: hsai : SAI_HandleTypeDef ½á¹¹
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SAI_TxHalfCpltCallback
+*	åŠŸèƒ½è¯´æ˜: Tx Transfer Half completed callbacks.  DMAå‘é€åˆ°1åŠæ—¶çš„å›è°ƒå‡½æ•°.
+*	å½¢    å‚: hsai : SAI_HandleTypeDef ç»“æ„
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
@@ -1281,28 +1274,28 @@ void HAL_SAI_TxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 }
 
 /*********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Play
-*	¹¦ÄÜËµÃ÷: IS2Ğ­Òé·ÅÒô¡£´«ËÍI2SÊı¾İ°ü£¬DMAÄ£Ê½£¬×Ô¶¯Í£Ö¹
-*	ĞÎ    ²Î: pBuffer : Ñù±¾Êı¾İ
-*			  Size : Ñù±¾¸öÊı. Ã¿Í¨µÀ16bit£¬Ë«Í¨µÀ¡£Ã¿¸öÑù±¾Õ¼4×Ö½Ú¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Play
+*	åŠŸèƒ½è¯´æ˜: IS2åè®®æ”¾éŸ³ã€‚ä¼ é€I2Sæ•°æ®åŒ…ï¼ŒDMAæ¨¡å¼ï¼Œè‡ªåŠ¨åœæ­¢
+*	å½¢    å‚: pBuffer : æ ·æœ¬æ•°æ®
+*			  Size : æ ·æœ¬ä¸ªæ•°. æ¯é€šé“16bitï¼ŒåŒé€šé“ã€‚æ¯ä¸ªæ ·æœ¬å 4å­—èŠ‚ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-uint32_t AUDIO_Play(int16_t* pBuffer, uint32_t Size)
-{		
-	s_PlayFileBuf = pBuffer;	/* ±£´æÖ¸Õë */
-	s_PlayFileLen = Size;		/* ±£´æÎÄ¼ş³¤¶È */
-	
+uint32_t AUDIO_Play(int16_t *pBuffer, uint32_t Size)
+{
+	s_PlayFileBuf = pBuffer; /* ä¿å­˜æŒ‡é’ˆ */
+	s_PlayFileLen = Size;		 /* ä¿å­˜æ–‡ä»¶é•¿åº¦ */
+
 	/* Initialize the data buffer */
 	for (int i = 0; i < PLAY_BUFF_SIZE; i++)
 	{
 		s_PlayBuffCache[i] = s_PlayFileBuf[i];
 	}
 
-	s_PlayPos = PLAY_BUFF_SIZE;		/* ÏÂ´Î»Ø·ÅÎ»ÖÃ */
-	
+	s_PlayPos = PLAY_BUFF_SIZE; /* ä¸‹æ¬¡å›æ”¾ä½ç½® */
+
 	s_PlayPointer = -1;
-	
+
 	if (HAL_OK != HAL_SAI_Transmit_DMA(&SaiOutHandle, (uint8_t *)s_PlayBuffCache, PLAY_BUFF_SIZE))
 	{
 		Error_Handler(__FILE__, __LINE__);
@@ -1312,28 +1305,28 @@ uint32_t AUDIO_Play(int16_t* pBuffer, uint32_t Size)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Poll
-*	¹¦ÄÜËµÃ÷: ·ÅÒôÂ¼Òô£¬ÂÖÑ¯º¯Êı¡£²åÈëwhileÑ­»·Ö´ĞĞ. ÓÃÓÚ½²ÎÄ¼ş»º³åÇøÊı¾İ°áÒÆµ½32×Ö½Ú¶ÔÆëµÄDMA»º³åÇø.
-*	ĞÎ    ²Î: pBuffer : Ñù±¾Êı¾İ
-*			  Size : Ñù±¾¸öÊı. Ã¿Í¨µÀ16bit£¬Ë«Í¨µÀ¡£Ã¿¸öÑù±¾Õ¼4×Ö½Ú¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Poll
+*	åŠŸèƒ½è¯´æ˜: æ”¾éŸ³å½•éŸ³ï¼Œè½®è¯¢å‡½æ•°ã€‚æ’å…¥whileå¾ªç¯æ‰§è¡Œ. ç”¨äºè®²æ–‡ä»¶ç¼“å†²åŒºæ•°æ®æ¬ç§»åˆ°32å­—èŠ‚å¯¹é½çš„DMAç¼“å†²åŒº.
+*	å½¢    å‚: pBuffer : æ ·æœ¬æ•°æ®
+*			  Size : æ ·æœ¬ä¸ªæ•°. æ¯é€šé“16bitï¼ŒåŒé€šé“ã€‚æ¯ä¸ªæ ·æœ¬å 4å­—èŠ‚ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_Poll(void)
 {
 	{
 		uint8_t file_end = 0;
-		
-		/* ²¥·ÅÁËÒ»°ë£¬Á¢¼´×¼±¸ºÃµÚ1²¿·ÖÊı¾İÇø */
+
+		/* æ’­æ”¾äº†ä¸€åŠï¼Œç«‹å³å‡†å¤‡å¥½ç¬¬1éƒ¨åˆ†æ•°æ®åŒº */
 		if (s_PlayDmaState == DMA_BUFFER_HALF)
 		{
 			s_PlayDmaState = DMA_BUFFER_NONE;
-			
-			/* Çåcashe£¬¶ÁÈ¡¸üĞÂµÄsramÊı¾İ */
-//			SCB_CleanDCache_by_Addr((uint32_t *)s_PlayBuffCache, PLAY_BUFF_SIZE);
+
+			/* æ¸…casheï¼Œè¯»å–æ›´æ–°çš„sramæ•°æ® */
+			//			SCB_CleanDCache_by_Addr((uint32_t *)s_PlayBuffCache, PLAY_BUFF_SIZE);
 			SCB_CleanInvalidateDCache();
-			
-			/* ½«DMAÄÚ´æÊı¾İ×ªÒÆµ½ÎÄ¼ş»º³åÇø */
+
+			/* å°†DMAå†…å­˜æ•°æ®è½¬ç§»åˆ°æ–‡ä»¶ç¼“å†²åŒº */
 			for (int i = 0; i < PLAY_BUFF_SIZE / 2; i++)
 			{
 				if (s_PlayPos < s_PlayFileLen)
@@ -1342,28 +1335,28 @@ void AUDIO_Poll(void)
 				}
 				else
 				{
-					s_PlayBuffCache[i] = 0;		/* ²»×ã²¹0¾²Òô */
+					s_PlayBuffCache[i] = 0; /* ä¸è¶³è¡¥0é™éŸ³ */
 					file_end = 1;
 				}
 			}
-			
+
 			if (s_PlayDmaState != DMA_BUFFER_NONE)
 			{
-				/* Èç¹ûÀ´²»¼°°áÔËÊı¾İ£¬ÔòËÀ»úÔÚ´Ë´¦ */
+				/* å¦‚æœæ¥ä¸åŠæ¬è¿æ•°æ®ï¼Œåˆ™æ­»æœºåœ¨æ­¤å¤„ */
 				Error_Handler(__FILE__, __LINE__);
-			}			
+			}
 		}
 
-		/* ²¥·ÅÍê±Ï£¬Á¢¼´×¼±¸ºÃµÚ2²¿·ÖÊı¾İÇø. DMAÑ­»·Ö´ĞĞ */
+		/* æ’­æ”¾å®Œæ¯•ï¼Œç«‹å³å‡†å¤‡å¥½ç¬¬2éƒ¨åˆ†æ•°æ®åŒº. DMAå¾ªç¯æ‰§è¡Œ */
 		if (s_PlayDmaState == DMA_BUFFER_FULL)
 		{
 			s_PlayDmaState = DMA_BUFFER_NONE;
-			
-			/* Çåcashe£¬¶ÁÈ¡¸üĞÂµÄsramÊı¾İ */
-//			SCB_CleanDCache_by_Addr((uint32_t *)s_PlayBuffCache + PLAY_BUFF_SIZE, PLAY_BUFF_SIZE);
+
+			/* æ¸…casheï¼Œè¯»å–æ›´æ–°çš„sramæ•°æ® */
+			//			SCB_CleanDCache_by_Addr((uint32_t *)s_PlayBuffCache + PLAY_BUFF_SIZE, PLAY_BUFF_SIZE);
 			SCB_CleanInvalidateDCache();
-			
-			/* ½«DMAÄÚ´æÊı¾İ×ªÒÆµ½ÎÄ¼ş»º³åÇø */
+
+			/* å°†DMAå†…å­˜æ•°æ®è½¬ç§»åˆ°æ–‡ä»¶ç¼“å†²åŒº */
 			for (int i = 0; i < PLAY_BUFF_SIZE / 2; i++)
 			{
 				if (s_PlayPos < s_PlayFileLen)
@@ -1372,37 +1365,37 @@ void AUDIO_Poll(void)
 				}
 				else
 				{
-					s_PlayBuffCache[i] = 0;		/* ²»×ã²¹0¾²Òô */
+					s_PlayBuffCache[i] = 0; /* ä¸è¶³è¡¥0é™éŸ³ */
 					file_end = 1;
 				}
 			}
 
 			if (s_PlayDmaState != DMA_BUFFER_NONE)
 			{
-				/* Èç¹ûÀ´²»¼°°áÔËÊı¾İ£¬ÔòËÀ»úÔÚ´Ë´¦ */
+				/* å¦‚æœæ¥ä¸åŠæ¬è¿æ•°æ®ï¼Œåˆ™æ­»æœºåœ¨æ­¤å¤„ */
 				Error_Handler(__FILE__, __LINE__);
-			}			
-		}		
-		
+			}
+		}
+
 		if (file_end == 1)
 		{
 			AUDIO_Stop();
-		}		
-	}	
-	
-	/* ÓÃÓÚÂ¼Òô */
+		}
+	}
+
+	/* ç”¨äºå½•éŸ³ */
 	{
 		uint8_t file_full = 0;
-		
+
 		if (s_RecDmaState == DMA_BUFFER_HALF)
 		{
 			s_RecDmaState = DMA_BUFFER_NONE;
-			
-			/* ½«casheÊı¾İË¢ĞÂµ½sram */
-//			SCB_InvalidateDCache_by_Addr((uint32_t *)s_RecBuffCache, REC_BUFF_SIZE);
+
+			/* å°†casheæ•°æ®åˆ·æ–°åˆ°sram */
+			//			SCB_InvalidateDCache_by_Addr((uint32_t *)s_RecBuffCache, REC_BUFF_SIZE);
 			SCB_CleanInvalidateDCache();
-			
-			/* ½«DMAÄÚ´æÊı¾İ×ªÒÆµ½ÎÄ¼ş»º³åÇø */
+
+			/* å°†DMAå†…å­˜æ•°æ®è½¬ç§»åˆ°æ–‡ä»¶ç¼“å†²åŒº */
 			for (int i = 0; i < REC_BUFF_SIZE / 2; i++)
 			{
 				if (s_RecPos < s_RecFileLen)
@@ -1417,20 +1410,20 @@ void AUDIO_Poll(void)
 
 			if (s_RecDmaState != DMA_BUFFER_NONE)
 			{
-				/* Èç¹ûÀ´²»¼°°áÔËÊı¾İ£¬ÔòËÀ»úÔÚ´Ë´¦ */
+				/* å¦‚æœæ¥ä¸åŠæ¬è¿æ•°æ®ï¼Œåˆ™æ­»æœºåœ¨æ­¤å¤„ */
 				Error_Handler(__FILE__, __LINE__);
-			}				
+			}
 		}
 
 		if (s_RecDmaState == DMA_BUFFER_FULL)
 		{
 			s_RecDmaState = DMA_BUFFER_NONE;
-			
-			/* ½«casheÊı¾İË¢ĞÂµ½sram */
-//			SCB_InvalidateDCache_by_Addr((uint32_t *)s_RecBuffCache + REC_BUFF_SIZE, REC_BUFF_SIZE);
+
+			/* å°†casheæ•°æ®åˆ·æ–°åˆ°sram */
+			//			SCB_InvalidateDCache_by_Addr((uint32_t *)s_RecBuffCache + REC_BUFF_SIZE, REC_BUFF_SIZE);
 			SCB_CleanInvalidateDCache();
-			
-			/* ½«DMAÄÚ´æÊı¾İ×ªÒÆµ½ÎÄ¼ş»º³åÇø */
+
+			/* å°†DMAå†…å­˜æ•°æ®è½¬ç§»åˆ°æ–‡ä»¶ç¼“å†²åŒº */
 			for (int i = 0; i < REC_BUFF_SIZE / 2; i++)
 			{
 				if (s_RecPos < s_RecFileLen)
@@ -1442,27 +1435,27 @@ void AUDIO_Poll(void)
 					file_full = 1;
 				}
 			}
-			
+
 			if (s_RecDmaState != DMA_BUFFER_NONE)
 			{
-				/* Èç¹ûÀ´²»¼°°áÔËÊı¾İ£¬ÔòËÀ»úÔÚ´Ë´¦ */
+				/* å¦‚æœæ¥ä¸åŠæ¬è¿æ•°æ®ï¼Œåˆ™æ­»æœºåœ¨æ­¤å¤„ */
 				Error_Handler(__FILE__, __LINE__);
-			}			
-		}		
-		
+			}
+		}
+
 		if (file_full == 1)
 		{
 			AUDIO_Stop();
-		}		
+		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SAI_RxCpltCallback
-*	¹¦ÄÜËµÃ÷: Rx Transfer completed callbacks. DMA½ÓÊÕ»º³åÇøÂú»Øµ÷º¯Êı
-*	ĞÎ    ²Î: hsai : SAI_HandleTypeDef structure
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SAI_RxCpltCallback
+*	åŠŸèƒ½è¯´æ˜: Rx Transfer completed callbacks. DMAæ¥æ”¶ç¼“å†²åŒºæ»¡å›è°ƒå‡½æ•°
+*	å½¢    å‚: hsai : SAI_HandleTypeDef structure
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef *hsai)
@@ -1472,10 +1465,10 @@ void HAL_SAI_RxCpltCallback(SAI_HandleTypeDef *hsai)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SAI_RxHalfCpltCallback
-*	¹¦ÄÜËµÃ÷:  Rx Transfer Half completed callbacks. DMA½ÓÊÕ»º³åÇøÌî³ä1°ëÊ±µÄ»Øµ÷º¯Êı
-*	ĞÎ    ²Î: hsai : SAI_HandleTypeDef structure
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SAI_RxHalfCpltCallback
+*	åŠŸèƒ½è¯´æ˜:  Rx Transfer Half completed callbacks. DMAæ¥æ”¶ç¼“å†²åŒºå¡«å……1åŠæ—¶çš„å›è°ƒå‡½æ•°
+*	å½¢    å‚: hsai : SAI_HandleTypeDef structure
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
@@ -1485,24 +1478,24 @@ void HAL_SAI_RxHalfCpltCallback(SAI_HandleTypeDef *hsai)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Record
-*	¹¦ÄÜËµÃ÷: ¿ªÊ¼·ÅÒô¡£²ÉÓÃDMA´«Êä·½Ê½¡£ Ö÷³ÌĞòĞèÒªÑ­»·Ö´ĞĞAUDIO_Poll()À´°áÒÆÊı¾İµ½DMA»º³åÇø.
-*	ĞÎ    ²Î: pBuffer : ÒôÆµÎÄ¼ş»º³åÇø¡£PCMÊı¾İ
-*			  Size : Ñù±¾¸öÊı¡£ ¶ÔÓÚ16bitË«ÉùµÀ£¬¾ÍÊÇ4×Ö½Ú1¸öÑù±¾¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Record
+*	åŠŸèƒ½è¯´æ˜: å¼€å§‹æ”¾éŸ³ã€‚é‡‡ç”¨DMAä¼ è¾“æ–¹å¼ã€‚ ä¸»ç¨‹åºéœ€è¦å¾ªç¯æ‰§è¡ŒAUDIO_Poll()æ¥æ¬ç§»æ•°æ®åˆ°DMAç¼“å†²åŒº.
+*	å½¢    å‚: pBuffer : éŸ³é¢‘æ–‡ä»¶ç¼“å†²åŒºã€‚PCMæ•°æ®
+*			  Size : æ ·æœ¬ä¸ªæ•°ã€‚ å¯¹äº16bitåŒå£°é“ï¼Œå°±æ˜¯4å­—èŠ‚1ä¸ªæ ·æœ¬ã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-uint32_t AUDIO_Record(int16_t* pBuffer, uint32_t Size)
-{	
-	s_RecFileBuf = pBuffer;		/* ±£´æÖ¸Õë */
-	s_RecFileLen = Size;		/* ±£´æÎÄ¼ş³¤¶È */
-	
+uint32_t AUDIO_Record(int16_t *pBuffer, uint32_t Size)
+{
+	s_RecFileBuf = pBuffer; /* ä¿å­˜æŒ‡é’ˆ */
+	s_RecFileLen = Size;		/* ä¿å­˜æ–‡ä»¶é•¿åº¦ */
+
 	s_RecPos = 0;
-	
+
 	s_RecDmaState = DMA_BUFFER_NONE;
-	
+
 	/* Start the PDM data reception process */
-	if (HAL_OK != HAL_SAI_Receive_DMA(&SaiInHandle, (uint8_t*)s_RecBuffCache, REC_BUFF_SIZE))
+	if (HAL_OK != HAL_SAI_Receive_DMA(&SaiInHandle, (uint8_t *)s_RecBuffCache, REC_BUFF_SIZE))
 	{
 		Error_Handler(__FILE__, __LINE__);
 	}
@@ -1512,10 +1505,10 @@ uint32_t AUDIO_Record(int16_t* pBuffer, uint32_t Size)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_GetRecordSampleCount
-*	¹¦ÄÜËµÃ÷: »ñµÃÉÏ´ÎÂ¼ÒôµÄÑù±¾¸öÊı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_GetRecordSampleCount
+*	åŠŸèƒ½è¯´æ˜: è·å¾—ä¸Šæ¬¡å½•éŸ³çš„æ ·æœ¬ä¸ªæ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint32_t AUDIO_GetRecordSampleCount(void)
@@ -1525,80 +1518,79 @@ uint32_t AUDIO_GetRecordSampleCount(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Pause
-*	¹¦ÄÜËµÃ÷: ÔİÍ£²¥·Å¡£ÔİÎ´ÆôÓÃ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Pause
+*	åŠŸèƒ½è¯´æ˜: æš‚åœæ’­æ”¾ã€‚æš‚æœªå¯ç”¨ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_Pause(void)
-{    
+{
 	;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Resume
-*	¹¦ÄÜËµÃ÷: »Ö¸´²¥·Å¡£ÔİÎ´ÆôÓÃ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Resume
+*	åŠŸèƒ½è¯´æ˜: æ¢å¤æ’­æ”¾ã€‚æš‚æœªå¯ç”¨ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_Resume(uint32_t Cmd)
-{    
+{
 	;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_Resume
-*	¹¦ÄÜËµÃ÷: Í£Ö¹Â¼ÒôºÍ²¥·Å¡£¹Ø±ÕDMA£¬¹Ø±ÕDMAÖÕ¶Ë. ½ûÖ¹SAIÉè±¸.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_Resume
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢å½•éŸ³å’Œæ’­æ”¾ã€‚å…³é—­DMAï¼Œå…³é—­DMAç»ˆç«¯. ç¦æ­¢SAIè®¾å¤‡.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_Stop(void)
 {
 	if (hSaiOutDma.Instance == SAI_OUT_DMA_STREAM)
 	{
-		/* Í£Ö¹²¥·Å */
+		/* åœæ­¢æ’­æ”¾ */
 		HAL_NVIC_DisableIRQ(SAI_OUT_DMA_STREAM_IRQ);
-		HAL_DMA_DeInit(&hSaiOutDma);		
+		HAL_DMA_DeInit(&hSaiOutDma);
 	}
-	
+
 	if (SaiOutHandle.Instance == SAI_OUT)
-	{	
+	{
 		__HAL_SAI_DISABLE(&SaiOutHandle);
 	}
-	
+
 	if (hSaiInDma.Instance == SAI_IN_DMA_STREAM)
 	{
-		/* Í£Ö¹²¥·Å */
+		/* åœæ­¢æ’­æ”¾ */
 		HAL_NVIC_DisableIRQ(SAI_IN_DMA_STREAM_IRQ);
-		HAL_DMA_DeInit(&hSaiInDma);		
+		HAL_DMA_DeInit(&hSaiInDma);
 	}
-	
+
 	if (SaiInHandle.Instance == SAI_IN)
-	{	
+	{
 		__HAL_SAI_DISABLE(&SaiInHandle);
-	}	
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AUDIO_SetVolume
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÒôÁ¿¡£¶ú»úÒôÁ¿ºÍÀ®°ÈÒôÁ¿Í¬Ê±ÉèÖÃ.
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AUDIO_SetVolume
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®éŸ³é‡ã€‚è€³æœºéŸ³é‡å’Œå–‡å­éŸ³é‡åŒæ—¶è®¾ç½®.
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void AUDIO_SetVolume(uint8_t Volume)
 {
-	/* µ÷½ÚÒôÁ¿£¬×óÓÒÏàÍ¬ÒôÁ¿ */
+	/* è°ƒèŠ‚éŸ³é‡ï¼Œå·¦å³ç›¸åŒéŸ³é‡ */
 	wm8978_SetEarVolume(Volume);
 	wm8978_SetSpkVolume(Volume);
 }
-
 
 /*-----------------------------------------------------------------------------
                     Audio MAL Interface Control Functions
@@ -1606,21 +1598,21 @@ void AUDIO_SetVolume(uint8_t Volume)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HAL_SAI_MspInit
-*	¹¦ÄÜËµÃ÷: ÅäÖÃSAIÄ£¿é¡£°üÀ¨·ÅÒôÓÃµÄSAIºÍÂ¼ÒôÓÃµÄSAI¡£
-*	ĞÎ    ²Î: hsai
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HAL_SAI_MspInit
+*	åŠŸèƒ½è¯´æ˜: é…ç½®SAIæ¨¡å—ã€‚åŒ…æ‹¬æ”¾éŸ³ç”¨çš„SAIå’Œå½•éŸ³ç”¨çš„SAIã€‚
+*	å½¢    å‚: hsai
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai)
 {
-	GPIO_InitTypeDef  GPIO_Init;
+	GPIO_InitTypeDef GPIO_Init;
 
 	if (hsai->Instance == SAI_OUT)
 	{
 		/* Configure DMA used for SAI1 */
 		SAI_OUT_DMA_CLK_ENABLE();
-		
+
 		/* Enable SAI1 clock */
 		SAI_OUT_CLK_ENABLE();
 
@@ -1630,41 +1622,41 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai)
 		SAI_OUT_FS_ENABLE();
 		SAI_OUT_SD_ENABLE();
 
-		GPIO_Init.Mode      = GPIO_MODE_AF_PP;
-		GPIO_Init.Pull      = GPIO_NOPULL;
-		GPIO_Init.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+		GPIO_Init.Mode = GPIO_MODE_AF_PP;
+		GPIO_Init.Pull = GPIO_NOPULL;
+		GPIO_Init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 
 		GPIO_Init.Alternate = SAI_OUT_FS_AF;
-		GPIO_Init.Pin       = SAI_OUT_FS_PIN;
+		GPIO_Init.Pin = SAI_OUT_FS_PIN;
 		HAL_GPIO_Init(SAI_OUT_FS_GPIO_PORT, &GPIO_Init);
-		
+
 		GPIO_Init.Alternate = SAI_OUT_SCK_AF;
-		GPIO_Init.Pin       = SAI_OUT_SCK_PIN;
+		GPIO_Init.Pin = SAI_OUT_SCK_PIN;
 		HAL_GPIO_Init(SAI_OUT_SCK_GPIO_PORT, &GPIO_Init);
-		
+
 		GPIO_Init.Alternate = SAI_OUT_SD_AF;
-		GPIO_Init.Pin       = SAI_OUT_SD_PIN;
+		GPIO_Init.Pin = SAI_OUT_SD_PIN;
 		HAL_GPIO_Init(SAI_OUT_SD_GPIO_PORT, &GPIO_Init);
-		
+
 		GPIO_Init.Alternate = SAI_OUT_MCLK_AF;
-		GPIO_Init.Pin       = SAI_OUT_MCLK_PIN;
+		GPIO_Init.Pin = SAI_OUT_MCLK_PIN;
 		HAL_GPIO_Init(SAI_OUT_MCLK_GPIO_PORT, &GPIO_Init);
-	
-		hSaiOutDma.Init.Request             = SAI_OUT_DMA_REQUEST;
-		hSaiOutDma.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-		hSaiOutDma.Init.PeriphInc           = DMA_PINC_DISABLE;
-		hSaiOutDma.Init.MemInc              = DMA_MINC_ENABLE;
+
+		hSaiOutDma.Init.Request = SAI_OUT_DMA_REQUEST;
+		hSaiOutDma.Init.Direction = DMA_MEMORY_TO_PERIPH;
+		hSaiOutDma.Init.PeriphInc = DMA_PINC_DISABLE;
+		hSaiOutDma.Init.MemInc = DMA_MINC_ENABLE;
 		hSaiOutDma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-		hSaiOutDma.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-		hSaiOutDma.Init.Mode                = DMA_CIRCULAR;
-		hSaiOutDma.Init.Priority            = DMA_PRIORITY_HIGH;
-		hSaiOutDma.Init.FIFOMode            = DMA_FIFOMODE_ENABLE;
-		hSaiOutDma.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-		hSaiOutDma.Init.MemBurst            = DMA_MBURST_SINGLE;
-		hSaiOutDma.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+		hSaiOutDma.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+		hSaiOutDma.Init.Mode = DMA_CIRCULAR;
+		hSaiOutDma.Init.Priority = DMA_PRIORITY_HIGH;
+		hSaiOutDma.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+		hSaiOutDma.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+		hSaiOutDma.Init.MemBurst = DMA_MBURST_SINGLE;
+		hSaiOutDma.Init.PeriphBurst = DMA_PBURST_SINGLE;
 
 		/* Select the DMA instance to be used for the transfer : DMA2_Stream6 */
-		hSaiOutDma.Instance                 = SAI_OUT_DMA_STREAM;
+		hSaiOutDma.Instance = SAI_OUT_DMA_STREAM;
 
 		/* Associate the DMA handle */
 		__HAL_LINKDMA(hsai, hdmatx, hSaiOutDma);
@@ -1679,43 +1671,43 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai)
 		}
 
 		HAL_NVIC_SetPriority(SAI_OUT_DMA_STREAM_IRQ, 0x01, 0);
-		HAL_NVIC_EnableIRQ(SAI_OUT_DMA_STREAM_IRQ);		
+		HAL_NVIC_EnableIRQ(SAI_OUT_DMA_STREAM_IRQ);
 	}
 
 	else if (hsai->Instance == SAI_IN)
 	{
 		/* Configure DMA used for SAI1 */
 		SAI_IN_DMA_CLK_ENABLE();
-		
+
 		/* Enable SAI1 clock */
 		SAI_IN_CLK_ENABLE();
 
 		/* Configure GPIOs used for SAI1 */
 		SAI_IN_SD_ENABLE();
 
-		GPIO_Init.Mode      = GPIO_MODE_AF_PP;
-		GPIO_Init.Pull      = GPIO_NOPULL;
-		GPIO_Init.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+		GPIO_Init.Mode = GPIO_MODE_AF_PP;
+		GPIO_Init.Pull = GPIO_NOPULL;
+		GPIO_Init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 
 		GPIO_Init.Alternate = SAI_IN_SD_AF;
-		GPIO_Init.Pin       = SAI_IN_SD_PIN;
+		GPIO_Init.Pin = SAI_IN_SD_PIN;
 		HAL_GPIO_Init(SAI_IN_SD_GPIO_PORT, &GPIO_Init);
-		
-		hSaiInDma.Init.Request             = SAI_IN_DMA_REQUEST;
-		hSaiInDma.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-		hSaiInDma.Init.PeriphInc           = DMA_PINC_DISABLE;
-		hSaiInDma.Init.MemInc              = DMA_MINC_ENABLE;
-		hSaiInDma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;	/* 16bit */
-		hSaiInDma.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;	/* 16bit */
-		hSaiInDma.Init.Mode                = DMA_CIRCULAR;
-		hSaiInDma.Init.Priority            = DMA_PRIORITY_HIGH;
-		hSaiInDma.Init.FIFOMode            = DMA_FIFOMODE_ENABLE;	// DMA_FIFOMODE_ENABLE; DMA_FIFOMODE_DISABLE
-		hSaiInDma.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-		hSaiInDma.Init.MemBurst            = DMA_MBURST_SINGLE;
-		hSaiInDma.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+
+		hSaiInDma.Init.Request = SAI_IN_DMA_REQUEST;
+		hSaiInDma.Init.Direction = DMA_PERIPH_TO_MEMORY;
+		hSaiInDma.Init.PeriphInc = DMA_PINC_DISABLE;
+		hSaiInDma.Init.MemInc = DMA_MINC_ENABLE;
+		hSaiInDma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD; /* 16bit */
+		hSaiInDma.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;		/* 16bit */
+		hSaiInDma.Init.Mode = DMA_CIRCULAR;
+		hSaiInDma.Init.Priority = DMA_PRIORITY_HIGH;
+		hSaiInDma.Init.FIFOMode = DMA_FIFOMODE_ENABLE; // DMA_FIFOMODE_ENABLE; DMA_FIFOMODE_DISABLE
+		hSaiInDma.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
+		hSaiInDma.Init.MemBurst = DMA_MBURST_SINGLE;
+		hSaiInDma.Init.PeriphBurst = DMA_PBURST_SINGLE;
 
 		/* Select the DMA instance to be used for the transfer : DMA2_Stream6 */
-		hSaiInDma.Instance                 = SAI_IN_DMA_STREAM;
+		hSaiInDma.Instance = SAI_IN_DMA_STREAM;
 
 		/* Associate the DMA handle */
 		__HAL_LINKDMA(hsai, hdmarx, hSaiInDma);
@@ -1730,16 +1722,16 @@ void HAL_SAI_MspInit(SAI_HandleTypeDef *hsai)
 		}
 
 		HAL_NVIC_SetPriority(SAI_IN_DMA_STREAM_IRQ, 0x01, 0);
-		HAL_NVIC_EnableIRQ(SAI_IN_DMA_STREAM_IRQ);			
+		HAL_NVIC_EnableIRQ(SAI_IN_DMA_STREAM_IRQ);
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SAI_OUT_DMA_STREAM_IRQHandler
-*	¹¦ÄÜËµÃ÷: ·ÅÒôDMAÖÕ¶Ë
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SAI_OUT_DMA_STREAM_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: æ”¾éŸ³DMAç»ˆç«¯
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void SAI_OUT_DMA_STREAM_IRQHandler(void)
@@ -1749,10 +1741,10 @@ void SAI_OUT_DMA_STREAM_IRQHandler(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SAI_IN_DMA_STREAM_IRQHandler
-*	¹¦ÄÜËµÃ÷: Â¼ÒôDMAÖÕ¶Ë
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SAI_IN_DMA_STREAM_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: å½•éŸ³DMAç»ˆç«¯
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void SAI_IN_DMA_STREAM_IRQHandler(void)
@@ -1760,5 +1752,4 @@ void SAI_IN_DMA_STREAM_IRQHandler(void)
 	HAL_DMA_IRQHandler(SaiInHandle.hdmarx);
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

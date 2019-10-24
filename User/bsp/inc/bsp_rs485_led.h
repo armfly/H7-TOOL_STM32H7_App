@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : °²¸»À³LED-485-XXXÏµÁĞÊıÂë¹ÜµÄÇı¶¯³ÌĞò
-*	ÎÄ¼şÃû³Æ : bsp_rs485_led.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : å®‰å¯Œè±LED-485-XXXç³»åˆ—æ•°ç ç®¡çš„é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_rs485_led.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,8 +14,8 @@
 #ifndef __BSP_RS485_LED_H
 #define __BSP_RS485_LED_H
 
-#define MODH_RX_SIZE		128
-#define MODH_TX_SIZE      128
+#define MODH_RX_SIZE 128
+#define MODH_TX_SIZE 128
 
 typedef struct
 {
@@ -33,12 +33,12 @@ typedef struct
 
 	uint8_t TxBuf[MODH_TX_SIZE];
 	uint8_t TxLen;
-	uint8_t fAckOK;		/* Ó¦´ğOK±êÖ¾ */
-}MODH_T;
+	uint8_t fAckOK; /* åº”ç­”OKæ ‡å¿— */
+} MODH_T;
 
 extern MODH_T g_tModH;
 
-/* ¿ØÖÆLED-485-xxx ÊıÂë¹ÜÏÔÊ¾Ä£¿éµÄAPIº¯Êı */
+/* æ§åˆ¶LED-485-xxx æ•°ç ç®¡æ˜¾ç¤ºæ¨¡å—çš„APIå‡½æ•° */
 
 void LED485_SetProtRTU(uint8_t _addr);
 void LED485_SetProtAscii(uint8_t _addr);
@@ -63,4 +63,4 @@ void MODH_Poll(void);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

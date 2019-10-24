@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ë«Í¨µÀÊ¾²¨Æ÷³ÌĞò
-*	ÎÄ¼şÃû³Æ : form_dso.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ê¹ÓÃSTM32ÄÚ²¿ADC²âÁ¿²¨ĞÎ¡£CH1 = PC0£¬ CH2 = PC1
+*	æ¨¡å—åç§° : åŒé€šé“ç¤ºæ³¢å™¨ç¨‹åº
+*	æ–‡ä»¶åç§° : form_dso.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ä½¿ç”¨STM32å†…éƒ¨ADCæµ‹é‡æ³¢å½¢ã€‚CH1 = PC0ï¼Œ CH2 = PC1
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2015-06-23  armfly  ÕıÊ½·¢²¼
-*		V1.1    2015-08-07  armfly  Ê¹ÓÃ¶ÑÕ»±£´æ´ó³ß´çµÄÊı¾İ»º³åÇø£¬½â¾öÈ«¾Ö±äÁ¿¡£
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2015-06-23  armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2015-08-07  armfly  ä½¿ç”¨å †æ ˆä¿å­˜å¤§å°ºå¯¸çš„æ•°æ®ç¼“å†²åŒºï¼Œè§£å†³å…¨å±€å˜é‡ã€‚
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,93 +19,92 @@
 #include "bsp.h"
 #include "form_dso.h"
 
-#define DSO_VER	"V0.6"		  /* µ±Ç°°æ±¾ */
+#define DSO_VER "V0.6" /* å½“å‰ç‰ˆæœ¬ */
 
-/* Ö÷³ÌĞò×´Ì¬×Ö */
+/* ä¸»ç¨‹åºçŠ¶æ€å­— */
 enum
 {
-	S_HELP		= 0,	/* °ïÖúÒ³Ãæ */
-	S_RUN		= 1,	/* ²É¼¯×´Ì¬ */
+	S_HELP = 0, /* å¸®åŠ©é¡µé¢ */
+	S_RUN = 1,	/* é‡‡é›†çŠ¶æ€ */
 
-	S_EXIT		= 3
+	S_EXIT = 3
 };
 
-/* Ê±¼ä·Ö¶È±í£¬ g_DSO->TimeBaseId×÷ÎªÊı×éË÷Òı  */
+/* æ—¶é—´åˆ†åº¦è¡¨ï¼Œ g_DSO->TimeBaseIdä½œä¸ºæ•°ç»„ç´¢å¼•  */
 const uint32_t g_TimeTable[] =
-{
-					10,
-	20, 	50, 	100, 
-	200,	500,	1000,
-	2000,	5000,	10000,
-	20000,	50000,	100000,
-	200000,	500000,	1000000		
-};
+		{
+				10,
+				20, 50, 100,
+				200, 500, 1000,
+				2000, 5000, 10000,
+				20000, 50000, 100000,
+				200000, 500000, 1000000};
 
-/* Ë¥¼õ±¶Êı±í  
+/* è¡°å‡å€æ•°è¡¨  
 
 
-¼ÆËã¹«Ê½£º
+è®¡ç®—å…¬å¼ï¼š
   iTemp = g_DSO->Ch1VOffset + (int16_t)((2024 - g_DSO->Ch1Buf[i + 1]) * 10) / g_DSO->Ch1Attenuation;
 
-	g_DSO->Ch1Attenuation ÊÇADCÖµºÍÏñËØÖ®¼äµÄ±¶ÂÊµÄ10±¶¡£
+	g_DSO->Ch1Attenuation æ˜¯ADCå€¼å’Œåƒç´ ä¹‹é—´çš„å€ç‡çš„10å€ã€‚
 
-	1V µµÎ»Ê±:  ADC = 4096 / 5.0 = 819£» ÏñËØ = 25
+	1V æ¡£ä½æ—¶:  ADC = 4096 / 5.0 = 819ï¼› åƒç´  = 25
 	g_DSO->Ch1Attenuation = 819 / 25 = 32.76
 
 */
-#define ATT_COUNT	6
+#define ATT_COUNT 6
 
 #ifdef D112_2
-	const uint32_t g_AttTable[ATT_COUNT][2] =
-	{
-		/* {³ıÊı*0.1, Ã¿´ó¸ñµçÑ¹}  1:1 */
-		{327,     5000}, 	/* GAIN = 3, ·Å´ó1±¶ */
-		{260,     2000},	/* GAIN = 2  ·Å´ó 2±¶ */
+const uint32_t g_AttTable[ATT_COUNT][2] =
+		{
+				/* {é™¤æ•°*0.1, æ¯å¤§æ ¼ç”µå‹}  1:1 */
+				{327, 5000}, /* GAIN = 3, æ”¾å¤§1å€ */
+				{260, 2000}, /* GAIN = 2  æ”¾å¤§ 2å€ */
 
-		{155 * 2, 1000}, /* GAIN = 1 ·Å´ó 5 ±¶ */
-		{155,	  500},	/* GAIN = 1 ·Å´ó 5±¶  */
-		{112,     200},	/* Gain = 0 ·Å´ó 10±¶ */
-		{112 / 2, 100},	/* Gain = 0 ·Å´ó 10±¶ */
-	};
+				{155 * 2, 1000}, /* GAIN = 1 æ”¾å¤§ 5 å€ */
+				{155, 500},			 /* GAIN = 1 æ”¾å¤§ 5å€  */
+				{112, 200},			 /* Gain = 0 æ”¾å¤§ 10å€ */
+				{112 / 2, 100},	/* Gain = 0 æ”¾å¤§ 10å€ */
+};
 #else
 
-	#define Y_RATE      327
-		
-	const uint32_t g_AttTable[ATT_COUNT][2] =
-	{
-		/* {³ıÊı*0.1, Ã¿´ó¸ñµçÑ¹}  1:1 */
-		//{Y_RATE * 5,	5000},
-		//{Y_RATE * 2,	2000},
-		{Y_RATE * 5 / 5,	5000}, 	/* GAIN = 3 */
-		{Y_RATE * 2 / 5,	2000},
+#define Y_RATE 327
 
-		{Y_RATE,	    1000},   /*¡¡GAIN = 1¡¡*/
-		{Y_RATE / 2,	500},
-		{Y_RATE / 5,	200},	/*  Gain = 0 */
-		{Y_RATE / 10,	100},	/* Gain = 0, ·Å´ó */
-	};
+const uint32_t g_AttTable[ATT_COUNT][2] =
+		{
+				/* {é™¤æ•°*0.1, æ¯å¤§æ ¼ç”µå‹}  1:1 */
+				//{Y_RATE * 5,	5000},
+				//{Y_RATE * 2,	2000},
+				{Y_RATE * 5 / 5, 5000}, /* GAIN = 3 */
+				{Y_RATE * 2 / 5, 2000},
+
+				{Y_RATE, 1000}, /*ã€€GAIN = 1ã€€*/
+				{Y_RATE / 2, 500},
+				{Y_RATE / 5, 200},	/*  Gain = 0 */
+				{Y_RATE / 10, 100}, /* Gain = 0, æ”¾å¤§ */
+};
 #endif
 
 static void DsoHelp(uint8_t *pMainStatus);
 static void DsoRun(uint8_t *pMainStatus);
 
-/* °´Å¥ */
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	80
-#define	BTN_RET_X	(g_LcdWidth - BTN_RET_W - 8)
-#define	BTN_RET_Y	(g_LcdHeight - BTN_RET_H - 4)
-#define	BTN_RET_T	"·µ»Ø"
+/* æŒ‰é’® */
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 80
+#define BTN_RET_X (g_LcdWidth - BTN_RET_W - 8)
+#define BTN_RET_Y (g_LcdHeight - BTN_RET_H - 4)
+#define BTN_RET_T "è¿”å›"
 
-DSO_T *g_DSO;	/* È«¾Ö±äÁ¿£¬ÊÇÒ»¸ö½á¹¹Ìå */
+DSO_T *g_DSO; /* å…¨å±€å˜é‡ï¼Œæ˜¯ä¸€ä¸ªç»“æ„ä½“ */
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	
+	FONT_T FontBtn; /* æŒ‰é’®çš„å­—ä½“ */
+
 	BUTTON_T BtnRet;
-	
+
 	BUTTON_T Btn1;
 	BUTTON_T Btn2;
 	BUTTON_T Btn3;
@@ -113,8 +112,8 @@ typedef struct
 	BUTTON_T Btn5;
 	BUTTON_T Btn6;
 	BUTTON_T Btn7;
-	BUTTON_T Btn8;	
-}FormDSO_T;
+	BUTTON_T Btn8;
+} FormDSO_T;
 
 FormDSO_T *FormDSO;
 
@@ -122,21 +121,21 @@ static void InitFormDSO(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormDSO
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormDSO
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormDSO(void)
 {
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormDSO->FontBtn.FontCode = FC_ST_16;
-	FormDSO->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormDSO->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormDSO->FontBtn.FrontColor = CL_BLACK;
 	FormDSO->FontBtn.Space = 0;
-	
-	/* °´Å¥ */
+
+	/* æŒ‰é’® */
 	FormDSO->BtnRet.Left = BTN_RET_X;
 	FormDSO->BtnRet.Top = BTN_RET_Y;
 	FormDSO->BtnRet.Height = BTN_RET_H;
@@ -144,22 +143,22 @@ static void InitFormDSO(void)
 	FormDSO->BtnRet.pCaption = BTN_RET_T;
 	FormDSO->BtnRet.Font = &FormDSO->FontBtn;
 	FormDSO->BtnRet.Focus = 0;
-	
-	/*  AC/DC µÄY×ø±ê = 224 */
+
+	/*  AC/DC çš„Yåæ ‡ = 224 */
 	/* void LCD_InitButton(BUTTON_T *_btn, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w, 
 		char *_pCaption, FONT_T *_pFont); */
-	
-	LCD_InitButton(&FormDSO->Btn1, 10      , 244, 24, 30, "AC", &FormDSO->FontBtn);	/* Í¨µÀ1 AC-DCÇĞ»» */
-	LCD_InitButton(&FormDSO->Btn2, 10 + 35 , 244, 24, 30, "+" , &FormDSO->FontBtn);	/* Í¨µÀ1 ·ù¶È+ */
-	LCD_InitButton(&FormDSO->Btn3, 10 + 65 , 244, 24, 30, "-" , &FormDSO->FontBtn);	/* Í¨µÀ1 ·ù¶È- */
-	LCD_InitButton(&FormDSO->Btn4, 10 + 110, 244, 24, 30, "AC", &FormDSO->FontBtn);	/* Í¨µÀ2 AC-DCÇĞ»» */
-	LCD_InitButton(&FormDSO->Btn5, 10 + 145, 244, 24, 30, "+" , &FormDSO->FontBtn);	/* Í¨µÀ2 ·ù¶È+ */
-	LCD_InitButton(&FormDSO->Btn6, 10 + 175, 244, 24, 30, "-" , &FormDSO->FontBtn);	/* Í¨µÀ2 ·ù¶È- */
 
-	LCD_InitButton(&FormDSO->Btn7, 10 + 225, 244, 24, 30, "+" , &FormDSO->FontBtn);	/* Ê±»ù+ */
-	LCD_InitButton(&FormDSO->Btn8, 10 + 265, 244, 24, 30, "-" , &FormDSO->FontBtn);	/* Ê±»ù- */
-	
-	/* »æÖÆ°´Å¥ */
+	LCD_InitButton(&FormDSO->Btn1, 10, 244, 24, 30, "AC", &FormDSO->FontBtn);				/* é€šé“1 AC-DCåˆ‡æ¢ */
+	LCD_InitButton(&FormDSO->Btn2, 10 + 35, 244, 24, 30, "+", &FormDSO->FontBtn);		/* é€šé“1 å¹…åº¦+ */
+	LCD_InitButton(&FormDSO->Btn3, 10 + 65, 244, 24, 30, "-", &FormDSO->FontBtn);		/* é€šé“1 å¹…åº¦- */
+	LCD_InitButton(&FormDSO->Btn4, 10 + 110, 244, 24, 30, "AC", &FormDSO->FontBtn); /* é€šé“2 AC-DCåˆ‡æ¢ */
+	LCD_InitButton(&FormDSO->Btn5, 10 + 145, 244, 24, 30, "+", &FormDSO->FontBtn);	/* é€šé“2 å¹…åº¦+ */
+	LCD_InitButton(&FormDSO->Btn6, 10 + 175, 244, 24, 30, "-", &FormDSO->FontBtn);	/* é€šé“2 å¹…åº¦- */
+
+	LCD_InitButton(&FormDSO->Btn7, 10 + 225, 244, 24, 30, "+", &FormDSO->FontBtn); /* æ—¶åŸº+ */
+	LCD_InitButton(&FormDSO->Btn8, 10 + 265, 244, 24, 30, "-", &FormDSO->FontBtn); /* æ—¶åŸº- */
+
+	/* ç»˜åˆ¶æŒ‰é’® */
 	LCD_DrawButton(&FormDSO->BtnRet);
 	LCD_DrawButton(&FormDSO->Btn1);
 	LCD_DrawButton(&FormDSO->Btn2);
@@ -168,81 +167,81 @@ static void InitFormDSO(void)
 	LCD_DrawButton(&FormDSO->Btn5);
 	LCD_DrawButton(&FormDSO->Btn6);
 	LCD_DrawButton(&FormDSO->Btn7);
-	LCD_DrawButton(&FormDSO->Btn8);	
+	LCD_DrawButton(&FormDSO->Btn8);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DsoMain
-*	¹¦ÄÜËµÃ÷: Ê¾²¨Æ÷³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DsoMain
+*	åŠŸèƒ½è¯´æ˜: ç¤ºæ³¢å™¨ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DsoMain(void)
 {
-	uint8_t MainStatus = S_RUN;		/* ³ÌĞòÖ´ĞĞ×´Ì¬ */
-	DSO_T tDSO;			/* ºÜ´óµÄÒ»¸ö±äÁ¿£¬´æ·ÅÔÚ¶ÑÕ»¡£½ÚÔ¼È«¾Ö±äÁ¿¿Õ¼ä */
-	
+	uint8_t MainStatus = S_RUN; /* ç¨‹åºæ‰§è¡ŒçŠ¶æ€ */
+	DSO_T tDSO;									/* å¾ˆå¤§çš„ä¸€ä¸ªå˜é‡ï¼Œå­˜æ”¾åœ¨å †æ ˆã€‚èŠ‚çº¦å…¨å±€å˜é‡ç©ºé—´ */
+
 	memset(&tDSO, 0, sizeof(tDSO));
 	g_DSO = &tDSO;
 
-	/* DAC1Êä³ö10KHz£¬·å·åÖµ2VµÄÕıÏÒ²¨ */
-	dac1_SetSinWave(1638, 10000);	/* Ê¹ÓÃSTM32ÄÚ²¿DAC1Êä³öÕıÏÒ²¨,  µÚ1¸ö²ÎÊıÊÇ·ù¶È(0-2048) µÚ2¸öÊÇÆµÂÊ */
+	/* DAC1è¾“å‡º10KHzï¼Œå³°å³°å€¼2Vçš„æ­£å¼¦æ³¢ */
+	dac1_SetSinWave(1638, 10000); /* ä½¿ç”¨STM32å†…éƒ¨DAC1è¾“å‡ºæ­£å¼¦æ³¢,  ç¬¬1ä¸ªå‚æ•°æ˜¯å¹…åº¦(0-2048) ç¬¬2ä¸ªæ˜¯é¢‘ç‡ */
 
-	/* PE6/TIM15_CH2 Êä³ö10KHz PWM£¬Õ¼¿Õ±È5000 = 50% */
+	/* PE6/TIM15_CH2 è¾“å‡º10KHz PWMï¼Œå ç©ºæ¯”5000 = 50% */
 	bsp_SetTIMOutPWM(GPIOE, GPIO_PIN_6, TIM15, 2, 10000, 5000);
-	
+
 	{
-		DSO_ConfigCtrlGPIO();	/* ÅäÖÃÊ¾²¨Æ÷Ä£¿éµÄ¿ØÖÆGPIO: ñîºÏÍ¨µÀºÍÔöÒæ */
-	
-		g_DSO->CH1_DC = 0;		/* CH1Ñ¡ÔñACñîºÏ */
-		g_DSO->CH2_DC = 0;		/* CH1Ñ¡ÔñACñîºÏ */
-		g_DSO->CH1_Gain = 0;	/* CH1Ñ¡ÔñĞ¡ÔöÒæ Ë¥¼õ1/5, µÚ2¸ö²ÎÊı1±íÊ¾²»Ë¥¼õ1;1 */
-		g_DSO->CH2_Gain = 0;	/* CH2Ñ¡ÔñĞ¡ÔöÒæ Ë¥¼õ1/5, µÚ2¸ö²ÎÊı1±íÊ¾²»Ë¥¼õ1;1 */		
-		
-		DSO_SetDC(1, g_DSO->CH1_DC);	
-		DSO_SetDC(2, g_DSO->CH2_DC);	
-		DSO_SetGain(1, g_DSO->CH1_Gain);	
-		DSO_SetGain(2, g_DSO->CH2_Gain);	
+		DSO_ConfigCtrlGPIO(); /* é…ç½®ç¤ºæ³¢å™¨æ¨¡å—çš„æ§åˆ¶GPIO: è€¦åˆé€šé“å’Œå¢ç›Š */
+
+		g_DSO->CH1_DC = 0;	 /* CH1é€‰æ‹©ACè€¦åˆ */
+		g_DSO->CH2_DC = 0;	 /* CH1é€‰æ‹©ACè€¦åˆ */
+		g_DSO->CH1_Gain = 0; /* CH1é€‰æ‹©å°å¢ç›Š è¡°å‡1/5, ç¬¬2ä¸ªå‚æ•°1è¡¨ç¤ºä¸è¡°å‡1;1 */
+		g_DSO->CH2_Gain = 0; /* CH2é€‰æ‹©å°å¢ç›Š è¡°å‡1/5, ç¬¬2ä¸ªå‚æ•°1è¡¨ç¤ºä¸è¡°å‡1;1 */
+
+		DSO_SetDC(1, g_DSO->CH1_DC);
+		DSO_SetDC(2, g_DSO->CH2_DC);
+		DSO_SetGain(1, g_DSO->CH1_Gain);
+		DSO_SetGain(2, g_DSO->CH2_Gain);
 	}
-	
-	/* ÒòÎª·äÃùÆ÷ÓÃÁËTIM1_CH1,  ºÍÊ¾²¨Æ÷µÄADC²É¼¯³åÍ»£¬Òò´ËÁÙÊ±ÆÁ±Î°´Å¥ÌáÊ¾Òô */
+
+	/* å› ä¸ºèœ‚é¸£å™¨ç”¨äº†TIM1_CH1,  å’Œç¤ºæ³¢å™¨çš„ADCé‡‡é›†å†²çªï¼Œå› æ­¤ä¸´æ—¶å±è”½æŒ‰é’®æç¤ºéŸ³ */
 	BEEP_Pause();
-	
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (1)
 	{
 		switch (MainStatus)
 		{
-			case S_HELP:
-				DsoHelp(&MainStatus);		/* ÏÔÊ¾°ïÖú */
-				break;
+		case S_HELP:
+			DsoHelp(&MainStatus); /* æ˜¾ç¤ºå¸®åŠ© */
+			break;
 
-			case S_RUN:
-				DsoRun(&MainStatus);		/* È«ËÙ²É¼¯£¬ÊµÊ±ÏÔÊ¾ */
-				break;
+		case S_RUN:
+			DsoRun(&MainStatus); /* å…¨é€Ÿé‡‡é›†ï¼Œå®æ—¶æ˜¾ç¤º */
+			break;
 
-			case S_EXIT:
-				dac1_StopWave();	/* ¹Ø±ÕDAC1Êä³ö */
-//				dac2_StopWave();	/* ¹Ø±ÕDAC2Êä³ö */
-//				bsp_SetTIMOutPWM(GPIOF, GPIO_PIN_9, TIM14, 1, 0, 5000);
-			
-				BEEP_Resume(); /* »Ö¸´·äÃùÆ÷¹¦ÄÜ */
-				return;
-			
-			default:
-				break;
+		case S_EXIT:
+			dac1_StopWave(); /* å…³é—­DAC1è¾“å‡º */
+											 //				dac2_StopWave();	/* å…³é—­DAC2è¾“å‡º */
+											 //				bsp_SetTIMOutPWM(GPIOF, GPIO_PIN_9, TIM14, 1, 0, 5000);
+
+			BEEP_Resume(); /* æ¢å¤èœ‚é¸£å™¨åŠŸèƒ½ */
+			return;
+
+		default:
+			break;
 		}
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispHelp1
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾²Ù×÷ÌáÊ¾
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispHelp1
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ“ä½œæç¤º
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispHelp1(void)
@@ -251,58 +250,58 @@ static void DispHelp1(void)
 	uint16_t LineCap;
 	FONT_T font;
 
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	font.FontCode = FC_ST_16;
-	font.BackColor = CL_BLUE;		/* ºÍ±³¾°É«ÏàÍ¬ */
-	font.FrontColor = CL_WHITE;		/* °×É«ÎÄ×Ö */
+	font.BackColor = CL_BLUE;		/* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
+	font.FrontColor = CL_WHITE; /* ç™½è‰²æ–‡å­— */
 	font.Space = 0;
 
-	LCD_ClrScr(CL_BLUE);  		/* ÇåÆÁ£¬±³¾°À¶É« */
+	LCD_ClrScr(CL_BLUE); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
 	y = 0;
-	LineCap = 18; /* ĞĞ¼ä¾à */
-	LCD_DispStr(20, y, "°²¸»À³STM32-V5¿ª·¢°å  www.armfly.com", &font);
-	
-	font.FrontColor = CL_YELLOW;		/* »ÆÉ«ÎÄ×Ö */
-	
-	y += LineCap;	
+	LineCap = 18; /* è¡Œé—´è· */
+	LCD_DispStr(20, y, "å®‰å¯Œè±STM32-V5å¼€å‘æ¿  www.armfly.com", &font);
+
+	font.FrontColor = CL_YELLOW; /* é»„è‰²æ–‡å­— */
+
+	y += LineCap;
 	LCD_DispStr(30, y, "QQ:1295744630     Email:armfly@qq.com", &font);
 	y += LineCap;
 
 	y += LineCap;
 
-	LCD_DispStr(30, y, "²Ù×÷ÌáÊ¾:", &font);
+	LCD_DispStr(30, y, "æ“ä½œæç¤º:", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "K1¼ü     = ÇĞ»»Í¨µÀ½¹µã¡£CH1»òCH2", &font);
-	y += LineCap; 
-	LCD_DispStr(50, y, "K2¼ü     = ÏÔÊ¾°ïÖú»òÍË³ö°ïÖú", &font);
+	LCD_DispStr(50, y, "K1é”®     = åˆ‡æ¢é€šé“ç„¦ç‚¹ã€‚CH1æˆ–CH2", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "K3¼ü     = ÔİÍ£»òÊµÊ±ÔËĞĞ", &font);
+	LCD_DispStr(50, y, "K2é”®     = æ˜¾ç¤ºå¸®åŠ©æˆ–é€€å‡ºå¸®åŠ©", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "Ò¡¸ËÉÏ¼ü = ·Å´ó²¨ĞÎ´¹Ö±·ù¶È»òÏòÉÏÒÆ¶¯", &font);
+	LCD_DispStr(50, y, "K3é”®     = æš‚åœæˆ–å®æ—¶è¿è¡Œ", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "Ò¡¸ËÏÂ¼ü = ËõĞ¡²¨ĞÎ´¹Ö±·ù¶È»òÏòÏÂÒÆ¶¯", &font);
+	LCD_DispStr(50, y, "æ‘‡æ†ä¸Šé”® = æ”¾å¤§æ³¢å½¢å‚ç›´å¹…åº¦æˆ–å‘ä¸Šç§»åŠ¨", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "Ò¡¸Ë×ó¼ü = Ë®Æ½Õ¹¿í²¨ĞÎ", &font);
+	LCD_DispStr(50, y, "æ‘‡æ†ä¸‹é”® = ç¼©å°æ³¢å½¢å‚ç›´å¹…åº¦æˆ–å‘ä¸‹ç§»åŠ¨", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "Ò¡¸ËÓÒ¼ü = Ë®Æ½ËõĞ¡²¨ĞÎ", &font);
+	LCD_DispStr(50, y, "æ‘‡æ†å·¦é”® = æ°´å¹³å±•å®½æ³¢å½¢", &font);
 	y += LineCap;
-	LCD_DispStr(50, y, "Ò¡¸ËOK¼ü = ÇĞ»»Ò¡¸Ëµ÷½ÚÄ£Ê½¡£·ù¶È»òÎ»ÖÃ", &font);
+	LCD_DispStr(50, y, "æ‘‡æ†å³é”® = æ°´å¹³ç¼©å°æ³¢å½¢", &font);
+	y += LineCap;
+	LCD_DispStr(50, y, "æ‘‡æ†OKé”® = åˆ‡æ¢æ‘‡æ†è°ƒèŠ‚æ¨¡å¼ã€‚å¹…åº¦æˆ–ä½ç½®", &font);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DsoHelp
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾²Ù×÷ÌáÊ¾µÄ×´Ì¬»ú
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DsoHelp
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ“ä½œæç¤ºçš„çŠ¶æ€æœº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DsoHelp(uint8_t *pMainStatus)
 {
 	uint8_t KeyCode;
 
-	uint8_t fRefresh = 1;	/* LCDË¢ĞÂ±êÖ¾ */
+	uint8_t fRefresh = 1; /* LCDåˆ·æ–°æ ‡å¿— */
 	uint8_t SubStatus = 0;
 
 	while (*pMainStatus == S_HELP)
@@ -319,34 +318,34 @@ static void DsoHelp(uint8_t *pMainStatus)
 			}
 		}
 
-		/* ¶ÁÈ¡°´¼ü£¬´óÓÚ0±íÊ¾ÓĞ¼ü°´ÏÂ */
+		/* è¯»å–æŒ‰é”®ï¼Œå¤§äº0è¡¨ç¤ºæœ‰é”®æŒ‰ä¸‹ */
 		KeyCode = bsp_GetKey();
 		if (KeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (KeyCode)
 			{
-				case KEY_DOWN_K2:				
-					/* ÍË³ö,½øÈëÈ«ËÙÔËĞĞ×´Ì¬ */
-					*pMainStatus = S_RUN;
-					break;
+			case KEY_DOWN_K2:
+				/* é€€å‡º,è¿›å…¥å…¨é€Ÿè¿è¡ŒçŠ¶æ€ */
+				*pMainStatus = S_RUN;
+				break;
 
-				case JOY_DOWN_L:	/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-				case JOY_DOWN_R:	/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-				case KEY_DOWN_K3:			
-				case JOY_DOWN_OK:	/* Ò¡¸ËOK¼ü */
-					/* ÍË³ö,½øÈëÈ«ËÙÔËĞĞ×´Ì¬ */
-					*pMainStatus = S_EXIT;
-					break;				
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+			case KEY_DOWN_K3:
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”® */
+				/* é€€å‡º,è¿›å…¥å…¨é€Ÿè¿è¡ŒçŠ¶æ€ */
+				*pMainStatus = S_EXIT;
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
-			
-				default:
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -354,20 +353,20 @@ static void DsoHelp(uint8_t *pMainStatus)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFrame
-*	¹¦ÄÜËµÃ÷: ÄÜ£ºÏÔÊ¾²¨ĞÎ´°¿ÚµÄ±ß¿òºÍ¿Ì¶ÈÏß
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFrame
+*	åŠŸèƒ½è¯´æ˜: èƒ½ï¼šæ˜¾ç¤ºæ³¢å½¢çª—å£çš„è¾¹æ¡†å’Œåˆ»åº¦çº¿
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFrame(void)
 {
 	uint16_t x, y;
 
-	/* »æÖÆÒ»¸öÊµÏß¾ØĞÎ¿ò x, y, h, w */
+	/* ç»˜åˆ¶ä¸€ä¸ªå®çº¿çŸ©å½¢æ¡† x, y, h, w */
 	LCD_DrawRect(9, 19, 202, 302, CL_WHITE);
 
-	/* »æÖÆ´¹Ö±¿Ì¶Èµã */
+	/* ç»˜åˆ¶å‚ç›´åˆ»åº¦ç‚¹ */
 	for (x = 0; x < 13; x++)
 	{
 		for (y = 0; y < 41; y++)
@@ -376,7 +375,7 @@ static void DispFrame(void)
 		}
 	}
 
-	/* »æÖÆË®Æ½¿Ì¶Èµã */
+	/* ç»˜åˆ¶æ°´å¹³åˆ»åº¦ç‚¹ */
 	for (y = 0; y < 9; y++)
 	{
 		for (x = 0; x < 61; x++)
@@ -385,16 +384,16 @@ static void DispFrame(void)
 		}
 	}
 
-	/* »æÖÆ´¹Ö±ÖĞĞÄ¿Ì¶Èµã */
+	/* ç»˜åˆ¶å‚ç›´ä¸­å¿ƒåˆ»åº¦ç‚¹ */
 	for (y = 0; y < 41; y++)
-	{	 
+	{
 		LCD_PutPixel(9 + (6 * 25), 20 + (y * 5), CL_WHITE);
 		LCD_PutPixel(11 + (6 * 25), 20 + (y * 5), CL_WHITE);
 	}
 
-	/* »æÖÆË®Æ½ÖĞĞÄ¿Ì¶Èµã */
+	/* ç»˜åˆ¶æ°´å¹³ä¸­å¿ƒåˆ»åº¦ç‚¹ */
 	for (x = 0; x < 61; x++)
-	{	 
+	{
 		LCD_PutPixel(10 + (x * 5), 19 + (4 * 25), CL_WHITE);
 		LCD_PutPixel(10 + (x * 5), 21 + (4 * 25), CL_WHITE);
 	}
@@ -402,28 +401,27 @@ static void DispFrame(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispButton
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾²¨ĞÎ´°¿ÚÓÒ±ßµÄ¹¦ÄÜ°´Å¥£¨´ıÀ©Õ¹£©
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispButton
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ³¢å½¢çª—å£å³è¾¹çš„åŠŸèƒ½æŒ‰é’®ï¼ˆå¾…æ‰©å±•ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispButton(void)
 {
-
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispCh1Wave
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾Í¨µÀ1²¨ĞÎ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispCh1Wave
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºé€šé“1æ³¢å½¢
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispCh1Wave(void)
 {
-	int16_t i;		/* ÓĞ·ûºÅÊı */
+	int16_t i; /* æœ‰ç¬¦å·æ•° */
 	//uint16_t pos;
 	uint16_t *px;
 	uint16_t *py;
@@ -431,14 +429,14 @@ static void DispCh1Wave(void)
 
 	if (g_DSO->Ch1Buf == 0)
 	{
-		return;	/* »¹Î´²É¼¯Êı¾İÖ±½Ó·µ»Ø */
+		return; /* è¿˜æœªé‡‡é›†æ•°æ®ç›´æ¥è¿”å› */
 	}
-	
-	/* ÏÔÊ¾Í¨µÀ1µçÆ½±ê¼Ç */
+
+	/* æ˜¾ç¤ºé€šé“1ç”µå¹³æ ‡è®° */
 	{
 		static uint16_t y = 70;
-	
-		LCD_DrawLine(1, y, 7, y, CL_BLUE);	 /* Ñ¡ÔñÀ¶É« */
+
+		LCD_DrawLine(1, y, 7, y, CL_BLUE); /* é€‰æ‹©è“è‰² */
 
 		y = g_DSO->Ch1VOffset;
 
@@ -453,11 +451,11 @@ static void DispCh1Wave(void)
 		LCD_DrawLine(1, y, 5, y, CL_YELLOW);
 	}
 
-//	if (s_DispFirst == 0)
-//	{
-//		s_DispFirst = 1;
-//		LCD_ClrScr(CL_BLUE);  			/* ÇåÆÁ£¬±³¾°À¶É« */
-//	}
+	//	if (s_DispFirst == 0)
+	//	{
+	//		s_DispFirst = 1;
+	//		LCD_ClrScr(CL_BLUE);  			/* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
+	//	}
 
 	if (g_DSO->BufUsed == 0)
 	{
@@ -479,14 +477,14 @@ static void DispCh1Wave(void)
 		py = g_DSO->yCh1Buf2;
 	}
 
-	/* ¼ÆËãµ±Ç°×îĞÂµÄÊı¾İÎ»ÖÃ£¬ÏòÇ°µİ¼õ400¸öÑù±¾ */
+	/* è®¡ç®—å½“å‰æœ€æ–°çš„æ•°æ®ä½ç½®ï¼Œå‘å‰é€’å‡400ä¸ªæ ·æœ¬ */
 	//pos = SAMPLE_COUNT - DMA_GetCurrDataCounter(DMA1_Channel1);
 	//pos = 0;
 
 	for (i = 0; i < 300; i++)
 	{
 		px[i] = 10 + i;
-		/* ADC = 2048 ÊÇBNCĞü¿ÕÊäÈëÊ±µÄADCÊıÖµ£¬Í³¼Æ¶à¿é°å×Ó»ñµÃµÄ  */
+		/* ADC = 2048 æ˜¯BNCæ‚¬ç©ºè¾“å…¥æ—¶çš„ADCæ•°å€¼ï¼Œç»Ÿè®¡å¤šå—æ¿å­è·å¾—çš„  */
 		iTemp = g_DSO->Ch1VOffset + (int16_t)((2048 - g_DSO->Ch1Buf[i + 1]) * 10) / g_DSO->Ch1Attenuation;
 
 		if (iTemp > 220)
@@ -500,7 +498,7 @@ static void DispCh1Wave(void)
 		py[i] = iTemp;
 	}
 
-	/* Çå³ıÉÏÖ¡²¨ĞÎ */
+	/* æ¸…é™¤ä¸Šå¸§æ³¢å½¢ */
 	if (g_DSO->BufUsed == 0)
 	{
 		LCD_DrawPoints(g_DSO->xCh1Buf2, g_DSO->yCh1Buf2, 300, CL_BLUE);
@@ -510,21 +508,21 @@ static void DispCh1Wave(void)
 		LCD_DrawPoints(g_DSO->xCh1Buf1, g_DSO->yCh1Buf1, 300, CL_BLUE);
 	}
 
-	/* ÏÔÊ¾¸üĞÂµÄ²¨ĞÎ */
+	/* æ˜¾ç¤ºæ›´æ–°çš„æ³¢å½¢ */
 	LCD_DrawPoints((uint16_t *)px, (uint16_t *)py, 300, CL_YELLOW);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispCh2Wave
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾Í¨µÀ2²¨ĞÎ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispCh2Wave
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºé€šé“2æ³¢å½¢
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispCh2Wave(void)
 {
-	int16_t i;		/* ÓĞ·ûºÅÊı */
+	int16_t i; /* æœ‰ç¬¦å·æ•° */
 	//uint16_t pos;
 	uint16_t *px;
 	uint16_t *py;
@@ -532,10 +530,10 @@ static void DispCh2Wave(void)
 
 	if (g_DSO->Ch2Buf == 0)
 	{
-		return;	/* »¹Î´²É¼¯Êı¾İÖ±½Ó·µ»Ø */
+		return; /* è¿˜æœªé‡‡é›†æ•°æ®ç›´æ¥è¿”å› */
 	}
-	
-	/* ÏÔÊ¾Í¨µÀ2µçÆ½±ê¼Ç */
+
+	/* æ˜¾ç¤ºé€šé“2ç”µå¹³æ ‡è®° */
 	{
 		static uint16_t y = 170;
 
@@ -553,7 +551,7 @@ static void DispCh2Wave(void)
 		}
 		LCD_DrawLine(1, y, 5, y, CL_GREEN);
 	}
-		
+
 	if (g_DSO->BufUsed == 0)
 	{
 		px = g_DSO->xCh2Buf1;
@@ -565,15 +563,15 @@ static void DispCh2Wave(void)
 		py = g_DSO->yCh2Buf2;
 	}
 
-	/* ¼ÆËãµ±Ç°×îĞÂµÄÊı¾İÎ»ÖÃ£¬ÏòÇ°µİ¼õ400¸öÑù±¾ */
+	/* è®¡ç®—å½“å‰æœ€æ–°çš„æ•°æ®ä½ç½®ï¼Œå‘å‰é€’å‡400ä¸ªæ ·æœ¬ */
 	//pos = SAMPLE_COUNT - DMA_GetCurrDataCounter(DMA2_Channel5);
 	//pos = 0;
 
 	for (i = 0; i < 300; i++)
 	{
 		px[i] = 10 + i;
-		
-		/* ADC = 2048 ÊÇBNCĞü¿ÕÊäÈëÊ±µÄADCÊıÖµ£¬Í³¼Æ¶à¿é°å×Ó»ñµÃµÄ  */
+
+		/* ADC = 2048 æ˜¯BNCæ‚¬ç©ºè¾“å…¥æ—¶çš„ADCæ•°å€¼ï¼Œç»Ÿè®¡å¤šå—æ¿å­è·å¾—çš„  */
 		iTemp = g_DSO->Ch2VOffset + (int16_t)((2048 - g_DSO->Ch2Buf[i + 1]) * 10) / g_DSO->Ch2Attenuation;
 
 		if (iTemp > 220)
@@ -587,7 +585,7 @@ static void DispCh2Wave(void)
 		py[i] = iTemp;
 	}
 
-	/* Çå³ıÉÏÖ¡²¨ĞÎ */
+	/* æ¸…é™¤ä¸Šå¸§æ³¢å½¢ */
 	if (g_DSO->BufUsed == 0)
 	{
 		LCD_DrawPoints(g_DSO->xCh2Buf2, g_DSO->yCh2Buf2, 300, CL_BLUE);
@@ -596,33 +594,33 @@ static void DispCh2Wave(void)
 	{
 		LCD_DrawPoints(g_DSO->xCh2Buf1, g_DSO->yCh2Buf1, 300, CL_BLUE);
 	}
-	/* ÏÔÊ¾¸üĞÂµÄ²¨ĞÎ */
+	/* æ˜¾ç¤ºæ›´æ–°çš„æ³¢å½¢ */
 	LCD_DrawPoints((uint16_t *)px, (uint16_t *)py, 300, CL_GREEN);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispChInfo
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾Í¨µÀĞÅÏ¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispChInfo
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºé€šé“ä¿¡æ¯
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispChInfo(void)
 {
-	char buf[32];   /* ×Ö·ûÏÔÊ¾»º³åÇø */
+	char buf[32]; /* å­—ç¬¦æ˜¾ç¤ºç¼“å†²åŒº */
 	FONT_T font;
 
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	font.FontCode = FC_ST_16;
-	font.BackColor = CL_BLUE;		/* ºÍ±³¾°É«ÏàÍ¬ */
-	font.FrontColor = CL_WHITE;		/* °×É«ÎÄ×Ö */
-	font.Space = 0;	
+	font.BackColor = CL_BLUE;		/* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
+	font.FrontColor = CL_WHITE; /* ç™½è‰²æ–‡å­— */
+	font.Space = 0;
 
-	/* ÏÔÊ¾Ê¾²¨Æ÷³ÌĞò°æ±¾ */
+	/* æ˜¾ç¤ºç¤ºæ³¢å™¨ç¨‹åºç‰ˆæœ¬ */
 	LCD_DispStr(10, 2, DSO_VER, &font);
 
-	/* ÏÔÊ¾Í¨µÀ1ĞÅÏ¢ */
+	/* æ˜¾ç¤ºé€šé“1ä¿¡æ¯ */
 	if (g_DSO->CH1_DC == 1)
 	{
 		strcpy(buf, "CH1 DC ");
@@ -643,19 +641,19 @@ static void DispChInfo(void)
 
 	if (g_DSO->ActiveCH == 1)
 	{
-		font.BackColor = CL_YELLOW;		/* »ÆÉ« */
-		font.FrontColor = CL_MAGENTA;	/* ×ÏÉ« */	
+		font.BackColor = CL_YELLOW;		/* é»„è‰² */
+		font.FrontColor = CL_MAGENTA; /* ç´«è‰² */
 	}
 	else
 	{
-		font.BackColor = CL_YELLOW;		/* »ÆÉ« */
-		font.FrontColor = CL_BLUE;		/* À¶É« */	
+		font.BackColor = CL_YELLOW; /* é»„è‰² */
+		font.FrontColor = CL_BLUE;	/* è“è‰² */
 	}
 
 	LCD_DispStr(10, 224, buf, &font);
 
-	/* ÏÔÊ¾Í¨µÀ2ĞÅÏ¢ */
-	font.FrontColor = CL_RED; /* CH2 ºìÉ« */
+	/* æ˜¾ç¤ºé€šé“2ä¿¡æ¯ */
+	font.FrontColor = CL_RED; /* CH2 çº¢è‰² */
 	if (g_DSO->CH2_DC == 1)
 	{
 		strcpy(buf, "CH2 DC ");
@@ -675,20 +673,20 @@ static void DispChInfo(void)
 	}
 	if (g_DSO->ActiveCH == 2)
 	{
-		font.BackColor = CL_GREEN;		/* ÂÌÉ« */
-		font.FrontColor = CL_MAGENTA;	/* ×ÏÉ« */			
+		font.BackColor = CL_GREEN;		/* ç»¿è‰² */
+		font.FrontColor = CL_MAGENTA; /* ç´«è‰² */
 	}
 	else
 	{
-		font.BackColor = CL_GREEN;		/* ÂÌÉ« */
-		font.FrontColor = CL_BLUE;		/* ×ÏÉ« */			
+		font.BackColor = CL_GREEN; /* ç»¿è‰² */
+		font.FrontColor = CL_BLUE; /* ç´«è‰² */
 	}
 	LCD_DispStr(120, 224, buf, &font);
 
-	/* ÏÔÊ¾Ê±»ù */
-	font.FrontColor = CL_WHITE;		/* °×É« */		
-	font.BackColor = CL_BLUE;		/* À¶É« */
-		
+	/* æ˜¾ç¤ºæ—¶åŸº */
+	font.FrontColor = CL_WHITE; /* ç™½è‰² */
+	font.BackColor = CL_BLUE;		/* è“è‰² */
+
 	if (g_DSO->TimeBase < 1000)
 	{
 		sprintf(buf, "Time %3dus", g_DSO->TimeBase);
@@ -699,94 +697,92 @@ static void DispChInfo(void)
 	}
 	else
 	{
-		sprintf(buf, "Time %3ds ", g_DSO->TimeBase / 1000000);	
+		sprintf(buf, "Time %3ds ", g_DSO->TimeBase / 1000000);
 	}
-	LCD_DispStr(230, 224,  buf, &font);
+	LCD_DispStr(230, 224, buf, &font);
 
+	/* æ˜¾ç¤ºè°ƒèŠ‚æ¨¡å¼ */
+	font.FrontColor = CL_WHITE; /* ç™½å­— */
+	font.BackColor = CL_BLUE;		/* è“åº• */
 
-	/* ÏÔÊ¾µ÷½ÚÄ£Ê½ */
-	font.FrontColor = CL_WHITE;		/* °××Ö */		
-	font.BackColor = CL_BLUE;		/* À¶µ× */
-	
 	if (g_DSO->AdjustMode == 1)
 	{
-		LCD_DispStr(245, 2, "µ÷½ÚÎ»ÖÃ", &font);
+		LCD_DispStr(245, 2, "è°ƒèŠ‚ä½ç½®", &font);
 	}
 	else
 	{
-		LCD_DispStr(245, 2, "µ÷½Ú·ù¶È", &font);
+		LCD_DispStr(245, 2, "è°ƒèŠ‚å¹…åº¦", &font);
 	}
 
-	sprintf(buf, "²ÉÑùÆµÂÊ:%7dHz",	g_DSO->SampleFreq);
+	sprintf(buf, "é‡‡æ ·é¢‘ç‡:%7dHz", g_DSO->SampleFreq);
 	LCD_DispStr(75, 2, buf, &font);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispDSO
-*	¹¦ÄÜËµÃ÷: DispDSO
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispDSO
+*	åŠŸèƒ½è¯´æ˜: DispDSO
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispDSO(void)
 {
 	DispButton();
 
-	DispFrame();	/* »æÖÆ¿Ì¶È¿ò */
-	DispChInfo();	/* ÏÔÊ¾Í¨µÀĞÅÏ¢(·ù¶È£¬Ê±¼äµµÎ») */
+	DispFrame();	/* ç»˜åˆ¶åˆ»åº¦æ¡† */
+	DispChInfo(); /* æ˜¾ç¤ºé€šé“ä¿¡æ¯(å¹…åº¦ï¼Œæ—¶é—´æ¡£ä½) */
 
-	DispCh1Wave();	/* ÏÔÊ¾²¨ĞÎ1 */	
-	DispCh2Wave();	/* ÏÔÊ¾²¨ĞÎ2 */	
+	DispCh1Wave(); /* æ˜¾ç¤ºæ³¢å½¢1 */
+	DispCh2Wave(); /* æ˜¾ç¤ºæ³¢å½¢2 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitDsoParam
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯È«¾Ö²ÎÊı±äÁ¿
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitDsoParam
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–å…¨å±€å‚æ•°å˜é‡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitDsoParam(void)
 {
-	g_DSO->Ch1Attenuation = 23;	/* ÉèÖÃÈ±Ê¡Ë¥¼õÏµÊı */
-	g_DSO->Ch2Attenuation = 23;	/* ÉèÖÃÈ±Ê¡Ë¥¼õÏµÊı */
-	g_DSO->Ch1VScale = 1000;	/* È±Ê¡ÊÇ1V */
-	g_DSO->Ch2VScale = 1000;	/* È±Ê¡ÊÇ1V */
+	g_DSO->Ch1Attenuation = 23; /* è®¾ç½®ç¼ºçœè¡°å‡ç³»æ•° */
+	g_DSO->Ch2Attenuation = 23; /* è®¾ç½®ç¼ºçœè¡°å‡ç³»æ•° */
+	g_DSO->Ch1VScale = 1000;		/* ç¼ºçœæ˜¯1V */
+	g_DSO->Ch2VScale = 1000;		/* ç¼ºçœæ˜¯1V */
 
-	g_DSO->Ch1VOffset = 70; 	/* Í¨µÀ1 GNDÏßÎ»ÖÃ */
-	g_DSO->Ch2VOffset = 170; /* Í¨µÀ2 GNDÏßÎ»ÖÃ */
+	g_DSO->Ch1VOffset = 70;	/* é€šé“1 GNDçº¿ä½ç½® */
+	g_DSO->Ch2VOffset = 170; /* é€šé“2 GNDçº¿ä½ç½® */
 
-	g_DSO->ActiveCH = 1;		/* È±Ê¡ÊÇCH1 */
-	g_DSO->AdjustMode = 1;	/* È±Ê¡ÊÇµ÷½Ú´¹Ö±Æ«ÒÆ£¬ ¿ÉÒÔÇĞ»»µ½2µ÷½Ú·ù¶È */
+	g_DSO->ActiveCH = 1;	 /* ç¼ºçœæ˜¯CH1 */
+	g_DSO->AdjustMode = 1; /* ç¼ºçœæ˜¯è°ƒèŠ‚å‚ç›´åç§»ï¼Œ å¯ä»¥åˆ‡æ¢åˆ°2è°ƒèŠ‚å¹…åº¦ */
 
 	g_DSO->HoldEn = 0;
 
-	g_DSO->TimeBaseId = 2;									 
-	g_DSO->TimeBase = 	g_TimeTable[g_DSO->TimeBaseId];
+	g_DSO->TimeBaseId = 2;
+	g_DSO->TimeBase = g_TimeTable[g_DSO->TimeBaseId];
 	g_DSO->SampleFreq = 25000000 / g_DSO->TimeBase;
 
 	g_DSO->Ch1AttId = 2;
 	g_DSO->Ch1Attenuation = g_AttTable[g_DSO->Ch1AttId][0];
-	g_DSO->Ch1VScale =  g_AttTable[g_DSO->Ch1AttId][1];
+	g_DSO->Ch1VScale = g_AttTable[g_DSO->Ch1AttId][1];
 
 	g_DSO->Ch2AttId = 2;
 	g_DSO->Ch2Attenuation = g_AttTable[g_DSO->Ch2AttId][0];
-	g_DSO->Ch2VScale =  g_AttTable[g_DSO->Ch2AttId][1];
-
+	g_DSO->Ch2VScale = g_AttTable[g_DSO->Ch2AttId][1];
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: IncSampleFreq
-*	¹¦ÄÜËµÃ÷: Ôö¼Ó²ÉÑùÆµÂÊ£¬°´ 1-2-5 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: IncSampleFreq
+*	åŠŸèƒ½è¯´æ˜: å¢åŠ é‡‡æ ·é¢‘ç‡ï¼ŒæŒ‰ 1-2-5 
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 /*
-	Ê±¼äÖá·Ö¶È£¨Ã¿1¸ö´ó¸ñµÄÊ±³¤)
+	æ—¶é—´è½´åˆ†åº¦ï¼ˆæ¯1ä¸ªå¤§æ ¼çš„æ—¶é•¿)
 		10us 	      2500000	
 		20us 	      1250000
 		50us 		   500000
@@ -812,19 +808,19 @@ static void IncSampleFreq(void)
 	{
 		g_DSO->TimeBaseId++;
 	}
-													 
-	g_DSO->TimeBase = 	g_TimeTable[g_DSO->TimeBaseId];
+
+	g_DSO->TimeBase = g_TimeTable[g_DSO->TimeBaseId];
 	g_DSO->SampleFreq = 25000000 / g_DSO->TimeBase;
 
-	DSO_SetSampRate(g_DSO->SampleFreq);	/* ¸Ä±ä²ÉÑùÆµÂÊ */
+	DSO_SetSampRate(g_DSO->SampleFreq); /* æ”¹å˜é‡‡æ ·é¢‘ç‡ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DecSampleFreq
-*	¹¦ÄÜËµÃ÷: ½µµÍ²ÉÑùÆµÂÊ£¬°´ 1-2-5 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DecSampleFreq
+*	åŠŸèƒ½è¯´æ˜: é™ä½é‡‡æ ·é¢‘ç‡ï¼ŒæŒ‰ 1-2-5 
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DecSampleFreq(void)
@@ -833,20 +829,20 @@ static void DecSampleFreq(void)
 	{
 		g_DSO->TimeBaseId--;
 	}
-													 
+
 	g_DSO->TimeBase = g_TimeTable[g_DSO->TimeBaseId];
 	g_DSO->SampleFreq = 25000000 / g_DSO->TimeBase;
 
-	DSO_SetSampRate(g_DSO->SampleFreq);	/* ¸Ä±ä²ÉÑùÆµÂÊ */
+	DSO_SetSampRate(g_DSO->SampleFreq); /* æ”¹å˜é‡‡æ ·é¢‘ç‡ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: AdjustAtt
-*	¹¦ÄÜËµÃ÷: µ÷½ÚµçÑ¹Ë¥¼õµµÎ»£¬°´ 1-2-5 
-*	ĞÎ    ²Î: ch   : Í¨µÀºÅ£¬1»ò2
-*			  mode : 0 ½µµÍ£¬ 1Ôö¼Ó
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: AdjustAtt
+*	åŠŸèƒ½è¯´æ˜: è°ƒèŠ‚ç”µå‹è¡°å‡æ¡£ä½ï¼ŒæŒ‰ 1-2-5 
+*	å½¢    å‚: ch   : é€šé“å·ï¼Œ1æˆ–2
+*			  mode : 0 é™ä½ï¼Œ 1å¢åŠ 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void AdjustAtt(uint8_t ch, uint8_t mode)
@@ -854,14 +850,14 @@ static void AdjustAtt(uint8_t ch, uint8_t mode)
 
 	if (ch == 1)
 	{
-		if (mode == 0) 	/* ½µµÍ */
+		if (mode == 0) /* é™ä½ */
 		{
 			if (g_DSO->Ch1AttId > 0)
 			{
 				g_DSO->Ch1AttId--;
 			}
 		}
-		else		/* Ôö¼Ó */
+		else /* å¢åŠ  */
 		{
 			if (g_DSO->Ch1AttId < ATT_COUNT - 1)
 			{
@@ -870,18 +866,18 @@ static void AdjustAtt(uint8_t ch, uint8_t mode)
 		}
 
 		g_DSO->Ch1Attenuation = g_AttTable[g_DSO->Ch1AttId][0];
-		g_DSO->Ch1VScale =  g_AttTable[g_DSO->Ch1AttId][1];
+		g_DSO->Ch1VScale = g_AttTable[g_DSO->Ch1AttId][1];
 	}
 	else if (ch == 2)
 	{
-		if (mode == 0) 	/* ½µµÍ */
+		if (mode == 0) /* é™ä½ */
 		{
 			if (g_DSO->Ch2AttId > 0)
 			{
 				g_DSO->Ch2AttId--;
 			}
 		}
-		else		/* Ôö¼Ó */
+		else /* å¢åŠ  */
 		{
 			if (g_DSO->Ch2AttId < ATT_COUNT - 1)
 			{
@@ -889,36 +885,35 @@ static void AdjustAtt(uint8_t ch, uint8_t mode)
 			}
 		}
 		g_DSO->Ch2Attenuation = g_AttTable[g_DSO->Ch2AttId][0];
-		g_DSO->Ch2VScale =  g_AttTable[g_DSO->Ch2AttId][1];
+		g_DSO->Ch2VScale = g_AttTable[g_DSO->Ch2AttId][1];
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DsoRun
-*	¹¦ÄÜËµÃ÷: DSOÔËĞĞ×´Ì¬
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DsoRun
+*	åŠŸèƒ½è¯´æ˜: DSOè¿è¡ŒçŠ¶æ€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DsoRun(uint8_t *pMainStatus)
 {
 	uint8_t KeyCode;
-	uint8_t fRefresh = 1;	/* LCDË¢ĞÂ±êÖ¾ */
-	FormDSO_T form;	
+	uint8_t fRefresh = 1; /* LCDåˆ·æ–°æ ‡å¿— */
+	FormDSO_T form;
 	uint8_t ucTouch;
-	int16_t tpX, tpY;	
+	int16_t tpX, tpY;
 
+	InitDsoParam(); /* åˆå§‹åŒ–ç¤ºæ³¢å™¨å‚æ•° */
 
-	InitDsoParam();	/* ³õÊ¼»¯Ê¾²¨Æ÷²ÎÊı */
+	LCD_ClrScr(CL_BLUE); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-	LCD_ClrScr(CL_BLUE);  			/* ÇåÆÁ£¬±³¾°À¶É« */
-	
 	FormDSO = &form;
 
-	InitFormDSO();	/* »æÖÆ°´Å¥ */
-	
-	bsp_StartTimer(1, 150);		/* Æô¶¯¶¨Ê±Æ÷1£¬100msË¢ĞÂ1´Î */
+	InitFormDSO(); /* ç»˜åˆ¶æŒ‰é’® */
+
+	bsp_StartTimer(1, 150); /* å¯åŠ¨å®šæ—¶å™¨1ï¼Œ100msåˆ·æ–°1æ¬¡ */
 	while (*pMainStatus == S_RUN)
 	{
 		bsp_Idle();
@@ -927,54 +922,54 @@ static void DsoRun(uint8_t *pMainStatus)
 		{
 			fRefresh = 0;
 
-			DSO_SetDC(1, g_DSO->CH1_DC);	
-			DSO_SetDC(2, g_DSO->CH2_DC);	
+			DSO_SetDC(1, g_DSO->CH1_DC);
+			DSO_SetDC(2, g_DSO->CH2_DC);
 
-			/* ×Ô¶¯ÇĞ»»Ó²¼şÁ¿³Ì */	
+			/* è‡ªåŠ¨åˆ‡æ¢ç¡¬ä»¶é‡ç¨‹ */
 			switch (g_DSO->Ch1AttId)
 			{
-				case 0:		/* 5V */				
-					DSO_SetGain(1, 3);	
-					break;
-				
-				case 1:		/* 2V */							
-					DSO_SetGain(1, 2);	
-					break;
-				
-				case 2:		/* 1V */					
-				case 3:		/* 500mV */
-					DSO_SetGain(1, 1);
-					break;
-				
-				case 4:		/* 200mV */
-				case 5:		/* 100mV */
-					DSO_SetGain(1, 0);	
-					break;				
+			case 0: /* 5V */
+				DSO_SetGain(1, 3);
+				break;
+
+			case 1: /* 2V */
+				DSO_SetGain(1, 2);
+				break;
+
+			case 2: /* 1V */
+			case 3: /* 500mV */
+				DSO_SetGain(1, 1);
+				break;
+
+			case 4: /* 200mV */
+			case 5: /* 100mV */
+				DSO_SetGain(1, 0);
+				break;
 			}
-			
+
 			switch (g_DSO->Ch2AttId)
 			{
-				case 0:		/* 5V */				
-					DSO_SetGain(2, 3);	
-					break;
-				
-				case 1:		/* 2V */							
-					DSO_SetGain(2, 2);	
-					break;
-				
-				case 2:		/* 1V */					
-				case 3:		/* 500mV */
-					DSO_SetGain(2, 1);
-					break;
-				
-				case 4:		/* 200mV */
-				case 5:		/* 100mV */
-					DSO_SetGain(2, 0);	
-					break;			
-			}			
-			
-			/* ¸ù¾İÔöÒæÉèÖÃ£¬¸Ä±äÓ²¼şË¥¼õ */			
-			
+			case 0: /* 5V */
+				DSO_SetGain(2, 3);
+				break;
+
+			case 1: /* 2V */
+				DSO_SetGain(2, 2);
+				break;
+
+			case 2: /* 1V */
+			case 3: /* 500mV */
+				DSO_SetGain(2, 1);
+				break;
+
+			case 4: /* 200mV */
+			case 5: /* 100mV */
+				DSO_SetGain(2, 0);
+				break;
+			}
+
+			/* æ ¹æ®å¢ç›Šè®¾ç½®ï¼Œæ”¹å˜ç¡¬ä»¶è¡°å‡ */
+
 			if (g_DSO->HoldEn == 1)
 			{
 				DispDSO();
@@ -983,244 +978,244 @@ static void DsoRun(uint8_t *pMainStatus)
 
 		if (bsp_CheckTimer(1))
 		{
-			bsp_StartTimer(1, 200);		/* Æô¶¯¶¨Ê±Æ÷1£¬200msË¢ĞÂ1´Î */
+			bsp_StartTimer(1, 200); /* å¯åŠ¨å®šæ—¶å™¨1ï¼Œ200msåˆ·æ–°1æ¬¡ */
 
-			/* ÔËĞĞ×´Ì¬¡£Ã¿¸ô100msË¢ĞÂ1´Î²¨ĞÎ */
+			/* è¿è¡ŒçŠ¶æ€ã€‚æ¯éš”100msåˆ·æ–°1æ¬¡æ³¢å½¢ */
 			if (g_DSO->HoldEn == 0)
 			{
-				DSO_PauseADC();	/* ÔİÍ£²ÉÑù */
-				
-				DispDSO();	/* ÏÔÊ¾²¨ĞÎ */
-				
-				/* ¿ªÊ¼²ÉÑù */			
+				DSO_PauseADC(); /* æš‚åœé‡‡æ · */
+
+				DispDSO(); /* æ˜¾ç¤ºæ³¢å½¢ */
+
+				/* å¼€å§‹é‡‡æ · */
 				DSO_StartADC(&g_DSO->Ch1Buf, &g_DSO->Ch2Buf, g_DSO->SampleFreq);
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (LCD_ButtonTouchDown(&FormDSO->BtnRet, tpX, tpY))
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (LCD_ButtonTouchDown(&FormDSO->BtnRet, tpX, tpY))
+				{
+					// *pMainStatus = S_EXIT;  <--- åœ¨æ¾å¼€æ—¶é€€å‡ºç•Œé¢
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn1, tpX, tpY))
+				{
+					/* é€šé“1 AC-DCè€¦åˆåˆ‡æ¢ */
+					if (g_DSO->CH1_DC == 0)
 					{
-						// *pMainStatus = S_EXIT;  <--- ÔÚËÉ¿ªÊ±ÍË³ö½çÃæ
-					}
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn1, tpX, tpY))
-					{
-						/* Í¨µÀ1 AC-DCñîºÏÇĞ»» */
-						if (g_DSO->CH1_DC == 0)
-						{
-							g_DSO->CH1_DC = 1;
-						}
-						else
-						{
-							g_DSO->CH1_DC = 0;
-						}
-						fRefresh = 1;
-					}
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn2, tpX, tpY))
-					{
-						AdjustAtt(1, 1);	/* Í¨µÀ1 ·ù¶Èµ÷½Ú+ */
-						fRefresh = 1;
-					}				
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn3, tpX, tpY))
-					{
-						AdjustAtt(1, 0);	/* Í¨µÀ1 ·ù¶Èµ÷½Ú- */
-						fRefresh = 1;
-					}
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn4, tpX, tpY))
-					{
-						/* Í¨µÀ2 AC-DCñîºÏÇĞ»» */
-						if (g_DSO->CH2_DC == 0)
-						{
-							g_DSO->CH2_DC = 1;
-						}
-						else
-						{
-							g_DSO->CH2_DC = 0;
-						}
-						fRefresh = 1;
-					}
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn5, tpX, tpY))
-					{
-						AdjustAtt(2, 1);	/* Í¨µÀ2 ·ù¶Èµ÷½Ú+ */
-						fRefresh = 1;
-					}				
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn6, tpX, tpY))
-					{
-						AdjustAtt(2, 0);	/* Í¨µÀ2 ·ù¶Èµ÷½Ú- */
-						fRefresh = 1;
-					}	
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn7, tpX, tpY))
-					{
-						DecSampleFreq();	/* µİ¼õ²ÉÑùÆµÂÊ */
-						fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */						
-					}				
-					else if (LCD_ButtonTouchDown(&FormDSO->Btn8, tpX, tpY))
-					{
-						IncSampleFreq();	/* µİÔö²ÉÑùÆµÂÊ */
-						fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					}	
-					break;
-
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&FormDSO->BtnRet, tpX, tpY))
-					{
-						*pMainStatus = S_EXIT;	/*¡¡·µ»Ø¼üÍË³ö¡¡*/
+						g_DSO->CH1_DC = 1;
 					}
 					else
 					{
-						LCD_ButtonTouchRelease(&FormDSO->Btn1, tpX, tpY);		
-						LCD_ButtonTouchRelease(&FormDSO->Btn2, tpX, tpY);	
-						LCD_ButtonTouchRelease(&FormDSO->Btn3, tpX, tpY);	
-						LCD_ButtonTouchRelease(&FormDSO->Btn4, tpX, tpY);	
-						LCD_ButtonTouchRelease(&FormDSO->Btn5, tpX, tpY);	
-						LCD_ButtonTouchRelease(&FormDSO->Btn6, tpX, tpY);
-						LCD_ButtonTouchRelease(&FormDSO->Btn7, tpX, tpY);	
-						LCD_ButtonTouchRelease(&FormDSO->Btn8, tpX, tpY);
+						g_DSO->CH1_DC = 0;
 					}
-					break;
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn2, tpX, tpY))
+				{
+					AdjustAtt(1, 1); /* é€šé“1 å¹…åº¦è°ƒèŠ‚+ */
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn3, tpX, tpY))
+				{
+					AdjustAtt(1, 0); /* é€šé“1 å¹…åº¦è°ƒèŠ‚- */
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn4, tpX, tpY))
+				{
+					/* é€šé“2 AC-DCè€¦åˆåˆ‡æ¢ */
+					if (g_DSO->CH2_DC == 0)
+					{
+						g_DSO->CH2_DC = 1;
+					}
+					else
+					{
+						g_DSO->CH2_DC = 0;
+					}
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn5, tpX, tpY))
+				{
+					AdjustAtt(2, 1); /* é€šé“2 å¹…åº¦è°ƒèŠ‚+ */
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn6, tpX, tpY))
+				{
+					AdjustAtt(2, 0); /* é€šé“2 å¹…åº¦è°ƒèŠ‚- */
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn7, tpX, tpY))
+				{
+					DecSampleFreq(); /* é€’å‡é‡‡æ ·é¢‘ç‡ */
+					fRefresh = 1;		 /* è¯·æ±‚åˆ·æ–°LCD */
+				}
+				else if (LCD_ButtonTouchDown(&FormDSO->Btn8, tpX, tpY))
+				{
+					IncSampleFreq(); /* é€’å¢é‡‡æ ·é¢‘ç‡ */
+					fRefresh = 1;		 /* è¯·æ±‚åˆ·æ–°LCD */
+				}
+				break;
+
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&FormDSO->BtnRet, tpX, tpY))
+				{
+					*pMainStatus = S_EXIT; /*ã€€è¿”å›é”®é€€å‡ºã€€*/
+				}
+				else
+				{
+					LCD_ButtonTouchRelease(&FormDSO->Btn1, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn2, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn3, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn4, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn5, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn6, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn7, tpX, tpY);
+					LCD_ButtonTouchRelease(&FormDSO->Btn8, tpX, tpY);
+				}
+				break;
 			}
 		}
-		
-		/* ¶ÁÈ¡°´¼ü£¬´óÓÚ0±íÊ¾ÓĞ¼ü°´ÏÂ */
+
+		/* è¯»å–æŒ‰é”®ï¼Œå¤§äº0è¡¨ç¤ºæœ‰é”®æŒ‰ä¸‹ */
 		KeyCode = bsp_GetKey();
 		if (KeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (KeyCode)
 			{
-				case  KEY_DOWN_K1:	/* TAMPER ¼ü£¬Í¨µÀÑ¡Ôñ(CH1»òCH2) */
-					if (g_DSO->ActiveCH == 1)
-					{
-						g_DSO->ActiveCH = 2;
-					}
-					else
-					{
-						g_DSO->ActiveCH = 1;
-					}
-					fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					break;
+			case KEY_DOWN_K1: /* TAMPER é”®ï¼Œé€šé“é€‰æ‹©(CH1æˆ–CH2) */
+				if (g_DSO->ActiveCH == 1)
+				{
+					g_DSO->ActiveCH = 2;
+				}
+				else
+				{
+					g_DSO->ActiveCH = 1;
+				}
+				fRefresh = 1; /* è¯·æ±‚åˆ·æ–°LCD */
+				break;
 
-				case  KEY_DOWN_K2:	/* WAKEUP ¼ü, µ÷½ÚÄ£Ê½Ñ¡Ôñ(·ù¶È»òÕß´¹Ö±Æ«ÒÆ) */
-					/* ÍË³ö,½øÈëÈ«ËÙÔËĞĞ×´Ì¬ */
-					*pMainStatus = S_HELP;
-					break;
+			case KEY_DOWN_K2: /* WAKEUP é”®, è°ƒèŠ‚æ¨¡å¼é€‰æ‹©(å¹…åº¦æˆ–è€…å‚ç›´åç§») */
+				/* é€€å‡º,è¿›å…¥å…¨é€Ÿè¿è¡ŒçŠ¶æ€ */
+				*pMainStatus = S_HELP;
+				break;
 
-				case  KEY_DOWN_K3:	/* USER ¼ü */
-					if (g_DSO->HoldEn == 0)
-					{
-						g_DSO->HoldEn = 1;
+			case KEY_DOWN_K3: /* USER é”® */
+				if (g_DSO->HoldEn == 0)
+				{
+					g_DSO->HoldEn = 1;
 
-						/* ±£´æÔİÍ£Ê±µÄÊ±»ù,ÎªÁËË®Æ½À©Õ¹ÓÃ */
-						g_DSO->TimeBaseIdHold = g_DSO->TimeBaseId;	
+					/* ä¿å­˜æš‚åœæ—¶çš„æ—¶åŸº,ä¸ºäº†æ°´å¹³æ‰©å±•ç”¨ */
+					g_DSO->TimeBaseIdHold = g_DSO->TimeBaseId;
 
-						DSO_StopADC();
-					}
-					else
-					{
-						g_DSO->HoldEn = 0;	
-					}
-					fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					break;
+					DSO_StopADC();
+				}
+				else
+				{
+					g_DSO->HoldEn = 0;
+				}
+				fRefresh = 1; /* è¯·æ±‚åˆ·æ–°LCD */
+				break;
 
-				case JOY_DOWN_L:	/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					if (g_DSO->HoldEn == 0)
-					{
-						DecSampleFreq();	/* µİ¼õ²ÉÑùÆµÂÊ */
-						fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					}
-					else
-					{
-						; /* ²¨ĞÎË®Æ½ÒÆ¶¯£¬´ıÍêÉÆ */
-					}
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				if (g_DSO->HoldEn == 0)
+				{
+					DecSampleFreq(); /* é€’å‡é‡‡æ ·é¢‘ç‡ */
+					fRefresh = 1;		 /* è¯·æ±‚åˆ·æ–°LCD */
+				}
+				else
+				{
+					; /* æ³¢å½¢æ°´å¹³ç§»åŠ¨ï¼Œå¾…å®Œå–„ */
+				}
+				break;
 
-				case JOY_DOWN_R:	/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					if (g_DSO->HoldEn == 0)
-					{
-						IncSampleFreq();  	/* µİÔö²ÉÑùÆµÂÊ */					
-						fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					}
-					else
-					{
-						; /* ²¨ĞÎË®Æ½ÒÆ¶¯£¬´ıÍêÉÆ */
-					}
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				if (g_DSO->HoldEn == 0)
+				{
+					IncSampleFreq(); /* é€’å¢é‡‡æ ·é¢‘ç‡ */
+					fRefresh = 1;		 /* è¯·æ±‚åˆ·æ–°LCD */
+				}
+				else
+				{
+					; /* æ³¢å½¢æ°´å¹³ç§»åŠ¨ï¼Œå¾…å®Œå–„ */
+				}
+				break;
 
-				case  JOY_DOWN_OK:	/* Ò¡¸ËOK¼ü */
-					if (g_DSO->AdjustMode == 0)
-					{
-						g_DSO->AdjustMode = 1;
-					}
-					else
-					{
-						g_DSO->AdjustMode = 0;
-					}
-					fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”® */
+				if (g_DSO->AdjustMode == 0)
+				{
+					g_DSO->AdjustMode = 1;
+				}
+				else
+				{
+					g_DSO->AdjustMode = 0;
+				}
+				fRefresh = 1; /* è¯·æ±‚åˆ·æ–°LCD */
+				break;
 
-				case JOY_DOWN_U:	/* Ò¡¸ËUP¼ü°´ÏÂ */
-					if (g_DSO->ActiveCH == 1) 	/* µ±Ç°¼¤»îµÄÊÇCH1 */
+			case JOY_DOWN_U:						/* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				if (g_DSO->ActiveCH == 1) /* å½“å‰æ¿€æ´»çš„æ˜¯CH1 */
+				{
+					if (g_DSO->AdjustMode == 0) /* è°ƒèŠ‚å¹…åº¦æ”¾å¤§å€æ•° */
 					{
-						if (g_DSO->AdjustMode == 0)	/* µ÷½Ú·ù¶È·Å´ó±¶Êı */
-						{
-							AdjustAtt(1, 1);
-						}
-						else 	/* µ÷½ÚÉÏÏÂÆ«ÒÆ */
-						{
-							g_DSO->Ch1VOffset -= 5;
-						}
+						AdjustAtt(1, 1);
 					}
-					else	/* µ±Ç°¼¤»îµÄÊÇCH2 */
+					else /* è°ƒèŠ‚ä¸Šä¸‹åç§» */
 					{
-						if (g_DSO->AdjustMode == 0)	/* µ÷½Ú·ù¶È·Å´ó±¶Êı */
-						{
-							AdjustAtt(2, 1);
-						}
-						else 	/* µ÷½ÚÉÏÏÂÆ«ÒÆ */
-						{
-							g_DSO->Ch2VOffset -= 5;
-						}
+						g_DSO->Ch1VOffset -= 5;
 					}
-					fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					break;
+				}
+				else /* å½“å‰æ¿€æ´»çš„æ˜¯CH2 */
+				{
+					if (g_DSO->AdjustMode == 0) /* è°ƒèŠ‚å¹…åº¦æ”¾å¤§å€æ•° */
+					{
+						AdjustAtt(2, 1);
+					}
+					else /* è°ƒèŠ‚ä¸Šä¸‹åç§» */
+					{
+						g_DSO->Ch2VOffset -= 5;
+					}
+				}
+				fRefresh = 1; /* è¯·æ±‚åˆ·æ–°LCD */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					if (g_DSO->ActiveCH == 1) 	/* µ±Ç°¼¤»îµÄÊÇCH1 */
+			case JOY_DOWN_D:						/* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				if (g_DSO->ActiveCH == 1) /* å½“å‰æ¿€æ´»çš„æ˜¯CH1 */
+				{
+					if (g_DSO->AdjustMode == 0) /* è°ƒèŠ‚å¹…åº¦æ”¾å¤§å€æ•° */
 					{
-						if (g_DSO->AdjustMode == 0)	/* µ÷½Ú·ù¶È·Å´ó±¶Êı */
-						{
-							AdjustAtt(1, 0);
-						}
-						else 	/* µ÷½ÚÉÏÏÂÆ«ÒÆ */
-						{
-							g_DSO->Ch1VOffset += 5;
-						}
+						AdjustAtt(1, 0);
 					}
-					else	/* µ±Ç°¼¤»îµÄÊÇCH2 */
+					else /* è°ƒèŠ‚ä¸Šä¸‹åç§» */
 					{
-						if (g_DSO->AdjustMode == 0)	/* µ÷½Ú·ù¶È·Å´ó±¶Êı */
-						{
-							AdjustAtt(2, 0);
-						}
-						else 	/* µ÷½ÚÉÏÏÂÆ«ÒÆ */
-						{
-							g_DSO->Ch2VOffset += 5;
-						}
+						g_DSO->Ch1VOffset += 5;
 					}
-					fRefresh = 1;		/* ÇëÇóË¢ĞÂLCD */
-					break;
+				}
+				else /* å½“å‰æ¿€æ´»çš„æ˜¯CH2 */
+				{
+					if (g_DSO->AdjustMode == 0) /* è°ƒèŠ‚å¹…åº¦æ”¾å¤§å€æ•° */
+					{
+						AdjustAtt(2, 0);
+					}
+					else /* è°ƒèŠ‚ä¸Šä¸‹åç§» */
+					{
+						g_DSO->Ch2VOffset += 5;
+					}
+				}
+				fRefresh = 1; /* è¯·æ±‚åˆ·æ–°LCD */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
-	
-	DSO_StopADC();	/* ¹Ø±Õ²ÉÑù */
+
+	DSO_StopADC(); /* å…³é—­é‡‡æ · */
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

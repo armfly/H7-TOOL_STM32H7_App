@@ -1,19 +1,19 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÉãÏñÍ·Çı¶¯BSPÄ£¿é(For OV7670)
-*	ÎÄ¼şÃû³Æ : bsp_camera.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : OV7670Çı¶¯³ÌĞò¡£±¾³ÌĞòÊÊÓÃÓÚ guanfu_wang  µÄOV7670ÉãÏñÍ·£¨²»´øFIFO,²»´øLDO£¬²»´ø24M¾§Õñ)
-*			  °²¸»À³STM32-V5¿ª·¢°å¼¯³ÉÁË3.0V LDO¸øOV7670¹©µç£¬Ö÷°å¼¯³ÉÁË24MÓĞÔ´¾§ÕñÌá¹©¸øÉãÏñÍ·¡£
+*	æ¨¡å—åç§° : æ‘„åƒå¤´é©±åŠ¨BSPæ¨¡å—(For OV7670)
+*	æ–‡ä»¶åç§° : bsp_camera.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : OV7670é©±åŠ¨ç¨‹åºã€‚æœ¬ç¨‹åºé€‚ç”¨äº guanfu_wang  çš„OV7670æ‘„åƒå¤´ï¼ˆä¸å¸¦FIFO,ä¸å¸¦LDOï¼Œä¸å¸¦24Mæ™¶æŒ¯)
+*			  å®‰å¯Œè±STM32-V5å¼€å‘æ¿é›†æˆäº†3.0V LDOç»™OV7670ä¾›ç”µï¼Œä¸»æ¿é›†æˆäº†24Mæœ‰æºæ™¶æŒ¯æä¾›ç»™æ‘„åƒå¤´ã€‚
 *
-*			  ±¾´úÂë²Î¿¼ÁË guanfu_wang Ìá¹©µÄÀı×Ó¡£http://mcudiy.taobao.com/
+*			  æœ¬ä»£ç å‚è€ƒäº† guanfu_wang æä¾›çš„ä¾‹å­ã€‚http://mcudiy.taobao.com/
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-03-01 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-03-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -21,7 +21,7 @@
 #include "bsp.h"
 
 /*
-	°²¸»À³STM32-V7¿ª·¢°åÉãÏñÍ·½Ó¿ÚGPIO¶¨Òå£º ¡¾DCIMÉè±¸£º ÉãÏñÍ·  ºÍ´®¿Ú6, AD7606 Ä£¿é²»ÄÜÍ¬Ê±Ê¹ÓÃ¡¿
+	å®‰å¯Œè±STM32-V7å¼€å‘æ¿æ‘„åƒå¤´æ¥å£GPIOå®šä¹‰ï¼š ã€DCIMè®¾å¤‡ï¼š æ‘„åƒå¤´  å’Œä¸²å£6, AD7606 æ¨¡å—ä¸èƒ½åŒæ—¶ä½¿ç”¨ã€‘
 	PA6/DCMI_PIXCLK
 	PA4/DCMI_HSYNC/DAC_OUT1
 	PC6/DCMI_D0/AD7606_CONVST
@@ -34,186 +34,182 @@
 	PE6/DCMI_D7/NRF905_CD
 	PB7/DCMI_VSYNC
 	
-	--- I2C×ÜÏß¿ØÖÆÉãÏñÍ·
+	--- I2Cæ€»çº¿æ§åˆ¶æ‘„åƒå¤´
 	PB6/I2C2_SCL
 	PB9/I2C2_SDA
 */
 
-#define DCMI_DR_ADDRESS       	0x50050028
-#define OV_REG_NUM  	116  //OV7670
+#define DCMI_DR_ADDRESS 0x50050028
+#define OV_REG_NUM 116 //OV7670
 
+/*ã€€DMAé€šé“å®šä¹‰,å¯é€‰çš„æœ‰ DMA2_Stream1 +  DMA_Channel_1ã€ DMA2_Stream7 +  DMA_Channel_1  */
 
-/*¡¡DMAÍ¨µÀ¶¨Òå,¿ÉÑ¡µÄÓĞ DMA2_Stream1 +  DMA_Channel_1¡¢ DMA2_Stream7 +  DMA_Channel_1  */
+#define DMA_CLOCK RCC_AHB1Periph_DMA2
+#define DMA_STREAM DMA2_Stream7
+#define DMA_CHANNEL DMA_Channel_1
+#define DMA_IRQ DMA2_Stream7_IRQn
+#define DMA_IT_TCIF DMA_IT_TCIF7
+#define DMA_IRQHandler DMA2_Stream7_IRQHandler
 
-#define DMA_CLOCK              RCC_AHB1Periph_DMA2
-#define DMA_STREAM             DMA2_Stream7
-#define DMA_CHANNEL            DMA_Channel_1
-#define DMA_IRQ                DMA2_Stream7_IRQn
-#define DMA_IT_TCIF            DMA_IT_TCIF7
-#define DMA_IRQHandler         DMA2_Stream7_IRQHandler
+/* è°ƒåˆ†è¾¨ç‡
 
-
-/* µ÷·Ö±æÂÊ
-
-12 17 18 19 1A 03¡£¡£¡£
+12 17 18 19 1A 03ã€‚ã€‚ã€‚
 
 */
 
 /*
-	ÒÔÏÂÎªOV7670 QVGA RGB565²ÎÊı  (by guanfu_wang)  http://mcudiy.taobao.com
+	ä»¥ä¸‹ä¸ºOV7670 QVGA RGB565å‚æ•°  (by guanfu_wang)  http://mcudiy.taobao.com
 
-	ÓÉÓÚRA8875Í¼ĞÎÄ£Ê½ÏÂ£¬É¨Ãè·½ÏòÎª´Ó×óµ½ÓÒ£¬´ÓÉÏµ½ÏÂ¡£
-	ºÍwang_guanfuÌá¹©µÄÈ±Ê¡Öµ²»Í¬¡£Òò´Ë×öÁËÊÊµ±µÄµ÷Õû¡£
+	ç”±äºRA8875å›¾å½¢æ¨¡å¼ä¸‹ï¼Œæ‰«ææ–¹å‘ä¸ºä»å·¦åˆ°å³ï¼Œä»ä¸Šåˆ°ä¸‹ã€‚
+	å’Œwang_guanfuæä¾›çš„ç¼ºçœå€¼ä¸åŒã€‚å› æ­¤åšäº†é€‚å½“çš„è°ƒæ•´ã€‚
 */
-static const unsigned char  OV_reg[OV_REG_NUM][2] =
-{
-	{0x3a, 0x0c},
-	{0x67, 0xc0},
-	{0x68, 0x80},
+static const unsigned char OV_reg[OV_REG_NUM][2] =
+		{
+				{0x3a, 0x0c},
+				{0x67, 0xc0},
+				{0x68, 0x80},
 
-	{0x40, 0xd0}, //RGB565
-	//{0x40, 0x10}, //RGB565
-	{0x12, 0x14}, //Output format, QVGA,RGB
+				{0x40, 0xd0}, //RGB565
+				//{0x40, 0x10}, //RGB565
+				{0x12, 0x14}, //Output format, QVGA,RGB
 
-	{0x32, 0x80},
-	{0x17, 0x16},
-	{0x18, 0x04},
-	{0x19, 0x02},
-	{0x1a, 0x7a},//0x7a,
+				{0x32, 0x80},
+				{0x17, 0x16},
+				{0x18, 0x04},
+				{0x19, 0x02},
+				{0x1a, 0x7a}, //0x7a,
 
-	{0x03, 0x05},//0x0a,
-	{0x0c, 0x00},
-	{0x3e, 0x00},//
+				{0x03, 0x05}, //0x0a,
+				{0x0c, 0x00},
+				{0x3e, 0x00}, //
 
-	{0x70, 0x00},
-	{0x71, 0x01},
-	{0x72, 0x11},
-	{0x73, 0x00},//
-	{0xa2, 0x02},
-	{0x11, 0x01},
+				{0x70, 0x00},
+				{0x71, 0x01},
+				{0x72, 0x11},
+				{0x73, 0x00}, //
+				{0xa2, 0x02},
+				{0x11, 0x01},
 
-	{0x7a,  0x2C},
-	{0x7b,  0x11},
-	{0x7c,  0x1a},
-	{0x7d,  0x2a},
-	{0x7e,  0x42},
-	{0x7f,  0x4c},
-	{0x80,  0x56},
-	{0x81,  0x5f},
-	{0x82,  0x67},
-	{0x83,  0x70},
-	{0x84,  0x78},
-	{0x85,  0x87},
-	{0x86,  0x95},
-	{0x87,  0xaf},
-	{0x88,  0xc8},
-	{0x89,  0xdf},
+				{0x7a, 0x2C},
+				{0x7b, 0x11},
+				{0x7c, 0x1a},
+				{0x7d, 0x2a},
+				{0x7e, 0x42},
+				{0x7f, 0x4c},
+				{0x80, 0x56},
+				{0x81, 0x5f},
+				{0x82, 0x67},
+				{0x83, 0x70},
+				{0x84, 0x78},
+				{0x85, 0x87},
+				{0x86, 0x95},
+				{0x87, 0xaf},
+				{0x88, 0xc8},
+				{0x89, 0xdf},
 
-	////////////////
-	{0x13, 0xe0},
-	{0x00, 0x00},//AGC
+				////////////////
+				{0x13, 0xe0},
+				{0x00, 0x00}, //AGC
 
-	{0x10, 0x00},
-	{0x0d, 0x00},
-	{0x14, 0x10},//0x38, limit the max gain
-	{0xa5, 0x05},
-	{0xab, 0x07},
+				{0x10, 0x00},
+				{0x0d, 0x00},
+				{0x14, 0x10}, //0x38, limit the max gain
+				{0xa5, 0x05},
+				{0xab, 0x07},
 
-	{0x24, 0x75},//40
-	{0x25, 0x63},
-	{0x26, 0xA5},
-	{0x9f, 0x78},
-	{0xa0, 0x68},
+				{0x24, 0x75}, //40
+				{0x25, 0x63},
+				{0x26, 0xA5},
+				{0x9f, 0x78},
+				{0xa0, 0x68},
 
-	{0xa1, 0x03},//0x0b,
-	{0xa6, 0xdf},//0xd8,
-	{0xa7, 0xdf},//0xd8,
-	{0xa8, 0xf0},
-	{0xa9, 0x90},
+				{0xa1, 0x03}, //0x0b,
+				{0xa6, 0xdf}, //0xd8,
+				{0xa7, 0xdf}, //0xd8,
+				{0xa8, 0xf0},
+				{0xa9, 0x90},
 
-	{0xaa, 0x94},//50
-	{0x13, 0xe5},
-	{0x0e, 0x61},
-	{0x0f, 0x4b},
-	{0x16, 0x02},
+				{0xaa, 0x94}, //50
+				{0x13, 0xe5},
+				{0x0e, 0x61},
+				{0x0f, 0x4b},
+				{0x16, 0x02},
 
 #if 1
-	{0x1e, 0x37},//0x07, 0x17, 0x27, 0x37 Ñ¡Ôñ1¸ö£¬¾ö¶¨É¨Ãè·½Ïò. ĞèÒªºÍLCDµÄÉ¨Ãè·½ÏòÆ¥Åä¡£
+				{0x1e, 0x37}, //0x07, 0x17, 0x27, 0x37 é€‰æ‹©1ä¸ªï¼Œå†³å®šæ‰«ææ–¹å‘. éœ€è¦å’ŒLCDçš„æ‰«ææ–¹å‘åŒ¹é…ã€‚
 #else
-	{0x1e, 0x27},//0x07,
+				{0x1e, 0x27}, //0x07,
 #endif
 
+				{0x21, 0x02},
+				{0x22, 0x91},
+				{0x29, 0x07},
+				{0x33, 0x0b},
 
-	{0x21, 0x02},
-	{0x22, 0x91},
-	{0x29, 0x07},
-	{0x33, 0x0b},
+				{0x35, 0x0b}, //60
+				{0x37, 0x1d},
+				{0x38, 0x71},
+				{0x39, 0x2a},
+				{0x3c, 0x78},
 
-	{0x35, 0x0b},//60
-	{0x37, 0x1d},
-	{0x38, 0x71},
-	{0x39, 0x2a},
-	{0x3c, 0x78},
+				{0x4d, 0x40},
+				{0x4e, 0x20},
+				{0x69, 0x5d},
+				{0x6b, 0x0a}, //PLL
+				{0x74, 0x19},
+				{0x8d, 0x4f},
 
-	{0x4d, 0x40},
-	{0x4e, 0x20},
-	{0x69, 0x5d},
-	{0x6b, 0x0a},//PLL
-	{0x74, 0x19},
-	{0x8d, 0x4f},
+				{0x8e, 0x00}, //70
+				{0x8f, 0x00},
+				{0x90, 0x00},
+				{0x91, 0x00},
+				{0x92, 0x00}, //0x19,//0x66
 
-	{0x8e, 0x00},//70
-	{0x8f, 0x00},
-	{0x90, 0x00},
-	{0x91, 0x00},
-	{0x92, 0x00},//0x19,//0x66
+				{0x96, 0x00},
+				{0x9a, 0x80},
+				{0xb0, 0x84},
+				{0xb1, 0x0c},
+				{0xb2, 0x0e},
 
-	{0x96, 0x00},
-	{0x9a, 0x80},
-	{0xb0, 0x84},
-	{0xb1, 0x0c},
-	{0xb2, 0x0e},
+				{0xb3, 0x82}, //80
+				{0xb8, 0x0a},
+				{0x43, 0x14},
+				{0x44, 0xf0},
+				{0x45, 0x34},
 
-	{0xb3, 0x82},//80
-	{0xb8, 0x0a},
-	{0x43, 0x14},
-	{0x44, 0xf0},
-	{0x45, 0x34},
+				{0x46, 0x58},
+				{0x47, 0x28},
+				{0x48, 0x3a},
+				{0x59, 0x88},
+				{0x5a, 0x88},
 
-	{0x46, 0x58},
-	{0x47, 0x28},
-	{0x48, 0x3a},
-	{0x59, 0x88},
-	{0x5a, 0x88},
+				{0x5b, 0x44}, //90
+				{0x5c, 0x67},
+				{0x5d, 0x49},
+				{0x5e, 0x0e},
+				{0x64, 0x04},
+				{0x65, 0x20},
 
-	{0x5b, 0x44},//90
-	{0x5c, 0x67},
-	{0x5d, 0x49},
-	{0x5e, 0x0e},
-	{0x64, 0x04},
-	{0x65, 0x20},
+				{0x66, 0x05},
+				{0x94, 0x04},
+				{0x95, 0x08},
+				{0x6c, 0x0a},
+				{0x6d, 0x55},
 
-	{0x66, 0x05},
-	{0x94, 0x04},
-	{0x95, 0x08},
-	{0x6c, 0x0a},
-	{0x6d, 0x55},
+				{0x4f, 0x80},
+				{0x50, 0x80},
+				{0x51, 0x00},
+				{0x52, 0x22},
+				{0x53, 0x5e},
+				{0x54, 0x80},
 
+				{0x76, 0xe1},
 
-	{0x4f, 0x80},
-	{0x50, 0x80},
-	{0x51, 0x00},
-	{0x52, 0x22},
-	{0x53, 0x5e},
-	{0x54, 0x80},
-
-	{0x76, 0xe1},
-
-	{0x6e, 0x11},//100
-	{0x6f, 0x9f},//0x9e for advance AWB
-	{0x55, 0x00},//ÁÁ¶È
-	{0x56, 0x40},//¶Ô±È¶È
-	{0x57, 0x80},//0x40,
+				{0x6e, 0x11}, //100
+				{0x6f, 0x9f}, //0x9e for advance AWB
+				{0x55, 0x00}, //äº®åº¦
+				{0x56, 0x40}, //å¯¹æ¯”åº¦
+				{0x57, 0x80}, //0x40,
 };
 
 static void CAM_ConfigCPU(void);
@@ -224,21 +220,21 @@ static uint8_t OV_ReadReg(uint8_t _ucRegAddr);
 CAM_T g_tCam;
 
 DCMI_HandleTypeDef hdcmi;
-DMA_HandleTypeDef  hdma_dcmi;
+DMA_HandleTypeDef hdma_dcmi;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitCamera
-*	¹¦ÄÜËµÃ÷: ÅäÖÃÉãÏñÍ·GPIOºÍCAMERAÉè±¸.
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitCamera
+*	åŠŸèƒ½è¯´æ˜: é…ç½®æ‘„åƒå¤´GPIOå’ŒCAMERAè®¾å¤‡.
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitCamera(void)
 {
 	CAM_ConfigCPU();
 
-	#if 1	/* ÏÂÃæµÄ´úÂë£¬ÑéÖ¤¶ÁĞ´¼Ä´æÆ÷ÊÇ·ñÕıÈ· */
+#if 1 /* ä¸‹é¢çš„ä»£ç ï¼ŒéªŒè¯è¯»å†™å¯„å­˜å™¨æ˜¯å¦æ­£ç¡® */
 	{
 		uint8_t read;
 
@@ -252,25 +248,25 @@ void bsp_InitCamera(void)
 
 		read = OV_ReadReg(0x3A);
 	}
-	#endif
+#endif
 
 	OV_InitReg();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CAM_ConfigCPU
-*	¹¦ÄÜËµÃ÷: ÅäÖÃÉãÏñÍ·GPIOºÍCAMERAÉè±¸¡£0V7670µÄI2C½Ó¿ÚÅäÖÃÔÚ bsp_gpio_i2c.c ÎÄ¼şÊµÏÖ¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CAM_ConfigCPU
+*	åŠŸèƒ½è¯´æ˜: é…ç½®æ‘„åƒå¤´GPIOå’ŒCAMERAè®¾å¤‡ã€‚0V7670çš„I2Cæ¥å£é…ç½®åœ¨ bsp_gpio_i2c.c æ–‡ä»¶å®ç°ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void CAM_ConfigCPU(void)
 {
- 	/* °²¸»À³STM32-V7¿ª·¢°å²ÉÓÃÓĞÔ´¾§ÕñÌá¹©24MÊ±ÖÓ£¬Òò´Ë²»ÓÃPA8²úÉúÊ±ÖÓ */
+	/* å®‰å¯Œè±STM32-V7å¼€å‘æ¿é‡‡ç”¨æœ‰æºæ™¶æŒ¯æä¾›24Mæ—¶é’Ÿï¼Œå› æ­¤ä¸ç”¨PA8äº§ç”Ÿæ—¶é’Ÿ */
 
 	/*
-		½«DCMIÏà¹ØµÄGPIOÉèÖÃÎª¸´ÓÃÄ£Ê½  - STM32-V7
+		å°†DCMIç›¸å…³çš„GPIOè®¾ç½®ä¸ºå¤ç”¨æ¨¡å¼  - STM32-V7
 			PA4/DCMI_HSYNC/DAC_OUT1		
 			PA6/DCMI_PIXCLK
 			PB7/DCMI_VSYNC			
@@ -283,58 +279,58 @@ static void CAM_ConfigCPU(void)
 			PG10/DCMI_D2/NRF24L01_CSN
 			PG11/DCMI_D3/ETH_RMII_TX_EN
 	*/
-	{  	
+	{
 		GPIO_InitTypeDef GPIO_InitStruct;
-		
+
 		/* Peripheral clock enable */
 		__HAL_RCC_DCMI_CLK_ENABLE();
-		
+
 		__HAL_RCC_GPIOA_CLK_ENABLE();
 		__HAL_RCC_GPIOB_CLK_ENABLE();
 		__HAL_RCC_GPIOC_CLK_ENABLE();
 		__HAL_RCC_GPIOD_CLK_ENABLE();
 		__HAL_RCC_GPIOE_CLK_ENABLE();
 		__HAL_RCC_GPIOG_CLK_ENABLE();
-		
+
 		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 		GPIO_InitStruct.Pull = GPIO_NOPULL;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 		GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
-		
+
 		GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_6;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);		
-		
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 		GPIO_InitStruct.Pin = GPIO_PIN_7;
 		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 		GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);	
+		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 		GPIO_InitStruct.Pin = GPIO_PIN_3;
 		HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 		GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
-		HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);	
-		
+		HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
 		GPIO_InitStruct.Pin = GPIO_PIN_10 | GPIO_PIN_11;
-		HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);	
+		HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 	}
 
-	/* ÅäÖÃ DCMIC ²ÎÊı */
+	/* é…ç½® DCMIC å‚æ•° */
 	{
 		/* DCMI INIT */
 		hdcmi.Instance = DCMI;
 		hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
-		hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_RISING;   
-		hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;              
-		hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;    
+		hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_RISING;
+		hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
+		hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
 		hdcmi.Init.CaptureRate = DCMI_CR_ALTERNATE_2_FRAME;
-		hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;                  
-		hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;  
+		hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
+		hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;
 		hdcmi.Init.ByteSelectMode = DCMI_BSM_ALL;
 		hdcmi.Init.ByteSelectStart = DCMI_OEBS_ODD;
 		hdcmi.Init.LineSelectMode = DCMI_LSM_ALL;
-		hdcmi.Init.LineSelectStart = DCMI_OELS_ODD; 
+		hdcmi.Init.LineSelectStart = DCMI_OELS_ODD;
 		if (HAL_DCMI_Init(&hdcmi) != HAL_OK)
 		{
 			Error_Handler(__FILE__, __LINE__);
@@ -342,48 +338,48 @@ static void CAM_ConfigCPU(void)
 
 		/* DCMI interrupt Init */
 		HAL_NVIC_SetPriority(DCMI_IRQn, 0, 0);
-		HAL_NVIC_EnableIRQ(DCMI_IRQn);			
+		HAL_NVIC_EnableIRQ(DCMI_IRQn);
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: OV_InitReg
-*	¹¦ÄÜËµÃ÷: ¸´Î»OV7670, ÅäÖÃOV7670µÄ¼Ä´æÆ÷£¬QVGA
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 0 ±íÊ¾ÕıÈ·£¬1±íÊ¾Ê§°Ü
+*	å‡½ æ•° å: OV_InitReg
+*	åŠŸèƒ½è¯´æ˜: å¤ä½OV7670, é…ç½®OV7670çš„å¯„å­˜å™¨ï¼ŒQVGA
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 0 è¡¨ç¤ºæ­£ç¡®ï¼Œ1è¡¨ç¤ºå¤±è´¥
 *********************************************************************************************************
 */
 static uint8_t OV_InitReg(void)
 {
-  	uint8_t i;
+	uint8_t i;
 
-  	CAM_ConfigCPU();
-	//bsp_InitI2C();		/* ÅäÖÃI2C×ÜÏß, ÔÚ bsp.c ÎÄ¼şÖ´ĞĞÁË */
+	CAM_ConfigCPU();
+	//bsp_InitI2C();		/* é…ç½®I2Cæ€»çº¿, åœ¨ bsp.c æ–‡ä»¶æ‰§è¡Œäº† */
 
-	OV_WriteReg(0x12, 0x80); 	/* Reset SCCB */
+	OV_WriteReg(0x12, 0x80); /* Reset SCCB */
 
 	bsp_DelayMS(5);
 
-	/* ÉèÖÃ OV7670¼Ä´æÆ÷ */
-  	for (i = 0; i < OV_REG_NUM; i++)
-  	{
+	/* è®¾ç½® OV7670å¯„å­˜å™¨ */
+	for (i = 0; i < OV_REG_NUM; i++)
+	{
 		OV_WriteReg(OV_reg[i][0], OV_reg[i][1]);
-  	}
+	}
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CAM_Start
-*	¹¦ÄÜËµÃ÷: Æô¶¯DMAºÍDCMI£¬¿ªÊ¼´«ËÍÍ¼ÏñÊı¾İµ½LCDÏÔ´æ
-*	ĞÎ    ²Î: _uiDispMemAddr ÏÔ´æµØÖ·
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CAM_Start
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨DMAå’ŒDCMIï¼Œå¼€å§‹ä¼ é€å›¾åƒæ•°æ®åˆ°LCDæ˜¾å­˜
+*	å½¢    å‚: _uiDispMemAddr æ˜¾å­˜åœ°å€
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void CAM_Start(uint32_t _uiDispMemAddr)
-{	
-	memset((char *)_uiDispMemAddr, 0,  2000);
+{
+	memset((char *)_uiDispMemAddr, 0, 2000);
 	/* DCMI DMA Init */
 	{
 		hdma_dcmi.Instance = DMA1_Stream7;
@@ -403,27 +399,27 @@ void CAM_Start(uint32_t _uiDispMemAddr)
 
 		__HAL_LINKDMA(&hdcmi, DMA_Handle, hdma_dcmi);
 
-		  /* DMA controller clock enable */
+		/* DMA controller clock enable */
 		__HAL_RCC_DMA1_CLK_ENABLE();
 
 		/* DMA interrupt init */
 		/* DMA1_Stream7_IRQn interrupt configuration */
 		HAL_NVIC_SetPriority(DMA1_Stream7_IRQn, 0, 0);
-		HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);		
+		HAL_NVIC_EnableIRQ(DMA1_Stream7_IRQn);
 	}
-	
-	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)buff, 128);
-	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)_uiDispMemAddr, 265*320*2);	
 
-	g_tCam.CaptureOk = 0;		/* È«¾Ö±êÖ¾ */
+	//HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)buff, 128);
+	HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)_uiDispMemAddr, 265 * 320 * 2);
+
+	g_tCam.CaptureOk = 0; /* å…¨å±€æ ‡å¿— */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: CAM_Stop
-*	¹¦ÄÜËµÃ÷: Í£Ö¹DMAºÍDCMI
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: CAM_Stop
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢DMAå’ŒDCMI
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void CAM_Stop(void)
@@ -433,103 +429,103 @@ void CAM_Stop(void)
 
 void DMA1_Stream7_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Stream7_IRQn 0 */
+	/* USER CODE BEGIN DMA1_Stream7_IRQn 0 */
 
-  /* USER CODE END DMA1_Stream7_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_dcmi);
-  /* USER CODE BEGIN DMA1_Stream7_IRQn 1 */
+	/* USER CODE END DMA1_Stream7_IRQn 0 */
+	HAL_DMA_IRQHandler(&hdma_dcmi);
+	/* USER CODE BEGIN DMA1_Stream7_IRQn 1 */
 
-  /* USER CODE END DMA1_Stream7_IRQn 1 */
+	/* USER CODE END DMA1_Stream7_IRQn 1 */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DMA2_Stream1_IRQHandler
-*	¹¦ÄÜËµÃ÷: DMA´«ÊäÍê³ÉÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DMA2_Stream1_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: DMAä¼ è¾“å®Œæˆä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DCMI_IRQHandler(void)
 {
 	HAL_DCMI_IRQHandler(&hdcmi);
-	
-	/* ¹Ø±ÕÉãÏñ */
+
+	/* å…³é—­æ‘„åƒ */
 	CAM_Stop();
-	g_tCam.CaptureOk = 1;		/* ±íÊ¾DMA´«Êä½áÊø */
+	g_tCam.CaptureOk = 1; /* è¡¨ç¤ºDMAä¼ è¾“ç»“æŸ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: OV_WriteReg
-*	¹¦ÄÜËµÃ÷: Ğ´0V7670¼Ä´æÆ÷
-*	ĞÎ    ²Î: _ucRegAddr  : ¼Ä´æÆ÷µØÖ·
-*			  _ucRegValue : ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: OV_WriteReg
+*	åŠŸèƒ½è¯´æ˜: å†™0V7670å¯„å­˜å™¨
+*	å½¢    å‚: _ucRegAddr  : å¯„å­˜å™¨åœ°å€
+*			  _ucRegValue : å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void OV_WriteReg(uint8_t _ucRegAddr, uint8_t _ucRegValue)
 {
-    i2c_Start();							/* ×ÜÏß¿ªÊ¼ĞÅºÅ */
+	i2c_Start(); /* æ€»çº¿å¼€å§‹ä¿¡å· */
 
-    i2c_SendByte(OV7670_SLAVE_ADDRESS);		/* ·¢ËÍÉè±¸µØÖ·+Ğ´ĞÅºÅ */
+	i2c_SendByte(OV7670_SLAVE_ADDRESS); /* å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å· */
 	i2c_WaitAck();
 
-    i2c_SendByte(_ucRegAddr);				/* ·¢ËÍ¼Ä´æÆ÷µØÖ· */
+	i2c_SendByte(_ucRegAddr); /* å‘é€å¯„å­˜å™¨åœ°å€ */
 	i2c_WaitAck();
 
-    i2c_SendByte(_ucRegValue);				/* ·¢ËÍ¼Ä´æÆ÷ÊıÖµ */
+	i2c_SendByte(_ucRegValue); /* å‘é€å¯„å­˜å™¨æ•°å€¼ */
 	i2c_WaitAck();
 
-    i2c_Stop();                   			/* ×ÜÏßÍ£Ö¹ĞÅºÅ */
+	i2c_Stop(); /* æ€»çº¿åœæ­¢ä¿¡å· */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: OV_ReadReg
-*	¹¦ÄÜËµÃ÷: ¶Á0V7670¼Ä´æÆ÷
-*	ĞÎ    ²Î: _ucRegAddr  : ¼Ä´æÆ÷µØÖ·
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: OV_ReadReg
+*	åŠŸèƒ½è¯´æ˜: è¯»0V7670å¯„å­˜å™¨
+*	å½¢    å‚: _ucRegAddr  : å¯„å­˜å™¨åœ°å€
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
 *********************************************************************************************************
 */
 static uint8_t OV_ReadReg(uint8_t _ucRegAddr)
 {
 	uint16_t usRegValue;
 
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ĞÅºÅ */
-	i2c_SendByte(OV7670_SLAVE_ADDRESS);		/* ·¢ËÍÉè±¸µØÖ·+Ğ´ĞÅºÅ */
+	i2c_Start();												/* æ€»çº¿å¼€å§‹ä¿¡å· */
+	i2c_SendByte(OV7670_SLAVE_ADDRESS); /* å‘é€è®¾å¤‡åœ°å€+å†™ä¿¡å· */
 	i2c_WaitAck();
-	i2c_SendByte(_ucRegAddr);				/* ·¢ËÍµØÖ· */
-	i2c_WaitAck();
-
-	i2c_Stop();			/* 0V7670 ĞèÒª²åÈë stop, ·ñÔò¶ÁÈ¡¼Ä´æÆ÷Ê§°Ü */
-
-	i2c_Start();                  			/* ×ÜÏß¿ªÊ¼ĞÅºÅ */
-	i2c_SendByte(OV7670_SLAVE_ADDRESS + 1);/* ·¢ËÍÉè±¸µØÖ·+¶ÁĞÅºÅ */
+	i2c_SendByte(_ucRegAddr); /* å‘é€åœ°å€ */
 	i2c_WaitAck();
 
-	usRegValue = i2c_ReadByte();       		/* ¶Á³ö¸ß×Ö½ÚÊı¾İ */
+	i2c_Stop(); /* 0V7670 éœ€è¦æ’å…¥ stop, å¦åˆ™è¯»å–å¯„å­˜å™¨å¤±è´¥ */
+
+	i2c_Start();														/* æ€»çº¿å¼€å§‹ä¿¡å· */
+	i2c_SendByte(OV7670_SLAVE_ADDRESS + 1); /* å‘é€è®¾å¤‡åœ°å€+è¯»ä¿¡å· */
+	i2c_WaitAck();
+
+	usRegValue = i2c_ReadByte(); /* è¯»å‡ºé«˜å­—èŠ‚æ•°æ® */
 	i2c_NAck();
-	i2c_Stop();                  			/* ×ÜÏßÍ£Ö¹ĞÅºÅ */
+	i2c_Stop(); /* æ€»çº¿åœæ­¢ä¿¡å· */
 
 	return usRegValue;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: OV_ReadID
-*	¹¦ÄÜËµÃ÷: ¶Á0V7670µÄĞ¾Æ¬ID
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: Ğ¾Æ¬ID. Õı³£Ó¦¸Ã·µ»Ø 0x7673
+*	å‡½ æ•° å: OV_ReadID
+*	åŠŸèƒ½è¯´æ˜: è¯»0V7670çš„èŠ¯ç‰‡ID
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: èŠ¯ç‰‡ID. æ­£å¸¸åº”è¯¥è¿”å› 0x7673
 *********************************************************************************************************
 */
 uint16_t OV_ReadID(void)
 {
-	uint8_t idh,idl;
+	uint8_t idh, idl;
 
 	idh = OV_ReadReg(0x0A);
 	idl = OV_ReadReg(0x0B);
 	return (idh << 8) + idl;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

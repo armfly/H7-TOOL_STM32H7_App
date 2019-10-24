@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÊÕÒô»ú²âÊÔ¡£
-*	ÎÄ¼şÃû³Æ : fm_radio.c
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : æ”¶éŸ³æœºæµ‹è¯•ã€‚
+*	æ–‡ä»¶åç§° : fm_radio.c
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,43 +13,43 @@
 #ifndef _FM_RADIO_H_
 #define _FM_RADIO_H_
 
-#define FM_RX		0
-#define AM_RX		1
+#define FM_RX 0
+#define AM_RX 1
 
-#define SI4704		4
-#define SI4730		30
+#define SI4704 4
+#define SI4730 30
 
 /*
-	Worldwide FM band support (64¨C108 MHz)
-	Worldwide AM band support (520¨C1710 kHz)
+	Worldwide FM band support (64â€“108 MHz)
+	Worldwide AM band support (520â€“1710 kHz)
 
-	ÖĞ¹ú·¶Î§£º 88-108Õ×ºÕĞÅºÅµ÷ÖÆ·½Ê½ÊÇµ÷Æµ£¨ÆµÂÊµ÷ÖÆ£©Ã¿¸öÆµµÀµÄÆµÂÊ¼ä¸ôÊÇ0.1Õ×ºÕ
+	ä¸­å›½èŒƒå›´ï¼š 88-108å…†èµ«ä¿¡å·è°ƒåˆ¶æ–¹å¼æ˜¯è°ƒé¢‘ï¼ˆé¢‘ç‡è°ƒåˆ¶ï¼‰æ¯ä¸ªé¢‘é“çš„é¢‘ç‡é—´éš”æ˜¯0.1å…†èµ«
 */
 
 typedef struct
 {
-	uint8_t ChipType;	/* Ğ¾Æ¬ĞÍºÅ´úÂë  */
-	
-	uint8_t ucMode;		/* AM »ò FM */
-	uint8_t ucListType;	/* µçÌ¨ÁĞ±íÀàĞÍ¡£ÎäººµØÇø»òÈ«¹ú */
+	uint8_t ChipType; /* èŠ¯ç‰‡å‹å·ä»£ç   */
 
-	uint8_t ucFMCount;	/* FM µçÌ¨¸öÊı */
-	uint16_t usFMList[255];	/* FM µçÌ¨ÁĞ±í */
-	uint8_t ucIndexFM;	/* µ±Ç°µçÌ¨Ë÷Òı */
+	uint8_t ucMode;			/* AM æˆ– FM */
+	uint8_t ucListType; /* ç”µå°åˆ—è¡¨ç±»å‹ã€‚æ­¦æ±‰åœ°åŒºæˆ–å…¨å›½ */
 
-	uint8_t ucAMCount;	/* FM µçÌ¨¸öÊı */
-	uint16_t usAMList[128];	/* FM µçÌ¨ÁĞ±í */
-	uint8_t ucIndexAM;	/* µ±Ç°µçÌ¨Ë÷Òı */
+	uint8_t ucFMCount;			/* FM ç”µå°ä¸ªæ•° */
+	uint16_t usFMList[255]; /* FM ç”µå°åˆ—è¡¨ */
+	uint8_t ucIndexFM;			/* å½“å‰ç”µå°ç´¢å¼• */
 
-	uint32_t usFreq;	/* µ±Ç°µçÌ¨ÆµÂÊ */
-	uint8_t ucVolume;	/* ÒôÁ¿ */
+	uint8_t ucAMCount;			/* FM ç”µå°ä¸ªæ•° */
+	uint16_t usAMList[128]; /* FM ç”µå°åˆ—è¡¨ */
+	uint8_t ucIndexAM;			/* å½“å‰ç”µå°ç´¢å¼• */
 
-	uint8_t ucSpkOutEn;	/* ÑïÉùÆ÷Êä³öÊ¹ÄÜ */
-	uint8_t ucRssiEn;	/* ĞÅºÅÖÊÁ¿¶¨Ê±Ë¢ĞÂ Ê¹ÄÜ */
-}RADIO_T;
+	uint32_t usFreq;	/* å½“å‰ç”µå°é¢‘ç‡ */
+	uint8_t ucVolume; /* éŸ³é‡ */
+
+	uint8_t ucSpkOutEn; /* æ‰¬å£°å™¨è¾“å‡ºä½¿èƒ½ */
+	uint8_t ucRssiEn;		/* ä¿¡å·è´¨é‡å®šæ—¶åˆ·æ–° ä½¿èƒ½ */
+} RADIO_T;
 
 void RadioMain(void);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

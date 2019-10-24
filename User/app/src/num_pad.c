@@ -1,22 +1,22 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Êı×ÖĞ¡¼üÅÌ½çÃæ
-*	ÎÄ¼şÃû³Æ : main.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Êı×ÖĞ¡¼üÅÌ½çÃæÖ÷³ÌĞò¡£µ¯³öÊı×ÖĞ¡¼üÅÌÓÃÓÚÊäÈë¡£
+*	æ¨¡å—åç§° : æ•°å­—å°é”®ç›˜ç•Œé¢
+*	æ–‡ä»¶åç§° : main.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æ•°å­—å°é”®ç›˜ç•Œé¢ä¸»ç¨‹åºã€‚å¼¹å‡ºæ•°å­—å°é”®ç›˜ç”¨äºè¾“å…¥ã€‚
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-01-01  armfly  ÕıÊ½·¢²¼
-*		V1.1    2014-04-25  armfly  (1) µ÷ÊÔÕûÊıÊäÈë·ÖÖ§£¬ Ôö¼Ó×Ö·û´®ÊäÈë£¨Ó¦¿Í»§ÒªÇó£©
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-01-01  armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2014-04-25  armfly  (1) è°ƒè¯•æ•´æ•°è¾“å…¥åˆ†æ”¯ï¼Œ å¢åŠ å­—ç¬¦ä¸²è¾“å…¥ï¼ˆåº”å®¢æˆ·è¦æ±‚ï¼‰
 *		V1.2	2015-07-22  armfly  
-*					(1) Ôö¼ÓÊäÈëÕûÊıµÄº¯Êı£¬InputInt( ), ¶Ô InputNumber() º¯ÊıÖØĞÂ·â×°
-*					(2) Ôö¼Ó×Ö·ûÊäÈë¹¦ÄÜ, NUMPAD_STR
+*					(1) å¢åŠ è¾“å…¥æ•´æ•°çš„å‡½æ•°ï¼ŒInputInt( ), å¯¹ InputNumber() å‡½æ•°é‡æ–°å°è£…
+*					(2) å¢åŠ å­—ç¬¦è¾“å…¥åŠŸèƒ½, NUMPAD_STR
 *									
 *
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -24,23 +24,23 @@
 #include "bsp.h"
 #include "num_pad.h"
 
-/* ÊäÈëÊı×Ö×î´ó³¤¶È */
-#define INPUT_MAX_LEN	32
-	
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* è¾“å…¥æ•°å­—æœ€å¤§é•¿åº¦ */
+#define INPUT_MAX_LEN 32
+
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ºÚÉ« */
-	FONT_T FontBlue;	/* À¶É« */
-	FONT_T FontBtn;		/* ¿ØÖÆ°´Å¥F1-F4µÄ×ÖÌå */
-	FONT_T FontBtnNum;	/* Êı×Ö°´Å¥µÄ×ÖÌå */
-	FONT_T FontWin;		/* WINµÄ×ÖÌå */	
-	FONT_T FontEdit;	/* EDITµÄ×ÖÌå */
+	FONT_T FontBlack;	/* é»‘è‰² */
+	FONT_T FontBlue;	 /* è“è‰² */
+	FONT_T FontBtn;		 /* æ§åˆ¶æŒ‰é’®F1-F4çš„å­—ä½“ */
+	FONT_T FontBtnNum; /* æ•°å­—æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontWin;		 /* WINçš„å­—ä½“ */
+	FONT_T FontEdit;	 /* EDITçš„å­—ä½“ */
 
 	EDIT_T Edit;
-	WIN_T  Win;
-	char *pTitle;	/* ´°¿Ú±êÌâ */
-	
+	WIN_T Win;
+	char *pTitle; /* çª—å£æ ‡é¢˜ */
+
 	BUTTON_T Btn1;
 	BUTTON_T Btn2;
 	BUTTON_T Btn3;
@@ -56,20 +56,20 @@ typedef struct
 	BUTTON_T BtnF1;
 	BUTTON_T BtnF2;
 	BUTTON_T BtnF3;
-	BUTTON_T BtnF4;	
-	
-	/* ±à¼­¿òÄÚ*/
-	char *pEditText;	
-}FormPad_T;
+	BUTTON_T BtnF4;
 
-/* ¼üÅÌÏÔÊ¾Ä£Ê½Ä£Ê½ */
+	/* ç¼–è¾‘æ¡†å†…*/
+	char *pEditText;
+} FormPad_T;
+
+/* é”®ç›˜æ˜¾ç¤ºæ¨¡å¼æ¨¡å¼ */
 enum
 {
-	PAD_DIGIT	= 0,	/* ´¿Êı×ÖÄ£Ê½ */
-	PAD_CHAR,		/* ÌØÊâ×Ö·û */	
-	PAD_ABC,		/* T9£¬Êı×ÖºÍ×ÖÄ¸ */
-	PAD_ABC0,		/* T9£¬¶ş¼¶½çÃæ£¬Ñ¡Ôñ0 Ö®ºó*/
-	PAD_ABC1,		/* T9£¬¶ş¼¶½çÃæ£¬Ñ¡Ôñ1 Ö®ºó*/	
+	PAD_DIGIT = 0, /* çº¯æ•°å­—æ¨¡å¼ */
+	PAD_CHAR,			 /* ç‰¹æ®Šå­—ç¬¦ */
+	PAD_ABC,			 /* T9ï¼Œæ•°å­—å’Œå­—æ¯ */
+	PAD_ABC0,			 /* T9ï¼ŒäºŒçº§ç•Œé¢ï¼Œé€‰æ‹©0 ä¹‹å*/
+	PAD_ABC1,			 /* T9ï¼ŒäºŒçº§ç•Œé¢ï¼Œé€‰æ‹©1 ä¹‹å*/
 	PAD_ABC2,
 	PAD_ABC3,
 	PAD_ABC4,
@@ -77,120 +77,120 @@ enum
 	PAD_ABC6,
 	PAD_ABC7,
 	PAD_ABC8,
-	PAD_ABC9,	
+	PAD_ABC9,
 	PAD_ABCA,
 	PAD_ABCB
 };
 
-/* Êı×ÖĞ¡¼üÅÌ ´°¿Ú */
+/* æ•°å­—å°é”®ç›˜ çª—å£ */
 enum
 {
-#if  1		/* fot 480*272 */	
-	/* Êı×ÖĞ¡¼üÅÌ´°¿ÚÎ»ÖÃ */
-	WIN_NUM_X		= 100,
-	WIN_NUM_Y		= 8,
+#if 1 /* fot 480*272 */
+	/* æ•°å­—å°é”®ç›˜çª—å£ä½ç½® */
+	WIN_NUM_X = 100,
+	WIN_NUM_Y = 8,
 
-	/* Êı×Ö°´Å¥(0-9,.*)¸ß¶ÈºÍ¿í¶È,È«²¿Ò»Ñù */
+	/* æ•°å­—æŒ‰é’®(0-9,.*)é«˜åº¦å’Œå®½åº¦,å…¨éƒ¨ä¸€æ · */
 	BTN_H = 40,
 	BTN_W = 70,
 
-	/* ¿ØÖÆ°´Å¥£¨ÍË¸ñ,CLR,RET,OK£©¸ß¶ÈºÍ¿í¶È,È«²¿Ò»Ñù */
+	/* æ§åˆ¶æŒ‰é’®ï¼ˆé€€æ ¼,CLR,RET,OKï¼‰é«˜åº¦å’Œå®½åº¦,å…¨éƒ¨ä¸€æ · */
 	BUTTON_CTRL_H = 40,
 	BUTTON_CTRL_W = 80,
 
-	/* Êı×ÖĞ¡¼üÅÌ´°¿Ú´óĞ¡ */
-	WIN_NUM_H		= 249,
-	WIN_NUM_W		= (BTN_W * 3) + BUTTON_CTRL_W + 8 + 6,
+	/* æ•°å­—å°é”®ç›˜çª—å£å¤§å° */
+	WIN_NUM_H = 249,
+	WIN_NUM_W = (BTN_W * 3) + BUTTON_CTRL_W + 8 + 6,
 
-	/* ÊäÈëÊı×Ö±à¼­¿ò */
-	EDIT_NUM_X	= WIN_NUM_X + 4,
-	EDIT_NUM_Y	= WIN_NUM_Y + 34,
-	EDIT_NUM_H	= 40,
-	EDIT_NUM_W	= WIN_NUM_W - 8,
+	/* è¾“å…¥æ•°å­—ç¼–è¾‘æ¡† */
+	EDIT_NUM_X = WIN_NUM_X + 4,
+	EDIT_NUM_Y = WIN_NUM_Y + 34,
+	EDIT_NUM_H = 40,
+	EDIT_NUM_W = WIN_NUM_W - 8,
 
-#else	/* for 800 * 480 */
-	/* Êı×Ö°´Å¥(0-9,.*)¸ß¶ÈºÍ¿í¶È,È«²¿Ò»Ñù */
+#else /* for 800 * 480 */
+	/* æ•°å­—æŒ‰é’®(0-9,.*)é«˜åº¦å’Œå®½åº¦,å…¨éƒ¨ä¸€æ · */
 	//BTN_H = 40,
 	BTN_H = 60,
 	BTN_W = 70,
 
-	/* ¿ØÖÆ°´Å¥£¨ÍË¸ñ,CLR,RET,OK£©¸ß¶ÈºÍ¿í¶È,È«²¿Ò»Ñù */
+	/* æ§åˆ¶æŒ‰é’®ï¼ˆé€€æ ¼,CLR,RET,OKï¼‰é«˜åº¦å’Œå®½åº¦,å…¨éƒ¨ä¸€æ · */
 	//BUTTON_CTRL_H = 40,
 	BTN_F_H = 60,
 	BTN_F_W = 80,
 
-	/* Êı×ÖĞ¡¼üÅÌ´°¿Ú´óĞ¡ */
-	WIN_NUM_H		= (BTN_H * 4 + 90),
-	WIN_NUM_W		= (BTN_W * 3) + BUTTON_CTRL_W + 8 + 6,
+	/* æ•°å­—å°é”®ç›˜çª—å£å¤§å° */
+	WIN_NUM_H = (BTN_H * 4 + 90),
+	WIN_NUM_W = (BTN_W * 3) + BUTTON_CTRL_W + 8 + 6,
 
-	/* Êı×ÖĞ¡¼üÅÌ´°¿ÚÎ»ÖÃ (°´800 * 480µÄ·Ö±æÂÊ¾ÓÖĞ) */
-	WIN_NUM_X		= ((800 - WIN_NUM_W) / 2),
-	WIN_NUM_Y		= ((480 - WIN_NUM_H) / 2),
-	
-	/* ÊäÈëÊı×Ö±à¼­¿ò */
-	EDIT_NUM_X	= WIN_NUM_X + 4,
-	EDIT_NUM_Y	= WIN_NUM_Y + 34,
-	EDIT_NUM_H	= 40,
-	EDIT_NUM_W	= WIN_NUM_W - 8,
+	/* æ•°å­—å°é”®ç›˜çª—å£ä½ç½® (æŒ‰800 * 480çš„åˆ†è¾¨ç‡å±…ä¸­) */
+	WIN_NUM_X = ((800 - WIN_NUM_W) / 2),
+	WIN_NUM_Y = ((480 - WIN_NUM_H) / 2),
+
+	/* è¾“å…¥æ•°å­—ç¼–è¾‘æ¡† */
+	EDIT_NUM_X = WIN_NUM_X + 4,
+	EDIT_NUM_Y = WIN_NUM_Y + 34,
+	EDIT_NUM_H = 40,
+	EDIT_NUM_W = WIN_NUM_W - 8,
 
 #endif
 	BUTTON_X_SPACE = BTN_W + 2,
 	BUTTON_Y_SPACE = BTN_H + 2,
-	
-	/* Êı×Ö1 °´Å¥ */
-	BTN1_X	= WIN_NUM_X + 4,
-	BTN1_Y	= EDIT_NUM_Y + 43,
-		/* Êı×Ö2 °´Å¥ */
-		BTN2_X	= BTN1_X + BUTTON_X_SPACE,
-		BTN2_Y	= BTN1_Y,
-			/* Êı×Ö3 °´Å¥ */
-			BTN3_X	= BTN1_X + 2 * BUTTON_X_SPACE,
-			BTN3_Y	= BTN1_Y,
-				/* F1 °´Å¥ */
-				BTNF1_X = BTN1_X + 3 * BUTTON_X_SPACE,
-				BTNF1_Y = BTN1_Y,
 
-	/* Êı×Ö4 °´Å¥ */
-	BTN4_X	= BTN1_X,
-	BTN4_Y	= BTN1_Y + BUTTON_Y_SPACE,
-		/* Êı5 °´Å¥ */
-		BTN5_X	= BTN1_X + BUTTON_X_SPACE,
-		BTN5_Y	= BTN1_Y + BUTTON_Y_SPACE,
-			/* Êı×Ö6 °´Å¥ */
-			BTN6_X	= BTN1_X + 2 * BUTTON_X_SPACE,
-			BTN6_Y	= BTN1_Y + BUTTON_Y_SPACE,
-				/* F2 °´Å¥ */
-				BTNF2_X	= BTN1_X + 3 * BUTTON_X_SPACE,
-				BTNF2_Y	= BTN1_Y + BUTTON_Y_SPACE,
+	/* æ•°å­—1 æŒ‰é’® */
+	BTN1_X = WIN_NUM_X + 4,
+	BTN1_Y = EDIT_NUM_Y + 43,
+	/* æ•°å­—2 æŒ‰é’® */
+	BTN2_X = BTN1_X + BUTTON_X_SPACE,
+	BTN2_Y = BTN1_Y,
+	/* æ•°å­—3 æŒ‰é’® */
+	BTN3_X = BTN1_X + 2 * BUTTON_X_SPACE,
+	BTN3_Y = BTN1_Y,
+	/* F1 æŒ‰é’® */
+	BTNF1_X = BTN1_X + 3 * BUTTON_X_SPACE,
+	BTNF1_Y = BTN1_Y,
 
-	/* Êı×Ö7 °´Å¥ */
-	BTN7_X	= BTN1_X,
-	BTN7_Y	= BTN1_Y + 2 * BUTTON_Y_SPACE,
-		/* Êı×Ö8 °´Å¥ */
-		BTN8_X	= BTN1_X + BUTTON_X_SPACE,
-		BTN8_Y	= BTN1_Y + 2 * BUTTON_Y_SPACE,
-			/* Êı×Ö9 °´Å¥ */
-			BTN9_X	= BTN1_X + 2 * BUTTON_X_SPACE,
-			BTN9_Y	= BTN1_Y + 2 * BUTTON_Y_SPACE,
-				/* F3 °´Å¥ */
-				BTNF3_X	= BTN1_X + 3 * BUTTON_X_SPACE,
-				BTNF3_Y	= BTN1_Y + 2 * BUTTON_Y_SPACE,
+	/* æ•°å­—4 æŒ‰é’® */
+	BTN4_X = BTN1_X,
+	BTN4_Y = BTN1_Y + BUTTON_Y_SPACE,
+	/* æ•°5 æŒ‰é’® */
+	BTN5_X = BTN1_X + BUTTON_X_SPACE,
+	BTN5_Y = BTN1_Y + BUTTON_Y_SPACE,
+	/* æ•°å­—6 æŒ‰é’® */
+	BTN6_X = BTN1_X + 2 * BUTTON_X_SPACE,
+	BTN6_Y = BTN1_Y + BUTTON_Y_SPACE,
+	/* F2 æŒ‰é’® */
+	BTNF2_X = BTN1_X + 3 * BUTTON_X_SPACE,
+	BTNF2_Y = BTN1_Y + BUTTON_Y_SPACE,
 
-	/* Êı×ÖA °´Å¥ */
-	BTNA_X	= BTN1_X,
-	BTNA_Y	= BTN1_Y + 3 * BUTTON_Y_SPACE,
-		/* Êı×Ö0 °´Å¥ */
-		BTN0_X	= BTN1_X + BUTTON_X_SPACE,
-		BTN0_Y	= BTN1_Y + 3 * BUTTON_Y_SPACE,
-			/* B °´Å¥ */
-			BTNB_X	= BTN1_X + 2 * BUTTON_X_SPACE,
-			BTNB_Y	= BTN1_Y + 3 * BUTTON_Y_SPACE,
-				/* F4°´Å¥ */
-				BTNF4_X	= BTN1_X + 3 * BUTTON_X_SPACE,
-				BTNF4_Y	= BTN1_Y + 3 * BUTTON_Y_SPACE,
+	/* æ•°å­—7 æŒ‰é’® */
+	BTN7_X = BTN1_X,
+	BTN7_Y = BTN1_Y + 2 * BUTTON_Y_SPACE,
+	/* æ•°å­—8 æŒ‰é’® */
+	BTN8_X = BTN1_X + BUTTON_X_SPACE,
+	BTN8_Y = BTN1_Y + 2 * BUTTON_Y_SPACE,
+	/* æ•°å­—9 æŒ‰é’® */
+	BTN9_X = BTN1_X + 2 * BUTTON_X_SPACE,
+	BTN9_Y = BTN1_Y + 2 * BUTTON_Y_SPACE,
+	/* F3 æŒ‰é’® */
+	BTNF3_X = BTN1_X + 3 * BUTTON_X_SPACE,
+	BTNF3_Y = BTN1_Y + 2 * BUTTON_Y_SPACE,
+
+	/* æ•°å­—A æŒ‰é’® */
+	BTNA_X = BTN1_X,
+	BTNA_Y = BTN1_Y + 3 * BUTTON_Y_SPACE,
+	/* æ•°å­—0 æŒ‰é’® */
+	BTN0_X = BTN1_X + BUTTON_X_SPACE,
+	BTN0_Y = BTN1_Y + 3 * BUTTON_Y_SPACE,
+	/* B æŒ‰é’® */
+	BTNB_X = BTN1_X + 2 * BUTTON_X_SPACE,
+	BTNB_Y = BTN1_Y + 3 * BUTTON_Y_SPACE,
+	/* F4æŒ‰é’® */
+	BTNF4_X = BTN1_X + 3 * BUTTON_X_SPACE,
+	BTNF4_Y = BTN1_Y + 3 * BUTTON_Y_SPACE,
 };
 
-/*¡¡ÊäÈëÎŞĞ§´°¿Ú¡¡*/
+/*ã€€è¾“å…¥æ— æ•ˆçª—å£ã€€*/
 enum
 {
 	WIN_INVALID_X = WIN_NUM_X + 15,
@@ -202,43 +202,306 @@ enum
 	LABLE_INVALID_Y = WIN_INVALID_Y + 38,
 };
 
-#define F1_NAME		"ÍË¸ñ"
-#define F2_NAME 	"Çå³ı"
-#define F3_NAME		"·µ»Ø"
-#define F4_NAME		"È·ÈÏ"
+#define F1_NAME "é€€æ ¼"
+#define F2_NAME "æ¸…é™¤"
+#define F3_NAME "è¿”å›"
+#define F4_NAME "ç¡®è®¤"
 
-/* ×Ö·ûÊäÈëÄ£Ê½ÏÂ,2¼¶²Ëµ¥°´¼ü×Ö·û */
+/* å­—ç¬¦è¾“å…¥æ¨¡å¼ä¸‹,2çº§èœå•æŒ‰é”®å­—ç¬¦ */
 const char *g_key_tab[12 * 12] =
-{
-#if 1	
-	"0", " ", "!", "@", "#", "$", "%", "=", "*", "(",  ")", "|",
-	"1", "-", "[", "]", "\\", "/", ":", ";", "\042", " ",  " ", " ",
-	"2", "a", "b", "c", "A", "B", "C", " ", " ", " ",  " ", " ",
-	"3", "d", "e", "f", "D", "E", "F", " ", " ", " ",  " ", " ",
-	"4", "g", "h", "i", "G", "H", "I", " ", " ", " ",  " ", " ",
-	"5", "j", "k", "l", "J", "K", "L", " ", " ", " ",  " ", " ",
-	"6", "m", "n", "o", "M", "N", "O", " ", " ", " ",  " ", " ",
-	"7", "p", "q", "r", "s", "P", "Q", "R", "S", " ",  " ", " ",
-	"8", "t", "u", "v", "T", "U", "V", " ", " ", " ",  " ", " ",
-	"9", "w", "x", "y", "z", "W", "X", "Y", "Z", " ",  " ", " ",
-	" ", " ", " ", " ", " ", " ", " ", " ", " ", " ",  " ", " ",
-	" ", " ", " ", " ", " ", " ", " ", " ", " ", " ",  " ", " ",      
+		{
+#if 1
+				"0",
+				" ",
+				"!",
+				"@",
+				"#",
+				"$",
+				"%",
+				"=",
+				"*",
+				"(",
+				")",
+				"|",
+				"1",
+				"-",
+				"[",
+				"]",
+				"\\",
+				"/",
+				":",
+				";",
+				"\042",
+				" ",
+				" ",
+				" ",
+				"2",
+				"a",
+				"b",
+				"c",
+				"A",
+				"B",
+				"C",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"3",
+				"d",
+				"e",
+				"f",
+				"D",
+				"E",
+				"F",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"4",
+				"g",
+				"h",
+				"i",
+				"G",
+				"H",
+				"I",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"5",
+				"j",
+				"k",
+				"l",
+				"J",
+				"K",
+				"L",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"6",
+				"m",
+				"n",
+				"o",
+				"M",
+				"N",
+				"O",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"7",
+				"p",
+				"q",
+				"r",
+				"s",
+				"P",
+				"Q",
+				"R",
+				"S",
+				" ",
+				" ",
+				" ",
+				"8",
+				"t",
+				"u",
+				"v",
+				"T",
+				"U",
+				"V",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				"9",
+				"w",
+				"x",
+				"y",
+				"z",
+				"W",
+				"X",
+				"Y",
+				"Z",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
 #else
-	" ", "!", "@", "#", "$", "%", "=", "*", "(", "0", ")", "|", 
-	"-", "[", "]", "\\", "/", ":", ";", "\042", " ", "1", " ",  
-	"a", "b", "c", "A", "B", "C", " ", " ", " ", "2", " ", " ", 
-	"d", "e", "f", "D", "E", "F", " ", " ", " ", "3", " ", " ", 
-	"g", "h", "i", "G", "H", "I", " ", " ", " ", "4", " ", " ", 
-	"j", "k", "l", "J", "K", "L", " ", " ", " ", "5", " ", " ", 
-	"m", "n", "o", "M", "N", "O", " ", " ", " ", "6", " ", " ", 
-	"p", "q", "r", "s", "P", "Q", "R", "S", " ", "7", " ", " ", 
-	"t", "u", "v", "T", "U", "V", " ", " ", " ", "8", " ", " ", 
-	"w", "x", "y", "z", "W", "X", "Y", "Z", " ", "9", " ", " ", 
-	" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", 
-	" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ",    
-#endif	
+				" ",
+				"!",
+				"@",
+				"#",
+				"$",
+				"%",
+				"=",
+				"*",
+				"(",
+				"0",
+				")",
+				"|",
+				"-",
+				"[",
+				"]",
+				"\\",
+				"/",
+				":",
+				";",
+				"\042",
+				" ",
+				"1",
+				" ",
+				"a",
+				"b",
+				"c",
+				"A",
+				"B",
+				"C",
+				" ",
+				" ",
+				" ",
+				"2",
+				" ",
+				" ",
+				"d",
+				"e",
+				"f",
+				"D",
+				"E",
+				"F",
+				" ",
+				" ",
+				" ",
+				"3",
+				" ",
+				" ",
+				"g",
+				"h",
+				"i",
+				"G",
+				"H",
+				"I",
+				" ",
+				" ",
+				" ",
+				"4",
+				" ",
+				" ",
+				"j",
+				"k",
+				"l",
+				"J",
+				"K",
+				"L",
+				" ",
+				" ",
+				" ",
+				"5",
+				" ",
+				" ",
+				"m",
+				"n",
+				"o",
+				"M",
+				"N",
+				"O",
+				" ",
+				" ",
+				" ",
+				"6",
+				" ",
+				" ",
+				"p",
+				"q",
+				"r",
+				"s",
+				"P",
+				"Q",
+				"R",
+				"S",
+				" ",
+				"7",
+				" ",
+				" ",
+				"t",
+				"u",
+				"v",
+				"T",
+				"U",
+				"V",
+				" ",
+				" ",
+				" ",
+				"8",
+				" ",
+				" ",
+				"w",
+				"x",
+				"y",
+				"z",
+				"W",
+				"X",
+				"Y",
+				"Z",
+				" ",
+				"9",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+				" ",
+#endif
 };
-	
+
 static void InitFormPad(void);
 static void DispFormPad(void);
 static void DispAllBtn(void);
@@ -247,28 +510,27 @@ static uint8_t GetCharPad(uint8_t _key1, uint8_t _key2);
 
 FormPad_T *FormPad;
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InputInt
-*	¹¦ÄÜËµÃ÷: µ÷³öÊı×ÖĞ¡¼üÅÌ£¬ÊäÈëÕûÊı¡£ÄÚ²¿»áÅĞ¶ÏÖµÓò.
-*	ĞÎ    ²Î£º
-*			 _ucMode : ¹¤×÷Ä£Ê½£¬ 0 ±íÊ¾IPµØÖ·£» 1±íÊ¾ÊäÈëÆÕÍ¨ÕûÊı
-*			_Caption : Êı×ÖĞ¡¼üÅÌ½çÃæµÄ´°¿Ú±êÌâ
-*			_pInParam : ÊäÈë²ÎÊı
-*					_ucMode = NUMPAD_STR  Ê±£¬±íÊ¾ÊäÈë×Ö·û´®µÄ³¤¶È£¬uint8_t ĞÍ
-*					_ucMode = NUMPAD_INT  ´øĞ¡ÊıµãÕûÊıÊäÈëÄ£Ê½£¬(NUMPAD_INT_T *) 
+*	å‡½ æ•° å: InputInt
+*	åŠŸèƒ½è¯´æ˜: è°ƒå‡ºæ•°å­—å°é”®ç›˜ï¼Œè¾“å…¥æ•´æ•°ã€‚å†…éƒ¨ä¼šåˆ¤æ–­å€¼åŸŸ.
+*	å½¢    å‚ï¼š
+*			 _ucMode : å·¥ä½œæ¨¡å¼ï¼Œ 0 è¡¨ç¤ºIPåœ°å€ï¼› 1è¡¨ç¤ºè¾“å…¥æ™®é€šæ•´æ•°
+*			_Caption : æ•°å­—å°é”®ç›˜ç•Œé¢çš„çª—å£æ ‡é¢˜
+*			_pInParam : è¾“å…¥å‚æ•°
+*					_ucMode = NUMPAD_STR  æ—¶ï¼Œè¡¨ç¤ºè¾“å…¥å­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œuint8_t å‹
+*					_ucMode = NUMPAD_INT  å¸¦å°æ•°ç‚¹æ•´æ•°è¾“å…¥æ¨¡å¼ï¼Œ(NUMPAD_INT_T *) 
 *							typedef struct
 *							{
-*								int32_t Min;	// ×îĞ¡Öµ
-*								int32_t Max;	// ×î´óÖµ
-*								int32_t Return;	// ´æ·ÅÊäÈë½á¹û
-*								uint8_t DotNum;	// Ğ¡ÊıµãÎ»Êı
+*								int32_t Min;	// æœ€å°å€¼
+*								int32_t Max;	// æœ€å¤§å€¼
+*								int32_t Return;	// å­˜æ”¾è¾“å…¥ç»“æœ
+*								uint8_t DotNum;	// å°æ•°ç‚¹ä½æ•°
 *							}NUMPAD_INT_T;
-*					_ucMode = NUMPAD_IP	£¬´Ë²ÎÊı¿ÉÒÔÌî0
-*					_ucMode = NUMPAD_TEL £¬´Ë²ÎÊı¿ÉÒÔÌî0
-*			_pOutParam  : Êä³ö²ÎÊı
-*	·µ »Ø Öµ: 1±íÊ¾ÊäÈëÓĞĞ§  0 ±íÊ¾ÊäÈëÎŞĞ§
+*					_ucMode = NUMPAD_IP	ï¼Œæ­¤å‚æ•°å¯ä»¥å¡«0
+*					_ucMode = NUMPAD_TEL ï¼Œæ­¤å‚æ•°å¯ä»¥å¡«0
+*			_pOutParam  : è¾“å‡ºå‚æ•°
+*	è¿” å› å€¼: 1è¡¨ç¤ºè¾“å…¥æœ‰æ•ˆ  0 è¡¨ç¤ºè¾“å…¥æ— æ•ˆ
 *********************************************************************************************************
 */
 uint8_t InputInt(char *_Caption, int32_t _min, int32_t _max, int32_t *_value)
@@ -276,10 +538,10 @@ uint8_t InputInt(char *_Caption, int32_t _min, int32_t _max, int32_t *_value)
 	char buf[13];
 	NUMPAD_INT_T Param;
 
-	Param.Min = _min;		/* ×îĞ¡Öµ */	
-	Param.Max = _max;		/* ×î´óÖµ */
-	Param.DotNum = 0;	/* Ğ¡ÊıµãÎ»Êı */
-	
+	Param.Min = _min; /* æœ€å°å€¼ */
+	Param.Max = _max; /* æœ€å¤§å€¼ */
+	Param.DotNum = 0; /* å°æ•°ç‚¹ä½æ•° */
+
 	if (InputNumber(NUMPAD_INT, _Caption, &Param, (void *)buf))
 	{
 		*_value = str_to_int(buf);
@@ -293,61 +555,61 @@ uint8_t InputInt(char *_Caption, int32_t _min, int32_t _max, int32_t *_value)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InputNumber
-*	¹¦ÄÜËµÃ÷: Êı×ÖĞ¡¼üÅÌ
-*	ĞÎ    ²Î£º
-*			 _ucMode : ¹¤×÷Ä£Ê½£¬ 0 ±íÊ¾IPµØÖ·£» 1±íÊ¾ÊäÈëÆÕÍ¨ÕûÊı
-*			_Caption : Êı×ÖĞ¡¼üÅÌ½çÃæµÄ´°¿Ú±êÌâ
-*			_pInParam : ÊäÈë²ÎÊı
-*					_ucMode = NUMPAD_STR  Ê±£¬±íÊ¾ÊäÈë×Ö·û´®µÄ³¤¶È£¬uint8_t ĞÍ
-*					_ucMode = NUMPAD_INT  ´øĞ¡ÊıµãÕûÊıÊäÈëÄ£Ê½£¬(NUMPAD_INT_T *) 
+*	å‡½ æ•° å: InputNumber
+*	åŠŸèƒ½è¯´æ˜: æ•°å­—å°é”®ç›˜
+*	å½¢    å‚ï¼š
+*			 _ucMode : å·¥ä½œæ¨¡å¼ï¼Œ 0 è¡¨ç¤ºIPåœ°å€ï¼› 1è¡¨ç¤ºè¾“å…¥æ™®é€šæ•´æ•°
+*			_Caption : æ•°å­—å°é”®ç›˜ç•Œé¢çš„çª—å£æ ‡é¢˜
+*			_pInParam : è¾“å…¥å‚æ•°
+*					_ucMode = NUMPAD_STR  æ—¶ï¼Œè¡¨ç¤ºè¾“å…¥å­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œuint8_t å‹
+*					_ucMode = NUMPAD_INT  å¸¦å°æ•°ç‚¹æ•´æ•°è¾“å…¥æ¨¡å¼ï¼Œ(NUMPAD_INT_T *) 
 *							typedef struct
 *							{
-*								int32_t Min;	// ×îĞ¡Öµ
-*								int32_t Max;	// ×î´óÖµ
-*								int32_t Return;	// ´æ·ÅÊäÈë½á¹û
-*								uint8_t DotNum;	// Ğ¡ÊıµãÎ»Êı
+*								int32_t Min;	// æœ€å°å€¼
+*								int32_t Max;	// æœ€å¤§å€¼
+*								int32_t Return;	// å­˜æ”¾è¾“å…¥ç»“æœ
+*								uint8_t DotNum;	// å°æ•°ç‚¹ä½æ•°
 *							}NUMPAD_INT_T;
-*					_ucMode = NUMPAD_IP	£¬´Ë²ÎÊı¿ÉÒÔÌî0
-*					_ucMode = NUMPAD_TEL £¬´Ë²ÎÊı¿ÉÒÔÌî0
-*			_pOutParam  : Êä³ö²ÎÊı
-*	·µ »Ø Öµ: 1±íÊ¾ÊäÈëÓĞĞ§  0 ±íÊ¾ÊäÈëÎŞĞ§
+*					_ucMode = NUMPAD_IP	ï¼Œæ­¤å‚æ•°å¯ä»¥å¡«0
+*					_ucMode = NUMPAD_TEL ï¼Œæ­¤å‚æ•°å¯ä»¥å¡«0
+*			_pOutParam  : è¾“å‡ºå‚æ•°
+*	è¿” å› å€¼: 1è¡¨ç¤ºè¾“å…¥æœ‰æ•ˆ  0 è¡¨ç¤ºè¾“å…¥æ— æ•ˆ
 *********************************************************************************************************
 */
 uint8_t InputNumber(NUMPAD_MODE_E _Mode, char *_Caption, void *_pInParam, void *_pOutParam)
 {
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
-	uint8_t fRefresh;		/* Ë¢ÆÁÇëÇó±êÖ¾,1±íÊ¾ĞèÒªË¢ĞÂ */
+	uint8_t ucTouch;	/* è§¦æ‘¸äº‹ä»¶ */
+	uint8_t fRefresh; /* åˆ·å±è¯·æ±‚æ ‡å¿—,1è¡¨ç¤ºéœ€è¦åˆ·æ–° */
 	int16_t tpX, tpY;
-	uint8_t ucCursor;	/* ¹â±ê */
+	uint8_t ucCursor; /* å…‰æ ‡ */
 	uint8_t ucKeyValue = 0xFF;
 	FormPad_T form;
-	char cEditBuf[INPUT_MAX_LEN+2];	/* ±à¼­¿òÄÚÊıÖµ */
+	char cEditBuf[INPUT_MAX_LEN + 2]; /* ç¼–è¾‘æ¡†å†…æ•°å€¼ */
 	uint8_t pad_layer = 0;
 	uint8_t pad_key = 0;
 
 	FormPad = &form;
-	
+
 	FormPad->pTitle = _Caption;
 	FormPad->pEditText = cEditBuf;
-	
+
 	InitFormPad();
-	
-	/* IPµØÖ· */ /* µç»°ºÅÂë */ /* ÕûÊı£¨´ø·¶Î§ÅĞ¶Ï£© */ /* ÈÎÒâ×ÖÄ¸Êı×Ö Ğ¡Êıµã */
+
+	/* IPåœ°å€ */ /* ç”µè¯å·ç  */ /* æ•´æ•°ï¼ˆå¸¦èŒƒå›´åˆ¤æ–­ï¼‰ */ /* ä»»æ„å­—æ¯æ•°å­— å°æ•°ç‚¹ */
 	if (_Mode == NUMPAD_IP || _Mode == NUMPAD_TEL || _Mode == NUMPAD_INT)
 	{
-		SetBtnText(PAD_DIGIT);	/* ´¿Êı×Ö¼üÅÌ */
+		SetBtnText(PAD_DIGIT); /* çº¯æ•°å­—é”®ç›˜ */
 	}
 	else
 	{
-		SetBtnText(PAD_ABC);	/* T9£¬Êı×ÖºÍ×ÖÄ¸ */
-	}	
-	
+		SetBtnText(PAD_ABC); /* T9ï¼Œæ•°å­—å’Œå­—æ¯ */
+	}
+
 	DispFormPad();
-	
+
 	ucCursor = 0;
 	cEditBuf[0] = 0;
-	fRefresh = 1;	/* 1±íÊ¾ĞèÒªË¢ĞÂLCD */
+	fRefresh = 1; /* 1è¡¨ç¤ºéœ€è¦åˆ·æ–°LCD */
 	while (1)
 	{
 		bsp_Idle();
@@ -359,364 +621,363 @@ uint8_t InputNumber(NUMPAD_MODE_E _Mode, char *_Caption, void *_pInParam, void *
 			LCD_DrawEdit(&FormPad->Edit);
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */				
-					if (LCD_ButtonTouchDown(&FormPad->BtnF1, tpX, tpY))	/* ÍË¸ñ */
+			case TOUCH_DOWN:																			/* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (LCD_ButtonTouchDown(&FormPad->BtnF1, tpX, tpY)) /* é€€æ ¼ */
+				{
+					if (ucCursor > 0)
 					{
-						if (ucCursor > 0)
-						{
-							ucCursor--;
-						}		
-						cEditBuf[ucCursor] = 0;	
-						fRefresh = 1;
-					
+						ucCursor--;
 					}
-					else if (LCD_ButtonTouchDown(&FormPad->BtnF2, tpX, tpY))
+					cEditBuf[ucCursor] = 0;
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormPad->BtnF2, tpX, tpY))
+				{
+					ucCursor = 0; /* "æ¸…é™¤"; */
+					cEditBuf[ucCursor] = 0;
+					fRefresh = 1;
+				}
+				else if (LCD_ButtonTouchDown(&FormPad->BtnF3, tpX, tpY))
+				{
+					if (pad_layer == 1)
 					{
-						ucCursor = 0;		/* "Çå³ı"; */
-						cEditBuf[ucCursor] = 0;	
 						fRefresh = 1;
+						FormPad->FontBtnNum.FrontColor = CL_BLACK; /* æ•°å­—æŒ‰é’®ç”¨é»‘è‰²å­—ä½“ */
+						SetBtnText(PAD_ABC);
+						DispAllBtn(); /* åªåˆ·æ–°æŒ‰é’® */
+						pad_layer = 0;
 					}
-					else if (LCD_ButtonTouchDown(&FormPad->BtnF3, tpX, tpY))
-					{
-						if (pad_layer == 1)
-						{								
-							fRefresh = 1;
-							FormPad->FontBtnNum.FrontColor = CL_BLACK;		/* Êı×Ö°´Å¥ÓÃºÚÉ«×ÖÌå */
-							SetBtnText(PAD_ABC);
-							DispAllBtn();	/* Ö»Ë¢ĞÂ°´Å¥ */							
-							pad_layer = 0;
-						}
-						else
-						{						
-							return 0;			/* "·µ»Ø"; */
-						}
-					}				
-					else if (LCD_ButtonTouchDown(&FormPad->BtnF4, tpX, tpY))
-					{
-						;	/* "È·ÈÏ £¬µÈ°´Å¥ÊÍ·ÅÊ±ÔÙÈ·ÈÏĞŞ¸Ä */
-					}				
 					else
 					{
-						ucKeyValue = 0xFF;
-						if (LCD_ButtonTouchDown(&FormPad->Btn0, tpX, tpY))
-						{	
-							ucKeyValue = '0';							
-						}				
-						else if (LCD_ButtonTouchDown(&FormPad->Btn1, tpX, tpY))
+						return 0; /* "è¿”å›"; */
+					}
+				}
+				else if (LCD_ButtonTouchDown(&FormPad->BtnF4, tpX, tpY))
+				{
+					; /* "ç¡®è®¤ ï¼Œç­‰æŒ‰é’®é‡Šæ”¾æ—¶å†ç¡®è®¤ä¿®æ”¹ */
+				}
+				else
+				{
+					ucKeyValue = 0xFF;
+					if (LCD_ButtonTouchDown(&FormPad->Btn0, tpX, tpY))
+					{
+						ucKeyValue = '0';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn1, tpX, tpY))
+					{
+						ucKeyValue = '1';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn2, tpX, tpY))
+					{
+						ucKeyValue = '2';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn3, tpX, tpY))
+					{
+						ucKeyValue = '3';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn4, tpX, tpY))
+					{
+						ucKeyValue = '4';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn5, tpX, tpY))
+					{
+						ucKeyValue = '5';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn6, tpX, tpY))
+					{
+						ucKeyValue = '6';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn7, tpX, tpY))
+					{
+						ucKeyValue = '7';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn8, tpX, tpY))
+					{
+						ucKeyValue = '8';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->Btn9, tpX, tpY))
+					{
+						ucKeyValue = '9';
+					}
+					else if (LCD_ButtonTouchDown(&FormPad->BtnA, tpX, tpY))
+					{
+						ucKeyValue = 'A';
+					}
+					/* æ˜Ÿå·é”®ä¿®æ”¹ä¸ºå‡å·ï¼Œä¾¿äºæ•°ç ç®¡æ˜¾ç¤º ----- */
+					else if (LCD_ButtonTouchDown(&FormPad->BtnB, tpX, tpY))
+					{
+						ucKeyValue = 'B';
+					}
+
+					if (_Mode == NUMPAD_STR)
+					{
+						if (ucKeyValue != 0xFF)
 						{
-							ucKeyValue = '1';
-						}				
-						else if (LCD_ButtonTouchDown(&FormPad->Btn2, tpX, tpY))
-						{
-							ucKeyValue = '2';
-						}
-						else if (LCD_ButtonTouchDown(&FormPad->Btn3, tpX, tpY))
-						{
-							ucKeyValue = '3';
-						}
-						else if (LCD_ButtonTouchDown(&FormPad->Btn4, tpX, tpY))
-						{
-							ucKeyValue = '4';
-						}
-						else if (LCD_ButtonTouchDown(&FormPad->Btn5, tpX, tpY))
-						{
-							ucKeyValue = '5';
-						}	
-						else if (LCD_ButtonTouchDown(&FormPad->Btn6, tpX, tpY))
-						{
-							ucKeyValue = '6';
-						}	
-						else if (LCD_ButtonTouchDown(&FormPad->Btn7, tpX, tpY))
-						{
-							ucKeyValue = '7';
-						}
-						else if (LCD_ButtonTouchDown(&FormPad->Btn8, tpX, tpY))
-						{
-							ucKeyValue = '8';
-						}	
-						else if (LCD_ButtonTouchDown(&FormPad->Btn9, tpX, tpY))
-						{
-							ucKeyValue = '9';
-						}	
-						else if (LCD_ButtonTouchDown(&FormPad->BtnA, tpX, tpY))
-						{
-							ucKeyValue = 'A';
-						}
-						/* ĞÇºÅ¼üĞŞ¸ÄÎª¼õºÅ£¬±ãÓÚÊıÂë¹ÜÏÔÊ¾ ----- */
-						else if (LCD_ButtonTouchDown(&FormPad->BtnB, tpX, tpY))
-						{
-							ucKeyValue = 'B';
-						}
-							
-						if (_Mode == NUMPAD_STR)
-						{
-							if (ucKeyValue != 0xFF)
+							if (pad_layer == 0)
 							{
-								if (pad_layer == 0)
+								pad_layer = 1; /* è¿›å…¥2çº§é”®ç›˜ */
+								pad_key = ucKeyValue;
+
+								if (ucKeyValue == 'A')
 								{
-									pad_layer = 1;			/* ½øÈë2¼¶¼üÅÌ */
-									pad_key = ucKeyValue;		
-			
-									if (ucKeyValue == 'A')
-									{
-										SetBtnText(PAD_ABCA);
-									}
-									else if (ucKeyValue == 'B')
-									{
-										SetBtnText(PAD_ABCB);
-									}
-									else  if (ucKeyValue >= '0' && ucKeyValue <= '9')
-									{
-										SetBtnText(pad_key - '0' + PAD_ABC0);	/* ´¿Êı×Ö¼üÅÌ */
-									}		
-									else
-									{
-										continue;
-									}
-									FormPad->FontBtnNum.FrontColor = CL_BLUE;		/* Êı×Ö°´Å¥ÓÃÀ¶É«×ÖÌå */
-									DispAllBtn();	/* Ö»Ë¢ĞÂ°´Å¥ */
+									SetBtnText(PAD_ABCA);
+								}
+								else if (ucKeyValue == 'B')
+								{
+									SetBtnText(PAD_ABCB);
+								}
+								else if (ucKeyValue >= '0' && ucKeyValue <= '9')
+								{
+									SetBtnText(pad_key - '0' + PAD_ABC0); /* çº¯æ•°å­—é”®ç›˜ */
+								}
+								else
+								{
 									continue;
 								}
-								else		/* ÔÚ¶ş¼¶²Ëµ¥ */
-								{
-									ucKeyValue = GetCharPad(pad_key, ucKeyValue);	/* µÃµ½¾ßÌåµÄ×Ö·û */									
-									pad_layer = 2;
-																	
-									LCD_DrawEdit(&FormPad->Edit);
-								}
-							}								
+								FormPad->FontBtnNum.FrontColor = CL_BLUE; /* æ•°å­—æŒ‰é’®ç”¨è“è‰²å­—ä½“ */
+								DispAllBtn();															/* åªåˆ·æ–°æŒ‰é’® */
+								continue;
+							}
+							else /* åœ¨äºŒçº§èœå• */
+							{
+								ucKeyValue = GetCharPad(pad_key, ucKeyValue); /* å¾—åˆ°å…·ä½“çš„å­—ç¬¦ */
+								pad_layer = 2;
+
+								LCD_DrawEdit(&FormPad->Edit);
+							}
+						}
+					}
+					else
+					{
+						if (ucKeyValue == 'A')
+						{
+							ucKeyValue = '.';
+						}
+						else if (ucKeyValue == 'B')
+						{
+							ucKeyValue = '-';
+						}
+					}
+
+					if (ucKeyValue != 0xFF)
+					{
+						if (ucCursor < INPUT_MAX_LEN)
+						{
+							cEditBuf[ucCursor++] = ucKeyValue;
 						}
 						else
 						{
-							if (ucKeyValue == 'A')
+							cEditBuf[ucCursor - 1] = ucKeyValue; /* å…‰æ ‡ä¸ç§»åŠ¨ï¼Œæ›´æ–°æœ€å1ä¸ªæ•°å­— */
+						}
+						cEditBuf[ucCursor] = 0;
+						fRefresh = 1;
+					}
+				}
+				break;
+
+			case TOUCH_MOVE: /* è§¦ç¬”ç§»åŠ¨äº‹ä»¶ */
+				break;
+
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+
+				if (_Mode == NUMPAD_STR) /* è¾“å…¥å­—ç¬¦çš„åˆ†æ”¯ */
+				{
+					if (pad_layer == 2)
+					{
+						pad_layer = 0; /* è¿›å…¥2çº§é”®ç›˜ */
+
+						FormPad->FontBtnNum.FrontColor = CL_BLACK; /* æ•°å­—æŒ‰é’®ç”¨é»‘è‰²å­—ä½“ */
+						SetBtnText(PAD_ABC);
+						DispAllBtn(); /* åˆ·æ–°æŒ‰é’® */
+					}
+				}
+
+				LCD_ButtonTouchRelease(&FormPad->Btn0, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn1, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn2, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn3, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn4, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn5, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn6, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn7, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn8, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->Btn9, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->BtnA, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->BtnB, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->BtnF1, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->BtnF2, tpX, tpY);
+				LCD_ButtonTouchRelease(&FormPad->BtnF3, tpX, tpY);
+
+				if (LCD_ButtonTouchRelease(&FormPad->BtnF4, tpX, tpY)) /* F4é”® */
+				{
+					/* ç‚¹å‡»äº† ok æŒ‰é’® */
+					if (_Mode == NUMPAD_IP) /* IPåœ°å€è¾“å…¥æ¨¡å¼. å°†IPåœ°å€çš„4ä¸ªå­—æ®µè§£ç ä¸º4ä¸ªæ•´æ•° */
+					{
+						int32_t iIP;
+						uint8_t ucDotNum; /* å°æ•°ç‚¹ä¸ªæ•°ï¼Œç”¨äºåˆ¤æ–­æ•°æ®åˆæ³• */
+						int16_t i;
+						NUMPAD_IP_T *pIP = (NUMPAD_IP_T *)_pOutParam; /* IPåœ°å€è¾“å…¥æ¨¡å¼ */
+
+						ucDotNum = 0;
+						for (i = 0; i < ucCursor; i++)
+						{
+							if (cEditBuf[i] == '.')
 							{
-								ucKeyValue = '.';
-							}
-							else if (ucKeyValue == 'B')
-							{
-								ucKeyValue = '-';
+								ucDotNum++;
 							}
 						}
-	
-						if (ucKeyValue != 0xFF)
+						if (ucDotNum != 3) /* å¿…é¡»åŒ…æ‹¬3ä¸ªå°æ•°ç‚¹ */
 						{
-							if (ucCursor < INPUT_MAX_LEN)
-							{
-								cEditBuf[ucCursor++] = ucKeyValue;
-							}
-							else
-							{
-								cEditBuf[ucCursor - 1] = ucKeyValue;	/* ¹â±ê²»ÒÆ¶¯£¬¸üĞÂ×îºó1¸öÊı×Ö */
-							}			
-							cEditBuf[ucCursor] = 0;	
-							fRefresh = 1;		
+							DispInvlidInput(); /* æ˜¾ç¤ºè¾“å…¥æ— æ•ˆ */
+
+							fRefresh = 1;
 						}
-					}
-					break;
-
-				case TOUCH_MOVE:		/* ´¥±ÊÒÆ¶¯ÊÂ¼ş */
-					break;
-
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */	
-					
-					if (_Mode == NUMPAD_STR)	/* ÊäÈë×Ö·ûµÄ·ÖÖ§ */				
-					{
-						if (pad_layer == 2)
+						else
 						{
-							pad_layer = 0;			/* ½øÈë2¼¶¼üÅÌ */
-					
-							FormPad->FontBtnNum.FrontColor = CL_BLACK;		/* Êı×Ö°´Å¥ÓÃºÚÉ«×ÖÌå */
-							SetBtnText(PAD_ABC);
-							DispAllBtn();	/* Ë¢ĞÂ°´Å¥ */
-						}				
-					}
-				
-					LCD_ButtonTouchRelease(&FormPad->Btn0, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn1, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn2, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn3, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn4, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn5, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn6, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn7, tpX, tpY);			
-					LCD_ButtonTouchRelease(&FormPad->Btn8, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->Btn9, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->BtnA, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->BtnB, tpX, tpY);	
-					LCD_ButtonTouchRelease(&FormPad->BtnF1, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->BtnF2, tpX, tpY);
-					LCD_ButtonTouchRelease(&FormPad->BtnF3, tpX, tpY);		
-				
-					if (LCD_ButtonTouchRelease(&FormPad->BtnF4, tpX, tpY))	/* F4¼ü */
-					{
-						/* µã»÷ÁË ok °´Å¥ */
-						if (_Mode == NUMPAD_IP)			/* IPµØÖ·ÊäÈëÄ£Ê½. ½«IPµØÖ·µÄ4¸ö×Ö¶Î½âÂëÎª4¸öÕûÊı */
-						{
-							int32_t iIP;
-							uint8_t ucDotNum;	/* Ğ¡Êıµã¸öÊı£¬ÓÃÓÚÅĞ¶ÏÊı¾İºÏ·¨ */
-							int16_t i;
-							NUMPAD_IP_T *pIP = (NUMPAD_IP_T *)_pOutParam;	/* IPµØÖ·ÊäÈëÄ£Ê½ */
-
+							/* æœ‰3ä¸ªå°æ•°ç‚¹ï¼Œå¼€å§‹è§£ç IPåœ°å€ */
 							ucDotNum = 0;
+							iIP = 0;
 							for (i = 0; i < ucCursor; i++)
 							{
-								if (cEditBuf[i] == '.')
+								if ((cEditBuf[i] == '.') || (i == ucCursor - 1))
 								{
-									ucDotNum++;
-								}
-							}
-							if (ucDotNum != 3)	/* ±ØĞë°üÀ¨3¸öĞ¡Êıµã */
-							{
-								DispInvlidInput();	/* ÏÔÊ¾ÊäÈëÎŞĞ§ */
-
-								fRefresh = 1;
-							}
-							else
-							{
-								/* ÓĞ3¸öĞ¡Êıµã£¬¿ªÊ¼½âÂëIPµØÖ· */
-								ucDotNum = 0;
-								iIP = 0;
-								for (i = 0; i < ucCursor; i++)
-								{
-									if ((cEditBuf[i] == '.') || (i == ucCursor - 1))
-									{
-										if (i == ucCursor - 1)
-										{
-											iIP = iIP * 10 + cEditBuf[i] - '0';
-										}
-										if (iIP <= 255)
-										{
-											pIP->ip_buf[ucDotNum] = iIP;
-											ucDotNum++;
-
-											if (ucDotNum == 4)
-											{
-												return 1;	/* ·µ»ØÕıÈ·½á¹û */
-											}
-											iIP = 0;
-										}
-										else
-										{
-											DispInvlidInput();	/* ÏÔÊ¾ÊäÈëÎŞĞ§ */
-											fRefresh = 1;
-											break;
-										}
-									}
-									else
+									if (i == ucCursor - 1)
 									{
 										iIP = iIP * 10 + cEditBuf[i] - '0';
 									}
+									if (iIP <= 255)
+									{
+										pIP->ip_buf[ucDotNum] = iIP;
+										ucDotNum++;
+
+										if (ucDotNum == 4)
+										{
+											return 1; /* è¿”å›æ­£ç¡®ç»“æœ */
+										}
+										iIP = 0;
+									}
+									else
+									{
+										DispInvlidInput(); /* æ˜¾ç¤ºè¾“å…¥æ— æ•ˆ */
+										fRefresh = 1;
+										break;
+									}
+								}
+								else
+								{
+									iIP = iIP * 10 + cEditBuf[i] - '0';
 								}
 							}
 						}
-						else if (_Mode == NUMPAD_TEL)			/* µç»°ºÅÂëÊäÈëÄ£Ê½¡£ Ö±½Ó¸´ÖÆ½á¹û£¨Ğ¡ÊıµãÒÑÌáÇ°½ûÖ¹£© */
+					}
+					else if (_Mode == NUMPAD_TEL) /* ç”µè¯å·ç è¾“å…¥æ¨¡å¼ã€‚ ç›´æ¥å¤åˆ¶ç»“æœï¼ˆå°æ•°ç‚¹å·²æå‰ç¦æ­¢ï¼‰ */
+					{
+						if (ucCursor < 3)
 						{
-							if (ucCursor < 3)
-							{
-								DispInvlidInput();	/* ÏÔÊ¾ÊäÈëÎŞĞ§ */
-								fRefresh = 1;
-								break;
-							}
-
-							strcpy((char *)_pOutParam, cEditBuf);
-							return 1;	/* ·µ»ØÕıÈ·½á¹û */
+							DispInvlidInput(); /* æ˜¾ç¤ºè¾“å…¥æ— æ•ˆ */
+							fRefresh = 1;
+							break;
 						}
-						else if (_Mode == NUMPAD_INT)	/* NUMPAD_INT - ´øĞ¡ÊıµãÕûÊıÊäÈëÄ£Ê½ ¡¾¸Ã·ÖÖ§»¹Î´µ÷ÊÔ¡¿*/
-						{
-							int32_t iRet;
-							uint8_t ucDotNum;	/* Ğ¡Êıµã¸öÊı£¬ÓÃÓÚÅĞ¶ÏÊı¾İºÏ·¨ */
-							int16_t i;
-							NUMPAD_INT_T *pInt = (NUMPAD_INT_T *)_pInParam;	/* ´øĞ¡ÊıµãÕûÊıÊäÈëÄ£Ê½ */
 
-							ucDotNum = 0;
+						strcpy((char *)_pOutParam, cEditBuf);
+						return 1; /* è¿”å›æ­£ç¡®ç»“æœ */
+					}
+					else if (_Mode == NUMPAD_INT) /* NUMPAD_INT - å¸¦å°æ•°ç‚¹æ•´æ•°è¾“å…¥æ¨¡å¼ ã€è¯¥åˆ†æ”¯è¿˜æœªè°ƒè¯•ã€‘*/
+					{
+						int32_t iRet;
+						uint8_t ucDotNum; /* å°æ•°ç‚¹ä¸ªæ•°ï¼Œç”¨äºåˆ¤æ–­æ•°æ®åˆæ³• */
+						int16_t i;
+						NUMPAD_INT_T *pInt = (NUMPAD_INT_T *)_pInParam; /* å¸¦å°æ•°ç‚¹æ•´æ•°è¾“å…¥æ¨¡å¼ */
+
+						ucDotNum = 0;
+						for (i = 0; i < ucCursor; i++)
+						{
+							if (cEditBuf[i] == '.')
+							{
+								ucDotNum++;
+							}
+						}
+						if (ucDotNum > 1)
+						{
+							/* å°æ•°ç‚¹ä¸ªæ•°å¤§äº1 */
+							iRet = -1;
+						}
+						else if (ucDotNum == 1) /* 1ä¸ªå°æ•°ç‚¹ */
+						{
+							int32_t iDotValue;
+							int32_t iMult;
+
+							/* å…ˆå¤„ç†å°æ•°ç‚¹å‰é¢çš„æ•°å­— */
+							iRet = 0;
 							for (i = 0; i < ucCursor; i++)
 							{
 								if (cEditBuf[i] == '.')
 								{
-									ucDotNum++;
+									break;
 								}
+								iRet *= 10;
+								iRet += cEditBuf[i] - '0';
 							}
-							if (ucDotNum > 1)
-							{
-								/* Ğ¡Êıµã¸öÊı´óÓÚ1 */
-								iRet = -1;
-							}
-							else if (ucDotNum == 1)	/* 1¸öĞ¡Êıµã */
-							{
-								int32_t iDotValue;
-								int32_t iMult;
+							iRet *= 1000;
 
-								/* ÏÈ´¦ÀíĞ¡ÊıµãÇ°ÃæµÄÊı×Ö */
-								iRet = 0;
-								for (i = 0; i <  ucCursor; i++)
-								{
-									if (cEditBuf[i] == '.')
-									{
-										break;
-									}
-									iRet *= 10;
-									iRet += cEditBuf[i] - '0';
-								}
-								iRet *= 1000;
-
-								/* ÔÙ´¦ÀíĞ¡ÊıµãºóÃæµÄÊı×Ö */
-								iDotValue = 0;
-								iMult = 100;
-								i++;
-								for ( ; i <  ucCursor; i++)
-								{
-									iDotValue += iMult * (cEditBuf[i] - '0');
-									iMult /= 10;
-								}
-
-								iRet += iDotValue;
-							}
-							else
+							/* å†å¤„ç†å°æ•°ç‚¹åé¢çš„æ•°å­— */
+							iDotValue = 0;
+							iMult = 100;
+							i++;
+							for (; i < ucCursor; i++)
 							{
-								/* È«²¿ÕûÊı */
-								iRet = 0;
-								for (i = 0; i <  ucCursor; i++)
-								{
-									iRet *= 10;
-									iRet += cEditBuf[i] - '0';
-								}
+								iDotValue += iMult * (cEditBuf[i] - '0');
+								iMult /= 10;
 							}
 
-							if ((ucCursor == 0) || (iRet < pInt->Min) || (iRet > pInt->Max ))
+							iRet += iDotValue;
+						}
+						else
+						{
+							/* å…¨éƒ¨æ•´æ•° */
+							iRet = 0;
+							for (i = 0; i < ucCursor; i++)
 							{
-								DispInvlidInput();	/* ÏÔÊ¾ÊäÈëÎŞĞ§ */
-
-								DispFormPad();	/* ÖØË¢½çÃæ */
-								fRefresh = 1;
-							}
-							else
-							{
-								strcpy((char *)_pOutParam, cEditBuf);
-								return 1;	/* ·µ»ØÓĞĞ§ÊäÈë */
+								iRet *= 10;
+								iRet += cEditBuf[i] - '0';
 							}
 						}
-						else if (_Mode == NUMPAD_STR)	/* ÊäÈë×Ö·ûµÄ·ÖÖ§ */
+
+						if ((ucCursor == 0) || (iRet < pInt->Min) || (iRet > pInt->Max))
 						{
-							uint8_t len = *(uint8_t *)_pInParam;								
-							
-							/* ¶Ô×Ö·û´®³¤¶È½øĞĞÏŞÖÆ */
-							if (ucCursor > len)
-							{
-								DispInvlidInput();	/* ÏÔÊ¾ÊäÈëÎŞĞ§ */
-								DispFormPad();	/* ÖØË¢½çÃæ */
-								fRefresh = 1;
-								break;
-							}
-							strcpy((char *)_pOutParam, cEditBuf);							
-							return 1;	/* ·µ»ØÕıÈ·½á¹û */							
+							DispInvlidInput(); /* æ˜¾ç¤ºè¾“å…¥æ— æ•ˆ */
+
+							DispFormPad(); /* é‡åˆ·ç•Œé¢ */
+							fRefresh = 1;
+						}
+						else
+						{
+							strcpy((char *)_pOutParam, cEditBuf);
+							return 1; /* è¿”å›æœ‰æ•ˆè¾“å…¥ */
 						}
 					}
-					break;
+					else if (_Mode == NUMPAD_STR) /* è¾“å…¥å­—ç¬¦çš„åˆ†æ”¯ */
+					{
+						uint8_t len = *(uint8_t *)_pInParam;
+
+						/* å¯¹å­—ç¬¦ä¸²é•¿åº¦è¿›è¡Œé™åˆ¶ */
+						if (ucCursor > len)
+						{
+							DispInvlidInput(); /* æ˜¾ç¤ºè¾“å…¥æ— æ•ˆ */
+							DispFormPad();		 /* é‡åˆ·ç•Œé¢ */
+							fRefresh = 1;
+							break;
+						}
+						strcpy((char *)_pOutParam, cEditBuf);
+						return 1; /* è¿”å›æ­£ç¡®ç»“æœ */
+					}
+				}
+				break;
 			}
 		}
 	}
@@ -724,10 +985,10 @@ uint8_t InputNumber(NUMPAD_MODE_E _Mode, char *_Caption, void *_pInParam, void *
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû£ºDispInvlidInput
-*	¹¦ÄÜËµÃ÷£ºÏÔÊ¾ÊäÈëÎŞĞ§Ğ¡´°¿Ú£¬ÑÓ³Ù2Ãë
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ£ºÎŞ
+*	å‡½ æ•° åï¼šDispInvlidInput
+*	åŠŸèƒ½è¯´æ˜ï¼šæ˜¾ç¤ºè¾“å…¥æ— æ•ˆå°çª—å£ï¼Œå»¶è¿Ÿ2ç§’
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼ï¼šæ— 
 *********************************************************************************************************
 */
 void DispInvlidInput(void)
@@ -736,12 +997,12 @@ void DispInvlidInput(void)
 	LABEL_T tLable;
 	FONT_T tFont;
 
-	tFont.FontCode = FC_ST_16;			/* ×ÖÌå´úÂë 16µãÕó */
-	tFont.FrontColor = CL_RED;			/* ×ÖÌåÑÕÉ« */
-	tFont.BackColor = CL_MASK;			/* ÎÄ×Ö±³¾°ÑÕÉ« */
-	tFont.Space = 0;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+	tFont.FontCode = FC_ST_16; /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+	tFont.FrontColor = CL_RED; /* å­—ä½“é¢œè‰² */
+	tFont.BackColor = CL_MASK; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+	tFont.Space = 0;					 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-	/* »æÖÆÖ÷´°Ìå */
+	/* ç»˜åˆ¶ä¸»çª—ä½“ */
 	tWin.Font = &tFont;
 
 	tWin.Left = WIN_INVALID_X;
@@ -755,7 +1016,7 @@ void DispInvlidInput(void)
 	tLable.Left = LABLE_INVALID_X;
 	tLable.Top = LABLE_INVALID_Y;
 	tLable.MaxLen = 0;
-	tLable.pCaption = "ÊäÈëÎŞĞ§!";
+	tLable.pCaption = "è¾“å…¥æ— æ•ˆ!";
 	LCD_DrawLabel(&tLable);
 
 	bsp_DelayMS(2000);
@@ -763,10 +1024,10 @@ void DispInvlidInput(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ClearWinNumPad
-*	¹¦ÄÜËµÃ÷£ºÇå³ıÊı×Ö¼üÅÌ´°¿Ú£¨ÓÃÓÚÖ÷½çÃæÖØ»æ)
-*	ĞÎ    ²Î£º_usColor : µ×É«
-*	·µ »Ø Öµ£ºÎŞ
+*	å‡½ æ•° å: ClearWinNumPad
+*	åŠŸèƒ½è¯´æ˜ï¼šæ¸…é™¤æ•°å­—é”®ç›˜çª—å£ï¼ˆç”¨äºä¸»ç•Œé¢é‡ç»˜)
+*	å½¢    å‚ï¼š_usColor : åº•è‰²
+*	è¿” å› å€¼ï¼šæ— 
 *********************************************************************************************************
 */
 void ClearWinNumPad(uint16_t _usColor)
@@ -776,96 +1037,97 @@ void ClearWinNumPad(uint16_t _usColor)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormPad
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ, ×ø±ê¡¢×ÖÌå
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormPad
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§, åæ ‡ã€å­—ä½“
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormPad(void)
 {
-	/* ×ÖÌå1  */
+	/* å­—ä½“1  */
 	FormPad->FontBlack.FontCode = FC_ST_16;
-	FormPad->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormPad->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormPad->FontBlack.FrontColor = CL_BLACK;
 	FormPad->FontBlack.Space = 0;
 
-	/* ×ÖÌå À¶É« */
+	/* å­—ä½“ è“è‰² */
 	FormPad->FontBlue.FontCode = FC_ST_16;
 	FormPad->FontBlue.BackColor = CL_BTN_FACE;
 	FormPad->FontBlue.FrontColor = CL_BLUE;
 	FormPad->FontBlue.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormPad->FontBtn.FontCode = FC_ST_16;
-	FormPad->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormPad->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormPad->FontBtn.FrontColor = CL_BLACK;
 	FormPad->FontBtn.Space = 0;
 
 	FormPad->FontBtnNum.FontCode = FC_ST_16;
-	FormPad->FontBtnNum.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormPad->FontBtnNum.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormPad->FontBtnNum.FrontColor = CL_BLACK;
-	FormPad->FontBtnNum.Space = 0;	
+	FormPad->FontBtnNum.Space = 0;
 
-	/* WIN×ÖÌå */
+	/* WINå­—ä½“ */
 	FormPad->FontWin.FontCode = FC_ST_16;
-	FormPad->FontWin.BackColor = CL_MASK;	/* Í¸Ã÷É« */
+	FormPad->FontWin.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormPad->FontWin.FrontColor = CL_WHITE;
 	FormPad->FontWin.Space = 0;
 
-	/* Edit×ÖÌå */
+	/* Editå­—ä½“ */
 	FormPad->FontEdit.FontCode = FC_ST_16;
-	FormPad->FontEdit.BackColor = CL_MASK;	/* Í¸Ã÷É« */
+	FormPad->FontEdit.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormPad->FontEdit.FrontColor = CL_RED;
 	FormPad->FontEdit.Space = 0;
 
 	/* win */
-	FormPad->Win.Font = &FormPad->FontWin;;
+	FormPad->Win.Font = &FormPad->FontWin;
+	;
 	FormPad->Win.Left = WIN_NUM_X;
 	FormPad->Win.Top = WIN_NUM_Y;
 	FormPad->Win.Height = WIN_NUM_H;
 	FormPad->Win.Width = WIN_NUM_W;
-	FormPad->Win.pCaption = FormPad->pTitle;	/* ĞÎ²Î£¬È«¾ÖµÄ */
-	
+	FormPad->Win.pCaption = FormPad->pTitle; /* å½¢å‚ï¼Œå…¨å±€çš„ */
+
 	/* Edit */
 	FormPad->Edit.Font = &FormPad->FontEdit;
 	FormPad->Edit.Left = EDIT_NUM_X;
 	FormPad->Edit.Top = EDIT_NUM_Y;
 	FormPad->Edit.Height = EDIT_NUM_H;
-	FormPad->Edit.Width = EDIT_NUM_W;	
+	FormPad->Edit.Width = EDIT_NUM_W;
 	FormPad->Edit.pCaption = FormPad->pEditText;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	// LCD_InitButton(BUTTON_T *_btn, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w, char *_pCaption, FONT_T *_pFont);
-	LCD_InitButton(&FormPad->Btn0,  BTN0_X,  BTN0_Y,  BTN_H, BTN_W, "0", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn1,  BTN1_X,  BTN1_Y,  BTN_H, BTN_W, "1", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn2,  BTN2_X,  BTN2_Y,  BTN_H, BTN_W, "2", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn3,  BTN3_X,  BTN3_Y,  BTN_H, BTN_W, "3", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn4,  BTN4_X,  BTN4_Y,  BTN_H, BTN_W, "4", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn5,  BTN5_X,  BTN5_Y,  BTN_H, BTN_W, "5", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn6,  BTN6_X,  BTN6_Y,  BTN_H, BTN_W, "6", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn7,  BTN7_X,  BTN7_Y,  BTN_H, BTN_W, "7", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn8,  BTN8_X,  BTN8_Y,  BTN_H, BTN_W, "8", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->Btn9,  BTN9_X,  BTN9_Y,  BTN_H, BTN_W, "9", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->BtnA,  BTNA_X,  BTNA_Y,  BTN_H, BTN_W, ".", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->BtnB,  BTNB_X,  BTNB_Y,  BTN_H, BTN_W, "-", &FormPad->FontBtnNum);
-	LCD_InitButton(&FormPad->BtnF1, BTNF1_X, BTNF1_Y, BTN_H, BTN_W, "ÍË¸ñ", &FormPad->FontBtn);
-	LCD_InitButton(&FormPad->BtnF2, BTNF2_X, BTNF2_Y, BTN_H, BTN_W, "Çå³ı", &FormPad->FontBtn);
-	LCD_InitButton(&FormPad->BtnF3, BTNF3_X, BTNF3_Y, BTN_H, BTN_W, "·µ»Ø", &FormPad->FontBtn);
-	LCD_InitButton(&FormPad->BtnF4, BTNF4_X, BTNF4_Y, BTN_H, BTN_W, "È·ÈÏ", &FormPad->FontBtn);	
+	LCD_InitButton(&FormPad->Btn0, BTN0_X, BTN0_Y, BTN_H, BTN_W, "0", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn1, BTN1_X, BTN1_Y, BTN_H, BTN_W, "1", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn2, BTN2_X, BTN2_Y, BTN_H, BTN_W, "2", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn3, BTN3_X, BTN3_Y, BTN_H, BTN_W, "3", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn4, BTN4_X, BTN4_Y, BTN_H, BTN_W, "4", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn5, BTN5_X, BTN5_Y, BTN_H, BTN_W, "5", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn6, BTN6_X, BTN6_Y, BTN_H, BTN_W, "6", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn7, BTN7_X, BTN7_Y, BTN_H, BTN_W, "7", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn8, BTN8_X, BTN8_Y, BTN_H, BTN_W, "8", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->Btn9, BTN9_X, BTN9_Y, BTN_H, BTN_W, "9", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->BtnA, BTNA_X, BTNA_Y, BTN_H, BTN_W, ".", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->BtnB, BTNB_X, BTNB_Y, BTN_H, BTN_W, "-", &FormPad->FontBtnNum);
+	LCD_InitButton(&FormPad->BtnF1, BTNF1_X, BTNF1_Y, BTN_H, BTN_W, "é€€æ ¼", &FormPad->FontBtn);
+	LCD_InitButton(&FormPad->BtnF2, BTNF2_X, BTNF2_Y, BTN_H, BTN_W, "æ¸…é™¤", &FormPad->FontBtn);
+	LCD_InitButton(&FormPad->BtnF3, BTNF3_X, BTNF3_Y, BTN_H, BTN_W, "è¿”å›", &FormPad->FontBtn);
+	LCD_InitButton(&FormPad->BtnF4, BTNF4_X, BTNF4_Y, BTN_H, BTN_W, "ç¡®è®¤", &FormPad->FontBtn);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SetBtnText
-*	¹¦ÄÜËµÃ÷: ÇĞ»»ÊäÈë°´Å¥µÄÎÄ×Ö¡£ 0-9 ¹²12¸ö°´Å¥¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SetBtnText
+*	åŠŸèƒ½è¯´æ˜: åˆ‡æ¢è¾“å…¥æŒ‰é’®çš„æ–‡å­—ã€‚ 0-9 å…±12ä¸ªæŒ‰é’®ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void SetBtnText(uint8_t _mode)
-{	
-	if (_mode == PAD_DIGIT)		/* ´¿Êı×Ö */
+{
+	if (_mode == PAD_DIGIT) /* çº¯æ•°å­— */
 	{
 		FormPad->Btn0.pCaption = "0";
 		FormPad->Btn1.pCaption = "1";
@@ -878,12 +1140,12 @@ static void SetBtnText(uint8_t _mode)
 		FormPad->Btn8.pCaption = "8";
 		FormPad->Btn9.pCaption = "9";
 		FormPad->BtnA.pCaption = ".";
-		FormPad->BtnB.pCaption = "-";		
+		FormPad->BtnB.pCaption = "-";
 	}
-	else if (_mode == PAD_ABC)	/* Êı×ÖºÍ×Ö·û»ìºÏ */
+	else if (_mode == PAD_ABC) /* æ•°å­—å’Œå­—ç¬¦æ··åˆ */
 	{
-		FormPad->Btn0.pCaption = "0 ·ûºÅ";
-		FormPad->Btn1.pCaption = "1 Êı×Ö";
+		FormPad->Btn0.pCaption = "0 ç¬¦å·";
+		FormPad->Btn1.pCaption = "1 æ•°å­—";
 		FormPad->Btn2.pCaption = "2 abc";
 		FormPad->Btn3.pCaption = "3 def";
 		FormPad->Btn4.pCaption = "4 ghi";
@@ -893,14 +1155,14 @@ static void SetBtnText(uint8_t _mode)
 		FormPad->Btn8.pCaption = "8 tuv";
 		FormPad->Btn9.pCaption = "9 wxyz";
 		FormPad->BtnA.pCaption = ".";
-		FormPad->BtnB.pCaption = "-";		
+		FormPad->BtnB.pCaption = "-";
 	}
-	else if (_mode >= PAD_ABC0 && _mode <= PAD_ABCB)	/* Êı×ÖºÍ×Ö·û»ìºÏ 0 °´ÏÂºóµÄ¶ş¼¶¼üÅÌ */
+	else if (_mode >= PAD_ABC0 && _mode <= PAD_ABCB) /* æ•°å­—å’Œå­—ç¬¦æ··åˆ 0 æŒ‰ä¸‹åçš„äºŒçº§é”®ç›˜ */
 	{
 		uint8_t index1;
-		
+
 		index1 = _mode - PAD_ABC0;
-		
+
 		FormPad->Btn0.pCaption = (char *)g_key_tab[index1 * 12];
 		FormPad->Btn1.pCaption = (char *)g_key_tab[index1 * 12 + 1];
 		FormPad->Btn2.pCaption = (char *)g_key_tab[index1 * 12 + 2];
@@ -913,9 +1175,9 @@ static void SetBtnText(uint8_t _mode)
 		FormPad->Btn9.pCaption = (char *)g_key_tab[index1 * 12 + 9];
 		FormPad->BtnA.pCaption = (char *)g_key_tab[index1 * 12 + 10];
 		FormPad->BtnB.pCaption = (char *)g_key_tab[index1 * 12 + 11];
-		
-		/* Ö»ÏÔÊ¾Êı×Ö²¿·Ö */
-		LCD_DrawButton(&FormPad->Btn0);	
+
+		/* åªæ˜¾ç¤ºæ•°å­—éƒ¨åˆ† */
+		LCD_DrawButton(&FormPad->Btn0);
 		LCD_DrawButton(&FormPad->Btn1);
 		LCD_DrawButton(&FormPad->Btn2);
 		LCD_DrawButton(&FormPad->Btn3);
@@ -928,23 +1190,23 @@ static void SetBtnText(uint8_t _mode)
 		LCD_DrawButton(&FormPad->Btn8);
 		LCD_DrawButton(&FormPad->Btn9);
 		LCD_DrawButton(&FormPad->BtnA);
-		LCD_DrawButton(&FormPad->BtnB);						
+		LCD_DrawButton(&FormPad->BtnB);
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: GetCharPad
-*	¹¦ÄÜËµÃ÷: ¸ù¾İ²Ëµ¥ID»ñµÃ¾ßÌåµÄ×Ö·û
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: GetCharPad
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®èœå•IDè·å¾—å…·ä½“çš„å­—ç¬¦
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static uint8_t GetCharPad(uint8_t _key1, uint8_t _key2)
 {
 	uint8_t index1, index2;
 	char *p;
-	
+
 	if (_key1 >= '0' && _key1 <= '9')
 	{
 		index1 = _key1 - '0';
@@ -956,7 +1218,7 @@ static uint8_t GetCharPad(uint8_t _key1, uint8_t _key2)
 	else if (_key1 == 'B')
 	{
 		index1 = 11;
-	}	
+	}
 	else
 	{
 		index1 = 0;
@@ -973,29 +1235,29 @@ static uint8_t GetCharPad(uint8_t _key1, uint8_t _key2)
 	else if (_key2 == 'B')
 	{
 		index2 = 11;
-	}	
+	}
 	else
 	{
 		index2 = 0;
-	}	
-	
+	}
+
 	p = (char *)g_key_tab[index1 * 12 + index2];
-			
+
 	return p[0];
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispAllBtn
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ°´Å¥¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispAllBtn
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æŒ‰é’®æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispAllBtn(void)
 {
-	/* °´Å¥ */
-	LCD_DrawButton(&FormPad->Btn0);	
+	/* æŒ‰é’® */
+	LCD_DrawButton(&FormPad->Btn0);
 	LCD_DrawButton(&FormPad->Btn1);
 	LCD_DrawButton(&FormPad->Btn2);
 	LCD_DrawButton(&FormPad->Btn3);
@@ -1017,10 +1279,10 @@ static void DispAllBtn(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormPad
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormPad
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormPad(void)
@@ -1030,4 +1292,4 @@ static void DispFormPad(void)
 	LCD_DrawEdit(&FormPad->Edit);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

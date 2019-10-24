@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : MODBUS´ÓÕ¾Í¨ĞÅÄ£¿é
-*	ÎÄ¼şÃû³Æ : modbus_slave.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : MODBUSä»ç«™é€šä¿¡æ¨¡å—
+*	æ–‡ä»¶åç§° : modbus_slave.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,17 +14,17 @@
 #ifndef __MODBUS_SLAVE_H
 #define __MODBUS_SLAVE_H
 
-/* RTU Ó¦´ğ´úÂë */
-#define RSP_OK				0		/* ³É¹¦ */
-#define RSP_ERR_CMD			0x01	/* ²»Ö§³ÖµÄ¹¦ÄÜÂë */
-#define RSP_ERR_REG_ADDR	0x02	/* ¼Ä´æÆ÷µØÖ·´íÎó */
-#define RSP_ERR_VALUE		0x03	/* Êı¾İÖµÓò´íÎó */
-#define RSP_ERR_WRITE		0x04	/* Ğ´ÈëÊ§°Ü */
+/* RTU åº”ç­”ä»£ç  */
+#define RSP_OK 0							/* æˆåŠŸ */
+#define RSP_ERR_CMD 0x01			/* ä¸æ”¯æŒçš„åŠŸèƒ½ç  */
+#define RSP_ERR_REG_ADDR 0x02 /* å¯„å­˜å™¨åœ°å€é”™è¯¯ */
+#define RSP_ERR_VALUE 0x03		/* æ•°æ®å€¼åŸŸé”™è¯¯ */
+#define RSP_ERR_WRITE 0x04		/* å†™å…¥å¤±è´¥ */
 
-#define ERR_PACKAGE			0x05	/* ×Ô¼º¶¨Òå´íÎó°üÓ¦´ğ */
+#define ERR_PACKAGE 0x05 /* è‡ªå·±å®šä¹‰é”™è¯¯åŒ…åº”ç­” */
 
-#define RX_BUF_SIZE	     (2 * 1024)
-#define TX_BUF_SIZE      (2 * 1024)
+#define RX_BUF_SIZE (2 * 1024)
+#define TX_BUF_SIZE (2 * 1024)
 
 typedef struct
 {
@@ -37,27 +37,27 @@ typedef struct
 
 	uint8_t TxBuf[TX_BUF_SIZE];
 	uint16_t TxCount;
-	
-	/*MODBUS TCPÍ·²¿*/
+
+	/*MODBUS TCPå¤´éƒ¨*/
 	uint8_t TCP_Head[6];
 	uint8_t TCP_Flag;
-}MODS_T;
+} MODS_T;
 
-/* ´«µİ²¨ĞÎÊı¾İµÄÍ¨ĞÅ½á¹¹ 60H¹¦ÄÜÂë×¨ÓÃ */
+/* ä¼ é€’æ³¢å½¢æ•°æ®çš„é€šä¿¡ç»“æ„ 60HåŠŸèƒ½ç ä¸“ç”¨ */
 typedef struct
 {
-	/* ±£´æPC»úµÄÖ¸Áî²ÎÊı */
-	uint32_t ChEn;	/* bit0 ±íÊ¾CH1£¬ bit1±íÊ¾CH2 */
-	uint32_t SampleSize;	/* Ã¿¸öÍ¨µÀÑù±¾¸öÊı */
-	uint16_t PackageSize;	/* Ã¿Í¨ĞÅ°üÑù±¾³¤¶È. µ¥Î»Îª1¸öÑù±¾ */
+	/* ä¿å­˜PCæœºçš„æŒ‡ä»¤å‚æ•° */
+	uint32_t ChEn;				/* bit0 è¡¨ç¤ºCH1ï¼Œ bit1è¡¨ç¤ºCH2 */
+	uint32_t SampleSize;	/* æ¯ä¸ªé€šé“æ ·æœ¬ä¸ªæ•° */
+	uint16_t PackageSize; /* æ¯é€šä¿¡åŒ…æ ·æœ¬é•¿åº¦. å•ä½ä¸º1ä¸ªæ ·æœ¬ */
 	uint32_t SampleOffset;
-	
-	/* Í¨ĞÅ¹ı³ÌÖĞ£¬¿ØÖÆ½ø¶È */
-	uint32_t TransPos;		/* Ñù±¾»º³åÇøµÄµ±Ç°Î»ÖÃ */
-	uint8_t StartTrans;		/* ¿ªÊ¼´«Êä²¨ĞÎµÄ±êÖ¾ */
-}MOD_WAVE_T;
 
-void uart_rx_isr(void);		/* ÔÚ stm8s_it.c ÖĞµ÷ÓÃ */
+	/* é€šä¿¡è¿‡ç¨‹ä¸­ï¼Œæ§åˆ¶è¿›åº¦ */
+	uint32_t TransPos;	/* æ ·æœ¬ç¼“å†²åŒºçš„å½“å‰ä½ç½® */
+	uint8_t StartTrans; /* å¼€å§‹ä¼ è¾“æ³¢å½¢çš„æ ‡å¿— */
+} MOD_WAVE_T;
+
+void uart_rx_isr(void); /* åœ¨ stm8s_it.c ä¸­è°ƒç”¨ */
 uint8_t AnalyzeCmd(uint8_t *_DispBuf);
 uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len);
 void MODS_SendAckErr(uint8_t _ucErrCode);
@@ -69,4 +69,4 @@ extern MOD_WAVE_T g_tModWave;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

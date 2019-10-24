@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : STM32F4 ÄÚÖÃETH MAC Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_eth.h
-*	°æ    ±¾ : V2.4
-*	Ëµ    Ã÷ : °²¸»À³STM32-V5¿ª·¢°åÍâÀ©µÄMACÎª DM9161
+*	æ¨¡å—åç§° : STM32F4 å†…ç½®ETH MAC é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_eth.h
+*	ç‰ˆ    æœ¬ : V2.4
+*	è¯´    æ˜ : å®‰å¯Œè±STM32-V5å¼€å‘æ¿å¤–æ‰©çš„MACä¸º DM9161
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -16,43 +16,41 @@
 #define __BSP_ETH_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 
-/* ¶¨Òå ETH_PHY ÖĞ¶Ï¿ÚÏß PH6  used to manage Ethernet link status */
-#define ETH_LINK_EXTI_LINE             EXTI_Line6
-#define ETH_LINK_EXTI_PORT_SOURCE      EXTI_PortSourceGPIOH
-#define ETH_LINK_EXTI_PIN_SOURCE       EXTI_PinSource6
-#define ETH_LINK_EXTI_IRQn             EXTI9_5_IRQn			/* ÖĞ¶ÏºÅ£¬ÔÚstm32f4xx.h ÖĞ¶¨Òå */
+/* å®šä¹‰ ETH_PHY ä¸­æ–­å£çº¿ PH6  used to manage Ethernet link status */
+#define ETH_LINK_EXTI_LINE EXTI_Line6
+#define ETH_LINK_EXTI_PORT_SOURCE EXTI_PortSourceGPIOH
+#define ETH_LINK_EXTI_PIN_SOURCE EXTI_PinSource6
+#define ETH_LINK_EXTI_IRQn EXTI9_5_IRQn /* ä¸­æ–­å·ï¼Œåœ¨stm32f4xx.h ä¸­å®šä¹‰ */
 
-#define ETH_LINK_PIN                   GPIO_Pin_6
-#define ETH_LINK_GPIO_PORT             GPIOH
-#define ETH_LINK_GPIO_CLK              RCC_AHB1Periph_GPIOH
+#define ETH_LINK_PIN GPIO_Pin_6
+#define ETH_LINK_GPIO_PORT GPIOH
+#define ETH_LINK_GPIO_CLK RCC_AHB1Periph_GPIOH
 
-
-#define PHY_ADDRESS      0x00 	/* µØÖ·ÓĞDM9161µÄRXD0 - RXD3 ¾ö¶¨£¬ÉÏµç¸´Î»Ê±Ëø´æ. °²¸»À³STM32-V5¿ª·¢°åµØÖ·ÊÇ0 */
-
+#define PHY_ADDRESS 0x00 /* åœ°å€æœ‰DM9161çš„RXD0 - RXD3 å†³å®šï¼Œä¸Šç”µå¤ä½æ—¶é”å­˜. å®‰å¯Œè±STM32-V5å¼€å‘æ¿åœ°å€æ˜¯0 */
 
 /* PHY registers */
-#define PHY_MICR                  0x11 	/* MII Interrupt Control Register */
-#define PHY_MICR_INT_EN           ((uint16_t)0x0002) /* PHY Enable interrupts */
-#define PHY_MICR_INT_OE           ((uint16_t)0x0001) /* PHY Enable output interrupt events */
-#define PHY_MISR                  0x12 /* MII Interrupt Status and Misc. Control Register */
-#define PHY_MISR_LINK_INT_EN      ((uint16_t)0x0020) /* Enable Interrupt on change of link status */
-#define PHY_LINK_STATUS           ((uint16_t)0x2000) /* PHY link status interrupt mask */
+#define PHY_MICR 0x11                           /* MII Interrupt Control Register */
+#define PHY_MICR_INT_EN ((uint16_t)0x0002)      /* PHY Enable interrupts */
+#define PHY_MICR_INT_OE ((uint16_t)0x0001)      /* PHY Enable output interrupt events */
+#define PHY_MISR 0x12                           /* MII Interrupt Status and Misc. Control Register */
+#define PHY_MISR_LINK_INT_EN ((uint16_t)0x0020) /* Enable Interrupt on change of link status */
+#define PHY_LINK_STATUS ((uint16_t)0x2000)      /* PHY link status interrupt mask */
 
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
-void  ETH_BSP_Config(void);
-uint32_t Eth_Link_PHYITConfig(uint16_t PHYAddress);
-void Eth_Link_EXTIConfig(void);
-void Eth_Link_ITHandler(uint16_t PHYAddress);
+  /* Exported macro ------------------------------------------------------------*/
+  /* Exported functions ------------------------------------------------------- */
+  void ETH_BSP_Config(void);
+  uint32_t Eth_Link_PHYITConfig(uint16_t PHYAddress);
+  void Eth_Link_EXTIConfig(void);
+  void Eth_Link_ITHandler(uint16_t PHYAddress);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* __STM32F4x7_ETH_BSP_H */
-
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

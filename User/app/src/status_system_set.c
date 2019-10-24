@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÏµÍ³ÉèÖÃÖ÷³ÌĞò
-*	ÎÄ¼şÃû³Æ : status_system_set.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ìá¹©Ò»¸ö²Ëµ¥Ñ¡Ôñ×Ó¹¦ÄÜ.
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-12-06  armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : ç³»ç»Ÿè®¾ç½®ä¸»ç¨‹åº
+*	æ–‡ä»¶åç§° : status_system_set.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æä¾›ä¸€ä¸ªèœå•é€‰æ‹©å­åŠŸèƒ½.
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-12-06  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -22,43 +22,41 @@
 #include "usbd_user.h"
 
 const uint8_t *g_Menu1_Text[] =
-{
-	" 1 Ó²¼şĞÅÏ¢",
-	" 2 USB×ª´®¿ÚÄ£Ê½",
-	" 3 ESP32¹Ì¼şÉı¼¶",
-	
-	/* ½áÊø·ûºÅ, ÓÃÓÚ²Ëµ¥º¯Êı×Ô¶¯Ê¶±ğ²Ëµ¥Ïî¸öÊı */
-  	"&"
-};
+		{
+				" 1 ç¡¬ä»¶ä¿¡æ¯",
+				" 2 USBè½¬ä¸²å£æ¨¡å¼",
+				" 3 ESP32å›ºä»¶å‡çº§",
+
+				/* ç»“æŸç¬¦å·, ç”¨äºèœå•å‡½æ•°è‡ªåŠ¨è¯†åˆ«èœå•é¡¹ä¸ªæ•° */
+				"&"};
 
 MENU_T g_tMenu1;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_SystemSetMain
-*	¹¦ÄÜËµÃ÷: ÏµÍ³ÉèÖÃ×´Ì¬. ²Ëµ¥Ñ¡Ôñ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_SystemSetMain
+*	åŠŸèƒ½è¯´æ˜: ç³»ç»Ÿè®¾ç½®çŠ¶æ€. èœå•é€‰æ‹©
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_SystemSetMain(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	uint8_t ucFirstKey = 1;	
+	FONT_T tFont; /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+	uint8_t ucFirstKey = 1;
 	static uint8_t s_enter_sub_menu = 0;
 
-	DispHeader("ÏµÍ³ÉèÖÃ");
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
-	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-	}
+	DispHeader("ç³»ç»Ÿè®¾ç½®");
 
+	/* è®¾ç½®å­—ä½“å‚æ•° */
+	{
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+	}
 
 	if (s_enter_sub_menu == 0)
 	{
@@ -68,79 +66,79 @@ void status_SystemSetMain(void)
 		g_tMenu1.Width = MENU_WIDTH;
 		g_tMenu1.LineCap = 2;
 		g_tMenu1.ViewLine = 8;
-		g_tMenu1.Font.FontCode = FC_ST_24;			/* ×ÖÌå´úÂë 16µãÕó */
-//		g_tMenu1.Font.FrontColor = CL_BLACK;		/* ×ÖÌåÑÕÉ« */
-//		g_tMenu1.Font.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		g_tMenu1.Font.Space = 0;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		LCD_InitMenu(&g_tMenu1, (char **)g_Menu1_Text);	/* ³õÊ¼»¯²Ëµ¥½á¹¹ */	
-	}	
+		g_tMenu1.Font.FontCode = FC_ST_24;							/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+																										//		g_tMenu1.Font.FrontColor = CL_BLACK;		/* å­—ä½“é¢œè‰² */
+																										//		g_tMenu1.Font.BackColor = FORM_BACK_COLOR;	/* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		g_tMenu1.Font.Space = 0;												/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+		LCD_InitMenu(&g_tMenu1, (char **)g_Menu1_Text); /* åˆå§‹åŒ–èœå•ç»“æ„ */
+	}
 	LCD_DispMenu(&g_tMenu1);
-	
+
 	fRefresh = 1;
 	while (g_MainStatus == MS_SYSTEM_SET)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
-			
+
 			if (g_tMenu1.Cursor == 0)
 			{
 				;
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü ÉÏ */
-					if (ucFirstKey == 1)
-					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}						
-					LCD_MoveUpMenu(&g_tMenu1);
+			case KEY_UP_S: /* Sé”® ä¸Š */
+				if (ucFirstKey == 1)
+				{
+					ucFirstKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+				LCD_MoveUpMenu(&g_tMenu1);
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü ÉÏ */
-					BEEP_KeyTone();	
-					s_enter_sub_menu = 1;
-				
-					if (g_tMenu1.Cursor == 0)
-					{
-						g_MainStatus = MS_HARD_INFO;
-					}
-					else if (g_tMenu1.Cursor == 1)
-					{
-						g_MainStatus = MS_USB_UART1;
-					}
-					else if (g_tMenu1.Cursor == 2)
-					{
-						g_MainStatus = MS_ESP32_TEST;
-					}										
-					break;				
+			case KEY_LONG_S: /* Sé”® ä¸Š */
+				BEEP_KeyTone();
+				s_enter_sub_menu = 1;
 
-				case  KEY_UP_C:		/* C¼ü ÏÂ */
-					if (ucFirstKey == 1)
-					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}					
-					LCD_MoveDownMenu(&g_tMenu1);	
+				if (g_tMenu1.Cursor == 0)
+				{
+					g_MainStatus = MS_HARD_INFO;
+				}
+				else if (g_tMenu1.Cursor == 1)
+				{
+					g_MainStatus = MS_USB_UART1;
+				}
+				else if (g_tMenu1.Cursor == 2)
+				{
+					g_MainStatus = MS_ESP32_TEST;
+				}
+				break;
+
+			case KEY_UP_C: /* Cé”® ä¸‹ */
+				if (ucFirstKey == 1)
+				{
+					ucFirstKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+				LCD_MoveDownMenu(&g_tMenu1);
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					BEEP_KeyTone();	
-					s_enter_sub_menu = 0;
-					g_MainStatus = MS_LINK_MODE;
-					break;					
-				
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				BEEP_KeyTone();
+				s_enter_sub_menu = 0;
+				g_MainStatus = MS_LINK_MODE;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -148,62 +146,61 @@ void status_SystemSetMain(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_HardInfo
-*	¹¦ÄÜËµÃ÷: Ó²¼şĞÅÏ¢²âÊÔ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_HardInfo
+*	åŠŸèƒ½è¯´æ˜: ç¡¬ä»¶ä¿¡æ¯æµ‹è¯•
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
 void status_HardInfo(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	FONT_T tFont;			 /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
 	uint16_t x, y;
 	uint16_t usLineCap = 18;
 	char buf[128];
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
-	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-	}
-	
 
-	LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
+	{
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+	}
+
+	LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
 	x = 5;
 	y = 3;
-	LCD_DispStr(x, y, "H7-TOOLÓ²¼şĞÅÏ¢", &tFont);			/* ÔÚ(8,3)×ø±ê´¦ÏÔÊ¾Ò»´®ºº×Ö */
+	LCD_DispStr(x, y, "H7-TOOLç¡¬ä»¶ä¿¡æ¯", &tFont); /* åœ¨(8,3)åæ ‡å¤„æ˜¾ç¤ºä¸€ä¸²æ±‰å­— */
 	y += usLineCap;
 
-	/* ¼ì²âCPU ID */
+	/* æ£€æµ‹CPU ID */
 	{
 		uint32_t id[3];
 
 		bsp_GetCpuID(id);
-		
+
 		sprintf(buf, "CPU : STM32H750IBK6  %dMHz", SystemCoreClock / 1000000);
-		LCD_DispStr(x, y, buf, &tFont);			
-		y += usLineCap;				
-		
+		LCD_DispStr(x, y, buf, &tFont);
+		y += usLineCap;
+
 		sprintf(buf, "  %08X %08X %08X", id[0], id[1], id[2]);
 		LCD_DispStr(x, y, buf, &tFont);
-		y += usLineCap;		
+		y += usLineCap;
 	}
-	
-	/* ÏÔÊ¾TFT¿ØÖÆÆ÷ĞÍºÅºÍÆÁÄ»·Ö±æÂÊ */
+
+	/* æ˜¾ç¤ºTFTæ§åˆ¶å™¨å‹å·å’Œå±å¹•åˆ†è¾¨ç‡ */
 	{
 		LCD_DispStr(x, y, "LCD : ST7789 / 240x240", &tFont);
 		y += usLineCap;
 	}
 
-	/* ²âÊÔeMMC */
+	/* æµ‹è¯•eMMC */
 	{
 		BSP_MMC_CardInfo CardInfo;
-	
+
 		BSP_MMC_Init();
 		BSP_MMC_GetCardInfo(&CardInfo);
 
@@ -211,9 +208,9 @@ void status_HardInfo(void)
 		if (CardInfo.LogBlockSize == 512)
 		{
 			uint32_t kb;
-			
+
 			kb = CardInfo.LogBlockNbr / 2;
-			sprintf(buf, "eMMC : %d.%02dGB Ok", kb / (1024 * 1024), (kb % (1024 *1024)) / 10000);
+			sprintf(buf, "eMMC : %d.%02dGB Ok", kb / (1024 * 1024), (kb % (1024 * 1024)) / 10000);
 			LCD_DispStr(x, y, buf, &tFont);
 		}
 		else
@@ -223,10 +220,10 @@ void status_HardInfo(void)
 			LCD_DispStr(x, y, buf, &tFont);
 			tFont.FrontColor = CL_WHITE;
 		}
-		y += usLineCap;				
+		y += usLineCap;
 	}
 
-	/* ²âÊÔI2CÉè±¸ */
+	/* æµ‹è¯•I2Cè®¾å¤‡ */
 	{
 		if (i2c_CheckDevice(EE_DEV_ADDR) == 0)
 		{
@@ -257,13 +254,13 @@ void status_HardInfo(void)
 		y += usLineCap;
 	}
 
-	/* QSPI¼ì²â */
+	/* QSPIæ£€æµ‹ */
 	{
 		uint32_t id;
 		char name[32];
-		
+
 		bsp_InitQSPI_W25Q256();
-		
+
 		id = QSPI_ReadID();
 		if (id == W25Q64_ID)
 		{
@@ -276,43 +273,43 @@ void status_HardInfo(void)
 		else if (id == W25Q256_ID)
 		{
 			strcpy(name, "W25Q256");
-		}		
+		}
 		else
 		{
 			strcpy(name, "UNKNOW");
 		}
-			
-		/* ¼ì²â´®ĞĞFlash OK */
+
+		/* æ£€æµ‹ä¸²è¡ŒFlash OK */
 		if (id == W25Q256_ID)
 		{
-			sprintf(buf, "QSPI : W25Q256 Ok, %08X", id);			
+			sprintf(buf, "QSPI : W25Q256 Ok, %08X", id);
 			LCD_DispStr(x, y, buf, &tFont);
 		}
 		else
 		{
-			sprintf(buf, "QSPI : W25Q256 Err, %08X", id);		
+			sprintf(buf, "QSPI : W25Q256 Err, %08X", id);
 			tFont.FrontColor = CL_RED;
 			LCD_DispStr(x, y, buf, &tFont);
 			tFont.FrontColor = CL_WHITE;
-		}	
-		y += usLineCap;		
+		}
+		y += usLineCap;
 	}
 
-	/* ÒÔÌ«ÍøMAC */
+	/* ä»¥å¤ªç½‘MAC */
 	{
 		uint32_t PhyID[2];
-		
+
 		/*
 			PhyID[0].15:0  = OUI:3:18
 			PhyID[1].15:10 = OUI.24:19
 		
 			PhyID[1].9:4 = Model Number
 			PhyID[1].3:0 = Revision Number
-		*/		
+		*/
 		ETH_PHY_IO_ReadReg(0, 2, &PhyID[0]);
 		ETH_PHY_IO_ReadReg(0, 3, &PhyID[1]);
-						
-		if ( ((PhyID[1] >> 4) & 0x2F) == 0x0F)
+
+		if (((PhyID[1] >> 4) & 0x2F) == 0x0F)
 		{
 			sprintf(buf, "Eth Phy : LAN8720 Ok");
 			LCD_DispStr(x, y, buf, &tFont);
@@ -323,58 +320,58 @@ void status_HardInfo(void)
 			tFont.FrontColor = CL_RED;
 			LCD_DispStr(x, y, buf, &tFont);
 			tFont.FrontColor = CL_WHITE;
-		}		
-		y += usLineCap;		
+		}
+		y += usLineCap;
 	}
-	
+
 	/* WiFi MAC */
 	{
 		//uint16_t mac[6];
-		
+
 		//ESP32_GetMac(&mac);
 	}
-	
+
 	bsp_StartAutoTimer(0, 1000);
 	while (g_MainStatus == MS_HARD_INFO)
 	{
 		bsp_Idle();
 
-		/* ÏÔÊ¾Ê±ÖÓ */
+		/* æ˜¾ç¤ºæ—¶é’Ÿ */
 		if (bsp_CheckTimer(0))
 		{
 			uint16_t x, y;
-			
-			tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-			tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-			tFont.BackColor = CL_BLUE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-			
-			RTC_ReadClock();	/* ¶ÁÊ±ÖÓ£¬½á¹ûÔÚ g_tRTC */
-			
+
+			tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+			tFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+
+			RTC_ReadClock(); /* è¯»æ—¶é’Ÿï¼Œç»“æœåœ¨ g_tRTC */
+
 			x = 5;
 			y = LCD_GetHeight() - 20;
-			
-			sprintf(buf, "%4d-%02d-%02d %02d:%02d:%02d",
-				g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day, g_tRTC.Hour, g_tRTC.Min, g_tRTC.Sec);
-			LCD_DispStr(x, y, buf, &tFont);
-		}		
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+			sprintf(buf, "%4d-%02d-%02d %02d:%02d:%02d",
+							g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day, g_tRTC.Hour, g_tRTC.Min, g_tRTC.Sec);
+			LCD_DispStr(x, y, buf, &tFont);
+		}
+
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_C:			/* C¼ü ÏÂ */
-					break;
+			case KEY_UP_C: /* Cé”® ä¸‹ */
+				break;
 
-				case KEY_LONG_C:		/* C¼ü³¤°´ */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
-					break;
-				
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -382,18 +379,18 @@ void status_HardInfo(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_DacTest
-*	¹¦ÄÜËµÃ÷: ²âÊÔDACÊä³ö²¨ĞÎ. ·ÏÆú¡£²ÎÊı¹ı¶à£¬ĞèÒªÁª»úÊ¹ÓÃDAC
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_DacTest
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•DACè¾“å‡ºæ³¢å½¢. åºŸå¼ƒã€‚å‚æ•°è¿‡å¤šï¼Œéœ€è¦è”æœºä½¿ç”¨DAC
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 #if 0
 void status_DacTest(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode;		/* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
+	FONT_T tFont;		/* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
 	uint8_t ucFirstKey = 1;
 	uint8_t ucWaveIdx = 0;
 	int16_t volt_min = -10000;
@@ -401,16 +398,16 @@ void status_DacTest(void)
 	uint32_t freq = 1000;
 	uint16_t duty = 50;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLACK;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;	/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLACK;	/* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR;	/* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;				/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR);  	/* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "DACÊä³öÕıÏÒ²¨", &tFont);
+		LCD_DispStr(5, 3, "DACè¾“å‡ºæ­£å¼¦æ³¢", &tFont);
 	}
 	
 	fRefresh = 1;
@@ -418,7 +415,7 @@ void status_DacTest(void)
 	{
 		bsp_Idle();
 
-		if (fRefresh == 1)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh == 1)	/* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
 			
@@ -431,35 +428,35 @@ void status_DacTest(void)
 			
 			if (ucWaveIdx == 0)
 			{
-				LCD_DispStr(5, 3, "DACÊä³öÕıÏÒ²¨", &tFont);
+				LCD_DispStr(5, 3, "DACè¾“å‡ºæ­£å¼¦æ³¢", &tFont);
 				
 				g_tDacWave.Type = DAC_WAVE_SIN;					
 				dac1_StartDacWave();
 			}
 			else if (ucWaveIdx == 1)
 			{
-				LCD_DispStr(5, 3, "DACÊä³ö·½²¨", &tFont);
+				LCD_DispStr(5, 3, "DACè¾“å‡ºæ–¹æ³¢", &tFont);
 				g_tDacWave.Type = DAC_WAVE_SQUARE;			
 				dac1_StartDacWave();				
 			}
 			else if (ucWaveIdx == 2)
 			{
-				LCD_DispStr(5, 3, "DACÊä³öÈı½Ç²¨", &tFont);
+				LCD_DispStr(5, 3, "DACè¾“å‡ºä¸‰è§’æ³¢", &tFont);
 				g_tDacWave.Type = DAC_WAVE_TRI;
 				dac1_StartDacWave();				
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey();	/* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{	
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü ÉÏ */
+				case  KEY_UP_S:		/* Sé”® ä¸Š */
 					if (ucFirstKey == 1)
 					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
+						ucFirstKey = 0;	/* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 						break;
 					}					
 					BEEP_KeyTone();
@@ -470,18 +467,18 @@ void status_DacTest(void)
 					fRefresh = 1;					
 					break;
 
-				case  KEY_LONG_S:		/* S¼ü ÉÏ */
+				case  KEY_LONG_S:		/* Sé”® ä¸Š */
 					break;				
 
-				case  KEY_UP_C:			/* C¼ü ÏÂ */
+				case  KEY_UP_C:			/* Cé”® ä¸‹ */
 					if (ucFirstKey == 1)
 					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
+						ucFirstKey = 0;	/* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 						break;
 					}
 					break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
+				case  KEY_LONG_C:		/* Cé”®é•¿æŒ‰ */
 					BEEP_KeyTone();	
 					g_MainStatus = MS_SYSTEM_SET;
 					break;					
@@ -492,188 +489,188 @@ void status_DacTest(void)
 		}
 	}
 	
-	/* Í£Ö¹DAC²¨ĞÎ */
+	/* åœæ­¢DACæ³¢å½¢ */
 	dac1_StopWave();
 }
 #endif
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_UsbUart1
-*	¹¦ÄÜËµÃ÷: USBĞéÄâ´®¿Ú£¬Ó³Éäµ½Ó²¼ş´®¿Ú
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_UsbUart1
+*	åŠŸèƒ½è¯´æ˜: USBè™šæ‹Ÿä¸²å£ï¼Œæ˜ å°„åˆ°ç¡¬ä»¶ä¸²å£
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_UsbUart1(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	FONT_T tFont;			 /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLACK;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLACK;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "USBĞéÄâ´®¿Ú", &tFont);
+		LCD_DispStr(5, 3, "USBè™šæ‹Ÿä¸²å£", &tFont);
 	}
 
 	usbd_CloseCDC();
-	usbd_OpenCDC(1);	/* Ó³Éäµ½´®¿Ú1 */
-	
+	usbd_OpenCDC(1); /* æ˜ å°„åˆ°ä¸²å£1 */
+
 	while (g_MainStatus == MS_USB_UART1)
 	{
 		bsp_Idle();
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
-		{	
-			/* ÓĞ¼ü°´ÏÂ */
+		{
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü µ¯Æğ */					
-					break;
-					
-				case  KEY_UP_C:			/* C¼ü ÏÂ */
-					break;					
+			case KEY_UP_S: /* Sé”® å¼¹èµ· */
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü ÉÏ */
-					break;				
+			case KEY_UP_C: /* Cé”® ä¸‹ */
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
-					break;					
-				
-				default:
-					break;
+			case KEY_LONG_S: /* Sé”® ä¸Š */
+				break;
+
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
 
 	usbd_CloseCDC();
-	usbd_OpenCDC(8);	/* Ó³Éäµ½´®¿Ú8. ºÍPCÈí¼şÁª»ú */	
+	usbd_OpenCDC(8); /* æ˜ å°„åˆ°ä¸²å£8. å’ŒPCè½¯ä»¶è”æœº */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_ESP32Test
-*	¹¦ÄÜËµÃ÷: esp32²âÊÔ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_ESP32Test
+*	åŠŸèƒ½è¯´æ˜: esp32æµ‹è¯•
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_ESP32Test(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
+	FONT_T tFont; /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
 	uint8_t ucFirstKey = 1;
 	uint8_t isp_flag = 0;
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "ESP32Ä£¿é²âÊÔ", &tFont);
+		LCD_DispStr(5, 3, "ESP32æ¨¡å—æµ‹è¯•", &tFont);
 	}
 
 	usbd_CloseCDC();
 	usbd_OpenCDC(4);
-	
+
 	//bsp_InitESP32();
-	
+
 	ESP32_EnterISP();
 	isp_flag = 1;
-	
+
 	wifi_state = WIFI_STOP;
-	
+
 	fRefresh = 1;
 	while (g_MainStatus == MS_ESP32_TEST)
 	{
 		bsp_Idle();
-		
-		if (fRefresh == 1)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+
+		if (fRefresh == 1) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
-			fRefresh = 0;		
+			fRefresh = 0;
 
 			if (isp_flag == 0)
 			{
-				LCD_DispStr(5, 60, "µ±Ç°Ä£Ê½: AT", &tFont);
+				LCD_DispStr(5, 60, "å½“å‰æ¨¡å¼: AT", &tFont);
 			}
 			else
 			{
-				LCD_DispStr(5, 60, "µ±Ç°Ä£Ê½: ISP", &tFont);
+				LCD_DispStr(5, 60, "å½“å‰æ¨¡å¼: ISP", &tFont);
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
-		{	
-			/* ÓĞ¼ü°´ÏÂ */
+		{
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_UP_S:		/* S¼ü µ¯Æğ */
-					if (ucFirstKey == 1)
-					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}					
-					BEEP_KeyTone();
-					
-					if (isp_flag == 0)
-					{
-						isp_flag = 1;
-						
-						ESP32_EnterISP();
-					}
-					else
-					{
-						isp_flag = 0;
-						
-						ESP32_EnterAT();
-					}
-					fRefresh = 1;					
+			case KEY_UP_S: /* Sé”® å¼¹èµ· */
+				if (ucFirstKey == 1)
+				{
+					ucFirstKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
-					
-				case  KEY_UP_C:			/* C¼ü ÏÂ */
-					if (ucFirstKey == 1)
-					{
-						ucFirstKey = 0;	/* ¶ªÆúµÚ1¸ö°´¼üµ¯ÆğÊÂ¼ş */
-						break;
-					}
+				}
+				BEEP_KeyTone();
 
-					fRefresh = 1;
-					break;					
+				if (isp_flag == 0)
+				{
+					isp_flag = 1;
 
-				case  KEY_LONG_S:		/* S¼ü ÉÏ */
-					break;				
+					ESP32_EnterISP();
+				}
+				else
+				{
+					isp_flag = 0;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					BEEP_KeyTone();	
-					g_MainStatus = MS_SYSTEM_SET;
-					break;					
-				
-				default:
+					ESP32_EnterAT();
+				}
+				fRefresh = 1;
+				break;
+
+			case KEY_UP_C: /* Cé”® ä¸‹ */
+				if (ucFirstKey == 1)
+				{
+					ucFirstKey = 0; /* ä¸¢å¼ƒç¬¬1ä¸ªæŒ‰é”®å¼¹èµ·äº‹ä»¶ */
 					break;
+				}
+
+				fRefresh = 1;
+				break;
+
+			case KEY_LONG_S: /* Sé”® ä¸Š */
+				break;
+
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				BEEP_KeyTone();
+				g_MainStatus = MS_SYSTEM_SET;
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
-	usbd_CloseCDC();	
-	usbd_OpenCDC(8);		/* ÆôÓÃUSBĞéÄâ´®¿Ú */
+	usbd_CloseCDC();
+	usbd_OpenCDC(8); /* å¯ç”¨USBè™šæ‹Ÿä¸²å£ */
 }
 
 #if 0	
-		bsp_InitExtIO();		/* Êä³ö¶Ë¿Ú³õÊ¼»¯ */
+		bsp_InitExtIO();		/* è¾“å‡ºç«¯å£åˆå§‹åŒ– */
 
 		EIO_ConfigPort(EIO_D0, ES_FMC_OUT);
 		EIO_ConfigPort(EIO_D1, ES_FMC_OUT);
@@ -711,7 +708,7 @@ void status_ESP32Test(void)
 				*pMem++ = *pPort;
 			}		
 		
-			// 18.18M, Ò»ÑùµÄÃ»±ä»¯
+			// 18.18M, ä¸€æ ·çš„æ²¡å˜åŒ–
 //			do
 //			{
 //				*pMem++ = *pPort;
@@ -730,27 +727,27 @@ void status_ESP32Test(void)
 //		EIO_ConfigPort(EIO_D8, ES_GPIO_OUT);
 //		EIO_ConfigPort(EIO_D9, ES_GPIO_OUT);
 //#endif
-		
-	#if 0
-	/* LwIP ³õÊ¼»¯ */
+
+#if 0
+	/* LwIP åˆå§‹åŒ– */
 	{
-		/* Èç¹û²»²åÍøÏß£¬´Ëº¯ÊıÖ´ĞĞÊ±¼ä¹ı³¤ */
-		/* ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
+		/* å¦‚æœä¸æ’ç½‘çº¿ï¼Œæ­¤å‡½æ•°æ‰§è¡Œæ—¶é—´è¿‡é•¿ */
+		/* ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
 		lwip_start();
 		
 		while (1)
 		{
 			lwip_pro();
 		}
-	}		
-	#endif		
-//		usbd_OpenCDC();		/* ÆôÓÃUSBĞéÄâ´®¿Ú */
+	}
+#endif		
+//		usbd_OpenCDC();		/* å¯ç”¨USBè™šæ‹Ÿä¸²å£ */
 
 //		bsp_DelayMS(1000);
 
-//		/* ²âÊÔESP32 */
+//		/* æµ‹è¯•ESP32 */
 //		bsp_InitESP32();
-//		//comClearRxFifo(COM_ESP32);	/* µÈ´ı·¢ËÍ»º³åÇøÎª¿Õ£¬Ó¦´ğ½áÊø*/	
+//		//comClearRxFifo(COM_ESP32);	/* ç­‰å¾…å‘é€ç¼“å†²åŒºä¸ºç©ºï¼Œåº”ç­”ç»“æŸ*/	
 //		ESP32_PowerOn();
 		
 		bsp_SetDAC1(0);
@@ -805,13 +802,13 @@ void status_ESP32Test(void)
 				}
 			}
 			
-			ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+			ucKeyCode = bsp_GetKey();	/* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 			if (ucKeyCode != KEY_NONE)
 			{
-				/* ÓĞ¼ü°´ÏÂ */
+				/* æœ‰é”®æŒ‰ä¸‹ */
 				switch (ucKeyCode)
 				{
-					case KEY_DOWN_S:		/* S¼ü */
+					case KEY_DOWN_S:		/* Sé”® */
 						BEEP_KeyTone();
 					
 //						ESP32_EnterISP();
@@ -843,7 +840,7 @@ void status_ESP32Test(void)
 						DSO_SetGain(1, gain);						
 						break;
 
-					case KEY_DOWN_C:		/* C¼ü */			
+					case KEY_DOWN_C:		/* Cé”® */			
 						BEEP_KeyTone();
 //					ESP32_ExitISP();
 						if (bsp_GetVoltOutRange() == 0)
@@ -873,7 +870,7 @@ void status_ESP32Test(void)
 			}
 		}
 	}
-	
+
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

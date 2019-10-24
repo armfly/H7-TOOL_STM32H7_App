@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ó¦ÓÃ³ÌĞò²ÎÊıÄ£¿é
-*	ÎÄ¼şÃû³Æ : param.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : åº”ç”¨ç¨‹åºå‚æ•°æ¨¡å—
+*	æ–‡ä»¶åç§° : param.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,30 +14,29 @@
 #ifndef __PARAM_H
 #define __PARAM_H
 
-#define PARAM_ADDR				0			/* »ù±¾²ÎÊıÇøµØÖ· */
-#define PARAM_SIZE				256			/* ×î´ó¿Õ¼ä£¬ÓÃÓÚ±àÒë²é´í */
+#define PARAM_ADDR 0	 /* åŸºæœ¬å‚æ•°åŒºåœ°å€ */
+#define PARAM_SIZE 256 /* æœ€å¤§ç©ºé—´ï¼Œç”¨äºç¼–è¯‘æŸ¥é”™ */
 
-#define PARAM_CALIB_ADDR		1024		/* »ù±¾²ÎÊıÇøµØÖ· */
-#define PARAM_CALIB_SIZE		512			/* ×î´ó¿Õ¼ä£¬ÓÃÓÚ±àÒë²é´í */
+#define PARAM_CALIB_ADDR 1024 /* åŸºæœ¬å‚æ•°åŒºåœ°å€ */
+#define PARAM_CALIB_SIZE 512	/* æœ€å¤§ç©ºé—´ï¼Œç”¨äºç¼–è¯‘æŸ¥é”™ */
 
-#define PARAM_VER				0x00000101				/* »ù±¾²ÎÊı°æ±¾ 100 */
+#define PARAM_VER 0x00000101 /* åŸºæœ¬å‚æ•°ç‰ˆæœ¬ 100 */
 
-#define CALIB_VER				0x00000201				/* Ğ£×¼²ÎÊı°æ±¾ 200 */
+#define CALIB_VER 0x00000201 /* æ ¡å‡†å‚æ•°ç‰ˆæœ¬ 200 */
 
-/* ÔİÎ´ÆôÓÃ ³ÌĞò»º´æ */
-#define APP_BUF_ADDR			0x08000000 + 1 * 1024 * 1024
+/* æš‚æœªå¯ç”¨ ç¨‹åºç¼“å­˜ */
+#define APP_BUF_ADDR 0x08000000 + 1 * 1024 * 1024
 
-/* Ğ£×¼²ÎÊı½á¹¹£¬Á½µãĞ£×¼£¬ Í¨ÓÃĞ£×¼²ÎÊı£¬ADC */
+/* æ ¡å‡†å‚æ•°ç»“æ„ï¼Œä¸¤ç‚¹æ ¡å‡†ï¼Œ é€šç”¨æ ¡å‡†å‚æ•°ï¼ŒADC */
 typedef struct
 {
 	float x1;
 	float y1;
 	float x2;
 	float y2;
-}
-AN_CALIB_T;
+} AN_CALIB_T;
 
-/* Ğ£×¼²ÎÊı½á¹¹£¬¶àµãĞ£×¼£¬½â¾öDACµçÂ··ÇÏßĞÔ²»ºÃµÄÎÊÌâ */
+/* æ ¡å‡†å‚æ•°ç»“æ„ï¼Œå¤šç‚¹æ ¡å‡†ï¼Œè§£å†³DACç”µè·¯éçº¿æ€§ä¸å¥½çš„é—®é¢˜ */
 typedef struct
 {
 	int16_t x1;
@@ -47,11 +46,10 @@ typedef struct
 	int16_t x3;
 	int16_t y3;
 	int16_t x4;
-	int16_t y4;	
-}
-AN_CALIB_DAC_T;
+	int16_t y4;
+} AN_CALIB_DAC_T;
 
-/* Ğ£×¼²ÎÊı½á¹¹£¬¶àµãĞ£×¼£¬½â¾öµçÁ÷·ÇÏßĞÔ²»ºÃµÄÎÊÌâ */
+/* æ ¡å‡†å‚æ•°ç»“æ„ï¼Œå¤šç‚¹æ ¡å‡†ï¼Œè§£å†³ç”µæµéçº¿æ€§ä¸å¥½çš„é—®é¢˜ */
 typedef struct
 {
 	float x1;
@@ -61,97 +59,94 @@ typedef struct
 	float x3;
 	float y3;
 	float x4;
-	float y4;	
-}
-AN_CALIB_ADC_T;
+	float y4;
+} AN_CALIB_ADC_T;
 
-/* È«¾Ö²ÎÊı */
+/* å…¨å±€å‚æ•° */
 typedef struct
 {
-	uint32_t UpgradeFlag;		/*Éı¼¶±ê¼Ç,0x55AAA55A±íÊ¾ĞèÒª¸üĞÂAPP£¬0xFFFF±íÊ¾¸üĞÂÍê±Ï*/
-	uint32_t ParamVer;			/* ²ÎÊıÇø°æ±¾¿ØÖÆ£¨¿ÉÓÃÓÚ³ÌĞòÉı¼¶Ê±£¬¾ö¶¨ÊÇ·ñ¶Ô²ÎÊıÇø½øĞĞÉı¼¶£© */
-	
-	uint8_t DispDir;			/* ÏÔÊ¾·½Ïò */
-	
+	uint32_t UpgradeFlag; /*å‡çº§æ ‡è®°,0x55AAA55Aè¡¨ç¤ºéœ€è¦æ›´æ–°APPï¼Œ0xFFFFè¡¨ç¤ºæ›´æ–°å®Œæ¯•*/
+	uint32_t ParamVer;		/* å‚æ•°åŒºç‰ˆæœ¬æ§åˆ¶ï¼ˆå¯ç”¨äºç¨‹åºå‡çº§æ—¶ï¼Œå†³å®šæ˜¯å¦å¯¹å‚æ•°åŒºè¿›è¡Œå‡çº§ï¼‰ */
+
+	uint8_t DispDir; /* æ˜¾ç¤ºæ–¹å‘ */
+
 	uint8_t Addr485;
-	
-	uint8_t LocalIPAddr[4];		/* ±¾»úIPµØÖ· */
-	uint8_t NetMask[4];			/* ×ÓÍøÑÚÂë */
-	uint8_t Gateway[4];			/* Íø¹Ø */
-	uint16_t LocalTCPPort;		/* ±¾»úTCP¶Ë¿Ú */	
-	uint16_t LocalUDPPort;		/* ±¾»úUDP¶Ë¿Ú */	
-	
-	uint8_t RemoteIPAddr[4];	/* Ô¶¶Ë(Ç°ÖÃ£©IPµØÖ· */
-	uint16_t RemoteTcpPort;		/* Ô¶¶Ë£¨Ç°ÖÃ£©TCP¶Ë¿Ú */
 
-	uint8_t WorkMode;			/* ¹¤×÷Ä£Ê½ ±£Áô */
+	uint8_t LocalIPAddr[4]; /* æœ¬æœºIPåœ°å€ */
+	uint8_t NetMask[4];			/* å­ç½‘æ©ç  */
+	uint8_t Gateway[4];			/* ç½‘å…³ */
+	uint16_t LocalTCPPort;	/* æœ¬æœºTCPç«¯å£ */
+	uint16_t LocalUDPPort;	/* æœ¬æœºUDPç«¯å£ */
 
-	uint8_t APSelfEn;			/* ±¾»ú°çÑİAP */	
-	uint8_t AP_SSID[32+1];		/* APÃû×Ö */
-	uint8_t AP_PASS[16+1];		/* APÃÜÂë */
-	uint8_t WiFiIPAddr[4];		/* IPµØÖ·  192.168.1.50 */
-	uint8_t WiFiNetMask[4];		/* ×ÓÍøÑÚÂë 255.255.255.0 */	
-	uint8_t WiFiGateway[4];		/* Íø¹Ø 192.168.1.1 */	
-	uint8_t DHCPEn;				/* DHCPÊ¹ÄÜ  */
+	uint8_t RemoteIPAddr[4]; /* è¿œç«¯(å‰ç½®ï¼‰IPåœ°å€ */
+	uint16_t RemoteTcpPort;	/* è¿œç«¯ï¼ˆå‰ç½®ï¼‰TCPç«¯å£ */
+
+	uint8_t WorkMode; /* å·¥ä½œæ¨¡å¼ ä¿ç•™ */
+
+	uint8_t APSelfEn;				 /* æœ¬æœºæ‰®æ¼”AP */
+	uint8_t AP_SSID[32 + 1]; /* APåå­— */
+	uint8_t AP_PASS[16 + 1]; /* APå¯†ç  */
+	uint8_t WiFiIPAddr[4];	 /* IPåœ°å€  192.168.1.50 */
+	uint8_t WiFiNetMask[4];	/* å­ç½‘æ©ç  255.255.255.0 */
+	uint8_t WiFiGateway[4];	/* ç½‘å…³ 192.168.1.1 */
+	uint8_t DHCPEn;					 /* DHCPä½¿èƒ½  */
 	uint8_t WiFiMac[6];
 
-	uint32_t TestWord;		/*¡¡²âÊÔµ¥Ôª£¬ÓÃÓÚ¼ì²âeepromg¹¦ÄÜ */
-	uint8_t NtcType;		/* NTCÈÈÃôµç×èÀàĞÍ 0 = 10K_B3950£¬1 = 100K_B3950 */
-}
-PARAM_T;
+	uint32_t TestWord; /*ã€€æµ‹è¯•å•å…ƒï¼Œç”¨äºæ£€æµ‹eepromgåŠŸèƒ½ */
+	uint8_t NtcType;	 /* NTCçƒ­æ•ç”µé˜»ç±»å‹ 0 = 10K_B3950ï¼Œ1 = 100K_B3950 */
+} PARAM_T;
 
-/* Ä£ÄâÁ¿Ğ£×¼²ÎÊı */
+/* æ¨¡æ‹Ÿé‡æ ¡å‡†å‚æ•° */
 typedef struct
 {
-	uint32_t CalibVer;		/* Ğ£×¼²ÎÊı°æ±¾. ÓÃÓÚÉı¼¶ */
-	AN_CALIB_T CH1[8];		/* CH1 Ê¾²¨Æ÷Í¨µÀADCĞ£×¼²ÎÊı, ¶ÔÓ¦8µµÓ²¼şÔöÒæ */
-	AN_CALIB_T CH2[8];		/* CH1 Ê¾²¨Æ÷Í¨µÀADCĞ£×¼²ÎÊı, ¶ÔÓ¦8µµÓ²¼şÔöÒæ */
-	
-	AN_CALIB_T LoadVolt;		/* ¸ºÔØµçÑ¹Ğ£×¼²ÎÊı */
-	AN_CALIB_ADC_T LoadCurr[2];		/* ¸ºÔØµçÁ÷Ğ£×¼²ÎÊı£¬2¸öÁ¿³Ì  */
-	
-	AN_CALIB_T TVCCVolt;	/* TVCC¼àÊÓµçÑ¹ */
-	AN_CALIB_ADC_T TVCCCurr;	/* TVCCµçÁ÷ */	
-	
-	AN_CALIB_ADC_T NtcRes;		/* NTC²âÎÂ½Ó¿Ú²Î¿¼µç×è×èÖµ */
-	
-	AN_CALIB_T TVCCSet;		/* TVCCÊä³öÉèÖÃµçÑ¹ */
-	
-	AN_CALIB_DAC_T Dac10V;	/* DACµçÑ¹Í¨µÀĞ£×¼²ÎÊı£¬Õı¸º10V */
-	AN_CALIB_DAC_T Dac20mA;	/* DACµçÁ÷Í¨µÀĞ£×¼²ÎÊı£¬20mA */
+	uint32_t CalibVer; /* æ ¡å‡†å‚æ•°ç‰ˆæœ¬. ç”¨äºå‡çº§ */
+	AN_CALIB_T CH1[8]; /* CH1 ç¤ºæ³¢å™¨é€šé“ADCæ ¡å‡†å‚æ•°, å¯¹åº”8æ¡£ç¡¬ä»¶å¢ç›Š */
+	AN_CALIB_T CH2[8]; /* CH1 ç¤ºæ³¢å™¨é€šé“ADCæ ¡å‡†å‚æ•°, å¯¹åº”8æ¡£ç¡¬ä»¶å¢ç›Š */
 
-	AN_CALIB_T USBVolt;			/* USB¹©µçµçÑ¹ */
-	AN_CALIB_T ExtPowerVolt;	/* Íâ²¿¹©µçµçÑ¹ */
-}CALIB_T;
+	AN_CALIB_T LoadVolt;				/* è´Ÿè½½ç”µå‹æ ¡å‡†å‚æ•° */
+	AN_CALIB_ADC_T LoadCurr[2]; /* è´Ÿè½½ç”µæµæ ¡å‡†å‚æ•°ï¼Œ2ä¸ªé‡ç¨‹  */
 
-/* È«¾Ö±äÁ¿ */
+	AN_CALIB_T TVCCVolt;		 /* TVCCç›‘è§†ç”µå‹ */
+	AN_CALIB_ADC_T TVCCCurr; /* TVCCç”µæµ */
+
+	AN_CALIB_ADC_T NtcRes; /* NTCæµ‹æ¸©æ¥å£å‚è€ƒç”µé˜»é˜»å€¼ */
+
+	AN_CALIB_T TVCCSet; /* TVCCè¾“å‡ºè®¾ç½®ç”µå‹ */
+
+	AN_CALIB_DAC_T Dac10V;	/* DACç”µå‹é€šé“æ ¡å‡†å‚æ•°ï¼Œæ­£è´Ÿ10V */
+	AN_CALIB_DAC_T Dac20mA; /* DACç”µæµé€šé“æ ¡å‡†å‚æ•°ï¼Œ20mA */
+
+	AN_CALIB_T USBVolt;			 /* USBä¾›ç”µç”µå‹ */
+	AN_CALIB_T ExtPowerVolt; /* å¤–éƒ¨ä¾›ç”µç”µå‹ */
+} CALIB_T;
+
+/* å…¨å±€å˜é‡ */
 typedef struct
 {
 	/* MCU ID */
 	uint32_t CPU_Sn[3];
-	
+
 	uint8_t WiFiDebugEn;
 	uint8_t RemoteTCPServerOk;
 	uint8_t HomeWiFiLinkOk;
-	
-	uint8_t WiFiRecivedIPD;		
-	
-	uint8_t MACaddr[6];			/* ÒÔÌ«ÍøMACµØÖ· */
-	
-	
+
+	uint8_t WiFiRecivedIPD;
+
+	uint8_t MACaddr[6]; /* ä»¥å¤ªç½‘MACåœ°å€ */
+
 	uint8_t InputState[32];
 	uint8_t RelayState[32];
-	
+
 	float CH1Volt;
 	float CH2Volt;
 	float HighSideVolt;
 	float HighSideCurr;
 	float USBPowerVolt;
 	float ExtPowerVolt;
-	float TVCCVolt;		/* TVCCÊµ²âµçÑ¹ */
-	float TVCCCurr;		/* TVCCÊµ²âµçÑ¹ */
-	float NTCRes;		/* NTCµç×è */
-	float NTCTemp;		/* NTCÎÂ¶È */
+	float TVCCVolt; /* TVCCå®æµ‹ç”µå‹ */
+	float TVCCCurr; /* TVCCå®æµ‹ç”µå‹ */
+	float NTCRes;		/* NTCç”µé˜» */
+	float NTCTemp;	/* NTCæ¸©åº¦ */
 
 	float ADC_CH1Volt;
 	float ADC_CH2Volt;
@@ -159,26 +154,26 @@ typedef struct
 	float ADC_HighSideCurr;
 	float ADC_USBPowerVolt;
 	float ADC_ExtPowerVolt;
-	float ADC_TVCCVolt;		/* TVCCÊµ²âµçÑ¹ */
-	float ADC_TVCCCurr;		/* TVCCÊµ²âµçÑ¹ */
-	float ADC_NTCRes;		/* NTCµç×è */	
-	
-	uint16_t OutTVCCDac;	/* Êä³öTVCC dacÖµ */
-	uint16_t OutTVCCmV;		/* Êä³öTVCC mVÖµ */
-	
-	uint16_t OutVoltDAC;	/* Êä³öµçÑ¹ dacÖµ */
-	int16_t OutVoltmV;		/* Êä³öµçÑ¹ mVÖµ ÓĞ·ûºÅÊı Ö§³Ö¸ºµçÑ¹*/
+	float ADC_TVCCVolt; /* TVCCå®æµ‹ç”µå‹ */
+	float ADC_TVCCCurr; /* TVCCå®æµ‹ç”µå‹ */
+	float ADC_NTCRes;		/* NTCç”µé˜» */
 
-	uint16_t OutCurrDAC;	/* Êä³öµçÁ÷ dacÖµ */
-	uint16_t OutCurruA;		/* Êä³öµçÁ÷ uAÖµ */
-	
+	uint16_t OutTVCCDac; /* è¾“å‡ºTVCC dacå€¼ */
+	uint16_t OutTVCCmV;	/* è¾“å‡ºTVCC mVå€¼ */
+
+	uint16_t OutVoltDAC; /* è¾“å‡ºç”µå‹ dacå€¼ */
+	int16_t OutVoltmV;	 /* è¾“å‡ºç”µå‹ mVå€¼ æœ‰ç¬¦å·æ•° æ”¯æŒè´Ÿç”µå‹*/
+
+	uint16_t OutCurrDAC; /* è¾“å‡ºç”µæµ dacå€¼ */
+	uint16_t OutCurruA;	/* è¾“å‡ºç”µæµ uAå€¼ */
+
 	uint8_t LuaRunOnce;
-	
+
 	uint8_t CalibEnable;
-	
-	uint8_t GpioMode[16];	/* ±£´æGPIOÄ£Ê½²ÎÊı£¬ÊäÈë£¬Êä³ö»òÌØÊâ¹¦ÄÜ */
-	
-}VAR_T;
+
+	uint8_t GpioMode[16]; /* ä¿å­˜GPIOæ¨¡å¼å‚æ•°ï¼Œè¾“å…¥ï¼Œè¾“å‡ºæˆ–ç‰¹æ®ŠåŠŸèƒ½ */
+
+} VAR_T;
 
 extern PARAM_T g_tParam;
 extern CALIB_T g_tCalib;

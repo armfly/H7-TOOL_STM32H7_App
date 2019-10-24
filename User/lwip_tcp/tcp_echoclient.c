@@ -53,7 +53,7 @@ __IO uint32_t message_count=0;
 //u8_t   data[100] = "123456";
 
 struct tcp_pcb *echoclient_pcb;
-TCP_USER_T g_tClient;		/* TCPÓÃ»§½á¹¹Ìå 2016-09-09 by xd*/
+TCP_USER_T g_tClient;		/* TCPç”¨æˆ·ç»“æ„ä½“ 2016-09-09 by xd*/
 uint8_t g_fTcpState;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -76,15 +76,15 @@ void tcp_echoclient_connect(void)
   ip_addr_t DestIPaddr;
   
   /* create new tcp pcb */
-  echoclient_pcb = tcp_new();		/* ´´½¨ĞÂµÄPCB */
+  echoclient_pcb = tcp_new();		/* åˆ›å»ºæ–°çš„PCB */
   
   if (echoclient_pcb != NULL)
   {
-    //IP4_ADDR( &DestIPaddr, DEST_IP_ADDR0, DEST_IP_ADDR1, DEST_IP_ADDR2, DEST_IP_ADDR3 );	/* ÉèÖÃÄ¿µÄIPµØÖ· */
-	IP4_ADDR( &DestIPaddr, g_tParam.RemoteIPAddr[0], g_tParam.RemoteIPAddr[1], g_tParam.RemoteIPAddr[2], g_tParam.RemoteIPAddr[3]);	/* ÉèÖÃÄ¿µÄIPµØÖ· */
+    //IP4_ADDR( &DestIPaddr, DEST_IP_ADDR0, DEST_IP_ADDR1, DEST_IP_ADDR2, DEST_IP_ADDR3 );	/* è®¾ç½®ç›®çš„IPåœ°å€ */
+	IP4_ADDR( &DestIPaddr, g_tParam.RemoteIPAddr[0], g_tParam.RemoteIPAddr[1], g_tParam.RemoteIPAddr[2], g_tParam.RemoteIPAddr[3]);	/* è®¾ç½®ç›®çš„IPåœ°å€ */
     
     /* connect to destination address/port */
-    tcp_connect(echoclient_pcb, &DestIPaddr, g_tParam.RemoteTcpPort, tcp_echoclient_connected);		/* Á¬½Óµ½Ä¿µÄµØÖ·µÄÖ¸¶¨¶Ë¿ÚÉÏ,Á¬½Ó³É¹¦ºó»Øµ÷tcp_client_connected()º¯Êı */
+    tcp_connect(echoclient_pcb, &DestIPaddr, g_tParam.RemoteTcpPort, tcp_echoclient_connected);		/* è¿æ¥åˆ°ç›®çš„åœ°å€çš„æŒ‡å®šç«¯å£ä¸Š,è¿æ¥æˆåŠŸåå›è°ƒtcp_client_connected()å‡½æ•° */
   }
   else
   {
@@ -99,10 +99,10 @@ void tcp_echoclient_connect(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: tcp_echoclient_connected
-*	¹¦ÄÜËµÃ÷: LwIP TCPÁ¬½Ó½¨Á¢ºóµ÷ÓÃµÄ»Øµ÷º¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: tcp_echoclient_connected
+*	åŠŸèƒ½è¯´æ˜: LwIP TCPè¿æ¥å»ºç«‹åè°ƒç”¨çš„å›è°ƒå‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 /**
@@ -118,16 +118,16 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
   if (err == ERR_OK)   
   {
     /* allocate structure es to maintain tcp connection informations */
-    es = (struct echoclient *)mem_malloc(sizeof(struct echoclient));	/* ·ÖÅäÄÚ´æ */
+    es = (struct echoclient *)mem_malloc(sizeof(struct echoclient));	/* åˆ†é…å†…å­˜ */
   
     if (es != NULL)
     {
-      es->state = ES_CONNECTED;		/* ×´Ì¬ÎªÁ¬½Ó³É¹¦ */
+      es->state = ES_CONNECTED;		/* çŠ¶æ€ä¸ºè¿æ¥æˆåŠŸ */
 		
-		g_tClient.TcpState = 1;		/* Á¬½Ó³É¹¦ */
+		g_tClient.TcpState = 1;		/* è¿æ¥æˆåŠŸ */
 		
       es->pcb = tpcb;
-	  es->p_tx = NULL;			/* 2016-09-05 xd Ôö¼Ó¡£Á¬½ÓÊ±£¬Çå¿ÕÊı¾İ»º³åÇø */
+	  es->p_tx = NULL;			/* 2016-09-05 xd å¢åŠ ã€‚è¿æ¥æ—¶ï¼Œæ¸…ç©ºæ•°æ®ç¼“å†²åŒº */
 	  //sprintf((char*)data, "sending tcp client message %d", message_count);
         
       /* allocate pbuf */
@@ -139,16 +139,16 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
         //pbuf_take(es->p_tx, (char*)data, strlen((char*)data));
         
         /* pass newly allocated es structure as argument to tpcb */
-        tcp_arg(tpcb, es);						/* Ê¹ÓÃes¸üĞÂtpcbµÄcallback arg */
+        tcp_arg(tpcb, es);						/* ä½¿ç”¨esæ›´æ–°tpcbçš„callback arg */
   
         /* initialize LwIP tcp_recv callback function */ 
-        tcp_recv(tpcb, tcp_echoclient_recv);	/* ³õÊ¼»¯LwIP½ÓÊÕ»Øµ÷º¯Êı */
+        tcp_recv(tpcb, tcp_echoclient_recv);	/* åˆå§‹åŒ–LwIPæ¥æ”¶å›è°ƒå‡½æ•° */
   
         /* initialize LwIP tcp_sent callback function */
-        tcp_sent(tpcb, tcp_echoclient_sent);	/* ³õÊ¼»¯LwIP·¢ËÍ»Øµ÷º¯Êı */
+        tcp_sent(tpcb, tcp_echoclient_sent);	/* åˆå§‹åŒ–LwIPå‘é€å›è°ƒå‡½æ•° */
   
         /* initialize LwIP tcp_poll callback function */
-        tcp_poll(tpcb, tcp_echoclient_poll, 1);	/* ³õÊ¼»¯LwIPµÄtcp_poll»Øµ÷º¯Êı */
+        tcp_poll(tpcb, tcp_echoclient_poll, 1);	/* åˆå§‹åŒ–LwIPçš„tcp_pollå›è°ƒå‡½æ•° */
     
         /* send data */
         //tcp_echoclient_send(tpcb,es);		
@@ -159,19 +159,19 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
     else
     {
       /* close connection */
-      tcp_echoclient_connection_close(tpcb, es);	/* ¹Ø±ÕÁ¬½Ó */
+      tcp_echoclient_connection_close(tpcb, es);	/* å…³é—­è¿æ¥ */
       
       /* return memory allocation error */
-      return ERR_MEM;  			/* ·µ»ØÄÚ´æ·ÖÅä´íÎó */
+      return ERR_MEM;  			/* è¿”å›å†…å­˜åˆ†é…é”™è¯¯ */
     }
   }
   else
   {
     /* close connection */
-    tcp_echoclient_connection_close(tpcb, es);		/* ¹Ø±ÕÁ¬½Ó */
+    tcp_echoclient_connection_close(tpcb, es);		/* å…³é—­è¿æ¥ */
   }
   
-  g_tClient.TcpState = 0;		/* Á¬½ÓÊ§°Ü */ 
+  g_tClient.TcpState = 0;		/* è¿æ¥å¤±è´¥ */ 
   return err;
 }
     
@@ -187,14 +187,14 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
   struct echoclient *es;
   err_t ret_err;
   struct pbuf *q;
-	uint32_t RxPos = 0;		/* µ±Ç°½ÓÊÕÊı¾İµÄÎ»ÖÃ */
+	uint32_t RxPos = 0;		/* å½“å‰æ¥æ”¶æ•°æ®çš„ä½ç½® */
 
   LWIP_ASSERT("arg != NULL",arg != NULL);
   
   es = (struct echoclient *)arg;
   
   /* if we receive an empty tcp frame from server => close connection */
-  if (p == NULL)			/* Èç¹û´Ó·şÎñÆ÷½ÓÊÜµ½¿ÕµÄTCP°ü -> ¹Ø±ÕÁ¬½Ó */
+  if (p == NULL)			/* å¦‚æœä»æœåŠ¡å™¨æ¥å—åˆ°ç©ºçš„TCPåŒ… -> å…³é—­è¿æ¥ */
   { 
     /* remote host closed connection */
     es->state = ES_CLOSING;
@@ -211,50 +211,50 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
     ret_err = ERR_OK;
   }   
   /* else : a non empty frame was received from echo server but for some reason err != ERR_OK */
-  else if(err != ERR_OK)		/* ·ñÔò£º½ÓÊÕµ½·Ç¿ÕµÄÊı¾İ£¬µ«ÊÇÓÉÓÚÄ³Ğ©Ô­Òò£¬´íÎó */
+  else if(err != ERR_OK)		/* å¦åˆ™ï¼šæ¥æ”¶åˆ°éç©ºçš„æ•°æ®ï¼Œä½†æ˜¯ç”±äºæŸäº›åŸå› ï¼Œé”™è¯¯ */
   {
     /* free received pbuf*/
-    pbuf_free(p);		/* ÊÍ·Å½ÓÊÜpbuf */
+    pbuf_free(p);		/* é‡Šæ”¾æ¥å—pbuf */
 
     ret_err = err;
   }
-  else if(es->state == ES_CONNECTED)	/* Á¬½Ó×´Ì¬£¬²¢ÇÒ½ÓÊÜµ½ÕıÈ·µÄÊı¾İ°ü */
+  else if(es->state == ES_CONNECTED)	/* è¿æ¥çŠ¶æ€ï¼Œå¹¶ä¸”æ¥å—åˆ°æ­£ç¡®çš„æ•°æ®åŒ… */
   {
     /* increment message count */
-    message_count++;		/* ½ÓÊÜµ½Êı¾İµÄÊıÁ¿ */
+    message_count++;		/* æ¥å—åˆ°æ•°æ®çš„æ•°é‡ */
 	  
 	if (p != NULL)
 	{
-		memset(g_tClient.RxData, 0, TCP_Rx_SIZE);		/* Çå¿Õ½ÓÊÕ»º³åÇø */
+		memset(g_tClient.RxData, 0, TCP_Rx_SIZE);		/* æ¸…ç©ºæ¥æ”¶ç¼“å†²åŒº */
 		
-		for(q = p;q != NULL;q = q->next) 	/* ±éÀúÕû¸öpbufÁ´±í */
+		for(q = p;q != NULL;q = q->next) 	/* éå†æ•´ä¸ªpbufé“¾è¡¨ */
 		{
-			if (q->len > (TCP_Rx_SIZE - RxPos))		/* ÅĞ¶ÏÊı¾İ³¤¶È£¬Èç¹û´óÓÚ½ÓÊÕbuf£¬ÔòÓ¦´ğ´íÎó */
+			if (q->len > (TCP_Rx_SIZE - RxPos))		/* åˆ¤æ–­æ•°æ®é•¿åº¦ï¼Œå¦‚æœå¤§äºæ¥æ”¶bufï¼Œåˆ™åº”ç­”é”™è¯¯ */
 			{
-				break;		/* Êı¾İ³¤¶È¹ı´ó£¬Ó¦´ğ´íÎó */
+				break;		/* æ•°æ®é•¿åº¦è¿‡å¤§ï¼Œåº”ç­”é”™è¯¯ */
 			}
-			else			/* ½«Êı¾İ´æÈëbuf */
+			else			/* å°†æ•°æ®å­˜å…¥buf */
 			{
 				memcpy(g_tClient.RxData + RxPos, q->payload, q->len);
 			}
-			RxPos += q->len;  		/* ½ÓÊÕµ½µÄÊı¾İ³¤¶È */
+			RxPos += q->len;  		/* æ¥æ”¶åˆ°çš„æ•°æ®é•¿åº¦ */
 		}
 
 		//strcpy((char*)g_tClient.TxData, (char*)g_tClient.RxData);	
 		
-		g_tClient.TcpState = 2;		/* ½ÓÊÕµ½Êı¾İ */
+		g_tClient.TcpState = 2;		/* æ¥æ”¶åˆ°æ•°æ® */
 		
 		/* Acknowledge data reception */
-		tcp_recved(tpcb, p->tot_len);  	/* »ñÈ¡½ÓÊÕÊı¾İ£¬Í¨ÖªLwIP¿ÉÒÔ»ñÈ¡¸ü¶àÊı¾İ */
+		tcp_recved(tpcb, p->tot_len);  	/* è·å–æ¥æ”¶æ•°æ®ï¼Œé€šçŸ¥LwIPå¯ä»¥è·å–æ›´å¤šæ•°æ® */
 
-		pbuf_free(p);		/* Êı¾İÒÑ·ÅÈë½ÓÊÕ»º³åÇø,¿ÉÒÔÊÍ·ÅÄÚ´æÁË */
-		//tcp_echoclient_connection_close(tpcb, es);	/* ÕâÀï²»ĞèÒª¶Ï¿ªÁ¬½Ó°É */
+		pbuf_free(p);		/* æ•°æ®å·²æ”¾å…¥æ¥æ”¶ç¼“å†²åŒº,å¯ä»¥é‡Šæ”¾å†…å­˜äº† */
+		//tcp_echoclient_connection_close(tpcb, es);	/* è¿™é‡Œä¸éœ€è¦æ–­å¼€è¿æ¥å§ */
 		ret_err = ERR_OK;
 	}
   }
 
   /* data received when connection already closed */
-  else	/* µ±Á¬½ÓÒÑ¾­¹Ø±Õ£¬½ÓÊÜµ½Êı¾İ */
+  else	/* å½“è¿æ¥å·²ç»å…³é—­ï¼Œæ¥å—åˆ°æ•°æ® */
   {
     /* Acknowledge data reception */
     tcp_recved(tpcb, p->tot_len);
@@ -269,10 +269,10 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: tcp_client_usersent
-*	¹¦ÄÜËµÃ÷: ÓÃ»§·¢ËÍÊı¾İ£¬2016-09-08 by xd
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: tcp_client_usersent
+*	åŠŸèƒ½è¯´æ˜: ç”¨æˆ·å‘é€æ•°æ®ï¼Œ2016-09-08 by xd
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void tcp_client_usersent(struct tcp_pcb *_tpcb)
@@ -280,18 +280,18 @@ void tcp_client_usersent(struct tcp_pcb *_tpcb)
 	struct echoclient *es = NULL;
 	es =_tpcb->callback_arg;
 	
-	if(es != NULL)  /* Á¬½Ó´¦ÓÚ¿ÕÏĞ¿ÉÒÔ·¢Êı¾İ */
+	if(es != NULL)  /* è¿æ¥å¤„äºç©ºé—²å¯ä»¥å‘æ•°æ® */
 	{
-		es->p_tx = pbuf_alloc(PBUF_TRANSPORT, g_tClient.TxCount , PBUF_POOL);		/* ·ÖÅäÄÚ´æ£¬ÄÚ´æµÄ´óĞ¡¾ÍÊÇÊı¾İ³¤¶Èptr->len */
+		es->p_tx = pbuf_alloc(PBUF_TRANSPORT, g_tClient.TxCount , PBUF_POOL);		/* åˆ†é…å†…å­˜ï¼Œå†…å­˜çš„å¤§å°å°±æ˜¯æ•°æ®é•¿åº¦ptr->len */
 		
 		 /* copy data to pbuf */
-        pbuf_take(es->p_tx, (char*)g_tClient.TxData, g_tClient.TxCount);		/* ½«data[]ÖĞµÄÊı¾İ¸´ÖÆµ½ es->p_tx */
+        pbuf_take(es->p_tx, (char*)g_tClient.TxData, g_tClient.TxCount);		/* å°†data[]ä¸­çš„æ•°æ®å¤åˆ¶åˆ° es->p_tx */
 		
 		tcp_echoclient_send(_tpcb, es);
 		
 		if (es->p_tx)
 		{
-			pbuf_free(es->p_tx);	/* ÊÍ·ÅÄÚ´æ */
+			pbuf_free(es->p_tx);	/* é‡Šæ”¾å†…å­˜ */
 		}
 	}
 }
@@ -343,8 +343,8 @@ static void tcp_echoclient_send(struct tcp_pcb *tpcb, struct echoclient * es)
      /* other problem ?? */
    }
    
-   	/* 2016-09-08 by xd Á¢¿Ì·¢ËÍ */
-	tcp_output(tpcb);		        /* ½«Êı¾İÁ¢¿Ì·¢ËÍ³öÈ¥ */
+   	/* 2016-09-08 by xd ç«‹åˆ»å‘é€ */
+	tcp_output(tpcb);		        /* å°†æ•°æ®ç«‹åˆ»å‘é€å‡ºå» */
    
   }
 }
@@ -416,10 +416,10 @@ static err_t tcp_echoclient_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: tcp_echoclient_connection_close
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕÓë·şÎñÆ÷µÄÁ¬½Ó
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: tcp_echoclient_connection_close
+*	åŠŸèƒ½è¯´æ˜: å…³é—­ä¸æœåŠ¡å™¨çš„è¿æ¥
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 /**
@@ -443,9 +443,9 @@ void tcp_echoclient_connection_close(struct tcp_pcb *tpcb, struct echoclient * e
   /* close tcp connection */
   tcp_close(tpcb);
   
-/* ÒÔÏÂ4¸öº¯Êı 2016-09-19 by xd */
-  g_tClient.TcpState = 0;	/* ¶Ï¿ªÁ¬½Ó */
-  tcp_abort(tpcb);			/* ÖÕÖ¹tcp¿ØÖÆ¿é */
+/* ä»¥ä¸‹4ä¸ªå‡½æ•° 2016-09-19 by xd */
+  g_tClient.TcpState = 0;	/* æ–­å¼€è¿æ¥ */
+  tcp_abort(tpcb);			/* ç»ˆæ­¢tcpæ§åˆ¶å— */
   tcp_arg(tpcb,NULL); 
   tcp_err(tpcb,NULL);
 }

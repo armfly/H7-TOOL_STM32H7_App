@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ²âÊÔSIM800 GPRSÄ£¿é
-*	ÎÄ¼şÃû³Æ : gprs_test.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔGPRSÄ£¿é SIM800
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-08-01 armfly  Ê×·¢
+*	æ¨¡å—åç§° : æµ‹è¯•SIM800 GPRSæ¨¡å—
+*	æ–‡ä»¶åç§° : gprs_test.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•GPRSæ¨¡å— SIM800
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-08-01 armfly  é¦–å‘
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,131 +18,135 @@
 #include "form_gprs.h"
 #include "num_pad.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
 	FONT_T FontRed;
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBtn; /* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox; /* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;
-	LABEL_T Label3; LABEL_T Label4;
-	LABEL_T Label5; LABEL_T Label6;
-	LABEL_T Label7; LABEL_T Label8;
+	LABEL_T Label1;
+	LABEL_T Label2;
+	LABEL_T Label3;
+	LABEL_T Label4;
+	LABEL_T Label5;
+	LABEL_T Label6;
+	LABEL_T Label7;
+	LABEL_T Label8;
 
 	LABEL_T Label9;
 
-	EDIT_T Edit1;		/* µç»°ºÅÂë */
+	EDIT_T Edit1; /* ç”µè¯å·ç  */
 
-	BUTTON_T Btn1;		/* ²¦ºÅ */
-	BUTTON_T Btn2;		/* ¹Ò»ú */
-	BUTTON_T Btn3;		/* ½ÓÌıÀ´»° */
-	BUTTON_T Btn4;		/* ²¦´ò10086 */
-	BUTTON_T Btn5;		/* ²¦´ò10010 */
+	BUTTON_T Btn1; /* æ‹¨å· */
+	BUTTON_T Btn2; /* æŒ‚æœº */
+	BUTTON_T Btn3; /* æ¥å¬æ¥è¯ */
+	BUTTON_T Btn4; /* æ‹¨æ‰“10086 */
+	BUTTON_T Btn5; /* æ‹¨æ‰“10010 */
 
-	BUTTON_T BtnRet;	/* ·µ»Ø */
+	BUTTON_T BtnRet; /* è¿”å› */
 
-	char strHardInfo[32];		/* Ä£¿éÓ²¼şĞÅÏ¢ */
-	uint8_t ucNetStatus;	/* ÍøÂç×´Ì¬ */
-	uint8_t ucAudioCh;		/* µ±Ç°ÒôÆµÍ¨µÀ 0£¬ 1 */
-	uint8_t ucEarVolume;	/* ¶ú»úÒôÁ¿ 0 - 5 */
-	int16_t ucMicGain;		/* MICÒôÁ¿  -12£º×îĞ¡ÔöÒæ  12£º×î´óÔöÒæ  13£º¾²Òô*/
+	char strHardInfo[32]; /* æ¨¡å—ç¡¬ä»¶ä¿¡æ¯ */
+	uint8_t ucNetStatus;	/* ç½‘ç»œçŠ¶æ€ */
+	uint8_t ucAudioCh;		/* å½“å‰éŸ³é¢‘é€šé“ 0ï¼Œ 1 */
+	uint8_t ucEarVolume;	/* è€³æœºéŸ³é‡ 0 - 5 */
+	int16_t ucMicGain;		/* MICéŸ³é‡  -12ï¼šæœ€å°å¢ç›Š  12ï¼šæœ€å¤§å¢ç›Š  13ï¼šé™éŸ³*/
 
-}FormGPRS_T;
+} FormGPRS_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"GPRSÄ£¿é²âÊÔ³ÌĞò."
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "GPRSæ¨¡å—æµ‹è¯•ç¨‹åº."
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Ä£¿é°æ±¾ : "
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "æ¨¡å—ç‰ˆæœ¬ : "
 
-	#define LABEL2_X  	(LABEL1_X + 100)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"---"
+#define LABEL2_X (LABEL1_X + 100)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "---"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"ÍøÂç×´Ì¬ : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "ç½‘ç»œçŠ¶æ€ : "
 
-	#define LABEL4_X  	(LABEL3_X + 100)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"---"
+#define LABEL4_X (LABEL3_X + 100)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "---"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"ÒôÆµÍ¨µÀ : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "éŸ³é¢‘é€šé“ : "
 
-	#define LABEL6_X  	(LABEL5_X + 100)
-	#define LABEL6_Y	LABEL5_Y
-	#define LABEL6_TEXT	"1"
+#define LABEL6_X (LABEL5_X + 100)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT "1"
 
-#define LABEL7_X  	(LABEL1_X)
-#define LABEL7_Y	(LABEL1_Y + 20 * 3)
-#define LABEL7_TEXT	"¶ú»úÒôÁ¿ºÍMICÔöÒæ : "
+#define LABEL7_X (LABEL1_X)
+#define LABEL7_Y (LABEL1_Y + 20 * 3)
+#define LABEL7_TEXT "è€³æœºéŸ³é‡å’ŒMICå¢ç›Š : "
 
-	#define LABEL8_X  	(LABEL7_X + 160)
-	#define LABEL8_Y	LABEL7_Y
-	#define LABEL8_TEXT	"---"
+#define LABEL8_X (LABEL7_X + 160)
+#define LABEL8_Y LABEL7_Y
+#define LABEL8_TEXT "---"
 
-#define LABEL9_X  	(LABEL1_X)
-#define LABEL9_Y	(LABEL1_Y + 20 * 5)
-#define LABEL9_TEXT	"µç»°ºÅÂë : "
+#define LABEL9_X (LABEL1_X)
+#define LABEL9_Y (LABEL1_Y + 20 * 5)
+#define LABEL9_TEXT "ç”µè¯å·ç  : "
 
 /* Edit */
-#define	EDIT1_X		(LABEL9_X + 90)
-#define	EDIT1_Y	 	(LABEL9_Y - 4)
-#define EDIT1_H		26
-#define EDIT1_W		132
+#define EDIT1_X (LABEL9_X + 90)
+#define EDIT1_Y (LABEL9_Y - 4)
+#define EDIT1_H 26
+#define EDIT1_W 132
 
-/* °´Å¥ */
-#define BTN1_H	32
-#define BTN1_W	60
-#define	BTN1_X	LABEL1_X
-#define	BTN1_Y	(EDIT1_Y + EDIT1_H + 10)
-#define	BTN1_TEXT	"²¦ºÅ"
+/* æŒ‰é’® */
+#define BTN1_H 32
+#define BTN1_W 60
+#define BTN1_X LABEL1_X
+#define BTN1_Y (EDIT1_Y + EDIT1_H + 10)
+#define BTN1_TEXT "æ‹¨å·"
 
-#define BTN2_H	32
-#define BTN2_W	60
-#define	BTN2_X	(BTN1_X +  BTN1_W + 10)
-#define	BTN2_Y	BTN1_Y
-#define	BTN2_TEXT	"¹Ò»ú"
+#define BTN2_H 32
+#define BTN2_W 60
+#define BTN2_X (BTN1_X + BTN1_W + 10)
+#define BTN2_Y BTN1_Y
+#define BTN2_TEXT "æŒ‚æœº"
 
-#define BTN3_H	32
-#define BTN3_W	90
-#define	BTN3_X	(BTN1_X +  2 * (BTN1_W + 10))
-#define	BTN3_Y	BTN1_Y
-#define	BTN3_TEXT	"½ÓÌıÀ´»°"
+#define BTN3_H 32
+#define BTN3_W 90
+#define BTN3_X (BTN1_X + 2 * (BTN1_W + 10))
+#define BTN3_Y BTN1_Y
+#define BTN3_TEXT "æ¥å¬æ¥è¯"
 
-#define BTN4_H	32
-#define BTN4_W	124
-#define	BTN4_X	BTN1_X
-#define	BTN4_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN4_TEXT	"²¦´ò10086"
+#define BTN4_H 32
+#define BTN4_W 124
+#define BTN4_X BTN1_X
+#define BTN4_Y (BTN1_Y + BTN1_H + 10)
+#define BTN4_TEXT "æ‹¨æ‰“10086"
 
-#define BTN5_H	32
-#define BTN5_W	124
-#define	BTN5_X	BTN4_X + BTN4_W + 10
-#define	BTN5_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN5_TEXT	"²¦´ò10010"
+#define BTN5_H 32
+#define BTN5_W 124
+#define BTN5_X BTN4_X + BTN4_W + 10
+#define BTN5_Y (BTN1_Y + BTN1_H + 10)
+#define BTN5_TEXT "æ‹¨æ‰“10010"
 
 static void InitFormGPRS(void);
 static void DispFormGPRS(void);
@@ -154,10 +158,10 @@ void TestGPRS_MG323(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestGPRS
-*	¹¦ÄÜËµÃ÷: ²âÊÔ»ªÎªGPRSÄ£¿é
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestGPRS
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•åä¸ºGPRSæ¨¡å—
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestGPRS(void)
@@ -167,16 +171,16 @@ void TestGPRS(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestGPRS_SIM800
-*	¹¦ÄÜËµÃ÷: ²âÊÔSIM800 GPRSÄ£¿é
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestGPRS_SIM800
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•SIM800 GPRSæ¨¡å—
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestGPRS_SIM800(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	uint8_t ucValue;
@@ -193,16 +197,16 @@ void TestGPRS_SIM800(void)
 
 	bsp_InitSIM800();
 
-	printf("ÕıÔÚ¸øGPRSÄ£¿éÉÏµç...\r\n");
+	printf("æ­£åœ¨ç»™GPRSæ¨¡å—ä¸Šç”µ...\r\n");
 
-	/* ¸øGSMÄ£¿éÉÏµç */
+	/* ç»™GSMæ¨¡å—ä¸Šç”µ */
 	if (SIM800_PowerOn())
 	{
-		printf("\r\nÉÏµçÍê³É\r\n");
+		printf("\r\nä¸Šç”µå®Œæˆ\r\n");
 	}
 	else
 	{
-		printf("\r\nÄ£¿éÎŞÓ¦´ğ\r\n");
+		printf("\r\næ¨¡å—æ— åº”ç­”\r\n");
 	}
 
 	{
@@ -216,54 +220,54 @@ void TestGPRS_SIM800(void)
 		else
 		{
 			FormGPRS->Label2.Font = &FormGPRS->FontRed;
-			sprintf(FormGPRS->strHardInfo, "Î´¼ì²âµ½Ä£¿é");
+			sprintf(FormGPRS->strHardInfo, "æœªæ£€æµ‹åˆ°æ¨¡å—");
 		}
 		FormGPRS->Label2.pCaption = FormGPRS->strHardInfo;
 		LCD_DrawLabel(&FormGPRS->Label2);
 	}
 
-	//SIM800_SetAutoReport();		/* ÉèÖÃÊÂ¼ş×Ô¶¯ÉÏ±¨ */
+	//SIM800_SetAutoReport();		/* è®¾ç½®äº‹ä»¶è‡ªåŠ¨ä¸ŠæŠ¥ */
 
-	SIM800_SetMicGain(0, FormGPRS->ucMicGain);	/* ÉèÖÃMICÔöÒæ */
-	SIM800_SetEarVolume(FormGPRS->ucEarVolume);	/* ÉèÖÃ¶ú»úÒôÁ¿ */
+	SIM800_SetMicGain(0, FormGPRS->ucMicGain);	/* è®¾ç½®MICå¢ç›Š */
+	SIM800_SetEarVolume(FormGPRS->ucEarVolume); /* è®¾ç½®è€³æœºéŸ³é‡ */
 
 	bsp_DelayMS(100);
-	SIM800_SendAT("AT+CMICBIAS=0");	/* ´ò¿ªMICÆ«ÖÃµçÂ· */
-	
+	SIM800_SendAT("AT+CMICBIAS=0"); /* æ‰“å¼€MICåç½®ç”µè·¯ */
+
 	bsp_StartAutoTimer(0, 500);
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
 
-		/* ´ÓMG323ÊÕµ½µÄÊı¾İ·¢ËÍµ½´®¿Ú1 */
+		/* ä»MG323æ”¶åˆ°çš„æ•°æ®å‘é€åˆ°ä¸²å£1 */
 		if (comGetChar(COM_SIM800, &ucValue))
 		{
 			comSendChar(COM1, ucValue);
 			continue;
 		}
-		/* ½«´®¿Ú1µÄÊı¾İ·¢ËÍµ½MG323Ä£¿é */
+		/* å°†ä¸²å£1çš„æ•°æ®å‘é€åˆ°MG323æ¨¡å— */
 		if (comGetChar(COM1, &ucValue))
 		{
 			comSendChar(COM_SIM800, ucValue);
 			continue;
 		}
 
-		/* Ã¿¸ô0.5Ãë²éÑ¯Ò»ÏÂÍøÂç×¢²á×´Ì¬ */
+		/* æ¯éš”0.5ç§’æŸ¥è¯¢ä¸€ä¸‹ç½‘ç»œæ³¨å†ŒçŠ¶æ€ */
 		if (bsp_CheckTimer(0))
 		{
 			FormGPRS->ucNetStatus = SIM800_GetNetStatus();
 
 			if ((FormGPRS->ucNetStatus == CREG_LOCAL_OK) || (FormGPRS->ucNetStatus == CREG_REMOTE_OK))
 			{
-				bsp_StopTimer(0);	/* Í£Ö¹×Ô¶¯Ë¢ĞÂ */
+				bsp_StopTimer(0); /* åœæ­¢è‡ªåŠ¨åˆ·æ–° */
 
-				/* ÅäÖÃWM8978Ğ¾Æ¬£¬ÊäÈëÎªLINE½Ó¿Ú£¬Êä³öÎª¶ú»ú ºÍ ÑïÉùÆ÷ */
+				/* é…ç½®WM8978èŠ¯ç‰‡ï¼Œè¾“å…¥ä¸ºLINEæ¥å£ï¼Œè¾“å‡ºä¸ºè€³æœº å’Œ æ‰¬å£°å™¨ */
 				wm8978_CfgAudioPath(LINE_ON, EAR_LEFT_ON | EAR_RIGHT_ON | SPK_ON);
-			}			
+			}
 			else if (FormGPRS->ucNetStatus == CREG_NO_REG)
 			{
-				bsp_StopTimer(0);	/* Í£Ö¹×Ô¶¯Ë¢ĞÂ */
+				bsp_StopTimer(0); /* åœæ­¢è‡ªåŠ¨åˆ·æ–° */
 			}
 			fRefresh = 1;
 		}
@@ -272,162 +276,162 @@ void TestGPRS_SIM800(void)
 		{
 			fRefresh = 0;
 
-			DispFormGPRS();	/* Ë¢ĞÂËùÓĞ¿Ø¼ş */
+			DispFormGPRS(); /* åˆ·æ–°æ‰€æœ‰æ§ä»¶ */
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */			
-					LCD_ButtonTouchDown(&FormGPRS->BtnRet, tpX, tpY);
-					LCD_ButtonTouchDown(&FormGPRS->Btn1, tpX, tpY);
-					LCD_ButtonTouchDown(&FormGPRS->Btn2, tpX, tpY);
-					LCD_ButtonTouchDown(&FormGPRS->Btn3, tpX, tpY);
-					LCD_ButtonTouchDown(&FormGPRS->Btn4, tpX, tpY);
-					LCD_ButtonTouchDown(&FormGPRS->Btn5, tpX, tpY);				
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				LCD_ButtonTouchDown(&FormGPRS->BtnRet, tpX, tpY);
+				LCD_ButtonTouchDown(&FormGPRS->Btn1, tpX, tpY);
+				LCD_ButtonTouchDown(&FormGPRS->Btn2, tpX, tpY);
+				LCD_ButtonTouchDown(&FormGPRS->Btn3, tpX, tpY);
+				LCD_ButtonTouchDown(&FormGPRS->Btn4, tpX, tpY);
+				LCD_ButtonTouchDown(&FormGPRS->Btn5, tpX, tpY);
 
-					/* ±à¼­¿ò */
-					if (TOUCH_InRect(tpX, tpY, EDIT1_X, EDIT1_Y, EDIT1_H, EDIT1_W))
+				/* ç¼–è¾‘æ¡† */
+				if (TOUCH_InRect(tpX, tpY, EDIT1_X, EDIT1_Y, EDIT1_H, EDIT1_W))
+				{
 					{
+						if (InputNumber(NUMPAD_TEL, "è®¾ç½®ç”µè¯å·ç ", 0, (void *)FormGPRS->Edit1.Text))
 						{
-							if (InputNumber(NUMPAD_TEL, "ÉèÖÃµç»°ºÅÂë", 0, (void *)FormGPRS->Edit1.Text))
-							{
-								;
-							}
-
-							ClearWinNumPad(FORM_BACK_COLOR);	/* Çå³ıÊı×Ö¼üÅÌ´°¿Ú */
-							fRefresh = 1;
+							;
 						}
-					}
-					break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (LCD_ButtonTouchRelease(&FormGPRS->BtnRet, tpX, tpY))
-					{
-						fQuit = 1;	/* ·µ»Ø */
+						ClearWinNumPad(FORM_BACK_COLOR); /* æ¸…é™¤æ•°å­—é”®ç›˜çª—å£ */
+						fRefresh = 1;
 					}
-					else if (LCD_ButtonTouchRelease(&FormGPRS->Btn1, tpX, tpY))	/* ²¦ºÅ */
-					{
-						/* ²¦´òµç»° */
-						SIM800_DialTel(FormGPRS->Edit1.Text);
-					}
-					else if (LCD_ButtonTouchRelease(&FormGPRS->Btn2, tpX, tpY))
-					{
-						/* ¹Ò»ú */
-						SIM800_Hangup();
-					}
-					else if (LCD_ButtonTouchRelease(&FormGPRS->Btn3, tpX, tpY))	/* ½ÓÌıÀ´»° */
-					{
-						SIM800_SendAT("ATA");
-					}
-					else if (LCD_ButtonTouchRelease(&FormGPRS->Btn4, tpX, tpY))	/* ²¦´ò10086 */
-					{
-						SIM800_DialTel("10086");
-					}
-					else if (LCD_ButtonTouchRelease(&FormGPRS->Btn5, tpX, tpY))	/* ²¦´ò10010 */
-					{
-						SIM800_DialTel("10010");
-					}					
-					break;
+				}
+				break;
+
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (LCD_ButtonTouchRelease(&FormGPRS->BtnRet, tpX, tpY))
+				{
+					fQuit = 1; /* è¿”å› */
+				}
+				else if (LCD_ButtonTouchRelease(&FormGPRS->Btn1, tpX, tpY)) /* æ‹¨å· */
+				{
+					/* æ‹¨æ‰“ç”µè¯ */
+					SIM800_DialTel(FormGPRS->Edit1.Text);
+				}
+				else if (LCD_ButtonTouchRelease(&FormGPRS->Btn2, tpX, tpY))
+				{
+					/* æŒ‚æœº */
+					SIM800_Hangup();
+				}
+				else if (LCD_ButtonTouchRelease(&FormGPRS->Btn3, tpX, tpY)) /* æ¥å¬æ¥è¯ */
+				{
+					SIM800_SendAT("ATA");
+				}
+				else if (LCD_ButtonTouchRelease(&FormGPRS->Btn4, tpX, tpY)) /* æ‹¨æ‰“10086 */
+				{
+					SIM800_DialTel("10086");
+				}
+				else if (LCD_ButtonTouchRelease(&FormGPRS->Btn5, tpX, tpY)) /* æ‹¨æ‰“10010 */
+				{
+					SIM800_DialTel("10010");
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					SIM800_SendAT("ATD10086;");	/* ²¦´ò10086 */
-					break;
+			case KEY_DOWN_K1:							/* K1é”® */
+				SIM800_SendAT("ATD10086;"); /* æ‹¨æ‰“10086 */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					SIM800_SendAT("ATH");	/* ¹Ò¶Ïµç»° */
-					break;
+			case KEY_DOWN_K2:				/* K2é”®æŒ‰ä¸‹ */
+				SIM800_SendAT("ATH"); /* æŒ‚æ–­ç”µè¯ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					fRefresh = 1;
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				fRefresh = 1;
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ  µ÷½Ú¶ú»úÒôÁ¿ */
-					if (FormGPRS->ucEarVolume < EAR_VOL_MAX)
-					{
-						FormGPRS->ucEarVolume++;
-						SIM800_SetEarVolume(FormGPRS->ucEarVolume);
-					}
-					fRefresh = 1;
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹  è°ƒèŠ‚è€³æœºéŸ³é‡ */
+				if (FormGPRS->ucEarVolume < EAR_VOL_MAX)
+				{
+					FormGPRS->ucEarVolume++;
+					SIM800_SetEarVolume(FormGPRS->ucEarVolume);
+				}
+				fRefresh = 1;
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ  µ÷½Ú¶ú»úÒôÁ¿ */
-					if (FormGPRS->ucEarVolume > EAR_VOL_MIN)
-					{
-						FormGPRS->ucEarVolume--;
-						SIM800_SetEarVolume(FormGPRS->ucEarVolume);
-					}
-					fRefresh = 1;
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹  è°ƒèŠ‚è€³æœºéŸ³é‡ */
+				if (FormGPRS->ucEarVolume > EAR_VOL_MIN)
+				{
+					FormGPRS->ucEarVolume--;
+					SIM800_SetEarVolume(FormGPRS->ucEarVolume);
+				}
+				fRefresh = 1;
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ  µ÷½ÚMICÔöÒæ */
-					if (FormGPRS->ucMicGain > MIC_GAIN_MIN)
-					{
-						FormGPRS->ucMicGain--;
-						SIM800_SetMicGain(0, FormGPRS->ucMicGain);
-					}
-					fRefresh = 1;
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹  è°ƒèŠ‚MICå¢ç›Š */
+				if (FormGPRS->ucMicGain > MIC_GAIN_MIN)
+				{
+					FormGPRS->ucMicGain--;
+					SIM800_SetMicGain(0, FormGPRS->ucMicGain);
+				}
+				fRefresh = 1;
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ  µ÷½ÚMICÔöÒæ */
-					if (FormGPRS->ucMicGain < MIC_GAIN_MAX)
-					{
-						FormGPRS->ucMicGain++;
-						SIM800_SetMicGain(0, FormGPRS->ucMicGain);
-					}
-					fRefresh = 1;
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹  è°ƒèŠ‚MICå¢ç›Š */
+				if (FormGPRS->ucMicGain < MIC_GAIN_MAX)
+				{
+					FormGPRS->ucMicGain++;
+					SIM800_SetMicGain(0, FormGPRS->ucMicGain);
+				}
+				fRefresh = 1;
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
 
-	/* ¹Ø±ÕWM8978Ğ¾Æ¬ */
+	/* å…³é—­WM8978èŠ¯ç‰‡ */
 	wm8978_PowerDown();
 
-	SIM800_PowerOff();	/* ÏÂµç */
-	printf("GPRSÄ£¿éÒÑÏÂµç.\r\n");
+	SIM800_PowerOff(); /* ä¸‹ç”µ */
+	printf("GPRSæ¨¡å—å·²ä¸‹ç”µ.\r\n");
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormGPRS
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯¿Ø¼şÊôĞÔ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormGPRS
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–æ§ä»¶å±æ€§
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormGPRS(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormGPRS->FontBox.FontCode = FC_ST_16;
-	FormGPRS->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormGPRS->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormGPRS->FontBox.FrontColor = CL_BLACK;
 	FormGPRS->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormGPRS->FontBlack.FontCode = FC_ST_16;
-	FormGPRS->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormGPRS->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormGPRS->FontBlack.FrontColor = CL_BLACK;
 	FormGPRS->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormGPRS->FontBlue.FontCode = FC_ST_16;
 	FormGPRS->FontBlue.BackColor = CL_BTN_FACE;
 	FormGPRS->FontBlue.FrontColor = CL_BLUE;
@@ -438,13 +442,13 @@ static void InitFormGPRS(void)
 	FormGPRS->FontRed.FrontColor = CL_RED;
 	FormGPRS->FontRed.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormGPRS->FontBtn.FontCode = FC_ST_16;
-	FormGPRS->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormGPRS->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormGPRS->FontBtn.FrontColor = CL_BLACK;
 	FormGPRS->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormGPRS->Box1.Left = BOX1_X;
 	FormGPRS->Box1.Top = BOX1_Y;
 	FormGPRS->Box1.Height = BOX1_H;
@@ -452,7 +456,7 @@ static void InitFormGPRS(void)
 	FormGPRS->Box1.pCaption = BOX1_TEXT;
 	FormGPRS->Box1.Font = &FormGPRS->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormGPRS->Label1.Left = LABEL1_X;
 	FormGPRS->Label1.Top = LABEL1_Y;
 	FormGPRS->Label1.MaxLen = 0;
@@ -483,7 +487,7 @@ static void InitFormGPRS(void)
 	FormGPRS->Label9.pCaption = LABEL9_TEXT;
 	FormGPRS->Label9.Font = &FormGPRS->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormGPRS->Label2.Left = LABEL2_X;
 	FormGPRS->Label2.Top = LABEL2_Y;
 	FormGPRS->Label2.MaxLen = 0;
@@ -508,7 +512,7 @@ static void InitFormGPRS(void)
 	FormGPRS->Label8.pCaption = LABEL8_TEXT;
 	FormGPRS->Label8.Font = &FormGPRS->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormGPRS->BtnRet.Left = BTN_RET_X;
 	FormGPRS->BtnRet.Top = BTN_RET_Y;
 	FormGPRS->BtnRet.Height = BTN_RET_H;
@@ -557,7 +561,7 @@ static void InitFormGPRS(void)
 	FormGPRS->Btn5.Font = &FormGPRS->FontBtn;
 	FormGPRS->Btn5.Focus = 0;
 
-	/* ±à¼­¿ò */
+	/* ç¼–è¾‘æ¡† */
 	FormGPRS->Edit1.Left = EDIT1_X;
 	FormGPRS->Edit1.Top = EDIT1_Y;
 	FormGPRS->Edit1.Height = EDIT1_H;
@@ -566,66 +570,66 @@ static void InitFormGPRS(void)
 	FormGPRS->Edit1.pCaption = FormGPRS->Edit1.Text;
 	FormGPRS->Edit1.Font = &FormGPRS->FontBtn;
 
-	FormGPRS->ucMicGain = MIC_GAIN_DEFAULT;		/* È±Ê¡MICÔöÒæ */
-	FormGPRS->ucEarVolume = EAR_VOL_DEFAULT;	/* È±Ê¡¶ú»úÒôÁ¿ */
+	FormGPRS->ucMicGain = MIC_GAIN_DEFAULT;	/* ç¼ºçœMICå¢ç›Š */
+	FormGPRS->ucEarVolume = EAR_VOL_DEFAULT; /* ç¼ºçœè€³æœºéŸ³é‡ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispFormGPRS
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispFormGPRS
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispFormGPRS(void)
 {
 	//LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormGPRS->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormGPRS->Label1);
 	LCD_DrawLabel(&FormGPRS->Label3);
 	LCD_DrawLabel(&FormGPRS->Label5);
 	LCD_DrawLabel(&FormGPRS->Label7);
 	LCD_DrawLabel(&FormGPRS->Label9);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormGPRS->BtnRet);
 	LCD_DrawButton(&FormGPRS->Btn1);
 	LCD_DrawButton(&FormGPRS->Btn2);
 	LCD_DrawButton(&FormGPRS->Btn3);
 	LCD_DrawButton(&FormGPRS->Btn4);
-	LCD_DrawButton(&FormGPRS->Btn5);	
+	LCD_DrawButton(&FormGPRS->Btn5);
 
-	/* ±à¼­¿ò */
+	/* ç¼–è¾‘æ¡† */
 	LCD_DrawEdit(&FormGPRS->Edit1);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormGPRS->Label2);
 
-	/* ÍøÂç×¢²á×´Ì¬ */
+	/* ç½‘ç»œæ³¨å†ŒçŠ¶æ€ */
 	if (FormGPRS->ucNetStatus == CREG_NO_REG)
 	{
-		FormGPRS->Label4.pCaption = "Ã»ÓĞ×¢²á, ÒÑÍ£Ö¹ËÑÑ°";
+		FormGPRS->Label4.pCaption = "æ²¡æœ‰æ³¨å†Œ, å·²åœæ­¢æœå¯»";
 	}
 	else if (FormGPRS->ucNetStatus == CREG_LOCAL_OK)
 	{
-		FormGPRS->Label4.pCaption = "ÒÑ×¢²áµ½±¾µØÍøÂç      ";
+		FormGPRS->Label4.pCaption = "å·²æ³¨å†Œåˆ°æœ¬åœ°ç½‘ç»œ      ";
 	}
 	else if (FormGPRS->ucNetStatus == CREG_SEARCH)
 	{
-		FormGPRS->Label4.pCaption = "ÕıÔÚËÑÑ°ÍøÂçÔËÓªÉÌ  ";
+		FormGPRS->Label4.pCaption = "æ­£åœ¨æœå¯»ç½‘ç»œè¿è¥å•†  ";
 	}
 	else if (FormGPRS->ucNetStatus == CREG_REJECT)
 	{
-		FormGPRS->Label4.pCaption = "×¢²á±»¾Ü¾ø          ";
+		FormGPRS->Label4.pCaption = "æ³¨å†Œè¢«æ‹’ç»          ";
 	}
 	else if (FormGPRS->ucNetStatus == CREG_REMOTE_OK)
 	{
-		FormGPRS->Label4.pCaption = "ÒÑ×¢²áµ½ÂşÓÎÍøÂç     ";
+		FormGPRS->Label4.pCaption = "å·²æ³¨å†Œåˆ°æ¼«æ¸¸ç½‘ç»œ     ";
 	}
 	else
 	{
@@ -635,15 +639,15 @@ static void DispFormGPRS(void)
 
 	if (FormGPRS->ucAudioCh == 0)
 	{
-		FormGPRS->Label6.pCaption = "µÚ1Í¨µÀ INTMIC, INTEAR";
+		FormGPRS->Label6.pCaption = "ç¬¬1é€šé“ INTMIC, INTEAR";
 	}
 	else
 	{
-		FormGPRS->Label6.pCaption = "µÚ2Í¨µÀ EXTMIC, EXTEAR";
+		FormGPRS->Label6.pCaption = "ç¬¬2é€šé“ EXTMIC, EXTEAR";
 	}
 	LCD_DrawLabel(&FormGPRS->Label6);
 
-	/* ¶ú»úÒôÁ¿ */
+	/* è€³æœºéŸ³é‡ */
 	{
 		char buf[64];
 
@@ -653,4 +657,4 @@ static void DispFormGPRS(void)
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

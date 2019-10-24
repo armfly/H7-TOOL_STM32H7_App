@@ -1,33 +1,33 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ¶¨Ê±Æ÷Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_timer.c
-*	°æ    ±¾ : V1.5
-*	Ëµ    Ã÷ : ÅäÖÃsystick¶¨Ê±Æ÷×÷ÎªÏµÍ³µÎ´ğ¶¨Ê±Æ÷¡£È±Ê¡¶¨Ê±ÖÜÆÚÎª1ms¡£
+*	æ¨¡å—åç§° : å®šæ—¶å™¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_timer.c
+*	ç‰ˆ    æœ¬ : V1.5
+*	è¯´    æ˜ : é…ç½®systickå®šæ—¶å™¨ä½œä¸ºç³»ç»Ÿæ»´ç­”å®šæ—¶å™¨ã€‚ç¼ºçœå®šæ—¶å‘¨æœŸä¸º1msã€‚
 *
-*				ÊµÏÖÁË¶à¸öÈí¼ş¶¨Ê±Æ÷¹©Ö÷³ÌĞòÊ¹ÓÃ(¾«¶È1ms)£¬ ¿ÉÒÔÍ¨¹ıĞŞ¸Ä TMR_COUNT Ôö¼õ¶¨Ê±Æ÷¸öÊı
-*				ÊµÏÖÁËms¼¶±ğÑÓ³Ùº¯Êı£¨¾«¶È1ms£© ºÍus¼¶ÑÓ³Ùº¯Êı
-*				ÊµÏÖÁËÏµÍ³ÔËĞĞÊ±¼äº¯Êı£¨1msµ¥Î»£©
+*				å®ç°äº†å¤šä¸ªè½¯ä»¶å®šæ—¶å™¨ä¾›ä¸»ç¨‹åºä½¿ç”¨(ç²¾åº¦1ms)ï¼Œ å¯ä»¥é€šè¿‡ä¿®æ”¹ TMR_COUNT å¢å‡å®šæ—¶å™¨ä¸ªæ•°
+*				å®ç°äº†msçº§åˆ«å»¶è¿Ÿå‡½æ•°ï¼ˆç²¾åº¦1msï¼‰ å’Œusçº§å»¶è¿Ÿå‡½æ•°
+*				å®ç°äº†ç³»ç»Ÿè¿è¡Œæ—¶é—´å‡½æ•°ï¼ˆ1mså•ä½ï¼‰
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-02-01 armfly  ÕıÊ½·¢²¼
-*		V1.1    2013-06-21 armfly  Ôö¼Óus¼¶ÑÓ³Ùº¯Êı bsp_DelayUS
-*		V1.2    2014-09-07 armfly  Ôö¼ÓTIM4 Ó²¼ş¶¨Ê±ÖĞ¶Ï£¬ÊµÏÖus¼¶±ğ¶¨Ê±.20us - 16Ãë
-*		V1.3    2015-04-06 armfly  Ôö¼Ó bsp_CheckRunTime(int32_t _LastTime) ÓÃÀ´¼ÆËãÊ±¼ä²îÖµ
-*		V1.4	2015-05-22 armfly  ÍêÉÆ bsp_InitHardTimer() £¬Ôö¼ÓÌõ¼ş±àÒëÑ¡ÔñTIM2-5
-*		V1.5	2018-11-26 armfly  s_tTmr¸³³õÖµ0; Ôö¼Óg_ucEnableSystickISR±äÁ¿±ÜÃâHALÌáÇ°´ò¿ªsystickÖĞ¶Ï
-*								   ÒıÆğµÄÒì³£¡£
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-02-01 armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2013-06-21 armfly  å¢åŠ usçº§å»¶è¿Ÿå‡½æ•° bsp_DelayUS
+*		V1.2    2014-09-07 armfly  å¢åŠ TIM4 ç¡¬ä»¶å®šæ—¶ä¸­æ–­ï¼Œå®ç°usçº§åˆ«å®šæ—¶.20us - 16ç§’
+*		V1.3    2015-04-06 armfly  å¢åŠ  bsp_CheckRunTime(int32_t _LastTime) ç”¨æ¥è®¡ç®—æ—¶é—´å·®å€¼
+*		V1.4	2015-05-22 armfly  å®Œå–„ bsp_InitHardTimer() ï¼Œå¢åŠ æ¡ä»¶ç¼–è¯‘é€‰æ‹©TIM2-5
+*		V1.5	2018-11-26 armfly  s_tTmrèµ‹åˆå€¼0; å¢åŠ g_ucEnableSystickISRå˜é‡é¿å…HALæå‰æ‰“å¼€systickä¸­æ–­
+*								   å¼•èµ·çš„å¼‚å¸¸ã€‚
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 #include "bsp.h"
 
 /*
-	¶¨ÒåÓÃÓÚÓ²¼ş¶¨Ê±Æ÷µÄTIM£¬ ¿ÉÒÔÊ¹ TIM2 - TIM5
+	å®šä¹‰ç”¨äºç¡¬ä»¶å®šæ—¶å™¨çš„TIMï¼Œ å¯ä»¥ä½¿ TIM2 - TIM5
 */
 #define USE_TIM2
 //#define USE_TIM3
@@ -35,104 +35,102 @@
 //#define USE_TIM5
 
 #ifdef USE_TIM2
-	#define TIM_HARD					TIM2
-	#define	RCC_TIM_HARD_CLK_ENABLE()	__HAL_RCC_TIM2_CLK_ENABLE()
-	#define TIM_HARD_IRQn				TIM2_IRQn
-	#define TIM_HARD_IRQHandler			TIM2_IRQHandler
+#define TIM_HARD TIM2
+#define RCC_TIM_HARD_CLK_ENABLE() __HAL_RCC_TIM2_CLK_ENABLE()
+#define TIM_HARD_IRQn TIM2_IRQn
+#define TIM_HARD_IRQHandler TIM2_IRQHandler
 #endif
 
 #ifdef USE_TIM3
-	#define TIM_HARD					TIM3
-	#define	RCC_TIM_HARD_CLK_ENABLE()	__HAL_RCC_TIM3_CLK_ENABLE()	
-	#define TIM_HARD_IRQn				TIM3_IRQn
-	#define TIM_HARD_IRQHandler			TIM3_IRQHandler
+#define TIM_HARD TIM3
+#define RCC_TIM_HARD_CLK_ENABLE() __HAL_RCC_TIM3_CLK_ENABLE()
+#define TIM_HARD_IRQn TIM3_IRQn
+#define TIM_HARD_IRQHandler TIM3_IRQHandler
 #endif
 
 #ifdef USE_TIM4
-	#define TIM_HARD					TIM4
-	#define	RCC_TIM_HARD_CLK_ENABLE()	__HAL_RCC_TIM4_CLK_ENABLE()
-	#define TIM_HARD_IRQn				TIM4_IRQn
-	#define TIM_HARD_IRQHandler			TIM4_IRQHandler
+#define TIM_HARD TIM4
+#define RCC_TIM_HARD_CLK_ENABLE() __HAL_RCC_TIM4_CLK_ENABLE()
+#define TIM_HARD_IRQn TIM4_IRQn
+#define TIM_HARD_IRQHandler TIM4_IRQHandler
 #endif
 
 #ifdef USE_TIM5
-	#define TIM_HARD					TIM5
-	#define	RCC_TIM_HARD_CLK_ENABLE()	__HAL_RCC_TIM5_CLK_ENABLE()
-	#define TIM_HARD_IRQn				TIM5_IRQn
-	#define TIM_HARD_IRQHandler			TIM5_IRQHandler
+#define TIM_HARD TIM5
+#define RCC_TIM_HARD_CLK_ENABLE() __HAL_RCC_TIM5_CLK_ENABLE()
+#define TIM_HARD_IRQn TIM5_IRQn
+#define TIM_HARD_IRQHandler TIM5_IRQHandler
 #endif
 
-/* ±£´æ TIM¶¨Ê±ÖĞ¶Ïµ½ºóÖ´ĞĞµÄ»Øµ÷º¯ÊıÖ¸Õë */
+/* ä¿å­˜ TIMå®šæ—¶ä¸­æ–­åˆ°åæ‰§è¡Œçš„å›è°ƒå‡½æ•°æŒ‡é’ˆ */
 static void (*s_TIM_CallBack1)(void);
 static void (*s_TIM_CallBack2)(void);
 static void (*s_TIM_CallBack3)(void);
 static void (*s_TIM_CallBack4)(void);
 
-
-/* Õâ2¸öÈ«¾Ö±äÁ¿×ªÓÃÓÚ bsp_DelayMS() º¯Êı */
+/* è¿™2ä¸ªå…¨å±€å˜é‡è½¬ç”¨äº bsp_DelayMS() å‡½æ•° */
 static volatile uint32_t s_uiDelayCount = 0;
 static volatile uint8_t s_ucTimeOutFlag = 0;
 
-/* ¶¨ÓÚÈí¼ş¶¨Ê±Æ÷½á¹¹Ìå±äÁ¿ */
+/* å®šäºè½¯ä»¶å®šæ—¶å™¨ç»“æ„ä½“å˜é‡ */
 static SOFT_TMR s_tTmr[TMR_COUNT] = {0};
 
 /*
-	È«¾ÖÔËĞĞÊ±¼ä£¬µ¥Î»1ms
-	×î³¤¿ÉÒÔ±íÊ¾ 24.85Ìì£¬Èç¹ûÄãµÄ²úÆ·Á¬ĞøÔËĞĞÊ±¼ä³¬¹ıÕâ¸öÊı£¬Ôò±ØĞë¿¼ÂÇÒç³öÎÊÌâ
+	å…¨å±€è¿è¡Œæ—¶é—´ï¼Œå•ä½1ms
+	æœ€é•¿å¯ä»¥è¡¨ç¤º 24.85å¤©ï¼Œå¦‚æœä½ çš„äº§å“è¿ç»­è¿è¡Œæ—¶é—´è¶…è¿‡è¿™ä¸ªæ•°ï¼Œåˆ™å¿…é¡»è€ƒè™‘æº¢å‡ºé—®é¢˜
 */
 __IO int32_t g_iRunTime = 0;
 
-static __IO uint8_t g_ucEnableSystickISR = 0;	/* µÈ´ı±äÁ¿³õÊ¼»¯ */
+static __IO uint8_t g_ucEnableSystickISR = 0; /* ç­‰å¾…å˜é‡åˆå§‹åŒ– */
 
 static void bsp_SoftTimerDec(SOFT_TMR *_tmr);
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitTimer
-*	¹¦ÄÜËµÃ÷: ÅäÖÃsystickÖĞ¶Ï£¬²¢³õÊ¼»¯Èí¼ş¶¨Ê±Æ÷±äÁ¿
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitTimer
+*	åŠŸèƒ½è¯´æ˜: é…ç½®systickä¸­æ–­ï¼Œå¹¶åˆå§‹åŒ–è½¯ä»¶å®šæ—¶å™¨å˜é‡
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitTimer(void)
 {
 	uint8_t i;
 
-	/* ÇåÁãËùÓĞµÄÈí¼ş¶¨Ê±Æ÷ */
+	/* æ¸…é›¶æ‰€æœ‰çš„è½¯ä»¶å®šæ—¶å™¨ */
 	for (i = 0; i < TMR_COUNT; i++)
 	{
 		s_tTmr[i].Count = 0;
 		s_tTmr[i].PreLoad = 0;
 		s_tTmr[i].Flag = 0;
-		s_tTmr[i].Mode = TMR_ONCE_MODE;	/* È±Ê¡ÊÇ1´ÎĞÔ¹¤×÷Ä£Ê½ */
+		s_tTmr[i].Mode = TMR_ONCE_MODE; /* ç¼ºçœæ˜¯1æ¬¡æ€§å·¥ä½œæ¨¡å¼ */
 	}
 
 	/*
-		ÅäÖÃsysticÖĞ¶ÏÖÜÆÚÎª1ms£¬²¢Æô¶¯systickÖĞ¶Ï¡£
+		é…ç½®systicä¸­æ–­å‘¨æœŸä¸º1msï¼Œå¹¶å¯åŠ¨systickä¸­æ–­ã€‚
 
-    	SystemCoreClock ÊÇ¹Ì¼şÖĞ¶¨ÒåµÄÏµÍ³ÄÚºËÊ±ÖÓ£¬¶ÔÓÚSTM32F4XX,Ò»°ãÎª 168MHz
+    	SystemCoreClock æ˜¯å›ºä»¶ä¸­å®šä¹‰çš„ç³»ç»Ÿå†…æ ¸æ—¶é’Ÿï¼Œå¯¹äºSTM32F4XX,ä¸€èˆ¬ä¸º 168MHz
 
-    	SysTick_Config() º¯ÊıµÄĞÎ²Î±íÊ¾ÄÚºËÊ±ÖÓ¶àÉÙ¸öÖÜÆÚºó´¥·¢Ò»´ÎSystick¶¨Ê±ÖĞ¶Ï.
-	    	-- SystemCoreClock / 1000  ±íÊ¾¶¨Ê±ÆµÂÊÎª 1000Hz£¬ Ò²¾ÍÊÇ¶¨Ê±ÖÜÆÚÎª  1ms
-	    	-- SystemCoreClock / 500   ±íÊ¾¶¨Ê±ÆµÂÊÎª 500Hz£¬  Ò²¾ÍÊÇ¶¨Ê±ÖÜÆÚÎª  2ms
-	    	-- SystemCoreClock / 2000  ±íÊ¾¶¨Ê±ÆµÂÊÎª 2000Hz£¬ Ò²¾ÍÊÇ¶¨Ê±ÖÜÆÚÎª  500us
+    	SysTick_Config() å‡½æ•°çš„å½¢å‚è¡¨ç¤ºå†…æ ¸æ—¶é’Ÿå¤šå°‘ä¸ªå‘¨æœŸåè§¦å‘ä¸€æ¬¡Systickå®šæ—¶ä¸­æ–­.
+	    	-- SystemCoreClock / 1000  è¡¨ç¤ºå®šæ—¶é¢‘ç‡ä¸º 1000Hzï¼Œ ä¹Ÿå°±æ˜¯å®šæ—¶å‘¨æœŸä¸º  1ms
+	    	-- SystemCoreClock / 500   è¡¨ç¤ºå®šæ—¶é¢‘ç‡ä¸º 500Hzï¼Œ  ä¹Ÿå°±æ˜¯å®šæ—¶å‘¨æœŸä¸º  2ms
+	    	-- SystemCoreClock / 2000  è¡¨ç¤ºå®šæ—¶é¢‘ç‡ä¸º 2000Hzï¼Œ ä¹Ÿå°±æ˜¯å®šæ—¶å‘¨æœŸä¸º  500us
 
-    	¶ÔÓÚ³£¹æµÄÓ¦ÓÃ£¬ÎÒÃÇÒ»°ãÈ¡¶¨Ê±ÖÜÆÚ1ms¡£¶ÔÓÚµÍËÙCPU»òÕßµÍ¹¦ºÄÓ¦ÓÃ£¬¿ÉÒÔÉèÖÃ¶¨Ê±ÖÜÆÚÎª 10ms
+    	å¯¹äºå¸¸è§„çš„åº”ç”¨ï¼Œæˆ‘ä»¬ä¸€èˆ¬å–å®šæ—¶å‘¨æœŸ1msã€‚å¯¹äºä½é€ŸCPUæˆ–è€…ä½åŠŸè€—åº”ç”¨ï¼Œå¯ä»¥è®¾ç½®å®šæ—¶å‘¨æœŸä¸º 10ms
     */
 	SysTick_Config(SystemCoreClock / 1000);
-	
-	g_ucEnableSystickISR = 1;		/* 1±íÊ¾Ö´ĞĞsystickÖĞ¶Ï */
-	
+
+	g_ucEnableSystickISR = 1; /* 1è¡¨ç¤ºæ‰§è¡Œsystickä¸­æ–­ */
+
 	bsp_InitHardTimer();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: SysTick_ISR
-*	¹¦ÄÜËµÃ÷: SysTickÖĞ¶Ï·şÎñ³ÌĞò£¬Ã¿¸ô1ms½øÈë1´Î
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: SysTick_ISR
+*	åŠŸèƒ½è¯´æ˜: SysTickä¸­æ–­æœåŠ¡ç¨‹åºï¼Œæ¯éš”1msè¿›å…¥1æ¬¡
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern void bsp_RunPer1ms(void);
@@ -143,10 +141,10 @@ void SysTick_ISR(void)
 {
 	static uint8_t s_count = 0;
 	uint8_t i;
-	
+
 	SysTick_Handler_DAP();
-	
-	/* Ã¿¸ô1ms½øÀ´1´Î £¨½öÓÃÓÚ bsp_DelayMS£© */
+
+	/* æ¯éš”1msè¿›æ¥1æ¬¡ ï¼ˆä»…ç”¨äº bsp_DelayMSï¼‰ */
 	if (s_uiDelayCount > 0)
 	{
 		if (--s_uiDelayCount == 0)
@@ -155,48 +153,48 @@ void SysTick_ISR(void)
 		}
 	}
 
-	/* Ã¿¸ô1ms£¬¶ÔÈí¼ş¶¨Ê±Æ÷µÄ¼ÆÊıÆ÷½øĞĞ¼õÒ»²Ù×÷ */
+	/* æ¯éš”1msï¼Œå¯¹è½¯ä»¶å®šæ—¶å™¨çš„è®¡æ•°å™¨è¿›è¡Œå‡ä¸€æ“ä½œ */
 	for (i = 0; i < TMR_COUNT; i++)
 	{
 		bsp_SoftTimerDec(&s_tTmr[i]);
 	}
 
-	/* È«¾ÖÔËĞĞÊ±¼äÃ¿1msÔö1 */
+	/* å…¨å±€è¿è¡Œæ—¶é—´æ¯1mså¢1 */
 	g_iRunTime++;
-	if (g_iRunTime == 0x7FFFFFFF)	/* Õâ¸ö±äÁ¿ÊÇ int32_t ÀàĞÍ£¬×î´óÊıÎª 0x7FFFFFFF */
+	if (g_iRunTime == 0x7FFFFFFF) /* è¿™ä¸ªå˜é‡æ˜¯ int32_t ç±»å‹ï¼Œæœ€å¤§æ•°ä¸º 0x7FFFFFFF */
 	{
 		g_iRunTime = 0;
 	}
 
-	bsp_RunPer1ms();		/* Ã¿¸ô1msµ÷ÓÃÒ»´Î´Ëº¯Êı£¬´Ëº¯ÊıÔÚ bsp.c */
+	bsp_RunPer1ms(); /* æ¯éš”1msè°ƒç”¨ä¸€æ¬¡æ­¤å‡½æ•°ï¼Œæ­¤å‡½æ•°åœ¨ bsp.c */
 
 	if (++s_count >= 10)
 	{
 		s_count = 0;
 
-		bsp_RunPer10ms();	/* Ã¿¸ô10msµ÷ÓÃÒ»´Î´Ëº¯Êı£¬´Ëº¯ÊıÔÚ bsp.c */
+		bsp_RunPer10ms(); /* æ¯éš”10msè°ƒç”¨ä¸€æ¬¡æ­¤å‡½æ•°ï¼Œæ­¤å‡½æ•°åœ¨ bsp.c */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_SoftTimerDec
-*	¹¦ÄÜËµÃ÷: Ã¿¸ô1ms¶ÔËùÓĞ¶¨Ê±Æ÷±äÁ¿¼õ1¡£±ØĞë±»SysTick_ISRÖÜÆÚĞÔµ÷ÓÃ¡£
-*	ĞÎ    ²Î:  _tmr : ¶¨Ê±Æ÷±äÁ¿Ö¸Õë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_SoftTimerDec
+*	åŠŸèƒ½è¯´æ˜: æ¯éš”1mså¯¹æ‰€æœ‰å®šæ—¶å™¨å˜é‡å‡1ã€‚å¿…é¡»è¢«SysTick_ISRå‘¨æœŸæ€§è°ƒç”¨ã€‚
+*	å½¢    å‚:  _tmr : å®šæ—¶å™¨å˜é‡æŒ‡é’ˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void bsp_SoftTimerDec(SOFT_TMR *_tmr)
 {
 	if (_tmr->Count > 0)
 	{
-		/* Èç¹û¶¨Ê±Æ÷±äÁ¿¼õµ½1ÔòÉèÖÃ¶¨Ê±Æ÷µ½´ï±êÖ¾ */
+		/* å¦‚æœå®šæ—¶å™¨å˜é‡å‡åˆ°1åˆ™è®¾ç½®å®šæ—¶å™¨åˆ°è¾¾æ ‡å¿— */
 		if (--_tmr->Count == 0)
 		{
 			_tmr->Flag = 1;
 
-			/* Èç¹ûÊÇ×Ô¶¯Ä£Ê½£¬Ôò×Ô¶¯ÖØ×°¼ÆÊıÆ÷ */
-			if(_tmr->Mode == TMR_AUTO_MODE)
+			/* å¦‚æœæ˜¯è‡ªåŠ¨æ¨¡å¼ï¼Œåˆ™è‡ªåŠ¨é‡è£…è®¡æ•°å™¨ */
+			if (_tmr->Mode == TMR_AUTO_MODE)
 			{
 				_tmr->Count = _tmr->PreLoad;
 			}
@@ -206,10 +204,10 @@ static void bsp_SoftTimerDec(SOFT_TMR *_tmr)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_DelayMS
-*	¹¦ÄÜËµÃ÷: ms¼¶ÑÓ³Ù£¬ÑÓ³Ù¾«¶ÈÎªÕı¸º1ms
-*	ĞÎ    ²Î:  n : ÑÓ³Ù³¤¶È£¬µ¥Î»1 ms¡£ n Ó¦´óÓÚ2
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_DelayMS
+*	åŠŸèƒ½è¯´æ˜: msçº§å»¶è¿Ÿï¼Œå»¶è¿Ÿç²¾åº¦ä¸ºæ­£è´Ÿ1ms
+*	å½¢    å‚:  n : å»¶è¿Ÿé•¿åº¦ï¼Œå•ä½1 msã€‚ n åº”å¤§äº2
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_DelayMS(uint32_t n)
@@ -223,20 +221,20 @@ void bsp_DelayMS(uint32_t n)
 		n = 2;
 	}
 
-	DISABLE_INT();  			/* ¹ØÖĞ¶Ï */
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
 	s_uiDelayCount = n;
 	s_ucTimeOutFlag = 0;
 
-	ENABLE_INT();  				/* ¿ªÖĞ¶Ï */
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
 
 	while (1)
 	{
-		bsp_Idle();				/* CPU¿ÕÏĞÖ´ĞĞµÄ²Ù×÷£¬ ¼û bsp.c ºÍ bsp.h ÎÄ¼ş */
+		bsp_Idle(); /* CPUç©ºé—²æ‰§è¡Œçš„æ“ä½œï¼Œ è§ bsp.c å’Œ bsp.h æ–‡ä»¶ */
 
 		/*
-			µÈ´ıÑÓ³ÙÊ±¼äµ½
-			×¢Òâ£º±àÒëÆ÷ÈÏÎª s_ucTimeOutFlag = 0£¬ËùÒÔ¿ÉÄÜÓÅ»¯´íÎó£¬Òò´Ë s_ucTimeOutFlag ±äÁ¿±ØĞëÉêÃ÷Îª volatile
+			ç­‰å¾…å»¶è¿Ÿæ—¶é—´åˆ°
+			æ³¨æ„ï¼šç¼–è¯‘å™¨è®¤ä¸º s_ucTimeOutFlag = 0ï¼Œæ‰€ä»¥å¯èƒ½ä¼˜åŒ–é”™è¯¯ï¼Œå› æ­¤ s_ucTimeOutFlag å˜é‡å¿…é¡»ç”³æ˜ä¸º volatile
 		*/
 		if (s_ucTimeOutFlag == 1)
 		{
@@ -247,142 +245,144 @@ void bsp_DelayMS(uint32_t n)
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: bsp_DelayUS
-*    ¹¦ÄÜËµÃ÷: us¼¶ÑÓ³Ù¡£ ±ØĞëÔÚsystick¶¨Ê±Æ÷Æô¶¯ºó²ÅÄÜµ÷ÓÃ´Ëº¯Êı¡£
-*    ĞÎ    ²Î:  n : ÑÓ³Ù³¤¶È£¬µ¥Î»1 us
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: bsp_DelayUS
+*    åŠŸèƒ½è¯´æ˜: usçº§å»¶è¿Ÿã€‚ å¿…é¡»åœ¨systickå®šæ—¶å™¨å¯åŠ¨åæ‰èƒ½è°ƒç”¨æ­¤å‡½æ•°ã€‚
+*    å½¢    å‚:  n : å»¶è¿Ÿé•¿åº¦ï¼Œå•ä½1 us
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_DelayUS(uint32_t n)
 {
-    uint32_t ticks;
-    uint32_t told;
-    uint32_t tnow;
-    uint32_t tcnt = 0;
-    uint32_t reload;
-       
-	reload = SysTick->LOAD;                
-    ticks = n * (SystemCoreClock / 1000000);	 /* ĞèÒªµÄ½ÚÅÄÊı */  
-    
-    tcnt = 0;
-    told = SysTick->VAL;             /* ¸Õ½øÈëÊ±µÄ¼ÆÊıÆ÷Öµ */
+	uint32_t ticks;
+	uint32_t told;
+	uint32_t tnow;
+	uint32_t tcnt = 0;
+	uint32_t reload;
 
-    while (1)
-    {
-        tnow = SysTick->VAL;    
-        if (tnow != told)
-        {    
-            /* SYSTICKÊÇÒ»¸öµİ¼õµÄ¼ÆÊıÆ÷ */    
-            if (tnow < told)
-            {
-                tcnt += told - tnow;    
-            }
-            /* ÖØĞÂ×°ÔØµİ¼õ */
-            else
-            {
-                tcnt += reload - tnow + told;    
-            }        
-            told = tnow;
+	reload = SysTick->LOAD;
+	ticks = n * (SystemCoreClock / 1000000); /* éœ€è¦çš„èŠ‚æ‹æ•° */
 
-            /* Ê±¼ä³¬¹ı/µÈÓÚÒªÑÓ³ÙµÄÊ±¼ä,ÔòÍË³ö */
-            if (tcnt >= ticks)
-            {
-            	break;
-            }
-        }  
-    }
-} 
+	tcnt = 0;
+	told = SysTick->VAL; /* åˆšè¿›å…¥æ—¶çš„è®¡æ•°å™¨å€¼ */
 
+	while (1)
+	{
+		tnow = SysTick->VAL;
+		if (tnow != told)
+		{
+			/* SYSTICKæ˜¯ä¸€ä¸ªé€’å‡çš„è®¡æ•°å™¨ */
+			if (tnow < told)
+			{
+				tcnt += told - tnow;
+			}
+			/* é‡æ–°è£…è½½é€’å‡ */
+			else
+			{
+				tcnt += reload - tnow + told;
+			}
+			told = tnow;
+
+			/* æ—¶é—´è¶…è¿‡/ç­‰äºè¦å»¶è¿Ÿçš„æ—¶é—´,åˆ™é€€å‡º */
+			if (tcnt >= ticks)
+			{
+				break;
+			}
+		}
+	}
+}
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartTimer
-*	¹¦ÄÜËµÃ÷: Æô¶¯Ò»¸ö¶¨Ê±Æ÷£¬²¢ÉèÖÃ¶¨Ê±ÖÜÆÚ¡£
-*	ĞÎ    ²Î:  	_id     : ¶¨Ê±Æ÷ID£¬ÖµÓò¡¾0,TMR_COUNT-1¡¿¡£ÓÃ»§±ØĞë×ÔĞĞÎ¬»¤¶¨Ê±Æ÷ID£¬ÒÔ±ÜÃâ¶¨Ê±Æ÷ID³åÍ»¡£
-*				_period : ¶¨Ê±ÖÜÆÚ£¬µ¥Î»1ms
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartTimer
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨ä¸€ä¸ªå®šæ—¶å™¨ï¼Œå¹¶è®¾ç½®å®šæ—¶å‘¨æœŸã€‚
+*	å½¢    å‚:  	_id     : å®šæ—¶å™¨IDï¼Œå€¼åŸŸã€0,TMR_COUNT-1ã€‘ã€‚ç”¨æˆ·å¿…é¡»è‡ªè¡Œç»´æŠ¤å®šæ—¶å™¨IDï¼Œä»¥é¿å…å®šæ—¶å™¨IDå†²çªã€‚
+*				_period : å®šæ—¶å‘¨æœŸï¼Œå•ä½1ms
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StartTimer(uint8_t _id, uint32_t _period)
 {
 	if (_id >= TMR_COUNT)
 	{
-		/* ´òÓ¡³ö´íµÄÔ´´úÂëÎÄ¼şÃû¡¢º¯ÊıÃû³Æ */
+		/* æ‰“å°å‡ºé”™çš„æºä»£ç æ–‡ä»¶åã€å‡½æ•°åç§° */
 		BSP_Printf("Error: file %s, function %s()\r\n", __FILE__, __FUNCTION__);
-		while(1); /* ²ÎÊıÒì³££¬ËÀ»úµÈ´ı¿´ÃÅ¹·¸´Î» */
+		while (1)
+			; /* å‚æ•°å¼‚å¸¸ï¼Œæ­»æœºç­‰å¾…çœ‹é—¨ç‹—å¤ä½ */
 	}
 
-	DISABLE_INT();  			/* ¹ØÖĞ¶Ï */
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
-	s_tTmr[_id].Count = _period;		/* ÊµÊ±¼ÆÊıÆ÷³õÖµ */
-	s_tTmr[_id].PreLoad = _period;		/* ¼ÆÊıÆ÷×Ô¶¯ÖØ×°Öµ£¬½ö×Ô¶¯Ä£Ê½Æğ×÷ÓÃ */
-	s_tTmr[_id].Flag = 0;				/* ¶¨Ê±Ê±¼äµ½±êÖ¾ */
-	s_tTmr[_id].Mode = TMR_ONCE_MODE;	/* 1´ÎĞÔ¹¤×÷Ä£Ê½ */
+	s_tTmr[_id].Count = _period;			/* å®æ—¶è®¡æ•°å™¨åˆå€¼ */
+	s_tTmr[_id].PreLoad = _period;		/* è®¡æ•°å™¨è‡ªåŠ¨é‡è£…å€¼ï¼Œä»…è‡ªåŠ¨æ¨¡å¼èµ·ä½œç”¨ */
+	s_tTmr[_id].Flag = 0;							/* å®šæ—¶æ—¶é—´åˆ°æ ‡å¿— */
+	s_tTmr[_id].Mode = TMR_ONCE_MODE; /* 1æ¬¡æ€§å·¥ä½œæ¨¡å¼ */
 
-	ENABLE_INT();  				/* ¿ªÖĞ¶Ï */
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartAutoTimer
-*	¹¦ÄÜËµÃ÷: Æô¶¯Ò»¸ö×Ô¶¯¶¨Ê±Æ÷£¬²¢ÉèÖÃ¶¨Ê±ÖÜÆÚ¡£
-*	ĞÎ    ²Î:  	_id     : ¶¨Ê±Æ÷ID£¬ÖµÓò¡¾0,TMR_COUNT-1¡¿¡£ÓÃ»§±ØĞë×ÔĞĞÎ¬»¤¶¨Ê±Æ÷ID£¬ÒÔ±ÜÃâ¶¨Ê±Æ÷ID³åÍ»¡£
-*				_period : ¶¨Ê±ÖÜÆÚ£¬µ¥Î»10ms
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartAutoTimer
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨ä¸€ä¸ªè‡ªåŠ¨å®šæ—¶å™¨ï¼Œå¹¶è®¾ç½®å®šæ—¶å‘¨æœŸã€‚
+*	å½¢    å‚:  	_id     : å®šæ—¶å™¨IDï¼Œå€¼åŸŸã€0,TMR_COUNT-1ã€‘ã€‚ç”¨æˆ·å¿…é¡»è‡ªè¡Œç»´æŠ¤å®šæ—¶å™¨IDï¼Œä»¥é¿å…å®šæ—¶å™¨IDå†²çªã€‚
+*				_period : å®šæ—¶å‘¨æœŸï¼Œå•ä½10ms
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StartAutoTimer(uint8_t _id, uint32_t _period)
 {
 	if (_id >= TMR_COUNT)
 	{
-		/* ´òÓ¡³ö´íµÄÔ´´úÂëÎÄ¼şÃû¡¢º¯ÊıÃû³Æ */
+		/* æ‰“å°å‡ºé”™çš„æºä»£ç æ–‡ä»¶åã€å‡½æ•°åç§° */
 		BSP_Printf("Error: file %s, function %s()\r\n", __FILE__, __FUNCTION__);
-		while(1); /* ²ÎÊıÒì³££¬ËÀ»úµÈ´ı¿´ÃÅ¹·¸´Î» */
+		while (1)
+			; /* å‚æ•°å¼‚å¸¸ï¼Œæ­»æœºç­‰å¾…çœ‹é—¨ç‹—å¤ä½ */
 	}
 
-	DISABLE_INT();  		/* ¹ØÖĞ¶Ï */
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
-	s_tTmr[_id].Count = _period;			/* ÊµÊ±¼ÆÊıÆ÷³õÖµ */
-	s_tTmr[_id].PreLoad = _period;		/* ¼ÆÊıÆ÷×Ô¶¯ÖØ×°Öµ£¬½ö×Ô¶¯Ä£Ê½Æğ×÷ÓÃ */
-	s_tTmr[_id].Flag = 0;				/* ¶¨Ê±Ê±¼äµ½±êÖ¾ */
-	s_tTmr[_id].Mode = TMR_AUTO_MODE;	/* ×Ô¶¯¹¤×÷Ä£Ê½ */
+	s_tTmr[_id].Count = _period;			/* å®æ—¶è®¡æ•°å™¨åˆå€¼ */
+	s_tTmr[_id].PreLoad = _period;		/* è®¡æ•°å™¨è‡ªåŠ¨é‡è£…å€¼ï¼Œä»…è‡ªåŠ¨æ¨¡å¼èµ·ä½œç”¨ */
+	s_tTmr[_id].Flag = 0;							/* å®šæ—¶æ—¶é—´åˆ°æ ‡å¿— */
+	s_tTmr[_id].Mode = TMR_AUTO_MODE; /* è‡ªåŠ¨å·¥ä½œæ¨¡å¼ */
 
-	ENABLE_INT();  			/* ¿ªÖĞ¶Ï */
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StopTimer
-*	¹¦ÄÜËµÃ÷: Í£Ö¹Ò»¸ö¶¨Ê±Æ÷
-*	ĞÎ    ²Î:  	_id     : ¶¨Ê±Æ÷ID£¬ÖµÓò¡¾0,TMR_COUNT-1¡¿¡£ÓÃ»§±ØĞë×ÔĞĞÎ¬»¤¶¨Ê±Æ÷ID£¬ÒÔ±ÜÃâ¶¨Ê±Æ÷ID³åÍ»¡£
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StopTimer
+*	åŠŸèƒ½è¯´æ˜: åœæ­¢ä¸€ä¸ªå®šæ—¶å™¨
+*	å½¢    å‚:  	_id     : å®šæ—¶å™¨IDï¼Œå€¼åŸŸã€0,TMR_COUNT-1ã€‘ã€‚ç”¨æˆ·å¿…é¡»è‡ªè¡Œç»´æŠ¤å®šæ—¶å™¨IDï¼Œä»¥é¿å…å®šæ—¶å™¨IDå†²çªã€‚
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_StopTimer(uint8_t _id)
 {
 	if (_id >= TMR_COUNT)
 	{
-		/* ´òÓ¡³ö´íµÄÔ´´úÂëÎÄ¼şÃû¡¢º¯ÊıÃû³Æ */
+		/* æ‰“å°å‡ºé”™çš„æºä»£ç æ–‡ä»¶åã€å‡½æ•°åç§° */
 		BSP_Printf("Error: file %s, function %s()\r\n", __FILE__, __FUNCTION__);
-		while(1); /* ²ÎÊıÒì³££¬ËÀ»úµÈ´ı¿´ÃÅ¹·¸´Î» */
+		while (1)
+			; /* å‚æ•°å¼‚å¸¸ï¼Œæ­»æœºç­‰å¾…çœ‹é—¨ç‹—å¤ä½ */
 	}
 
-	DISABLE_INT();  	/* ¹ØÖĞ¶Ï */
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
-	s_tTmr[_id].Count = 0;				/* ÊµÊ±¼ÆÊıÆ÷³õÖµ */
-	s_tTmr[_id].Flag = 0;				/* ¶¨Ê±Ê±¼äµ½±êÖ¾ */
-	s_tTmr[_id].Mode = TMR_ONCE_MODE;	/* ×Ô¶¯¹¤×÷Ä£Ê½ */
+	s_tTmr[_id].Count = 0;						/* å®æ—¶è®¡æ•°å™¨åˆå€¼ */
+	s_tTmr[_id].Flag = 0;							/* å®šæ—¶æ—¶é—´åˆ°æ ‡å¿— */
+	s_tTmr[_id].Mode = TMR_ONCE_MODE; /* è‡ªåŠ¨å·¥ä½œæ¨¡å¼ */
 
-	ENABLE_INT();  		/* ¿ªÖĞ¶Ï */
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_CheckTimer
-*	¹¦ÄÜËµÃ÷: ¼ì²â¶¨Ê±Æ÷ÊÇ·ñ³¬Ê±
-*	ĞÎ    ²Î:  	_id     : ¶¨Ê±Æ÷ID£¬ÖµÓò¡¾0,TMR_COUNT-1¡¿¡£ÓÃ»§±ØĞë×ÔĞĞÎ¬»¤¶¨Ê±Æ÷ID£¬ÒÔ±ÜÃâ¶¨Ê±Æ÷ID³åÍ»¡£
-*				_period : ¶¨Ê±ÖÜÆÚ£¬µ¥Î»1ms
-*	·µ »Ø Öµ: ·µ»Ø 0 ±íÊ¾¶¨Ê±Î´µ½£¬ 1±íÊ¾¶¨Ê±µ½
+*	å‡½ æ•° å: bsp_CheckTimer
+*	åŠŸèƒ½è¯´æ˜: æ£€æµ‹å®šæ—¶å™¨æ˜¯å¦è¶…æ—¶
+*	å½¢    å‚:  	_id     : å®šæ—¶å™¨IDï¼Œå€¼åŸŸã€0,TMR_COUNT-1ã€‘ã€‚ç”¨æˆ·å¿…é¡»è‡ªè¡Œç»´æŠ¤å®šæ—¶å™¨IDï¼Œä»¥é¿å…å®šæ—¶å™¨IDå†²çªã€‚
+*				_period : å®šæ—¶å‘¨æœŸï¼Œå•ä½1ms
+*	è¿” å› å€¼: è¿”å› 0 è¡¨ç¤ºå®šæ—¶æœªåˆ°ï¼Œ 1è¡¨ç¤ºå®šæ—¶åˆ°
 *********************************************************************************************************
 */
 uint8_t bsp_CheckTimer(uint8_t _id)
@@ -405,31 +405,31 @@ uint8_t bsp_CheckTimer(uint8_t _id)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_GetRunTime
-*	¹¦ÄÜËµÃ÷: »ñÈ¡CPUÔËĞĞÊ±¼ä£¬µ¥Î»1ms¡£×î³¤¿ÉÒÔ±íÊ¾ 24.85Ìì£¬Èç¹ûÄãµÄ²úÆ·Á¬ĞøÔËĞĞÊ±¼ä³¬¹ıÕâ¸öÊı£¬Ôò±ØĞë¿¼ÂÇÒç³öÎÊÌâ
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: CPUÔËĞĞÊ±¼ä£¬µ¥Î»1ms
+*	å‡½ æ•° å: bsp_GetRunTime
+*	åŠŸèƒ½è¯´æ˜: è·å–CPUè¿è¡Œæ—¶é—´ï¼Œå•ä½1msã€‚æœ€é•¿å¯ä»¥è¡¨ç¤º 24.85å¤©ï¼Œå¦‚æœä½ çš„äº§å“è¿ç»­è¿è¡Œæ—¶é—´è¶…è¿‡è¿™ä¸ªæ•°ï¼Œåˆ™å¿…é¡»è€ƒè™‘æº¢å‡ºé—®é¢˜
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: CPUè¿è¡Œæ—¶é—´ï¼Œå•ä½1ms
 *********************************************************************************************************
 */
 int32_t bsp_GetRunTime(void)
 {
 	int32_t runtime;
 
-	DISABLE_INT();  	/* ¹ØÖĞ¶Ï */
+	DISABLE_INT(); /* å…³ä¸­æ–­ */
 
-	runtime = g_iRunTime;	/* Õâ¸ö±äÁ¿ÔÚSystickÖĞ¶ÏÖĞ±»¸ÄĞ´£¬Òò´ËĞèÒª¹ØÖĞ¶Ï½øĞĞ±£»¤ */
+	runtime = g_iRunTime; /* è¿™ä¸ªå˜é‡åœ¨Systickä¸­æ–­ä¸­è¢«æ”¹å†™ï¼Œå› æ­¤éœ€è¦å…³ä¸­æ–­è¿›è¡Œä¿æŠ¤ */
 
-	ENABLE_INT();  		/* ¿ªÖĞ¶Ï */
+	ENABLE_INT(); /* å¼€ä¸­æ–­ */
 
 	return runtime;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_CheckRunTimeNS
-*	¹¦ÄÜËµÃ÷: ¼ÆËãµ±Ç°ÔËĞĞÊ±¼äºÍ¸ø¶¨Ê±¿ÌÖ®¼äµÄ²îÖµ¡£´¦ÀíÁË¼ÆÊıÆ÷Ñ­»·¡£
-*	ĞÎ    ²Î:  _LastTime ÉÏ¸öÊ±¿Ì
-*	·µ »Ø Öµ: µ±Ç°Ê±¼äºÍ¹ıÈ¥Ê±¼äµÄ²îÖµ£¬µ¥Î»1ms
+*	å‡½ æ•° å: bsp_CheckRunTimeNS
+*	åŠŸèƒ½è¯´æ˜: è®¡ç®—å½“å‰è¿è¡Œæ—¶é—´å’Œç»™å®šæ—¶åˆ»ä¹‹é—´çš„å·®å€¼ã€‚å¤„ç†äº†è®¡æ•°å™¨å¾ªç¯ã€‚
+*	å½¢    å‚:  _LastTime ä¸Šä¸ªæ—¶åˆ»
+*	è¿” å› å€¼: å½“å‰æ—¶é—´å’Œè¿‡å»æ—¶é—´çš„å·®å€¼ï¼Œå•ä½1ms
 *********************************************************************************************************
 */
 int32_t bsp_CheckRunTime(int32_t _LastTime)
@@ -437,10 +437,10 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
 	int32_t now_time;
 	int32_t time_diff;
 
-	DISABLE_INT();  	/* ¹ØÖĞ¶Ï */
-	now_time = g_iRunTime;	/* Õâ¸ö±äÁ¿ÔÚSystickÖĞ¶ÏÖĞ±»¸ÄĞ´£¬Òò´ËĞèÒª¹ØÖĞ¶Ï½øĞĞ±£»¤ */
-	ENABLE_INT();  		/* ¿ªÖĞ¶Ï */
-	
+	DISABLE_INT();				 /* å…³ä¸­æ–­ */
+	now_time = g_iRunTime; /* è¿™ä¸ªå˜é‡åœ¨Systickä¸­æ–­ä¸­è¢«æ”¹å†™ï¼Œå› æ­¤éœ€è¦å…³ä¸­æ–­è¿›è¡Œä¿æŠ¤ */
+	ENABLE_INT();					 /* å¼€ä¸­æ–­ */
+
 	if (now_time >= _LastTime)
 	{
 		time_diff = now_time - _LastTime;
@@ -455,76 +455,76 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: bsp_DelayNS
-*    ¹¦ÄÜËµÃ÷: us¼¶ÑÓ³Ù¡£ ±ØĞëÔÚsystick¶¨Ê±Æ÷Æô¶¯ºó²ÅÄÜµ÷ÓÃ´Ëº¯Êı¡£
-*    ĞÎ    ²Î:  n : ÑÓ³Ù³¤¶È£¬µ¥Î»NS
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: bsp_DelayNS
+*    åŠŸèƒ½è¯´æ˜: usçº§å»¶è¿Ÿã€‚ å¿…é¡»åœ¨systickå®šæ—¶å™¨å¯åŠ¨åæ‰èƒ½è°ƒç”¨æ­¤å‡½æ•°ã€‚
+*    å½¢    å‚:  n : å»¶è¿Ÿé•¿åº¦ï¼Œå•ä½NS
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_DelayNS(uint32_t n)
 {
-    uint32_t ticks;
-    uint32_t told;
-    uint32_t tnow;
-    uint32_t tcnt = 0;
-    uint32_t reload;
-       
-	reload = SysTick->LOAD;                
-    ticks = n * (SystemCoreClock / 1000000);	 /* ĞèÒªµÄ½ÚÅÄÊı */  
+	uint32_t ticks;
+	uint32_t told;
+	uint32_t tnow;
+	uint32_t tcnt = 0;
+	uint32_t reload;
+
+	reload = SysTick->LOAD;
+	ticks = n * (SystemCoreClock / 1000000); /* éœ€è¦çš„èŠ‚æ‹æ•° */
 	ticks = ticks / 1000;
-    
-    tcnt = 0;
-    told = SysTick->VAL;             /* ¸Õ½øÈëÊ±µÄ¼ÆÊıÆ÷Öµ */
 
-    while (1)
-    {
-        tnow = SysTick->VAL;    
-        if (tnow != told)
-        {    
-            /* SYSTICKÊÇÒ»¸öµİ¼õµÄ¼ÆÊıÆ÷ */    
-            if (tnow < told)
-            {
-                tcnt += told - tnow;    
-            }
-            /* ÖØĞÂ×°ÔØµİ¼õ */
-            else
-            {
-                tcnt += reload - tnow + told;    
-            }        
-            told = tnow;
+	tcnt = 0;
+	told = SysTick->VAL; /* åˆšè¿›å…¥æ—¶çš„è®¡æ•°å™¨å€¼ */
 
-            /* Ê±¼ä³¬¹ı/µÈÓÚÒªÑÓ³ÙµÄÊ±¼ä,ÔòÍË³ö */
-            if (tcnt >= ticks)
-            {
-            	break;
-            }
-        }  
-    }
-} 
-
-/*
-*********************************************************************************************************
-*	º¯ Êı Ãû: SysTick_Handler
-*	¹¦ÄÜËµÃ÷: ÏµÍ³àÖàª¶¨Ê±Æ÷ÖĞ¶Ï·şÎñ³ÌĞò¡£Æô¶¯ÎÄ¼şÖĞÒıÓÃÁË¸Ãº¯Êı¡£
-*	ĞÎ    ²Î:  ÎŞ
-*	·µ »Ø Öµ: ÎŞ
-*********************************************************************************************************
-*/
-void SysTick_Handler(void)
-{
-	HAL_IncTick();	/* ST HAL¿âµÄµÎ´ğ¶¨Ê±ÖĞ¶Ï·şÎñ³ÌĞò */
-	
-	if (g_ucEnableSystickISR == 0)
+	while (1)
 	{
-		return;
+		tnow = SysTick->VAL;
+		if (tnow != told)
+		{
+			/* SYSTICKæ˜¯ä¸€ä¸ªé€’å‡çš„è®¡æ•°å™¨ */
+			if (tnow < told)
+			{
+				tcnt += told - tnow;
+			}
+			/* é‡æ–°è£…è½½é€’å‡ */
+			else
+			{
+				tcnt += reload - tnow + told;
+			}
+			told = tnow;
+
+			/* æ—¶é—´è¶…è¿‡/ç­‰äºè¦å»¶è¿Ÿçš„æ—¶é—´,åˆ™é€€å‡º */
+			if (tcnt >= ticks)
+			{
+				break;
+			}
+		}
 	}
-	
-	SysTick_ISR();	/* °²¸»À³bsp¿âµÄµÎ´ğ¶¨Ê±ÖĞ¶Ï·şÎñ³ÌĞò */
 }
 
 /*
 *********************************************************************************************************
-*	ÏÂÃæµÄ´úÂëÊ¹ÓÃÒ»¸öTIMµÄ4¸ö²¶»ñÖĞ¶Ï£¬ÊµÏÖ4¸öÓ²¼ş¶¨Ê±Æ÷
+*	å‡½ æ•° å: SysTick_Handler
+*	åŠŸèƒ½è¯´æ˜: ç³»ç»Ÿå˜€å—’å®šæ—¶å™¨ä¸­æ–­æœåŠ¡ç¨‹åºã€‚å¯åŠ¨æ–‡ä»¶ä¸­å¼•ç”¨äº†è¯¥å‡½æ•°ã€‚
+*	å½¢    å‚:  æ— 
+*	è¿” å› å€¼: æ— 
+*********************************************************************************************************
+*/
+void SysTick_Handler(void)
+{
+	HAL_IncTick(); /* ST HALåº“çš„æ»´ç­”å®šæ—¶ä¸­æ–­æœåŠ¡ç¨‹åº */
+
+	if (g_ucEnableSystickISR == 0)
+	{
+		return;
+	}
+
+	SysTick_ISR(); /* å®‰å¯Œè±bspåº“çš„æ»´ç­”å®šæ—¶ä¸­æ–­æœåŠ¡ç¨‹åº */
+}
+
+/*
+*********************************************************************************************************
+*	ä¸‹é¢çš„ä»£ç ä½¿ç”¨ä¸€ä¸ªTIMçš„4ä¸ªæ•è·ä¸­æ–­ï¼Œå®ç°4ä¸ªç¡¬ä»¶å®šæ—¶å™¨
 *********************************************************************************************************
 */
 
@@ -532,55 +532,55 @@ void SysTick_Handler(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitHardTimer
-*	¹¦ÄÜËµÃ÷: ÅäÖÃ TIMx£¬ÓÃÓÚus¼¶±ğÓ²¼ş¶¨Ê±¡£TIMx½«×ÔÓÉÔËĞĞ£¬ÓÀ²»Í£Ö¹.
-*			TIMx¿ÉÒÔÓÃTIM2 - TIM5 Ö®¼äµÄTIM, ÕâĞ©TIMÓĞ4¸öÍ¨µÀ, ¹ÒÔÚ APB1 ÉÏ£¬ÊäÈëÊ±ÖÓ=SystemCoreClock / 2
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitHardTimer
+*	åŠŸèƒ½è¯´æ˜: é…ç½® TIMxï¼Œç”¨äºusçº§åˆ«ç¡¬ä»¶å®šæ—¶ã€‚TIMxå°†è‡ªç”±è¿è¡Œï¼Œæ°¸ä¸åœæ­¢.
+*			TIMxå¯ä»¥ç”¨TIM2 - TIM5 ä¹‹é—´çš„TIM, è¿™äº›TIMæœ‰4ä¸ªé€šé“, æŒ‚åœ¨ APB1 ä¸Šï¼Œè¾“å…¥æ—¶é’Ÿ=SystemCoreClock / 2
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitHardTimer(void)
 {
-	TIM_HandleTypeDef    TimHandle;
+	TIM_HandleTypeDef TimHandle;
 	uint32_t usPeriod;
 	uint16_t usPrescaler;
 	uint32_t uiTIMxCLK;
-	TIM_TypeDef* TIMx = TIM_HARD;
-	
-	RCC_TIM_HARD_CLK_ENABLE();		/* Ê¹ÄÜTIMÊ±ÖÓ */
-	
-    /*-----------------------------------------------------------------------
-		system_stm32f4xx.c ÎÄ¼şÖĞ void SetSysClock(void) º¯Êı¶ÔÊ±ÖÓµÄÅäÖÃÈçÏÂ: 
+	TIM_TypeDef *TIMx = TIM_HARD;
+
+	RCC_TIM_HARD_CLK_ENABLE(); /* ä½¿èƒ½TIMæ—¶é’Ÿ */
+
+	/*-----------------------------------------------------------------------
+		system_stm32f4xx.c æ–‡ä»¶ä¸­ void SetSysClock(void) å‡½æ•°å¯¹æ—¶é’Ÿçš„é…ç½®å¦‚ä¸‹: 
 
 		HCLK = SYSCLK / 1     (AHB1Periph)
 		PCLK2 = HCLK / 2      (APB2Periph)
 		PCLK1 = HCLK / 4      (APB1Periph)
 
-		ÒòÎªAPB1 prescaler != 1, ËùÒÔ APB1ÉÏµÄTIMxCLK = PCLK1 x 2 = SystemCoreClock / 2;
-		ÒòÎªAPB2 prescaler != 1, ËùÒÔ APB2ÉÏµÄTIMxCLK = PCLK2 x 2 = SystemCoreClock;
+		å› ä¸ºAPB1 prescaler != 1, æ‰€ä»¥ APB1ä¸Šçš„TIMxCLK = PCLK1 x 2 = SystemCoreClock / 2;
+		å› ä¸ºAPB2 prescaler != 1, æ‰€ä»¥ APB2ä¸Šçš„TIMxCLK = PCLK2 x 2 = SystemCoreClock;
 
-		APB1 ¶¨Ê±Æ÷ÓĞ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13,TIM14
-		APB2 ¶¨Ê±Æ÷ÓĞ TIM1, TIM8 ,TIM15, TIM16, TIM17
+		APB1 å®šæ—¶å™¨æœ‰ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13,TIM14
+		APB2 å®šæ—¶å™¨æœ‰ TIM1, TIM8 ,TIM15, TIM16, TIM17
 
 	----------------------------------------------------------------------- */
 	if ((TIMx == TIM1) || (TIMx == TIM8) || (TIMx == TIM15) || (TIMx == TIM16) || (TIMx == TIM17))
 	{
-		/* APB2 ¶¨Ê±Æ÷Ê±ÖÓ = 200M */
+		/* APB2 å®šæ—¶å™¨æ—¶é’Ÿ = 200M */
 		uiTIMxCLK = SystemCoreClock / 2;
 	}
-	else	
+	else
 	{
-		/* APB1 ¶¨Ê±Æ÷ = 200M */
+		/* APB1 å®šæ—¶å™¨ = 200M */
 		uiTIMxCLK = SystemCoreClock / 2;
 	}
 
-	usPrescaler = uiTIMxCLK / 1000000 - 1;	/* ·ÖÆµ±È = 1 */
-	
-//	if (TIMx == TIM2 || TIMx == TIM5)	H743 ÎŞĞèÌØÊâ´¦Àí
-//	{
-//		usPeriod = 0xFFFFFFFF;
-//	}
-//	else
+	usPrescaler = uiTIMxCLK / 1000000 - 1; /* åˆ†é¢‘æ¯” = 1 */
+
+	//	if (TIMx == TIM2 || TIMx == TIM5)	H743 æ— éœ€ç‰¹æ®Šå¤„ç†
+	//	{
+	//		usPeriod = 0xFFFFFFFF;
+	//	}
+	//	else
 	{
 		usPeriod = 0xFFFF;
 	}
@@ -592,157 +592,157 @@ void bsp_InitHardTimer(void)
 	+ Counter direction = Up
 	*/
 	TimHandle.Instance = TIMx;
-	TimHandle.Init.Prescaler         = usPrescaler;
-	TimHandle.Init.Period            = usPeriod;
-	TimHandle.Init.ClockDivision     = 0;
-	TimHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
+	TimHandle.Init.Prescaler = usPrescaler;
+	TimHandle.Init.Period = usPeriod;
+	TimHandle.Init.ClockDivision = 0;
+	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
 	TimHandle.Init.RepetitionCounter = 0;
 	TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	
+
 	if (HAL_TIM_Base_Init(&TimHandle) != HAL_OK)
 	{
 		Error_Handler(__FILE__, __LINE__);
 	}
 
-	/* ÅäÖÃTIM¶¨Ê±¸üĞÂÖĞ¶Ï (Update) */
+	/* é…ç½®TIMå®šæ—¶æ›´æ–°ä¸­æ–­ (Update) */
 	{
 		HAL_NVIC_SetPriority(TIM_HARD_IRQn, 0, 2);
-		HAL_NVIC_EnableIRQ(TIM_HARD_IRQn);	
+		HAL_NVIC_EnableIRQ(TIM_HARD_IRQn);
 	}
 	HAL_TIM_Base_Start(&TimHandle);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_StartHardTimer
-*	¹¦ÄÜËµÃ÷: Ê¹ÓÃTIM2-5×öµ¥´Î¶¨Ê±Æ÷Ê¹ÓÃ, ¶¨Ê±Ê±¼äµ½ºóÖ´ĞĞ»Øµ÷º¯Êı¡£¿ÉÒÔÍ¬Ê±Æô¶¯4¸ö¶¨Ê±Æ÷£¬»¥²»¸ÉÈÅ¡£
-*             ¶¨Ê±¾«¶ÈÕı¸º1us £¨Ö÷ÒªºÄ·ÑÔÚµ÷ÓÃ±¾º¯ÊıµÄÖ´ĞĞÊ±¼ä£¬º¯ÊıÄÚ²¿½øĞĞÁË²¹³¥¼õĞ¡Îó²î£©
-*			 TIM2ºÍTIM5 ÊÇ32Î»¶¨Ê±Æ÷¡£¶¨Ê±·¶Î§ºÜ´ó
-*			 TIM3ºÍTIM4 ÊÇ16Î»¶¨Ê±Æ÷¡£
-*	ĞÎ    ²Î: _CC : ²¶»ñÍ¨µÀ¼¸£¬1£¬2£¬3, 4
-*             _uiTimeOut : ³¬Ê±Ê±¼ä, µ¥Î» 1us.       ¶ÔÓÚ16Î»¶¨Ê±Æ÷£¬×î´ó 65.5ms; ¶ÔÓÚ32Î»¶¨Ê±Æ÷£¬×î´ó 4294Ãë
-*             _pCallBack : ¶¨Ê±Ê±¼äµ½ºó£¬±»Ö´ĞĞµÄº¯Êı
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_StartHardTimer
+*	åŠŸèƒ½è¯´æ˜: ä½¿ç”¨TIM2-5åšå•æ¬¡å®šæ—¶å™¨ä½¿ç”¨, å®šæ—¶æ—¶é—´åˆ°åæ‰§è¡Œå›è°ƒå‡½æ•°ã€‚å¯ä»¥åŒæ—¶å¯åŠ¨4ä¸ªå®šæ—¶å™¨ï¼Œäº’ä¸å¹²æ‰°ã€‚
+*             å®šæ—¶ç²¾åº¦æ­£è´Ÿ1us ï¼ˆä¸»è¦è€—è´¹åœ¨è°ƒç”¨æœ¬å‡½æ•°çš„æ‰§è¡Œæ—¶é—´ï¼Œå‡½æ•°å†…éƒ¨è¿›è¡Œäº†è¡¥å¿å‡å°è¯¯å·®ï¼‰
+*			 TIM2å’ŒTIM5 æ˜¯32ä½å®šæ—¶å™¨ã€‚å®šæ—¶èŒƒå›´å¾ˆå¤§
+*			 TIM3å’ŒTIM4 æ˜¯16ä½å®šæ—¶å™¨ã€‚
+*	å½¢    å‚: _CC : æ•è·é€šé“å‡ ï¼Œ1ï¼Œ2ï¼Œ3, 4
+*             _uiTimeOut : è¶…æ—¶æ—¶é—´, å•ä½ 1us.       å¯¹äº16ä½å®šæ—¶å™¨ï¼Œæœ€å¤§ 65.5ms; å¯¹äº32ä½å®šæ—¶å™¨ï¼Œæœ€å¤§ 4294ç§’
+*             _pCallBack : å®šæ—¶æ—¶é—´åˆ°åï¼Œè¢«æ‰§è¡Œçš„å‡½æ•°
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void bsp_StartHardTimer(uint8_t _CC, uint32_t _uiTimeOut, void * _pCallBack)
+void bsp_StartHardTimer(uint8_t _CC, uint32_t _uiTimeOut, void *_pCallBack)
 {
-    uint16_t cnt_now;
-    uint16_t cnt_tar;
-	TIM_TypeDef* TIMx = TIM_HARD;
-	
-    /*
-		H743ËÙ¶ÈÌ«¿ì£¬ÎŞĞè²¹³¥ÑÓ³Ù£¬Êµ²â¾«¶ÈÕı¸º1us
-        407Ö´ĞĞÏÂÃæÕâ¸öÓï¾ä£¬Ê±³¤ = 18us (Í¨¹ıÂß¼­·ÖÎöÒÇ²âÁ¿IO·­×ª)
+	uint16_t cnt_now;
+	uint16_t cnt_tar;
+	TIM_TypeDef *TIMx = TIM_HARD;
+
+	/*
+		H743é€Ÿåº¦å¤ªå¿«ï¼Œæ— éœ€è¡¥å¿å»¶è¿Ÿï¼Œå®æµ‹ç²¾åº¦æ­£è´Ÿ1us
+        407æ‰§è¡Œä¸‹é¢è¿™ä¸ªè¯­å¥ï¼Œæ—¶é•¿ = 18us (é€šè¿‡é€»è¾‘åˆ†æä»ªæµ‹é‡IOç¿»è½¬)
         bsp_StartTimer2(3, 500, (void *)test1);
 	*/
-//	if (_uiTimeOut < 1)
-//	{
-//		;
-//	}
-//	else
-//	{
-//		_uiTimeOut -= 5;	5 for F407
-//	}
+	//	if (_uiTimeOut < 1)
+	//	{
+	//		;
+	//	}
+	//	else
+	//	{
+	//		_uiTimeOut -= 5;	5 for F407
+	//	}
 
-    cnt_now = (uint16_t)TIMx->CNT;    	/* ¶ÁÈ¡µ±Ç°µÄ¼ÆÊıÆ÷Öµ CNTÊµ¼ÊÖ»ÓĞ16bit */
-    cnt_tar = cnt_now + _uiTimeOut;			/* ¼ÆËã²¶»ñµÄ¼ÆÊıÆ÷Öµ */
-    if (_CC == 1)
-    {
-        s_TIM_CallBack1 = (void (*)(void))_pCallBack;
+	cnt_now = (uint16_t)TIMx->CNT;	/* è¯»å–å½“å‰çš„è®¡æ•°å™¨å€¼ CNTå®é™…åªæœ‰16bit */
+	cnt_tar = cnt_now + _uiTimeOut; /* è®¡ç®—æ•è·çš„è®¡æ•°å™¨å€¼ */
+	if (_CC == 1)
+	{
+		s_TIM_CallBack1 = (void (*)(void))_pCallBack;
 
-		TIMx->CCR1 = cnt_tar; 				//TIM_SetCompare1(TIM_HARD, cnt_tar);      	/* ÉèÖÃ²¶»ñ±È½Ï¼ÆÊıÆ÷CC1 */
-        TIMx->SR = (uint16_t)~TIM_IT_CC1; //TIM_ClearITPendingBit(TIM_HARD, TIM_IT_CC1);
-		TIMx->DIER |= TIM_IT_CC1;			//TIM_ITConfig(TIM_HARD, TIM_IT_CC1, ENABLE);	/* Ê¹ÄÜCC1ÖĞ¶Ï */
+		TIMx->CCR1 = cnt_tar;							//TIM_SetCompare1(TIM_HARD, cnt_tar);      	/* è®¾ç½®æ•è·æ¯”è¾ƒè®¡æ•°å™¨CC1 */
+		TIMx->SR = (uint16_t)~TIM_IT_CC1; //TIM_ClearITPendingBit(TIM_HARD, TIM_IT_CC1);
+		TIMx->DIER |= TIM_IT_CC1;					//TIM_ITConfig(TIM_HARD, TIM_IT_CC1, ENABLE);	/* ä½¿èƒ½CC1ä¸­æ–­ */
 	}
-    else if (_CC == 2)
-    {
+	else if (_CC == 2)
+	{
 		s_TIM_CallBack2 = (void (*)(void))_pCallBack;
 
-		TIMx->CCR2 = cnt_tar;				/* ÉèÖÃ²¶»ñ±È½Ï¼ÆÊıÆ÷CC2 */
-        TIMx->SR = (uint16_t)~TIM_IT_CC2;	
-		TIMx->DIER |= TIM_IT_CC2;			/* Ê¹ÄÜCC2ÖĞ¶Ï */
-    }
-    else if (_CC == 3)
-    {
-        s_TIM_CallBack3 = (void (*)(void))_pCallBack;
+		TIMx->CCR2 = cnt_tar; /* è®¾ç½®æ•è·æ¯”è¾ƒè®¡æ•°å™¨CC2 */
+		TIMx->SR = (uint16_t)~TIM_IT_CC2;
+		TIMx->DIER |= TIM_IT_CC2; /* ä½¿èƒ½CC2ä¸­æ–­ */
+	}
+	else if (_CC == 3)
+	{
+		s_TIM_CallBack3 = (void (*)(void))_pCallBack;
 
-		TIMx->CCR3 = cnt_tar;				/* ÉèÖÃ²¶»ñ±È½Ï¼ÆÊıÆ÷CC3 */
-        TIMx->SR = (uint16_t)~TIM_IT_CC3;	
-		TIMx->DIER |= TIM_IT_CC3;			/* Ê¹ÄÜCC3ÖĞ¶Ï */
-    }
-    else if (_CC == 4)
-    {
-        s_TIM_CallBack4 = (void (*)(void))_pCallBack;
+		TIMx->CCR3 = cnt_tar; /* è®¾ç½®æ•è·æ¯”è¾ƒè®¡æ•°å™¨CC3 */
+		TIMx->SR = (uint16_t)~TIM_IT_CC3;
+		TIMx->DIER |= TIM_IT_CC3; /* ä½¿èƒ½CC3ä¸­æ–­ */
+	}
+	else if (_CC == 4)
+	{
+		s_TIM_CallBack4 = (void (*)(void))_pCallBack;
 
-		TIMx->CCR4 = cnt_tar;				/* ÉèÖÃ²¶»ñ±È½Ï¼ÆÊıÆ÷CC3 */
-        TIMx->SR = (uint16_t)~TIM_IT_CC4;	
-		TIMx->DIER |= TIM_IT_CC4;			/* Ê¹ÄÜCC4ÖĞ¶Ï */
-    }
+		TIMx->CCR4 = cnt_tar; /* è®¾ç½®æ•è·æ¯”è¾ƒè®¡æ•°å™¨CC3 */
+		TIMx->SR = (uint16_t)~TIM_IT_CC4;
+		TIMx->DIER |= TIM_IT_CC4; /* ä½¿èƒ½CC4ä¸­æ–­ */
+	}
 	else
-    {
-        return;
-    }
+	{
+		return;
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TIMx_IRQHandler
-*	¹¦ÄÜËµÃ÷: TIM ÖĞ¶Ï·şÎñ³ÌĞò
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TIMx_IRQHandler
+*	åŠŸèƒ½è¯´æ˜: TIM ä¸­æ–­æœåŠ¡ç¨‹åº
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TIM_HARD_IRQHandler(void)
 {
 	uint16_t itstatus = 0x0, itenable = 0x0;
-	TIM_TypeDef* TIMx = TIM_HARD;
-	
-  	itstatus = TIMx->SR & TIM_IT_CC1;
+	TIM_TypeDef *TIMx = TIM_HARD;
+
+	itstatus = TIMx->SR & TIM_IT_CC1;
 	itenable = TIMx->DIER & TIM_IT_CC1;
 	if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
 	{
 		TIMx->SR = (uint16_t)~TIM_IT_CC1;
-		TIMx->DIER &= (uint16_t)~TIM_IT_CC1;		/* ½ûÄÜCC1ÖĞ¶Ï */	
+		TIMx->DIER &= (uint16_t)~TIM_IT_CC1; /* ç¦èƒ½CC1ä¸­æ–­ */
 
-        /* ÏÈ¹Ø±ÕÖĞ¶Ï£¬ÔÙÖ´ĞĞ»Øµ÷º¯Êı¡£ÒòÎª»Øµ÷º¯Êı¿ÉÄÜĞèÒªÖØÆô¶¨Ê±Æ÷ */
-        s_TIM_CallBack1();
-    }
+		/* å…ˆå…³é—­ä¸­æ–­ï¼Œå†æ‰§è¡Œå›è°ƒå‡½æ•°ã€‚å› ä¸ºå›è°ƒå‡½æ•°å¯èƒ½éœ€è¦é‡å¯å®šæ—¶å™¨ */
+		s_TIM_CallBack1();
+	}
 
 	itstatus = TIMx->SR & TIM_IT_CC2;
 	itenable = TIMx->DIER & TIM_IT_CC2;
 	if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
 	{
 		TIMx->SR = (uint16_t)~TIM_IT_CC2;
-		TIMx->DIER &= (uint16_t)~TIM_IT_CC2;		/* ½ûÄÜCC2ÖĞ¶Ï */	
+		TIMx->DIER &= (uint16_t)~TIM_IT_CC2; /* ç¦èƒ½CC2ä¸­æ–­ */
 
-        /* ÏÈ¹Ø±ÕÖĞ¶Ï£¬ÔÙÖ´ĞĞ»Øµ÷º¯Êı¡£ÒòÎª»Øµ÷º¯Êı¿ÉÄÜĞèÒªÖØÆô¶¨Ê±Æ÷ */
-        s_TIM_CallBack2();
-    }
+		/* å…ˆå…³é—­ä¸­æ–­ï¼Œå†æ‰§è¡Œå›è°ƒå‡½æ•°ã€‚å› ä¸ºå›è°ƒå‡½æ•°å¯èƒ½éœ€è¦é‡å¯å®šæ—¶å™¨ */
+		s_TIM_CallBack2();
+	}
 
 	itstatus = TIMx->SR & TIM_IT_CC3;
 	itenable = TIMx->DIER & TIM_IT_CC3;
 	if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
 	{
 		TIMx->SR = (uint16_t)~TIM_IT_CC3;
-		TIMx->DIER &= (uint16_t)~TIM_IT_CC3;		/* ½ûÄÜCC2ÖĞ¶Ï */	
+		TIMx->DIER &= (uint16_t)~TIM_IT_CC3; /* ç¦èƒ½CC2ä¸­æ–­ */
 
-        /* ÏÈ¹Ø±ÕÖĞ¶Ï£¬ÔÙÖ´ĞĞ»Øµ÷º¯Êı¡£ÒòÎª»Øµ÷º¯Êı¿ÉÄÜĞèÒªÖØÆô¶¨Ê±Æ÷ */
-        s_TIM_CallBack3();
-    }
+		/* å…ˆå…³é—­ä¸­æ–­ï¼Œå†æ‰§è¡Œå›è°ƒå‡½æ•°ã€‚å› ä¸ºå›è°ƒå‡½æ•°å¯èƒ½éœ€è¦é‡å¯å®šæ—¶å™¨ */
+		s_TIM_CallBack3();
+	}
 
 	itstatus = TIMx->SR & TIM_IT_CC4;
 	itenable = TIMx->DIER & TIM_IT_CC4;
 	if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
 	{
 		TIMx->SR = (uint16_t)~TIM_IT_CC4;
-		TIMx->DIER &= (uint16_t)~TIM_IT_CC4;		/* ½ûÄÜCC4ÖĞ¶Ï */	
+		TIMx->DIER &= (uint16_t)~TIM_IT_CC4; /* ç¦èƒ½CC4ä¸­æ–­ */
 
-        /* ÏÈ¹Ø±ÕÖĞ¶Ï£¬ÔÙÖ´ĞĞ»Øµ÷º¯Êı¡£ÒòÎª»Øµ÷º¯Êı¿ÉÄÜĞèÒªÖØÆô¶¨Ê±Æ÷ */
-        s_TIM_CallBack4();
-    }	
+		/* å…ˆå…³é—­ä¸­æ–­ï¼Œå†æ‰§è¡Œå›è°ƒå‡½æ•°ã€‚å› ä¸ºå›è°ƒå‡½æ•°å¯èƒ½éœ€è¦é‡å¯å®šæ—¶å™¨ */
+		s_TIM_CallBack4();
+	}
 }
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

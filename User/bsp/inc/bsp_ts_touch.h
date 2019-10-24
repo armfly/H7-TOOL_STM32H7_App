@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µç×èÊ½´¥Ãş°åÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_touch.h
-*	°æ    ±¾ : V1.6
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : ç”µé˜»å¼è§¦æ‘¸æ¿é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_touch.h
+*	ç‰ˆ    æœ¬ : V1.6
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,106 +14,106 @@
 #ifndef __BSP_TOUCH_H
 #define __BSP_TOUCH_H
 
-/* ´¥Ãş°åÀàĞÍ */
+/* è§¦æ‘¸æ¿ç±»å‹ */
 enum
 {
-	CT_FT5X06 = 0,		/* FTÏµÁĞµçÈİ´¥ÃşIC */
-	CT_GT811,			/* 7´çµçÈİ´¥ÃşGT811 800 * 480 */
-	CT_GT911,			/* 7´çµçÈİ´¥ÃşGT911 800 * 480 */
-	
-	CT_STMPE811			/* µç×è´¥Ãş */
+	CT_FT5X06 = 0, /* FTç³»åˆ—ç”µå®¹è§¦æ‘¸IC */
+	CT_GT811,			 /* 7å¯¸ç”µå®¹è§¦æ‘¸GT811 800 * 480 */
+	CT_GT911,			 /* 7å¯¸ç”µå®¹è§¦æ‘¸GT911 800 * 480 */
+
+	CT_STMPE811 /* ç”µé˜»è§¦æ‘¸ */
 };
 
-/* LCDÃæ°åÀàĞÍ */
+/* LCDé¢æ¿ç±»å‹ */
 enum
 {
-	LCD_35_480X320 = 0,	/* 3.5´ç 480 * 320 */	
-	LCD_43_480X272,		/* 4.3´ç 480 * 272 */
-	LCD_50_480X272,		/* 5.0´ç 480 * 272 */
-	LCD_50_800X480,		/* 5.0´ç 480 * 272 */
-	LCD_70_800X480,		/* 7.0´ç 800 * 480 */	
-	LCD_70_1024X600,	/* 7.0´ç 1024 * 600 */		
+	LCD_35_480X320 = 0, /* 3.5å¯¸ 480 * 320 */
+	LCD_43_480X272,			/* 4.3å¯¸ 480 * 272 */
+	LCD_50_480X272,			/* 5.0å¯¸ 480 * 272 */
+	LCD_50_800X480,			/* 5.0å¯¸ 480 * 272 */
+	LCD_70_800X480,			/* 7.0å¯¸ 800 * 480 */
+	LCD_70_1024X600,		/* 7.0å¯¸ 1024 * 600 */
 };
 
-#define CALIB_POINT_COUNT	2		/* 2 = 2µãĞ£×¼£» 4 = ËÄµãĞ£×¼ */
+#define CALIB_POINT_COUNT 2 /* 2 = 2ç‚¹æ ¡å‡†ï¼› 4 = å››ç‚¹æ ¡å‡† */
 
-#define TOUCH_FIFO_SIZE		20
+#define TOUCH_FIFO_SIZE 20
 
 typedef struct
 {
-	/* 2µãĞ£×¼ ºÍ 4µãĞ£×¼ */
-//	uint16_t usAdcX1;	/* ×óÉÏ½Ç */
-//	uint16_t usAdcY1;
-//	uint16_t usAdcX2;	/* ÓÒÏÂ½Ç */
-//	uint16_t usAdcY2;
-//	uint16_t usAdcX3;	/* ×óÏÂ½Ç */
-//	uint16_t usAdcY3;
-//	uint16_t usAdcX4;	/* ÓÒÉÏ½Ç */
-//	uint16_t usAdcY4;
-//	
-//	uint16_t usLcdX1;	/* ×óÉÏ½Ç */
-//	uint16_t usLcdY1;
-//	uint16_t usLcdX2;	/* ÓÒÏÂ½Ç */
-//	uint16_t usLcdY2;
-//	uint16_t usLcdX3;	/* ×óÏÂ½Ç */
-//	uint16_t usLcdY3;
-//	uint16_t usLcdX4;	/* ÓÒÉÏ½Ç */
-//	uint16_t usLcdY4;	
+	/* 2ç‚¹æ ¡å‡† å’Œ 4ç‚¹æ ¡å‡† */
+	//	uint16_t usAdcX1;	/* å·¦ä¸Šè§’ */
+	//	uint16_t usAdcY1;
+	//	uint16_t usAdcX2;	/* å³ä¸‹è§’ */
+	//	uint16_t usAdcY2;
+	//	uint16_t usAdcX3;	/* å·¦ä¸‹è§’ */
+	//	uint16_t usAdcY3;
+	//	uint16_t usAdcX4;	/* å³ä¸Šè§’ */
+	//	uint16_t usAdcY4;
+	//
+	//	uint16_t usLcdX1;	/* å·¦ä¸Šè§’ */
+	//	uint16_t usLcdY1;
+	//	uint16_t usLcdX2;	/* å³ä¸‹è§’ */
+	//	uint16_t usLcdY2;
+	//	uint16_t usLcdX3;	/* å·¦ä¸‹è§’ */
+	//	uint16_t usLcdY3;
+	//	uint16_t usLcdX4;	/* å³ä¸Šè§’ */
+	//	uint16_t usLcdY4;
 
-//	uint16_t XYChange;	/* X, Y ÊÇ·ñ½»»»  */
+	//	uint16_t XYChange;	/* X, Y æ˜¯å¦äº¤æ¢  */
 
-	uint16_t usMaxAdc;	/* ´¥Ãş°å×î´óADCÖµ£¬ÓÃÓÚÓĞĞ§µãÅĞ¶Ï. ×îĞ¡ADC = 0  */
+	uint16_t usMaxAdc; /* è§¦æ‘¸æ¿æœ€å¤§ADCå€¼ï¼Œç”¨äºæœ‰æ•ˆç‚¹åˆ¤æ–­. æœ€å°ADC = 0  */
 	uint16_t usAdcNowX;
 	uint16_t usAdcNowY;
 
-	uint8_t Enable;		/* ´¥Ãş¼ì²âÊ¹ÄÜ±êÖ¾ */
+	uint8_t Enable; /* è§¦æ‘¸æ£€æµ‹ä½¿èƒ½æ ‡å¿— */
 
-	uint8_t Event[TOUCH_FIFO_SIZE];	/* ´¥ÃşÊÂ¼ş */
-	int16_t XBuf[TOUCH_FIFO_SIZE];	/* ´¥Ãş×ø±ê»º³åÇø */
-	int16_t YBuf[TOUCH_FIFO_SIZE];	/* ´¥Ãş×ø±ê»º³åÇø */
-	uint8_t Read;					/* »º³åÇø¶ÁÖ¸Õë */
-	uint8_t Write;					/* »º³åÇøĞ´Ö¸Õë */
-}TOUCH_T;
+	uint8_t Event[TOUCH_FIFO_SIZE]; /* è§¦æ‘¸äº‹ä»¶ */
+	int16_t XBuf[TOUCH_FIFO_SIZE];	/* è§¦æ‘¸åæ ‡ç¼“å†²åŒº */
+	int16_t YBuf[TOUCH_FIFO_SIZE];	/* è§¦æ‘¸åæ ‡ç¼“å†²åŒº */
+	uint8_t Read;										/* ç¼“å†²åŒºè¯»æŒ‡é’ˆ */
+	uint8_t Write;									/* ç¼“å†²åŒºå†™æŒ‡é’ˆ */
+} TOUCH_T;
 
-/* ±£´æµÄµç×èÆÁĞ£×¼²ÎÊı */
+/* ä¿å­˜çš„ç”µé˜»å±æ ¡å‡†å‚æ•° */
 typedef struct
 {
-	uint8_t CalibPointCount;	/* Ğ£×¼µãÊı£¬2±íÊ¾2µãĞ£×¼£¬4±íÊ¾4µãĞ£×¼ */	
-	
-	uint8_t TouchDirection;	/* ÆÁÄ»·½Ïò 0-3  0±íÊ¾ºáÆÁ£¬1±íÊ¾ºáÆÁ180¡ã 2±íÊ¾ÊúÆÁ 3±íÊ¾ÊúÆÁ180¡ã */
-	
-	uint8_t XYChange;		/* X, Y ÊÇ·ñ½»»»£¬ 1±íÊ¾iÇĞ»»£¬0±íÊ¾²»ÇĞ»»  */
-	
-	uint16_t usAdcX1;	/* ×óÉÏ½Ç */
+	uint8_t CalibPointCount; /* æ ¡å‡†ç‚¹æ•°ï¼Œ2è¡¨ç¤º2ç‚¹æ ¡å‡†ï¼Œ4è¡¨ç¤º4ç‚¹æ ¡å‡† */
+
+	uint8_t TouchDirection; /* å±å¹•æ–¹å‘ 0-3  0è¡¨ç¤ºæ¨ªå±ï¼Œ1è¡¨ç¤ºæ¨ªå±180Â° 2è¡¨ç¤ºç«–å± 3è¡¨ç¤ºç«–å±180Â° */
+
+	uint8_t XYChange; /* X, Y æ˜¯å¦äº¤æ¢ï¼Œ 1è¡¨ç¤ºiåˆ‡æ¢ï¼Œ0è¡¨ç¤ºä¸åˆ‡æ¢  */
+
+	uint16_t usAdcX1; /* å·¦ä¸Šè§’ */
 	uint16_t usAdcY1;
-	uint16_t usAdcX2;	/* ÓÒÏÂ½Ç */
+	uint16_t usAdcX2; /* å³ä¸‹è§’ */
 	uint16_t usAdcY2;
-	uint16_t usAdcX3;	/* ×óÏÂ½Ç */
+	uint16_t usAdcX3; /* å·¦ä¸‹è§’ */
 	uint16_t usAdcY3;
-	uint16_t usAdcX4;	/* ÓÒÉÏ½Ç */
+	uint16_t usAdcX4; /* å³ä¸Šè§’ */
 	uint16_t usAdcY4;
-	
-	uint16_t usLcdX1;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdY1;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdX2;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdY2;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdX3;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdY3;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdX4;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */
-	uint16_t usLcdY4;	/* Ğ£×¼Ê±£¬ÆÁÄ»×ø±ê */	
 
-}TP_CALIB_PARAM_T;
+	uint16_t usLcdX1; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdY1; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdX2; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdY2; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdX3; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdY3; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdX4; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
+	uint16_t usLcdY4; /* æ ¡å‡†æ—¶ï¼Œå±å¹•åæ ‡ */
 
-/* ´¥ÃşÊÂ¼ş */
+} TP_CALIB_PARAM_T;
+
+/* è§¦æ‘¸äº‹ä»¶ */
 enum
 {
-	TOUCH_NONE = 0,		/* ÎŞ´¥Ãş */
-	TOUCH_DOWN = 1,		/* °´ÏÂ */
-	TOUCH_MOVE = 2,		/* ÒÆ¶¯ */
-	TOUCH_RELEASE = 3	/* ÊÍ·Å */
+	TOUCH_NONE = 0,		/* æ— è§¦æ‘¸ */
+	TOUCH_DOWN = 1,		/* æŒ‰ä¸‹ */
+	TOUCH_MOVE = 2,		/* ç§»åŠ¨ */
+	TOUCH_RELEASE = 3 /* é‡Šæ”¾ */
 };
 
-/* ¹©Íâ²¿µ÷ÓÃµÄº¯ÊıÉùÃ÷ */
+/* ä¾›å¤–éƒ¨è°ƒç”¨çš„å‡½æ•°å£°æ˜ */
 void TOUCH_InitHard(void);
 uint8_t TOUCH_PenInt(void);
 void TOUCH_Calibration(uint8_t _PointCount);
@@ -124,7 +124,7 @@ int16_t TOUCH_GetY(void);
 uint8_t TOUCH_GetKey(int16_t *_pX, int16_t *_pY);
 void TOUCH_CelarFIFO(void);
 uint8_t TOUCH_InRect(uint16_t _usX, uint16_t _usY,
-uint16_t _usRectX, uint16_t _usRectY, uint16_t _usRectH, uint16_t _usRectW);
+										 uint16_t _usRectX, uint16_t _usRectY, uint16_t _usRectH, uint16_t _usRectW);
 void TOUCH_Scan(void);
 int32_t TOUCH_Abs(int32_t x);
 void TOUCH_PutKey(uint8_t _ucEvent, uint16_t _usX, uint16_t _usY);
@@ -137,4 +137,4 @@ extern uint8_t g_LcdType;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

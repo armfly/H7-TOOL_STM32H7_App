@@ -1,33 +1,32 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : TFTÒº¾§ÏÔÊ¾Æ÷Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : LCD_tft_lcd.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : TFTæ¶²æ™¶æ˜¾ç¤ºå™¨é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : LCD_tft_lcd.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2010-2011, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2010-2011, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
-
 
 #ifndef _BSP_OLED_H
 #define _BSP_OLED_H
 
 #if 1
-	#include "bsp_tft_lcd.h"	/* ½öÊ¹ÓÃÁËÆäÖĞµÄ FONT_T ½á¹¹Ìå */
+#include "bsp_tft_lcd.h" /* ä»…ä½¿ç”¨äº†å…¶ä¸­çš„ FONT_T ç»“æ„ä½“ */
 #else
-	typedef struct
-	{
-		uint16_t FontCode;	/* ×ÖÌå´úÂë 0 ±íÊ¾16µãÕó */
-		uint16_t FrontColor;/* ×ÖÌåÑÕÉ« */
-		uint16_t BackColor;	/* ÎÄ×Ö±³¾°ÑÕÉ«£¬Í¸Ã÷ */
-		uint16_t Space;		/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-	}FONT_T;
+typedef struct
+{
+	uint16_t FontCode;	 /* å­—ä½“ä»£ç  0 è¡¨ç¤º16ç‚¹é˜µ */
+	uint16_t FrontColor; /* å­—ä½“é¢œè‰² */
+	uint16_t BackColor;	/* æ–‡å­—èƒŒæ™¯é¢œè‰²ï¼Œé€æ˜ */
+	uint16_t Space;			 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+} FONT_T;
 #endif
 
-/* ¿É¹©Íâ²¿Ä£¿éµ÷ÓÃµÄº¯Êı */
+/* å¯ä¾›å¤–éƒ¨æ¨¡å—è°ƒç”¨çš„å‡½æ•° */
 void OLED_InitHard(void);
 void OLED_DispOn(void);
 void OLED_DispOff(void);
@@ -39,12 +38,10 @@ void OLED_ClrScr(uint8_t _ucMode);
 void OLED_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont);
 void OLED_PutPixel(uint16_t _usX, uint16_t _usY, uint8_t _ucColor);
 uint8_t OLED_GetPixel(uint16_t _usX, uint16_t _usY);
-void OLED_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t _usY2 , uint8_t _ucColor);
+void OLED_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint8_t _ucColor);
 void OLED_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint8_t _ucColor);
 void OLED_DrawRect(uint16_t _usX, uint16_t _usY, uint8_t _usHeight, uint16_t _usWidth, uint8_t _ucColor);
 void OLED_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint8_t _ucColor);
 void OLED_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint8_t *_ptr);
 
 #endif
-
-

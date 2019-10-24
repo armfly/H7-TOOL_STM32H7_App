@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : GT911µçÈİ´¥ÃşĞ¾Æ¬Çı¶¯³ÌĞò
-*	ÎÄ¼şÃû³Æ : bsp_GT911.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : GT911ç”µå®¹è§¦æ‘¸èŠ¯ç‰‡é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_GT911.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2017-2025, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2017-2025, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,14 +14,14 @@
 #ifndef _BSP_GT911_H
 #define _BSP_GT911_H
 
-#define GT911_I2C_ADDR1	0xBA
+#define GT911_I2C_ADDR1 0xBA
 
 typedef struct
 {
 	uint8_t Enable;
 	uint8_t TimerCount;
 	uint8_t i2c_addr;
-	
+
 	uint8_t TouchpointFlag;
 	uint8_t Touchkeystate;
 
@@ -44,7 +44,7 @@ typedef struct
 	uint16_t X4;
 	uint16_t Y4;
 	uint16_t P4;
-}GT911_T;
+} GT911_T;
 
 void GT911_InitHard(void);
 uint32_t GT911_ReadID(void);
@@ -52,9 +52,8 @@ uint16_t GT911_ReadVersion(void);
 void GT911_Scan(void);
 void GT911_Timer1ms(void);
 
-
 extern GT911_T g_GT911;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

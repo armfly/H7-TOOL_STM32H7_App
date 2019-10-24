@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : µç×è±í
-*	ÎÄ¼şÃû³Æ : status_resitor_meter.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : µç×è±í
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-12-06 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : ç”µé˜»è¡¨
+*	æ–‡ä»¶åç§° : status_resitor_meter.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ç”µé˜»è¡¨
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-12-06 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,74 +20,74 @@ static void DispResistor(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: status_ResistorMeter
-*	¹¦ÄÜËµÃ÷: µç×è±í×´Ì¬
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: status_ResistorMeter
+*	åŠŸèƒ½è¯´æ˜: ç”µé˜»è¡¨çŠ¶æ€
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void status_ResistorMeter(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
 	uint8_t fRefresh;
 
-	DispHeader("µç×è²âÁ¿");
-	
+	DispHeader("ç”µé˜»æµ‹é‡");
+
 	fRefresh = 1;
 	bsp_StartAutoTimer(0, 300);
 	while (g_MainStatus == MS_RESISTOR_METER)
 	{
 		bsp_Idle();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
-			fRefresh = 0;					
+			fRefresh = 0;
 			DispResistor();
 		}
 
-		/* ¶ÌÂ··äÃù 20Å· */
+		/* çŸ­è·¯èœ‚é¸£ 20æ¬§ */
 		if (g_tVar.NTCRes < (float)0.02)
 		{
-			BEEP_Start(10,10,0);
+			BEEP_Start(10, 10, 0);
 		}
 		else
 		{
 			BEEP_Stop();
 		}
-		
+
 		if (bsp_CheckTimer(0))
 		{
 			fRefresh = 1;
 		}
-		
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* S¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_S: /* Sé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_S:			/* S¼üÊÍ·Å */
-					g_MainStatus = NextStatus(MS_RESISTOR_METER);
-					break;
+			case KEY_UP_S: /* Sé”®é‡Šæ”¾ */
+				g_MainStatus = NextStatus(MS_RESISTOR_METER);
+				break;
 
-				case  KEY_LONG_S:		/* S¼ü³¤°´ */
-					break;				
+			case KEY_LONG_S: /* Sé”®é•¿æŒ‰ */
+				break;
 
-				case  KEY_DOWN_C:		/* C¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_C: /* Cé”®æŒ‰ä¸‹ */
+				break;
 
-				case  KEY_UP_C:			/* C¼üÊÍ·Å */
-					g_MainStatus = LastStatus(MS_RESISTOR_METER);
-					break;
+			case KEY_UP_C: /* Cé”®é‡Šæ”¾ */
+				g_MainStatus = LastStatus(MS_RESISTOR_METER);
+				break;
 
-				case  KEY_LONG_C:		/* C¼ü³¤°´ */
-					break;	
-				
-				default:
-					break;
+			case KEY_LONG_C: /* Cé”®é•¿æŒ‰ */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -97,39 +97,39 @@ void status_ResistorMeter(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispResistor
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾µç×èÖµ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispResistor
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºç”µé˜»å€¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispResistor(void)
 {
 	FONT_T tFont;
 	char buf[64];
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_24;			/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = HEAD_BAR_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_24;				/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			/* å­—ä½“é¢œè‰² */
+		tFont.BackColor = HEAD_BAR_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
-	
+
 	if (g_tVar.NTCRes < 1.0)
 	{
-		sprintf(buf, "µç×è: %0.1f¦¸", g_tVar.NTCRes * 1000);
+		sprintf(buf, "ç”µé˜»: %0.1fÎ©", g_tVar.NTCRes * 1000);
 	}
 	else if (g_tVar.NTCRes < 1000)
 	{
-		sprintf(buf, "µç×è: %0.3fK¦¸", g_tVar.NTCRes);
+		sprintf(buf, "ç”µé˜»: %0.3fKÎ©", g_tVar.NTCRes);
 	}
 	else
 	{
-		sprintf(buf, "µç×è: > 1M¦¸" );
+		sprintf(buf, "ç”µé˜»: > 1MÎ©");
 	}
 
 	LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

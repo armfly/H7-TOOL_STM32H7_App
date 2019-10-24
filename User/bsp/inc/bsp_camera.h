@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÉãÏñÍ·Çı¶¯BSPÄ£¿é(For OV7670)
-*	ÎÄ¼şÃû³Æ : bsp_camera.h
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : æ‘„åƒå¤´é©±åŠ¨BSPæ¨¡å—(For OV7670)
+*	æ–‡ä»¶åç§° : bsp_camera.h
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,12 +13,12 @@
 #ifndef __DCMI_H
 #define __DCMI_H
 
-#define OV7670_SLAVE_ADDRESS	0x42		/* I2C ×ÜÏßµØÖ· */
+#define OV7670_SLAVE_ADDRESS 0x42 /* I2C æ€»çº¿åœ°å€ */
 
 typedef struct
 {
-	uint8_t CaptureOk;		/* ²¶»ñÍê³É */
-}CAM_T;
+	uint8_t CaptureOk; /* æ•è·å®Œæˆ */
+} CAM_T;
 
 void bsp_InitCamera(void);
 uint16_t OV_ReadID(void);
@@ -27,4 +27,3 @@ void CAM_Stop(void);
 
 extern CAM_T g_tCam;
 #endif
-

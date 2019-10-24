@@ -1,7 +1,7 @@
 /*
 *********************************************************************************************************
 *
-*	´ËÎÄ¼şÎªÓÃ»§×Ô¼º±àĞ´£¬ÕâÀïÓÃµ½ST¹Ù·½Àı³ÌÏà¹Ø´úÂë¡£¿ÉÒÔ¸ù¾İ²»Í¬µÄĞèÇóĞŞ¸Ä´ËÎÄ¼şÄÚÈİ¡£2016-08-26  xd 
+*	æ­¤æ–‡ä»¶ä¸ºç”¨æˆ·è‡ªå·±ç¼–å†™ï¼Œè¿™é‡Œç”¨åˆ°STå®˜æ–¹ä¾‹ç¨‹ç›¸å…³ä»£ç ã€‚å¯ä»¥æ ¹æ®ä¸åŒçš„éœ€æ±‚ä¿®æ”¹æ­¤æ–‡ä»¶å†…å®¹ã€‚2016-08-26  xd 
 *
 *********************************************************************************************************
 */
@@ -48,7 +48,7 @@
 #include "lwip/tcp.h"
 
 #include "bsp.h"
-#include "modbus_slave.h"	/* tcp + modbusĞ­Òé */
+#include "modbus_slave.h"	/* tcp + modbusåè®® */
 #include "param.h"
 
 #if LWIP_TCP
@@ -97,7 +97,7 @@ void tcp_echoserver_init(void)
     err_t err;
     
     /* bind echo_pcb to port 7 (ECHO protocol) */
-    err = tcp_bind(tcp_echoserver_pcb, IP_ADDR_ANY, g_tParam.LocalTCPPort);		/* ¶Ë¿ÚºÅÎªg_tParam.Ctrl_Port */
+    err = tcp_bind(tcp_echoserver_pcb, IP_ADDR_ANY, g_tParam.LocalTCPPort);		/* ç«¯å£å·ä¸ºg_tParam.Ctrl_Port */
     
     if (err == ERR_OK)
     {
@@ -105,7 +105,7 @@ void tcp_echoserver_init(void)
       tcp_echoserver_pcb = tcp_listen(tcp_echoserver_pcb);
       
       /* initialize LwIP tcp_accept callback function */
-      tcp_accept(tcp_echoserver_pcb, tcp_echoserver_accept);	/* ³õÊ¼»¯½ÓÊÕ»Øµ÷º¯Êı */
+      tcp_accept(tcp_echoserver_pcb, tcp_echoserver_accept);	/* åˆå§‹åŒ–æ¥æ”¶å›è°ƒå‡½æ•° */
     }
     else 
     {
@@ -127,7 +127,7 @@ void tcp_echoserver_init(void)
   * @param  err: not used 
   * @retval err_t: error status
   */
-/* ¿Í»§¶ËÁ¬½ÓÊ±£¬»áµ÷ÓÃ´Ë»Øµ÷º¯Êı£¬½«es->state = ES_ACCEPTED ±íÊ¾Á¬½Ó×´Ì¬ */
+/* å®¢æˆ·ç«¯è¿æ¥æ—¶ï¼Œä¼šè°ƒç”¨æ­¤å›è°ƒå‡½æ•°ï¼Œå°†es->state = ES_ACCEPTED è¡¨ç¤ºè¿æ¥çŠ¶æ€ */
 static err_t tcp_echoserver_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
 {
   err_t ret_err;
@@ -151,13 +151,13 @@ static err_t tcp_echoserver_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
     tcp_arg(newpcb, es);
     
     /* initialize lwip tcp_recv callback function for newpcb  */ 
-    tcp_recv(newpcb, tcp_echoserver_recv);		/* ³õÊ¼»¯Êı¾İ½ÓÊÕ»Øµ÷º¯Êı */
+    tcp_recv(newpcb, tcp_echoserver_recv);		/* åˆå§‹åŒ–æ•°æ®æ¥æ”¶å›è°ƒå‡½æ•° */
     
     /* initialize lwip tcp_err callback function for newpcb  */
-    tcp_err(newpcb, tcp_echoserver_error);		/* ³õÊ¼»¯´íÎó»Øµ÷º¯Êı */
+    tcp_err(newpcb, tcp_echoserver_error);		/* åˆå§‹åŒ–é”™è¯¯å›è°ƒå‡½æ•° */
     
     /* initialize lwip tcp_poll callback function for newpcb */
-    tcp_poll(newpcb, tcp_echoserver_poll, 1);	/* tcp_poll»Øµ÷º¯Êı */
+    tcp_poll(newpcb, tcp_echoserver_poll, 1);	/* tcp_pollå›è°ƒå‡½æ•° */
     
     ret_err = ERR_OK;
   }
@@ -191,7 +191,7 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
   
 //		DebugToggle1();
   /* if we receive an empty tcp frame from client => close connection */
-  if (p == NULL)					/* ´Ó¿Í»§¶Ë½ÓÊÕµ½¿ÕÊı¾İ */
+  if (p == NULL)					/* ä»å®¢æˆ·ç«¯æ¥æ”¶åˆ°ç©ºæ•°æ® */
   {
     /* remote host closed connection */
     es->state = ES_CLOSING;
@@ -202,7 +202,7 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
     }
     else
     {
-	#if 0							/* ¼ÈÈ»»¹Ã»Íê³É£¬´Ë²¿·Ö´úÂëÒ²Ã»Ê²Ã´ÓÃ£¬ËùÒÔÈ¥³ı¸Ã²¿·Ö */
+	#if 0							/* æ—¢ç„¶è¿˜æ²¡å®Œæˆï¼Œæ­¤éƒ¨åˆ†ä»£ç ä¹Ÿæ²¡ä»€ä¹ˆç”¨ï¼Œæ‰€ä»¥å»é™¤è¯¥éƒ¨åˆ† */
       /* we're not done yet */
       /* acknowledge received packet */
       tcp_sent(tpcb, tcp_echoserver_sent);		
@@ -214,14 +214,14 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
     ret_err = ERR_OK;
   }   
   /* else : a non empty frame was received from client but for some reason err != ERR_OK */
-  else if(err != ERR_OK)			/* ´Ó¿Í»§¶Ë½ÓÊÕµ½Ò»¸ö·Ç¿ÕµÄÊı¾İ,µ«ÊÇÓÉÓÚÄ³ÖÖÔ­Òòerr!=ERR_OK */
+  else if(err != ERR_OK)			/* ä»å®¢æˆ·ç«¯æ¥æ”¶åˆ°ä¸€ä¸ªéç©ºçš„æ•°æ®,ä½†æ˜¯ç”±äºæŸç§åŸå› err!=ERR_OK */
   {
     /* free received pbuf*/
     es->p = NULL;
     pbuf_free(p);
     ret_err = err;
   }
-  else if(es->state == ES_ACCEPTED)			/* Á´½Ó×´Ì¬£¬µÚÒ»´ÎÊÕµ½Êı¾İ»á½øÈë´Ë·ÖÖ§£¬Ö®ºó»áÔÚes->state == ES_RECEIVED·ÖÖ§ */
+  else if(es->state == ES_ACCEPTED)			/* é“¾æ¥çŠ¶æ€ï¼Œç¬¬ä¸€æ¬¡æ”¶åˆ°æ•°æ®ä¼šè¿›å…¥æ­¤åˆ†æ”¯ï¼Œä¹‹åä¼šåœ¨es->state == ES_RECEIVEDåˆ†æ”¯ */
   {
     /* first data chunk in p->payload */
     es->state = ES_RECEIVED;
@@ -230,10 +230,10 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
     es->p = p;
     
     /* initialize LwIP tcp_sent callback function */
-    tcp_sent(tpcb, tcp_echoserver_sent);		/* ³õÊ¼»¯LwipĞ­ÒéÕ»tcp_sentµÄ»Øµ÷º¯Êı£¬´Ëº¯Êı¿ÉÒÔ·ÅÔÚtcp_echoserver_acceptÖĞÒ»Æğ×ö */
+    tcp_sent(tpcb, tcp_echoserver_sent);		/* åˆå§‹åŒ–Lwipåè®®æ ˆtcp_sentçš„å›è°ƒå‡½æ•°ï¼Œæ­¤å‡½æ•°å¯ä»¥æ”¾åœ¨tcp_echoserver_acceptä¸­ä¸€èµ·åš */
     
     /* send back the received data (echo) */
-    tcp_echoserver_send(tpcb, es);	/* ST¹Ù·½Àı³Ì½ÓÊÕµ½Êı¾İÁ¢¿Ì·¢ËÍ³öÈ¥£¬ËùÒÔÉ¾³ıÕâ²¿·Ö´úÂë */
+    tcp_echoserver_send(tpcb, es);	/* STå®˜æ–¹ä¾‹ç¨‹æ¥æ”¶åˆ°æ•°æ®ç«‹åˆ»å‘é€å‡ºå»ï¼Œæ‰€ä»¥åˆ é™¤è¿™éƒ¨åˆ†ä»£ç  */
     
     ret_err = ERR_OK;
   }
@@ -246,7 +246,7 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
       es->p = p;
   
       /* send back received data */
-      tcp_echoserver_send(tpcb, es);	/* ST¹Ù·½Àı³Ì½ÓÊÕµ½Êı¾İÁ¢¿Ì·¢ËÍ³öÈ¥£¬ËùÒÔÉ¾³ıÕâ²¿·Ö´úÂë */
+      tcp_echoserver_send(tpcb, es);	/* STå®˜æ–¹ä¾‹ç¨‹æ¥æ”¶åˆ°æ•°æ®ç«‹åˆ»å‘é€å‡ºå»ï¼Œæ‰€ä»¥åˆ é™¤è¿™éƒ¨åˆ†ä»£ç  */
     }
     else
     {
@@ -311,7 +311,7 @@ static err_t tcp_echoserver_poll(void *arg, struct tcp_pcb *tpcb)
     if (es->p != NULL)
     {
       /* there is a remaining pbuf (chain) , try to send data */
-      //tcp_echoserver_send(tpcb, es);			/* ´ËÊ±²»ÄÜ·¢ËÍÈÎºÎÊı¾İ */
+      //tcp_echoserver_send(tpcb, es);			/* æ­¤æ—¶ä¸èƒ½å‘é€ä»»ä½•æ•°æ® */
     }
     else
     {
@@ -383,10 +383,10 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
     /* get pointer on pbuf from es structure */
     ptr = es->p;
 	  
-	#if 1		/* Ä¬ÈÏÊı¾İ°ü¾ÍÔÚÒ»¸ö½á¹¹ÌåÖĞ£¬Ã»ÓĞÓÃµ½Á´±í½âÎö xd 2016-08-27 */
+	#if 1		/* é»˜è®¤æ•°æ®åŒ…å°±åœ¨ä¸€ä¸ªç»“æ„ä½“ä¸­ï¼Œæ²¡æœ‰ç”¨åˆ°é“¾è¡¨è§£æ xd 2016-08-27 */
 	  {
 //		  uint8_t *p;
-		  bsp_LedToggle(1);		/* ĞÅºÅÖ¸Ê¾µÆ·­×ª */
+		  bsp_LedToggle(1);		/* ä¿¡å·æŒ‡ç¤ºç¯ç¿»è½¬ */
 		
 //		  p = ptr->payload;
 		 #if 1
@@ -412,9 +412,9 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
 			wr_err = tcp_write(tpcb, g_tModS.TxBuf, g_tModS.TxCount, 1); 
 		#endif
 	  } 
-    #else		/* ´Ë·ÖÖ§Îª½âÎöÁ´±íÊı¾İ£¬²¢·¢ËÍ½ÓÊÕµÄÊı¾İ,st¹Ù·½Àı³Ì´úÂë */
+    #else		/* æ­¤åˆ†æ”¯ä¸ºè§£æé“¾è¡¨æ•°æ®ï¼Œå¹¶å‘é€æ¥æ”¶çš„æ•°æ®,stå®˜æ–¹ä¾‹ç¨‹ä»£ç  */
 		/* enqueue data for transmission */
-		wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);	/* pbufÎªÊı¾İ½á¹¹Ìå£¬ptr->payloadÎªÊı¾İ»º³åÇø */
+		wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);	/* pbufä¸ºæ•°æ®ç»“æ„ä½“ï¼Œptr->payloadä¸ºæ•°æ®ç¼“å†²åŒº */
 	#endif
 
 	if (wr_err == ERR_OK)
@@ -424,12 +424,12 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
 		plen = ptr->len;
 
 		/* continue with next pbuf in chain (if any) */
-		es->p = ptr->next;							/* Ö¸ÏòÏÂÒ»¸öpbuf */
+		es->p = ptr->next;							/* æŒ‡å‘ä¸‹ä¸€ä¸ªpbuf */
 
 		if(es->p != NULL)
 		{
 		/* increment reference count for es->p */
-		pbuf_ref(es->p);							/* pbufµÄref¼Ó1£¬±íÊ¾ÓÃµ½´ÎÊı£¨LwipĞ­ÒéÕ»Ô´Âë£© */
+		pbuf_ref(es->p);							/* pbufçš„refåŠ 1ï¼Œè¡¨ç¤ºç”¨åˆ°æ¬¡æ•°ï¼ˆLwipåè®®æ ˆæºç ï¼‰ */
 		}
 
 		/* free pbuf: will free pbufs up to es->p (because es->p has a reference count > 0) */
@@ -437,7 +437,7 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
 
 		/* Update tcp window size to be advertized : should be called when received
 		data (with the amount plen) has been processed by the application layer */
-		tcp_recved(tpcb, plen);			/* ¸üĞÂtcp´°¿Ú´óĞ¡ */
+		tcp_recved(tpcb, plen);			/* æ›´æ–°tcpçª—å£å¤§å° */
 	}
 	else if(wr_err == ERR_MEM)
 	{
@@ -452,14 +452,14 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
 	   
    }
    	/* 
-		ÉÏÃæÓÃtcp_writeº¯Êı½«Êı¾İĞ´Èëtpcb£¬µ«´ËÊ±Êı¾İ²¢Ã»ÓĞ·¢ËÍ³öÈ¥¡£
-		¶øÊÇÔÚtcp_inputº¯Êıµ÷ÓÃtcp_output(tpcb)Êı¾İ²Å·¢ËÍ³öÈ¥¡£
-		Èç¹ûÒªÔö¼Ó·¢ËÍËÙ¶È£¬¿ÉÒÔÔÚÕâÀïµ÷ÓÃtcp_output(tpcb);
+		ä¸Šé¢ç”¨tcp_writeå‡½æ•°å°†æ•°æ®å†™å…¥tpcbï¼Œä½†æ­¤æ—¶æ•°æ®å¹¶æ²¡æœ‰å‘é€å‡ºå»ã€‚
+		è€Œæ˜¯åœ¨tcp_inputå‡½æ•°è°ƒç”¨tcp_output(tpcb)æ•°æ®æ‰å‘é€å‡ºå»ã€‚
+		å¦‚æœè¦å¢åŠ å‘é€é€Ÿåº¦ï¼Œå¯ä»¥åœ¨è¿™é‡Œè°ƒç”¨tcp_output(tpcb);
 	*/
   }
   
-	/* 2016-09-13 by xd Á¢¿Ì·¢ËÍ */
-	tcp_output(tpcb);		        /* ½«Êı¾İÁ¢¿Ì·¢ËÍ³öÈ¥ */
+	/* 2016-09-13 by xd ç«‹åˆ»å‘é€ */
+	tcp_output(tpcb);		        /* å°†æ•°æ®ç«‹åˆ»å‘é€å‡ºå» */
 }
 
 /**

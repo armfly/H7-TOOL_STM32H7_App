@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ST7789 TFT SPI½Ó¿ÚÇı¶¯³ÌĞò
-*	ÎÄ¼şÃû³Æ : bsp_tft_st7789.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : SPI½Ó¿Ú£¬ÏÔÊ¾Çı¶¯ICÎªST7789£¬·Ö±æÂÊÎª240*240,1.3´çISP
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
+*	æ¨¡å—åç§° : ST7789 TFT SPIæ¥å£é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_tft_st7789.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : SPIæ¥å£ï¼Œæ˜¾ç¤ºé©±åŠ¨ICä¸ºST7789ï¼Œåˆ†è¾¨ç‡ä¸º240*240,1.3å¯¸ISP
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
 *		V1.0	2018-12-06 armfly 
-*		V1.1	2019-03-25 armfly Èí¼şSPI£¬ÓÅ»¯Ö´ĞĞËÙ¶È
+*		V1.1	2019-03-25 armfly è½¯ä»¶SPIï¼Œä¼˜åŒ–æ‰§è¡Œé€Ÿåº¦
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,8 +20,8 @@
 #include "param.h"
 
 /*
-	H7-TOOL LCD¿ÚÏß·ÖÅä
-	----- µÚ6°æ -----
+	H7-TOOL LCDå£çº¿åˆ†é…
+	----- ç¬¬6ç‰ˆ -----
 	PG15  --->  LCD_RS
 	PE1	 --->  LCD_CS
 	PH6 --->  LCD_SCK		SPI3_SCK	
@@ -29,9 +29,9 @@
 	PH9	 --->  BACK_LIGHT	TIM12_CH2
 	
 	PB6  --->  LCD_RESET
-	PH15 --->  µçÔ´¿ØÖÆ
+	PH15 --->  ç”µæºæ§åˆ¶
 	
-	----- µÚ4¡¢5°æ -----
+	----- ç¬¬4ã€5ç‰ˆ -----
 	PF3  --->  LCD_RS
 	PE1	 --->  LCD_CS
 	PG10 --->  LCD_SCK		SPI3_SCK	
@@ -39,9 +39,9 @@
 	PH9	 --->  BACK_LIGHT	TIM12_CH2
 	
 	PB6  --->  LCD_RESET
-	PH15 --->  µçÔ´¿ØÖÆ
+	PH15 --->  ç”µæºæ§åˆ¶
 	
-	--------------- ¾É°æ -------
+	--------------- æ—§ç‰ˆ -------
 	PF3  --->  LCD_RS
 	PG2	 --->  LCD_CS
 	PC12 --->  LCD_SDA		SPI3_MOSI
@@ -49,51 +49,51 @@
 	
 	PH9	 --->  BACK_LIGHT	TIM12_CH2
 	
-	µÚ2°æÔö¼Óreset
+	ç¬¬2ç‰ˆå¢åŠ reset
 	
 	PB6  --->  LCD_RESET
 */
 
+#define ALL_LCD_GPIO_CLK_ENABLE() \
+	__HAL_RCC_GPIOB_CLK_ENABLE();   \
+	__HAL_RCC_GPIOE_CLK_ENABLE();   \
+	__HAL_RCC_GPIOG_CLK_ENABLE();   \
+	__HAL_RCC_GPIOH_CLK_ENABLE();
 
-#define ALL_LCD_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE();	\
-									__HAL_RCC_GPIOE_CLK_ENABLE();	\
-									__HAL_RCC_GPIOG_CLK_ENABLE();	\
-									__HAL_RCC_GPIOH_CLK_ENABLE();
+/* LCD_RS å¯„å­˜å™¨é€‰æ‹© */
+#define LCD_RS_GPIO GPIOG
+#define LCD_RS_PIN GPIO_PIN_15
+#define LCD_RS_0() LCD_RS_GPIO->BSRRH = LCD_RS_PIN
+#define LCD_RS_1() LCD_RS_GPIO->BSRRL = LCD_RS_PIN
 
-/* LCD_RS ¼Ä´æÆ÷Ñ¡Ôñ */
-#define LCD_RS_GPIO		GPIOG
-#define LCD_RS_PIN		GPIO_PIN_15
-#define LCD_RS_0()  	LCD_RS_GPIO->BSRRH = LCD_RS_PIN	
-#define LCD_RS_1()  	LCD_RS_GPIO->BSRRL = LCD_RS_PIN
+/* LCD_CS SPIç‰‡é€‰*/
+#define LCD_CS_GPIO GPIOE
+#define LCD_CS_PIN GPIO_PIN_1
+#define LCD_CS_0() LCD_CS_GPIO->BSRRH = LCD_CS_PIN
+#define LCD_CS_1() LCD_CS_GPIO->BSRRL = LCD_CS_PIN
 
-/* LCD_CS SPIÆ¬Ñ¡*/
-#define LCD_CS_GPIO		GPIOE
-#define LCD_CS_PIN		GPIO_PIN_1
-#define LCD_CS_0()  	LCD_CS_GPIO->BSRRH = LCD_CS_PIN	
-#define LCD_CS_1()  	LCD_CS_GPIO->BSRRL = LCD_CS_PIN
+/* SPI æ¥å£ */
+#define LCD_SCK_GPIO GPIOH
+#define LCD_SCK_PIN GPIO_PIN_6
+#define LCD_SCK_0() LCD_SCK_GPIO->BSRRH = LCD_SCK_PIN
+#define LCD_SCK_1() LCD_SCK_GPIO->BSRRL = LCD_SCK_PIN
 
-/* SPI ½Ó¿Ú */
-#define LCD_SCK_GPIO	GPIOH
-#define LCD_SCK_PIN		GPIO_PIN_6
-#define LCD_SCK_0()  	LCD_SCK_GPIO->BSRRH = LCD_SCK_PIN	
-#define LCD_SCK_1()  	LCD_SCK_GPIO->BSRRL = LCD_SCK_PIN
+#define LCD_SDA_GPIO GPIOH
+#define LCD_SDA_PIN GPIO_PIN_7
+#define LCD_SDA_0() LCD_SDA_GPIO->BSRRH = LCD_SDA_PIN
+#define LCD_SDA_1() LCD_SDA_GPIO->BSRRL = LCD_SDA_PIN
 
-#define LCD_SDA_GPIO	GPIOH
-#define LCD_SDA_PIN		GPIO_PIN_7
-#define LCD_SDA_0()  	LCD_SDA_GPIO->BSRRH = LCD_SDA_PIN	
-#define LCD_SDA_1()  	LCD_SDA_GPIO->BSRRL = LCD_SDA_PIN
+/* LCD_RESET å¤ä½ */
+#define LCD_RESET_GPIO GPIOB
+#define LCD_RESET_PIN GPIO_PIN_6
+#define LCD_RESET_0() LCD_RESET_GPIO->BSRRH = LCD_RESET_PIN
+#define LCD_RESET_1() LCD_RESET_GPIO->BSRRL = LCD_RESET_PIN
 
-/* LCD_RESET ¸´Î» */
-#define LCD_RESET_GPIO	GPIOB
-#define LCD_RESET_PIN	GPIO_PIN_6
-#define LCD_RESET_0()  	LCD_RESET_GPIO->BSRRH = LCD_RESET_PIN	
-#define LCD_RESET_1()  	LCD_RESET_GPIO->BSRRL = LCD_RESET_PIN
-
-/* LCD_PWR_EN µçÔ´¿ØÖÆ */
-#define LCD_PWR_EN_GPIO		GPIOH
-#define LCD_PWR_EN_PIN		GPIO_PIN_15
-#define LCD_PWR_EN_0()  	LCD_PWR_EN_GPIO->BSRRH = LCD_PWR_EN_PIN	
-#define LCD_PWR_EN_1()  	LCD_PWR_EN_GPIO->BSRRL = LCD_PWR_EN_PIN
+/* LCD_PWR_EN ç”µæºæ§åˆ¶ */
+#define LCD_PWR_EN_GPIO GPIOH
+#define LCD_PWR_EN_PIN GPIO_PIN_15
+#define LCD_PWR_EN_0() LCD_PWR_EN_GPIO->BSRRH = LCD_PWR_EN_PIN
+#define LCD_PWR_EN_1() LCD_PWR_EN_GPIO->BSRRL = LCD_PWR_EN_PIN
 
 static void ST7789_ConfigGPIO(void);
 static void ST7789_initial(void);
@@ -101,76 +101,76 @@ static void ST7789_SendByteQuick(uint8_t data);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_InitHard
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯LCD
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_InitHard
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–LCD
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_InitHard(void)
 {
-	ST7789_ConfigGPIO();			/* ÅäÖÃ429 CPUÄÚ²¿LTDC */
-	
+	ST7789_ConfigGPIO(); /* é…ç½®429 CPUå†…éƒ¨LTDC */
+
 	ST7789_initial();
-	
-	g_LcdHeight = 240;			/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¸ß¶È */
-	g_LcdWidth = 240;			/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¿í¶È */
+
+	g_LcdHeight = 240; /* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-é«˜åº¦ */
+	g_LcdWidth = 240;	/* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-å®½åº¦ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_ConfigLTDC
-*	¹¦ÄÜËµÃ÷: ÅäÖÃLTDC
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_ConfigLTDC
+*	åŠŸèƒ½è¯´æ˜: é…ç½®LTDC
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void ST7789_ConfigGPIO(void)
 {
-	/* ÅäÖÃGPIO */
+	/* é…ç½®GPIO */
 	{
 		GPIO_InitTypeDef gpio_init;
 
-		/* ´ò¿ªGPIOÊ±ÖÓ */
+		/* æ‰“å¼€GPIOæ—¶é’Ÿ */
 		ALL_LCD_GPIO_CLK_ENABLE();
-		
+
 		LCD_CS_1();
 		LCD_SCK_1();
-		
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* ÉèÖÃÍÆÍìÊä³ö */
-		gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */	
-		
-		gpio_init.Pin = LCD_RS_PIN;	
-		HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);	
-		
-		gpio_init.Pin = LCD_CS_PIN;	
-		HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);	
 
-		gpio_init.Pin = LCD_SCK_PIN;	
-		HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);	
+		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+		gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
 
-		gpio_init.Pin = LCD_SDA_PIN;	
-		HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);	
+		gpio_init.Pin = LCD_RS_PIN;
+		HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_RESET_PIN;	
-		HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);	
+		gpio_init.Pin = LCD_CS_PIN;
+		HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_SCK_PIN;
+		HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_SDA_PIN;
+		HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
+
+		gpio_init.Pin = LCD_RESET_PIN;
+		HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
 	}
 }
 
-/*Ğ´Ö¸Áîµ½ LCD Ä£¿é*/
+/*å†™æŒ‡ä»¤åˆ° LCD æ¨¡å—*/
 void Lcd_WriteIndex(uint8_t data1)
 {
-	
-	LCD_RS_0();	
+
+	LCD_RS_0();
 	LCD_CS_0();
 
 	ST7789_SendByteQuick(data1);
-	
+
 	LCD_CS_1();
 }
 
-/* ÓÅ»¯´úÂë£¬¿ìËÙ²Ù×÷ */
+/* ä¼˜åŒ–ä»£ç ï¼Œå¿«é€Ÿæ“ä½œ */
 static void ST7789_SendByteQuick(uint8_t data)
 {
 	uint8_t bit;
@@ -183,8 +183,9 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_0();
 	}
-	LCD_SCK_0(); LCD_SCK_1();
-	
+	LCD_SCK_0();
+	LCD_SCK_1();
+
 	/* bit6 */
 	bit = (data & 0xC0);
 	if (bit == 0x80)
@@ -195,8 +196,9 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();
-	
+	LCD_SCK_0();
+	LCD_SCK_1();
+
 	/* bit5 */
 	data <<= 1;
 	bit = (data & 0xC0);
@@ -208,7 +210,8 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();	
+	LCD_SCK_0();
+	LCD_SCK_1();
 
 	/* bit4 */
 	data <<= 1;
@@ -221,8 +224,9 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();
-	
+	LCD_SCK_0();
+	LCD_SCK_1();
+
 	/* bit3 */
 	data <<= 1;
 	bit = (data & 0xC0);
@@ -234,8 +238,9 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();	
-	
+	LCD_SCK_0();
+	LCD_SCK_1();
+
 	/* bit2 */
 	data <<= 1;
 	bit = (data & 0xC0);
@@ -247,7 +252,8 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();
+	LCD_SCK_0();
+	LCD_SCK_1();
 
 	/* bit1 */
 	data <<= 1;
@@ -260,7 +266,8 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();	
+	LCD_SCK_0();
+	LCD_SCK_1();
 
 	/* bit0 */
 	data <<= 1;
@@ -273,47 +280,48 @@ static void ST7789_SendByteQuick(uint8_t data)
 	{
 		LCD_SDA_1();
 	}
-	LCD_SCK_0();LCD_SCK_1();		
+	LCD_SCK_0();
+	LCD_SCK_1();
 }
 
-/*Ğ´Êı¾İµ½ LCD Ä£¿é*/
+/*å†™æ•°æ®åˆ° LCD æ¨¡å—*/
 void Lcd_WriteData(uint8_t data1)
 {
 	char i;
-	
-	LCD_RS_1();		
+
+	LCD_RS_1();
 	LCD_CS_0();
 	ST7789_SendByteQuick(data1);
 	LCD_CS_1();
 }
 
-// Á¬Ğ´2¸ö×Ö½Ú£¨¼´ 16 Î»£©Êı¾İµ½LCDÄ£¿é
+// è¿å†™2ä¸ªå­—èŠ‚ï¼ˆå³ 16 ä½ï¼‰æ•°æ®åˆ°LCDæ¨¡å—
 void Lcd_WriteData_16(uint16_t data2)
-{	
-	LCD_RS_1();	
+{
+	LCD_RS_1();
 	LCD_CS_0();
 
 	ST7789_SendByteQuick(data2 >> 8);
 	ST7789_SendByteQuick(data2);
-	
+
 	LCD_CS_1();
 }
 
-//LCD ³õÊ¼»¯
+//LCD åˆå§‹åŒ–
 static void ST7789_initial(void)
 {
 	LCD_PWR_EN_1();
-	
-	bsp_DelayUS(10 * 1000);		/* µÈ´ıµçÔ´ÎÈ¶¨ */
-	LCD_RESET_0();				/* µÍµçÆ½£º¸´Î»£¬ Ö»ĞèÒª´óÓÚ10us */
-	bsp_DelayUS(20);			/* ÑÓ³Ù 20us */
-	LCD_RESET_1(); 				/* ¸ßµçÆ½£º¸´Î»½áÊø */
-	bsp_DelayUS(10 * 1000);		/* ¸´Î»Ö®ºó£¬ÒªÇóµÈ´ıÖÁÉÙ5ms, ´Ë´¦µÈ´ı10ms */
-	
-	Lcd_WriteIndex(0x36); 		/* É¨Ãè·½Ïò */
+
+	bsp_DelayUS(10 * 1000); /* ç­‰å¾…ç”µæºç¨³å®š */
+	LCD_RESET_0();					/* ä½ç”µå¹³ï¼šå¤ä½ï¼Œ åªéœ€è¦å¤§äº10us */
+	bsp_DelayUS(20);				/* å»¶è¿Ÿ 20us */
+	LCD_RESET_1();					/* é«˜ç”µå¹³ï¼šå¤ä½ç»“æŸ */
+	bsp_DelayUS(10 * 1000); /* å¤ä½ä¹‹åï¼Œè¦æ±‚ç­‰å¾…è‡³å°‘5ms, æ­¤å¤„ç­‰å¾…10ms */
+
+	Lcd_WriteIndex(0x36); /* æ‰«ææ–¹å‘ */
 	Lcd_WriteData(0x00);
 
-	Lcd_WriteIndex(0x3A); 
+	Lcd_WriteIndex(0x3A);
 	Lcd_WriteData(0x05);
 
 	Lcd_WriteIndex(0xB2);
@@ -323,8 +331,8 @@ static void ST7789_initial(void)
 	Lcd_WriteData(0x33);
 	Lcd_WriteData(0x33);
 
-	Lcd_WriteIndex(0xB7); 
-	Lcd_WriteData(0x35);  
+	Lcd_WriteIndex(0xB7);
+	Lcd_WriteData(0x35);
 
 	Lcd_WriteIndex(0xBB);
 	Lcd_WriteData(0x19);
@@ -336,15 +344,15 @@ static void ST7789_initial(void)
 	Lcd_WriteData(0x01);
 
 	Lcd_WriteIndex(0xC3);
-	Lcd_WriteData(0x12);   
+	Lcd_WriteData(0x12);
 
 	Lcd_WriteIndex(0xC4);
-	Lcd_WriteData(0x20);  
+	Lcd_WriteData(0x20);
 
-	Lcd_WriteIndex(0xC6); 
-	Lcd_WriteData(0x0F);    
+	Lcd_WriteIndex(0xC6);
+	Lcd_WriteData(0x0F);
 
-	Lcd_WriteIndex(0xD0); 
+	Lcd_WriteIndex(0xD0);
 	Lcd_WriteData(0xA4);
 	Lcd_WriteData(0xA1);
 
@@ -380,20 +388,19 @@ static void ST7789_initial(void)
 	Lcd_WriteData(0x20);
 	Lcd_WriteData(0x23);
 
-	Lcd_WriteIndex(0x21); 
+	Lcd_WriteIndex(0x21);
 
-	Lcd_WriteIndex(0x11); 
-
+	Lcd_WriteIndex(0x11);
 
 	Lcd_WriteIndex(0x29);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_GetChipDescribe
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡LCDÇı¶¯Ğ¾Æ¬µÄÃèÊö·ûºÅ£¬ÓÃÓÚÏÔÊ¾
-*	ĞÎ    ²Î: char *_str : ÃèÊö·û×Ö·û´®ÌîÈë´Ë»º³åÇø
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_GetChipDescribe
+*	åŠŸèƒ½è¯´æ˜: è¯»å–LCDé©±åŠ¨èŠ¯ç‰‡çš„æè¿°ç¬¦å·ï¼Œç”¨äºæ˜¾ç¤º
+*	å½¢    å‚: char *_str : æè¿°ç¬¦å­—ç¬¦ä¸²å¡«å…¥æ­¤ç¼“å†²åŒº
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_GetChipDescribe(char *_str)
@@ -403,26 +410,26 @@ void ST7789_GetChipDescribe(char *_str)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_SetDispWin
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÏÔÊ¾´°¿Ú£¬½øÈë´°¿ÚÏÔÊ¾Ä£Ê½¡£
-*	ĞÎ    ²Î:  
-*		_usX : Ë®Æ½×ø±ê
-*		_usY : ´¹Ö±×ø±ê
-*		_usHeight: ´°¿Ú¸ß¶È
-*		_usWidth : ´°¿Ú¿í¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_SetDispWin
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®æ˜¾ç¤ºçª—å£ï¼Œè¿›å…¥çª—å£æ˜¾ç¤ºæ¨¡å¼ã€‚
+*	å½¢    å‚:  
+*		_usX : æ°´å¹³åæ ‡
+*		_usY : å‚ç›´åæ ‡
+*		_usHeight: çª—å£é«˜åº¦
+*		_usWidth : çª—å£å®½åº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth)
 {
-	/* ÓÅ»¯´úÂë£¬×ø±ê²»±ä»¯£¬Ôò²»¸ü¸Ä */
+	/* ä¼˜åŒ–ä»£ç ï¼Œåæ ‡ä¸å˜åŒ–ï¼Œåˆ™ä¸æ›´æ”¹ */
 	static uint16_t s_x1 = 9999;
 	static uint16_t s_x2 = 9999;
 	static uint16_t s_y1 = 9999;
 	static uint16_t s_y2 = 9999;
-	uint16_t x1,x2,y1,y2;
-		
-	/* ÉèÖÃ X ¿ªÊ¼¼°½áÊøµÄµØÖ· */
+	uint16_t x1, x2, y1, y2;
+
+	/* è®¾ç½® X å¼€å§‹åŠç»“æŸçš„åœ°å€ */
 	if (g_tParam.DispDir == 3)
 	{
 		_usX += 319 - 239;
@@ -431,14 +438,14 @@ void ST7789_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 	x2 = _usX + _usWidth - 1;
 	if (s_x1 != x1 || s_x2 != x2)
 	{
-		Lcd_WriteIndex(0x2a); 
+		Lcd_WriteIndex(0x2a);
 		Lcd_WriteData_16(x1);
-		Lcd_WriteData_16(x2);			
+		Lcd_WriteData_16(x2);
 		s_x1 = x1;
 		s_x2 = x2;
 	}
-	
-	/* ÉèÖÃ Y¿ªÊ¼¼°½áÊøµÄµØÖ· */
+
+	/* è®¾ç½® Yå¼€å§‹åŠç»“æŸçš„åœ°å€ */
 	if (g_tParam.DispDir == 1)
 	{
 		/*
@@ -447,25 +454,25 @@ void ST7789_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 		_usY += 319 - 239;
 	}
 	y1 = _usY;
-	y2 = _usY + 0 + _usHeight - 1;	
+	y2 = _usY + 0 + _usHeight - 1;
 	if (s_y1 != y1 || s_y2 != y2)
 	{
 		Lcd_WriteIndex(0x2b);
 		Lcd_WriteData_16(y1);
 		Lcd_WriteData_16(y2);
 		s_y1 = y1;
-		s_y2 = y2;		
+		s_y2 = y2;
 	}
-	
-	Lcd_WriteIndex(0x2c); /* Ğ´Êı¾İ¿ªÊ¼ */
+
+	Lcd_WriteIndex(0x2c); /* å†™æ•°æ®å¼€å§‹ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_QuitWinMode
-*	¹¦ÄÜËµÃ÷: ÍË³ö´°¿ÚÏÔÊ¾Ä£Ê½£¬±äÎªÈ«ÆÁÏÔÊ¾Ä£Ê½
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_QuitWinMode
+*	åŠŸèƒ½è¯´æ˜: é€€å‡ºçª—å£æ˜¾ç¤ºæ¨¡å¼ï¼Œå˜ä¸ºå…¨å±æ˜¾ç¤ºæ¨¡å¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_QuitWinMode(void)
@@ -475,10 +482,10 @@ void ST7789_QuitWinMode(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DispOn
-*	¹¦ÄÜËµÃ÷: ´ò¿ªÏÔÊ¾
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DispOn
+*	åŠŸèƒ½è¯´æ˜: æ‰“å¼€æ˜¾ç¤º
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DispOn(void)
@@ -487,10 +494,10 @@ void ST7789_DispOn(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DispOff
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕÏÔÊ¾
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DispOff
+*	åŠŸèƒ½è¯´æ˜: å…³é—­æ˜¾ç¤º
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DispOff(void)
@@ -499,10 +506,10 @@ void ST7789_DispOff(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_ClrScr
-*	¹¦ÄÜËµÃ÷: ¸ù¾İÊäÈëµÄÑÕÉ«ÖµÇåÆÁ
-*	ĞÎ    ²Î: _usColor : ±³¾°É«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_ClrScr
+*	åŠŸèƒ½è¯´æ˜: æ ¹æ®è¾“å…¥çš„é¢œè‰²å€¼æ¸…å±
+*	å½¢    å‚: _usColor : èƒŒæ™¯è‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_ClrScr(uint16_t _usColor)
@@ -512,12 +519,12 @@ void ST7789_ClrScr(uint16_t _usColor)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_PutPixel
-*	¹¦ÄÜËµÃ÷: »­1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY : ÏñËØ×ø±ê
-*			_usColor  : ÏñËØÑÕÉ« ( RGB = 565 ¸ñÊ½)
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_PutPixel
+*	åŠŸèƒ½è¯´æ˜: ç”»1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY : åƒç´ åæ ‡
+*			_usColor  : åƒç´ é¢œè‰² ( RGB = 565 æ ¼å¼)
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
@@ -528,12 +535,12 @@ void ST7789_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_GetPixel
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY : ÏñËØ×ø±ê
-*			_usColor  : ÏñËØÑÕÉ«
-*	·µ »Ø Öµ: RGBÑÕÉ«Öµ
+*	å‡½ æ•° å: ST7789_GetPixel
+*	åŠŸèƒ½è¯´æ˜: è¯»å–1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY : åƒç´ åæ ‡
+*			_usColor  : åƒç´ é¢œè‰²
+*	è¿” å› å€¼: RGBé¢œè‰²å€¼
 *********************************************************************************************************
 */
 uint16_t ST7789_GetPixel(uint16_t _usX, uint16_t _usY)
@@ -541,37 +548,36 @@ uint16_t ST7789_GetPixel(uint16_t _usX, uint16_t _usY)
 	return CL_BLUE;
 }
 
-
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawLine
-*	¹¦ÄÜËµÃ÷: ²ÉÓÃ Bresenham Ëã·¨£¬ÔÚ2µã¼ä»­Ò»ÌõÖ±Ïß¡£
-*	ĞÎ    ²Î:
-*			_usX1, _usY1 : ÆğÊ¼µã×ø±ê
-*			_usX2, _usY2 : ÖÕÖ¹µãY×ø±ê
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawLine
+*	åŠŸèƒ½è¯´æ˜: é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œåœ¨2ç‚¹é—´ç”»ä¸€æ¡ç›´çº¿ã€‚
+*	å½¢    å‚:
+*			_usX1, _usY1 : èµ·å§‹ç‚¹åæ ‡
+*			_usX2, _usY2 : ç»ˆæ­¢ç‚¹Yåæ ‡
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7789_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t _usY2 , uint16_t _usColor)
+void ST7789_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor)
 {
-	int32_t dx , dy ;
-	int32_t tx , ty ;
-	int32_t inc1 , inc2 ;
-	int32_t d , iTag ;
-	int32_t x , y ;
+	int32_t dx, dy;
+	int32_t tx, ty;
+	int32_t inc1, inc2;
+	int32_t d, iTag;
+	int32_t x, y;
 
-	/* ²ÉÓÃ Bresenham Ëã·¨£¬ÔÚ2µã¼ä»­Ò»ÌõÖ±Ïß */
+	/* é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œåœ¨2ç‚¹é—´ç”»ä¸€æ¡ç›´çº¿ */
 
-	ST7789_PutPixel(_usX1 , _usY1 , _usColor);
+	ST7789_PutPixel(_usX1, _usY1, _usColor);
 
-	/* Èç¹ûÁ½µãÖØºÏ£¬½áÊøºóÃæµÄ¶¯×÷¡£*/
-	if ( _usX1 == _usX2 && _usY1 ==  _usY2 )
+	/* å¦‚æœä¸¤ç‚¹é‡åˆï¼Œç»“æŸåé¢çš„åŠ¨ä½œã€‚*/
+	if (_usX1 == _usX2 && _usY1 == _usY2)
 	{
 		return;
 	}
 
-	iTag = 0 ;
+	iTag = 0;
 	/* dx = abs ( _usX2 - _usX1 ); */
 	if (_usX2 >= _usX1)
 	{
@@ -583,7 +589,7 @@ void ST7789_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t
 	}
 
 	/* dy = abs ( _usY2 - _usY1 ); */
-	if (_usY2 >=  _usY1)
+	if (_usY2 >= _usY1)
 	{
 		dy = _usY2 - _usY1;
 	}
@@ -592,109 +598,115 @@ void ST7789_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t
 		dy = _usY1 - _usY2;
 	}
 
-	if ( dx < dy )   /*Èç¹ûdyÎª¼Æ³¤·½Ïò£¬Ôò½»»»×İºá×ø±ê¡£*/
+	if (dx < dy) /*å¦‚æœdyä¸ºè®¡é•¿æ–¹å‘ï¼Œåˆ™äº¤æ¢çºµæ¨ªåæ ‡ã€‚*/
 	{
 		uint16_t temp;
 
-		iTag = 1 ;
-		temp = _usX1; _usX1 = _usY1; _usY1 = temp;
-		temp = _usX2; _usX2 = _usY2; _usY2 = temp;
-		temp = dx; dx = dy; dy = temp;
+		iTag = 1;
+		temp = _usX1;
+		_usX1 = _usY1;
+		_usY1 = temp;
+		temp = _usX2;
+		_usX2 = _usY2;
+		_usY2 = temp;
+		temp = dx;
+		dx = dy;
+		dy = temp;
 	}
-	tx = _usX2 > _usX1 ? 1 : -1 ;    /* È·¶¨ÊÇÔö1»¹ÊÇ¼õ1 */
-	ty = _usY2 > _usY1 ? 1 : -1 ;
-	x = _usX1 ;
-	y = _usY1 ;
-	inc1 = 2 * dy ;
-	inc2 = 2 * ( dy - dx );
-	d = inc1 - dx ;
-	while ( x != _usX2 )     /* Ñ­»·»­µã */
+	tx = _usX2 > _usX1 ? 1 : -1; /* ç¡®å®šæ˜¯å¢1è¿˜æ˜¯å‡1 */
+	ty = _usY2 > _usY1 ? 1 : -1;
+	x = _usX1;
+	y = _usY1;
+	inc1 = 2 * dy;
+	inc2 = 2 * (dy - dx);
+	d = inc1 - dx;
+	while (x != _usX2) /* å¾ªç¯ç”»ç‚¹ */
 	{
-		if (d < 0 )
+		if (d < 0)
 		{
-			d +=  inc1 ;
+			d += inc1;
 		}
 		else
 		{
-			y +=  ty ;
-			d +=  inc2 ;
+			y += ty;
+			d += inc2;
 		}
-		if (iTag )
+		if (iTag)
 		{
-			ST7789_PutPixel(y , x , _usColor) ;
+			ST7789_PutPixel(y, x, _usColor);
 		}
 		else
 		{
-			ST7789_PutPixel(x , y , _usColor) ;
+			ST7789_PutPixel(x, y, _usColor);
 		}
-		x +=  tx ;
-	}	
+		x += tx;
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawHLine
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»ÌõË®Æ½Ïß. Ê¹ÓÃSTM32F429 DMA2DÓ²¼ş»æÖÆ.
-*	ĞÎ    ²Î:
-*			_usX1, _usY1 : ÆğÊ¼µã×ø±ê
-*			_usLen       : ÏßµÄ³¤¶È
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawHLine
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€æ¡æ°´å¹³çº¿. ä½¿ç”¨STM32F429 DMA2Dç¡¬ä»¶ç»˜åˆ¶.
+*	å½¢    å‚:
+*			_usX1, _usY1 : èµ·å§‹ç‚¹åæ ‡
+*			_usLen       : çº¿çš„é•¿åº¦
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7789_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen , uint16_t _usColor)
+void ST7789_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
 	ST7789_FillRect(_usX, _usY, 1, _usLen, _usColor);
-#else	
+#else
 	uint16_t i;
-	
+
 	for (i = 0; i < _usLen; i++)
-	{	
-		ST7789_PutPixel(_usX + i , _usY , _usColor);
+	{
+		ST7789_PutPixel(_usX + i, _usY, _usColor);
 	}
-#endif	
+#endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawVLine
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»Ìõ´¹Ö±Ïß¡£ Ê¹ÓÃSTM32F429 DMA2DÓ²¼ş»æÖÆ.
-*	ĞÎ    ²Î:
-*			_usX, _usY : ÆğÊ¼µã×ø±ê
-*			_usLen       : ÏßµÄ³¤¶È
-*			_usColor     : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawVLine
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€æ¡å‚ç›´çº¿ã€‚ ä½¿ç”¨STM32F429 DMA2Dç¡¬ä»¶ç»˜åˆ¶.
+*	å½¢    å‚:
+*			_usX, _usY : èµ·å§‹ç‚¹åæ ‡
+*			_usLen       : çº¿çš„é•¿åº¦
+*			_usColor     : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void ST7789_DrawVLine(uint16_t _usX , uint16_t _usY , uint16_t _usLen , uint16_t _usColor)
+void ST7789_DrawVLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
 	ST7789_FillRect(_usX, _usY, _usLen, 1, _usColor);
-#else	
+#else
 	uint16_t i;
-	
+
 	for (i = 0; i < _usLen; i++)
-	{	
+	{
 		ST7789_PutPixel(_usX, _usY + i, _usColor);
 	}
-#endif	
+#endif
 }
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawPoints
-*	¹¦ÄÜËµÃ÷: ²ÉÓÃ Bresenham Ëã·¨£¬»æÖÆÒ»×éµã£¬²¢½«ÕâĞ©µãÁ¬½ÓÆğÀ´¡£¿ÉÓÃÓÚ²¨ĞÎÏÔÊ¾¡£
-*	ĞÎ    ²Î:
-*			x, y     : ×ø±êÊı×é
-*			_usColor : ÑÕÉ«
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawPoints
+*	åŠŸèƒ½è¯´æ˜: é‡‡ç”¨ Bresenham ç®—æ³•ï¼Œç»˜åˆ¶ä¸€ç»„ç‚¹ï¼Œå¹¶å°†è¿™äº›ç‚¹è¿æ¥èµ·æ¥ã€‚å¯ç”¨äºæ³¢å½¢æ˜¾ç¤ºã€‚
+*	å½¢    å‚:
+*			x, y     : åæ ‡æ•°ç»„
+*			_usColor : é¢œè‰²
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor)
 {
 	uint16_t i;
 
-	for (i = 0 ; i < _usSize - 1; i++)
+	for (i = 0; i < _usSize - 1; i++)
 	{
 		ST7789_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
 	}
@@ -702,49 +714,49 @@ void ST7789_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usC
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawRect
-*	¹¦ÄÜËµÃ÷: »æÖÆË®Æ½·ÅÖÃµÄ¾ØĞÎ¡£
-*	ĞÎ    ²Î:
-*			_usX,_usY: ¾ØĞÎ×óÉÏ½ÇµÄ×ø±ê
-*			_usHeight : ¾ØĞÎµÄ¸ß¶È
-*			_usWidth  : ¾ØĞÎµÄ¿í¶È
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawRect
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶æ°´å¹³æ”¾ç½®çš„çŸ©å½¢ã€‚
+*	å½¢    å‚:
+*			_usX,_usY: çŸ©å½¢å·¦ä¸Šè§’çš„åæ ‡
+*			_usHeight : çŸ©å½¢çš„é«˜åº¦
+*			_usWidth  : çŸ©å½¢çš„å®½åº¦
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
 	/*
 	 ---------------->---
-	|(_usX£¬_usY)        |
+	|(_usXï¼Œ_usY)        |
 	V                    V  _usHeight
 	|                    |
 	 ---------------->---
 		  _usWidth
 	*/
 	ST7789_DrawHLine(_usX, _usY, _usWidth, _usColor);
-	ST7789_DrawVLine(_usX +_usWidth - 1, _usY, _usHeight, _usColor);
+	ST7789_DrawVLine(_usX + _usWidth - 1, _usY, _usHeight, _usColor);
 	ST7789_DrawHLine(_usX, _usY + _usHeight - 1, _usWidth, _usColor);
 	ST7789_DrawVLine(_usX, _usY, _usHeight, _usColor);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_FillRect
-*	¹¦ÄÜËµÃ÷: ÓÃÒ»¸öÑÕÉ«ÖµÌî³äÒ»¸ö¾ØĞÎ¡£Ê¹ÓÃSTM32F429ÄÚ²¿DMA2DÓ²¼ş»æÖÆ¡£
-*	ĞÎ    ²Î:
-*			_usX,_usY: ¾ØĞÎ×óÉÏ½ÇµÄ×ø±ê
-*			_usHeight : ¾ØĞÎµÄ¸ß¶È
-*			_usWidth  : ¾ØĞÎµÄ¿í¶È
-*			_usColor  : ÑÕÉ«´úÂë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_FillRect
+*	åŠŸèƒ½è¯´æ˜: ç”¨ä¸€ä¸ªé¢œè‰²å€¼å¡«å……ä¸€ä¸ªçŸ©å½¢ã€‚ä½¿ç”¨STM32F429å†…éƒ¨DMA2Dç¡¬ä»¶ç»˜åˆ¶ã€‚
+*	å½¢    å‚:
+*			_usX,_usY: çŸ©å½¢å·¦ä¸Šè§’çš„åæ ‡
+*			_usHeight : çŸ©å½¢çš„é«˜åº¦
+*			_usWidth  : çŸ©å½¢çš„å®½åº¦
+*			_usColor  : é¢œè‰²ä»£ç 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
 	uint32_t i;
-	
+
 	ST7789_SetDispWin(_usX, _usY, _usHeight, _usWidth);
-	
+
 	LCD_RS_1();
 	LCD_CS_0();
 	for (i = 0; i < _usHeight * _usWidth; i++)
@@ -757,25 +769,25 @@ void ST7789_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawCircle
-*	¹¦ÄÜËµÃ÷: »æÖÆÒ»¸öÔ²£¬±Ê¿íÎª1¸öÏñËØ
-*	ĞÎ    ²Î:
-*			_usX,_usY  : Ô²ĞÄµÄ×ø±ê
-*			_usRadius  : Ô²µÄ°ë¾¶
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawCircle
+*	åŠŸèƒ½è¯´æ˜: ç»˜åˆ¶ä¸€ä¸ªåœ†ï¼Œç¬”å®½ä¸º1ä¸ªåƒç´ 
+*	å½¢    å‚:
+*			_usX,_usY  : åœ†å¿ƒçš„åæ ‡
+*			_usRadius  : åœ†çš„åŠå¾„
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor)
 {
-	int32_t  D;			/* Decision Variable */
-	uint32_t  CurX;		/* µ±Ç° X Öµ */
-	uint32_t  CurY;		/* µ±Ç° Y Öµ */
+	int32_t D;		 /* Decision Variable */
+	uint32_t CurX; /* å½“å‰ X å€¼ */
+	uint32_t CurY; /* å½“å‰ Y å€¼ */
 
 	D = 3 - (_usRadius << 1);
 	CurX = 0;
 	CurY = _usRadius;
 
-	while (CurX <=  CurY)
+	while (CurX <= CurY)
 	{
 		ST7789_PutPixel(_usX + CurX, _usY + CurY, _usColor);
 		ST7789_PutPixel(_usX + CurX, _usY - CurY, _usColor);
@@ -788,11 +800,11 @@ void ST7789_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_
 
 		if (D < 0)
 		{
-			D +=  (CurX << 2) + 6;
+			D += (CurX << 2) + 6;
 		}
 		else
 		{
-			D +=  ((CurX - CurY) << 2) + 10;
+			D += ((CurX - CurY) << 2) + 10;
 			CurY--;
 		}
 		CurX++;
@@ -801,14 +813,14 @@ void ST7789_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_DrawBMP
-*	¹¦ÄÜËµÃ÷: ÔÚLCDÉÏÏÔÊ¾Ò»¸öBMPÎ»Í¼£¬Î»Í¼µãÕóÉ¨Ãè´ÎĞò£º´Ó×óµ½ÓÒ£¬´ÓÉÏµ½ÏÂ
-*	ĞÎ    ²Î:  
-*			_usX, _usY : Í¼Æ¬µÄ×ø±ê
-*			_usHeight  £ºÍ¼Æ¬¸ß¶È
-*			_usWidth   £ºÍ¼Æ¬¿í¶È
-*			_ptr       £ºÍ¼Æ¬µãÕóÖ¸Õë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_DrawBMP
+*	åŠŸèƒ½è¯´æ˜: åœ¨LCDä¸Šæ˜¾ç¤ºä¸€ä¸ªBMPä½å›¾ï¼Œä½å›¾ç‚¹é˜µæ‰«ææ¬¡åºï¼šä»å·¦åˆ°å³ï¼Œä»ä¸Šåˆ°ä¸‹
+*	å½¢    å‚:  
+*			_usX, _usY : å›¾ç‰‡çš„åæ ‡
+*			_usHeight  ï¼šå›¾ç‰‡é«˜åº¦
+*			_usWidth   ï¼šå›¾ç‰‡å®½åº¦
+*			_ptr       ï¼šå›¾ç‰‡ç‚¹é˜µæŒ‡é’ˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t *_ptr)
@@ -824,17 +836,17 @@ void ST7789_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _
 		{
 			ST7789_PutPixel(_usX + k, y, *p++);
 		}
-		
+
 		y++;
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ST7789_SetDirection
-*	¹¦ÄÜËµÃ÷: ÉèÖÃÏÔÊ¾ÆÁÏÔÊ¾·½Ïò£¨ºáÆÁ ÊúÆÁ£©
-*	ĞÎ    ²Î: ÏÔÊ¾·½Ïò´úÂë 0 ºáÆÁÕı³£, 1 = ºáÆÁ180¶È·­×ª, 2 = ÊúÆÁ, 3 = ÊúÆÁ180¶È·­×ª
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ST7789_SetDirection
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®æ˜¾ç¤ºå±æ˜¾ç¤ºæ–¹å‘ï¼ˆæ¨ªå± ç«–å±ï¼‰
+*	å½¢    å‚: æ˜¾ç¤ºæ–¹å‘ä»£ç  0 æ¨ªå±æ­£å¸¸, 1 = æ¨ªå±180åº¦ç¿»è½¬, 2 = ç«–å±, 3 = ç«–å±180åº¦ç¿»è½¬
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ST7789_SetDirection(uint8_t _dir)
@@ -843,81 +855,80 @@ void ST7789_SetDirection(uint8_t _dir)
 
 	/*
 		Bit D7-  MY , Page Address Order 
-			¡°0¡± = Top to Bottom (When MADCTL D7=¡±0¡±). 
-			¡°1¡± = Bottom to Top (When MADCTL D7=¡±1¡±). 
+			â€œ0â€ = Top to Bottom (When MADCTL D7=â€0â€). 
+			â€œ1â€ = Bottom to Top (When MADCTL D7=â€1â€). 
 		Bit D6-  MX,  Column Address Order 
-			¡°0¡± = Left to Right (When MADCTL D6=¡±0¡±). 
-			¡°1¡± = Right to Left (When MADCTL D6=¡±1¡±). 
+			â€œ0â€ = Left to Right (When MADCTL D6=â€0â€). 
+			â€œ1â€ = Right to Left (When MADCTL D6=â€1â€). 
 		Bit D5-  MV , Page/Column Order 
-			¡°0¡± = Normal Mode (When MADCTL D5=¡±0¡±). 
-			¡°1¡± = Reverse Mode (When MADCTL D5=¡±1¡±) 
+			â€œ0â€ = Normal Mode (When MADCTL D5=â€0â€). 
+			â€œ1â€ = Reverse Mode (When MADCTL D5=â€1â€) 
 		Note: Bits D7 to D5, alse refer to section 8.12 Address Control 
 		
 		Bit D4- Line Address Order 
-			¡°0¡± = LCD Refresh Top to Bottom (When MADCTL D4=¡±0¡±) 
-			¡°1¡± = LCD Refresh Bottom to Top (When MADCTL D4=¡±1¡±) 
+			â€œ0â€ = LCD Refresh Top to Bottom (When MADCTL D4=â€0â€) 
+			â€œ1â€ = LCD Refresh Bottom to Top (When MADCTL D4=â€1â€) 
 		Bit D3- RGB/BGR Order 
-			¡°0¡± = RGB (When MADCTL D3=¡±0¡±) 
-			¡°1¡± = BGR (When MADCTL D3=¡±1¡±) 
+			â€œ0â€ = RGB (When MADCTL D3=â€0â€) 
+			â€œ1â€ = BGR (When MADCTL D3=â€1â€) 
 		Bit D2- Display Data Latch Data Order 
-			¡°0¡± = LCD Refresh Left to Right (When MADCTL D2=¡±0¡±) 
-			¡°1¡± = LCD Refresh Right to Left (When MADCTL D2=¡±1¡±) 
+			â€œ0â€ = LCD Refresh Left to Right (When MADCTL D2=â€0â€) 
+			â€œ1â€ = LCD Refresh Right to Left (When MADCTL D2=â€1â€) 
 	*/
-	
+
 	/*
 		D5  D6  D7
 		MV  MX  MY 
-		 0  0  0  - Õı³£ ºáÆÁ
-		 0  1  1  - X¾µÏñ Y¾µÏñ£¬    ºáÆÁ·­×ª180¶È
-		 1  0  1  - X-Y½»»»£¬Y¾µÏñ£¬ÊúÆÁ
-		 1  1  0  - X-Y½»»»£¬X¾µÏñ£¬ÊúÆÁ180¶È
+		 0  0  0  - æ­£å¸¸ æ¨ªå±
+		 0  1  1  - Xé•œåƒ Yé•œåƒï¼Œ    æ¨ªå±ç¿»è½¬180åº¦
+		 1  0  1  - X-Yäº¤æ¢ï¼ŒYé•œåƒï¼Œç«–å±
+		 1  1  0  - X-Yäº¤æ¢ï¼ŒXé•œåƒï¼Œç«–å±180åº¦
 	*/
-	
+
 	/*
 		The address ranges are X=0 to X=239 (Efh) and Y=0 to Y=319 (13Fh).	
 	*/
-	
-	if (_dir ==  0 || _dir ==  1)		/* ºáÆÁ£¬ ºáÆÁ180¶È */
+
+	if (_dir == 0 || _dir == 1) /* æ¨ªå±ï¼Œ æ¨ªå±180åº¦ */
 	{
 		if (g_LcdWidth < g_LcdHeight)
 		{
 			temp = g_LcdWidth;
 			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;			
+			g_LcdHeight = temp;
 		}
-		
+
 		if (_dir == 0)
 		{
-			Lcd_WriteIndex(0x36); 		/* É¨Ãè·½Ïò */
-			Lcd_WriteData((0 << 5) | (0 << 6) | (0 << 7));	
-		}	
+			Lcd_WriteIndex(0x36); /* æ‰«ææ–¹å‘ */
+			Lcd_WriteData((0 << 5) | (0 << 6) | (0 << 7));
+		}
 		else
 		{
-			Lcd_WriteIndex(0x36); 		/* É¨Ãè·½Ïò */
-			Lcd_WriteData((0 << 5) | (1 << 6) | (1 << 7));				
+			Lcd_WriteIndex(0x36); /* æ‰«ææ–¹å‘ */
+			Lcd_WriteData((0 << 5) | (1 << 6) | (1 << 7));
 		}
 	}
-	else if (_dir ==  2 || _dir ==  3)	/* ÊúÆÁ, ÊúÆÁ180¡ã*/
+	else if (_dir == 2 || _dir == 3) /* ç«–å±, ç«–å±180Â°*/
 	{
 		if (g_LcdWidth > g_LcdHeight)
 		{
 			temp = g_LcdWidth;
 			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;			
+			g_LcdHeight = temp;
 		}
-		
+
 		if (_dir == 3)
 		{
-			Lcd_WriteIndex(0x36); 		/* É¨Ãè·½Ïò */
-			Lcd_WriteData((1 << 5) | (0 << 6) | (1 << 7));					
-		}	
+			Lcd_WriteIndex(0x36); /* æ‰«ææ–¹å‘ */
+			Lcd_WriteData((1 << 5) | (0 << 6) | (1 << 7));
+		}
 		else
 		{
-			Lcd_WriteIndex(0x36); 		/* É¨Ãè·½Ïò */
-			Lcd_WriteData((1 << 5) | (1 << 6) | (0 << 7));			
-		}		
+			Lcd_WriteIndex(0x36); /* æ‰«ææ–¹å‘ */
+			Lcd_WriteData((1 << 5) | (1 << 6) | (0 << 7));
+		}
 	}
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

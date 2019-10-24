@@ -1,12 +1,12 @@
 /*										
 *********************************************************************************************************
 *	                                  
-*	Ä£¿éÃû³Æ : ×Ö¿âÄ£¿é
-*	ÎÄ¼şÃû³Æ : fonts.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : å­—åº“æ¨¡å—
+*	æ–‡ä»¶åç§° : fonts.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2010-2011, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2010-2011, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,13 +14,13 @@
 #ifndef __FONTS_H_
 #define __FONTS_H_
 
-#define USE_SMALL_FONT			/* ¶¨Òå´ËĞĞ±íÊ¾Ê¹ÓÃĞ¡×Ö¿â£¬ Õâ¸öºêÖ»ÔÚbsp_tft+lcd.cÖĞÊ¹ÓÃ */
+#define USE_SMALL_FONT /* å®šä¹‰æ­¤è¡Œè¡¨ç¤ºä½¿ç”¨å°å­—åº“ï¼Œ è¿™ä¸ªå®åªåœ¨bsp_tft+lcd.cä¸­ä½¿ç”¨ */
 
-/* 0x64000000 ÊÇNOR FlashµÄÊ×µØÖ· */
-#define HZK12_ADDR (0x64000000 + 0x0)		/* 12µãÕóºº×Ö¿âµØÖ· */
-#define HZK16_ADDR (0x64000000 + 0x2C9D0)	/* 16µãÕóºº×Ö¿âµØÖ· */
-#define HZK24_ADDR (0x64000000 + 0x68190)	/* 24µãÕóºº×Ö¿âµØÖ· */
-#define HZK32_ADDR (0x64000000 + 0xEDF00)	/* 32µãÕóºº×Ö¿âµØÖ· */
+/* 0x64000000 æ˜¯NOR Flashçš„é¦–åœ°å€ */
+#define HZK12_ADDR (0x64000000 + 0x0)     /* 12ç‚¹é˜µæ±‰å­—åº“åœ°å€ */
+#define HZK16_ADDR (0x64000000 + 0x2C9D0) /* 16ç‚¹é˜µæ±‰å­—åº“åœ°å€ */
+#define HZK24_ADDR (0x64000000 + 0x68190) /* 24ç‚¹é˜µæ±‰å­—åº“åœ°å€ */
+#define HZK32_ADDR (0x64000000 + 0xEDF00) /* 32ç‚¹é˜µæ±‰å­—åº“åœ°å€ */
 
 extern unsigned char const g_Ascii12[];
 extern unsigned char const g_Ascii16[];
@@ -30,8 +30,8 @@ extern unsigned char const g_Ascii32[];
 extern unsigned char const g_Ascii24_VarWidth[];
 extern unsigned char const g_Ascii32_VarWidth[];
 
-extern unsigned char const g_Ascii62x40[];	/* 62 * 40 ASCII,²¿·Ö×Ö·û */
-extern unsigned char const g_Ascii96x40[];	/* 96 * 40 ASCII,²¿·Ö×Ö·û */
+extern unsigned char const g_Ascii62x40[]; /* 62 * 40 ASCII,éƒ¨åˆ†å­—ç¬¦ */
+extern unsigned char const g_Ascii96x40[]; /* 96 * 40 ASCII,éƒ¨åˆ†å­—ç¬¦ */
 
 extern unsigned char const g_Hz12[];
 extern unsigned char const g_Hz16[];
@@ -45,4 +45,4 @@ extern unsigned char const g_RA8875_Ascii32_width[];
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

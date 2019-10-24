@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : GPS¶¨Î»Ä£¿é²âÊÔ³ÌĞò
-*	ÎÄ¼şÃû³Æ : gps_test.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔMPU-6050, HCM5833L, BMP085, BH1750
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
+*	æ¨¡å—åç§° : GPSå®šä½æ¨¡å—æµ‹è¯•ç¨‹åº
+*	æ–‡ä»¶åç§° : gps_test.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•MPU-6050, HCM5833L, BMP085, BH1750
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,83 +17,88 @@
 #include "bsp.h"
 #include "form_gps.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå */
-	FONT_T FontRed;		/* ºìÉ«×ÖÌå */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ */
+	FONT_T FontRed;		/* çº¢è‰²å­—ä½“ */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;	/* Î³¶È */
-	LABEL_T Label3; LABEL_T Label4;	/* ¾­¶È */
-	LABEL_T Label5; LABEL_T Label6;	/* ËÙ¶È */
-	LABEL_T Label7; LABEL_T Label8;	/* º£°Î */
-	
-	LABEL_T Label9; LABEL_T Label10;	/* ×´Ì¬ */	
+	LABEL_T Label1;
+	LABEL_T Label2; /* çº¬åº¦ */
+	LABEL_T Label3;
+	LABEL_T Label4; /* ç»åº¦ */
+	LABEL_T Label5;
+	LABEL_T Label6; /* é€Ÿåº¦ */
+	LABEL_T Label7;
+	LABEL_T Label8; /* æµ·æ‹” */
+
+	LABEL_T Label9;
+	LABEL_T Label10; /* çŠ¶æ€ */
 
 	BUTTON_T BtnRet;
-}FormGPS_T;
+} FormGPS_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* ¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"GPS¶¨Î»Ä£¿é²âÊÔ³ÌĞò"
+/* æ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "GPSå®šä½æ¨¡å—æµ‹è¯•ç¨‹åº"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define LABEL1_X  	(BOX1_X + 6)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Î³¶È : "
+#define LABEL1_X (BOX1_X + 6)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "çº¬åº¦ : "
 
-	#define LABEL2_X  	(LABEL1_X + 64)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"0000.0000"
+#define LABEL2_X (LABEL1_X + 64)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "0000.0000"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"¾­¶È : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "ç»åº¦ : "
 
-	#define LABEL4_X  	(LABEL3_X + 64)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"00000.0000"
+#define LABEL4_X (LABEL3_X + 64)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "00000.0000"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"ËÙ¶È : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "é€Ÿåº¦ : "
 
-	#define LABEL6_X  	(LABEL5_X + 64)
-	#define LABEL6_Y	LABEL5_Y
-	#define LABEL6_TEXT	"0.0KM"
+#define LABEL6_X (LABEL5_X + 64)
+#define LABEL6_Y LABEL5_Y
+#define LABEL6_TEXT "0.0KM"
 
-#define LABEL7_X  	(LABEL1_X)
-#define LABEL7_Y	(LABEL1_Y + 20 * 3)
-#define LABEL7_TEXT	"º£°Î : "
+#define LABEL7_X (LABEL1_X)
+#define LABEL7_Y (LABEL1_Y + 20 * 3)
+#define LABEL7_TEXT "æµ·æ‹” : "
 
-	#define LABEL8_X  	(LABEL7_X + 64)
-	#define LABEL8_Y	LABEL7_Y
-	#define LABEL8_TEXT	"0.0M"
+#define LABEL8_X (LABEL7_X + 64)
+#define LABEL8_Y LABEL7_Y
+#define LABEL8_TEXT "0.0M"
 
-#define LABEL9_X  	(LABEL1_X)
-#define LABEL9_Y	(LABEL1_Y + 20 * 5)
-#define LABEL9_TEXT	"Ó²¼ş : "
+#define LABEL9_X (LABEL1_X)
+#define LABEL9_Y (LABEL1_Y + 20 * 5)
+#define LABEL9_TEXT "ç¡¬ä»¶ : "
 
-	#define LABEL10_X  	(LABEL9_X + 64)
-	#define LABEL10_Y	LABEL9_Y
-	#define LABEL10_TEXT	""
+#define LABEL10_X (LABEL9_X + 64)
+#define LABEL10_Y LABEL9_Y
+#define LABEL10_TEXT ""
 
 static void InitFormGPS(void);
 static void DispGPSInitFace(void);
@@ -103,16 +108,16 @@ FormGPS_T *FormGPS;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestGPS
-*	¹¦ÄÜËµÃ÷: ²âÊÔGPSÄ£¿é¡£
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestGPS
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•GPSæ¨¡å—ã€‚
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestGPS(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	FormGPS_T form;
@@ -120,17 +125,16 @@ void TestGPS(void)
 	FormGPS = &form;
 
 	bsp_InitGPS();
-	
+
 	InitFormGPS();
 
 	DispGPSInitFace();
 
-	
-	bsp_StartAutoTimer(0, 1000);	/* Ã¿Ãë¶¨Ê±ÏÔÊ¾GPS×´Ì¬ */
-	
-	bsp_StartTimer(1, 3000);	/* 3Ãë³¬Ê±Ã»ÓĞÊÕµ½GPSÊı¾İ£¬ÔòÈÏÎª´®¿ÚÁ¬½ÓÊ§°Ü */
-	
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */	
+	bsp_StartAutoTimer(0, 1000); /* æ¯ç§’å®šæ—¶æ˜¾ç¤ºGPSçŠ¶æ€ */
+
+	bsp_StartTimer(1, 3000); /* 3ç§’è¶…æ—¶æ²¡æœ‰æ”¶åˆ°GPSæ•°æ®ï¼Œåˆ™è®¤ä¸ºä¸²å£è¿æ¥å¤±è´¥ */
+
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -142,88 +146,88 @@ void TestGPS(void)
 			DispGPSStatus();
 		}
 
-		/* Õâ¶Î´úÂëÓÃÓÚÅĞ¶ÏCPUÊÇ·ñÄÜ¹»ÊÕµ½GPSÄ£¿é·µ»ØµÄÊı¾İ */
+		/* è¿™æ®µä»£ç ç”¨äºåˆ¤æ–­CPUæ˜¯å¦èƒ½å¤Ÿæ”¶åˆ°GPSæ¨¡å—è¿”å›çš„æ•°æ® */
 		{
 			if (bsp_CheckTimer(1))
 			{
 				FormGPS->Label10.Font = &FormGPS->FontRed;
-				FormGPS->Label10.pCaption = "Î´¼ì²âµ½GPSÄ£¿é";
-				LCD_DrawLabel(&FormGPS->Label10);						
+				FormGPS->Label10.pCaption = "æœªæ£€æµ‹åˆ°GPSæ¨¡å—";
+				LCD_DrawLabel(&FormGPS->Label10);
 			}
-			if (g_tGPS.UartOk == 1)	/* ´®¿ÚÍ¨ĞÅÕı³£µÄ±êÖ¾, Èç¹ûÒÔºóÊÕµ½ÁËĞ£ÑéºÏ¸ñµÄÃüÁî´®ÔòÉèÖÃÎª1 */		
-			{			
-				bsp_StartTimer(1, 3000);	/* 3Ãë³¬Ê±Ã»ÓĞÊÕµ½GPSÊı¾İ£¬ÔòÈÏÎª´®¿ÚÁ¬½ÓÊ§°Ü */	
+			if (g_tGPS.UartOk == 1) /* ä¸²å£é€šä¿¡æ­£å¸¸çš„æ ‡å¿—, å¦‚æœä»¥åæ”¶åˆ°äº†æ ¡éªŒåˆæ ¼çš„å‘½ä»¤ä¸²åˆ™è®¾ç½®ä¸º1 */
+			{
+				bsp_StartTimer(1, 3000); /* 3ç§’è¶…æ—¶æ²¡æœ‰æ”¶åˆ°GPSæ•°æ®ï¼Œåˆ™è®¤ä¸ºä¸²å£è¿æ¥å¤±è´¥ */
 
 				FormGPS->Label10.Font = &FormGPS->FontBlue;
-				FormGPS->Label10.pCaption = "¼ì²âµ½GPSÄ£¿é. ´®¿ÚÊı¾İÊÕ·¢OK";
-				LCD_DrawLabel(&FormGPS->Label10);						
-				
+				FormGPS->Label10.pCaption = "æ£€æµ‹åˆ°GPSæ¨¡å—. ä¸²å£æ•°æ®æ”¶å‘OK";
+				LCD_DrawLabel(&FormGPS->Label10);
+
 				g_tGPS.UartOk = 0;
 			}
 		}
-		
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormGPS->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormGPS->BtnRet);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormGPS->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormGPS->BtnRet);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormGPS->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormGPS->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormGPS->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormGPS->BtnRet);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormGPS->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormGPS->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormGPS->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormGPS->BtnRet);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -233,66 +237,66 @@ void TestGPS(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispGPSStatus
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾GPS×´Ì¬
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispGPSStatus
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºGPSçŠ¶æ€
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispGPSStatus(void)
 {
 	char buf[128];
 
-	/* Î³¶È */
+	/* çº¬åº¦ */
 	if (g_tGPS.NS == 'S')
 	{
-		sprintf(buf, "ÄÏÎ³ %02d¡ã%02d.%04d'=%02d.%06d¡ã", g_tGPS.WeiDu_Du,
-			g_tGPS.WeiDu_Fen / 10000, g_tGPS.WeiDu_Fen % 10000,
-			g_tGPS.WeiDu_Du, gps_FenToDu(g_tGPS.WeiDu_Fen));
+		sprintf(buf, "å—çº¬ %02dÂ°%02d.%04d'=%02d.%06dÂ°", g_tGPS.WeiDu_Du,
+						g_tGPS.WeiDu_Fen / 10000, g_tGPS.WeiDu_Fen % 10000,
+						g_tGPS.WeiDu_Du, gps_FenToDu(g_tGPS.WeiDu_Fen));
 
-		sprintf(&buf[strlen(buf)], "=%02d¡ã%02d'%02d\"", g_tGPS.WeiDu_Du,
-			g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.WeiDu_Fen));
+		sprintf(&buf[strlen(buf)], "=%02dÂ°%02d'%02d\"", g_tGPS.WeiDu_Du,
+						g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.WeiDu_Fen));
 	}
 	else
 	{
-		sprintf(buf, "±±Î³ %02d¡ã%02d.%04d'=%02d.%06d¡ã", g_tGPS.WeiDu_Du,
-			g_tGPS.WeiDu_Fen / 10000, g_tGPS.WeiDu_Fen % 10000,
-			g_tGPS.WeiDu_Du, gps_FenToDu(g_tGPS.WeiDu_Fen));
+		sprintf(buf, "åŒ—çº¬ %02dÂ°%02d.%04d'=%02d.%06dÂ°", g_tGPS.WeiDu_Du,
+						g_tGPS.WeiDu_Fen / 10000, g_tGPS.WeiDu_Fen % 10000,
+						g_tGPS.WeiDu_Du, gps_FenToDu(g_tGPS.WeiDu_Fen));
 
-		sprintf(&buf[strlen(buf)], "=%02d¡ã%02d'%02d\"", g_tGPS.WeiDu_Du,
-			g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.WeiDu_Fen));
+		sprintf(&buf[strlen(buf)], "=%02dÂ°%02d'%02d\"", g_tGPS.WeiDu_Du,
+						g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.WeiDu_Fen));
 	}
 	FormGPS->Label2.pCaption = buf;
 	LCD_DrawLabel(&FormGPS->Label2);
 
-	/* ¾­¶È */
+	/* ç»åº¦ */
 	if (g_tGPS.EW == 'E')
 	{
-		sprintf(buf, "¶«¾­ %03d¡ã%02d.%04d'=%03d.%06d¡ã", g_tGPS.JingDu_Du,
-			g_tGPS.JingDu_Fen / 10000, g_tGPS.JingDu_Fen % 10000,
-			g_tGPS.JingDu_Du, gps_FenToDu(g_tGPS.JingDu_Fen));
+		sprintf(buf, "ä¸œç» %03dÂ°%02d.%04d'=%03d.%06dÂ°", g_tGPS.JingDu_Du,
+						g_tGPS.JingDu_Fen / 10000, g_tGPS.JingDu_Fen % 10000,
+						g_tGPS.JingDu_Du, gps_FenToDu(g_tGPS.JingDu_Fen));
 
-		sprintf(&buf[strlen(buf)], "=%03d¡ã%02d'%02d\"", g_tGPS.JingDu_Du,
-			g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.JingDu_Fen));
+		sprintf(&buf[strlen(buf)], "=%03dÂ°%02d'%02d\"", g_tGPS.JingDu_Du,
+						g_tGPS.WeiDu_Fen / 10000, gps_FenToMiao(g_tGPS.JingDu_Fen));
 	}
 	else
 	{
-		sprintf(buf, "Î÷¾­ %03d¡ã%02d.%04d'=%03d.%06d¡ã", g_tGPS.JingDu_Du,
-			g_tGPS.JingDu_Fen / 10000, g_tGPS.JingDu_Fen % 10000,
-			g_tGPS.JingDu_Du, gps_FenToDu(g_tGPS.JingDu_Fen));
+		sprintf(buf, "è¥¿ç» %03dÂ°%02d.%04d'=%03d.%06dÂ°", g_tGPS.JingDu_Du,
+						g_tGPS.JingDu_Fen / 10000, g_tGPS.JingDu_Fen % 10000,
+						g_tGPS.JingDu_Du, gps_FenToDu(g_tGPS.JingDu_Fen));
 
-		sprintf(&buf[strlen(buf)], "=%03d¡ã%02d'%02d\"", g_tGPS.JingDu_Du,
-			g_tGPS.JingDu_Fen / 10000, gps_FenToMiao(g_tGPS.JingDu_Fen));
+		sprintf(&buf[strlen(buf)], "=%03dÂ°%02d'%02d\"", g_tGPS.JingDu_Du,
+						g_tGPS.JingDu_Fen / 10000, gps_FenToMiao(g_tGPS.JingDu_Fen));
 	}
 	FormGPS->Label4.pCaption = buf;
 	LCD_DrawLabel(&FormGPS->Label4);
 
-	/* ËÙ¶È */
+	/* é€Ÿåº¦ */
 	sprintf(buf, "%5d.%d KM/h", g_tGPS.SpeedKM / 10, g_tGPS.SpeedKM % 10);
 	FormGPS->Label6.pCaption = buf;
 	LCD_DrawLabel(&FormGPS->Label6);
 
-	/* º£°Î */
+	/* æµ·æ‹” */
 	sprintf(buf, "%5d.%d M", g_tGPS.Altitude / 10, g_tGPS.Altitude % 10);
 	FormGPS->Label8.pCaption = buf;
 	LCD_DrawLabel(&FormGPS->Label8);
@@ -300,27 +304,27 @@ static void DispGPSStatus(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormGPS
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯GPS³õÊ¼½çÃæ¿Ø¼ş
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormGPS
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–GPSåˆå§‹ç•Œé¢æ§ä»¶
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormGPS(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormGPS->FontBox.FontCode = FC_ST_16;
-	FormGPS->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormGPS->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormGPS->FontBox.FrontColor = CL_BLACK;
 	FormGPS->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormGPS->FontBlack.FontCode = FC_ST_16;
-	FormGPS->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormGPS->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormGPS->FontBlack.FrontColor = CL_BLACK;
 	FormGPS->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormGPS->FontBlue.FontCode = FC_ST_16;
 	FormGPS->FontBlue.BackColor = CL_BTN_FACE;
 	FormGPS->FontBlue.FrontColor = CL_BLUE;
@@ -329,15 +333,15 @@ static void InitFormGPS(void)
 	FormGPS->FontRed.FontCode = FC_ST_16;
 	FormGPS->FontRed.BackColor = CL_BTN_FACE;
 	FormGPS->FontRed.FrontColor = CL_RED;
-	FormGPS->FontRed.Space = 0;	
+	FormGPS->FontRed.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormGPS->FontBtn.FontCode = FC_ST_16;
-	FormGPS->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormGPS->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormGPS->FontBtn.FrontColor = CL_BLACK;
 	FormGPS->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormGPS->Box1.Left = BOX1_X;
 	FormGPS->Box1.Top = BOX1_Y;
 	FormGPS->Box1.Height = BOX1_H;
@@ -345,7 +349,7 @@ static void InitFormGPS(void)
 	FormGPS->Box1.pCaption = BOX1_TEXT;
 	FormGPS->Box1.Font = &FormGPS->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormGPS->Label1.Left = LABEL1_X;
 	FormGPS->Label1.Top = LABEL1_Y;
 	FormGPS->Label1.MaxLen = 0;
@@ -376,7 +380,7 @@ static void InitFormGPS(void)
 	FormGPS->Label9.pCaption = LABEL9_TEXT;
 	FormGPS->Label9.Font = &FormGPS->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormGPS->Label2.Left = LABEL2_X;
 	FormGPS->Label2.Top = LABEL2_Y;
 	FormGPS->Label2.MaxLen = 0;
@@ -406,8 +410,8 @@ static void InitFormGPS(void)
 	FormGPS->Label10.MaxLen = 0;
 	FormGPS->Label10.pCaption = LABEL10_TEXT;
 	FormGPS->Label10.Font = &FormGPS->FontBlue;
-	
-	/* °´Å¥ */
+
+	/* æŒ‰é’® */
 	FormGPS->BtnRet.Left = BTN_RET_X;
 	FormGPS->BtnRet.Top = BTN_RET_Y;
 	FormGPS->BtnRet.Height = BTN_RET_H;
@@ -419,35 +423,35 @@ static void InitFormGPS(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispGPSInitFace
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¾²Ì¬¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispGPSInitFace
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„é™æ€æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispGPSInitFace(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormGPS->Box1);
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormGPS->Label1);
 	LCD_DrawLabel(&FormGPS->Label3);
 	LCD_DrawLabel(&FormGPS->Label5);
 	LCD_DrawLabel(&FormGPS->Label7);
-	LCD_DrawLabel(&FormGPS->Label9);	
+	LCD_DrawLabel(&FormGPS->Label9);
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	LCD_DrawLabel(&FormGPS->Label2);
 	LCD_DrawLabel(&FormGPS->Label4);
 	LCD_DrawLabel(&FormGPS->Label6);
 	LCD_DrawLabel(&FormGPS->Label8);
 	LCD_DrawLabel(&FormGPS->Label10);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormGPS->BtnRet);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

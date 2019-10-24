@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : cpuÄÚ²¿falsh²Ù×÷Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_cpu_flash.h
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : cpuå†…éƒ¨falshæ“ä½œæ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_cpu_flash.h
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,27 +13,27 @@
 #ifndef _BSP_CPU_FLASH_H_
 #define _BSP_CPU_FLASH_H_
 
-//#define FLASH_BASE_ADDR	0x08000000			/* Flash»ùµØÖ· */
-//#define	FLASH_SIZE		(1*1024*1024)		/* Flash ÈİÁ¿ */
+//#define FLASH_BASE_ADDR	0x08000000			/* FlashåŸºåœ°å€ */
+//#define	FLASH_SIZE		(1*1024*1024)		/* Flash å®¹é‡ */
 
 /* Base address of the Flash sectors */
-#define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
-#define ADDR_FLASH_SECTOR_1     ((uint32_t)0x08004000) /* Base @ of Sector 1, 16 Kbytes */
-#define ADDR_FLASH_SECTOR_2     ((uint32_t)0x08008000) /* Base @ of Sector 2, 16 Kbytes */
-#define ADDR_FLASH_SECTOR_3     ((uint32_t)0x0800C000) /* Base @ of Sector 3, 16 Kbytes */
-#define ADDR_FLASH_SECTOR_4     ((uint32_t)0x08010000) /* Base @ of Sector 4, 64 Kbytes */
-#define ADDR_FLASH_SECTOR_5     ((uint32_t)0x08020000) /* Base @ of Sector 5, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_6     ((uint32_t)0x08040000) /* Base @ of Sector 6, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_7     ((uint32_t)0x08060000) /* Base @ of Sector 7, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_8     ((uint32_t)0x08080000) /* Base @ of Sector 8, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_9     ((uint32_t)0x080A0000) /* Base @ of Sector 9, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_10    ((uint32_t)0x080C0000) /* Base @ of Sector 10, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_11    ((uint32_t)0x080E0000) /* Base @ of Sector 11, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_0 ((uint32_t)0x08000000)  /* Base @ of Sector 0, 16 Kbytes */
+#define ADDR_FLASH_SECTOR_1 ((uint32_t)0x08004000)  /* Base @ of Sector 1, 16 Kbytes */
+#define ADDR_FLASH_SECTOR_2 ((uint32_t)0x08008000)  /* Base @ of Sector 2, 16 Kbytes */
+#define ADDR_FLASH_SECTOR_3 ((uint32_t)0x0800C000)  /* Base @ of Sector 3, 16 Kbytes */
+#define ADDR_FLASH_SECTOR_4 ((uint32_t)0x08010000)  /* Base @ of Sector 4, 64 Kbytes */
+#define ADDR_FLASH_SECTOR_5 ((uint32_t)0x08020000)  /* Base @ of Sector 5, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_6 ((uint32_t)0x08040000)  /* Base @ of Sector 6, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_7 ((uint32_t)0x08060000)  /* Base @ of Sector 7, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_8 ((uint32_t)0x08080000)  /* Base @ of Sector 8, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_9 ((uint32_t)0x080A0000)  /* Base @ of Sector 9, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_10 ((uint32_t)0x080C0000) /* Base @ of Sector 10, 128 Kbytes */
+#define ADDR_FLASH_SECTOR_11 ((uint32_t)0x080E0000) /* Base @ of Sector 11, 128 Kbytes */
 
-#define FLASH_IS_EQU		0   /* FlashÄÚÈİºÍ´ıĞ´ÈëµÄÊı¾İÏàµÈ£¬²»ĞèÒª²Á³ıºÍĞ´²Ù×÷ */
-#define FLASH_REQ_WRITE		1	/* Flash²»ĞèÒª²Á³ı£¬Ö±½ÓĞ´ */
-#define FLASH_REQ_ERASE		2	/* FlashĞèÒªÏÈ²Á³ı,ÔÙĞ´ */
-#define FLASH_PARAM_ERR		3	/* º¯Êı²ÎÊı´íÎó */
+#define FLASH_IS_EQU 0    /* Flashå†…å®¹å’Œå¾…å†™å…¥çš„æ•°æ®ç›¸ç­‰ï¼Œä¸éœ€è¦æ“¦é™¤å’Œå†™æ“ä½œ */
+#define FLASH_REQ_WRITE 1 /* Flashä¸éœ€è¦æ“¦é™¤ï¼Œç›´æ¥å†™ */
+#define FLASH_REQ_ERASE 2 /* Flashéœ€è¦å…ˆæ“¦é™¤,å†å†™ */
+#define FLASH_PARAM_ERR 3 /* å‡½æ•°å‚æ•°é”™è¯¯ */
 
 uint8_t bsp_ReadCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpDst, uint32_t _ulSize);
 uint8_t bsp_WriteCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpSrc, uint32_t _ulSize);
@@ -41,6 +41,4 @@ uint8_t bsp_CmpCpuFlash(uint32_t _ulFlashAddr, uint8_t *_ucpBuf, uint32_t _ulSiz
 
 #endif
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
-
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

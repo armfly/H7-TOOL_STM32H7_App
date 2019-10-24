@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *	                                  
-*	Ä£¿éÃû³Æ : STM32ÄÚ²¿¿´ÃÅ¹·
-*	ÎÄ¼şÃû³Æ : bsp_watchdog.h
-*	°æ    ±¾ : V1.0
+*	æ¨¡å—åç§° : STM32å†…éƒ¨çœ‹é—¨ç‹—
+*	æ–‡ä»¶åç§° : bsp_watchdog.h
+*	ç‰ˆ    æœ¬ : V1.0
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,7 +13,6 @@
 #ifndef _BSP_WATCHDOG_H
 #define _BSP_WATCHDOG_H
 
-void bsp_StartDog(void)
-void bsp_FeedDog(void)
+void bsp_StartDog(void) void bsp_FeedDog(void)
 
 #endif

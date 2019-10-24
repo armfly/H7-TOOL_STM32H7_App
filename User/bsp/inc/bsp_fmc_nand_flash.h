@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : NAND Flash Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_nand.h
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : NAND Flash é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_nand.h
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -24,16 +24,16 @@
 
 typedef struct
 {
-  uint16_t Zone;
-  uint16_t Block;
-  uint16_t Page;
+	uint16_t Zone;
+	uint16_t Block;
+	uint16_t Page;
 } NAND_ADDRESS_T;
 
-#define NAND_TYPE	HY27UF081G2A	/* for V5£¬ V6 */
+#define NAND_TYPE HY27UF081G2A /* for V5ï¼Œ V6 */
 //#define NAND_TYPE	H27U4G8F2DTR 	/*  */
 
 /*
-	¶¨ÒåÓĞĞ§µÄ NAND ID
+	å®šä¹‰æœ‰æ•ˆçš„ NAND ID
 	HY27UF081G2A  	= 0xAD 0xF1 0x80 0x1D
 	K9F1G08U0A		= 0xEC 0xF1 0x80 0x15
 	K9F1G08U0B		= 0xEC 0xF1 0x00 0x95
@@ -41,21 +41,21 @@ typedef struct
 	H27U4G8F2DTR    = 0xAD DC 90 95
 */
 
-/* NAND Flash ĞÍºÅ */
-#define HY27UF081G2A	0xADF1801D
-#define K9F1G08U0A		0xECF18015
-#define K9F1G08U0B		0xECF10095
-#define H27U1G8F2BTR	0xADF1001D		/* STM32-V4 È±Ê¡, ºóÀ´V5£¬V6 ¶¼Í³Ò»ÓÃÕâ¸öĞÍºÅ */
+/* NAND Flash å‹å· */
+#define HY27UF081G2A 0xADF1801D
+#define K9F1G08U0A 0xECF18015
+#define K9F1G08U0B 0xECF10095
+#define H27U1G8F2BTR 0xADF1001D /* STM32-V4 ç¼ºçœ, åæ¥V5ï¼ŒV6 éƒ½ç»Ÿä¸€ç”¨è¿™ä¸ªå‹å· */
 
-#define H27U4G8F2DTR	0xADDC9095
+#define H27U4G8F2DTR 0xADDC9095
 
-#define NAND_UNKNOW		0xFFFFFFFF
+#define NAND_UNKNOW 0xFFFFFFFF
 
 /* Exported constants --------------------------------------------------------*/
 /* NAND Area definition  for STM3210E-EVAL Board RevD */
 //#define CMD_AREA                   (uint32_t)(1<<16)  /* A16 = CLE  high */
 //#define ADDR_AREA                  (uint32_t)(1<<17)  /* A17 = ALE high */
-#define DATA_AREA                  ((uint32_t)0x00000000)
+#define DATA_AREA ((uint32_t)0x00000000)
 
 /* FSMC NAND memory command */
 //#define	NAND_CMD_AREA_A            ((uint8_t)0x00)
@@ -81,133 +81,135 @@ typedef struct
 //#define NAND_TIMEOUT_ERROR         ((uint8_t)0x80)
 
 /* FSMC NAND memory parameters */
-/* ÓÃÓÚHY27UF081G2A    K9F1G08 */
+/* ç”¨äºHY27UF081G2A    K9F1G08 */
 #if NAND_TYPE == HY27UF081G2A
-	#define NAND_PAGE_SIZE             ((uint16_t)0x0800) /* 2 * 1024 bytes per page w/o Spare Area */
-	#define NAND_BLOCK_SIZE            ((uint16_t)0x0040) /* 64 pages per block */
-	#define NAND_ZONE_SIZE             ((uint16_t)0x0400) /* 1024 Block per zone */
-	#define NAND_SPARE_AREA_SIZE       ((uint16_t)0x0040) /* last 64 bytes as spare area */
-	#define NAND_MAX_ZONE              ((uint16_t)0x0001) /* 1 zones of 1024 block */
-	#define NAND_ADDR_5					0			/* 0±íÊ¾Ö»ÓÃ·¢ËÍ4¸ö×Ö½ÚµÄµØÖ·£¬1±íÊ¾5¸ö */
+#define NAND_PAGE_SIZE ((uint16_t)0x0800)				/* 2 * 1024 bytes per page w/o Spare Area */
+#define NAND_BLOCK_SIZE ((uint16_t)0x0040)			/* 64 pages per block */
+#define NAND_ZONE_SIZE ((uint16_t)0x0400)				/* 1024 Block per zone */
+#define NAND_SPARE_AREA_SIZE ((uint16_t)0x0040) /* last 64 bytes as spare area */
+#define NAND_MAX_ZONE ((uint16_t)0x0001)				/* 1 zones of 1024 block */
+#define NAND_ADDR_5 0														/* 0è¡¨ç¤ºåªç”¨å‘é€4ä¸ªå­—èŠ‚çš„åœ°å€ï¼Œ1è¡¨ç¤º5ä¸ª */
 
-	/* ÃüÁî´úÂë¶¨Òå */
-	#define NAND_CMD_COPYBACK_A			((uint8_t)0x00)		/* PAGE COPY-BACK ÃüÁîĞòÁĞ */
-	#define NAND_CMD_COPYBACK_B			((uint8_t)0x35)
-	#define NAND_CMD_COPYBACK_C			((uint8_t)0x85)
-	#define NAND_CMD_COPYBACK_D			((uint8_t)0x10)
+/* å‘½ä»¤ä»£ç å®šä¹‰ */
+#define NAND_CMD_COPYBACK_A ((uint8_t)0x00) /* PAGE COPY-BACK å‘½ä»¤åºåˆ— */
+#define NAND_CMD_COPYBACK_B ((uint8_t)0x35)
+#define NAND_CMD_COPYBACK_C ((uint8_t)0x85)
+#define NAND_CMD_COPYBACK_D ((uint8_t)0x10)
 
-//	#define NAND_CMD_STATUS				((uint8_t)0x70)		/* ¶ÁNAND FlashµÄ×´Ì¬×Ö */
+//	#define NAND_CMD_STATUS				((uint8_t)0x70)		/* è¯»NAND Flashçš„çŠ¶æ€å­— */
 
-	#define MAX_PHY_BLOCKS_PER_ZONE  1024	/* Ã¿¸öÇø×î´óÎïÀí¿éºÅ */
-	#define MAX_LOG_BLOCKS_PER_ZONE  1000	/* Ã¿¸öÇø×î´óÂß¼­¿éºÅ */
+#define MAX_PHY_BLOCKS_PER_ZONE 1024 /* æ¯ä¸ªåŒºæœ€å¤§ç‰©ç†å—å· */
+#define MAX_LOG_BLOCKS_PER_ZONE 1000 /* æ¯ä¸ªåŒºæœ€å¤§é€»è¾‘å—å· */
 
-	#define NAND_BLOCK_COUNT			1024 /* ¿é¸öÊı */
-	#define NAND_PAGE_TOTAL_SIZE		(NAND_PAGE_SIZE + NAND_SPARE_AREA_SIZE)	/* Ò³Ãæ×Ü´óĞ¡ */
+#define NAND_BLOCK_COUNT 1024																				 /* å—ä¸ªæ•° */
+#define NAND_PAGE_TOTAL_SIZE (NAND_PAGE_SIZE + NAND_SPARE_AREA_SIZE) /* é¡µé¢æ€»å¤§å° */
 
 #elif NAND_TYPE == H27U4G8F2DTR
-	#define NAND_PAGE_SIZE             ((uint16_t)0x0800) /* 2 * 1024 bytes per page w/o Spare Area */
-	#define NAND_BLOCK_SIZE            ((uint16_t)0x0040) /* 64 pages per block */
-	#define NAND_ZONE_SIZE             ((uint16_t)0x1000) /* 4096 Block per zone */
-	#define NAND_SPARE_AREA_SIZE       ((uint16_t)0x0040) /* last 64 bytes as spare area */
-	#define NAND_MAX_ZONE              ((uint16_t)0x0001) /* 1 zones of 4096 block */
-	#define NAND_ADDR_5					1			/* 1±íÊ¾Ö»·¢ËÍ4¸ö×Ö½ÚµÄµØÖ·£¬1±íÊ¾5¸ö */
+#define NAND_PAGE_SIZE ((uint16_t)0x0800)				/* 2 * 1024 bytes per page w/o Spare Area */
+#define NAND_BLOCK_SIZE ((uint16_t)0x0040)			/* 64 pages per block */
+#define NAND_ZONE_SIZE ((uint16_t)0x1000)				/* 4096 Block per zone */
+#define NAND_SPARE_AREA_SIZE ((uint16_t)0x0040) /* last 64 bytes as spare area */
+#define NAND_MAX_ZONE ((uint16_t)0x0001)				/* 1 zones of 4096 block */
+#define NAND_ADDR_5 1														/* 1è¡¨ç¤ºåªå‘é€4ä¸ªå­—èŠ‚çš„åœ°å€ï¼Œ1è¡¨ç¤º5ä¸ª */
 
-	/* ÃüÁî´úÂë¶¨Òå */
-	#define NAND_CMD_COPYBACK_A			((uint8_t)0x00)		/* PAGE COPY-BACK ÃüÁîĞòÁĞ */
-	#define NAND_CMD_COPYBACK_B			((uint8_t)0x35)
-	#define NAND_CMD_COPYBACK_C			((uint8_t)0x85)
-	#define NAND_CMD_COPYBACK_D			((uint8_t)0x10)
+/* å‘½ä»¤ä»£ç å®šä¹‰ */
+#define NAND_CMD_COPYBACK_A ((uint8_t)0x00)			/* PAGE COPY-BACK å‘½ä»¤åºåˆ— */
+#define NAND_CMD_COPYBACK_B ((uint8_t)0x35)
+#define NAND_CMD_COPYBACK_C ((uint8_t)0x85)
+#define NAND_CMD_COPYBACK_D ((uint8_t)0x10)
 
-	#define NAND_CMD_STATUS				((uint8_t)0x70)		/* ¶ÁNAND FlashµÄ×´Ì¬×Ö */
+#define NAND_CMD_STATUS ((uint8_t)0x70) /* è¯»NAND Flashçš„çŠ¶æ€å­— */
 
-	#define MAX_PHY_BLOCKS_PER_ZONE     4096	/* Ã¿¸öÇø×î´óÎïÀí¿éºÅ */
-	#define MAX_LOG_BLOCKS_PER_ZONE     4000	/* Ã¿¸öÇø×î´óÂß¼­¿éºÅ */
+#define MAX_PHY_BLOCKS_PER_ZONE 4096 /* æ¯ä¸ªåŒºæœ€å¤§ç‰©ç†å—å· */
+#define MAX_LOG_BLOCKS_PER_ZONE 4000 /* æ¯ä¸ªåŒºæœ€å¤§é€»è¾‘å—å· */
 
-	#define NAND_BLOCK_COUNT			4096 /* ¿é¸öÊı */
-	#define NAND_PAGE_TOTAL_SIZE		(NAND_PAGE_SIZE + NAND_SPARE_AREA_SIZE)	/* Ò³Ãæ×Ü´óĞ¡ */
+#define NAND_BLOCK_COUNT 4096																				 /* å—ä¸ªæ•° */
+#define NAND_PAGE_TOTAL_SIZE (NAND_PAGE_SIZE + NAND_SPARE_AREA_SIZE) /* é¡µé¢æ€»å¤§å° */
 
 #else
-	#define NAND_PAGE_SIZE             ((uint16_t)0x0200) /* 512 bytes per page w/o Spare Area */
-	#define NAND_BLOCK_SIZE            ((uint16_t)0x0020) /* 32x512 bytes pages per block */
-	#define NAND_ZONE_SIZE             ((uint16_t)0x0400) /* 1024 Block per zone */
-	#define NAND_SPARE_AREA_SIZE       ((uint16_t)0x0010) /* last 16 bytes as spare area */
-	#define NAND_MAX_ZONE              ((uint16_t)0x0004) /* 4 zones of 1024 block */
+#define NAND_PAGE_SIZE ((uint16_t)0x0200)				/* 512 bytes per page w/o Spare Area */
+#define NAND_BLOCK_SIZE ((uint16_t)0x0020)			/* 32x512 bytes pages per block */
+#define NAND_ZONE_SIZE ((uint16_t)0x0400)				/* 1024 Block per zone */
+#define NAND_SPARE_AREA_SIZE ((uint16_t)0x0010) /* last 16 bytes as spare area */
+#define NAND_MAX_ZONE ((uint16_t)0x0004)				/* 4 zones of 1024 block */
 #endif
 
-#define NAND_BAD_BLOCK_FLAG			0x00	/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ1¸ö×Ö½ÚĞ´Èë·Ç0xFFÊı¾İ±íÊ¾»µ¿é */
-#define NAND_USED_BLOCK_FLAG		0xF0	/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ2¸ö×Ö½ÚĞ´Èë·Ç0xFFÊı¾İ±íÊ¾ÒÑÊ¹ÓÃµÄ¿é */
+#define NAND_BAD_BLOCK_FLAG 0x00	/* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬1ä¸ªå­—èŠ‚å†™å…¥é0xFFæ•°æ®è¡¨ç¤ºåå— */
+#define NAND_USED_BLOCK_FLAG 0xF0 /* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬2ä¸ªå­—èŠ‚å†™å…¥é0xFFæ•°æ®è¡¨ç¤ºå·²ä½¿ç”¨çš„å— */
 
-#define BI_OFFSET				0		/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ1¸ö×Ö½ÚÊÇ»µ¿é±êÖ¾ */
-#define USED_OFFSET				1		/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ1¸ö×Ö½ÚÊÇÒÑÓÃ±êÖ¾ */
-#define LBN0_OFFSET				2		/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ3¸ö×Ö½Ú±íÊ¾Âß¼­¿éºÅµÍ8bit */
-#define LBN1_OFFSET				3		/* ¿éÄÚµÚ1¸öpage±¸ÓÃÇøµÄµÚ4¸ö×Ö½Ú±íÊ¾Âß¼­¿éºÅ¸ß8bit */
-#define VALID_SPARE_SIZE		4		/* Êµ¼ÊÊ¹ÓÃµÄ±¸ÓÃÇø´óĞ¡,ÓÃÓÚº¯ÊıÄÚ²¿ÉùÃ÷Êı¾İ»º³åÇø´óĞ¡ */
+#define BI_OFFSET 0				 /* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬1ä¸ªå­—èŠ‚æ˜¯åå—æ ‡å¿— */
+#define USED_OFFSET 1			 /* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬1ä¸ªå­—èŠ‚æ˜¯å·²ç”¨æ ‡å¿— */
+#define LBN0_OFFSET 2			 /* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬3ä¸ªå­—èŠ‚è¡¨ç¤ºé€»è¾‘å—å·ä½8bit */
+#define LBN1_OFFSET 3			 /* å—å†…ç¬¬1ä¸ªpageå¤‡ç”¨åŒºçš„ç¬¬4ä¸ªå­—èŠ‚è¡¨ç¤ºé€»è¾‘å—å·é«˜8bit */
+#define VALID_SPARE_SIZE 4 /* å®é™…ä½¿ç”¨çš„å¤‡ç”¨åŒºå¤§å°,ç”¨äºå‡½æ•°å†…éƒ¨å£°æ˜æ•°æ®ç¼“å†²åŒºå¤§å° */
 
 /* FSMC NAND memory address computation */
-#define ADDR_1st_CYCLE(ADDR)       (uint8_t)((ADDR)& 0xFF)               /* 1st addressing cycle */
-#define ADDR_2nd_CYCLE(ADDR)       (uint8_t)(((ADDR)& 0xFF00) >> 8)      /* 2nd addressing cycle */
-#define ADDR_3rd_CYCLE(ADDR)       (uint8_t)(((ADDR)& 0xFF0000) >> 16)   /* 3rd addressing cycle */
-#define ADDR_4th_CYCLE(ADDR)       (uint8_t)(((ADDR)& 0xFF000000) >> 24) /* 4th addressing cycle */
+#define ADDR_1st_CYCLE(ADDR) (uint8_t)((ADDR)&0xFF)								/* 1st addressing cycle */
+#define ADDR_2nd_CYCLE(ADDR) (uint8_t)(((ADDR)&0xFF00) >> 8)			/* 2nd addressing cycle */
+#define ADDR_3rd_CYCLE(ADDR) (uint8_t)(((ADDR)&0xFF0000) >> 16)		/* 3rd addressing cycle */
+#define ADDR_4th_CYCLE(ADDR) (uint8_t)(((ADDR)&0xFF000000) >> 24) /* 4th addressing cycle */
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-#define NAND_OK   0
+#define NAND_OK 0
 #define NAND_FAIL 1
 
-#define FREE_BLOCK  (1 << 12 )
-#define BAD_BLOCK   (1 << 13 )
-#define VALID_BLOCK (1 << 14 )
-#define USED_BLOCK  (1 << 15 )
+#define FREE_BLOCK (1 << 12)
+#define BAD_BLOCK (1 << 13)
+#define VALID_BLOCK (1 << 14)
+#define USED_BLOCK (1 << 15)
 
 /*
-		LUT[]µÄ¸ñÊ½£º
-		uint16_t usGoodBlockFirst;				 // µÚ1¸öºÃ¿é
-		uint16_t usDataBlockCount;	             // ¿ÉÓÃÓÚÊı¾İ´æ´¢µÄ¿é¸öÊı, ´ÓµÚ2¸öºÃ¿é¿ªÊ¼
-		uint16_t usBakBlockStart;				 // ±¸·İ¿éÆğÊ¼¿éºÅ
-		uint32_t usPhyBlockNo[ulDataBlockCount]; // ÎïÀí¿éºÅÊı×é¡£µÍ×Ö½ÚÔÚÇ°£¬¸ß×Ö½ÚÔÚºó¡£
+		LUT[]çš„æ ¼å¼ï¼š
+		uint16_t usGoodBlockFirst;				 // ç¬¬1ä¸ªå¥½å—
+		uint16_t usDataBlockCount;	             // å¯ç”¨äºæ•°æ®å­˜å‚¨çš„å—ä¸ªæ•°, ä»ç¬¬2ä¸ªå¥½å—å¼€å§‹
+		uint16_t usBakBlockStart;				 // å¤‡ä»½å—èµ·å§‹å—å·
+		uint32_t usPhyBlockNo[ulDataBlockCount]; // ç‰©ç†å—å·æ•°ç»„ã€‚ä½å­—èŠ‚åœ¨å‰ï¼Œé«˜å­—èŠ‚åœ¨åã€‚
 */
-#define DATA_BLOCK_PERCENT		98	/* Êı¾İ¿éÕ¼×ÜÓĞĞ§¿éÊıµÄ°Ù·Ö±È */
-#define LUT_FIRST_GOOD_BLOCK	0	/* LUT[] µÚ1¸öµ¥ÔªÓÃÓÚ´æ´¢µÚ1¸öÓĞĞ§¿éºÅ */
-#define LUT_DATA_BLOCK_COUNT	1	/* LUT[] µÚ2¸öµ¥ÔªÓÃÓÚ´æ´¢µÚÓĞĞ§¿éºÅ¸öÊı */
-#define LUT_BAK_BLOCK_START		2	/* LUT[] µÚ3¸öµ¥ÔªÓÃÓÚ±¸·İÇøÆğÊ¼¿éºÅ */
-#define LUT_GOOD_BLOCK_START	3	/* LUT[] µÚ4¸öµ¥ÔªÓÃÓÚÊı¾İÇøÆğÊ¼¿éºÅ */
-
+#define DATA_BLOCK_PERCENT 98	/* æ•°æ®å—å æ€»æœ‰æ•ˆå—æ•°çš„ç™¾åˆ†æ¯” */
+#define LUT_FIRST_GOOD_BLOCK 0 /* LUT[] ç¬¬1ä¸ªå•å…ƒç”¨äºå­˜å‚¨ç¬¬1ä¸ªæœ‰æ•ˆå—å· */
+#define LUT_DATA_BLOCK_COUNT 1 /* LUT[] ç¬¬2ä¸ªå•å…ƒç”¨äºå­˜å‚¨ç¬¬æœ‰æ•ˆå—å·ä¸ªæ•° */
+#define LUT_BAK_BLOCK_START 2	/* LUT[] ç¬¬3ä¸ªå•å…ƒç”¨äºå¤‡ä»½åŒºèµ·å§‹å—å· */
+#define LUT_GOOD_BLOCK_START 3 /* LUT[] ç¬¬4ä¸ªå•å…ƒç”¨äºæ•°æ®åŒºèµ·å§‹å—å· */
 
 /* Private Structures---------------------------------------------------------*/
-typedef struct __SPARE_AREA {
+typedef struct __SPARE_AREA
+{
 	uint16_t LogicalIndex;
 	uint16_t DataStatus;
 	uint16_t BlockStatus;
 } SPARE_AREA;
 
-typedef enum {
-  WRITE_IDLE = 0,
-  POST_WRITE,
-  PRE_WRITE,
-  WRITE_CLEANUP,
-  WRITE_ONGOING
-}WRITE_STATE;
+typedef enum
+{
+	WRITE_IDLE = 0,
+	POST_WRITE,
+	PRE_WRITE,
+	WRITE_CLEANUP,
+	WRITE_ONGOING
+} WRITE_STATE;
 
-typedef enum {
-  OLD_BLOCK = 0,
-  UNUSED_BLOCK
-}BLOCK_STATE;
+typedef enum
+{
+	OLD_BLOCK = 0,
+	UNUSED_BLOCK
+} BLOCK_STATE;
 
-/* ONFI ½á¹¹ (for H27U4G8F2DTR)  page 26 */
-/* ±ØĞëÌí¼Ó__packed¹Ø¼ü×Ö±íÊ¾½á¹¹Ìå³ÉÔ±¼ä½ôÃÜÅÅÁĞ */
+/* ONFI ç»“æ„ (for H27U4G8F2DTR)  page 26 */
+/* å¿…é¡»æ·»åŠ __packedå…³é”®å­—è¡¨ç¤ºç»“æ„ä½“æˆå‘˜é—´ç´§å¯†æ’åˆ— */
 //__PACKED typedef struct
 typedef struct
 {
-	uint8_t Sign[4];		/* = "ONFI" */
-	uint16_t Revision; 		/* Bit1 = 1 ±íÊ¾Ö§³Ö ONFI Ver 1.0 */
-	uint16_t Features;		/* */
+	uint8_t Sign[4];	 /* = "ONFI" */
+	uint16_t Revision; /* Bit1 = 1 è¡¨ç¤ºæ”¯æŒ ONFI Ver 1.0 */
+	uint16_t Features; /* */
 	uint16_t OptionalCommands;
 	uint8_t Rsv1[22];
 
 	/* Manufacturer information block */
-	uint8_t Manufacturer[12];	/* ÖÆÔìÉÌ */
-	uint8_t Model[20];	/* ĞÍºÅ */
-	uint8_t JEDEC_ID;	/* AD */
+	uint8_t Manufacturer[12]; /* åˆ¶é€ å•† */
+	uint8_t Model[20];				/* å‹å· */
+	uint8_t JEDEC_ID;					/* AD */
 	uint16_t DateCode;
 	uint8_t Rsv2[13];
 
@@ -223,12 +225,12 @@ typedef struct
 	uint8_t CellBits;
 	uint16_t BadBlockMax;
 	uint16_t BlockEndurance;
-	uint8_t ValidBlocksBegin;	/* ×îÇ°Ãæ±£Ö¤ÓĞĞ§µÄ¿é¸öÊı */
-	uint16_t BlockEndurance2;	/* Block endurance for guaranteed valid blocks */
-	uint8_t  ProgramsPerPage;	/* Number of programs per page */
+	uint8_t ValidBlocksBegin; /* æœ€å‰é¢ä¿è¯æœ‰æ•ˆçš„å—ä¸ªæ•° */
+	uint16_t BlockEndurance2; /* Block endurance for guaranteed valid blocks */
+	uint8_t ProgramsPerPage;	/* Number of programs per page */
 	uint8_t PartialProgram;
 	uint8_t ECCcorrectBits;
-	uint8_t InterleavedAddrBits;	/* ½»´íµÄµØÖ·Î» */
+	uint8_t InterleavedAddrBits; /* äº¤é”™çš„åœ°å€ä½ */
 	uint8_t InterleavedOperaton;
 	uint8_t Rsv3[13];
 
@@ -246,16 +248,16 @@ typedef struct
 	uint16_t VendorRevision;
 	uint8_t VendorSpecific[88];
 	uint16_t IntegritaCRC;
-}PARAM_PAGE_T;
+} PARAM_PAGE_T;
 
 /* Private macro --------------------------------------------------------------*/
-//#define WEAR_LEVELLING_SUPPORT		Ä¥ËğÆ½ºâÖ§³Ö
-#define WEAR_DEPTH         10			/* Ä¥ËğÉî¶È */
-#define PAGE_TO_WRITE      (Transfer_Length/512)
+//#define WEAR_LEVELLING_SUPPORT		ç£¨æŸå¹³è¡¡æ”¯æŒ
+#define WEAR_DEPTH 10 /* ç£¨æŸæ·±åº¦ */
+#define PAGE_TO_WRITE (Transfer_Length / 512)
 
-#define BAD_BALOK_TEST_CYCLE	2		/* ÅĞ±ğ»µ¿éËã·¨µÄÖØ¸´²ÁĞ´´ÎÊı  */
+#define BAD_BALOK_TEST_CYCLE 2 /* åˆ¤åˆ«åå—ç®—æ³•çš„é‡å¤æ“¦å†™æ¬¡æ•°  */
 
-/* NAND ¿éÍ³¼Æ */
+/* NAND å—ç»Ÿè®¡ */
 typedef struct
 {
 	uint32_t ChipID;
@@ -263,7 +265,7 @@ typedef struct
 	uint32_t Bad;
 	uint32_t Free;
 	uint32_t Used;
-}NAND_BLOCK_INFO_T;
+} NAND_BLOCK_INFO_T;
 
 /* Private variables ----------------------------------------------------------*/
 /* Private function prototypes ------------------------------------------------*/
@@ -287,11 +289,10 @@ void NAND_ReadONFI(uint8_t *_pBuf);
 void NAND_ReadParamPage(PARAM_PAGE_T *_pData);
 void NAND_DispParamPage(void);
 
-
 void NAND_ScanAllBadBlock(void);
 uint8_t NAND_GetBlockInfo(NAND_BLOCK_INFO_T *_pInfo);
 void NAND_MarkBadBlock(uint32_t _ulBlockNo);
 
 #endif /* __FSMC_NAND_H */
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

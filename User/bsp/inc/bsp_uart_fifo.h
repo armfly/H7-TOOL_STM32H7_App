@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ´®¿ÚÖĞ¶Ï+FIFOÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_uart_fifo.h
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : ä¸²å£ä¸­æ–­+FIFOé©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_uart_fifo.h
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,151 +13,151 @@
 #ifndef _BSP_USART_FIFO_H_
 #define _BSP_USART_FIFO_H_
 
-/* ¶¨ÒåÏÂÃæÕâĞĞ£¬1±íÊ¾printf µ½UDP¶Ë¿Ú. 0±íÊ¾Êä³öµ½USB´®¿Ú */
-#define PRINT_TO_UDP	1
-#define LUA_UDP_PORT	777
+/* å®šä¹‰ä¸‹é¢è¿™è¡Œï¼Œ1è¡¨ç¤ºprintf åˆ°UDPç«¯å£. 0è¡¨ç¤ºè¾“å‡ºåˆ°USBä¸²å£ */
+#define PRINT_TO_UDP 1
+#define LUA_UDP_PORT 777
 
 /*
-	H7-TOOL ´®¿Ú·ÖÅä£º
-	¡¾´®¿Ú1¡¿ RS485£¬ RS232£¬TTL´®¿Ú£¬3ºÏÒ»
+	H7-TOOL ä¸²å£åˆ†é…ï¼š
+	ã€ä¸²å£1ã€‘ RS485ï¼Œ RS232ï¼ŒTTLä¸²å£ï¼Œ3åˆä¸€
 		PA9/USART1_TX
 		P10/USART1_RX
 
-	¡¾´®¿Ú2¡¿ --- Î´ÓÃ
-		PA2/USART2_TX/ETH_MDIO (ÓÃÓÚÒÔÌ«Íø£¬²»×ö´®¿Ú·¢ËÍÓÃ)
-		PA3/USART2_RX	;½ÓGPSÄ£¿éÊä³ö
+	ã€ä¸²å£2ã€‘ --- æœªç”¨
+		PA2/USART2_TX/ETH_MDIO (ç”¨äºä»¥å¤ªç½‘ï¼Œä¸åšä¸²å£å‘é€ç”¨)
+		PA3/USART2_RX	;æ¥GPSæ¨¡å—è¾“å‡º
 
-	¡¾´®¿Ú3¡¿ --- Î´ÓÃ
+	ã€ä¸²å£3ã€‘ --- æœªç”¨
 		PB10/USART3_TX
 		PB11/USART3_RX
 
-	¡¾´®¿Ú4¡¿ --- ESP-32Ä£¿éÓÃ
+	ã€ä¸²å£4ã€‘ --- ESP-32æ¨¡å—ç”¨
 		PH13/UART4_TX
 		PH14/UART4_RX
 		
-	¡¾´®¿Ú5¡¿ ---  Î´ÓÃ
+	ã€ä¸²å£5ã€‘ ---  æœªç”¨
 
-	¡¾´®¿Ú6¡¿---  Î´ÓÃ
+	ã€ä¸²å£6ã€‘---  æœªç”¨
 		PC6/USART6_TX
 		PC7/USART6_RX
 		
-	¡¾´®¿Ú7¡¿ ---  Òı³ö£¬ºÍFMC_D0 D1¸´ÓÃ
-		PA15/UART7_TX		£¨FMC_DO)
-		PA8/UART7_RX		£¨FMC_D1)
+	ã€ä¸²å£7ã€‘ ---  å¼•å‡ºï¼Œå’ŒFMC_D0 D1å¤ç”¨
+		PA15/UART7_TX		ï¼ˆFMC_DO)
+		PA8/UART7_RX		ï¼ˆFMC_D1)
 	
-	¡¾´®¿Ú8¡¿ ---  Î´ÓÃ
+	ã€ä¸²å£8ã€‘ ---  æœªç”¨
 */
 
-#define	UART1_FIFO_EN	0	/* ½ûÖ¹¡£ÔÚUSBĞéÄâ´®¿ÚÇı¶¯ÖĞÊ¹ÓÃDMA²Ù×÷ */
-#define	UART2_FIFO_EN	0
-#define	UART3_FIFO_EN	0
-#define	UART4_FIFO_EN	0
-#define	UART5_FIFO_EN	0
-#define	UART6_FIFO_EN	0
-#define	UART7_FIFO_EN	0
-#define	UART8_FIFO_EN	0
+#define UART1_FIFO_EN 0 /* ç¦æ­¢ã€‚åœ¨USBè™šæ‹Ÿä¸²å£é©±åŠ¨ä¸­ä½¿ç”¨DMAæ“ä½œ */
+#define UART2_FIFO_EN 0
+#define UART3_FIFO_EN 0
+#define UART4_FIFO_EN 0
+#define UART5_FIFO_EN 0
+#define UART6_FIFO_EN 0
+#define UART7_FIFO_EN 0
+#define UART8_FIFO_EN 0
 
-#define UART_USB_FIFO_EN	1	/* ĞéÄâUSB´®¿ÚÓÃ */
+#define UART_USB_FIFO_EN 1 /* è™šæ‹ŸUSBä¸²å£ç”¨ */
 
-/* PI10 ¿ØÖÆRS485Ğ¾Æ¬µÄ·¢ËÍÊ¹ÄÜ */
-#define RS485_TXEN_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOI_CLK_ENABLE()
-#define RS485_TXEN_GPIO_PORT              GPIOI
-#define RS485_TXEN_PIN                    GPIO_PIN_10
+/* PI10 æ§åˆ¶RS485èŠ¯ç‰‡çš„å‘é€ä½¿èƒ½ */
+#define RS485_TXEN_GPIO_CLK_ENABLE() __HAL_RCC_GPIOI_CLK_ENABLE()
+#define RS485_TXEN_GPIO_PORT GPIOI
+#define RS485_TXEN_PIN GPIO_PIN_10
 
-#define RS485_RX_EN()	RS485_TXEN_GPIO_PORT->BSRRH = RS485_TXEN_PIN
-#define RS485_TX_EN()	RS485_TXEN_GPIO_PORT->BSRRL = RS485_TXEN_PIN
+#define RS485_RX_EN() RS485_TXEN_GPIO_PORT->BSRRH = RS485_TXEN_PIN
+#define RS485_TX_EN() RS485_TXEN_GPIO_PORT->BSRRL = RS485_TXEN_PIN
 
-/* ¶¨Òå¶Ë¿ÚºÅ */
+/* å®šä¹‰ç«¯å£å· */
 typedef enum
 {
-	COM1 = 0,	/* USART1 */
-	COM2 = 1,	/* USART2 */
-	COM3 = 2,	/* USART3 */
-	COM4 = 3,	/* UART4 */
-	COM5 = 4,	/* UART5 */
-	COM6 = 5,	/* USART6 */
-	COM7 = 6,	/* UART7 */	
-	COM8 = 7,	/* UART8 */	
-	
-	COM_USB = 8	/* UART8 */	
-}COM_PORT_E;
+	COM1 = 0, /* USART1 */
+	COM2 = 1, /* USART2 */
+	COM3 = 2, /* USART3 */
+	COM4 = 3, /* UART4 */
+	COM5 = 4, /* UART5 */
+	COM6 = 5, /* USART6 */
+	COM7 = 6, /* UART7 */
+	COM8 = 7, /* UART8 */
 
-/* ¶¨Òå´®¿Ú²¨ÌØÂÊºÍFIFO»º³åÇø´óĞ¡£¬·ÖÎª·¢ËÍ»º³åÇøºÍ½ÓÊÕ»º³åÇø, Ö§³ÖÈ«Ë«¹¤ */
+	COM_USB = 8 /* UART8 */
+} COM_PORT_E;
+
+/* å®šä¹‰ä¸²å£æ³¢ç‰¹ç‡å’ŒFIFOç¼“å†²åŒºå¤§å°ï¼Œåˆ†ä¸ºå‘é€ç¼“å†²åŒºå’Œæ¥æ”¶ç¼“å†²åŒº, æ”¯æŒå…¨åŒå·¥ */
 #if UART1_FIFO_EN == 1
-	#define UART1_BAUD			115200
-	#define UART1_TX_BUF_SIZE	1*1024
-	#define UART1_RX_BUF_SIZE	1*1024
+#define UART1_BAUD 115200
+#define UART1_TX_BUF_SIZE 1 * 1024
+#define UART1_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART2_FIFO_EN == 1
-	#define UART2_BAUD			9600
-	#define UART2_TX_BUF_SIZE	10
-	#define UART2_RX_BUF_SIZE	2*1024
+#define UART2_BAUD 9600
+#define UART2_TX_BUF_SIZE 10
+#define UART2_RX_BUF_SIZE 2 * 1024
 #endif
 
 #if UART3_FIFO_EN == 1
-	#define UART3_BAUD			9600
-	#define UART3_TX_BUF_SIZE	1*1024
-	#define UART3_RX_BUF_SIZE	1*1024
+#define UART3_BAUD 9600
+#define UART3_TX_BUF_SIZE 1 * 1024
+#define UART3_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART4_FIFO_EN == 1
-	#define UART4_BAUD			115200
-	#define UART4_TX_BUF_SIZE	1*1024
-	#define UART4_RX_BUF_SIZE	1*1024
+#define UART4_BAUD 115200
+#define UART4_TX_BUF_SIZE 1 * 1024
+#define UART4_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART5_FIFO_EN == 1
-	#define UART5_BAUD			115200
-	#define UART5_TX_BUF_SIZE	1*1024
-	#define UART5_RX_BUF_SIZE	1*1024
+#define UART5_BAUD 115200
+#define UART5_TX_BUF_SIZE 1 * 1024
+#define UART5_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART6_FIFO_EN == 1
-	#define UART6_BAUD			115200
-	#define UART6_TX_BUF_SIZE	1*1024
-	#define UART6_RX_BUF_SIZE	1*1024
+#define UART6_BAUD 115200
+#define UART6_TX_BUF_SIZE 1 * 1024
+#define UART6_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART7_FIFO_EN == 1
-	#define UART7_BAUD			115200
-	#define UART7_TX_BUF_SIZE	1*1024
-	#define UART7_RX_BUF_SIZE	1*1024
+#define UART7_BAUD 115200
+#define UART7_TX_BUF_SIZE 1 * 1024
+#define UART7_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART8_FIFO_EN == 1
-	#define UART8_BAUD			115200
-	#define UART8_TX_BUF_SIZE	1*1024
-	#define UART8_RX_BUF_SIZE	1*1024
+#define UART8_BAUD 115200
+#define UART8_TX_BUF_SIZE 1 * 1024
+#define UART8_RX_BUF_SIZE 1 * 1024
 #endif
 
 #if UART_USB_FIFO_EN == 1
-	#define UART_USB_BAUD			115200
-	#define UART_USB_TX_BUF_SIZE	2*1024
-	#define UART_USB_RX_BUF_SIZE	2*1024
+#define UART_USB_BAUD 115200
+#define UART_USB_TX_BUF_SIZE 2 * 1024
+#define UART_USB_RX_BUF_SIZE 2 * 1024
 #endif
 
-/* ´®¿ÚÉè±¸½á¹¹Ìå */
+/* ä¸²å£è®¾å¤‡ç»“æ„ä½“ */
 typedef struct
 {
-	USART_TypeDef *uart;		/* STM32ÄÚ²¿´®¿ÚÉè±¸Ö¸Õë */
-	uint8_t *pTxBuf;			/* ·¢ËÍ»º³åÇø */
-	uint8_t *pRxBuf;			/* ½ÓÊÕ»º³åÇø */
-	uint16_t usTxBufSize;		/* ·¢ËÍ»º³åÇø´óĞ¡ */
-	uint16_t usRxBufSize;		/* ½ÓÊÕ»º³åÇø´óĞ¡ */
-	__IO uint16_t usTxWrite;	/* ·¢ËÍ»º³åÇøĞ´Ö¸Õë */
-	__IO uint16_t usTxRead;		/* ·¢ËÍ»º³åÇø¶ÁÖ¸Õë */
-	__IO uint16_t usTxCount;	/* µÈ´ı·¢ËÍµÄÊı¾İ¸öÊı */
+	USART_TypeDef *uart;		 /* STM32å†…éƒ¨ä¸²å£è®¾å¤‡æŒ‡é’ˆ */
+	uint8_t *pTxBuf;				 /* å‘é€ç¼“å†²åŒº */
+	uint8_t *pRxBuf;				 /* æ¥æ”¶ç¼“å†²åŒº */
+	uint16_t usTxBufSize;		 /* å‘é€ç¼“å†²åŒºå¤§å° */
+	uint16_t usRxBufSize;		 /* æ¥æ”¶ç¼“å†²åŒºå¤§å° */
+	__IO uint16_t usTxWrite; /* å‘é€ç¼“å†²åŒºå†™æŒ‡é’ˆ */
+	__IO uint16_t usTxRead;	/* å‘é€ç¼“å†²åŒºè¯»æŒ‡é’ˆ */
+	__IO uint16_t usTxCount; /* ç­‰å¾…å‘é€çš„æ•°æ®ä¸ªæ•° */
 
-	__IO uint16_t usRxWrite;	/* ½ÓÊÕ»º³åÇøĞ´Ö¸Õë */
-	__IO uint16_t usRxRead;		/* ½ÓÊÕ»º³åÇø¶ÁÖ¸Õë */
-	__IO uint16_t usRxCount;	/* »¹Î´¶ÁÈ¡µÄĞÂÊı¾İ¸öÊı */
+	__IO uint16_t usRxWrite; /* æ¥æ”¶ç¼“å†²åŒºå†™æŒ‡é’ˆ */
+	__IO uint16_t usRxRead;	/* æ¥æ”¶ç¼“å†²åŒºè¯»æŒ‡é’ˆ */
+	__IO uint16_t usRxCount; /* è¿˜æœªè¯»å–çš„æ–°æ•°æ®ä¸ªæ•° */
 
-	void (*SendBefor)(void); 	/* ¿ªÊ¼·¢ËÍÖ®Ç°µÄ»Øµ÷º¯ÊıÖ¸Õë£¨Ö÷ÒªÓÃÓÚRS485ÇĞ»»µ½·¢ËÍÄ£Ê½£© */
-	void (*SendOver)(void); 	/* ·¢ËÍÍê±ÏµÄ»Øµ÷º¯ÊıÖ¸Õë£¨Ö÷ÒªÓÃÓÚRS485½«·¢ËÍÄ£Ê½ÇĞ»»Îª½ÓÊÕÄ£Ê½£© */
-	void (*ReciveNew)(uint8_t _byte);	/* ´®¿ÚÊÕµ½Êı¾İµÄ»Øµ÷º¯ÊıÖ¸Õë */
-	uint8_t Sending;			/* ÕıÔÚ·¢ËÍÖĞ */
-}UART_T;
+	void (*SendBefor)(void);					/* å¼€å§‹å‘é€ä¹‹å‰çš„å›è°ƒå‡½æ•°æŒ‡é’ˆï¼ˆä¸»è¦ç”¨äºRS485åˆ‡æ¢åˆ°å‘é€æ¨¡å¼ï¼‰ */
+	void (*SendOver)(void);						/* å‘é€å®Œæ¯•çš„å›è°ƒå‡½æ•°æŒ‡é’ˆï¼ˆä¸»è¦ç”¨äºRS485å°†å‘é€æ¨¡å¼åˆ‡æ¢ä¸ºæ¥æ”¶æ¨¡å¼ï¼‰ */
+	void (*ReciveNew)(uint8_t _byte); /* ä¸²å£æ”¶åˆ°æ•°æ®çš„å›è°ƒå‡½æ•°æŒ‡é’ˆ */
+	uint8_t Sending;									/* æ­£åœ¨å‘é€ä¸­ */
+} UART_T;
 
 void bsp_InitUart(void);
 void comSendBuf(COM_PORT_E _ucPort, uint8_t *_ucaBuf, uint16_t _usLen);
@@ -168,8 +168,8 @@ void comClearTxFifo(COM_PORT_E _ucPort);
 void comClearRxFifo(COM_PORT_E _ucPort);
 void comSetBaud(COM_PORT_E _ucPort, uint32_t _BaudRate);
 
-void USART_SetBaudRate(USART_TypeDef* USARTx, uint32_t BaudRate);
-void bsp_SetUartParam(USART_TypeDef *Instance,  uint32_t BaudRate, uint32_t Parity, uint32_t Mode);
+void USART_SetBaudRate(USART_TypeDef *USARTx, uint32_t BaudRate);
+void bsp_SetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint32_t Parity, uint32_t Mode);
 
 void RS485_SendBuf(uint8_t *_ucaBuf, uint16_t _usLen);
 void RS485_SendStr(char *_pBuf);
@@ -180,4 +180,4 @@ void comPutRxFifo(COM_PORT_E _ucPort, uint8_t *_buf, uint16_t _len);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

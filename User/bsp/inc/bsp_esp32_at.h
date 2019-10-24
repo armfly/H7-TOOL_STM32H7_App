@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ESP32 ´®¿ÚWIFIÄ£¿éÇı¶¯³ÌĞò
-*	ÎÄ¼şÃû³Æ : bsp_esp32_at.h
-*	°æ    ±¾ : V1.3
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : ESP32 ä¸²å£WIFIæ¨¡å—é©±åŠ¨ç¨‹åº
+*	æ–‡ä»¶åç§° : bsp_esp32_at.h
+*	ç‰ˆ    æœ¬ : V1.3
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,32 +14,32 @@
 #ifndef __BSP_ESP32_H
 #define __BSP_ESP32_H
 
-#define COM_ESP32		COM4		/* ESP32´®¿Ú */
-#define COM_DEBUG		COM2		/* µ÷ÊÔ´®¿Ú */
+#define COM_ESP32 COM4 /* ESP32ä¸²å£ */
+#define COM_DEBUG COM2 /* è°ƒè¯•ä¸²å£ */
 
-/* ¶¨ÒåÏÂÃæÕâ¾ä»°, ½«°ÑÊÕµ½µÄ×Ö·û·¢ËÍµ½µ÷ÊÔ´®¿Ú1 */
+/* å®šä¹‰ä¸‹é¢è¿™å¥è¯, å°†æŠŠæ”¶åˆ°çš„å­—ç¬¦å‘é€åˆ°è°ƒè¯•ä¸²å£1 */
 #define ESP32_TO_COM1_EN
 
-#define SSID_MAX_LEN		32		/* SSID×î³¤32¸ö×Ö·û£¬´æ´¢Ê±ĞèÒª32+1¿Õ¼ä£¬Ä©Î²¼Ó0 */
-#define PASSWORD_MAX_LEN	64		/* WIFI ÃÜÂë ×î³¤64¸ö×Ö·û£¬´æ´¢Ê±ĞèÒª32+1¿Õ¼ä£¬Ä©Î²¼Ó0 */
+#define SSID_MAX_LEN 32			/* SSIDæœ€é•¿32ä¸ªå­—ç¬¦ï¼Œå­˜å‚¨æ—¶éœ€è¦32+1ç©ºé—´ï¼Œæœ«å°¾åŠ 0 */
+#define PASSWORD_MAX_LEN 64 /* WIFI å¯†ç  æœ€é•¿64ä¸ªå­—ç¬¦ï¼Œå­˜å‚¨æ—¶éœ€è¦32+1ç©ºé—´ï¼Œæœ«å°¾åŠ 0 */
 
-/* Éè±¸½á¹¹Ìå */
+/* è®¾å¤‡ç»“æ„ä½“ */
 typedef struct
 {
-	char ssid[33];	/* SSIDÊÇÒ»¸öÎŞÏß¾ÖÓòÍøÂç£¨WLAN£©µÄÃû³Æ¡£SSIDÊÇÇø·Ö´óĞ¡Ğ´µÄÎÄ±¾×Ö·û´®£¬×î´ó³¤¶È32¸ö×Ö·û */
-	uint8_t ecn;	/* ¼ÓÃÜ·½Ê½ 
+	char ssid[33];	 /* SSIDæ˜¯ä¸€ä¸ªæ— çº¿å±€åŸŸç½‘ç»œï¼ˆWLANï¼‰çš„åç§°ã€‚SSIDæ˜¯åŒºåˆ†å¤§å°å†™çš„æ–‡æœ¬å­—ç¬¦ä¸²ï¼Œæœ€å¤§é•¿åº¦32ä¸ªå­—ç¬¦ */
+	uint8_t ecn;		 /* åŠ å¯†æ–¹å¼ 
 						0   OPEN
 						1   WEP
 						2   WPA_PSK
 						3   WPA2_PSK
 						4   WPA_WPA2_PSK
 					*/
-	int32_t rssi;		/* ĞÅºÅÇ¿¶È */
-	uint8_t mac[20];	/* MACµØÖ·×Ö·û´®*/
-	uint8_t ch;			/* ĞÅµÀ */
-}WIFI_AP_T;
+	int32_t rssi;		 /* ä¿¡å·å¼ºåº¦ */
+	uint8_t mac[20]; /* MACåœ°å€å­—ç¬¦ä¸²*/
+	uint8_t ch;			 /* ä¿¡é“ */
+} WIFI_AP_T;
 
-/* ¼ÓÃÜ·½Ê½ */
+/* åŠ å¯†æ–¹å¼ */
 enum
 {
 	ECN_OPEN = 0,
@@ -49,56 +49,56 @@ enum
 	ECN_WPA_WPA2_PSK = 4,
 };
 
-/* ESP32_PT_WaitResonse º¯ÊıµÄ·µ»ØÖµ¶¨Òå */
+/* ESP32_PT_WaitResonse å‡½æ•°çš„è¿”å›å€¼å®šä¹‰ */
 enum
 {
-	PT_NULL = 0,	/* ¿Õ²Ù×÷£¬ĞèÒª¼ÌĞøµÈ´ı */
-	PT_TIMEOUT,		/* Ö´ĞĞ³¬Ê± */ 
-	
-	PT_OK,			/* ³É¹¦Ö´ĞĞ */
-	PT_ERR,			/* Ö´ĞĞÊ§°Ü */
+	PT_NULL = 0, /* ç©ºæ“ä½œï¼Œéœ€è¦ç»§ç»­ç­‰å¾… */
+	PT_TIMEOUT,	/* æ‰§è¡Œè¶…æ—¶ */
+
+	PT_OK,	/* æˆåŠŸæ‰§è¡Œ */
+	PT_ERR, /* æ‰§è¡Œå¤±è´¥ */
 };
 
-/* ESP32_QueryIPStatus º¯ÊıµÄ·µ»ØÖµ¶¨Òå */
+/* ESP32_QueryIPStatus å‡½æ•°çš„è¿”å›å€¼å®šä¹‰ */
 enum
-{	
-	IPS_GET_IP = '2',	/* »ñµÃIP */
-	IPS_LINK_OK = '3',	/* ½¨Á¢Á¬½Ó */
-	IPS_LINK_LOST = '4',	/* Ê§È¥Á¬½Ó£¬Ä£¿é¿ÉÄÜ¿´ÃÅ¹·¸´Î» */
-	
-	IPS_BUSY = '8',		/* Ä£¿éÄÚ²¿Ã¦£¬ zhg ×Ô¶¨ÒåµÄ×´Ì¬£¬²»ÊÇÃüÁîÕıÈ·Ó¦´ğ */
-	IPS_TIMEOUT = '9'	/* ÃüÁîÓ¦´ğ³¬Ê±£¬ zhg ×Ô¶¨ÒåµÄ×´Ì¬ */
+{
+	IPS_GET_IP = '2',		 /* è·å¾—IP */
+	IPS_LINK_OK = '3',	 /* å»ºç«‹è¿æ¥ */
+	IPS_LINK_LOST = '4', /* å¤±å»è¿æ¥ï¼Œæ¨¡å—å¯èƒ½çœ‹é—¨ç‹—å¤ä½ */
+
+	IPS_BUSY = '8',		/* æ¨¡å—å†…éƒ¨å¿™ï¼Œ zhg è‡ªå®šä¹‰çš„çŠ¶æ€ï¼Œä¸æ˜¯å‘½ä»¤æ­£ç¡®åº”ç­” */
+	IPS_TIMEOUT = '9' /* å‘½ä»¤åº”ç­”è¶…æ—¶ï¼Œ zhg è‡ªå®šä¹‰çš„çŠ¶æ€ */
 };
 
-/* ESP32_RxData º¯ÊıµÄ·µ»ØÖµ¶¨Òå */
+/* ESP32_RxData å‡½æ•°çš„è¿”å›å€¼å®šä¹‰ */
 enum
-{	
-	ESP_RX_NONE = 0,	/* Ã»ÓĞ¶Áµ½×Ö½Ú */
-	ESP_RX_BYTE,		/* ±íÊ¾½ÓÊÕµ½×Ö½Ú£¨Êı¾İ²»È«£¬Î´½âÂë¡£ ÓÃÓÚÖ÷³ÌĞòÅĞ¶Ï³¬Ê±£© */
-	ESP_RX_IPD,			/* +IPDÊı¾İ°ü, TCP£¬UDPÊı¾İ°ü  */
-	ESP_RX_OTHER		/* ÊÕµ½»Ø³µ»»ĞĞ½áÊøµÄÓ¦´ğ×Ö·û´®  */
+{
+	ESP_RX_NONE = 0, /* æ²¡æœ‰è¯»åˆ°å­—èŠ‚ */
+	ESP_RX_BYTE,		 /* è¡¨ç¤ºæ¥æ”¶åˆ°å­—èŠ‚ï¼ˆæ•°æ®ä¸å…¨ï¼Œæœªè§£ç ã€‚ ç”¨äºä¸»ç¨‹åºåˆ¤æ–­è¶…æ—¶ï¼‰ */
+	ESP_RX_IPD,			 /* +IPDæ•°æ®åŒ…, TCPï¼ŒUDPæ•°æ®åŒ…  */
+	ESP_RX_OTHER		 /* æ”¶åˆ°å›è½¦æ¢è¡Œç»“æŸçš„åº”ç­”å­—ç¬¦ä¸²  */
 };
 
-/* ÓÃÓÚ·Ç×èÈûº¯Êı */
-#define ACK_MAX_LEN		128
+/* ç”¨äºéé˜»å¡å‡½æ•° */
+#define ACK_MAX_LEN 128
 typedef struct
 {
 	uint8_t RxBuf[ACK_MAX_LEN];
 	uint8_t Len1;
 	uint8_t Len2;
 	uint8_t Len3;
-	
+
 	char *pStr1;
 	char *pStr2;
-	char *pStr3;		
+	char *pStr3;
 
 	int32_t LastTime;
 	uint16_t Timeout;
-	
-	uint8_t RunFirst;
-}ESP32_PT_T;
 
-/* ¹©Íâ²¿µ÷ÓÃµÄº¯ÊıÉùÃ÷ */
+	uint8_t RunFirst;
+} ESP32_PT_T;
+
+/* ä¾›å¤–éƒ¨è°ƒç”¨çš„å‡½æ•°å£°æ˜ */
 void bsp_InitESP32(void);
 void ESP32_Reset(void);
 uint8_t ESP32_PowerOn(void);
@@ -129,7 +129,7 @@ uint8_t ESP32_GetChar(uint8_t *_data);
 void ESP32_SendBuf(uint8_t *_cmd, uint16_t _len);
 
 uint8_t ESP32_Set_AP_IP(char *_ip);
-uint8_t ESP32_Set_AP_NamePass(char *_name, char * _pwd, uint8_t _ch, uint8_t _ecn);
+uint8_t ESP32_Set_AP_NamePass(char *_name, char *_pwd, uint8_t _ch, uint8_t _ecn);
 
 uint8_t ESP32_ValidSSID(char *_ssid);
 uint8_t ESP32_ValidPassword(char *_pass);
@@ -146,13 +146,13 @@ uint8_t WIFI_CheckAck(uint8_t *_str, int32_t _timeout);
 void ESP32_Reset(void);
 void ESP32_EnterAT(void);
 void ESP32_EnterISP(void);
-	
-#define RX_MSG_MAX	32
-extern uint8_t g_RxMsgBuf[RX_MSG_MAX]; 
+
+#define RX_MSG_MAX 32
+extern uint8_t g_RxMsgBuf[RX_MSG_MAX];
 extern uint8_t g_RxMsgLen;
 
-extern ESP32_PT_T s_tAT;	/* ÓÃÓÚ·Ç×èÈûÄ£Ê½Ö´ĞĞATÖ¸Áî */
+extern ESP32_PT_T s_tAT; /* ç”¨äºéé˜»å¡æ¨¡å¼æ‰§è¡ŒATæŒ‡ä»¤ */
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

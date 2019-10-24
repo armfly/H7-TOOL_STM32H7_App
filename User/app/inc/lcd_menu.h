@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : LCDÒº¾§ÏÔÊ¾Æ÷ ²Ëµ¥×é¼ş
-*	ÎÄ¼şÃû³Æ : lcd_menu.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-04-25 armfly  ST¹Ì¼ş¿â°æ±¾ V2.1.0
+*	æ¨¡å—åç§° : LCDæ¶²æ™¶æ˜¾ç¤ºå™¨ èœå•ç»„ä»¶
+*	æ–‡ä»¶åç§° : lcd_menu.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-04-25 armfly  STå›ºä»¶åº“ç‰ˆæœ¬ V2.1.0
 *
-*	Copyright (C), 2015-2016, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2016, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,43 +17,42 @@
 #ifndef _LCD_MENU_H
 #define _LCD_MENU_H
 
-#define CL_MENU_TEXT1	CL_WHITE
-#define CL_MENU_BACK1	MAIN_BACK_COLOR
+#define CL_MENU_TEXT1 CL_WHITE
+#define CL_MENU_BACK1 MAIN_BACK_COLOR
 
-/* ¹â±êÑ¡ÖĞ */
-#define CL_MENU_TEXT2	CL_BLACK
-#define CL_MENU_BACK2	CL_YELLOW
+/* å…‰æ ‡é€‰ä¸­ */
+#define CL_MENU_TEXT2 CL_BLACK
+#define CL_MENU_BACK2 CL_YELLOW
 
-/* ²Ëµ¥Ñ¡ÖĞ£¬±£ÁôÁíÍâÒ»¸öÑÕÉ« */
-#define CL_MENU_TEXT3	CL_BLACK
-#define CL_MENU_BACK3	RGB(142,209,158)
+/* èœå•é€‰ä¸­ï¼Œä¿ç•™å¦å¤–ä¸€ä¸ªé¢œè‰² */
+#define CL_MENU_TEXT3 CL_BLACK
+#define CL_MENU_BACK3 RGB(142, 209, 158)
 
+#define MENU_LEFT (0 + 5)
+#define MENU_TOP (0 + 5)
+#define MENU_WIDTH (240 - 10)
+#define MENU_HEIGHT (240 - 50)
+#define MENU_CAP 26
 
-#define MENU_LEFT		(0 + 5)
-#define MENU_TOP		(0 + 5)
-#define MENU_WIDTH		(240 - 10)
-#define MENU_HEIGHT 	(240 - 50)
-#define MENU_CAP		26
-
-/* ²Ëµ¥½á¹¹ */
+/* èœå•ç»“æ„ */
 typedef struct
 {
-	uint8_t **Text;		/* ²Ëµ¥ÎÄ±¾ */
-	uint8_t ViewLine;	/* ¿ÉÊÓĞĞÊı */
-	uint8_t Count;		/* ²Ëµ¥Ïî¸öÊı */
-	uint8_t Offset;		/* µ±Ç°ÆÁÄ»µÚ1ĞĞ¶ÔÓ¦µÄË÷Òı */
-	uint8_t Cursor;		/* Ñ¡ÖĞĞĞµÄË÷Òı */
-	
-	uint16_t Left;		/* X ×ø±ê */
-	uint16_t Top;		/* Y ×ø±ê */
-	uint16_t Height;	/* ¸ß¶È */
-	uint16_t Width;		/* ¿í¶È */
-	uint16_t LineCap;	/* ĞĞ¼ä¾à */
-	
-	FONT_T Font;		/* ×ÖÌå */
-}MENU_T;
+	uint8_t **Text;		/* èœå•æ–‡æœ¬ */
+	uint8_t ViewLine; /* å¯è§†è¡Œæ•° */
+	uint8_t Count;		/* èœå•é¡¹ä¸ªæ•° */
+	uint8_t Offset;		/* å½“å‰å±å¹•ç¬¬1è¡Œå¯¹åº”çš„ç´¢å¼• */
+	uint8_t Cursor;		/* é€‰ä¸­è¡Œçš„ç´¢å¼• */
 
-/* ²Ëµ¥ÏÔÊ¾Àà */
+	uint16_t Left;		/* X åæ ‡ */
+	uint16_t Top;			/* Y åæ ‡ */
+	uint16_t Height;	/* é«˜åº¦ */
+	uint16_t Width;		/* å®½åº¦ */
+	uint16_t LineCap; /* è¡Œé—´è· */
+
+	FONT_T Font; /* å­—ä½“ */
+} MENU_T;
+
+/* èœå•æ˜¾ç¤ºç±» */
 void LCD_InitMenu(MENU_T *_pMenu, char **_Text);
 void LCD_DispMenu(MENU_T *_pMenu);
 void LCD_MoveDownMenu(MENU_T *_pMenu);
@@ -61,4 +60,4 @@ void LCD_MoveUpMenu(MENU_T *_pMenu);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,8 +1,8 @@
 /*
 *********************************************************************************************************
 *
-*	ģ������ : mainģ��
-*	�ļ����� : main.h
+*	模块名称 : main模块
+*	文件名称 : main.h
 *
 *********************************************************************************************************
 */
@@ -14,23 +14,23 @@
 #include "param.h"
 #include "modbus_register.h"
 
-#define SWITCH_BEEP_ENABLE	1		/* 1��ʾ�л���״̬ʱ������������ */
+#define SWITCH_BEEP_ENABLE 1 /* 1表示切换主状态时，蜂鸣器鸣叫 */
 
-/* ������״̬�ֶ���, MS = Main Status */
+/* 主程序状态字定义, MS = Main Status */
 enum
 {
-	MS_LINK_MODE = 0,	/* ����״̬ */
-	
-	MS_SYSTEM_SET,		/* ϵͳ���� */
-	MS_HARD_INFO,		/* ����-Ӳ����Ϣ */
-	MS_ESP32_TEST,		/* ESP32ģ������״̬ */
-	MS_USB_UART1,		/* ���⴮��״̬��RS232 RS485 TTL-UART */
+	MS_LINK_MODE = 0, /* 联机状态 */
 
-	MS_PROGRAMMER,		/* �ѻ������� */	
-	MS_VOLTAGE_METER,	/* ��ѹ�� */
-	MS_CURRENT_METER,	/* �߲������ */
-	MS_TEMP_METER,		/* �¶ȱ� */
-	MS_RESISTOR_METER,	/* ����� */
+	MS_SYSTEM_SET, /* 系统设置 */
+	MS_HARD_INFO,	/* 关于-硬件信息 */
+	MS_ESP32_TEST, /* ESP32模块升级状态 */
+	MS_USB_UART1,	/* 虚拟串口状态。RS232 RS485 TTL-UART */
+
+	MS_PROGRAMMER,		 /* 脱机下载器 */
+	MS_VOLTAGE_METER,	/* 电压表 */
+	MS_CURRENT_METER,	/* 高侧电流表 */
+	MS_TEMP_METER,		 /* 温度表 */
+	MS_RESISTOR_METER, /* 电阻表 */
 };
 
 void DispHeader(char *_str);
@@ -40,9 +40,6 @@ void DSO_StartMode2(void);
 
 extern uint16_t g_MainStatus;
 
-
-
 #endif
 
-/***************************** ���������� www.armfly.com (END OF FILE) *********************************/
-
+/***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

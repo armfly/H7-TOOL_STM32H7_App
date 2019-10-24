@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : TFTÒº¾§ÏÔÊ¾Æ÷Çı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : LCD_tft_lcd.h
-*	°æ    ±¾ : V2.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : TFTæ¶²æ™¶æ˜¾ç¤ºå™¨é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : LCD_tft_lcd.h
+*	ç‰ˆ    æœ¬ : V2.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2010-2011, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2010-2011, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,97 +14,95 @@
 #ifndef _BSP_TFT_LCD_H
 #define _BSP_TFT_LCD_H
 
-#define BUTTON_BEEP()	BEEP_KeyTone();	/* °´¼üÌáÊ¾Òô */
-//#define BUTTON_BEEP()	/* ÎŞ°´¼üÌáÊ¾Òô */
+#define BUTTON_BEEP() BEEP_KeyTone(); /* æŒ‰é”®æç¤ºéŸ³ */
+//#define BUTTON_BEEP()	/* æ— æŒ‰é”®æç¤ºéŸ³ */
 
-/* ¶¨ÒåLCDÏÔÊ¾ÇøÓòµÄ·Ö±æÂÊ */
-#define LCD_30_HEIGHT	240		/* 3.0´ç¿íÆÁ ¸ß¶È£¬µ¥Î»£ºÏñËØ */
-#define LCD_30_WIDTH	400		/* 3.0´ç¿íÆÁ ¿í¶È£¬µ¥Î»£ºÏñËØ */
+/* å®šä¹‰LCDæ˜¾ç¤ºåŒºåŸŸçš„åˆ†è¾¨ç‡ */
+#define LCD_30_HEIGHT 240 /* 3.0å¯¸å®½å± é«˜åº¦ï¼Œå•ä½ï¼šåƒç´  */
+#define LCD_30_WIDTH 400	/* 3.0å¯¸å®½å± å®½åº¦ï¼Œå•ä½ï¼šåƒç´  */
 
-#define LCD_43_HEIGHT	272		/* 4.3´ç¿íÆÁ ¸ß¶È£¬µ¥Î»£ºÏñËØ */
-#define LCD_43_WIDTH	480		/* 4.3´ç¿íÆÁ ¿í¶È£¬µ¥Î»£ºÏñËØ */
+#define LCD_43_HEIGHT 272 /* 4.3å¯¸å®½å± é«˜åº¦ï¼Œå•ä½ï¼šåƒç´  */
+#define LCD_43_WIDTH 480	/* 4.3å¯¸å®½å± å®½åº¦ï¼Œå•ä½ï¼šåƒç´  */
 
-#define LCD_70_HEIGHT	480		/* 7.0´ç¿íÆÁ ¸ß¶È£¬µ¥Î»£ºÏñËØ */
-#define LCD_70_WIDTH	800		/* 7.0´ç¿íÆÁ ¿í¶È£¬µ¥Î»£ºÏñËØ */
+#define LCD_70_HEIGHT 480 /* 7.0å¯¸å®½å± é«˜åº¦ï¼Œå•ä½ï¼šåƒç´  */
+#define LCD_70_WIDTH 800	/* 7.0å¯¸å®½å± å®½åº¦ï¼Œå•ä½ï¼šåƒç´  */
 
-/* Ö§³ÖµÄÇı¶¯Ğ¾Æ¬ID */
+/* æ”¯æŒçš„é©±åŠ¨èŠ¯ç‰‡ID */
 enum
 {
-	IC_5420		= 0x5420,
-	IC_4001		= 0x4001,
-	IC_61509 	= 0xB509,
-	IC_8875 	= 0x0075,	
-	IC_9488 	= 0x9488
+	IC_5420 = 0x5420,
+	IC_4001 = 0x4001,
+	IC_61509 = 0xB509,
+	IC_8875 = 0x0075,
+	IC_9488 = 0x9488
 };
 
-#define CHIP_STR_5420	"SPFD5420A"
-#define CHIP_STR_4001	"OTM4001A"
-#define CHIP_STR_61509	"R61509V"
-#define CHIP_STR_8875	"RA8875"
-#define CHIP_STR_9488	"ILI9488"
+#define CHIP_STR_5420 "SPFD5420A"
+#define CHIP_STR_4001 "OTM4001A"
+#define CHIP_STR_61509 "R61509V"
+#define CHIP_STR_8875 "RA8875"
+#define CHIP_STR_9488 "ILI9488"
 
-#define CHIP_STR_F429	"STM32F429"
+#define CHIP_STR_F429 "STM32F429"
 
 /*
-	LCD ÑÕÉ«´úÂë£¬CL_ÊÇColorµÄ¼òĞ´
-	16BitÓÉ¸ßÎ»ÖÁµÍÎ»£¬ RRRR RGGG GGGB BBBB
+	LCD é¢œè‰²ä»£ç ï¼ŒCL_æ˜¯Colorçš„ç®€å†™
+	16Bitç”±é«˜ä½è‡³ä½ä½ï¼Œ RRRR RGGG GGGB BBBB
 
-	ÏÂÃæµÄRGB ºê½«24Î»µÄRGBÖµ×ª»»Îª16Î»¸ñÊ½¡£
-	Æô¶¯windowsµÄ»­±Ê³ÌĞò£¬µã»÷±à¼­ÑÕÉ«£¬Ñ¡Ôñ×Ô¶¨ÒåÑÕÉ«£¬¿ÉÒÔ»ñµÃµÄRGBÖµ¡£
+	ä¸‹é¢çš„RGB å®å°†24ä½çš„RGBå€¼è½¬æ¢ä¸º16ä½æ ¼å¼ã€‚
+	å¯åŠ¨windowsçš„ç”»ç¬”ç¨‹åºï¼Œç‚¹å‡»ç¼–è¾‘é¢œè‰²ï¼Œé€‰æ‹©è‡ªå®šä¹‰é¢œè‰²ï¼Œå¯ä»¥è·å¾—çš„RGBå€¼ã€‚
 
-	ÍÆ¼öÊ¹ÓÃÃÔÄãÈ¡É«Æ÷Èí¼ş»ñµÃÄã¿´µ½µÄ½çÃæÑÕÉ«¡£
+	æ¨èä½¿ç”¨è¿·ä½ å–è‰²å™¨è½¯ä»¶è·å¾—ä½ çœ‹åˆ°çš„ç•Œé¢é¢œè‰²ã€‚
 */
-#define RGB(R,G,B)	(((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3))	/* ½«8Î»R,G,B×ª»¯Îª 16Î»RGB565¸ñÊ½ */
+#define RGB(R, G, B) (((R >> 3) << 11) | ((G >> 2) << 5) | (B >> 3)) /* å°†8ä½R,G,Bè½¬åŒ–ä¸º 16ä½RGB565æ ¼å¼ */
 
-/* ½âÂë³ö R=8bit G=8bit B=8bit */
-#define RGB565_R(x)  ((x >> 8) & 0xF8)
-#define RGB565_G(x)  ((x >> 3) & 0xFC)
-#define RGB565_B(x)  ((x << 3) & 0xF8)
+/* è§£ç å‡º R=8bit G=8bit B=8bit */
+#define RGB565_R(x) ((x >> 8) & 0xF8)
+#define RGB565_G(x) ((x >> 3) & 0xFC)
+#define RGB565_B(x) ((x << 3) & 0xF8)
 
-/* ½âÂë³ö R=5bit G=6bit B=5bit */
-#define RGB565_R2(x)  ((x >> 11) & 0x1F)
-#define RGB565_G2(x)  ((x >> 5) & 0x3F)
-#define RGB565_B2(x)  ((x >> 0) & 0x1F)
-
+/* è§£ç å‡º R=5bit G=6bit B=5bit */
+#define RGB565_R2(x) ((x >> 11) & 0x1F)
+#define RGB565_G2(x) ((x >> 5) & 0x3F)
+#define RGB565_B2(x) ((x >> 0) & 0x1F)
 
 enum
 {
-	CL_WHITE        = RGB(255,255,255),	/* °×É« */
-	CL_BLACK        = RGB(  0,  0,  0),	/* ºÚÉ« */
-	CL_RED          = RGB(255,	0,  0),	/* ºìÉ« */
-	CL_GREEN        = RGB(  0,255,  0),	/* ÂÌÉ« */
-	CL_BLUE         = RGB(  0,	0,255),	/* À¶É« */
-	CL_YELLOW       = RGB(255,255,  0),	/* »ÆÉ« */
+	CL_WHITE = RGB(255, 255, 255), /* ç™½è‰² */
+	CL_BLACK = RGB(0, 0, 0),			 /* é»‘è‰² */
+	CL_RED = RGB(255, 0, 0),			 /* çº¢è‰² */
+	CL_GREEN = RGB(0, 255, 0),		 /* ç»¿è‰² */
+	CL_BLUE = RGB(0, 0, 255),			 /* è“è‰² */
+	CL_YELLOW = RGB(255, 255, 0),	/* é»„è‰² */
 
-	CL_GREY			= RGB( 98, 98, 98), 	/* Éî»ÒÉ« */
-	CL_GREY1		= RGB( 150, 150, 150), 	/* Ç³»ÒÉ« */
-	CL_GREY2		= RGB( 180, 180, 180), 	/* Ç³»ÒÉ« */
-	CL_GREY3		= RGB( 200, 200, 200), 	/* ×îÇ³»ÒÉ« */
-	CL_GREY4		= RGB( 230, 230, 230), 	/* ×îÇ³»ÒÉ« */
+	CL_GREY = RGB(98, 98, 98),		 /* æ·±ç°è‰² */
+	CL_GREY1 = RGB(150, 150, 150), /* æµ…ç°è‰² */
+	CL_GREY2 = RGB(180, 180, 180), /* æµ…ç°è‰² */
+	CL_GREY3 = RGB(200, 200, 200), /* æœ€æµ…ç°è‰² */
+	CL_GREY4 = RGB(230, 230, 230), /* æœ€æµ…ç°è‰² */
 
-	CL_BUTTON_GREY	= RGB( 220, 220, 220), /* WINDOWS °´Å¥±íÃæ»ÒÉ« */
+	CL_BUTTON_GREY = RGB(220, 220, 220), /* WINDOWS æŒ‰é’®è¡¨é¢ç°è‰² */
 
-	CL_MAGENTA      = 0xF81F,	/* ºì×ÏÉ«£¬ÑóºìÉ« */
-	CL_CYAN         = 0x7FFF,	/* À¶ÂÌÉ«£¬ÇàÉ« */
+	CL_MAGENTA = 0xF81F, /* çº¢ç´«è‰²ï¼Œæ´‹çº¢è‰² */
+	CL_CYAN = 0x7FFF,		 /* è“ç»¿è‰²ï¼Œé’è‰² */
 
-	CL_BLUE1        = RGB(  0,  0, 240),		/* ÉîÀ¶É« */
-	CL_BLUE2        = RGB(  0,  0, 128),		/* ÉîÀ¶É« */
-	CL_BLUE3        = RGB(  68, 68, 255),		/* Ç³À¶É«1 */
-	CL_BLUE4        = RGB(  0, 64, 128),		/* Ç³À¶É«1 */
+	CL_BLUE1 = RGB(0, 0, 240),	 /* æ·±è“è‰² */
+	CL_BLUE2 = RGB(0, 0, 128),	 /* æ·±è“è‰² */
+	CL_BLUE3 = RGB(68, 68, 255), /* æµ…è“è‰²1 */
+	CL_BLUE4 = RGB(0, 64, 128),	/* æµ…è“è‰²1 */
 
-	/* UI ½çÃæ Windows¿Ø¼ş³£ÓÃÉ« */
-	CL_BTN_FACE		= RGB(236, 233, 216),	/* °´Å¥±íÃæÑÕÉ«(»Ò) */
-	
-	CL_BTN_FONT		= CL_BLACK,				/* °´Å¥×ÖÌåÑÕÉ«£¨ºÚ£© */
-	
-	CL_BOX_BORDER1	= RGB(172, 168,153),	/* ·Ö×é¿òÖ÷ÏßÑÕÉ« */
-	CL_BOX_BORDER2	= RGB(255, 255,255),	/* ·Ö×é¿òÒõÓ°ÏßÑÕÉ« */
+	/* UI ç•Œé¢ Windowsæ§ä»¶å¸¸ç”¨è‰² */
+	CL_BTN_FACE = RGB(236, 233, 216), /* æŒ‰é’®è¡¨é¢é¢œè‰²(ç°) */
 
+	CL_BTN_FONT = CL_BLACK, /* æŒ‰é’®å­—ä½“é¢œè‰²ï¼ˆé»‘ï¼‰ */
 
-	CL_MASK			= 0x9999	/* ÑÕÉ«ÑÚÂë£¬ÓÃÓÚÎÄ×Ö±³¾°Í¸Ã÷ */
+	CL_BOX_BORDER1 = RGB(172, 168, 153), /* åˆ†ç»„æ¡†ä¸»çº¿é¢œè‰² */
+	CL_BOX_BORDER2 = RGB(255, 255, 255), /* åˆ†ç»„æ¡†é˜´å½±çº¿é¢œè‰² */
+
+	CL_MASK = 0x9999 /* é¢œè‰²æ©ç ï¼Œç”¨äºæ–‡å­—èƒŒæ™¯é€æ˜ */
 };
 
-/* ÎÄ×Ö¶ÔÆë·½Ê½ */
+/* æ–‡å­—å¯¹é½æ–¹å¼ */
 enum
 {
 	ALIGN_LEFT = 0,
@@ -112,99 +110,99 @@ enum
 	ALIGN_RIGHT = 2
 };
 
-/* ±à¼­¿ò·ç¸ñ */
+/* ç¼–è¾‘æ¡†é£æ ¼ */
 enum
 {
-	EDIT_BORDER_COLOR		= CL_BLUE2,		/* ±à¼­¿òËÄ¸ö±ßµÄÑÕÉ«£¬Î´Ñ¡ÖĞÊ± */
-	EDIT_BORDER_COLOR2		= CL_BLUE3,		/* ±à¼­¿òËÄ¸ö±ßµÄÑÕÉ«,Ñ¡ÖĞÊ± */
-	EDIT_BACK_COLOR			= RGB(237, 125, 49),		/* ±à¼­¿ò±³¾°£¬Î´Ñ¡ÖĞÊ± */
-	EDIT_BACK_COLOR2		= RGB(255, 192, 0),		/* ±à¼­¿ò±³¾°ÑÕÉ«£¬Ñ¡ÖĞÊ± */
+	EDIT_BORDER_COLOR = CL_BLUE2,				 /* ç¼–è¾‘æ¡†å››ä¸ªè¾¹çš„é¢œè‰²ï¼Œæœªé€‰ä¸­æ—¶ */
+	EDIT_BORDER_COLOR2 = CL_BLUE3,			 /* ç¼–è¾‘æ¡†å››ä¸ªè¾¹çš„é¢œè‰²,é€‰ä¸­æ—¶ */
+	EDIT_BACK_COLOR = RGB(237, 125, 49), /* ç¼–è¾‘æ¡†èƒŒæ™¯ï¼Œæœªé€‰ä¸­æ—¶ */
+	EDIT_BACK_COLOR2 = RGB(255, 192, 0), /* ç¼–è¾‘æ¡†èƒŒæ™¯é¢œè‰²ï¼Œé€‰ä¸­æ—¶ */
 };
 
-/* °´Å¥·ç¸ñ */
+/* æŒ‰é’®é£æ ¼ */
 enum
 {
-	/* Î´°´ÏÂÊ± */
-	BTN_BORDER_COLOR1	= RGB(172, 168,153),	/* °´Å¥±ß¿òµÄÑÕÉ« */
-	BTN_BODY_COLOR1		= RGB(200, 210, 210),	/* °´Å¥µ×É« */
-	BTN_SHADOW_COLOR1	= RGB(220, 230, 230),	/* °´Å¥ÉÏ°ë²¿ÒõÓ°É« */
+	/* æœªæŒ‰ä¸‹æ—¶ */
+	BTN_BORDER_COLOR1 = RGB(172, 168, 153), /* æŒ‰é’®è¾¹æ¡†çš„é¢œè‰² */
+	BTN_BODY_COLOR1 = RGB(200, 210, 210),		/* æŒ‰é’®åº•è‰² */
+	BTN_SHADOW_COLOR1 = RGB(220, 230, 230), /* æŒ‰é’®ä¸ŠåŠéƒ¨é˜´å½±è‰² */
 
-	/* °´ÏÂÊ± */
-	BTN_BORDER_COLOR2	= RGB(172, 200,153),	/* °´ÏÂÊ±°´Å¥±ß¿òµÄÑÕÉ« */
-	BTN_BODY_COLOR2		= RGB(191, 238, 255),	/* °´ÏÂÊ±°´Å¥µ×É« */
-	BTN_SHADOW_COLOR2	= RGB(200, 255, 255),	/* °´ÏÂÊ±°´Å¥ÉÏ°ë²¿ÒõÓ°É« */	
+	/* æŒ‰ä¸‹æ—¶ */
+	BTN_BORDER_COLOR2 = RGB(172, 200, 153), /* æŒ‰ä¸‹æ—¶æŒ‰é’®è¾¹æ¡†çš„é¢œè‰² */
+	BTN_BODY_COLOR2 = RGB(191, 238, 255),		/* æŒ‰ä¸‹æ—¶æŒ‰é’®åº•è‰² */
+	BTN_SHADOW_COLOR2 = RGB(200, 255, 255), /* æŒ‰ä¸‹æ—¶æŒ‰é’®ä¸ŠåŠéƒ¨é˜´å½±è‰² */
 };
 
-/* ´°¿Ú·ç¸ñ */
+/* çª—å£é£æ ¼ */
 enum
 {
-	WIN_BORDER_COLOR	= CL_BLUE4,		/* ´°¿Ú±ß¿ò */
-	WIN_TITLE_COLOR		= CL_BLUE3,		/* ´°¿Ú±êÌâÀ¶±³¾°ÑÕÉ« */
-	WIN_CAPTION_COLOR	= CL_WHITE,		/* ´°¿Ú±êÌâÀ¸ÎÄ×ÖÑÕÉ« */
-	WIN_BODY_COLOR		= CL_GREY2,		/* ´°ÌåÑÕÉ« */
+	WIN_BORDER_COLOR = CL_BLUE4,	/* çª—å£è¾¹æ¡† */
+	WIN_TITLE_COLOR = CL_BLUE3,		/* çª—å£æ ‡é¢˜è“èƒŒæ™¯é¢œè‰² */
+	WIN_CAPTION_COLOR = CL_WHITE, /* çª—å£æ ‡é¢˜æ æ–‡å­—é¢œè‰² */
+	WIN_BODY_COLOR = CL_GREY2,		/* çª—ä½“é¢œè‰² */
 };
 
-/* ¼ì²é¿ò·ç¸ñ */
+/* æ£€æŸ¥æ¡†é£æ ¼ */
 enum
 {
-	CHECK_BOX_BORDER_COLOR	= CL_BLUE2,		/* ¼ì²é¿òËÄ¸ö±ßµÄÑÕÉ« */
-	CHECK_BOX_BACK_COLOR	= CL_GREY3,		/* ¼ì²é¿ò±³¾° */
-	CHECK_BOX_CHECKED_COLOR	= CL_RED,		/* ¼ì²é¿ò´ò¹´µÄÑÕÉ« */
+	CHECK_BOX_BORDER_COLOR = CL_BLUE2, /* æ£€æŸ¥æ¡†å››ä¸ªè¾¹çš„é¢œè‰² */
+	CHECK_BOX_BACK_COLOR = CL_GREY3,	 /* æ£€æŸ¥æ¡†èƒŒæ™¯ */
+	CHECK_BOX_CHECKED_COLOR = CL_RED,	/* æ£€æŸ¥æ¡†æ‰“å‹¾çš„é¢œè‰² */
 
-	CHECK_BOX_H			= 24,				/* ¼ì²é¿ò¸ß¶È */
-	CHECK_BOX_W			= 24,				/* ¼ì²é¿ò¸ß¶È */
+	CHECK_BOX_H = 24, /* æ£€æŸ¥æ¡†é«˜åº¦ */
+	CHECK_BOX_W = 24, /* æ£€æŸ¥æ¡†é«˜åº¦ */
 };
 
-/* ×ÖÌå´úÂë */
+/* å­—ä½“ä»£ç  */
 typedef enum
 {
-	FC_ST_12 = 0,		/* ËÎÌå12x12µãÕó £¨¿íx¸ß£© */
-	FC_ST_16,			/* ËÎÌå15x16µãÕó £¨¿íx¸ß£© */
-	FC_ST_24,			/* ËÎÌå24x24µãÕó £¨¿íx¸ß£© -- ÔİÊ±Î´Ö§³Ö */
-	FC_ST_32,			/* ËÎÌå32x32µãÕó £¨¿íx¸ß£© -- ÔİÊ±Î´Ö§³Ö */	
+	FC_ST_12 = 0, /* å®‹ä½“12x12ç‚¹é˜µ ï¼ˆå®½xé«˜ï¼‰ */
+	FC_ST_16,			/* å®‹ä½“15x16ç‚¹é˜µ ï¼ˆå®½xé«˜ï¼‰ */
+	FC_ST_24,			/* å®‹ä½“24x24ç‚¹é˜µ ï¼ˆå®½xé«˜ï¼‰ -- æš‚æ—¶æœªæ”¯æŒ */
+	FC_ST_32,			/* å®‹ä½“32x32ç‚¹é˜µ ï¼ˆå®½xé«˜ï¼‰ -- æš‚æ—¶æœªæ”¯æŒ */
 
-	FC_ST_62X40,		/* 64x40µãÕó(¸ß62£¬¿í40)£¬ASCII×Ö·û */
-	FC_ST_96X40,		/* 96x40µãÕó(¸ß96£¬¿í40)£¬ASCII×Ö·û */
-	
-	FC_RA8875_16,		/* RA8875 ÄÚÖÃ×ÖÌå 16µãÕó */
-	FC_RA8875_24,		/* RA8875 ÄÚÖÃ×ÖÌå 24µãÕó */
-	FC_RA8875_32		/* RA8875 ÄÚÖÃ×ÖÌå 32µãÕó */	
-}FONT_CODE_E;
+	FC_ST_62X40, /* 64x40ç‚¹é˜µ(é«˜62ï¼Œå®½40)ï¼ŒASCIIå­—ç¬¦ */
+	FC_ST_96X40, /* 96x40ç‚¹é˜µ(é«˜96ï¼Œå®½40)ï¼ŒASCIIå­—ç¬¦ */
 
-/* ×ÖÌåÊôĞÔ½á¹¹, ÓÃÓÚLCD_DispStr() */
+	FC_RA8875_16, /* RA8875 å†…ç½®å­—ä½“ 16ç‚¹é˜µ */
+	FC_RA8875_24, /* RA8875 å†…ç½®å­—ä½“ 24ç‚¹é˜µ */
+	FC_RA8875_32	/* RA8875 å†…ç½®å­—ä½“ 32ç‚¹é˜µ */
+} FONT_CODE_E;
+
+/* å­—ä½“å±æ€§ç»“æ„, ç”¨äºLCD_DispStr() */
 typedef struct
 {
-	FONT_CODE_E FontCode;	/* ×ÖÌå´úÂë FONT_CODE_E  */
-	uint16_t FrontColor;/* ×ÖÌåÑÕÉ« */
-	uint16_t BackColor;	/* ÎÄ×Ö±³¾°ÑÕÉ«£¬Í¸Ã÷ */
-	uint16_t Space;		/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-}FONT_T;
+	FONT_CODE_E FontCode; /* å­—ä½“ä»£ç  FONT_CODE_E  */
+	uint16_t FrontColor;	/* å­—ä½“é¢œè‰² */
+	uint16_t BackColor;		/* æ–‡å­—èƒŒæ™¯é¢œè‰²ï¼Œé€æ˜ */
+	uint16_t Space;				/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+} FONT_T;
 
-/* ¿Ø¼şID */
+/* æ§ä»¶ID */
 typedef enum
 {
-	ID_ICON		= 1,
-	ID_WIN		= 2,
-	ID_LABEL	= 3,
-	ID_BUTTON	= 4,
-	ID_CHECK 	= 5,
-	ID_EDIT 	= 6,
-	ID_GROUP 	= 7,
-}CONTROL_ID_T;
+	ID_ICON = 1,
+	ID_WIN = 2,
+	ID_LABEL = 3,
+	ID_BUTTON = 4,
+	ID_CHECK = 5,
+	ID_EDIT = 6,
+	ID_GROUP = 7,
+} CONTROL_ID_T;
 
-/* Í¼±ê½á¹¹ */
+/* å›¾æ ‡ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
-	uint16_t Left;		/* ×óÉÏ½ÇX×ø±ê */
-	uint16_t Top;		/* ×óÉÏ½ÇY×ø±ê */
-	uint16_t Height;	/* Í¼±ê¸ß¶È */
-	uint16_t Width;		/* Í¼±ê¿í¶È */
-	uint16_t *pBmp;		/* Ö¸ÏòÍ¼±êÍ¼Æ¬Êı¾İ */
-	char  Text[16];	/* Í¼±êÎÄ±¾, ×î¶àÏÔÊ¾5¸öºº×Ö16µãÕó */
-}ICON_T;
+	uint16_t Left;	 /* å·¦ä¸Šè§’Xåæ ‡ */
+	uint16_t Top;		 /* å·¦ä¸Šè§’Yåæ ‡ */
+	uint16_t Height; /* å›¾æ ‡é«˜åº¦ */
+	uint16_t Width;	/* å›¾æ ‡å®½åº¦ */
+	uint16_t *pBmp;	/* æŒ‡å‘å›¾æ ‡å›¾ç‰‡æ•°æ® */
+	char Text[16];	 /* å›¾æ ‡æ–‡æœ¬, æœ€å¤šæ˜¾ç¤º5ä¸ªæ±‰å­—16ç‚¹é˜µ */
+} ICON_T;
 
-/* ´°Ìå½á¹¹ */
+/* çª—ä½“ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
@@ -215,22 +213,22 @@ typedef struct
 	uint16_t Color;
 	FONT_T *Font;
 	char *pCaption;
-}WIN_T;
+} WIN_T;
 
-/* ÎÄ±¾±êÇ©½á¹¹ */
+/* æ–‡æœ¬æ ‡ç­¾ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
-	uint16_t Left;			/* ×óÉÏ½ÇX×ø±ê */
-	uint16_t Top;			/* ×óÉÏ½ÇY×ø±ê */
-	uint16_t Height;		/* ¸ß¶È */
-	uint16_t Width;			/* ¿í¶È */
-	uint16_t MaxLen;		/* ×Ö·û´®³¤¶È */
-	FONT_T *Font;			/* ×ÖÌå */
-	char  *pCaption;
-}LABEL_T;
+	uint16_t Left;	 /* å·¦ä¸Šè§’Xåæ ‡ */
+	uint16_t Top;		 /* å·¦ä¸Šè§’Yåæ ‡ */
+	uint16_t Height; /* é«˜åº¦ */
+	uint16_t Width;	/* å®½åº¦ */
+	uint16_t MaxLen; /* å­—ç¬¦ä¸²é•¿åº¦ */
+	FONT_T *Font;		 /* å­—ä½“ */
+	char *pCaption;
+} LABEL_T;
 
-/* °´Å¥½á¹¹ */
+/* æŒ‰é’®ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
@@ -238,24 +236,23 @@ typedef struct
 	uint16_t Top;
 	uint16_t Height;
 	uint16_t Width;
-	/* °´Å¥µÄÑÕÉ«£¬ÓÉµ×²ã×Ô¶¯¹ÜÀí */
-	FONT_T *Font;			/* ×ÖÌå */
+	/* æŒ‰é’®çš„é¢œè‰²ï¼Œç”±åº•å±‚è‡ªåŠ¨ç®¡ç† */
+	FONT_T *Font; /* å­—ä½“ */
 	char *pCaption;
-	uint8_t Focus;			/* ½¹µã */
-}BUTTON_T;
+	uint8_t Focus; /* ç„¦ç‚¹ */
+} BUTTON_T;
 
-
-/* °´Å¥µÄ×ø±êºÍÎÄ±¾²ÎÊı½á¹¹ */
+/* æŒ‰é’®çš„åæ ‡å’Œæ–‡æœ¬å‚æ•°ç»“æ„ */
 typedef struct
 {
 	uint16_t x;
 	uint16_t y;
 	uint16_t h;
 	uint16_t w;
-	char *text;		/* °´Å¥µÄÎÄ×Ö */
-}BTN_PARAM_T;
+	char *text; /* æŒ‰é’®çš„æ–‡å­— */
+} BTN_PARAM_T;
 
-/* Í¼Æ¬°´Å¥½á¹¹ */
+/* å›¾ç‰‡æŒ‰é’®ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
@@ -264,21 +261,21 @@ typedef struct
 	uint16_t Height;
 	uint16_t Width;
 	uint32_t Pic1;
-	uint32_t Pic2;	
-	uint8_t Focus;			/* ½¹µã */
-}BMP_BUTTON_T;
+	uint32_t Pic2;
+	uint8_t Focus; /* ç„¦ç‚¹ */
+} BMP_BUTTON_T;
 
-/* Ñ¡ÖĞ½á¹¹ */
+/* é€‰ä¸­ç»“æ„ */
 typedef struct
 {
 	uint16_t Left;
 	uint16_t Top;
 	uint16_t Height;
 	uint16_t Width;
-	
-}SELECT_T;
 
-/* ±à¼­¿ò½á¹¹ */
+} SELECT_T;
+
+/* ç¼–è¾‘æ¡†ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
@@ -287,57 +284,57 @@ typedef struct
 	uint16_t Height;
 	uint16_t Width;
 	uint16_t Color;
-	FONT_T *Font;			/* ×ÖÌå */
-	char   *pCaption;
+	FONT_T *Font; /* å­—ä½“ */
+	char *pCaption;
 	uint8_t Focus;
-	char Text[32+1];		/* ±£´æ±à¼­¿òÄÚµÄÖµ */
-}EDIT_T;
+	char Text[32 + 1]; /* ä¿å­˜ç¼–è¾‘æ¡†å†…çš„å€¼ */
+} EDIT_T;
 
-/* ¼ì²é¿ò CHECK BOX ½á¹¹ */
+/* æ£€æŸ¥æ¡† CHECK BOX ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
-	uint16_t Left;			/* ×óÉÏ½ÇX×ø±ê */
-	uint16_t Top;			/* ×óÉÏ½ÇY×ø±ê */
-	uint16_t Height;		/* ¸ß¶È */
-	uint16_t Width;			/* ¿í¶È */
-	uint16_t Color;			/* ÑÕÉ« */
-	FONT_T *Font;			/* ×ÖÌå */
-	char  *pCaption;
-	uint8_t Checked;		/* 1±íÊ¾´ò¹´ */
-}CHECK_T;
+	uint16_t Left;	 /* å·¦ä¸Šè§’Xåæ ‡ */
+	uint16_t Top;		 /* å·¦ä¸Šè§’Yåæ ‡ */
+	uint16_t Height; /* é«˜åº¦ */
+	uint16_t Width;	/* å®½åº¦ */
+	uint16_t Color;	/* é¢œè‰² */
+	FONT_T *Font;		 /* å­—ä½“ */
+	char *pCaption;
+	uint8_t Checked; /* 1è¡¨ç¤ºæ‰“å‹¾ */
+} CHECK_T;
 
-/* ·Ö×é¿òGROUP BOX ½á¹¹ */
+/* åˆ†ç»„æ¡†GROUP BOX ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
-	uint16_t Left;			/* ×óÉÏ½ÇX×ø±ê */
-	uint16_t Top;			/* ×óÉÏ½ÇY×ø±ê */
-	uint16_t Height;		/* ¸ß¶È */
-	uint16_t Width;			/* ¿í¶È */
-	FONT_T *Font;			/* ×ÖÌå */
-	char  *pCaption;
-}GROUP_T;
+	uint16_t Left;	 /* å·¦ä¸Šè§’Xåæ ‡ */
+	uint16_t Top;		 /* å·¦ä¸Šè§’Yåæ ‡ */
+	uint16_t Height; /* é«˜åº¦ */
+	uint16_t Width;	/* å®½åº¦ */
+	FONT_T *Font;		 /* å­—ä½“ */
+	char *pCaption;
+} GROUP_T;
 
-/* PannelÃæ°å½á¹¹ */
+/* Pannelé¢æ¿ç»“æ„ */
 typedef struct
 {
 	uint8_t id;
-	uint16_t Left;			/* ×óÉÏ½ÇX×ø±ê */
-	uint16_t Top;			/* ×óÉÏ½ÇY×ø±ê */
-	uint16_t Height;		/* ¸ß¶È */
-	uint16_t Width;			/* ¿í¶È */
-	uint16_t Arc;			/* Ô²½Ç»¡°ë¾¶ */
-	uint16_t Color;			/* Ìî³äÑÕÉ« */	
-}PANNEL_T;
+	uint16_t Left;	 /* å·¦ä¸Šè§’Xåæ ‡ */
+	uint16_t Top;		 /* å·¦ä¸Šè§’Yåæ ‡ */
+	uint16_t Height; /* é«˜åº¦ */
+	uint16_t Width;	/* å®½åº¦ */
+	uint16_t Arc;		 /* åœ†è§’å¼§åŠå¾„ */
+	uint16_t Color;	/* å¡«å……é¢œè‰² */
+} PANNEL_T;
 
-/* ±³¾°¹â¿ØÖÆ */
-#define BRIGHT_MAX		255
-#define BRIGHT_MIN		0
-#define BRIGHT_DEFAULT	255
-#define BRIGHT_STEP		5
+/* èƒŒæ™¯å…‰æ§åˆ¶ */
+#define BRIGHT_MAX 255
+#define BRIGHT_MIN 0
+#define BRIGHT_DEFAULT 255
+#define BRIGHT_STEP 5
 
-/* ¿É¹©Íâ²¿Ä£¿éµ÷ÓÃµÄº¯Êı */
+/* å¯ä¾›å¤–éƒ¨æ¨¡å—è°ƒç”¨çš„å‡½æ•° */
 void LCD_InitHard(void);
 void LCD_GetChipDescribe(char *_str);
 uint16_t LCD_GetHeight(void);
@@ -348,7 +345,7 @@ void LCD_ClrScr(uint16_t _usColor);
 void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont);
 void LCD_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor);
 uint16_t LCD_GetPixel(uint16_t _usX, uint16_t _usY);
-void LCD_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t _usY2 , uint16_t _usColor);
+void LCD_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor);
 void LCD_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor);
 void LCD_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor);
 void LCD_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor);
@@ -375,7 +372,7 @@ uint16_t LCD_GetFontWidth(FONT_T *_tFont);
 uint16_t LCD_GetFontHeight(FONT_T *_tFont);
 uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont);
 void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-	uint8_t _Align);
+									 uint8_t _Align);
 
 void LCD_SetDirection(uint8_t _dir);
 
@@ -383,16 +380,14 @@ uint8_t LCD_ButtonTouchDown(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY);
 uint8_t LCD_ButtonTouchRelease(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY);
 void LCD_InitButton(BUTTON_T *_btn, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w, char *_pCaption, FONT_T *_pFont);
 
-void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-	uint16_t _usRadius, uint16_t _usColor);
-void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-	uint16_t _usRadius, uint16_t _usColor);
+void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
+											 uint16_t _usRadius, uint16_t _usColor);
+void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
+											 uint16_t _usRadius, uint16_t _usColor);
 
-/* ÏÂÃæ3¸ö±äÁ¿£¬Ö÷ÒªÓÃÓÚÊ¹³ÌĞòÍ¬Ê±Ö§³Ö²»Í¬µÄÆÁ */
-extern uint16_t g_LcdHeight;		/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¸ß¶È */
-extern uint16_t g_LcdWidth;			/* ÏÔÊ¾ÆÁ·Ö±æÂÊ-¿í¶È */
-extern uint8_t g_LcdDirection;		/* ÏÔÊ¾·½Ïò.0£¬1£¬2£¬3 */
+/* ä¸‹é¢3ä¸ªå˜é‡ï¼Œä¸»è¦ç”¨äºä½¿ç¨‹åºåŒæ—¶æ”¯æŒä¸åŒçš„å± */
+extern uint16_t g_LcdHeight;	 /* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-é«˜åº¦ */
+extern uint16_t g_LcdWidth;		 /* æ˜¾ç¤ºå±åˆ†è¾¨ç‡-å®½åº¦ */
+extern uint8_t g_LcdDirection; /* æ˜¾ç¤ºæ–¹å‘.0ï¼Œ1ï¼Œ2ï¼Œ3 */
 
 #endif
-
-

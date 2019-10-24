@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : DAC8562/8563 Çı¶¯Ä£¿é(µ¥Í¨µÀ´ø16Î»DAC)
-*	ÎÄ¼şÃû³Æ : bsp_dac8562.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : DAC8562/8563Ä£¿éºÍCPUÖ®¼ä²ÉÓÃSPI½Ó¿Ú¡£±¾Çı¶¯³ÌĞòÖ§³ÖÓ²¼şSPI½Ó¿Ú¡£
+*	æ¨¡å—åç§° : DAC8562/8563 é©±åŠ¨æ¨¡å—(å•é€šé“å¸¦16ä½DAC)
+*	æ–‡ä»¶åç§° : bsp_dac8562.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : DAC8562/8563æ¨¡å—å’ŒCPUä¹‹é—´é‡‡ç”¨SPIæ¥å£ã€‚æœ¬é©±åŠ¨ç¨‹åºæ”¯æŒç¡¬ä»¶SPIæ¥å£ã€‚
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ         ×÷Õß     ËµÃ÷
-*		V1.0    2014-01-17  armfly  ÕıÊ½·¢²¼
-*		V1.1    2015-10-09  armfly  ĞŞÕı½ÓÏß´íÎó£¬LDACÒı½ÅĞèÒª½ÓµØ£¬CLRÒ²ĞèÒª½ÓµØ
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ         ä½œè€…     è¯´æ˜
+*		V1.0    2014-01-17  armfly  æ­£å¼å‘å¸ƒ
+*		V1.1    2015-10-09  armfly  ä¿®æ­£æ¥çº¿é”™è¯¯ï¼ŒLDACå¼•è„šéœ€è¦æ¥åœ°ï¼ŒCLRä¹Ÿéœ€è¦æ¥åœ°
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,136 +19,136 @@
 #include "bsp.h"
 
 /*
-	DAC8562Ä£¿é¿ÉÒÔÖ±½Ó²åµ½STM32-V7¿ª·¢°åCN19ÅÅÄ¸(2*4P 2.54mm)½Ó¿ÚÉÏ
+	DAC8562æ¨¡å—å¯ä»¥ç›´æ¥æ’åˆ°STM32-V7å¼€å‘æ¿CN19æ’æ¯(2*4P 2.54mm)æ¥å£ä¸Š
 
-    DAC8562/8563Ä£¿é    STM32-V6¿ª·¢°å
+    DAC8562/8563æ¨¡å—    STM32-V6å¼€å‘æ¿
 	  GND   ------  GND
 	  VCC   ------  3.3V
 
-	  LDAC  ------  À©Õ¹IO/NRF24L01_CE/DAC1_OUT    --- ±ØĞë½ÓµØ»ò·¢Ö¸ÁîÇ°Éè0V
+	  LDAC  ------  æ‰©å±•IO/NRF24L01_CE/DAC1_OUT    --- å¿…é¡»æ¥åœ°æˆ–å‘æŒ‡ä»¤å‰è®¾0V
       SYNC  ------  PG10/NRF24L01_CSN
 
       SCLK  ------  PB3/SPI3_SCK
       DIN   ------  PB5/SPI3_MOSI
 
-			------  PB4/SPI3_MISO         ---- DACÎŞ¶Á³öĞèÇó
-	  CLR   ------  PE4/NRF24L01_IRQ	  ---  ÍÆ¼ö½ÓGND¡£
+			------  PB4/SPI3_MISO         ---- DACæ— è¯»å‡ºéœ€æ±‚
+	  CLR   ------  PE4/NRF24L01_IRQ	  ---  æ¨èæ¥GNDã€‚
 */
 
 /*
-	DAC8562»ù±¾ÌØĞÔ:
-	1¡¢¹©µç2.7 - 5V;  ¡¾±¾ÀıÊ¹ÓÃ3.3V¡¿
-	4¡¢²Î¿¼µçÑ¹2.5V£¬Ê¹ÓÃÄÚ²¿²Î¿¼
+	DAC8562åŸºæœ¬ç‰¹æ€§:
+	1ã€ä¾›ç”µ2.7 - 5V;  ã€æœ¬ä¾‹ä½¿ç”¨3.3Vã€‘
+	4ã€å‚è€ƒç”µå‹2.5Vï¼Œä½¿ç”¨å†…éƒ¨å‚è€ƒ
 
-	¶ÔSPIµÄÊ±ÖÓËÙ¶ÈÒªÇó: ¸ß´ï50MHz£¬ ËÙ¶ÈºÜ¿ì.
-	SCLKÏÂ½µÑØ¶ÁÈ¡Êı¾İ, Ã¿´Î´«ËÍ24bitÊı¾İ£¬ ¸ßÎ»ÏÈ´«
+	å¯¹SPIçš„æ—¶é’Ÿé€Ÿåº¦è¦æ±‚: é«˜è¾¾50MHzï¼Œ é€Ÿåº¦å¾ˆå¿«.
+	SCLKä¸‹é™æ²¿è¯»å–æ•°æ®, æ¯æ¬¡ä¼ é€24bitæ•°æ®ï¼Œ é«˜ä½å…ˆä¼ 
 */
 
-/* SYNC, Ò²¾ÍÊÇCSÆ¬Ñ¡ */	
-#define CS_CLK_ENABLE() 	__HAL_RCC_GPIOG_CLK_ENABLE()
-#define CS_GPIO				GPIOG
-#define CS_PIN				GPIO_PIN_10
-#define CS_1()				CS_GPIO->BSRRL = CS_PIN
-#define CS_0()				CS_GPIO->BSRRH = CS_PIN
+/* SYNC, ä¹Ÿå°±æ˜¯CSç‰‡é€‰ */
+#define CS_CLK_ENABLE() __HAL_RCC_GPIOG_CLK_ENABLE()
+#define CS_GPIO GPIOG
+#define CS_PIN GPIO_PIN_10
+#define CS_1() CS_GPIO->BSRRL = CS_PIN
+#define CS_0() CS_GPIO->BSRRH = CS_PIN
 
-/* CLR */	
-#define CLR_CLK_ENABLE() 	__HAL_RCC_GPIOE_CLK_ENABLE()
-#define CLR_GPIO			GPIOE
-#define CLR_PIN				GPIO_PIN_4
-#define CLR_1()				CLR_GPIO->BSRRL = CLR_PIN
-#define CLR_0()				CLR_GPIO->BSRRH = CLR_PIN
+/* CLR */
+#define CLR_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
+#define CLR_GPIO GPIOE
+#define CLR_PIN GPIO_PIN_4
+#define CLR_1() CLR_GPIO->BSRRL = CLR_PIN
+#define CLR_0() CLR_GPIO->BSRRH = CLR_PIN
 
-/* LDAC Ê¹ÓÃÀ©Õ¹IO */	
-#define LDAC_1()			HC574_SetPin(NRF24L01_CE, 1);
-#define LDAC_0()			HC574_SetPin(NRF24L01_CE, 0);
+/* LDAC ä½¿ç”¨æ‰©å±•IO */
+#define LDAC_1() HC574_SetPin(NRF24L01_CE, 1);
+#define LDAC_0() HC574_SetPin(NRF24L01_CE, 0);
 
 static void DAC8562_WriteCmd(uint32_t _cmd);
 
-/* ¶¨ÒåµçÑ¹ºÍDACÖµ¼äµÄ¹ØÏµ¡£ Á½µãĞ£×¼ xÊÇdac y ÊÇµçÑ¹ 0.1mV */
-#define X1	0
-#define Y1  -100000
+/* å®šä¹‰ç”µå‹å’ŒDACå€¼é—´çš„å…³ç³»ã€‚ ä¸¤ç‚¹æ ¡å‡† xæ˜¯dac y æ˜¯ç”µå‹ 0.1mV */
+#define X1 0
+#define Y1 -100000
 
-#define X2	65535
-#define Y2  100000
+#define X2 65535
+#define Y2 100000
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: bsp_InitDAC8562
-*	¹¦ÄÜËµÃ÷: ÅäÖÃGPIO²¢³õÊ¼»¯DAC8562¼Ä´æÆ÷
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: bsp_InitDAC8562
+*	åŠŸèƒ½è¯´æ˜: é…ç½®GPIOå¹¶åˆå§‹åŒ–DAC8562å¯„å­˜å™¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void bsp_InitDAC8562(void)
 {
-	/* ÅäÖÃGPIO */
+	/* é…ç½®GPIO */
 	{
 		GPIO_InitTypeDef gpio_init;
 
-		/* ´ò¿ªGPIOÊ±ÖÓ */
+		/* æ‰“å¼€GPIOæ—¶é’Ÿ */
 		CS_CLK_ENABLE();
 		CLR_CLK_ENABLE();
-		
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* ÉèÖÃÍÆÍìÊä³ö */
-		gpio_init.Pull = GPIO_NOPULL;				/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;  	/* GPIOËÙ¶ÈµÈ¼¶ */	
-		
-		gpio_init.Pin = CS_PIN;	
-		HAL_GPIO_Init(CS_GPIO, &gpio_init);	
 
-		gpio_init.Pin = CLR_PIN;	
-		HAL_GPIO_Init(CLR_GPIO, &gpio_init);			
+		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* è®¾ç½®æ¨æŒ½è¾“å‡º */
+		gpio_init.Pull = GPIO_NOPULL;						/* ä¸Šä¸‹æ‹‰ç”µé˜»ä¸ä½¿èƒ½ */
+		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIOé€Ÿåº¦ç­‰çº§ */
+
+		gpio_init.Pin = CS_PIN;
+		HAL_GPIO_Init(CS_GPIO, &gpio_init);
+
+		gpio_init.Pin = CLR_PIN;
+		HAL_GPIO_Init(CLR_GPIO, &gpio_init);
 	}
-	
-	CLR_0();		/* CLR½ÓGND¿É¿¿Ò»Ğ©£¬CLRÊÇÏÂ½µÑØ´¥·¢ */
-	LDAC_0();		/* ²»ÓÃÒì²½¸üĞÂÄ£Ê½£¬´ËÒı½Å½ÓGND */
 
-	/* ³õÊ¼»¯DAC8562¼Ä´æÆ÷ */
+	CLR_0();	/* CLRæ¥GNDå¯é ä¸€äº›ï¼ŒCLRæ˜¯ä¸‹é™æ²¿è§¦å‘ */
+	LDAC_0(); /* ä¸ç”¨å¼‚æ­¥æ›´æ–°æ¨¡å¼ï¼Œæ­¤å¼•è„šæ¥GND */
+
+	/* åˆå§‹åŒ–DAC8562å¯„å­˜å™¨ */
 	{
 		/* Power up DAC-A and DAC-B */
 		DAC8562_WriteCmd((4 << 19) | (0 << 16) | (3 << 0));
 
-		/* LDAC pin inactive for DAC-B and DAC-A  ²»Ê¹ÓÃLDACÒı½Å¸üĞÂÊı¾İ */
+		/* LDAC pin inactive for DAC-B and DAC-A  ä¸ä½¿ç”¨LDACå¼•è„šæ›´æ–°æ•°æ® */
 		DAC8562_WriteCmd((6 << 19) | (0 << 16) | (3 << 0));
 
-		/* ¸´Î»2¸öDACµ½ÖĞ¼äÖµ, Êä³ö0V */
+		/* å¤ä½2ä¸ªDACåˆ°ä¸­é—´å€¼, è¾“å‡º0V */
 		DAC8562_SetDacData(0, 32767);
 		DAC8562_SetDacData(1, 32767);
 
-		/* Ñ¡ÔñÄÚ²¿²Î¿¼²¢¸´Î»2¸öDACµÄÔöÒæ=2 £¨¸´Î»Ê±£¬ÄÚ²¿²Î¿¼ÊÇ½ûÖ¹µÄ) */
+		/* é€‰æ‹©å†…éƒ¨å‚è€ƒå¹¶å¤ä½2ä¸ªDACçš„å¢ç›Š=2 ï¼ˆå¤ä½æ—¶ï¼Œå†…éƒ¨å‚è€ƒæ˜¯ç¦æ­¢çš„) */
 		DAC8562_WriteCmd((7 << 19) | (0 << 16) | (1 << 0));
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DAC8562_SetCS
-*	¹¦ÄÜËµÃ÷: DAC8562 Æ¬Ñ¡¿ØÖÆº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DAC8562_SetCS
+*	åŠŸèƒ½è¯´æ˜: DAC8562 ç‰‡é€‰æ§åˆ¶å‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DAC8562_SetCS(uint8_t _Level)
 {
 	if (_Level == 0)
 	{
-		bsp_SpiBusEnter();	/* Õ¼ÓÃSPI×ÜÏß  */	
-		bsp_InitSPIParam(SPI_BAUDRATEPRESCALER_8, SPI_PHASE_1EDGE, SPI_POLARITY_LOW);		
+		bsp_SpiBusEnter(); /* å ç”¨SPIæ€»çº¿  */
+		bsp_InitSPIParam(SPI_BAUDRATEPRESCALER_8, SPI_PHASE_1EDGE, SPI_POLARITY_LOW);
 		CS_0();
 	}
 	else
-	{		
-		CS_1();	
-		bsp_SpiBusExit();	/* ÊÍ·ÅSPI×ÜÏß */
-	}	
+	{
+		CS_1();
+		bsp_SpiBusExit(); /* é‡Šæ”¾SPIæ€»çº¿ */
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DAC8562_WriteCmd
-*	¹¦ÄÜËµÃ÷: ÏòSPI×ÜÏß·¢ËÍ24¸öbitÊı¾İ¡£
-*	ĞÎ    ²Î: _cmd : Êı¾İ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DAC8562_WriteCmd
+*	åŠŸèƒ½è¯´æ˜: å‘SPIæ€»çº¿å‘é€24ä¸ªbitæ•°æ®ã€‚
+*	å½¢    å‚: _cmd : æ•°æ®
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DAC8562_WriteCmd(uint32_t _cmd)
@@ -159,18 +159,18 @@ static void DAC8562_WriteCmd(uint32_t _cmd)
 	g_spiTxBuf[g_spiLen++] = (_cmd >> 16);
 	g_spiTxBuf[g_spiLen++] = (_cmd >> 8);
 	g_spiTxBuf[g_spiLen++] = (_cmd);
-	bsp_spiTransfer();		
+	bsp_spiTransfer();
 
 	DAC8562_SetCS(1);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DAC8562_SetDacData
-*	¹¦ÄÜËµÃ÷: ÉèÖÃDACÊä³ö£¬²¢Á¢¼´¸üĞÂ¡£
-*	ĞÎ    ²Î: _ch, Í¨µÀ, 0 , 1
-*		     _data : Êı¾İ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DAC8562_SetDacData
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®DACè¾“å‡ºï¼Œå¹¶ç«‹å³æ›´æ–°ã€‚
+*	å½¢    å‚: _ch, é€šé“, 0 , 1
+*		     _data : æ•°æ®
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DAC8562_SetDacData(uint8_t _ch, uint16_t _dac)
@@ -189,10 +189,10 @@ void DAC8562_SetDacData(uint8_t _ch, uint16_t _dac)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DAC8562_DacToVoltage
-*	¹¦ÄÜËµÃ÷: ½«DACÖµ»»ËãÎªµçÑ¹Öµ£¬µ¥Î»0.1mV
-*	ĞÎ    ²Î: _dac  16Î»DAC×Ö
-*	·µ »Ø Öµ: µçÑ¹¡£µ¥Î»0.1mV
+*	å‡½ æ•° å: DAC8562_DacToVoltage
+*	åŠŸèƒ½è¯´æ˜: å°†DACå€¼æ¢ç®—ä¸ºç”µå‹å€¼ï¼Œå•ä½0.1mV
+*	å½¢    å‚: _dac  16ä½DACå­—
+*	è¿” å› å€¼: ç”µå‹ã€‚å•ä½0.1mV
 *********************************************************************************************************
 */
 int32_t DAC8562_DacToVoltage(uint16_t _dac)
@@ -200,16 +200,16 @@ int32_t DAC8562_DacToVoltage(uint16_t _dac)
 	int32_t y;
 
 	/* CaculTwoPoint(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x);*/
-	y =  CaculTwoPoint(X1, Y1, X2, Y2, _dac);
+	y = CaculTwoPoint(X1, Y1, X2, Y2, _dac);
 	return y;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DAC8562_VoltageToDac
-*	¹¦ÄÜËµÃ÷: ½«DACÖµ»»ËãÎªµçÑ¹Öµ£¬µ¥Î» 0.1mV
-*	ĞÎ    ²Î: _volt µçÑ¹¡£µ¥Î»0.1mV
-*	·µ »Ø Öµ: 16Î»DAC×Ö
+*	å‡½ æ•° å: DAC8562_VoltageToDac
+*	åŠŸèƒ½è¯´æ˜: å°†DACå€¼æ¢ç®—ä¸ºç”µå‹å€¼ï¼Œå•ä½ 0.1mV
+*	å½¢    å‚: _volt ç”µå‹ã€‚å•ä½0.1mV
+*	è¿” å› å€¼: 16ä½DACå­—
 *********************************************************************************************************
 */
 uint32_t DAC8562_VoltageToDac(int32_t _volt)
@@ -218,4 +218,4 @@ uint32_t DAC8562_VoltageToDac(int32_t _volt)
 	return CaculTwoPoint(Y1, X1, Y2, X2, _volt);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

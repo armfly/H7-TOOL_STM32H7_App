@@ -1,8 +1,8 @@
 /*
 *********************************************************************************************************
 *	                                  
-*	Ä£¿éÃû³Æ : wifi´®¿ÚÊÕ·¢½Ó¿Úº¯Êı
-*	ÎÄ¼şÃû³Æ : wifi_if.h
+*	æ¨¡å—åç§° : wifiä¸²å£æ”¶å‘æ¥å£å‡½æ•°
+*	æ–‡ä»¶åç§° : wifi_if.h
 *
 *********************************************************************************************************
 */
@@ -10,43 +10,31 @@
 #ifndef __WIFI_IF_H
 #define __WIFI_IF_H
 
-/* TCP UDPÊı¾İÁ¬½ÓID·ÖÅä */
-#define LINK_ID_UDP_SERVER		0		/* UDP¼àÌı */
-//#define LINK_ID_TCP_SERVER		4		/* TCP·şÎñÆ÷£¬½ÓÊÕ¿ØÖÆ */
-#define LINK_ID_TCP_CLIENT		4		/* TCP¿Í»§¶Ë£¬Á¬½Óµ½Ô¶³Ì·şÎñÆ÷£¬×Ô¶¯»ã±¨1 */
+/* TCP UDPæ•°æ®è¿æ¥IDåˆ†é… */
+#define LINK_ID_UDP_SERVER 0 /* UDPç›‘å¬ */
+//#define LINK_ID_TCP_SERVER		4		/* TCPæœåŠ¡å™¨ï¼Œæ¥æ”¶æ§åˆ¶ */
+#define LINK_ID_TCP_CLIENT 4 /* TCPå®¢æˆ·ç«¯ï¼Œè¿æ¥åˆ°è¿œç¨‹æœåŠ¡å™¨ï¼Œè‡ªåŠ¨æ±‡æŠ¥1 */
 
-typedef enum 
-{	
-	WIFI_STOP		=  0,
-	WIFI_INIT		=  5,
-	WIFI_LINK_AP    =  10,
-	
-	WIFI_LINK_SERVER  = 20,
-
-	WIFI_WATCH_DOG	= 30,
-	
-	WIFI_SOFT_AP	=  40,
-	
-	WIFI_READY = 50,	
-	
-	WIFI_REG_PACKAGE =  60,
-	
-	
-}WIFI_STATE_T;
+typedef enum
+{
+	WIFI_STOP = 0,
+	WIFI_INIT = 5,
+	WIFI_LINK_AP = 10,
+	WIFI_LINK_SERVER = 20,
+	WIFI_WATCH_DOG = 30,
+	WIFI_SOFT_AP = 40,
+	WIFI_READY = 50,
+	WIFI_REG_PACKAGE = 60,
+} WIFI_STATE_T;
 
 void wifi_Start_SoftAP_Station(void);
 uint8_t wifi_LinkHomeAP(void);
 void wifi_SendBuf(uint8_t *str, uint16_t len);
-
 void wifi_LinkToServer(void);
 void wifi_DebugATCommand(uint8_t *_rxbuf, uint16_t _rxlen);
 uint8_t wifi_LinkSoftAP(void);
 void wifi_SendUdp(uint8_t *str, uint16_t len);
-
 uint8_t wifi_task(void);
-
 extern uint8_t wifi_state;
 
 #endif
-
-

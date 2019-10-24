@@ -1,12 +1,12 @@
 
 beep()
-print("H7_Ğ£×¼AD7606_DAC8563.lua")
-write_tvcc_dac(47)	--3.3V½Ó¿ÚµçÆ½
+print("H7_æ ¡å‡†AD7606_DAC8563.lua")
+write_tvcc_dac(47)	--3.3Væ¥å£ç”µå¹³
 delayms(500)
 extio_start()
-print("À©Õ¹IO°åÒÑÆô¶¯")
+print("æ‰©å±•IOæ¿å·²å¯åŠ¨")
 
---¸ù¾İ2µã·½³ÌÇóÖµ
+--æ ¹æ®2ç‚¹æ–¹ç¨‹æ±‚å€¼
 function cacul(x1,y1,x2,y2,x)
 	local ff
 
@@ -18,7 +18,7 @@ function cacul(x1,y1,x2,y2,x)
 	return ff
 end
 	
---·µ»Ø0-7Í¨µÀµÄµçÑ¹ V
+--è¿”å›0-7é€šé“çš„ç”µå‹ V
 function ad7606_volt(ch)
 	local X1 = {75,		75,		74,		72,		73,		74,		73,		71}
 	local Y1 = {0,		0,		0,		0,		0,		0,		0,		0}
@@ -32,7 +32,7 @@ function ad7606_volt(ch)
 	return volt
 end
 
---·µ»Ø0-7Í¨µÀµÄµçÁ÷ mA
+--è¿”å›0-7é€šé“çš„ç”µæµ mA
 function ad7606_curr(ch)
 	local X1 = {75,		75,		74,		72,		73,		74,		73,		71}
 	local Y1 = {0,		0,		0,		0,		0,		0,		0,		0}
@@ -46,7 +46,7 @@ function ad7606_curr(ch)
 	return curr
 end
 
---ÉèÖÃDAC8563Êä³öµçÑ¹£¬µ¥Î»V, ¸¡µã
+--è®¾ç½®DAC8563è¾“å‡ºç”µå‹ï¼Œå•ä½V, æµ®ç‚¹
 function dac8563_volt(volt)
 	local X1 = 1000
 	local Y1 = -9.8551

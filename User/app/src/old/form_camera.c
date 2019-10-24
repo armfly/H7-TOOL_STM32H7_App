@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : ÉãÏñÍ·Ä£¿é³ÌĞò¡£
-*	ÎÄ¼şÃû³Æ : camera_test.c
-*	°æ    ±¾ : V1.1
-*	Ëµ    Ã÷ : Ê¹ÓÃSTM32F429µÄDCMIÉãÏñÍ·½Ó¿Ú£¬ÏÔÊ¾Í¼Ïñ
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢ STM32F407
-*		v1.1    2015-10-17 armfly  ÒÆÖ²µ½STM32F429
+*	æ¨¡å—åç§° : æ‘„åƒå¤´æ¨¡å—ç¨‹åºã€‚
+*	æ–‡ä»¶åç§° : camera_test.c
+*	ç‰ˆ    æœ¬ : V1.1
+*	è¯´    æ˜ : ä½¿ç”¨STM32F429çš„DCMIæ‘„åƒå¤´æ¥å£ï¼Œæ˜¾ç¤ºå›¾åƒ
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘ STM32F407
+*		v1.1    2015-10-17 armfly  ç§»æ¤åˆ°STM32F429
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,87 +18,90 @@
 #include "bsp.h"
 #include "form_camera.h"
 
-/* ¶¨Òå½çÃæ½á¹¹ */
+/* å®šä¹‰ç•Œé¢ç»“æ„ */
 typedef struct
 {
-	FONT_T FontBlack;	/* ¾²Ì¬µÄÎÄ×Ö */
-	FONT_T FontBlue;	/* ±ä»¯µÄÎÄ×Ö×ÖÌå À¶É« */
-	FONT_T FontRed;		/* ±ä»¯µÄÎÄ×Ö×ÖÌå ºìÉ« */
-	FONT_T FontBtn;		/* °´Å¥µÄ×ÖÌå */
-	FONT_T FontBox;		/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	FONT_T FontBlack; /* é™æ€çš„æ–‡å­— */
+	FONT_T FontBlue;	/* å˜åŒ–çš„æ–‡å­—å­—ä½“ è“è‰² */
+	FONT_T FontRed;		/* å˜åŒ–çš„æ–‡å­—å­—ä½“ çº¢è‰² */
+	FONT_T FontBtn;		/* æŒ‰é’®çš„å­—ä½“ */
+	FONT_T FontBox;		/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 
 	GROUP_T Box1;
 
-	LABEL_T Label1;	LABEL_T Label2;	/* ×´Ì¬ */
-	LABEL_T Label3; LABEL_T Label4;	/* ×´Ì¬ */
-	LABEL_T Label5; LABEL_T Label6;	/* ×´Ì¬ */
+	LABEL_T Label1;
+	LABEL_T Label2; /* çŠ¶æ€ */
+	LABEL_T Label3;
+	LABEL_T Label4; /* çŠ¶æ€ */
+	LABEL_T Label5;
+	LABEL_T Label6; /* çŠ¶æ€ */
 
-	BUTTON_T Btn1;		/* ´ò¿ªÉãÏñÍ· */
-	BUTTON_T Btn2;		/* ÔİÍ£ */
+	BUTTON_T Btn1; /* æ‰“å¼€æ‘„åƒå¤´ */
+	BUTTON_T Btn2; /* æš‚åœ */
 
 	BUTTON_T BtnRet;
 
-}FormCAM_T;
+} FormCAM_T;
 
-/* ´°Ìå±³¾°É« */
-#define FORM_BACK_COLOR		CL_BTN_FACE
+/* çª—ä½“èƒŒæ™¯è‰² */
+#define FORM_BACK_COLOR CL_BTN_FACE
 
-/* 4¸ö¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	5
-#define BOX1_H	(g_LcdHeight - BOX1_Y - 10)
-#define BOX1_W	(g_LcdWidth -  2 * BOX1_X)
-#define BOX1_TEXT	"ÉãÏñÍ·0V7670²âÊÔ³ÌĞò"
+/* 4ä¸ªæ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 5
+#define BOX1_H (g_LcdHeight - BOX1_Y - 10)
+#define BOX1_W (g_LcdWidth - 2 * BOX1_X)
+#define BOX1_TEXT "æ‘„åƒå¤´0V7670æµ‹è¯•ç¨‹åº"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BTN_RET_H	32
-#define BTN_RET_W	60
-#define	BTN_RET_X	((BOX1_X + BOX1_W) - BTN_RET_W - 4)
-#define	BTN_RET_Y	((BOX1_Y  + BOX1_H) - BTN_RET_H - 4)
-#define	BTN_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BTN_RET_H 32
+#define BTN_RET_W 60
+#define BTN_RET_X ((BOX1_X + BOX1_W) - BTN_RET_W - 4)
+#define BTN_RET_Y ((BOX1_Y + BOX1_H) - BTN_RET_H - 4)
+#define BTN_RET_TEXT "è¿”å›"
 
-#define BTN1_H	32
-#define BTN1_W	100
-#define	BTN1_X	(BOX1_X + 330)
-#define	BTN1_Y	(BOX1_Y + 100)
-#define	BTN1_TEXT	"´ò¿ªÉãÏñÍ·"
+#define BTN1_H 32
+#define BTN1_W 100
+#define BTN1_X (BOX1_X + 330)
+#define BTN1_Y (BOX1_Y + 100)
+#define BTN1_TEXT "æ‰“å¼€æ‘„åƒå¤´"
 
-#define BTN2_H	32
-#define BTN2_W	100
-#define	BTN2_X	BTN1_X
-#define	BTN2_Y	(BTN1_Y + BTN1_H + 10)
-#define	BTN2_TEXT	"¹Ø±ÕÉãÏñÍ·"
+#define BTN2_H 32
+#define BTN2_W 100
+#define BTN2_X BTN1_X
+#define BTN2_Y (BTN1_Y + BTN1_H + 10)
+#define BTN2_TEXT "å…³é—­æ‘„åƒå¤´"
 
-/* ±êÇ© */
-#define LABEL1_X  	(BOX1_X + 330)
-#define LABEL1_Y	(BOX1_Y + 20)
-#define LABEL1_TEXT	"Chip ID : "
+/* æ ‡ç­¾ */
+#define LABEL1_X (BOX1_X + 330)
+#define LABEL1_Y (BOX1_Y + 20)
+#define LABEL1_TEXT "Chip ID : "
 
-	#define LABEL2_X  	(LABEL1_X + 80)
-	#define LABEL2_Y	LABEL1_Y
-	#define LABEL2_TEXT	"--"
+#define LABEL2_X (LABEL1_X + 80)
+#define LABEL2_Y LABEL1_Y
+#define LABEL2_TEXT "--"
 
-#define LABEL3_X  	(LABEL1_X)
-#define LABEL3_Y	(LABEL1_Y + 20)
-#define LABEL3_TEXT	"×´Ì¬1   : "
+#define LABEL3_X (LABEL1_X)
+#define LABEL3_Y (LABEL1_Y + 20)
+#define LABEL3_TEXT "çŠ¶æ€1   : "
 
-	#define LABEL4_X  	(LABEL3_X + 80)
-	#define LABEL4_Y	(LABEL3_Y)
-	#define LABEL4_TEXT	"--"
+#define LABEL4_X (LABEL3_X + 80)
+#define LABEL4_Y (LABEL3_Y)
+#define LABEL4_TEXT "--"
 
-#define LABEL5_X  	(LABEL1_X)
-#define LABEL5_Y	(LABEL1_Y + 20 * 2)
-#define LABEL5_TEXT	"×´Ì¬2   : "
+#define LABEL5_X (LABEL1_X)
+#define LABEL5_Y (LABEL1_Y + 20 * 2)
+#define LABEL5_TEXT "çŠ¶æ€2   : "
 
-	#define LABEL6_X  	(LABEL5_X + 80)
-	#define LABEL6_Y	(LABEL5_Y)
-	#define LABEL6_TEXT	"--"
+#define LABEL6_X (LABEL5_X + 80)
+#define LABEL6_Y (LABEL5_Y)
+#define LABEL6_TEXT "--"
 
-/* ÉãÏñÏÔÊ¾´°¿ÚÎ»ÖÃºÍ´óĞ¡ */
-#define PHOTO_X	10
-#define PHOTO_Y	22
-#define PHOTO_H	240
-#define PHOTO_W	320
+/* æ‘„åƒæ˜¾ç¤ºçª—å£ä½ç½®å’Œå¤§å° */
+#define PHOTO_X 10
+#define PHOTO_Y 22
+#define PHOTO_H 240
+#define PHOTO_W 320
 
 static void InitFormCam(void);
 static void DispCamInitFace(void);
@@ -106,21 +109,21 @@ static void DispCamInitFace(void);
 FormCAM_T *FormCam;
 
 /* Buffer location should aligned to cache line size (32 bytes) */
-#define CAN_BUF_SIZE	(320*265*2)
-ALIGN_32BYTES (uint16_t s_CamCache[CAN_BUF_SIZE]);
+#define CAN_BUF_SIZE (320 * 265 * 2)
+ALIGN_32BYTES(uint16_t s_CamCache[CAN_BUF_SIZE]);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestCamera
-*	¹¦ÄÜËµÃ÷: ²âÊÔÉãÏñÍ·
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestCamera
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•æ‘„åƒå¤´
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestCamera(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	uint8_t fQuit = 0;
 	int16_t tpX, tpY;
 	uint16_t usChipID;
@@ -158,7 +161,7 @@ void TestCamera(void)
 
 	fRefresh = 1;
 
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -172,15 +175,15 @@ void TestCamera(void)
 
 		if (g_tCam.CaptureOk == 1)
 		{
-			g_tCam.CaptureOk = 0;		
-			
-			/* ¿ªÊ¼»æÍ¼ ,Í¼Æ¬ÔÚ s_CamCache */
+			g_tCam.CaptureOk = 0;
+
+			/* å¼€å§‹ç»˜å›¾ ,å›¾ç‰‡åœ¨ s_CamCache */
 			SCB_CleanInvalidateDCache();
 			LCD429_DrawBMP(PHOTO_X, PHOTO_Y, PHOTO_H, PHOTO_W, (uint16_t *)s_CamCache);
 
 			if (fStop == 0)
 			{
-				bsp_StartTimer(0, 50);	/* Æô¶¯¶¨Ê±Æ÷ */
+				bsp_StartTimer(0, 50); /* å¯åŠ¨å®šæ—¶å™¨ */
 			}
 		}
 
@@ -194,184 +197,184 @@ void TestCamera(void)
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormCam->BtnRet.Focus = 1;
-						LCD_DrawButton(&FormCam->BtnRet);
-					}
-					else if (TOUCH_InRect(tpX, tpY, BTN1_X, BTN1_Y, BTN1_H, BTN1_W))
-					{
-						FormCam->Btn1.Focus = 1;
-						LCD_DrawButton(&FormCam->Btn1);
-					}
-					else if (TOUCH_InRect(tpX, tpY, BTN2_X, BTN2_Y, BTN2_H, BTN2_W))
-					{
-						FormCam->Btn2.Focus = 1;
-						LCD_DrawButton(&FormCam->Btn2);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormCam->BtnRet.Focus = 1;
+					LCD_DrawButton(&FormCam->BtnRet);
+				}
+				else if (TOUCH_InRect(tpX, tpY, BTN1_X, BTN1_Y, BTN1_H, BTN1_W))
+				{
+					FormCam->Btn1.Focus = 1;
+					LCD_DrawButton(&FormCam->Btn1);
+				}
+				else if (TOUCH_InRect(tpX, tpY, BTN2_X, BTN2_Y, BTN2_H, BTN2_W))
+				{
+					FormCam->Btn2.Focus = 1;
+					LCD_DrawButton(&FormCam->Btn2);
+				}
+				break;
 
-				case TOUCH_MOVE:		/* ´¥±ÊÒÆ¶¯ÊÂ¼ş */
-					break;
+			case TOUCH_MOVE: /* è§¦ç¬”ç§»åŠ¨äº‹ä»¶ */
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
-					{
-						FormCam->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormCam->BtnRet);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else if (TOUCH_InRect(tpX, tpY, BTN1_X, BTN1_Y, BTN1_H, BTN1_W))	/* ´ò¿ªÉãÏñÍ· */
-					{
-						FormCam->Btn1.Focus = 0;
-						LCD_DrawButton(&FormCam->Btn1);
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BTN_RET_X, BTN_RET_Y, BTN_RET_H, BTN_RET_W))
+				{
+					FormCam->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormCam->BtnRet);
+					fQuit = 1; /* è¿”å› */
+				}
+				else if (TOUCH_InRect(tpX, tpY, BTN1_X, BTN1_Y, BTN1_H, BTN1_W)) /* æ‰“å¼€æ‘„åƒå¤´ */
+				{
+					FormCam->Btn1.Focus = 0;
+					LCD_DrawButton(&FormCam->Btn1);
 
+					{
+						if (i2c_CheckDevice(OV7670_SLAVE_ADDRESS) == 0)
 						{
-							if (i2c_CheckDevice(OV7670_SLAVE_ADDRESS) == 0)
-							{
-								usChipID = OV_ReadID();
-								sprintf(buf, "0x%04X", usChipID);
+							usChipID = OV_ReadID();
+							sprintf(buf, "0x%04X", usChipID);
 
-								FormCam->Label2.Font = &FormCam->FontBlue;
-								FormCam->Label2.pCaption = buf;
-							}
-							else
-							{
-								sprintf(buf, "None  ");
-
-								FormCam->Label2.Font = &FormCam->FontRed;
-								FormCam->Label2.pCaption = buf;
-							}
-							LCD_DrawLabel(&FormCam->Label2);
+							FormCam->Label2.Font = &FormCam->FontBlue;
+							FormCam->Label2.pCaption = buf;
 						}
-
+						else
 						{
-							//g_tTP.Enable = 0;
+							sprintf(buf, "None  ");
 
-							//RA8875_StartDirectDraw(PHOTO_X, PHOTO_Y, PHOTO_H, PHOTO_W);
-							CAM_Start((uint32_t)s_CamCache);	/* ÉãÏñÍ·DMAµÄÄ¿±êµØÖ·ÉèÖÃÎªÏÔ´æ */
+							FormCam->Label2.Font = &FormCam->FontRed;
+							FormCam->Label2.pCaption = buf;
 						}
-						fStop = 0;	
-						fRefresh = 1;						
+						LCD_DrawLabel(&FormCam->Label2);
 					}
-					else if (TOUCH_InRect(tpX, tpY, BTN2_X, BTN2_Y, BTN2_H, BTN2_W))
+
 					{
-						FormCam->Btn2.Focus = 0;
-						LCD_DrawButton(&FormCam->Btn2);
+						//g_tTP.Enable = 0;
 
-						bsp_StopTimer(0);	/* Í£Ö¹×Ô¶¯¶¨Ê±Æ÷ */
-
-						fStop = 1;	
-						fRefresh = 1;
+						//RA8875_StartDirectDraw(PHOTO_X, PHOTO_Y, PHOTO_H, PHOTO_W);
+						CAM_Start((uint32_t)s_CamCache); /* æ‘„åƒå¤´DMAçš„ç›®æ ‡åœ°å€è®¾ç½®ä¸ºæ˜¾å­˜ */
 					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						FormCam->BtnRet.Focus = 0;
-						LCD_DrawButton(&FormCam->BtnRet);
+					fStop = 0;
+					fRefresh = 1;
+				}
+				else if (TOUCH_InRect(tpX, tpY, BTN2_X, BTN2_Y, BTN2_H, BTN2_W))
+				{
+					FormCam->Btn2.Focus = 0;
+					LCD_DrawButton(&FormCam->Btn2);
 
-						FormCam->Btn1.Focus = 0;
-						LCD_DrawButton(&FormCam->Btn1);
+					bsp_StopTimer(0); /* åœæ­¢è‡ªåŠ¨å®šæ—¶å™¨ */
 
-						FormCam->Btn2.Focus = 0;
-						LCD_DrawButton(&FormCam->Btn2);
-					}
-					break;
+					fStop = 1;
+					fRefresh = 1;
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					FormCam->BtnRet.Focus = 0;
+					LCD_DrawButton(&FormCam->BtnRet);
+
+					FormCam->Btn1.Focus = 0;
+					LCD_DrawButton(&FormCam->Btn1);
+
+					FormCam->Btn2.Focus = 0;
+					LCD_DrawButton(&FormCam->Btn2);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼ü */
-					break;
+			case KEY_DOWN_K1: /* K1é”® */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:		/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					CAM_Stop();		/* Í£Ö¹ÉãÏñÍ·DMA */
-					g_tTP.Enable = 1;
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				CAM_Stop();			/* åœæ­¢æ‘„åƒå¤´DMA */
+				g_tTP.Enable = 1;
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
 
-	bsp_StopTimer(0);	/* Í£Ö¹×Ô¶¯¶¨Ê±Æ÷ */
-	
+	bsp_StopTimer(0); /* åœæ­¢è‡ªåŠ¨å®šæ—¶å™¨ */
+
 	CAM_Stop();
-//	RA8875_QuitDirectDraw();
+	//	RA8875_QuitDirectDraw();
 	g_tTP.Enable = 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: InitFormCam
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯GPS³õÊ¼½çÃæ¿Ø¼ş
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: InitFormCam
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–GPSåˆå§‹ç•Œé¢æ§ä»¶
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void InitFormCam(void)
 {
-	/* ·Ö×é¿ò±êÌâ×ÖÌå */
+	/* åˆ†ç»„æ¡†æ ‡é¢˜å­—ä½“ */
 	FormCam->FontBox.FontCode = FC_ST_16;
-	FormCam->FontBox.BackColor = CL_BTN_FACE;	/* ºÍ±³¾°É«ÏàÍ¬ */
+	FormCam->FontBox.BackColor = CL_BTN_FACE; /* å’ŒèƒŒæ™¯è‰²ç›¸åŒ */
 	FormCam->FontBox.FrontColor = CL_BLACK;
 	FormCam->FontBox.Space = 0;
 
-	/* ×ÖÌå1 ÓÃÓÚ¾²Ö¹±êÇ© */
+	/* å­—ä½“1 ç”¨äºé™æ­¢æ ‡ç­¾ */
 	FormCam->FontBlack.FontCode = FC_ST_16;
-	FormCam->FontBlack.BackColor = CL_MASK;		/* Í¸Ã÷É« */
+	FormCam->FontBlack.BackColor = CL_MASK; /* é€æ˜è‰² */
 	FormCam->FontBlack.FrontColor = CL_BLACK;
 	FormCam->FontBlack.Space = 0;
 
-	/* ×ÖÌå2 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“2 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormCam->FontBlue.FontCode = FC_ST_16;
 	FormCam->FontBlue.BackColor = CL_BTN_FACE;
 	FormCam->FontBlue.FrontColor = CL_BLUE;
 	FormCam->FontBlue.Space = 0;
 
-	/* ×ÖÌå3 ÓÃÓÚ±ä»¯µÄÎÄ×Ö */
+	/* å­—ä½“3 ç”¨äºå˜åŒ–çš„æ–‡å­— */
 	FormCam->FontRed.FontCode = FC_ST_16;
 	FormCam->FontRed.BackColor = CL_BTN_FACE;
 	FormCam->FontRed.FrontColor = CL_RED;
 	FormCam->FontRed.Space = 0;
 
-	/* °´Å¥×ÖÌå */
+	/* æŒ‰é’®å­—ä½“ */
 	FormCam->FontBtn.FontCode = FC_ST_16;
-	FormCam->FontBtn.BackColor = CL_MASK;		/* Í¸Ã÷±³¾° */
+	FormCam->FontBtn.BackColor = CL_MASK; /* é€æ˜èƒŒæ™¯ */
 	FormCam->FontBtn.FrontColor = CL_BLACK;
 	FormCam->FontBtn.Space = 0;
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	FormCam->Box1.Left = BOX1_X;
 	FormCam->Box1.Top = BOX1_Y;
 	FormCam->Box1.Height = BOX1_H;
@@ -379,7 +382,7 @@ static void InitFormCam(void)
 	FormCam->Box1.pCaption = BOX1_TEXT;
 	FormCam->Box1.Font = &FormCam->FontBox;
 
-	/* ¾²Ì¬±êÇ© */
+	/* é™æ€æ ‡ç­¾ */
 	FormCam->Label1.Left = LABEL1_X;
 	FormCam->Label1.Top = LABEL1_Y;
 	FormCam->Label1.MaxLen = 0;
@@ -398,7 +401,7 @@ static void InitFormCam(void)
 	FormCam->Label5.pCaption = LABEL5_TEXT;
 	FormCam->Label5.Font = &FormCam->FontBlack;
 
-	/* ¶¯Ì¬±êÇ© */
+	/* åŠ¨æ€æ ‡ç­¾ */
 	FormCam->Label2.Left = LABEL2_X;
 	FormCam->Label2.Top = LABEL2_Y;
 	FormCam->Label2.MaxLen = 0;
@@ -417,7 +420,7 @@ static void InitFormCam(void)
 	FormCam->Label6.pCaption = LABEL6_TEXT;
 	FormCam->Label6.Font = &FormCam->FontBlue;
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	FormCam->BtnRet.Left = BTN_RET_X;
 	FormCam->BtnRet.Top = BTN_RET_Y;
 	FormCam->BtnRet.Height = BTN_RET_H;
@@ -445,20 +448,20 @@ static void InitFormCam(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispUSBInitFace
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾ËùÓĞµÄ¿Ø¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispUSBInitFace
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ‰€æœ‰çš„æ§ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispCamInitFace(void)
 {
 	LCD_ClrScr(CL_BTN_FACE);
 
-	/* ·Ö×é¿ò */
+	/* åˆ†ç»„æ¡† */
 	LCD_DrawGroupBox(&FormCam->Box1);
 
-	/* ±êÇ© */
+	/* æ ‡ç­¾ */
 	LCD_DrawLabel(&FormCam->Label1);
 	LCD_DrawLabel(&FormCam->Label2);
 	LCD_DrawLabel(&FormCam->Label3);
@@ -466,10 +469,10 @@ static void DispCamInitFace(void)
 	LCD_DrawLabel(&FormCam->Label5);
 	LCD_DrawLabel(&FormCam->Label6);
 
-	/* °´Å¥ */
+	/* æŒ‰é’® */
 	LCD_DrawButton(&FormCam->BtnRet);
 	LCD_DrawButton(&FormCam->Btn1);
 	LCD_DrawButton(&FormCam->Btn2);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

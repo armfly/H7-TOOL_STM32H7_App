@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : LCDÒº¾§²Ëµ¥(¼üÅÌ¿ØÖÆ£©
-*	ÎÄ¼şÃû³Æ : lcd_menu.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2015-04-25 armfly  ST¹Ì¼ş¿â°æ±¾ V2.1.0
+*	æ¨¡å—åç§° : LCDæ¶²æ™¶èœå•(é”®ç›˜æ§åˆ¶ï¼‰
+*	æ–‡ä»¶åç§° : lcd_menu.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2015-04-25 armfly  STå›ºä»¶åº“ç‰ˆæœ¬ V2.1.0
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -21,19 +21,19 @@
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LCD_InitMenu
-*	¹¦ÄÜËµÃ÷: °´ÕÕ16µãÕóºº×Ö³õÊ¼»¯²Ëµ¥½á¹¹
-*	ĞÎ    ²Î: _pMenu : ²Ëµ¥½á¹¹ÌåÖ¸Õë; ÓÉÖ÷³ÌĞòÉêÇëÈ«¾Ö²Ëµ¥½á¹¹Ìå±äÁ¿¡£
-*			 _Text : ²Ëµ¥ÎÄ±¾µÄÊı×éÖ¸Õë¡£ ÓÉÖ÷³ÌĞò·ÖÅä¿Õ¼ä±£´æÊı×é
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LCD_InitMenu
+*	åŠŸèƒ½è¯´æ˜: æŒ‰ç…§16ç‚¹é˜µæ±‰å­—åˆå§‹åŒ–èœå•ç»“æ„
+*	å½¢    å‚: _pMenu : èœå•ç»“æ„ä½“æŒ‡é’ˆ; ç”±ä¸»ç¨‹åºç”³è¯·å…¨å±€èœå•ç»“æ„ä½“å˜é‡ã€‚
+*			 _Text : èœå•æ–‡æœ¬çš„æ•°ç»„æŒ‡é’ˆã€‚ ç”±ä¸»ç¨‹åºåˆ†é…ç©ºé—´ä¿å­˜æ•°ç»„
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LCD_InitMenu(MENU_T *_pMenu, char **_Text)
 {
-  	uint8_t i;
-	
-	_pMenu->Text = (uint8_t **)_Text;			/* ²Ëµ¥ÎÄ±¾ */
-	
+	uint8_t i;
+
+	_pMenu->Text = (uint8_t **)_Text; /* èœå•æ–‡æœ¬ */
+
 	for (i = 0; i < 255; i++)
 	{
 		if (_pMenu->Text[i][0] == '&')
@@ -42,73 +42,73 @@ void LCD_InitMenu(MENU_T *_pMenu, char **_Text)
 			break;
 		}
 	}
-	
-	_pMenu->Cursor = 0;		/* µ±Ç°ÆÁÄ»µÚ1ĞĞ¶ÔÓ¦µÄË÷Òı */
-	_pMenu->Offset = 0;		/* Ñ¡ÖĞĞĞµÄË÷Òı */
+
+	_pMenu->Cursor = 0; /* å½“å‰å±å¹•ç¬¬1è¡Œå¯¹åº”çš„ç´¢å¼• */
+	_pMenu->Offset = 0; /* é€‰ä¸­è¡Œçš„ç´¢å¼• */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LCD_DispMenu16
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾²Ëµ¥ 16µãÕóºº×Ö¡£ °×µ×±íÊ¾Ñ¡ÖĞ
-*	ĞÎ    ²Î: _pMenu : ²Ëµ¥ÎÄ×ÖÊı×é
-*			  _Count : ²Ëµ¥Ïî¸öÊı
-*			  _Cursor : ¹â±êĞĞ
-*			  _FocusLine :  ½¹µãĞĞ(0-3)
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LCD_DispMenu16
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºèœå• 16ç‚¹é˜µæ±‰å­—ã€‚ ç™½åº•è¡¨ç¤ºé€‰ä¸­
+*	å½¢    å‚: _pMenu : èœå•æ–‡å­—æ•°ç»„
+*			  _Count : èœå•é¡¹ä¸ªæ•°
+*			  _Cursor : å…‰æ ‡è¡Œ
+*			  _FocusLine :  ç„¦ç‚¹è¡Œ(0-3)
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LCD_DispMenu(MENU_T *_pMenu)
 {
 	uint8_t i;
 	uint8_t FontHeight;
-	uint16_t  y;
+	uint16_t y;
 	uint8_t line_cap1, line_cap2;
-		
+
 	FontHeight = LCD_GetFontWidth(&_pMenu->Font);
 
-	line_cap1 = _pMenu->LineCap / 2;			/* ²Ëµ¥ÎÄ±¾Ç°µÄ¸ß¶È */
-	line_cap2 = _pMenu->LineCap - line_cap1;	/* ²Ëµ¥ÎÄ±¾ºóµÄ¸ß¶È */
+	line_cap1 = _pMenu->LineCap / 2;				 /* èœå•æ–‡æœ¬å‰çš„é«˜åº¦ */
+	line_cap2 = _pMenu->LineCap - line_cap1; /* èœå•æ–‡æœ¬åçš„é«˜åº¦ */
 	for (i = 0; i < _pMenu->ViewLine; i++)
 	{
 		if (i >= _pMenu->Count)
 		{
 			break;
 		}
-		
-  		if (i + _pMenu->Offset == _pMenu->Cursor)
-		{  		
-			/* ÉèÖÃÎª·´°× */
+
+		if (i + _pMenu->Offset == _pMenu->Cursor)
+		{
+			/* è®¾ç½®ä¸ºåç™½ */
 			_pMenu->Font.FrontColor = CL_MENU_TEXT2;
 			_pMenu->Font.BackColor = CL_MENU_BACK2;
 		}
 		else
 		{
-			/* »Ö¸´Õı³£µ×É« */
+			/* æ¢å¤æ­£å¸¸åº•è‰² */
 			_pMenu->Font.FrontColor = CL_MENU_TEXT1;
 			_pMenu->Font.BackColor = CL_MENU_BACK1;
 		}
-		
+
 		y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
-		
-		/* Çå¶ÎÇ°±³¾° */
-		LCD_Fill_Rect(_pMenu->Left, y,  line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
-		
-		/* Ë¢ĞÂÎÄ±¾ */
-		LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font, 
-			_pMenu->Width, ALIGN_LEFT);
-		
-		/* Çå¶Îºó±³¾° */
+
+		/* æ¸…æ®µå‰èƒŒæ™¯ */
+		LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
+
+		/* åˆ·æ–°æ–‡æœ¬ */
+		LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+									_pMenu->Width, ALIGN_LEFT);
+
+		/* æ¸…æ®µåèƒŒæ™¯ */
 		LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LCD_MoveDownMenu
-*	¹¦ÄÜËµÃ÷: ÏòÏÂÒÆ¶¯Ñ¡ÖĞµÄ²Ëµ¥ĞĞ, ²¢Ë¢ĞÂÏÔÊ¾.
-*	ĞÎ    ²Î: _pMenu : ²Ëµ¥½á¹¹ÌåÖ¸Õë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LCD_MoveDownMenu
+*	åŠŸèƒ½è¯´æ˜: å‘ä¸‹ç§»åŠ¨é€‰ä¸­çš„èœå•è¡Œ, å¹¶åˆ·æ–°æ˜¾ç¤º.
+*	å½¢    å‚: _pMenu : èœå•ç»“æ„ä½“æŒ‡é’ˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LCD_MoveDownMenu(MENU_T *_pMenu)
@@ -121,23 +121,23 @@ void LCD_MoveDownMenu(MENU_T *_pMenu)
 		{
 			_pMenu->Offset++;
 		}
-		
-		LCD_DispMenu(_pMenu);	/* Ë¢ĞÂÏÔÊ¾ */
+
+		LCD_DispMenu(_pMenu); /* åˆ·æ–°æ˜¾ç¤º */
 	}
-	else	
+	else
 	{
 		_pMenu->Cursor = 0;
 		_pMenu->Offset = 0;
-		LCD_DispMenu(_pMenu);	/* Ë¢ĞÂÏÔÊ¾ */
-	}	
+		LCD_DispMenu(_pMenu); /* åˆ·æ–°æ˜¾ç¤º */
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LCD_MoveUpMenu
-*	¹¦ÄÜËµÃ÷: ÏòÉÏÒÆ¶¯Ñ¡ÖĞµÄ²Ëµ¥ĞĞ, ²¢Ë¢ĞÂÏÔÊ¾.
-*	ĞÎ    ²Î: _pMenu : ²Ëµ¥½á¹¹ÌåÖ¸Õë
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LCD_MoveUpMenu
+*	åŠŸèƒ½è¯´æ˜: å‘ä¸Šç§»åŠ¨é€‰ä¸­çš„èœå•è¡Œ, å¹¶åˆ·æ–°æ˜¾ç¤º.
+*	å½¢    å‚: _pMenu : èœå•ç»“æ„ä½“æŒ‡é’ˆ
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void LCD_MoveUpMenu(MENU_T *_pMenu)
@@ -151,12 +151,12 @@ void LCD_MoveUpMenu(MENU_T *_pMenu)
 			_pMenu->Offset--;
 		}
 
-		LCD_DispMenu(_pMenu);	/* Ë¢ĞÂÏÔÊ¾ */						
-	}	
-	else	
+		LCD_DispMenu(_pMenu); /* åˆ·æ–°æ˜¾ç¤º */
+	}
+	else
 	{
 		_pMenu->Cursor = _pMenu->Count - 1;
-		if (_pMenu->Count >  _pMenu->ViewLine)
+		if (_pMenu->Count > _pMenu->ViewLine)
 		{
 			_pMenu->Offset = _pMenu->Count - _pMenu->ViewLine;
 		}
@@ -164,8 +164,8 @@ void LCD_MoveUpMenu(MENU_T *_pMenu)
 		{
 			_pMenu->Offset = 0;
 		}
-		LCD_DispMenu(_pMenu);	/* Ë¢ĞÂÏÔÊ¾ */
+		LCD_DispMenu(_pMenu); /* åˆ·æ–°æ˜¾ç¤º */
 	}
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

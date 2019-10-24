@@ -1,21 +1,21 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : H7-TOOL AppÖ÷³ÌĞò
-*	ÎÄ¼şÃû³Æ : main.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : 
+*	æ¨¡å—åç§° : H7-TOOL Appä¸»ç¨‹åº
+*	æ–‡ä»¶åç§° : main.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : 
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2019-10-01 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2019-10-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2019-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2019-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h"		/* printfº¯Êı¶¨ÏòÊä³öµ½´®¿Ú£¬ËùÒÔ±ØĞë°üº¬Õâ¸öÎÄ¼ş */
+#include "bsp.h" /* printfå‡½æ•°å®šå‘è¾“å‡ºåˆ°ä¸²å£ï¼Œæ‰€ä»¥å¿…é¡»åŒ…å«è¿™ä¸ªæ–‡ä»¶ */
 #include "main.h"
 
 #include "status_link_mode.h"
@@ -43,118 +43,117 @@ static void DispLogo(void);
 
 uint16_t g_MainStatus;
 
-/* Ö÷×´Ì¬ÇĞ»»Ë³Ğò */
-static const uint16_t StatusOrder[] = 
-{
-	MS_LINK_MODE,		/* Áª»ú×´Ì¬ */
-	MS_VOLTAGE_METER,	/* µçÑ¹±í */	
-	MS_RESISTOR_METER,	/* µç×è±í */	
-	MS_CURRENT_METER,	/* ¸ß²àµçÁ÷±í */
-	MS_TEMP_METER,		/* ÎÂ¶È±í */
-	MS_PROGRAMMER,		/* ÍÑ»úÏÂÔØÆ÷ */	
+/* ä¸»çŠ¶æ€åˆ‡æ¢é¡ºåº */
+static const uint16_t StatusOrder[] =
+		{
+				MS_LINK_MODE,			 /* è”æœºçŠ¶æ€ */
+				MS_VOLTAGE_METER,	/* ç”µå‹è¡¨ */
+				MS_RESISTOR_METER, /* ç”µé˜»è¡¨ */
+				MS_CURRENT_METER,	/* é«˜ä¾§ç”µæµè¡¨ */
+				MS_TEMP_METER,		 /* æ¸©åº¦è¡¨ */
+				MS_PROGRAMMER,		 /* è„±æœºä¸‹è½½å™¨ */
 };
-
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: main
-*	¹¦ÄÜËµÃ÷: c³ÌĞòÈë¿Ú
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ´íÎó´úÂë(ÎŞĞè´¦Àí)
+*	å‡½ æ•° å: main
+*	åŠŸèƒ½è¯´æ˜: cç¨‹åºå…¥å£
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: é”™è¯¯ä»£ç (æ— éœ€å¤„ç†)
 *********************************************************************************************************
 */
 int main(void)
-{	
-	bsp_Init();	
-	LoadParam();	/* ¶ÁÈ¡Ó¦ÓÃ³ÌĞò²ÎÊı, ¸Ãº¯ÊıÔÚparam.c */
-	
-	PERIOD_Start(&g_tRunLed, 50, 50, 0);		/* LEDÒ»Ö±ÉÁË¸, ·Ç×èÈû */
-	
+{
+	bsp_Init();
+	LoadParam(); /* è¯»å–åº”ç”¨ç¨‹åºå‚æ•°, è¯¥å‡½æ•°åœ¨param.c */
+
+	PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LEDä¸€ç›´é—ªçƒ, éé˜»å¡ */
+
 	DispLogo();
-		
+
 	bsp_InitESP32();
-	
+
 	DSO_InitHard();
-	DSO_SetDC(1,1);
-	DSO_SetDC(2,1);
+	DSO_SetDC(1, 1);
+	DSO_SetDC(2, 1);
 	DSO_SetGain(1, 3);
 	DSO_SetGain(2, 3);
-	
+
 	//usbd_OpenMassStorage();
 	bsp_SetTVCC(3300);
-	
-	/* LwIP ³õÊ¼»¯ */
+
+	/* LwIP åˆå§‹åŒ– */
 	{
-		/* Èç¹û²»²åÍøÏß£¬´Ëº¯ÊıÖ´ĞĞÊ±¼ä¹ı³¤ */
-		/* ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
+		/* å¦‚æœä¸æ’ç½‘çº¿ï¼Œæ­¤å‡½æ•°æ‰§è¡Œæ—¶é—´è¿‡é•¿ */
+		/* ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
 		lwip_start();
-		
+
 		lwip_pro();
-	}	
-	
-	PERIOD_Stop(&g_tRunLed);	/* Í£Ö¹LEDÉÁË¸ */
-	
+	}
+
+	PERIOD_Stop(&g_tRunLed); /* åœæ­¢LEDé—ªçƒ */
+
 	//wifi_state = WIFI_INIT;
-	
-	/* Ö÷³ÌĞò²ÉÓÃ×´Ì¬»úÊµÏÖ³ÌĞò¹¦ÄÜÇĞ»» */
-	g_MainStatus = MS_LINK_MODE;	/* ³õÊ¼×´Ì¬ = Áª»ú½çÃæ */
+
+	/* ä¸»ç¨‹åºé‡‡ç”¨çŠ¶æ€æœºå®ç°ç¨‹åºåŠŸèƒ½åˆ‡æ¢ */
+	g_MainStatus = MS_LINK_MODE; /* åˆå§‹çŠ¶æ€ = è”æœºç•Œé¢ */
 	while (1)
 	{
 		switch (g_MainStatus)
-		{	
-			case MS_LINK_MODE:		/* Áª»ú×´Ì¬ */
-				status_LinkMode();
-				break;
-			
-			case MS_SYSTEM_SET:		/* ÏµÍ³ÉèÖÃ */
-				status_SystemSetMain();
-				break;
+		{
+		case MS_LINK_MODE: /* è”æœºçŠ¶æ€ */
+			status_LinkMode();
+			break;
 
-			case MS_HARD_INFO:		/* Ó²¼şĞÅÏ¢ */
-				status_HardInfo();
-				break;	
-			
-			case MS_ESP32_TEST:		/* ESP32Ä£¿é¹Ì¼şÉı¼¶ */
-				status_ESP32Test();
-				break;	
-			
-			case MS_USB_UART1:		/* USBĞéÄâ´®¿Ú£¬Ó³Éäµ½Ó²¼şUART1£¬ RS485 RS232 */
-				status_UsbUart1();
-				break;
-			
-			case MS_PROGRAMMER:		/* ÍÑ»úÏÂÔØÆ÷ */	
-				status_Programmer();
-				break;
+		case MS_SYSTEM_SET: /* ç³»ç»Ÿè®¾ç½® */
+			status_SystemSetMain();
+			break;
 
-			case MS_VOLTAGE_METER:	/* µçÑ¹±í */
-				status_VoltageMeter();
-				break;
-				
-			case MS_CURRENT_METER:	/* ¸ß²àµçÁ÷±í */
-				status_CurrentMeter();
-				break;
-			
-			case MS_TEMP_METER:		/* ÎÂ¶È±í */
-				status_TempMeter();
-				break;
-			
-			case MS_RESISTOR_METER:	/* µç×è±í */
-				status_ResistorMeter();
-				break;
+		case MS_HARD_INFO: /* ç¡¬ä»¶ä¿¡æ¯ */
+			status_HardInfo();
+			break;
 
-			default:
-				g_MainStatus = MS_LINK_MODE;
-				break;
+		case MS_ESP32_TEST: /* ESP32æ¨¡å—å›ºä»¶å‡çº§ */
+			status_ESP32Test();
+			break;
+
+		case MS_USB_UART1: /* USBè™šæ‹Ÿä¸²å£ï¼Œæ˜ å°„åˆ°ç¡¬ä»¶UART1ï¼Œ RS485 RS232 */
+			status_UsbUart1();
+			break;
+
+		case MS_PROGRAMMER: /* è„±æœºä¸‹è½½å™¨ */
+			status_Programmer();
+			break;
+
+		case MS_VOLTAGE_METER: /* ç”µå‹è¡¨ */
+			status_VoltageMeter();
+			break;
+
+		case MS_CURRENT_METER: /* é«˜ä¾§ç”µæµè¡¨ */
+			status_CurrentMeter();
+			break;
+
+		case MS_TEMP_METER: /* æ¸©åº¦è¡¨ */
+			status_TempMeter();
+			break;
+
+		case MS_RESISTOR_METER: /* ç”µé˜»è¡¨ */
+			status_ResistorMeter();
+			break;
+
+		default:
+			g_MainStatus = MS_LINK_MODE;
+			break;
 		}
 	}
-}	
+}
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: NextStatus
-*	¹¦ÄÜËµÃ÷: ×´Ì¬ÇĞ»», Ïòºó·­
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: NextStatus
+*	åŠŸèƒ½è¯´æ˜: çŠ¶æ€åˆ‡æ¢, å‘åç¿»
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint16_t NextStatus(uint16_t _NowStatus)
@@ -162,7 +161,7 @@ uint16_t NextStatus(uint16_t _NowStatus)
 	uint16_t next;
 	uint16_t i;
 	uint16_t count;
-	
+
 	count = sizeof(StatusOrder) / 2;
 
 	for (i = 0; i < count; i++)
@@ -173,24 +172,24 @@ uint16_t NextStatus(uint16_t _NowStatus)
 			break;
 		}
 	}
-	
+
 	if (++next >= count)
 	{
 		next = 0;
 	}
-	
-	#if SWITCH_BEEP_ENABLE == 1
-		BEEP_KeyTone();
-	#endif
+
+#if SWITCH_BEEP_ENABLE == 1
+	BEEP_KeyTone();
+#endif
 	return StatusOrder[next];
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: LastStatus
-*	¹¦ÄÜËµÃ÷: ×´Ì¬ÇĞ»», ÏòÇ°·­
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: LastStatus
+*	åŠŸèƒ½è¯´æ˜: çŠ¶æ€åˆ‡æ¢, å‘å‰ç¿»
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 uint16_t LastStatus(uint16_t _NowStatus)
@@ -198,7 +197,7 @@ uint16_t LastStatus(uint16_t _NowStatus)
 	uint16_t next;
 	uint16_t i;
 	uint16_t count;
-	
+
 	count = sizeof(StatusOrder) / 2;
 
 	for (i = 0; i < count; i++)
@@ -209,7 +208,7 @@ uint16_t LastStatus(uint16_t _NowStatus)
 			break;
 		}
 	}
-	
+
 	if (next > 0)
 	{
 		next--;
@@ -218,162 +217,161 @@ uint16_t LastStatus(uint16_t _NowStatus)
 	{
 		next = count - 1;
 	}
-	#if SWITCH_BEEP_ENABLE == 1
-		BEEP_KeyTone();
-	#endif	
+#if SWITCH_BEEP_ENABLE == 1
+	BEEP_KeyTone();
+#endif
 	return StatusOrder[next];
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispLogo
-*	¹¦ÄÜËµÃ÷: ¿ª»úÏÔÊ¾°æ±¾ºÅ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispLogo
+*	åŠŸèƒ½è¯´æ˜: å¼€æœºæ˜¾ç¤ºç‰ˆæœ¬å·
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispLogo(void)
 {
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
-	
-	tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-	tFont.FrontColor = CL_YELLOW;	/* ×ÖÌåÑÕÉ« */
-	tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-	tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+	FONT_T tFont; /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
+
+	tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+	tFont.FrontColor = CL_YELLOW;			 /* å­—ä½“é¢œè‰² */
+	tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+	tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
 	ST7789_SetDirection(g_tParam.DispDir);
-	
-	LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
-	
-	/* ÏÔÊ¾APP¹Ì¼ş°æ±¾¡£°æ±¾ºÅ·ÅÔÚÖĞ¶ÏÏòÁ¿±í */
+
+	LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
+
+	/* æ˜¾ç¤ºAPPå›ºä»¶ç‰ˆæœ¬ã€‚ç‰ˆæœ¬å·æ”¾åœ¨ä¸­æ–­å‘é‡è¡¨ */
 	{
 		char buf[64];
 		uint16_t x = 5;
 		uint16_t y = 3;
 		uint16_t line_cap = 20;
 
-		LCD_DispStr(x , y, "H7-TOOL¶à¹¦ÄÜ¿ª·¢¹¤¾ß", &tFont);
+		LCD_DispStr(x, y, "H7-TOOLå¤šåŠŸèƒ½å¼€å‘å·¥å…·", &tFont);
 		y += line_cap;
-		
+
 		sprintf(buf, "App Ver:%d.%02X",
-			APP_VERSION >> 8, APP_VERSION & 0xFF);
-		LCD_DispStr(x , y, buf, &tFont);
+						APP_VERSION >> 8, APP_VERSION & 0xFF);
+		LCD_DispStr(x, y, buf, &tFont);
 
 		y += line_cap;
 		sprintf(buf, "Boot Ver:%d.%02X",
-			BOOT_VERSION >> 8, BOOT_VERSION & 0xFF);
-		LCD_DispStr(x , y, buf, &tFont);			
-		
+						BOOT_VERSION >> 8, BOOT_VERSION & 0xFF);
+		LCD_DispStr(x, y, buf, &tFont);
+
 		y += line_cap;
-		LCD_DispStr(x , y, "ÕıÔÚÅäÖÃÍøÂç...", &tFont);	
+		LCD_DispStr(x, y, "æ­£åœ¨é…ç½®ç½‘ç»œ...", &tFont);
 	}
-		
-	LCD_SetBackLight(BRIGHT_DEFAULT);	 /* ´ò¿ª±³¹â£¬ÉèÖÃÎªÈ±Ê¡ÁÁ¶È */
+
+	LCD_SetBackLight(BRIGHT_DEFAULT); /* æ‰“å¼€èƒŒå…‰ï¼Œè®¾ç½®ä¸ºç¼ºçœäº®åº¦ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispHeader
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾½çÃæ±êÌâ£¨Ì§Í·µÚ1ĞĞ£©
-*	ĞÎ    ²Î: _str : ±êÌâÎÄ×Ö
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispHeader
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºç•Œé¢æ ‡é¢˜ï¼ˆæŠ¬å¤´ç¬¬1è¡Œï¼‰
+*	å½¢    å‚: _str : æ ‡é¢˜æ–‡å­—
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-void DispHeader(char * _str)
+void DispHeader(char *_str)
 {
 	FONT_T tFont;
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
-	{
-		tFont.FontCode = FC_ST_24;			/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = HEAD_BAR_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-	}
-	
-	LCD_DispStrEx(0, 0, _str, &tFont, 240, ALIGN_CENTER);
-	
-	LCD_Fill_Rect(0, 24, 240 - 24, 240, FORM_BACK_COLOR);	/* ÇåÆÁ  */
-}
 
+	/* è®¾ç½®å­—ä½“å‚æ•° */
+	{
+		tFont.FontCode = FC_ST_24;				/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE;			/* å­—ä½“é¢œè‰² */
+		tFont.BackColor = HEAD_BAR_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+	}
+
+	LCD_DispStrEx(0, 0, _str, &tFont, 240, ALIGN_CENTER);
+
+	LCD_Fill_Rect(0, 24, 240 - 24, 240, FORM_BACK_COLOR); /* æ¸…å±  */
+}
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DSO_StartMode2
-*	¹¦ÄÜËµÃ÷: Æô¶¯Ê¾²¨Æ÷Å·Ê½2£¬¶àÍ¨µÀµÍËÙÉ¨ÃèÄ£Ê½
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DSO_StartMode2
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨ç¤ºæ³¢å™¨æ¬§å¼2ï¼Œå¤šé€šé“ä½é€Ÿæ‰«ææ¨¡å¼
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void DSO_StartMode2(void)
 {
-	WriteRegValue_06H(0x01FF, 2);		/* ¶àÍ¨µÀµÍËÙ²âÁ¿ */
-	WriteRegValue_06H(0x0200, 1);		/* CH1Ñ¡DCñîºÏ */
-	WriteRegValue_06H(0x0201, 1);		/* CH2Ñ¡DCñîºÏ */
-	WriteRegValue_06H(0x0202, 0);		/* CH1Í¨µÀÔöÒæ0µµ£¬²»·Å´ó */
-	WriteRegValue_06H(0x0203, 0);		/* CH2Í¨µÀÔöÒæ0µµ£¬²»·Å´ó */
-	WriteRegValue_06H(0x0204, 0);		/* CH1Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ */
-	WriteRegValue_06H(0x0205, 0);		/* CH2Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ */
-	WriteRegValue_06H(0x0206, 12);		/* ²ÉÑùÆµÂÊ1M */
-	WriteRegValue_06H(0x0207, 0);		/* ²ÉÑùÉî¶È1K */
-	WriteRegValue_06H(0x0208, 0);		/* ´¥·¢µçÆ½ */
-	WriteRegValue_06H(0x0209, 50);		/* ´¥·¢Î»ÖÃ */
-	WriteRegValue_06H(0x020A, 0);		/* ´¥·¢Ä£Ê½ 0=×Ô¶¯ */
-	WriteRegValue_06H(0x020B, 0);		/* ´¥·¢Í¨µÀCH1 */
-	WriteRegValue_06H(0x020C, 0);		/* ´¥·¢±ßÑØ */
-	WriteRegValue_06H(0x020D, 2);		/* Í¨µÀÊ¹ÄÜ */
-	WriteRegValue_06H(0x020E, 1);		/* ¿ªÊ¼²É¼¯ */
+	WriteRegValue_06H(0x01FF, 2);	/* å¤šé€šé“ä½é€Ÿæµ‹é‡ */
+	WriteRegValue_06H(0x0200, 1);	/* CH1é€‰DCè€¦åˆ */
+	WriteRegValue_06H(0x0201, 1);	/* CH2é€‰DCè€¦åˆ */
+	WriteRegValue_06H(0x0202, 0);	/* CH1é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§ */
+	WriteRegValue_06H(0x0203, 0);	/* CH2é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§ */
+	WriteRegValue_06H(0x0204, 0);	/* CH1é€šé“ç›´æµåå€¼ï¼Œæœªç”¨ */
+	WriteRegValue_06H(0x0205, 0);	/* CH2é€šé“ç›´æµåå€¼ï¼Œæœªç”¨ */
+	WriteRegValue_06H(0x0206, 12); /* é‡‡æ ·é¢‘ç‡1M */
+	WriteRegValue_06H(0x0207, 0);	/* é‡‡æ ·æ·±åº¦1K */
+	WriteRegValue_06H(0x0208, 0);	/* è§¦å‘ç”µå¹³ */
+	WriteRegValue_06H(0x0209, 50); /* è§¦å‘ä½ç½® */
+	WriteRegValue_06H(0x020A, 0);	/* è§¦å‘æ¨¡å¼ 0=è‡ªåŠ¨ */
+	WriteRegValue_06H(0x020B, 0);	/* è§¦å‘é€šé“CH1 */
+	WriteRegValue_06H(0x020C, 0);	/* è§¦å‘è¾¹æ²¿ */
+	WriteRegValue_06H(0x020D, 2);	/* é€šé“ä½¿èƒ½ */
+	WriteRegValue_06H(0x020E, 1);	/* å¼€å§‹é‡‡é›† */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestFunc
-*	¹¦ÄÜËµÃ÷: ÁÙÊ±²âÊÔº¯Êı¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestFunc
+*	åŠŸèƒ½è¯´æ˜: ä¸´æ—¶æµ‹è¯•å‡½æ•°ã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 #if 0
 static void TestFunc(void)
 {
-	#if 0	/* ²âÊÔeepromÇı¶¯ */
+#if 0 /* æµ‹è¯•eepromé©±åŠ¨ */
 	
 	ee_WriteBytes("12345678",0,  8);
 	ee_WriteBytes("87981234",2048 - 8,  8);
-	
-	#endif
-	
-	#if 0	/* ²âÊÔSWD½Ó¿Ú */
+
+#endif
+
+#if 0 /* æµ‹è¯•SWDæ¥å£ */
 	{
 		static uint8_t read_buf[2048];
 				
 		sysTickInit();
 		
-		bsp_SetTVCC(3.3 * 1000);	/* ÉèÖÃ½Ó¿ÚµçÆ½3.3V */
-		bsp_DelayUS(100 * 100);		/* ÑÓ³Ù100ms */
+		bsp_SetTVCC(3.3 * 1000);	/* è®¾ç½®æ¥å£ç”µå¹³3.3V */
+		bsp_DelayUS(100 * 100);		/* å»¶è¿Ÿ100ms */
 		
-		swd_init_debug();	/* ½øÈëswd debug×´Ì¬ */
+		swd_init_debug();	/* è¿›å…¥swd debugçŠ¶æ€ */
 		
 
 		while (1)
 		{
-			/******** ´Ë¶Î´úÂëÖ´ĞĞÊ±¼ä 5.2ms *************/
-				/* Ğ´2048×Ö½Úµ½STM32F030ÄÚ´æ */
+			/******** æ­¤æ®µä»£ç æ‰§è¡Œæ—¶é—´ 5.2ms *************/
+				/* å†™2048å­—èŠ‚åˆ°STM32F030å†…å­˜ */
 				memset(read_buf, 0x55, 2048);
 				swd_write_memory(0x20000000, read_buf, 2048);
 				
-				/* ¶ÁSTM32F030ÄÚ´æ2048×Ö½Ú */
+				/* è¯»STM32F030å†…å­˜2048å­—èŠ‚ */
 				memset(read_buf, 0, 2048);
 				swd_read_memory(0x20000000, read_buf, 2048);   
 
 				swd_read_memory(0x58020000, read_buf, 2048);   
 			
-			bsp_DelayUS(50000);	/* ÑÓ³Ù1ms */		
+			bsp_DelayUS(50000);	/* å»¶è¿Ÿ1ms */		
 		}
 	}
-	#endif
-	
-	#if 0
+#endif
+
+#if 0
 	{
 		uint8_t ucWaveIdx = 0;
 		int16_t volt_min = -10000;
@@ -395,8 +393,8 @@ static void TestFunc(void)
 		
 		while(1);
 	}
-	#endif	
+#endif	
 }
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

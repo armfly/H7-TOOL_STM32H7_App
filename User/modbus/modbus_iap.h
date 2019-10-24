@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : RS485 MODEBUS Í¨ĞÅÄ£¿é
-*	ÎÄ¼şÃû³Æ : modbus_rs485.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : RS485 MODEBUS é€šä¿¡æ¨¡å—
+*	æ–‡ä»¶åç§° : modbus_rs485.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2014-2015, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2014-2015, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,15 +14,12 @@
 #ifndef __MODBUS_IAP_H_
 #define __MODBUS_IAP_H_
 
-
-/* 06H boot²¨ÌØÂÊ¼Ä´æÆ÷ ºÍ ³ÌĞòÉı¼¶¼Ä´æÆ÷ */
-#define SYS_RESET			0x9100
-#define BOOT_BAUD			0x9101
-#define BOOT_UPGRADE_FLAG	0x9102
+/* 06H bootæ³¢ç‰¹ç‡å¯„å­˜å™¨ å’Œ ç¨‹åºå‡çº§å¯„å­˜å™¨ */
+#define SYS_RESET 0x9100
+#define BOOT_BAUD 0x9101
+#define BOOT_UPGRADE_FLAG 0x9102
 
 void MODS_15H(void);
 uint8_t IAP_Write06H(uint16_t reg_addr, uint16_t reg_value);
 
 #endif
-
-

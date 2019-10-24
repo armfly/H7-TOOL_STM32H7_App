@@ -24,7 +24,7 @@
   *
   ******************************************************************************
   */
-  
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TCP_ECHOCLIENT_H__
 #define __TCP_ECHOCLIENT_H__
@@ -33,17 +33,17 @@
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
 
-#define TCP_Tx_SIZE		64
-#define TCP_Rx_SIZE		2048 + 10
+#define TCP_Tx_SIZE 64
+#define TCP_Rx_SIZE 2048 + 10
 
-/* ÓÃ»§TCP½ÓÊÕ/·¢ËÍ½á¹¹Ìå */
+/* ç”¨æˆ·TCPæ¥æ”¶/å‘é€ç»“æ„ä½“ */
 typedef struct
 {
-	uint8_t TcpState;			/* TCPÁ¬½Ó×´Ì¬ 0±íÊ¾Ã»Á¬½Ó£¬1±íÊ¾Á¬ÉÏÁË */
-	uint8_t TxData[TCP_Tx_SIZE];	/* TCP·¢ËÍÊı¾İ»º³åÇø */
-	uint16_t TxCount;				/* TCP·¢ËÍµÄÊı¾İ³¤¶È */
-	uint8_t RxData[TCP_Rx_SIZE];	/* TCP½ÓÊÕÊı¾İ»º³åÇø */
-}TCP_USER_T;
+  uint8_t TcpState;            /* TCPè¿æ¥çŠ¶æ€ 0è¡¨ç¤ºæ²¡è¿æ¥ï¼Œ1è¡¨ç¤ºè¿ä¸Šäº† */
+  uint8_t TxData[TCP_Tx_SIZE]; /* TCPå‘é€æ•°æ®ç¼“å†²åŒº */
+  uint16_t TxCount;            /* TCPå‘é€çš„æ•°æ®é•¿åº¦ */
+  uint8_t RxData[TCP_Rx_SIZE]; /* TCPæ¥æ”¶æ•°æ®ç¼“å†²åŒº */
+} TCP_USER_T;
 
 /* ECHO protocol states */
 enum echoclient_states
@@ -69,12 +69,12 @@ struct echoclient
 /* Exported functions ------------------------------------------------------- */
 void tcp_echoclient_connect(void);
 
-void tcp_echoclient_connection_close(struct tcp_pcb *tpcb, struct echoclient * es);
-void tcp_client_usersent(struct tcp_pcb *_tpcb);		/* ÓÃ»§·¢ËÍÊı¾İ */
+void tcp_echoclient_connection_close(struct tcp_pcb *tpcb, struct echoclient *es);
+void tcp_client_usersent(struct tcp_pcb *_tpcb); /* ç”¨æˆ·å‘é€æ•°æ® */
 extern struct tcp_pcb *echoclient_pcb;
 
 extern TCP_USER_T g_tClient;
-extern uint8_t g_fTcpState;		/* TCPÁ¬½Ó */
+extern uint8_t g_fTcpState; /* TCPè¿æ¥ */
 
 #endif /* __TCP_ECHOCLIENT_H__ */
 

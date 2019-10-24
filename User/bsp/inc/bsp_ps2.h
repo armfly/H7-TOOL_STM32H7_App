@@ -1,10 +1,10 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : PS/2¼üÅÌºÍÊó±êÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_ps2.h
+*	æ¨¡å—åç§° : PS/2é”®ç›˜å’Œé¼ æ ‡é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_ps2.h
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -12,139 +12,139 @@
 #ifndef _BSP_PS2_H
 #define _BSP_PS2_H
 
-/* ÓÃÓÚ×Ô¶¯Ê¶±ğÉè±¸ÀàĞÍµÄº¯Êı */
+/* ç”¨äºè‡ªåŠ¨è¯†åˆ«è®¾å¤‡ç±»å‹çš„å‡½æ•° */
 enum
 {
-	PS2_UNKNOW_DEVICE	= 0,	/* Î´ÖªÉè±¸ */
-	PS2_MOUSE			= 1,	/* Êó±êÉè±¸ */
-	PS2_KEYBOARD		= 2,	/* ¼üÅÌÉè±¸ */
+    PS2_UNKNOW_DEVICE = 0, /* æœªçŸ¥è®¾å¤‡ */
+    PS2_MOUSE = 1,         /* é¼ æ ‡è®¾å¤‡ */
+    PS2_KEYBOARD = 2,      /* é”®ç›˜è®¾å¤‡ */
 };
 
-/* Ö¸Ê¾µÆÀà±ğ£¬ÓÃÓÚµãÁÁ¼üÅÌLEDµÆµÄº¯Êı */
+/* æŒ‡ç¤ºç¯ç±»åˆ«ï¼Œç”¨äºç‚¹äº®é”®ç›˜LEDç¯çš„å‡½æ•° */
 enum
 {
-	LED_CapsLock = 0,
-	LED_NumLock,
-	LED_ScrollLock
+    LED_CapsLock = 0,
+    LED_NumLock,
+    LED_ScrollLock
 };
 
-#define PS2_NONE     0
-#define KB_PAUSE     0xE11477E1
+#define PS2_NONE 0
+#define KB_PAUSE 0xE11477E1
 #define KB_PRNT_SCRN 0xE012E07C
 enum
 {
-    KB_A         = 0x00001C,
-    KB_B         = 0x000032,
-    KB_C         = 0x000021,
-    KB_D         = 0x000023,
-    KB_E         = 0x000024,
-    KB_F         = 0x00002B,
-    KB_G         = 0x000034,
-    KB_H         = 0x000033,
-    KB_I         = 0x000043,
-    KB_J         = 0x00003B,
-    KB_K         = 0x000042,
-    KB_L         = 0x00004B,
-    KB_M         = 0x00003A,
-    KB_N         = 0x000031,
-    KB_O         = 0x000044,
-    KB_P         = 0x00004D,
-    KB_Q         = 0x000015,
-    KB_R         = 0x00002D,
-    KB_S         = 0x00001B,
-    KB_T         = 0x00002C,
-    KB_U         = 0x00003C,
-    KB_V         = 0x00002A,
-    KB_W         = 0x00001D,
-    KB_X         = 0x000022,
-    KB_Y         = 0x000035,
-    KB_Z         = 0x00001A,
-    KB_0         = 0x000045,
-    KB_1         = 0x000016,
-    KB_2         = 0x00001E,
-    KB_3         = 0x000026,
-    KB_4         = 0x000025,
-    KB_5         = 0x00002E,
-    KB_6         = 0x000036,
-    KB_7         = 0x00003D,
-    KB_8         = 0x00003E,
-    KB_9         = 0x000046,
-    KB_PIE       = 0x00000E,    /* Æ²£¬¼üÅÌ×óÉÏ½Ç */
-    KB_SUB       = 0x00004E,    /* ÖĞ¸Ü£¬¼õºÅ */
-    KB_EQU       = 0x000055,    /* µÈºÅ */
-    KB_FXG       = 0x00005D,    /* ·´Ğ±¸Ü */
-    KB_BKSP      = 0x000066,
-    KB_SPACE     = 0x000029,
-    KB_TAB       = 0x00000D,
-    KB_CAPS      = 0x000058,
-    KB_L_SHFT    = 0x000012,
-    KB_L_CTRL    = 0x000014,
-    KB_L_GUI     = 0x00E01F,
-    KB_L_ALT     = 0x000011,
-    KB_R_SHFT    = 0x000059,
-    KB_R_CTRL    = 0x00E014,
-    KB_R_GUI     = 0x00E027,
-    KB_R_ALT     = 0x00E011,
-    KB_APPS      = 0x00E02F,
-    KB_ENTER     = 0x00005A,
-    KB_ESC       = 0x000076,
-    KB_F1        = 0x000005,
-    KB_F2        = 0x000006,
-    KB_F3        = 0x000004,
-    KB_F4        = 0x00000C,
-    KB_F5        = 0x000003,
-    KB_F6        = 0x00000B,
-    KB_F7        = 0x000083,
-    KB_F8        = 0x00000A,
-    KB_F9        = 0x000001,
-    KB_F10       = 0x000009,
-    KB_F11       = 0x000078,
-    KB_F12       = 0x000007,
+    KB_A = 0x00001C,
+    KB_B = 0x000032,
+    KB_C = 0x000021,
+    KB_D = 0x000023,
+    KB_E = 0x000024,
+    KB_F = 0x00002B,
+    KB_G = 0x000034,
+    KB_H = 0x000033,
+    KB_I = 0x000043,
+    KB_J = 0x00003B,
+    KB_K = 0x000042,
+    KB_L = 0x00004B,
+    KB_M = 0x00003A,
+    KB_N = 0x000031,
+    KB_O = 0x000044,
+    KB_P = 0x00004D,
+    KB_Q = 0x000015,
+    KB_R = 0x00002D,
+    KB_S = 0x00001B,
+    KB_T = 0x00002C,
+    KB_U = 0x00003C,
+    KB_V = 0x00002A,
+    KB_W = 0x00001D,
+    KB_X = 0x000022,
+    KB_Y = 0x000035,
+    KB_Z = 0x00001A,
+    KB_0 = 0x000045,
+    KB_1 = 0x000016,
+    KB_2 = 0x00001E,
+    KB_3 = 0x000026,
+    KB_4 = 0x000025,
+    KB_5 = 0x00002E,
+    KB_6 = 0x000036,
+    KB_7 = 0x00003D,
+    KB_8 = 0x00003E,
+    KB_9 = 0x000046,
+    KB_PIE = 0x00000E, /* æ’‡ï¼Œé”®ç›˜å·¦ä¸Šè§’ */
+    KB_SUB = 0x00004E, /* ä¸­æ ï¼Œå‡å· */
+    KB_EQU = 0x000055, /* ç­‰å· */
+    KB_FXG = 0x00005D, /* åæ–œæ  */
+    KB_BKSP = 0x000066,
+    KB_SPACE = 0x000029,
+    KB_TAB = 0x00000D,
+    KB_CAPS = 0x000058,
+    KB_L_SHFT = 0x000012,
+    KB_L_CTRL = 0x000014,
+    KB_L_GUI = 0x00E01F,
+    KB_L_ALT = 0x000011,
+    KB_R_SHFT = 0x000059,
+    KB_R_CTRL = 0x00E014,
+    KB_R_GUI = 0x00E027,
+    KB_R_ALT = 0x00E011,
+    KB_APPS = 0x00E02F,
+    KB_ENTER = 0x00005A,
+    KB_ESC = 0x000076,
+    KB_F1 = 0x000005,
+    KB_F2 = 0x000006,
+    KB_F3 = 0x000004,
+    KB_F4 = 0x00000C,
+    KB_F5 = 0x000003,
+    KB_F6 = 0x00000B,
+    KB_F7 = 0x000083,
+    KB_F8 = 0x00000A,
+    KB_F9 = 0x000001,
+    KB_F10 = 0x000009,
+    KB_F11 = 0x000078,
+    KB_F12 = 0x000007,
     //KB_PRNT_SCRN = 0xE012E07C,    /* E0 12 E0 7C */
-    KB_SCROLL    = 0x00007E,
-    //KB_PAUSE     = 0xE11477E1,    /* E1,14,77,    E1,F0,14, F0,77  ±ÜÃâ±àÒëÆ÷±¨int³¬ÏŞ¾¯¸æ */
-    KB_ZZKH      = 0x000054,    /* [ ×óÖĞÀ¨ºÅ */
-    KB_INSERT    = 0x00E070,
-    KB_HOME      = 0x00E06C,
-    KB_PGUP      = 0x00E07D,
-    KB_DELETE    = 0x00E071,
-    KB_END       = 0x00E069,
-    KB_PGDN      = 0x00E07A,
-    KB_U_ARROW   = 0x00E075,
-    KB_L_ARROW   = 0x00E06B,
-    KB_D_ARROW   = 0x00E072,
-    KB_R_ARROW   = 0x00E074,
-    KB_NUM       = 0x000077,
-    KB_KP_DIV    = 0x00E04A,    /* Ğ¡¼üÅÌ³ıºÅ  KP ±íÊ¾Ğ¡¼üÅÌ */
-    KB_KP_MULT   = 0x00007C,    /* Ğ¡¼üÅÌ³ËºÅ */
-    KB_KP_SUB    = 0x00007B,    /* - */
-    KB_KP_ADD    = 0x000079,    /* + */
-    KB_KP_ENTER  = 0x00E05A,
-    KB_KP_DOT    = 0x000071,    /* Ğ¡Êıµã */
-    KB_KP_0      = 0x000070,
-    KB_KP_1      = 0x000069,
-    KB_KP_2      = 0x000072,
-    KB_KP_3      = 0x00007A,
-    KB_KP_4      = 0x00006B,
-    KB_KP_5      = 0x000073,
-    KB_KP_6      = 0x000074,
-    KB_KP_7      = 0x00006C,
-    KB_KP_8      = 0x000075,
-    KB_KP_9      = 0x00007D,
-    KB_YZKH      = 0x00005B,    /* ] ÓÒÖĞÀ¨ºÅ */
-    KB_SEMICOLON = 0x00004C,    /* ; ·ÖºÅ */
-    KB_QUOTES    = 0x000052,    /* µ¥ÒıºÅ */
-    KB_COMMA     = 0x000041,    /* ¶ººÅ */
-    KB_DOT       = 0x000049,    /* Ğ¡Êıµã */
-    KB_DIV       = 0x00004A,    /* ³ıºÅ */
+    KB_SCROLL = 0x00007E,
+    //KB_PAUSE     = 0xE11477E1,    /* E1,14,77,    E1,F0,14, F0,77  é¿å…ç¼–è¯‘å™¨æŠ¥intè¶…é™è­¦å‘Š */
+    KB_ZZKH = 0x000054, /* [ å·¦ä¸­æ‹¬å· */
+    KB_INSERT = 0x00E070,
+    KB_HOME = 0x00E06C,
+    KB_PGUP = 0x00E07D,
+    KB_DELETE = 0x00E071,
+    KB_END = 0x00E069,
+    KB_PGDN = 0x00E07A,
+    KB_U_ARROW = 0x00E075,
+    KB_L_ARROW = 0x00E06B,
+    KB_D_ARROW = 0x00E072,
+    KB_R_ARROW = 0x00E074,
+    KB_NUM = 0x000077,
+    KB_KP_DIV = 0x00E04A,  /* å°é”®ç›˜é™¤å·  KP è¡¨ç¤ºå°é”®ç›˜ */
+    KB_KP_MULT = 0x00007C, /* å°é”®ç›˜ä¹˜å· */
+    KB_KP_SUB = 0x00007B,  /* - */
+    KB_KP_ADD = 0x000079,  /* + */
+    KB_KP_ENTER = 0x00E05A,
+    KB_KP_DOT = 0x000071, /* å°æ•°ç‚¹ */
+    KB_KP_0 = 0x000070,
+    KB_KP_1 = 0x000069,
+    KB_KP_2 = 0x000072,
+    KB_KP_3 = 0x00007A,
+    KB_KP_4 = 0x00006B,
+    KB_KP_5 = 0x000073,
+    KB_KP_6 = 0x000074,
+    KB_KP_7 = 0x00006C,
+    KB_KP_8 = 0x000075,
+    KB_KP_9 = 0x00007D,
+    KB_YZKH = 0x00005B,      /* ] å³ä¸­æ‹¬å· */
+    KB_SEMICOLON = 0x00004C, /* ; åˆ†å· */
+    KB_QUOTES = 0x000052,    /* å•å¼•å· */
+    KB_COMMA = 0x000041,     /* é€—å· */
+    KB_DOT = 0x000049,       /* å°æ•°ç‚¹ */
+    KB_DIV = 0x00004A,       /* é™¤å· */
 
-    /* ÏÂÃæÊÇ¼üÅÌÊÍ·ÅµÄ´úÂë */
-    BREAK_L_SHFT    = 0x00F012,
-    BREAK_L_CTRL    = 0x00F014,
-    BREAK_L_ALT     = 0x00F011,
-    BREAK_R_SHFT    = 0x00F059,
-    BREAK_R_CTRL    = 0xE0F014,
-    BREAK_R_ALT     = 0xE0F011,
+    /* ä¸‹é¢æ˜¯é”®ç›˜é‡Šæ”¾çš„ä»£ç  */
+    BREAK_L_SHFT = 0x00F012,
+    BREAK_L_CTRL = 0x00F014,
+    BREAK_L_ALT = 0x00F011,
+    BREAK_R_SHFT = 0x00F059,
+    BREAK_R_CTRL = 0xE0F014,
+    BREAK_R_ALT = 0xE0F011,
 };
 
 /*
@@ -156,54 +156,54 @@ enum
 	Right "Ctrl"  E0, 14       E0, F0, 14
 */
 
-/* °´¼üFIFOÓÃµ½±äÁ¿ */
-#define PS2_FIFO_SIZE	10
+/* æŒ‰é”®FIFOç”¨åˆ°å˜é‡ */
+#define PS2_FIFO_SIZE 10
 
-#define PS2_MAX_LEN	10
+#define PS2_MAX_LEN 10
 typedef struct
 {
-	uint32_t Buf[PS2_FIFO_SIZE];		/* ¼üÖµ»º³åÇø */
-	uint8_t Read;					/* »º³åÇø¶ÁÖ¸Õë1 */
-	uint8_t Write;					/* »º³åÇøĞ´Ö¸Õë */
+    uint32_t Buf[PS2_FIFO_SIZE]; /* é”®å€¼ç¼“å†²åŒº */
+    uint8_t Read;                /* ç¼“å†²åŒºè¯»æŒ‡é’ˆ1 */
+    uint8_t Write;               /* ç¼“å†²åŒºå†™æŒ‡é’ˆ */
 
-	uint8_t Status;
-	uint8_t CodeBuf[PS2_MAX_LEN];	/* Ô­Ê¼Êı¾İ»º³åÇø */
-	uint8_t Len;					/* Êı¾İ³¤¶È */
-	uint8_t TxTimeOut;				/* Ö÷»ú·¢ËÍÃüÁî³¬Ê± */
-	uint8_t RxTimeOut;				/* Ö÷»ú½ÓÊÕPS2Éè±¸Êı¾İ°ü³¬Ê± */	
+    uint8_t Status;
+    uint8_t CodeBuf[PS2_MAX_LEN]; /* åŸå§‹æ•°æ®ç¼“å†²åŒº */
+    uint8_t Len;                  /* æ•°æ®é•¿åº¦ */
+    uint8_t TxTimeOut;            /* ä¸»æœºå‘é€å‘½ä»¤è¶…æ—¶ */
+    uint8_t RxTimeOut;            /* ä¸»æœºæ¥æ”¶PS2è®¾å¤‡æ•°æ®åŒ…è¶…æ—¶ */
 
-	uint8_t Sending;				/* 1±íÊ¾ Ö÷»úÏòÊó±êºÍ¼üÅÌ·¢ËÍÊı¾İ×´Ì¬ */
-	uint8_t Cmd;
-	uint8_t Ack;					/* Ö÷»ú¸øÉè±¸·¢ËÍ1×Ö½Úºó£¬Éè±¸¸øÖ÷»úµÄÓ¦´ğĞÅºÅ,Õı³£ACK = 0 */
+    uint8_t Sending; /* 1è¡¨ç¤º ä¸»æœºå‘é¼ æ ‡å’Œé”®ç›˜å‘é€æ•°æ®çŠ¶æ€ */
+    uint8_t Cmd;
+    uint8_t Ack; /* ä¸»æœºç»™è®¾å¤‡å‘é€1å­—èŠ‚åï¼Œè®¾å¤‡ç»™ä¸»æœºçš„åº”ç­”ä¿¡å·,æ­£å¸¸ACK = 0 */
 
-	/* ¼üÅÌ×´Ì¬Î» */
-	uint8_t ksShift;				/* 1±íÊ¾ Shift ¼ü±»°´ÏÂ */
-	uint8_t ksCtrl;					/* 1±íÊ¾ Ctrl ¼ü±»°´ÏÂ */
-	uint8_t ksAlt;					/* 1±íÊ¾ Alt ¼ü±»°´ÏÂ */
-	uint8_t ksCapsLock;				/* 1±íÊ¾ CapsLock ×´Ì¬Ö¸Ê¾µÆÁÁ */
-	uint8_t KsNumLock;				/* 1±íÊ¾ NumLock ×´Ì¬Ö¸Ê¾µÆÁÁ */
-	uint8_t KsScrollLock;			/* 1±íÊ¾ ScrollLock ×´Ì¬Ö¸Ê¾µÆÁÁ */
-	
-	/* ĞŞ¸Ä¼üÅÌµÆ×´Ì¬ÓÃµ½µÄ±äÁ¿ */
-	uint8_t LedReq;					/* Ö÷³ÌĞò¼ì²âµ½ 1 Ê±, ·¢ËÍÃüÁî¿ØÖÆ¼üÅÌµÆ×´Ì¬ */
-	uint8_t LedData;				
-}PS2_T;
+    /* é”®ç›˜çŠ¶æ€ä½ */
+    uint8_t ksShift;      /* 1è¡¨ç¤º Shift é”®è¢«æŒ‰ä¸‹ */
+    uint8_t ksCtrl;       /* 1è¡¨ç¤º Ctrl é”®è¢«æŒ‰ä¸‹ */
+    uint8_t ksAlt;        /* 1è¡¨ç¤º Alt é”®è¢«æŒ‰ä¸‹ */
+    uint8_t ksCapsLock;   /* 1è¡¨ç¤º CapsLock çŠ¶æ€æŒ‡ç¤ºç¯äº® */
+    uint8_t KsNumLock;    /* 1è¡¨ç¤º NumLock çŠ¶æ€æŒ‡ç¤ºç¯äº® */
+    uint8_t KsScrollLock; /* 1è¡¨ç¤º ScrollLock çŠ¶æ€æŒ‡ç¤ºç¯äº® */
 
-/* Êó±êÊı¾İ½á¹¹Ìå */
+    /* ä¿®æ”¹é”®ç›˜ç¯çŠ¶æ€ç”¨åˆ°çš„å˜é‡ */
+    uint8_t LedReq; /* ä¸»ç¨‹åºæ£€æµ‹åˆ° 1 æ—¶, å‘é€å‘½ä»¤æ§åˆ¶é”®ç›˜ç¯çŠ¶æ€ */
+    uint8_t LedData;
+} PS2_T;
+
+/* é¼ æ ‡æ•°æ®ç»“æ„ä½“ */
 typedef struct
 {
-	uint8_t Intelli;	/* 1±íÊ¾ÖÇÄÜÊó±ê */
-	uint8_t Xoverflow;
-	uint8_t Yoverflow;
-	int16_t Xmove;
-	int16_t Ymove;
-	int16_t Zmove;
-	uint8_t BtnLeft;
-	uint8_t BtnMid;
-	uint8_t BtnRight;
-	uint8_t Btn4;
-	uint8_t Btn5;
-}MOUSE_PACKET_T;
+    uint8_t Intelli; /* 1è¡¨ç¤ºæ™ºèƒ½é¼ æ ‡ */
+    uint8_t Xoverflow;
+    uint8_t Yoverflow;
+    int16_t Xmove;
+    int16_t Ymove;
+    int16_t Zmove;
+    uint8_t BtnLeft;
+    uint8_t BtnMid;
+    uint8_t BtnRight;
+    uint8_t Btn4;
+    uint8_t Btn5;
+} MOUSE_PACKET_T;
 
 void bsp_InitPS2(void);
 void PS2_StartWork(void);
@@ -220,10 +220,10 @@ uint8_t PS2_IsMousePacket(uint32_t _input);
 
 uint8_t PS2_InitKeyboard(void);
 void PS2_SetKeyboardLed(uint8_t _id, uint8_t _on);
-const char * GetNameOfKey(uint32_t _code);
+const char *GetNameOfKey(uint32_t _code);
 
 extern PS2_T g_tPS2;
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

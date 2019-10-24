@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : °´¼üÇı¶¯Ä£¿é
-*	ÎÄ¼şÃû³Æ : bsp_key.h
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : æŒ‰é”®é©±åŠ¨æ¨¡å—
+*	æ–‡ä»¶åç§° : bsp_key.h
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,86 +14,86 @@
 #ifndef __BSP_KEY_H
 #define __BSP_KEY_H
 
-/* ¸ù¾İÓ¦ÓÃ³ÌĞòµÄ¹¦ÄÜÖØÃüÃû°´¼üºê */
-#define KEY_DOWN_S		KEY_1_DOWN
-#define KEY_UP_S		KEY_1_UP
-#define KEY_LONG_S		KEY_1_LONG
+/* æ ¹æ®åº”ç”¨ç¨‹åºçš„åŠŸèƒ½é‡å‘½åæŒ‰é”®å® */
+#define KEY_DOWN_S KEY_1_DOWN
+#define KEY_UP_S KEY_1_UP
+#define KEY_LONG_S KEY_1_LONG
 
-#define KEY_DOWN_C		KEY_2_DOWN
-#define KEY_UP_C		KEY_2_UP
-#define KEY_LONG_C		KEY_2_LONG
+#define KEY_DOWN_C KEY_2_DOWN
+#define KEY_UP_C KEY_2_UP
+#define KEY_LONG_C KEY_2_LONG
 
-/* °´¼üID, Ö÷ÒªÓÃÓÚbsp_KeyState()º¯ÊıµÄÈë¿Ú²ÎÊı */
+/* æŒ‰é”®ID, ä¸»è¦ç”¨äºbsp_KeyState()å‡½æ•°çš„å…¥å£å‚æ•° */
 typedef enum
 {
 	KID_S = 0,
 	KID_C,
-}KEY_ID_E;
+} KEY_ID_E;
 
 /*
-	°´¼üÂË²¨Ê±¼ä50ms, µ¥Î»10ms¡£
-	Ö»ÓĞÁ¬Ğø¼ì²âµ½50ms×´Ì¬²»±ä²ÅÈÏÎªÓĞĞ§£¬°üÀ¨µ¯ÆğºÍ°´ÏÂÁ½ÖÖÊÂ¼ş
-	¼´Ê¹°´¼üµçÂ·²»×öÓ²¼şÂË²¨£¬¸ÃÂË²¨»úÖÆÒ²¿ÉÒÔ±£Ö¤¿É¿¿µØ¼ì²âµ½°´¼üÊÂ¼ş
+	æŒ‰é”®æ»¤æ³¢æ—¶é—´50ms, å•ä½10msã€‚
+	åªæœ‰è¿ç»­æ£€æµ‹åˆ°50msçŠ¶æ€ä¸å˜æ‰è®¤ä¸ºæœ‰æ•ˆï¼ŒåŒ…æ‹¬å¼¹èµ·å’ŒæŒ‰ä¸‹ä¸¤ç§äº‹ä»¶
+	å³ä½¿æŒ‰é”®ç”µè·¯ä¸åšç¡¬ä»¶æ»¤æ³¢ï¼Œè¯¥æ»¤æ³¢æœºåˆ¶ä¹Ÿå¯ä»¥ä¿è¯å¯é åœ°æ£€æµ‹åˆ°æŒ‰é”®äº‹ä»¶
 */
-#define KEY_FILTER_TIME   5
-#define KEY_LONG_TIME     50			/* µ¥Î»10ms£¬ ³ÖĞø1Ãë£¬ÈÏÎª³¤°´ÊÂ¼ş */
+#define KEY_FILTER_TIME 5
+#define KEY_LONG_TIME 50 /* å•ä½10msï¼Œ æŒç»­1ç§’ï¼Œè®¤ä¸ºé•¿æŒ‰äº‹ä»¶ */
 
 /*
-	Ã¿¸ö°´¼ü¶ÔÓ¦1¸öÈ«¾ÖµÄ½á¹¹Ìå±äÁ¿¡£
+	æ¯ä¸ªæŒ‰é”®å¯¹åº”1ä¸ªå…¨å±€çš„ç»“æ„ä½“å˜é‡ã€‚
 */
 typedef struct
 {
-	/* ÏÂÃæÊÇÒ»¸öº¯ÊıÖ¸Õë£¬Ö¸ÏòÅĞ¶Ï°´¼üÊÖ·ñ°´ÏÂµÄº¯Êı */
-	uint8_t (*IsKeyDownFunc)(void); /* °´¼ü°´ÏÂµÄÅĞ¶Ïº¯Êı,1±íÊ¾°´ÏÂ */
+	/* ä¸‹é¢æ˜¯ä¸€ä¸ªå‡½æ•°æŒ‡é’ˆï¼ŒæŒ‡å‘åˆ¤æ–­æŒ‰é”®æ‰‹å¦æŒ‰ä¸‹çš„å‡½æ•° */
+	uint8_t (*IsKeyDownFunc)(void); /* æŒ‰é”®æŒ‰ä¸‹çš„åˆ¤æ–­å‡½æ•°,1è¡¨ç¤ºæŒ‰ä¸‹ */
 
-	uint8_t  Count;			/* ÂË²¨Æ÷¼ÆÊıÆ÷ */
-	uint16_t LongCount;		/* ³¤°´¼ÆÊıÆ÷ */
-	uint16_t LongTime;		/* °´¼ü°´ÏÂ³ÖĞøÊ±¼ä, 0±íÊ¾²»¼ì²â³¤°´ */
-	uint8_t  State;			/* °´¼üµ±Ç°×´Ì¬£¨°´ÏÂ»¹ÊÇµ¯Æğ£© */
-	uint8_t  RepeatSpeed;	/* Á¬Ğø°´¼üÖÜÆÚ */
-	uint8_t  RepeatCount;	/* Á¬Ğø°´¼ü¼ÆÊıÆ÷ */
-}KEY_T;
+	uint8_t Count;			 /* æ»¤æ³¢å™¨è®¡æ•°å™¨ */
+	uint16_t LongCount;	/* é•¿æŒ‰è®¡æ•°å™¨ */
+	uint16_t LongTime;	 /* æŒ‰é”®æŒ‰ä¸‹æŒç»­æ—¶é—´, 0è¡¨ç¤ºä¸æ£€æµ‹é•¿æŒ‰ */
+	uint8_t State;			 /* æŒ‰é”®å½“å‰çŠ¶æ€ï¼ˆæŒ‰ä¸‹è¿˜æ˜¯å¼¹èµ·ï¼‰ */
+	uint8_t RepeatSpeed; /* è¿ç»­æŒ‰é”®å‘¨æœŸ */
+	uint8_t RepeatCount; /* è¿ç»­æŒ‰é”®è®¡æ•°å™¨ */
+} KEY_T;
 
 /*
-	¶¨Òå¼üÖµ´úÂë, ±ØĞë°´ÈçÏÂ´ÎĞò¶¨Ê±Ã¿¸ö¼üµÄ°´ÏÂ¡¢µ¯ÆğºÍ³¤°´ÊÂ¼ş
+	å®šä¹‰é”®å€¼ä»£ç , å¿…é¡»æŒ‰å¦‚ä¸‹æ¬¡åºå®šæ—¶æ¯ä¸ªé”®çš„æŒ‰ä¸‹ã€å¼¹èµ·å’Œé•¿æŒ‰äº‹ä»¶
 
-	ÍÆ¼öÊ¹ÓÃenum, ²»ÓÃ#define£¬Ô­Òò£º
-	(1) ±ãÓÚĞÂÔö¼üÖµ,·½±ãµ÷ÕûË³Ğò£¬Ê¹´úÂë¿´ÆğÀ´Êæ·şµã
-	(2) ±àÒëÆ÷¿É°ïÎÒÃÇ±ÜÃâ¼üÖµÖØ¸´¡£
+	æ¨èä½¿ç”¨enum, ä¸ç”¨#defineï¼ŒåŸå› ï¼š
+	(1) ä¾¿äºæ–°å¢é”®å€¼,æ–¹ä¾¿è°ƒæ•´é¡ºåºï¼Œä½¿ä»£ç çœ‹èµ·æ¥èˆ’æœç‚¹
+	(2) ç¼–è¯‘å™¨å¯å¸®æˆ‘ä»¬é¿å…é”®å€¼é‡å¤ã€‚
 */
 typedef enum
 {
-	KEY_NONE = 0,			/* 0 ±íÊ¾°´¼üÊÂ¼ş */
+	KEY_NONE = 0, /* 0 è¡¨ç¤ºæŒ‰é”®äº‹ä»¶ */
 
-	KEY_1_DOWN,				/* 1¼ü°´ÏÂ */
-	KEY_1_UP,				/* 1¼üµ¯Æğ */
-	KEY_1_LONG,				/* 1¼ü³¤°´ */
+	KEY_1_DOWN, /* 1é”®æŒ‰ä¸‹ */
+	KEY_1_UP,		/* 1é”®å¼¹èµ· */
+	KEY_1_LONG, /* 1é”®é•¿æŒ‰ */
 
-	KEY_2_DOWN,				/* 2¼ü°´ÏÂ */
-	KEY_2_UP,				/* 2¼üµ¯Æğ */
-	KEY_2_LONG,				/* 2¼ü³¤°´ */
-}KEY_ENUM;
+	KEY_2_DOWN, /* 2é”®æŒ‰ä¸‹ */
+	KEY_2_UP,		/* 2é”®å¼¹èµ· */
+	KEY_2_LONG, /* 2é”®é•¿æŒ‰ */
+} KEY_ENUM;
 
-/* °´¼üFIFOÓÃµ½±äÁ¿ */
-#define KEY_FIFO_SIZE	10
+/* æŒ‰é”®FIFOç”¨åˆ°å˜é‡ */
+#define KEY_FIFO_SIZE 10
 typedef struct
 {
-	uint8_t Buf[KEY_FIFO_SIZE];		/* ¼üÖµ»º³åÇø */
-	uint8_t Read;					/* »º³åÇø¶ÁÖ¸Õë1 */
-	uint8_t Write;					/* »º³åÇøĞ´Ö¸Õë */
-	uint8_t Read2;					/* »º³åÇø¶ÁÖ¸Õë2 */
-}KEY_FIFO_T;
+	uint8_t Buf[KEY_FIFO_SIZE]; /* é”®å€¼ç¼“å†²åŒº */
+	uint8_t Read;								/* ç¼“å†²åŒºè¯»æŒ‡é’ˆ1 */
+	uint8_t Write;							/* ç¼“å†²åŒºå†™æŒ‡é’ˆ */
+	uint8_t Read2;							/* ç¼“å†²åŒºè¯»æŒ‡é’ˆ2 */
+} KEY_FIFO_T;
 
-/* ¹©Íâ²¿µ÷ÓÃµÄº¯ÊıÉùÃ÷ */
+/* ä¾›å¤–éƒ¨è°ƒç”¨çš„å‡½æ•°å£°æ˜ */
 void bsp_InitKey(void);
 void bsp_KeyScan10ms(void);
 void bsp_PutKey(uint8_t _KeyCode);
 uint8_t bsp_GetKey(void);
 uint8_t bsp_GetKey2(void);
 uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID);
-void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t  _RepeatSpeed);
+void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t _RepeatSpeed);
 void bsp_ClearKey(void);
 
 #endif
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

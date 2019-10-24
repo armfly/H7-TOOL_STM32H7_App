@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : MEMS ´«¸ĞÆ÷²âÊÔ£¨I2C£© ÈıÖáÍÓÂİÒÇ£¬´ÅÁ¦¼Æ£¬ÆøÑ¹¼Æ, ¹âÕÕ¶È´«¸ĞÆ÷
-*	ÎÄ¼şÃû³Æ : mems_test.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ²âÊÔMPU-6050, HCM5833L, BMP085, BH1750
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2013-02-01 armfly  Ê×·¢
+*	æ¨¡å—åç§° : MEMS ä¼ æ„Ÿå™¨æµ‹è¯•ï¼ˆI2Cï¼‰ ä¸‰è½´é™€èºä»ªï¼Œç£åŠ›è®¡ï¼Œæ°”å‹è®¡, å…‰ç…§åº¦ä¼ æ„Ÿå™¨
+*	æ–‡ä»¶åç§° : mems_test.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æµ‹è¯•MPU-6050, HCM5833L, BMP085, BH1750
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v1.0    2013-02-01 armfly  é¦–å‘
 *
-*	Copyright (C), 2013-2014, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2013-2014, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -17,50 +17,50 @@
 #include "bsp.h"
 #include "form_mems.h"
 
-/* 4¸ö¿òµÄ×ø±êºÍ´óĞ¡ */
-#define BOX1_X	5
-#define BOX1_Y	8
-#define BOX1_H	120
-#define BOX1_W	190
-#define BOX1_TEXT	"MPU6050 ÍÓÂİÒÇ"
+/* 4ä¸ªæ¡†çš„åæ ‡å’Œå¤§å° */
+#define BOX1_X 5
+#define BOX1_Y 8
+#define BOX1_H 120
+#define BOX1_W 190
+#define BOX1_TEXT "MPU6050 é™€èºä»ª"
 
-#define BOX2_X	(BOX1_X + BOX1_W + 5)
-#define BOX2_Y	BOX1_Y
-#define BOX2_H	BOX1_H
-#define BOX2_W	250
-#define BOX2_TEXT	"´ÅÁ¦¼Æ"
+#define BOX2_X (BOX1_X + BOX1_W + 5)
+#define BOX2_Y BOX1_Y
+#define BOX2_H BOX1_H
+#define BOX2_W 250
+#define BOX2_TEXT "ç£åŠ›è®¡"
 
-#define BOX3_X	BOX1_X
-#define BOX3_Y	(BOX1_Y + BOX1_H + 5)
-#define BOX3_H	52
-#define BOX3_W	220
-#define BOX3_TEXT	"BMP085 ÆøÑ¹¼ÆºÍÎÂ¶È"
+#define BOX3_X BOX1_X
+#define BOX3_Y (BOX1_Y + BOX1_H + 5)
+#define BOX3_H 52
+#define BOX3_W 220
+#define BOX3_TEXT "BMP085 æ°”å‹è®¡å’Œæ¸©åº¦"
 
-#define BOX4_X	(BOX1_X + BOX3_W + 5)
-#define BOX4_Y	(BOX1_Y + BOX1_H + 5)
-#define BOX4_H	52
-#define BOX4_W	220
-#define BOX4_TEXT	"BH1750 ¹âÕÕ¶È"
+#define BOX4_X (BOX1_X + BOX3_W + 5)
+#define BOX4_Y (BOX1_Y + BOX1_H + 5)
+#define BOX4_H 52
+#define BOX4_W 220
+#define BOX4_TEXT "BH1750 å…‰ç…§åº¦"
 
-#define BOX5_X	BOX1_X
-#define BOX5_Y	(BOX3_Y + BOX3_H + 5)
-#define BOX5_H	52
-#define BOX5_W	220
-#define BOX5_TEXT	"DS18B20 ÎÂ¶È´«¸ĞÆ÷"
+#define BOX5_X BOX1_X
+#define BOX5_Y (BOX3_Y + BOX3_H + 5)
+#define BOX5_H 52
+#define BOX5_W 220
+#define BOX5_TEXT "DS18B20 æ¸©åº¦ä¼ æ„Ÿå™¨"
 
-#define BOX6_X	(BOX1_X + BOX5_W + 5)
-#define BOX6_Y	(BOX3_Y + BOX3_H + 5)
-#define BOX6_H	52
-#define BOX6_W	220
-#define BOX6_TEXT	"DHT11 ÎÂÊª¶È´«¸ĞÆ÷"
+#define BOX6_X (BOX1_X + BOX5_W + 5)
+#define BOX6_Y (BOX3_Y + BOX3_H + 5)
+#define BOX6_H 52
+#define BOX6_W 220
+#define BOX6_TEXT "DHT11 æ¸©æ¹¿åº¦ä¼ æ„Ÿå™¨"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BUTTON_RET_ID	0
-#define BUTTON_RET_H	32
-#define BUTTON_RET_W	60
-#define	BUTTON_RET_X	(g_LcdWidth - BUTTON_RET_W - 4)
-#define	BUTTON_RET_Y	(g_LcdHeight - BUTTON_RET_H - 4)
-#define	BUTTON_RET_TEXT	"·µ»Ø"
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BUTTON_RET_ID 0
+#define BUTTON_RET_H 32
+#define BUTTON_RET_W 60
+#define BUTTON_RET_X (g_LcdWidth - BUTTON_RET_W - 4)
+#define BUTTON_RET_Y (g_LcdHeight - BUTTON_RET_H - 4)
+#define BUTTON_RET_TEXT "è¿”å›"
 
 static void DispInitFace(void);
 static void DispMPU6050(void);
@@ -72,46 +72,46 @@ static void DispDHT11(void);
 
 static void DispButton(uint8_t _id, uint8_t _focus);
 
-static uint8_t s_use_dht11 = 0;		/* ÓÃÀ´×Ô¶¯Ñ¡Ôñ DS18B20ºÍ DHT11 */
+static uint8_t s_use_dht11 = 0; /* ç”¨æ¥è‡ªåŠ¨é€‰æ‹© DS18B20å’Œ DHT11 */
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: TestMems
-*	¹¦ÄÜËµÃ÷: ²âÊÔÍÓÂİÒÇ£¬¼ÓËÙ¶È¼Æ£¬´ÅÁ¦¼Æ£¬ÆøÑ¹¼Æ£¬¹âÕÕ¶È
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: TestMems
+*	åŠŸèƒ½è¯´æ˜: æµ‹è¯•é™€èºä»ªï¼ŒåŠ é€Ÿåº¦è®¡ï¼Œç£åŠ›è®¡ï¼Œæ°”å‹è®¡ï¼Œå…‰ç…§åº¦
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void TestMems(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
-//	uint8_t fRefresh;		/* Ë¢ÆÁÇëÇó±êÖ¾,1±íÊ¾ĞèÒªË¢ĞÂ */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
+										 //	uint8_t fRefresh;		/* åˆ·å±è¯·æ±‚æ ‡å¿—,1è¡¨ç¤ºéœ€è¦åˆ·æ–° */
 	uint8_t fQuit = 0;
 
 	int16_t tpX, tpY;
 
 	DispInitFace();
 
-//	fRefresh = 1;
+	//	fRefresh = 1;
 
-	/* ÖØĞÂÅäÖÃ1´ÎBMP085 */
+	/* é‡æ–°é…ç½®1æ¬¡BMP085 */
 	bsp_InitBMP085();
-	BMP085_ReadTempPress();		/* ¶ÁÈ¡½á¹û´æ·ÅÔÚÈ«¾Ö±äÁ¿ */
-	
+	BMP085_ReadTempPress(); /* è¯»å–ç»“æœå­˜æ”¾åœ¨å…¨å±€å˜é‡ */
+
 	if (i2c_CheckDevice(HMC5883L_SLAVE_ADDRESS) == 0)
 	{
 		bsp_InitHMC5883L();
 	}
-	
+
 	bsp_InitMPU6050();
-	
+
 	bsp_InitDS18B20();
-	
-	/* ½øÈëÖ÷³ÌĞòÑ­»·Ìå */
-	bsp_StartAutoTimer(0, 250);		/* ÍÓÂİÒÇ ¼ÓËÙ¶È ´ÅÁ¦¼Æ ¶¨Ê±²ÉÑùÖÜÆÚ */
+
+	/* è¿›å…¥ä¸»ç¨‹åºå¾ªç¯ä½“ */
+	bsp_StartAutoTimer(0, 250); /* é™€èºä»ª åŠ é€Ÿåº¦ ç£åŠ›è®¡ å®šæ—¶é‡‡æ ·å‘¨æœŸ */
 	bsp_DelayMS(125);
-	bsp_StartAutoTimer(1, 1000);	/* ÆøÑ¹¼ÆºÍ¹âÕÕ¶È¶¨Ê±²ÉÑùÖÜÆÚ */
+	bsp_StartAutoTimer(1, 1000); /* æ°”å‹è®¡å’Œå…‰ç…§åº¦å®šæ—¶é‡‡æ ·å‘¨æœŸ */
 	while (fQuit == 0)
 	{
 		bsp_Idle();
@@ -121,11 +121,11 @@ void TestMems(void)
 			MPU6050_ReadData();
 
 			DispMPU6050();
-			
-			HMC5883L_ReadData();
-			DispHMC5833L();		
 
-			DispDS18B20();	/* ¶ÁÈ¡²¢ÏÔÊ¾DS18B20µÄÊı¾İ */				
+			HMC5883L_ReadData();
+			DispHMC5833L();
+
+			DispDS18B20(); /* è¯»å–å¹¶æ˜¾ç¤ºDS18B20çš„æ•°æ® */
 		}
 
 		if (bsp_CheckTimer(1))
@@ -134,69 +134,69 @@ void TestMems(void)
 			DispBMP085();
 
 			DispBH1750(BH1750_GetLux());
-		
+
 			DispDHT11();
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-						DispButton(BUTTON_RET_ID, 1);
-					}
-					break;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					DispButton(BUTTON_RET_ID, 1);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-						DispButton(BUTTON_RET_ID, 0);
-						fQuit = 1;	/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						DispButton(BUTTON_RET_ID, 0);
-					}
-					break;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					DispButton(BUTTON_RET_ID, 0);
+					fQuit = 1; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					DispButton(BUTTON_RET_ID, 0);
+				}
+				break;
 			}
 		}
 
-		/* ´¦Àí°´¼üÊÂ¼ş */
+		/* å¤„ç†æŒ‰é”®äº‹ä»¶ */
 		ucKeyCode = bsp_GetKey();
 		if (ucKeyCode > 0)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:		/* K1¼üÇĞ»»ÒôÆµ¸ñÊ½£¬ÔÚÏÂ´Î¿ªÊ¼Â¼ÒôºÍ·ÅÒôÊ±ÓĞĞ§ */
-					break;
+			case KEY_DOWN_K1: /* K1é”®åˆ‡æ¢éŸ³é¢‘æ ¼å¼ï¼Œåœ¨ä¸‹æ¬¡å¼€å§‹å½•éŸ³å’Œæ”¾éŸ³æ—¶æœ‰æ•ˆ */
+				break;
 
-				case KEY_DOWN_K2:		/* K2¼ü°´ÏÂ£¬Â¼Òô */
-					break;
+			case KEY_DOWN_K2: /* K2é”®æŒ‰ä¸‹ï¼Œå½•éŸ³ */
+				break;
 
-				case KEY_DOWN_K3:		/* K3¼ü°´ÏÂ£¬·ÅÒô */
-					break;
+			case KEY_DOWN_K3: /* K3é”®æŒ‰ä¸‹ï¼Œæ”¾éŸ³ */
+				break;
 
-				case JOY_DOWN_U:		/* Ò¡¸ËUP¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_U: /* æ‘‡æ†UPé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_D:		/* Ò¡¸ËDOWN¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_D: /* æ‘‡æ†DOWNé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_L:		/* Ò¡¸ËLEFT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_L: /* æ‘‡æ†LEFTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_R:	/* Ò¡¸ËRIGHT¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_R: /* æ‘‡æ†RIGHTé”®æŒ‰ä¸‹ */
+				break;
 
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü°´ÏÂ */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”®æŒ‰ä¸‹ */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -207,10 +207,10 @@ void TestMems(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispMPU6050
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾MPU6050Êä³öÊı¾İ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispMPU6050
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºMPU6050è¾“å‡ºæ•°æ®
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispMPU6050(void)
@@ -220,12 +220,12 @@ static void DispMPU6050(void)
 	uint16_t x, y;
 	uint8_t ucLineCap = 17;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
 	x = BOX1_X + 5;
@@ -254,15 +254,14 @@ static void DispMPU6050(void)
 	sprintf(buf, "Accel_Z = %6d", g_tMPU6050.Accel_Z);
 	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
-
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispHMC5833L
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾HMC5833LÊä³öµÄÊı¾İ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispHMC5833L
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºHMC5833Lè¾“å‡ºçš„æ•°æ®
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispHMC5833L(void)
@@ -272,79 +271,79 @@ static void DispHMC5833L(void)
 	uint16_t x, y;
 	uint8_t ucLineCap = 17;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
 	x = BOX2_X + 5;
 	y = BOX2_Y + 18;
 
-	sprintf(buf, "   µ±Ç° | ×îĞ¡, ×î´ó,·¶Î§");
-	tFont.FrontColor = CL_GREY;		/* ºìÉ« Òì³£*/
-	LCD_DispStr(x, y, buf, &tFont);	
+	sprintf(buf, "   å½“å‰ | æœ€å°, æœ€å¤§,èŒƒå›´");
+	tFont.FrontColor = CL_GREY; /* çº¢è‰² å¼‚å¸¸*/
+	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
-	
-	sprintf(buf, "X =%5d|%5d,%5d,%5d", g_tMag.X, g_tMag.X_Min, g_tMag.X_Max, 
-		g_tMag.X_Max - g_tMag.X_Min);
+
+	sprintf(buf, "X =%5d|%5d,%5d,%5d", g_tMag.X, g_tMag.X_Min, g_tMag.X_Max,
+					g_tMag.X_Max - g_tMag.X_Min);
 	if (g_tMag.X_Max - g_tMag.X_Min < 500)
 	{
-		tFont.FrontColor = CL_RED;		/* ºìÉ« Òì³£*/
+		tFont.FrontColor = CL_RED; /* çº¢è‰² å¼‚å¸¸*/
 	}
 	else
 	{
-		tFont.FrontColor = CL_BLACK;	/* °×É«  Õı³£ */
-	}	
-	LCD_DispStr(x, y, buf, &tFont);	
+		tFont.FrontColor = CL_BLACK; /* ç™½è‰²  æ­£å¸¸ */
+	}
+	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
 
-	sprintf(buf, "Y =%5d|%5d,%5d,%5d", g_tMag.Y, g_tMag.Y_Min, g_tMag.Y_Max, 
-		g_tMag.Y_Max - g_tMag.Y_Min);
+	sprintf(buf, "Y =%5d|%5d,%5d,%5d", g_tMag.Y, g_tMag.Y_Min, g_tMag.Y_Max,
+					g_tMag.Y_Max - g_tMag.Y_Min);
 	if (g_tMag.Y_Max - g_tMag.Y_Min < 500)
 	{
-		tFont.FrontColor = CL_RED;		/* ºìÉ« Òì³£*/
+		tFont.FrontColor = CL_RED; /* çº¢è‰² å¼‚å¸¸*/
 	}
 	else
 	{
-		tFont.FrontColor = CL_BLACK;	/* °×É«  Õı³£ */
-	}	
+		tFont.FrontColor = CL_BLACK; /* ç™½è‰²  æ­£å¸¸ */
+	}
 	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
 
-	sprintf(buf, "Z =%5d|%5d,%5d,%5d", g_tMag.Z, g_tMag.Z_Min, g_tMag.Z_Max, 
-		g_tMag.Z_Max - g_tMag.Z_Min);
+	sprintf(buf, "Z =%5d|%5d,%5d,%5d", g_tMag.Z, g_tMag.Z_Min, g_tMag.Z_Max,
+					g_tMag.Z_Max - g_tMag.Z_Min);
 	if (g_tMag.Z_Max - g_tMag.Z_Min < 500)
 	{
-		tFont.FrontColor = CL_RED;		/* ºìÉ« Òì³£*/
+		tFont.FrontColor = CL_RED; /* çº¢è‰² å¼‚å¸¸*/
 	}
 	else
 	{
-		tFont.FrontColor = CL_BLACK;	/* °×É«  Õı³£ */
+		tFont.FrontColor = CL_BLACK; /* ç™½è‰²  æ­£å¸¸ */
 	}
 	LCD_DispStr(x, y, buf, &tFont);
-	y += ucLineCap;	
-	
-	/* ÏÔÊ¾ÅäÖÃ¼Ä´æÆ÷ºÍID¼Ä´æÆ÷ */
-	y += 3;	
-	tFont.FrontColor = CL_GREY;		/* ×ÖÌåÑÕÉ« */
-	
-	sprintf(buf, "CFG_A = 0x%02X,CFG_B = 0x%02X", g_tMag.CfgRegA,  g_tMag.CfgRegB);	
-	LCD_DispStr(x, y, buf, &tFont);
-	y += ucLineCap;	
+	y += ucLineCap;
 
-	sprintf(buf, "Mode  = 0x%02d,ID = %s", g_tMag.ModeReg,  (char *)g_tMag.IDReg);	
+	/* æ˜¾ç¤ºé…ç½®å¯„å­˜å™¨å’ŒIDå¯„å­˜å™¨ */
+	y += 3;
+	tFont.FrontColor = CL_GREY; /* å­—ä½“é¢œè‰² */
+
+	sprintf(buf, "CFG_A = 0x%02X,CFG_B = 0x%02X", g_tMag.CfgRegA, g_tMag.CfgRegB);
+	LCD_DispStr(x, y, buf, &tFont);
+	y += ucLineCap;
+
+	sprintf(buf, "Mode  = 0x%02d,ID = %s", g_tMag.ModeReg, (char *)g_tMag.IDReg);
 	LCD_DispStr(x, y, buf, &tFont);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispBMP085
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾BMP085Êä³öµÄÊı¾İ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispBMP085
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºBMP085è¾“å‡ºçš„æ•°æ®
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispBMP085(void)
@@ -354,34 +353,34 @@ static void DispBMP085(void)
 	uint16_t x, y;
 	uint8_t ucLineCap = 17;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
 	x = BOX3_X + 5;
 	y = BOX3_Y + 18;
 
-	/* ÎÂ¶ÈÖµ£¬ µ¥Î» 0.1ÉãÊÏ¶È */
-	/* Ñ¹Á¦Öµ£¬ µ¥Î» Pa */
-	sprintf(buf, "»·¾³ÎÂ¶È  = %3d.%d¡æ", g_tBMP085.Temp / 10, g_tBMP085.Temp % 10);
+	/* æ¸©åº¦å€¼ï¼Œ å•ä½ 0.1æ‘„æ°åº¦ */
+	/* å‹åŠ›å€¼ï¼Œ å•ä½ Pa */
+	sprintf(buf, "ç¯å¢ƒæ¸©åº¦  = %3d.%dâ„ƒ", g_tBMP085.Temp / 10, g_tBMP085.Temp % 10);
 	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
 
-	sprintf(buf, "´óÆøÑ¹Á¦  = %3d.%03dKPa", g_tBMP085.Press / 1000, g_tBMP085.Press % 1000);
+	sprintf(buf, "å¤§æ°”å‹åŠ›  = %3d.%03dKPa", g_tBMP085.Press / 1000, g_tBMP085.Press % 1000);
 	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispBH1750
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾BH1750Êä³öµÄÊı¾İ
-*	ĞÎ    ²Î: _value : ¸¡µã¸ñÊ½µÄ¹âÕÕ¶ÈÖµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispBH1750
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºBH1750è¾“å‡ºçš„æ•°æ®
+*	å½¢    å‚: _value : æµ®ç‚¹æ ¼å¼çš„å…‰ç…§åº¦å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispBH1750(float _value)
@@ -391,28 +390,28 @@ static void DispBH1750(float _value)
 	uint16_t x, y;
 	uint8_t ucLineCap = 17;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
 	x = BOX4_X + 5;
 	y = BOX4_Y + 18;
 
-	sprintf(buf, "¹âÕÕ¶È  = %6.2f lux", _value);
+	sprintf(buf, "å…‰ç…§åº¦  = %6.2f lux", _value);
 	LCD_DispStr(x, y, buf, &tFont);
 	y += ucLineCap;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispDS18B20
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾DS18B20Êä³öµÄÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispDS18B20
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºDS18B20è¾“å‡ºçš„æ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispDS18B20(void)
@@ -422,43 +421,43 @@ static void DispDS18B20(void)
 	uint16_t x, y;
 
 	if (s_use_dht11 == 1)
-	{		
-		/* ÔÚDS18B20³ÌĞòÖĞ ÔİÊ±ÆÁ±Î, ±ÜÃâÓ¡Ïó DHT11 */
+	{
+		/* åœ¨DS18B20ç¨‹åºä¸­ æš‚æ—¶å±è”½, é¿å…å°è±¡ DHT11 */
 		return;
 	}
-	
-	/* ¶Á ROM ID */
+
+	/* è¯» ROM ID */
 	{
 		uint8_t id[8];
 		uint8_t ret;
-		uint8_t i;		
+		uint8_t i;
 
 		x = BOX5_X + 5;
 		y = BOX5_Y + 18;
-			
+
 		ret = DS18B20_ReadID(id);
-		
+
 		if (ret == 0)
 		{
-			/* ÉèÖÃ×ÖÌå²ÎÊı ºìÉ« */
+			/* è®¾ç½®å­—ä½“å‚æ•° çº¢è‰² */
 			{
-				tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-				tFont.FrontColor = CL_RED;		/* ×ÖÌåÑÕÉ« */
-				tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-				tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-			}		
+				tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+				tFont.FrontColor = CL_RED;		 /* å­—ä½“é¢œè‰² */
+				tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+				tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+			}
 		}
 		else
 		{
-			/* ÉèÖÃ×ÖÌå²ÎÊı À¶É« */
+			/* è®¾ç½®å­—ä½“å‚æ•° è“è‰² */
 			{
-				tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-				tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-				tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-				tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-			}	
+				tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+				tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+				tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+				tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+			}
 		}
-		
+
 		sprintf(buf, "id = ");
 		for (i = 0; i < 8; i++)
 		{
@@ -468,37 +467,37 @@ static void DispDS18B20(void)
 				sprintf(&buf[strlen(buf)], " ");
 			}
 		}
-		LCD_DispStr(x, y, buf, &tFont);		
+		LCD_DispStr(x, y, buf, &tFont);
 	}
 
 	{
 		int16_t reg;
-			
+
 		reg = DS18B20_ReadTempReg();
-		sprintf(buf, "reg = 0x%04X -> %-4.04f¡æ ", (uint16_t)reg, (float)reg / 16);
-		
+		sprintf(buf, "reg = 0x%04X -> %-4.04fâ„ƒ ", (uint16_t)reg, (float)reg / 16);
+
 		x = BOX5_X + 5;
 		y += 17;
-		
-		/* ÉèÖÃ×ÖÌå²ÎÊı À¶É« */
-		{
-			tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-			tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-			tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		}	
-		LCD_DispStr(x, y, buf, &tFont);		
 
-		LCD_DispStr(x, y + 26, "DS18B20ºÍDHT11²»ÄÜÍ¬Ê±½ÓÈë¿ª·¢°å", &tFont);			
-	}		
+		/* è®¾ç½®å­—ä½“å‚æ•° è“è‰² */
+		{
+			tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+			tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+		}
+		LCD_DispStr(x, y, buf, &tFont);
+
+		LCD_DispStr(x, y + 26, "DS18B20å’ŒDHT11ä¸èƒ½åŒæ—¶æ¥å…¥å¼€å‘æ¿", &tFont);
+	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispDHT11
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾DHT11Êä³öµÄÊı¾İ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispDHT11
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºDHT11è¾“å‡ºçš„æ•°æ®
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispDHT11(void)
@@ -506,7 +505,7 @@ static void DispDHT11(void)
 	FONT_T tFont;
 	char buf[128];
 	uint16_t x, y;
-	
+
 	DHT11_T tDHT;
 	uint8_t ret;
 
@@ -516,59 +515,59 @@ static void DispDHT11(void)
 	ret = DHT11_ReadData(&tDHT);
 	if (ret == 1)
 	{
-		/* ÉèÖÃ×ÖÌå²ÎÊı À¶É« */
+		/* è®¾ç½®å­—ä½“å‚æ•° è“è‰² */
 		{
-			tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-			tFont.FrontColor = CL_BLUE;		/* ×ÖÌåÑÕÉ« */
-			tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		}			
-		sprintf(buf, "Êª¶È %d%%,ÎÂ¶È %d¡æ       ", tDHT.Hum, tDHT.Temp);
-		LCD_DispStr(x, y, buf, &tFont);					
-		
-		s_use_dht11 = 1;	/* ÔÚDS18B20³ÌĞòÖĞ ÔİÊ±ÆÁ±Î */
-	}			
+			tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tFont.FrontColor = CL_BLUE;		 /* å­—ä½“é¢œè‰² */
+			tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+		}
+		sprintf(buf, "æ¹¿åº¦ %d%%,æ¸©åº¦ %dâ„ƒ       ", tDHT.Hum, tDHT.Temp);
+		LCD_DispStr(x, y, buf, &tFont);
+
+		s_use_dht11 = 1; /* åœ¨DS18B20ç¨‹åºä¸­ æš‚æ—¶å±è”½ */
+	}
 	else
 	{
-		/* ÉèÖÃ×ÖÌå²ÎÊı ºìÉ« */
+		/* è®¾ç½®å­—ä½“å‚æ•° çº¢è‰² */
 		{
-			tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-			tFont.FrontColor = CL_RED;		/* ×ÖÌåÑÕÉ« */
-			tFont.BackColor = CL_BTN_FACE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-		}		
-		sprintf(buf, "Î´·¢ÏÖDHT11       ");		
-		LCD_DispStr(x, y, buf, &tFont);			
+			tFont.FontCode = FC_ST_16;		 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tFont.FrontColor = CL_RED;		 /* å­—ä½“é¢œè‰² */
+			tFont.BackColor = CL_BTN_FACE; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tFont.Space = 0;							 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+		}
+		sprintf(buf, "æœªå‘ç°DHT11       ");
+		LCD_DispStr(x, y, buf, &tFont);
 
-		s_use_dht11 = 0;	/* ÔÚDS18B20³ÌĞòÖĞ È¡ÏûÆÁ±Î */
+		s_use_dht11 = 0; /* åœ¨DS18B20ç¨‹åºä¸­ å–æ¶ˆå±è”½ */
 	}
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispInitFace
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾³õÊ¼½çÃæ
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispInitFace
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºåˆå§‹ç•Œé¢
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispInitFace(void)
 {
-	FONT_T tFontBox;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊı */
+	FONT_T tFontBox; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºè®¾ç½®å­—ä½“å‚æ•° */
 	GROUP_T tBox;
 
-	LCD_ClrScr(CL_BTN_FACE);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+	LCD_ClrScr(CL_BTN_FACE); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		/* ·Ö×é¿ò×ÖÌå */
+		/* åˆ†ç»„æ¡†å­—ä½“ */
 		tFontBox.FontCode = FC_ST_16;
 		tFontBox.BackColor = CL_BTN_FACE;
 		tFontBox.FrontColor = CL_BLACK;
 		tFontBox.Space = 0;
 	}
 
-	/* ÏÔÊ¾·Ö×é¿ò */
+	/* æ˜¾ç¤ºåˆ†ç»„æ¡† */
 	{
 		tBox.Font = &tFontBox;
 
@@ -620,22 +619,22 @@ static void DispInitFace(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: DispButton
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾Ö¸¶¨Î»ÖÃµÄ°´Å¥
-*	ĞÎ    ²Î£ºÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: DispButton
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæŒ‡å®šä½ç½®çš„æŒ‰é’®
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispButton(uint8_t _id, uint8_t _focus)
 {
-	FONT_T tFontBtn;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊı */
+	FONT_T tFontBtn; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºè®¾ç½®å­—ä½“å‚æ•° */
 	BUTTON_T tBtn;
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		/* °´Å¥×ÖÌå */
+		/* æŒ‰é’®å­—ä½“ */
 		tFontBtn.FontCode = FC_ST_16;
-		tFontBtn.BackColor = CL_MASK;	/* Í¸Ã÷É« */
+		tFontBtn.BackColor = CL_MASK; /* é€æ˜è‰² */
 		tFontBtn.FrontColor = CL_BLACK;
 		tFontBtn.Space = 0;
 	}
@@ -644,20 +643,20 @@ static void DispButton(uint8_t _id, uint8_t _focus)
 
 	switch (_id)
 	{
-		case BUTTON_RET_ID:
-			tBtn.Left = BUTTON_RET_X;
-			tBtn.Top = BUTTON_RET_Y;
-			tBtn.Height = BUTTON_RET_H;
-			tBtn.Width = BUTTON_RET_W;
-			tBtn.Focus = _focus;
-			tBtn.pCaption = BUTTON_RET_TEXT;
-			break;
+	case BUTTON_RET_ID:
+		tBtn.Left = BUTTON_RET_X;
+		tBtn.Top = BUTTON_RET_Y;
+		tBtn.Height = BUTTON_RET_H;
+		tBtn.Width = BUTTON_RET_W;
+		tBtn.Focus = _focus;
+		tBtn.pCaption = BUTTON_RET_TEXT;
+		break;
 
-		default:
-			return;
+	default:
+		return;
 	}
 
 	LCD_DrawButton(&tBtn);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,42 +1,42 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ó²¼ş²âÊÔ½çÃæ¡£
-*	ÎÄ¼şÃû³Æ : hard_test.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ÏÔÊ¾Ó²¼şĞÅÏ¢¡£×Ô¶¯²âÊÔÒ»Ğ©Ğ¾Æ¬¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-01-01 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : ç¡¬ä»¶æµ‹è¯•ç•Œé¢ã€‚
+*	æ–‡ä»¶åç§° : hard_test.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æ˜¾ç¤ºç¡¬ä»¶ä¿¡æ¯ã€‚è‡ªåŠ¨æµ‹è¯•ä¸€äº›èŠ¯ç‰‡ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-01-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h"			/* printfº¯Êı¶¨ÏòÊä³öµ½´®¿Ú£¬ËùÒÔ±ØĞë°üº¬Õâ¸öÎÄ¼ş */
+#include "bsp.h" /* printfå‡½æ•°å®šå‘è¾“å‡ºåˆ°ä¸²å£ï¼Œæ‰€ä»¥å¿…é¡»åŒ…å«è¿™ä¸ªæ–‡ä»¶ */
 #include "form_hard_test.h"
 
-/* ·µ»Ø°´Å¥µÄ×ø±ê(ÆÁÄ»ÓÒÏÂ½Ç) */
-#define BUTTON_RET_H	32
-#define BUTTON_RET_W	60
-#define	BUTTON_RET_X	(g_LcdWidth - BUTTON_RET_W - 4)
-#define	BUTTON_RET_Y	(g_LcdHeight - BUTTON_RET_H - 4)
+/* è¿”å›æŒ‰é’®çš„åæ ‡(å±å¹•å³ä¸‹è§’) */
+#define BUTTON_RET_H 32
+#define BUTTON_RET_W 60
+#define BUTTON_RET_X (g_LcdWidth - BUTTON_RET_W - 4)
+#define BUTTON_RET_Y (g_LcdHeight - BUTTON_RET_H - 4)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: HardInfo
-*	¹¦ÄÜËµÃ÷: ×Ô¶¯¼ì²âÓ²¼ş
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: HardInfo
+*	åŠŸèƒ½è¯´æ˜: è‡ªåŠ¨æ£€æµ‹ç¡¬ä»¶
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void HardInfo(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
-	uint8_t fRefresh;		/* Ë¢ÆÁÇëÇó±êÖ¾,1±íÊ¾ĞèÒªË¢ĞÂ */
-	FONT_T tFont, tFontBtn;	/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊı */
+	uint8_t ucKeyCode;			/* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;				/* è§¦æ‘¸äº‹ä»¶ */
+	uint8_t fRefresh;				/* åˆ·å±è¯·æ±‚æ ‡å¿—,1è¡¨ç¤ºéœ€è¦åˆ·æ–° */
+	FONT_T tFont, tFontBtn; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æ„ä½“å˜é‡ï¼Œç”¨äºè®¾ç½®å­—ä½“å‚æ•° */
 	char buf[128];
 	uint16_t x, y;
 	uint16_t usLineCap = 18;
@@ -44,59 +44,58 @@ void HardInfo(void)
 	int16_t tpX, tpY;
 	BUTTON_T tBtn;
 
-	LCD_ClrScr(CL_BLUE);  	/* ÇåÆÁ£¬±³¾°À¶É« */
-	
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
-	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BLUE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+	LCD_ClrScr(CL_BLUE); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		/* °´Å¥×ÖÌå */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
+	{
+		tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+
+		/* æŒ‰é’®å­—ä½“ */
 		tFontBtn.FontCode = FC_ST_16;
-		tFontBtn.BackColor = CL_MASK;	/* Í¸Ã÷É« */
+		tFontBtn.BackColor = CL_MASK; /* é€æ˜è‰² */
 		tFontBtn.FrontColor = CL_BLACK;
 		tFontBtn.Space = 0;
 	}
-	
+
 	x = 5;
 	y = 3;
-	LCD_DispStr(x, y, "°²¸»À³STM32-V6¿ª·¢°åÓ²¼şĞÅÏ¢", &tFont);			/* ÔÚ(8,3)×ø±ê´¦ÏÔÊ¾Ò»´®ºº×Ö */
+	LCD_DispStr(x, y, "å®‰å¯Œè±STM32-V6å¼€å‘æ¿ç¡¬ä»¶ä¿¡æ¯", &tFont); /* åœ¨(8,3)åæ ‡å¤„æ˜¾ç¤ºä¸€ä¸²æ±‰å­— */
 	y += usLineCap;
 
-	/* ¼ì²âCPU ID */
+	/* æ£€æµ‹CPU ID */
 	{
 		uint32_t id[3];
 
 		bsp_GetCpuID(id);
 
-		printf("\r\nCPU : STM32H743, Ö÷Æµ: %dMHz\r\n", SystemCoreClock / 1000000);
-		
-		LCD_DispStr(x, y, "CPU : STM32H743", &tFont);			
-		y += usLineCap;				
-		
-		sprintf(buf, " UID = %08X %08X %08X"
-			, id[0], id[1], id[2]);
+		printf("\r\nCPU : STM32H743, ä¸»é¢‘: %dMHz\r\n", SystemCoreClock / 1000000);
+
+		LCD_DispStr(x, y, "CPU : STM32H743", &tFont);
+		y += usLineCap;
+
+		sprintf(buf, " UID = %08X %08X %08X", id[0], id[1], id[2]);
 		printf("%s\r\n", buf);
 		LCD_DispStr(x, y, buf, &tFont);
-		y += usLineCap;		
+		y += usLineCap;
 	}
-	
-	/* ÏÔÊ¾TFT¿ØÖÆÆ÷ĞÍºÅºÍÆÁÄ»·Ö±æÂÊ */
+
+	/* æ˜¾ç¤ºTFTæ§åˆ¶å™¨å‹å·å’Œå±å¹•åˆ†è¾¨ç‡ */
 	{
 		strcpy(buf, "TFT Driver : ");
-		LCD_GetChipDescribe(&buf[strlen(buf)]);	/* ¶ÁÈ¡TFTÇı¶¯Ğ¾Æ¬ĞÍºÅ */
+		LCD_GetChipDescribe(&buf[strlen(buf)]); /* è¯»å–TFTé©±åŠ¨èŠ¯ç‰‡å‹å· */
 		sprintf(&buf[strlen(buf)], "   %d x %d", LCD_GetWidth(), LCD_GetHeight());
 		LCD_DispStr(x, y, buf, &tFont);
 		y += usLineCap;
 	}
 
-	/* ²âÊÔSRAM */
+	/* æµ‹è¯•SRAM */
 	{
 		sprintf(buf, "SDRAM Model ... ");
 
-		LCD_DispStr(x, y, buf, &tFont);		
+		LCD_DispStr(x, y, buf, &tFont);
 		if (bsp_TestExtSDRAM2() == 0)
 		{
 			sprintf(buf, "SDRAM, 32Bit, Test OK");
@@ -116,13 +115,13 @@ void HardInfo(void)
 		y += usLineCap;
 	}
 
-	/* ²âÊÔNADN Flash */
-	#if 1
+/* æµ‹è¯•NADN Flash */
+#if 1
 	{
 		uint32_t id;
 
-		NAND_Init();	/* ³õÊ¼»¯NAND */
-		
+		NAND_Init(); /* åˆå§‹åŒ–NAND */
+
 		id = NAND_ReadID();
 
 		sprintf(buf, "NAND Flash ID = 0x%04X, Type = ", id);
@@ -137,13 +136,13 @@ void HardInfo(void)
 			sprintf(buf, "NAND Flash ID = 0x%04X, Model = H27U1G8F2BTR, OK", id);
 			printf("%s\r\n", buf);
 			LCD_DispStr(x, y, buf, &tFont);
-		}		
+		}
 		else if (id == H27U4G8F2DTR)
 		{
 			sprintf(buf, "NAND Flash ID = 0x%04X, Model = H27U4G8F2DTR, OK", id);
 			printf("%s\r\n", buf);
 			LCD_DispStr(x, y, buf, &tFont);
-		}		
+		}
 		else
 		{
 			sprintf(buf, "NAND Flash ID = 0x%04X, Model = Unknow, Err", id);
@@ -152,10 +151,10 @@ void HardInfo(void)
 			tFont.FrontColor = CL_WHITE;
 		}
 		y += usLineCap;
-		//NAND_DispBadBlockInfo();	/* Ïò´®¿Ú1´òÓ¡NAND Flash»µ¿éĞÅÏ¢ (´Ëº¯Êı¿ªÍ·³õÊ¼FSMC) */
+		//NAND_DispBadBlockInfo();	/* å‘ä¸²å£1æ‰“å°NAND Flashåå—ä¿¡æ¯ (æ­¤å‡½æ•°å¼€å¤´åˆå§‹FSMC) */
 	}
-	#endif
-	/* ²âÊÔI2CÉè±¸ */
+#endif
+	/* æµ‹è¯•I2Cè®¾å¤‡ */
 	{
 		if (i2c_CheckDevice(EE_DEV_ADDR) == 0)
 		{
@@ -207,7 +206,7 @@ void HardInfo(void)
 			tFont.FrontColor = CL_WHITE;
 		}
 		y += usLineCap;
-#endif		
+#endif
 
 		if (i2c_CheckDevice(MPU6050_SLAVE_ADDRESS) == 0)
 		{
@@ -278,14 +277,14 @@ void HardInfo(void)
 		y += usLineCap;
 	}
 
-	/* ²âÊÔSPI Flash */
+	/* æµ‹è¯•SPI Flash */
 	{
-		bsp_InitSFlash();	/* ³õÊ¼»¯SPIÓ²¼ş */
+		bsp_InitSFlash(); /* åˆå§‹åŒ–SPIç¡¬ä»¶ */
 
 		sf_ReadInfo();
-		
-		/* ¼ì²â´®ĞĞFlash OK */
-		sprintf(buf, "SPI Flash ID = %08X, Model = %s",g_tSF.ChipID , g_tSF.ChipName);
+
+		/* æ£€æµ‹ä¸²è¡ŒFlash OK */
+		sprintf(buf, "SPI Flash ID = %08X, Model = %s", g_tSF.ChipID, g_tSF.ChipName);
 		printf("%s\r\n", buf);
 
 		if (g_tSF.ChipID == W25Q64BV_ID)
@@ -300,37 +299,37 @@ void HardInfo(void)
 		}
 	}
 
-	fRefresh = 1;	/* 1±íÊ¾ĞèÒªË¢ĞÂLCD */
+	fRefresh = 1; /* 1è¡¨ç¤ºéœ€è¦åˆ·æ–°LCD */
 	bsp_StartAutoTimer(0, 1000);
 	while (1)
 	{
 		bsp_Idle();
 
-		/* ÏÔÊ¾Ê±ÖÓ */
+		/* æ˜¾ç¤ºæ—¶é’Ÿ */
 		if (bsp_CheckTimer(0))
 		{
 			uint16_t x, y;
-			
-			tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-			tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-			tFont.BackColor = CL_BLUE;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-			tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
-			
-			RTC_ReadClock();	/* ¶ÁÊ±ÖÓ£¬½á¹ûÔÚ g_tRTC */
-			
+
+			tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+			tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+			tFont.BackColor = CL_BLUE;	 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+			tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
+
+			RTC_ReadClock(); /* è¯»æ—¶é’Ÿï¼Œç»“æœåœ¨ g_tRTC */
+
 			x = 5;
 			y = LCD_GetHeight() - 20;
-			
+
 			sprintf(buf, "%4d-%02d-%02d %02d:%02d:%02d",
-				g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day, g_tRTC.Hour, g_tRTC.Min, g_tRTC.Sec);
+							g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day, g_tRTC.Hour, g_tRTC.Min, g_tRTC.Sec);
 			LCD_DispStr(x, y, buf, &tFont);
-		}		
-		
+		}
+
 		if (fRefresh)
 		{
 			fRefresh = 0;
 
-			/* ÏÔÊ¾°´Å¥ */
+			/* æ˜¾ç¤ºæŒ‰é’® */
 			{
 				tBtn.Font = &tFontBtn;
 
@@ -338,74 +337,73 @@ void HardInfo(void)
 				tBtn.Top = BUTTON_RET_Y;
 				tBtn.Height = BUTTON_RET_H;
 				tBtn.Width = BUTTON_RET_W;
-				tBtn.Focus = 0;	/* Ê§È¥½¹µã */
-				tBtn.pCaption = "·µ»Ø";
+				tBtn.Focus = 0; /* å¤±å»ç„¦ç‚¹ */
+				tBtn.pCaption = "è¿”å›";
 				LCD_DrawButton(&tBtn);
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃşÊÂ¼ş */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-						tBtn.Font = &tFontBtn;
+			case TOUCH_DOWN: /* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Font = &tFontBtn;
 
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 1;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
-					}
-					break;
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 1; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
+				}
+				break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼ş */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
-					{
-						tBtn.Font = &tFontBtn;
+			case TOUCH_RELEASE: /* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Font = &tFontBtn;
 
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 1;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 1; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
 
-						return;		/* ·µ»Ø */
-					}
-					else	/* °´Å¥Ê§È¥½¹µã */
-					{
-						tBtn.Font = &tFontBtn;
+					return; /* è¿”å› */
+				}
+				else /* æŒ‰é’®å¤±å»ç„¦ç‚¹ */
+				{
+					tBtn.Font = &tFontBtn;
 
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 0;	/* ½¹µã */
-						tBtn.pCaption = "·µ»Ø";
-						LCD_DrawButton(&tBtn);
-
-					}
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 0; /* ç„¦ç‚¹ */
+					tBtn.pCaption = "è¿”å›";
+					LCD_DrawButton(&tBtn);
+				}
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case JOY_DOWN_OK:		/* Ò¡¸ËOK¼ü */
-					break;
+			case JOY_DOWN_OK: /* æ‘‡æ†OKé”® */
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 		}
 	}
@@ -413,10 +411,10 @@ void HardInfo(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: PrintfHardInfo
-*	¹¦ÄÜËµÃ÷: ×Ô¶¯¼ì²âÓ²¼ş. printfµ½´®¿Ú¡£²»ÏÔÊ¾¡£
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: PrintfHardInfo
+*	åŠŸèƒ½è¯´æ˜: è‡ªåŠ¨æ£€æµ‹ç¡¬ä»¶. printfåˆ°ä¸²å£ã€‚ä¸æ˜¾ç¤ºã€‚
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern uint32_t dm9k_ReadID(void);
@@ -424,28 +422,27 @@ void PrintfHardInfo(void)
 {
 	char buf[128];
 
-	/* ¼ì²âCPU ID */
+	/* æ£€æµ‹CPU ID */
 	{
 		uint32_t id[3];
 
 		bsp_GetCpuID(id);
 
-		printf("\r\nCPU : STM32H743, Ö÷Æµ: %dMHz\r\n", SystemCoreClock / 1000000);
-		sprintf(buf, " UID = %08X %08X %08X"
-			, id[0], id[1], id[2]);
+		printf("\r\nCPU : STM32H743, ä¸»é¢‘: %dMHz\r\n", SystemCoreClock / 1000000);
+		sprintf(buf, " UID = %08X %08X %08X", id[0], id[1], id[2]);
 		printf("%s\r\n", buf);
 	}
-	
-	/* ÏÔÊ¾TFT¿ØÖÆÆ÷ĞÍºÅºÍÆÁÄ»·Ö±æÂÊ */
+
+	/* æ˜¾ç¤ºTFTæ§åˆ¶å™¨å‹å·å’Œå±å¹•åˆ†è¾¨ç‡ */
 	{
 		strcpy(buf, "TFT Driver : ");
-		LCD_GetChipDescribe(&buf[strlen(buf)]);	/* ¶ÁÈ¡TFTÇı¶¯Ğ¾Æ¬ĞÍºÅ */
+		LCD_GetChipDescribe(&buf[strlen(buf)]); /* è¯»å–TFTé©±åŠ¨èŠ¯ç‰‡å‹å· */
 		sprintf(&buf[strlen(buf)], "   %d x %d", LCD_GetWidth(), LCD_GetHeight());
 		printf("%s\r\n", buf);
 	}
 
-	/* ²âÊÔSRAM */
-	#if 0
+/* æµ‹è¯•SRAM */
+#if 0
 	{
 		if (bsp_TestExtSDRAM2() == 0)
 		{
@@ -458,15 +455,15 @@ void PrintfHardInfo(void)
 			printf("%s\r\n", buf);
 		}
 	}
-	#endif
+#endif
 
-	/* ²âÊÔNADN Flash */
-	#if 1
+/* æµ‹è¯•NADN Flash */
+#if 1
 	{
 		uint32_t id;
 
-		NAND_Init();	/* ³õÊ¼»¯NAND */
-		
+		NAND_Init(); /* åˆå§‹åŒ–NAND */
+
 		id = NAND_ReadID();
 
 		sprintf(buf, "NAND Flash ID = 0x%04X, Type = ", id);
@@ -479,7 +476,7 @@ void PrintfHardInfo(void)
 		{
 			sprintf(buf, "NAND Flash ID = 0x%04X, Model = H27U1G8F2BTR, OK", id);
 			printf("%s\r\n", buf);
-		}			
+		}
 		else if (id == H27U4G8F2DTR)
 		{
 			sprintf(buf, "NAND Flash ID = 0x%04X, Model = H27U4G8F2DTR, OK", id);
@@ -491,8 +488,8 @@ void PrintfHardInfo(void)
 			printf("%s\r\n", buf);
 		}
 	}
-	#endif
-	/* ²âÊÔI2CÉè±¸ */
+#endif
+	/* æµ‹è¯•I2Cè®¾å¤‡ */
 	{
 		if (i2c_CheckDevice(EE_DEV_ADDR) == 0)
 		{
@@ -573,17 +570,17 @@ void PrintfHardInfo(void)
 		}
 	}
 
-	/* ²âÊÔSPI Flash */
+	/* æµ‹è¯•SPI Flash */
 	{
-		//bsp_InitSFlash();	/* ³õÊ¼»¯SPIÓ²¼ş, bsp.c ÖĞÒÑ¾­³õÊ¼»¯ */
+		//bsp_InitSFlash();	/* åˆå§‹åŒ–SPIç¡¬ä»¶, bsp.c ä¸­å·²ç»åˆå§‹åŒ– */
 
-		/* ¼ì²â´®ĞĞFlash OK */
-		sprintf(buf, "SPI Flash ID= = %08X, Model = %s",g_tSF.ChipID , g_tSF.ChipName);
+		/* æ£€æµ‹ä¸²è¡ŒFlash OK */
+		sprintf(buf, "SPI Flash ID= = %08X, Model = %s", g_tSF.ChipID, g_tSF.ChipName);
 		printf("%s\r\n", buf);
 	}
-	
-	/* ¼ì²âDM9000 */
-	#if 0
+
+/* æ£€æµ‹DM9000 */
+#if 0
 	{
 		uint32_t id;
 		
@@ -598,7 +595,7 @@ void PrintfHardInfo(void)
 			printf("DM9000AEP Error, ID = %8X\r\n", id);
 		}
 	}
-	#endif
+#endif
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

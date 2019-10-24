@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : web server ÑİÊ¾
-*	ÎÄ¼şÃû³Æ : http_server.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : Ìá¹©WEB·şÎñÆ÷¹¦ÄÜ¡£Ö÷ÒªÄ¿µÄÊÇ²âÊÔDM9000AEPÍø¿¨µçÂ·ºÍDM9161 PHYµçÂ·¡£
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2013-01-01 armfly  ÕıÊ½·¢²¼
+*	æ¨¡å—åç§° : web server æ¼”ç¤º
+*	æ–‡ä»¶åç§° : http_server.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : æä¾›WEBæœåŠ¡å™¨åŠŸèƒ½ã€‚ä¸»è¦ç›®çš„æ˜¯æµ‹è¯•DM9000AEPç½‘å¡ç”µè·¯å’ŒDM9161 PHYç”µè·¯ã€‚
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2013-01-01 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -39,78 +39,78 @@ void lwip_pro(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: WebServer
-*	¹¦ÄÜËµÃ÷: web·şÎñÆ÷³ÌĞò
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: WebServer
+*	åŠŸèƒ½è¯´æ˜: webæœåŠ¡å™¨ç¨‹åº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void WebServer(void)
 {
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃşÊÂ¼ş */
+	uint8_t ucKeyCode; /* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;	 /* è§¦æ‘¸äº‹ä»¶ */
 	int16_t tpX, tpY;
 	uint16_t x, y;
 	uint16_t usLineCap = 18;
 	char buf[128];
 	uint8_t fRefresh;
-	FONT_T tFont;		/* ¶¨Òå×ÖÌå½á¹¹Ìå±äÁ¿ */
+	FONT_T tFont; /* å®šä¹‰å­—ä½“ç»“æ„ä½“å˜é‡ */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊı */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;	/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_BLACK;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = FORM_BACK_COLOR;	/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;				 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_BLACK;			 /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = FORM_BACK_COLOR; /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;									 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
-		LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+		LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
-		LCD_DispStr(5, 3, "Âß¼­·ÖÎöÒÇÊ¾²¨Æ÷", &tFont);
+		LCD_DispStr(5, 3, "é€»è¾‘åˆ†æä»ªç¤ºæ³¢å™¨", &tFont);
 	}
 
-	/* LwIP ³õÊ¼»¯ */
+	/* LwIP åˆå§‹åŒ– */
 	{
-		/* Èç¹û²»²åÍøÏß£¬´Ëº¯ÊıÖ´ĞĞÊ±¼ä¹ı³¤ */
-		/* ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
+		/* å¦‚æœä¸æ’ç½‘çº¿ï¼Œæ­¤å‡½æ•°æ‰§è¡Œæ—¶é—´è¿‡é•¿ */
+		/* ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
 		lwip_start();
 	}
 
-	LCD_ClrScr(FORM_BACK_COLOR);  	/* ÇåÆÁ£¬±³¾°À¶É« */
+	LCD_ClrScr(FORM_BACK_COLOR); /* æ¸…å±ï¼ŒèƒŒæ™¯è“è‰² */
 
 	fRefresh = 1;
-	while(1)
+	while (1)
 	{
 		bsp_Idle();
 
 		uip_pro();
 		lwip_pro();
 
-		if (fRefresh)	/* Ë¢ĞÂÕû¸ö½çÃæ */
+		if (fRefresh) /* åˆ·æ–°æ•´ä¸ªç•Œé¢ */
 		{
 			fRefresh = 0;
 		}
-		
-		if (PHYLinkChanged == 1)	/* DM9162ÁªÍø×´Ì¬±ä»¯ */
+
+		if (PHYLinkChanged == 1) /* DM9162è”ç½‘çŠ¶æ€å˜åŒ– */
 		{
 			PHYLinkChanged = 0;
 
 			fRefresh = 1;
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎŞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å› KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓĞ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  KEY_DOWN_S:		/* S¼ü */
-					break;
+			case KEY_DOWN_S: /* Sé”® */
+				break;
 
-				case  KEY_DOWN_C:		/* C¼ü */
-					break;
-				
-				default:
-					break;
+			case KEY_DOWN_C: /* Cé”® */
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -118,7 +118,7 @@ void WebServer(void)
 
 /*
 *********************************************************************************************************
-*	ÏÂÃæÊÇ LwIP ²¿·ÖµÄ´úÂë
+*	ä¸‹é¢æ˜¯ LwIP éƒ¨åˆ†çš„ä»£ç 
 *********************************************************************************************************
 */
 
@@ -126,23 +126,23 @@ struct netif gnetif;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: uip_ChangeNetParam
-*	¹¦ÄÜËµÃ÷: ÖØĞÂÉèÖÃÍøÂç²ÎÊı£¬ ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.uip_ip, g_tParam.uip_net_mask, 
+*	å‡½ æ•° å: uip_ChangeNetParam
+*	åŠŸèƒ½è¯´æ˜: é‡æ–°è®¾ç½®ç½‘ç»œå‚æ•°ï¼Œ ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.uip_ip, g_tParam.uip_net_mask, 
 *			  g_tParam.uip_gateway 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lwip_ChangeNetParam(void)
 {
-//	//uip_ipaddr(ipaddr, 192,168,1,10);	/* È±Ê¡IP */
-//	uip_sethostaddr((uint16_t *)g_tParam.uip_ip);
+	//	//uip_ipaddr(ipaddr, 192,168,1,10);	/* ç¼ºçœIP */
+	//	uip_sethostaddr((uint16_t *)g_tParam.uip_ip);
 
-//	//uip_ipaddr(ipaddr, 255,255,255,0);	/* µØÖ·ÑÚÂë */
-//	uip_setnetmask((uint16_t *)g_tParam.uip_net_mask);
+	//	//uip_ipaddr(ipaddr, 255,255,255,0);	/* åœ°å€æ©ç  */
+	//	uip_setnetmask((uint16_t *)g_tParam.uip_net_mask);
 
-//	//uip_ipaddr(ipaddr, 192,168,1,1);	/* Ä¬ÈÏÍø¹Ø */
-//	uip_setdraddr((uint16_t *)g_tParam.uip_gateway);
+	//	//uip_ipaddr(ipaddr, 192,168,1,1);	/* é»˜è®¤ç½‘å…³ */
+	//	uip_setdraddr((uint16_t *)g_tParam.uip_gateway);
 }
 
 /**
@@ -151,62 +151,62 @@ void lwip_ChangeNetParam(void)
   * @retval None
   */
 /*Static IP ADDRESS: IP_ADDR0.IP_ADDR1.IP_ADDR2.IP_ADDR3 */
-#define IP_ADDR0   ((uint8_t) 192U)
-#define IP_ADDR1   ((uint8_t) 168U)
-#define IP_ADDR2   ((uint8_t) 1U)
-#define IP_ADDR3   ((uint8_t) 86U)
-   
+#define IP_ADDR0 ((uint8_t)192U)
+#define IP_ADDR1 ((uint8_t)168U)
+#define IP_ADDR2 ((uint8_t)1U)
+#define IP_ADDR3 ((uint8_t)86U)
+
 /*NETMASK*/
-#define NETMASK_ADDR0   ((uint8_t) 255U)
-#define NETMASK_ADDR1   ((uint8_t) 255U)
-#define NETMASK_ADDR2   ((uint8_t) 255U)
-#define NETMASK_ADDR3   ((uint8_t) 0U)
+#define NETMASK_ADDR0 ((uint8_t)255U)
+#define NETMASK_ADDR1 ((uint8_t)255U)
+#define NETMASK_ADDR2 ((uint8_t)255U)
+#define NETMASK_ADDR3 ((uint8_t)0U)
 
 /*Gateway Address*/
-#define GW_ADDR0   ((uint8_t) 192U)
-#define GW_ADDR1   ((uint8_t) 168U)
-#define GW_ADDR2   ((uint8_t) 1U)
-#define GW_ADDR3   ((uint8_t) 1U) 
+#define GW_ADDR0 ((uint8_t)192U)
+#define GW_ADDR1 ((uint8_t)168U)
+#define GW_ADDR2 ((uint8_t)1U)
+#define GW_ADDR3 ((uint8_t)1U)
 
 static void Netif_Config(void)
 {
-  ip_addr_t ipaddr;
-  ip_addr_t netmask;
-  ip_addr_t gw;
-	
-#if LWIP_DHCP 
-  ip_addr_set_zero_ip4(&ipaddr);
-  ip_addr_set_zero_ip4(&netmask);
-  ip_addr_set_zero_ip4(&gw);
-#else	
+	ip_addr_t ipaddr;
+	ip_addr_t netmask;
+	ip_addr_t gw;
 
-  /* IP address default setting */
-  IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
-  IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1 , NETMASK_ADDR2, NETMASK_ADDR3);
-  IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3); 
-	
+#if LWIP_DHCP
+	ip_addr_set_zero_ip4(&ipaddr);
+	ip_addr_set_zero_ip4(&netmask);
+	ip_addr_set_zero_ip4(&gw);
+#else
+
+	/* IP address default setting */
+	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+
 #endif
-  
-  /* add the network interface */    
-  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
-  
-  /*  Registers the default network interface */
-  netif_set_default(&gnetif);
-  
-  ethernet_link_status_updated(&gnetif);
-  
-#if LWIP_NETIF_LINK_CALLBACK  
-  netif_set_link_callback(&gnetif, ethernet_link_status_updated);
+
+	/* add the network interface */
+	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
+
+	/*  Registers the default network interface */
+	netif_set_default(&gnetif);
+
+	ethernet_link_status_updated(&gnetif);
+
+#if LWIP_NETIF_LINK_CALLBACK
+	netif_set_link_callback(&gnetif, ethernet_link_status_updated);
 #endif
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lwip_start
-*	¹¦ÄÜËµÃ÷: Æô¶¯lwip_start,  ÍøÂç²ÎÊı´æÔÚÔÚÈ«¾Ö±äÁ¿ g_tParam.lwip_ip, g_tParam.lwip_net_mask, 
+*	å‡½ æ•° å: lwip_start
+*	åŠŸèƒ½è¯´æ˜: å¯åŠ¨lwip_start,  ç½‘ç»œå‚æ•°å­˜åœ¨åœ¨å…¨å±€å˜é‡ g_tParam.lwip_ip, g_tParam.lwip_net_mask, 
 *			  g_tParam.lwip_gateway 
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lwip_start(void)
@@ -223,30 +223,28 @@ void lwip_start(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lwip_pro
-*	¹¦ÄÜËµÃ÷: lwip ÂÖÑ¯£¬²åÈëµ½Ö÷Ñ­»·ÖĞ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lwip_pro
+*	åŠŸèƒ½è¯´æ˜: lwip è½®è¯¢ï¼Œæ’å…¥åˆ°ä¸»å¾ªç¯ä¸­
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lwip_pro(void)
 {
-    /* Read a received packet from the Ethernet buffers and send it 
+	/* Read a received packet from the Ethernet buffers and send it 
        to the lwIP for handling */
-    ethernetif_input(&gnetif);
+	ethernetif_input(&gnetif);
 
-    /* Handle timeouts */
-    sys_check_timeouts();
+	/* Handle timeouts */
+	sys_check_timeouts();
 
-#if LWIP_NETIF_LINK_CALLBACK     
-    Ethernet_Link_Periodic_Handle(&gnetif);
+#if LWIP_NETIF_LINK_CALLBACK
+	Ethernet_Link_Periodic_Handle(&gnetif);
 #endif
-    
-#if LWIP_DHCP   
-    DHCP_Periodic_Handle(&gnetif);
-#endif 
+
+#if LWIP_DHCP
+	DHCP_Periodic_Handle(&gnetif);
+#endif
 }
 
-
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -1,23 +1,23 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ : SDø®«˝∂Øƒ£øÈ
-*	Œƒº˛√˚≥∆ : bsp_sdio_sd.c
-*	∞Ê    ±æ : V1.0
-*	Àµ    √˜ : SDø®µ◊≤„«˝∂Ø°£∏˘æ›stm32h743i_eval_sd.cŒƒº˛–ﬁ∏ƒ°£
+*	Ê®°ÂùóÂêçÁß∞ : SDÂç°È©±Âä®Ê®°Âùó
+*	Êñá‰ª∂ÂêçÁß∞ : bsp_sdio_sd.c
+*	Áâà    Êú¨ : V1.0
+*	ËØ¥    Êòé : SDÂç°Â∫ïÂ±ÇÈ©±Âä®„ÄÇÊ†πÊçÆstm32h743i_eval_sd.cÊñá‰ª∂‰øÆÊîπ„ÄÇ
 *
-*	–ﬁ∏ƒº«¬º :
-*		∞Ê±æ∫≈  »’∆⁄        ◊˜’ﬂ     Àµ√˜
-*		V1.0    2018-09-08  armfly  ’˝ Ω∑¢≤º
+*	‰øÆÊîπËÆ∞ÂΩï :
+*		ÁâàÊú¨Âè∑  Êó•Êúü        ‰ΩúËÄÖ     ËØ¥Êòé
+*		V1.0    2018-09-08  armfly  Ê≠£ÂºèÂèëÂ∏É
 *
-*	Copyright (C), 2018-2030, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2018-2030, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
 
 /*
-	1. –ﬁ∏ƒø®≤Â»ÎºÏ≤‚GPIOœ‡πÿ≈‰÷√
-	2. void SDMMC1_IRQHandler(void) ’‚∏ˆ÷–∂œ∑˛ŒÒ≥Ã–Ú∑≈µΩ±æŒƒº˛ƒ©Œ≤
+	1. ‰øÆÊîπÂç°ÊèíÂÖ•Ê£ÄÊµãGPIOÁõ∏ÂÖ≥ÈÖçÁΩÆ
+	2. void SDMMC1_IRQHandler(void) Ëøô‰∏™‰∏≠Êñ≠ÊúçÂä°Á®ãÂ∫èÊîæÂà∞Êú¨Êñá‰ª∂Êú´Â∞æ
 */
 
 /**
@@ -114,7 +114,6 @@
   * @{
   */
 
-
 /** @defgroup STM32H743I_EVAL_SD_Private_TypesDefinitions SD Private TypesDefinitions
   * @{
   */
@@ -126,16 +125,16 @@
   * @{
   */
 
-/* ø®≤Â»Î“˝Ω≈ : PG9 */
+/* Âç°ÊèíÂÖ•ÂºïËÑö : PG9 */
 //#define SD_DETECT_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
 
 //#define SD_DETECT_GPIO_PORT	GPIOG
 //#define SD_DETECT_PIN		GPIO_PIN_9
 
-/* PG9 == 0 ±Ì æø®≤Â»Î */
+/* PG9 == 0 Ë°®Á§∫Âç°ÊèíÂÖ• */
 //#define SD_IS_INSERTED()  ((SD_DETECT_GPIO_PORT->IDR & SD_DETECT_PIN) == 0)
 
-#define SD_IS_INSERTED()   1
+#define SD_IS_INSERTED() 1
 
 /**
   * @}
@@ -151,7 +150,7 @@
 /** @defgroup STM32H743I_EVAL_SD_Private_Variables SD Private Variables
   * @{
   */
-  
+
 SD_HandleTypeDef uSdHandle;
 //static uint8_t UseExtiModeDetection = 0;
 
@@ -181,33 +180,33 @@ uint8_t BSP_SD_Init(void)
   /* uSD device interface configuration */
   uSdHandle.Instance = SDMMC1;
 
-  uSdHandle.Init.ClockDiv            = 1;
-  uSdHandle.Init.ClockPowerSave      = SDMMC_CLOCK_POWER_SAVE_DISABLE;
-  uSdHandle.Init.ClockEdge           = SDMMC_CLOCK_EDGE_RISING;
+  uSdHandle.Init.ClockDiv = 1;
+  uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
+  uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  uSdHandle.Init.BusWide             = SDMMC_BUS_WIDE_4B;
+  uSdHandle.Init.BusWide = SDMMC_BUS_WIDE_4B;
 
   /* Check if the SD card is plugged in the slot */
 #ifdef SD_DETECT_GPIO_PORT
   {
-		GPIO_InitTypeDef gpio_init;
+    GPIO_InitTypeDef gpio_init;
 
-		SD_DETECT_GPIO_CLK_ENABLE();	/* ¥Úø™GPIO ±÷” */
-	  
-		gpio_init.Mode = GPIO_MODE_INPUT;   			/* …Ë÷√ ‰»Î */
-		gpio_init.Pull = GPIO_NOPULL;                 /* …œœ¬¿≠µÁ◊Ë≤ª πƒ‹ */
-		gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;  /* GPIOÀŸ∂»µ»º∂ */	
-		gpio_init.Pin = SD_DETECT_PIN;
-		HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpio_init);	  
+    SD_DETECT_GPIO_CLK_ENABLE(); /* ÊâìÂºÄGPIOÊó∂Èíü */
+
+    gpio_init.Mode = GPIO_MODE_INPUT;            /* ËÆæÁΩÆËæìÂÖ• */
+    gpio_init.Pull = GPIO_NOPULL;                /* ‰∏ä‰∏ãÊãâÁîµÈòª‰∏ç‰ΩøËÉΩ */
+    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; /* GPIOÈÄüÂ∫¶Á≠âÁ∫ß */
+    gpio_init.Pin = SD_DETECT_PIN;
+    HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpio_init);
   }
 #endif
 
-#if 0	/* ∞≤∏ª¿≥STM32-V7ø™∑¢∞ÂπÃ∂® «3.3Vø®£¨≤ª÷ß≥÷1.8Vø® */
+#if 0 /* ÂÆâÂØåËé±STM32-V7ÂºÄÂèëÊùøÂõ∫ÂÆöÊòØ3.3VÂç°Ôºå‰∏çÊîØÊåÅ1.8VÂç° */
   /* Initialise Transciver MFXPIN to enable 1.8V Switch mode */
   BSP_IO_ConfigPin(SD_LDO_SEL_PIN, IO_MODE_OUTPUT_PP_PU);
 #endif
-	
-  if(BSP_SD_IsDetected() != SD_PRESENT)
+
+  if (BSP_SD_IsDetected() != SD_PRESENT)
   {
     return MSD_ERROR_SD_NOT_PRESENT;
   }
@@ -216,12 +215,12 @@ uint8_t BSP_SD_Init(void)
   BSP_SD_MspInit(&uSdHandle, NULL);
 
   /* HAL SD initialization */
-  if(HAL_SD_Init(&uSdHandle) != HAL_OK)
+  if (HAL_SD_Init(&uSdHandle) != HAL_OK)
   {
     sd_state = MSD_ERROR;
   }
 
-  return  sd_state;
+  return sd_state;
 }
 
 /**
@@ -238,7 +237,7 @@ uint8_t BSP_SD_DeInit(void)
   //UseExtiModeDetection = 0;
 
   /* HAL SD deinitialization */
-  if(HAL_SD_DeInit(&uSdHandle) != HAL_OK)
+  if (HAL_SD_DeInit(&uSdHandle) != HAL_OK)
   {
     sd_state = MSD_ERROR;
   }
@@ -247,7 +246,7 @@ uint8_t BSP_SD_DeInit(void)
   uSdHandle.Instance = SDMMC1;
   BSP_SD_MspDeInit(&uSdHandle, NULL);
 
-  return  sd_state;
+  return sd_state;
 }
 
 /**
@@ -256,7 +255,7 @@ uint8_t BSP_SD_DeInit(void)
   */
 uint8_t BSP_SD_ITConfig(void)
 {
-#if 0	/* ≤ª π”√Õ‚≤øEXIT÷–∂œºÏ≤‚ */
+#if 0 /* ‰∏ç‰ΩøÁî®Â§ñÈÉ®EXIT‰∏≠Êñ≠Ê£ÄÊµã */
   /* Configure Interrupt mode for SD detection pin */
   /* Note: disabling exti mode can be done calling BSP_SD_DeInit() */
   UseExtiModeDetection = 1;
@@ -271,21 +270,20 @@ uint8_t BSP_SD_ITConfig(void)
  */
 uint8_t BSP_SD_IsDetected(void)
 {
-	__IO uint8_t status = SD_PRESENT;
+  __IO uint8_t status = SD_PRESENT;
 
-	/* Check SD card detect pin */
-	if (SD_IS_INSERTED())
-	{
-		status = SD_PRESENT;
-	}
-	else
-	{
-		status = SD_NOT_PRESENT;
-	}
+  /* Check SD card detect pin */
+  if (SD_IS_INSERTED())
+  {
+    status = SD_PRESENT;
+  }
+  else
+  {
+    status = SD_NOT_PRESENT;
+  }
 
-	return status;
+  return status;
 }
-
 
 /**
   * @brief  Reads block(s) from a specified address in an SD card, in polling mode.
@@ -298,7 +296,7 @@ uint8_t BSP_SD_IsDetected(void)
 uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
 
-  if( HAL_SD_ReadBlocks(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) == HAL_OK)
+  if (HAL_SD_ReadBlocks(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) == HAL_OK)
   {
     return MSD_OK;
   }
@@ -306,7 +304,6 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
   {
     return MSD_ERROR;
   }
-
 }
 
 /**
@@ -320,7 +317,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBloc
 uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
 
-  if( HAL_SD_WriteBlocks(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) == HAL_OK)
+  if (HAL_SD_WriteBlocks(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks, Timeout) == HAL_OK)
   {
     return MSD_OK;
   }
@@ -340,7 +337,7 @@ uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBl
 uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOfBlocks)
 {
 
-  if( HAL_SD_ReadBlocks_DMA(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks) == HAL_OK)
+  if (HAL_SD_ReadBlocks_DMA(&uSdHandle, (uint8_t *)pData, ReadAddr, NumOfBlocks) == HAL_OK)
   {
     return MSD_OK;
   }
@@ -360,7 +357,7 @@ uint8_t BSP_SD_ReadBlocks_DMA(uint32_t *pData, uint32_t ReadAddr, uint32_t NumOf
 uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks)
 {
 
-  if( HAL_SD_WriteBlocks_DMA(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks) == HAL_OK)
+  if (HAL_SD_WriteBlocks_DMA(&uSdHandle, (uint8_t *)pData, WriteAddr, NumOfBlocks) == HAL_OK)
   {
     return MSD_OK;
   }
@@ -368,7 +365,6 @@ uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t Num
   {
     return MSD_ERROR;
   }
-
 }
 
 /**
@@ -380,7 +376,7 @@ uint8_t BSP_SD_WriteBlocks_DMA(uint32_t *pData, uint32_t WriteAddr, uint32_t Num
 uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
 {
 
-  if( HAL_SD_Erase(&uSdHandle, StartAddr, EndAddr) == HAL_OK)
+  if (HAL_SD_Erase(&uSdHandle, StartAddr, EndAddr) == HAL_OK)
   {
     return MSD_OK;
   }
@@ -409,9 +405,9 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
-  gpio_init_structure.Mode      = GPIO_MODE_AF_PP;
-  gpio_init_structure.Pull      = GPIO_NOPULL;
-  gpio_init_structure.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+  gpio_init_structure.Mode = GPIO_MODE_AF_PP;
+  gpio_init_structure.Pull = GPIO_NOPULL;
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 
   /* D0(PC8), D1(PC9), D2(PC10), D3(PC11), CK(PC12), CMD(PD2) */
   /* Common GPIO configuration */
@@ -425,17 +421,17 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   gpio_init_structure.Pin = GPIO_PIN_2;
   HAL_GPIO_Init(GPIOD, &gpio_init_structure);
 
-//  /* D0DIR(PC6), D123DIR(PC7) */
-//  gpio_init_structure.Alternate = GPIO_AF8_SDIO1;
-//  /* GPIOC configuration */
-//  gpio_init_structure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-//  HAL_GPIO_Init(GPIOC, &gpio_init_structure);
+  //  /* D0DIR(PC6), D123DIR(PC7) */
+  //  gpio_init_structure.Alternate = GPIO_AF8_SDIO1;
+  //  /* GPIOC configuration */
+  //  gpio_init_structure.Pin = GPIO_PIN_6 | GPIO_PIN_7;
+  //  HAL_GPIO_Init(GPIOC, &gpio_init_structure);
 
-//  /* CKIN(PB8), CDIR(PB9) */
-//  gpio_init_structure.Alternate = GPIO_AF7_SDIO1;
-//  /* GPIOB configuration */
-//  gpio_init_structure.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-//  HAL_GPIO_Init(GPIOB, &gpio_init_structure);
+  //  /* CKIN(PB8), CDIR(PB9) */
+  //  gpio_init_structure.Alternate = GPIO_AF7_SDIO1;
+  //  /* GPIOB configuration */
+  //  gpio_init_structure.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+  //  HAL_GPIO_Init(GPIOB, &gpio_init_structure);
 
   __HAL_RCC_SDMMC1_FORCE_RESET();
   __HAL_RCC_SDMMC1_RELEASE_RESET();
@@ -443,8 +439,6 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   /* NVIC configuration for SDIO interrupts */
   HAL_NVIC_SetPriority(SDMMC1_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
-
-
 }
 
 /**
@@ -455,16 +449,16 @@ __weak void BSP_SD_MspInit(SD_HandleTypeDef *hsd, void *Params)
   */
 __weak void BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params)
 {
-    /* Disable NVIC for SDIO interrupts */
-    HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
+  /* Disable NVIC for SDIO interrupts */
+  HAL_NVIC_DisableIRQ(SDMMC1_IRQn);
 
-    /* DeInit GPIO pins can be done in the application
+  /* DeInit GPIO pins can be done in the application
        (by surcharging this __weak function) */
 
-    /* Disable SDMMC1 clock */
-    __HAL_RCC_SDMMC1_CLK_DISABLE();
+  /* Disable SDMMC1 clock */
+  __HAL_RCC_SDMMC1_CLK_DISABLE();
 
-    /* GPIO pins clock and DMA clocks can be shut down in the application
+  /* GPIO pins clock and DMA clocks can be shut down in the application
        by surcharging this __weak function */
 }
 
@@ -477,9 +471,8 @@ __weak void BSP_SD_MspDeInit(SD_HandleTypeDef *hsd, void *Params)
   */
 uint8_t BSP_SD_GetCardState(void)
 {
-  return((HAL_SD_GetCardState(&uSdHandle) == HAL_SD_CARD_TRANSFER ) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
+  return ((HAL_SD_GetCardState(&uSdHandle) == HAL_SD_CARD_TRANSFER) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
 }
-
 
 /**
   * @brief  Get SD information about specific SD card.
@@ -491,14 +484,12 @@ void BSP_SD_GetCardInfo(BSP_SD_CardInfo *CardInfo)
   HAL_SD_GetCardInfo(&uSdHandle, CardInfo);
 }
 
-
 /**
   * @brief BSP SD Abort callbacks
   * @retval None
   */
 __weak void BSP_SD_AbortCallback(void)
 {
-
 }
 
 /**
@@ -507,7 +498,6 @@ __weak void BSP_SD_AbortCallback(void)
   */
 __weak void BSP_SD_WriteCpltCallback(void)
 {
-
 }
 
 /**
@@ -516,9 +506,7 @@ __weak void BSP_SD_WriteCpltCallback(void)
   */
 __weak void BSP_SD_ReadCpltCallback(void)
 {
-
 }
-
 
 /**
   * @brief BSP Error callbacks
@@ -526,16 +514,14 @@ __weak void BSP_SD_ReadCpltCallback(void)
   */
 __weak void BSP_SD_ErrorCallback(void)
 {
-
 }
-
 
 /**
   * @brief  BSP SD Transceiver 1.8V Mode Callback.
   */
 __weak void BSP_SD_DriveTransciver_1_8V_Callback(FlagStatus status)
 {
-	#if 0
+#if 0
 	  if(status == SET)
 	  {
 		BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_SET);
@@ -544,7 +530,7 @@ __weak void BSP_SD_DriveTransciver_1_8V_Callback(FlagStatus status)
 	  {
 		BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_RESET);
 	  }
-	#endif
+#endif
 }
 
 /**
@@ -560,7 +546,6 @@ void HAL_SD_AbortCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_AbortCallback();
 }
-
 
 /**
   * @brief Tx Transfer completed callbacks
@@ -591,26 +576,26 @@ void HAL_SD_ErrorCallback(SD_HandleTypeDef *hsd)
 {
   BSP_SD_ErrorCallback();
 }
-  
+
 /**
   * @brief  Enable the SD Transceiver 1.8V Mode Callback.
   */
 void HAL_SD_DriveTransciver_1_8V_Callback(FlagStatus status)
 {
-    BSP_SD_DriveTransciver_1_8V_Callback(status);
+  BSP_SD_DriveTransciver_1_8V_Callback(status);
 }
-  
+
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: SDIO_IRQHandler
-*	π¶ƒ‹Àµ√˜: SDIO÷–∂œ
-*	–Œ    ≤Œ:  Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: SDIO_IRQHandler
+*	ÂäüËÉΩËØ¥Êòé: SDIO‰∏≠Êñ≠
+*	ÂΩ¢    ÂèÇ:  Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 void SDMMC1_IRQHandler(void)
 {
-	HAL_SD_IRQHandler(&uSdHandle);
+  HAL_SD_IRQHandler(&uSdHandle);
 }
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

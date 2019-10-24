@@ -1,146 +1,145 @@
 /*
 *********************************************************************************************************
 *
-*	ƒ£øÈ√˚≥∆ :  ’“Ùª˙≤‚ ‘°£
-*	Œƒº˛√˚≥∆ : fm_radio.c
-*	∞Ê    ±æ : V1.1
-*	Àµ    √˜ : ÷˜“™”√”⁄≤‚ ‘Si4730 ’“Ù–æ∆¨µƒπ¶ƒ‹
-*	–ﬁ∏ƒº«¬º :
-*		∞Ê±æ∫≈  »’∆⁄        ◊˜’ﬂ     Àµ√˜
-*		V1.0    2013-01-01  armfly  ’˝ Ω∑¢≤º
-*		V1.1    2014-09-06  armfly  ÕÍ…∆“Ù¡øµ˜Ω⁄∫Ø ˝°£WM8978∫ÕSi47XX–æ∆¨µƒ“Ù¡øÕ¨≤Ωµ˜Ω⁄°£
-*								    Volume µ•¥ œ‘ æ¥ÌŒÛ. ÷ß≥÷Si4704£¨ ‘ˆº”FM µ˜–≥µÁ»›œ‘ æ°£
+*	Ê®°ÂùóÂêçÁß∞ : Êî∂Èü≥Êú∫ÊµãËØï„ÄÇ
+*	Êñá‰ª∂ÂêçÁß∞ : fm_radio.c
+*	Áâà    Êú¨ : V1.1
+*	ËØ¥    Êòé : ‰∏ªË¶ÅÁî®‰∫éÊµãËØïSi4730Êî∂Èü≥ËäØÁâáÁöÑÂäüËÉΩ
+*	‰øÆÊîπËÆ∞ÂΩï :
+*		ÁâàÊú¨Âè∑  Êó•Êúü        ‰ΩúËÄÖ     ËØ¥Êòé
+*		V1.0    2013-01-01  armfly  Ê≠£ÂºèÂèëÂ∏É
+*		V1.1    2014-09-06  armfly  ÂÆåÂñÑÈü≥ÈáèË∞ÉËäÇÂáΩÊï∞„ÄÇWM8978ÂíåSi47XXËäØÁâáÁöÑÈü≥ÈáèÂêåÊ≠•Ë∞ÉËäÇ„ÄÇ
+*								    Volume ÂçïËØçÊòæÁ§∫ÈîôËØØ. ÊîØÊåÅSi4704Ôºå Â¢ûÂä†FM Ë∞ÉË∞êÁîµÂÆπÊòæÁ§∫„ÄÇ
 *
-*	Copyright (C), 2014-2015, ∞≤∏ª¿≥µÁ◊” www.armfly.com
+*	Copyright (C), 2014-2015, ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h"			/* printf∫Ø ˝∂®œÚ ‰≥ˆµΩ¥Æø⁄£¨À˘“‘±ÿ–Î∞¸∫¨’‚∏ˆŒƒº˛ */
+#include "bsp.h" /* printfÂáΩÊï∞ÂÆöÂêëËæìÂá∫Âà∞‰∏≤Âè£ÔºåÊâÄ‰ª•ÂøÖÈ°ªÂåÖÂê´Ëøô‰∏™Êñá‰ª∂ */
 #include "form_fm_radio.h"
 #include "param.h"
 
-/* ∑µªÿ∞¥≈•µƒ◊¯±Í(∆¡ƒª”“œ¬Ω«) */
-#define BUTTON_RET_H	32
-#define BUTTON_RET_W	60
-#define	BUTTON_RET_X	(g_LcdWidth - BUTTON_RET_W - 4)
-#define	BUTTON_RET_Y	(g_LcdHeight - BUTTON_RET_H - 4)
+/* ËøîÂõûÊåâÈíÆÁöÑÂùêÊ†á(Â±èÂπïÂè≥‰∏ãËßí) */
+#define BUTTON_RET_H 32
+#define BUTTON_RET_W 60
+#define BUTTON_RET_X (g_LcdWidth - BUTTON_RET_W - 4)
+#define BUTTON_RET_Y (g_LcdHeight - BUTTON_RET_H - 4)
 
-#define BUTTON_RET2_H	32
-#define BUTTON_RET2_W	120
-#define	BUTTON_RET2_X	(BUTTON_RET_X - BUTTON_RET2_W - 5)
-#define	BUTTON_RET2_Y	BUTTON_RET_Y
-#define	BUTTON_RET2_TEXT	"±£≥÷ ’“Ù,∑µªÿ"
+#define BUTTON_RET2_H 32
+#define BUTTON_RET2_W 120
+#define BUTTON_RET2_X (BUTTON_RET_X - BUTTON_RET2_W - 5)
+#define BUTTON_RET2_Y BUTTON_RET_Y
+#define BUTTON_RET2_TEXT "‰øùÊåÅÊî∂Èü≥,ËøîÂõû"
 
-#define BUTTON_FM_H	32
-#define BUTTON_FM_W	60
-#define	BUTTON_FM_X	5
-#define	BUTTON_FM_Y	120
+#define BUTTON_FM_H 32
+#define BUTTON_FM_W 60
+#define BUTTON_FM_X 5
+#define BUTTON_FM_Y 120
 
-#define BUTTON_AM_H	32
-#define BUTTON_AM_W	60
-#define	BUTTON_AM_X	(BUTTON_FM_X + 70)
-#define	BUTTON_AM_Y	BUTTON_FM_Y
+#define BUTTON_AM_H 32
+#define BUTTON_AM_W 60
+#define BUTTON_AM_X (BUTTON_FM_X + 70)
+#define BUTTON_AM_Y BUTTON_FM_Y
 
-#define BUTTON_VOLP_H	32
-#define BUTTON_VOLP_W	48
-#define BUTTON_VOLP_X	32
-#define BUTTON_VOLP_Y	48
+#define BUTTON_VOLP_H 32
+#define BUTTON_VOLP_W 48
+#define BUTTON_VOLP_X 32
+#define BUTTON_VOLP_Y 48
 
-#define BUTTON_CHP_H	32
-#define BUTTON_CHP_W	48
-#define BUTTON_CHP_X	32
-#define BUTTON_CHP_Y	48
+#define BUTTON_CHP_H 32
+#define BUTTON_CHP_W 48
+#define BUTTON_CHP_X 32
+#define BUTTON_CHP_Y 48
 
-#define	BUTTON_FREQ_	(BUTTON_FM_X + 70)
-#define	BUTTON__Y	BUTTON_FM_Y
+#define BUTTON_FREQ_ (BUTTON_FM_X + 70)
+#define BUTTON__Y BUTTON_FM_Y
 
-/* “‘œ¬ «ºÏ≤ÈøÚ */
-#define CHECK_SPK_X		BUTTON_FM_X
-#define CHECK_SPK_Y		(BUTTON_FM_Y + BUTTON_FM_H + 5)
-#define	CHECK_SPK_H		CHECK_BOX_H
-#define	CHECK_SPK_W		(CHECK_BOX_W + 5 * 16)		/* æˆ∂®¥•√˛”––ß«¯”Ú */
-#define CHECK_SPK_TEXT	"¥Úø™—Ô…˘∆˜"
+/* ‰ª•‰∏ãÊòØÊ£ÄÊü•Ê°Ü */
+#define CHECK_SPK_X BUTTON_FM_X
+#define CHECK_SPK_Y (BUTTON_FM_Y + BUTTON_FM_H + 5)
+#define CHECK_SPK_H CHECK_BOX_H
+#define CHECK_SPK_W (CHECK_BOX_W + 5 * 16) /* ÂÜ≥ÂÆöËß¶Êë∏ÊúâÊïàÂå∫Âüü */
+#define CHECK_SPK_TEXT "ÊâìÂºÄÊâ¨Â£∞Âô®"
 
-#define CHECK_RSSI_X	BUTTON_FM_X
-#define CHECK_RSSI_Y	(CHECK_SPK_Y + 30)
-#define	CHECK_RSSI_H	CHECK_BOX_H
-#define	CHECK_RSSI_W	(CHECK_BOX_W + 14 * 16)		/* æˆ∂®¥•√˛”––ß«¯”Ú */
-#define CHECK_RSSI_TEXT	"œ‘ æ–≈∫≈÷ ¡ø£®ø…ƒ‹“˝∆‘Î“Ù£©"
+#define CHECK_RSSI_X BUTTON_FM_X
+#define CHECK_RSSI_Y (CHECK_SPK_Y + 30)
+#define CHECK_RSSI_H CHECK_BOX_H
+#define CHECK_RSSI_W (CHECK_BOX_W + 14 * 16) /* ÂÜ≥ÂÆöËß¶Êë∏ÊúâÊïàÂå∫Âüü */
+#define CHECK_RSSI_TEXT "ÊòæÁ§∫‰ø°Âè∑Ë¥®ÈáèÔºàÂèØËÉΩÂºïËµ∑Âô™Èü≥Ôºâ"
 
-#define CHECK_LIST_X	BUTTON_FM_X
-#define CHECK_LIST_Y	(CHECK_RSSI_Y + 30)
-#define	CHECK_LIST_H	CHECK_BOX_H
-#define	CHECK_LIST_W	(CHECK_BOX_W + 5 * 16)		/* æˆ∂®¥•√˛”––ß«¯”Ú */
-#define CHECK_LIST_TEXT	"—°‘Ò»´π˙µÁÃ®¡–±Ì"
+#define CHECK_LIST_X BUTTON_FM_X
+#define CHECK_LIST_Y (CHECK_RSSI_Y + 30)
+#define CHECK_LIST_H CHECK_BOX_H
+#define CHECK_LIST_W (CHECK_BOX_W + 5 * 16) /* ÂÜ≥ÂÆöËß¶Êë∏ÊúâÊïàÂå∫Âüü */
+#define CHECK_LIST_TEXT "ÈÄâÊã©ÂÖ®ÂõΩÁîµÂè∞ÂàóË°®"
 
 /*
-AM873£¨FM88.4£¨Œ‰∫∫»À√Òπ„≤•µÁÃ®£®–¬Œ≈◊€∫œ∆µ¬ £©
+AM873ÔºåFM88.4ÔºåÊ≠¶Ê±â‰∫∫Ê∞ëÂπøÊí≠ÁîµÂè∞ÔºàÊñ∞ÈóªÁªºÂêàÈ¢ëÁéáÔºâ
 
 
 
-	Œ‰∫∫µÿ«¯FMµÁÃ®∆µ¬ ±Ì£∫
+	Ê≠¶Ê±âÂú∞Âå∫FMÁîµÂè∞È¢ëÁéáË°®Ôºö
 	88.4
 
-	FM89.6 Œ‰∫∫π„≤•µÁÃ®ΩªÕ®Ã®
+	FM89.6 Ê≠¶Ê±âÂπøÊí≠ÁîµÂè∞‰∫§ÈÄöÂè∞
 		90.7
 		91.2
-	FM91.6 ≥˛ÃÏπ„≤•µÁÃ®Œ¿–«Ã®
+	FM91.6 Ê•öÂ§©ÂπøÊí≠ÁîµÂè∞Âç´ÊòüÂè∞
 	
-	FM92.7 ≥˛ÃÏπ„≤•µÁÃ®ΩªÕ®ÃÂ”˝Ã®
-	FM93.6 Œ‰∫∫π„≤•µÁÃ®÷–≤®Ã®
-	FM95.6 ÷–—Îπ„≤•µÁÃ®÷–π˙÷Æ…˘
+	FM92.7 Ê•öÂ§©ÂπøÊí≠ÁîµÂè∞‰∫§ÈÄö‰ΩìËÇ≤Âè∞
+	FM93.6 Ê≠¶Ê±âÂπøÊí≠ÁîµÂè∞‰∏≠Ê≥¢Âè∞
+	FM95.6 ‰∏≠Â§ÆÂπøÊí≠ÁîµÂè∞‰∏≠ÂõΩ‰πãÂ£∞
 	96.0==
-	FM96.6 ∫˛±±π„≤•µÁÃ®…˙ªÓ∆µµ¿
+	FM96.6 ÊπñÂåóÂπøÊí≠ÁîµÂè∞ÁîüÊ¥ªÈ¢ëÈÅì
 	
-	FM97.8 ÷–—Îπ„≤•µÁÃ®æ≠º√÷Æ…˘
+	FM97.8 ‰∏≠Â§ÆÂπøÊí≠ÁîµÂè∞ÁªèÊµé‰πãÂ£∞
 	
-	FM99.8 ∫˛±±π„≤•µÁÃ®æ≠º√∆µµ¿
-	FM100.6 ≥§Ω≠æ≠º√π„≤•µÁÃ®
-	FM101.8 Œ‰∫∫π„≤•µÁÃ®Œƒ“’Ã®
-	FM102.6 ∫˛±±π„≤•µÁÃ®∏æ≈Æ∂˘ÕØ∆µµ¿
-	FM103.8 ∫˛±±π„≤•µÁÃ®“Ù¿÷∆µµ¿
-	FM104.6 ∫˛±±π„≤•µÁÃ®÷–≤®∆µµ¿
-	FM105.8 ≥˛ÃÏπ„≤•µÁÃ®“Ù¿÷Ã®
-	FM107.8 ∫˛±±π„≤•µÁÃ®ΩªÕ®∆µµ¿
+	FM99.8 ÊπñÂåóÂπøÊí≠ÁîµÂè∞ÁªèÊµéÈ¢ëÈÅì
+	FM100.6 ÈïøÊ±üÁªèÊµéÂπøÊí≠ÁîµÂè∞
+	FM101.8 Ê≠¶Ê±âÂπøÊí≠ÁîµÂè∞ÊñáËâ∫Âè∞
+	FM102.6 ÊπñÂåóÂπøÊí≠ÁîµÂè∞Â¶áÂ•≥ÂÑøÁ´•È¢ëÈÅì
+	FM103.8 ÊπñÂåóÂπøÊí≠ÁîµÂè∞Èü≥‰πêÈ¢ëÈÅì
+	FM104.6 ÊπñÂåóÂπøÊí≠ÁîµÂè∞‰∏≠Ê≥¢È¢ëÈÅì
+	FM105.8 Ê•öÂ§©ÂπøÊí≠ÁîµÂè∞Èü≥‰πêÂè∞
+	FM107.8 ÊπñÂåóÂπøÊí≠ÁîµÂè∞‰∫§ÈÄöÈ¢ëÈÅì
 */
 
 const uint16_t g_InitListFM[] = {
-	8640,
-	8840,
-	8960,
-	9060,
-	9120,
-	9270,
-	9360,
-	9440,
-	9560,
-	9660,
-	9780,
-	9980,
-	10060,
-	10180,
-	10260,
-	10380,
-	10460,
-	10580,
-	10780	
-};
+		8640,
+		8840,
+		8960,
+		9060,
+		9120,
+		9270,
+		9360,
+		9440,
+		9560,
+		9660,
+		9780,
+		9980,
+		10060,
+		10180,
+		10260,
+		10380,
+		10460,
+		10580,
+		10780};
 
 const uint16_t g_InitListAM[] = {
-	531,
-	540,
-	549,
-	558,
-	603,
-	639,
-	855,
-	873,
-	882,
-	900,
-	909,
-	918,
-	927,
+		531,
+		540,
+		549,
+		558,
+		603,
+		639,
+		855,
+		873,
+		882,
+		900,
+		909,
+		918,
+		927,
 };
 
 RADIO_T g_tRadio;
@@ -155,19 +154,19 @@ static void radio_AdjustVolume(uint8_t _ucVolume);
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: RadioMain
-*	π¶ƒ‹Àµ√˜:  ’“Ùª˙÷˜≥Ã–Ú
-*	–Œ    ≤Œ: Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: RadioMain
+*	ÂäüËÉΩËØ¥Êòé: Êî∂Èü≥Êú∫‰∏ªÁ®ãÂ∫è
+*	ÂΩ¢    ÂèÇ: Êó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 void RadioMain(void)
 {
-	uint8_t ucKeyCode;		/* ∞¥º¸¥˙¬Î */
-	uint8_t ucTouch;		/* ¥•√˛ ¬º˛ */
-	uint8_t fRefresh;		/* À¢∆¡«Î«Û±Í÷æ,1±Ì æ–Ë“™À¢–¬ */
+	uint8_t ucKeyCode; /* ÊåâÈîÆ‰ª£Á†Å */
+	uint8_t ucTouch;	 /* Ëß¶Êë∏‰∫ã‰ª∂ */
+	uint8_t fRefresh;	/* Âà∑Â±èËØ∑Ê±ÇÊ†áÂøó,1Ë°®Á§∫ÈúÄË¶ÅÂà∑Êñ∞ */
 	uint8_t fQuit = 0;
-	FONT_T tFont, tFontBtn, tFontChk;			/* ∂®“Â“ª∏ˆ◊÷ÃÂΩ·ππÃÂ±‰¡ø£¨”√”⁄…Ë÷√◊÷ÃÂ≤Œ ˝ */
+	FONT_T tFont, tFontBtn, tFontChk; /* ÂÆö‰πâ‰∏Ä‰∏™Â≠ó‰ΩìÁªìÊûÑ‰ΩìÂèòÈáèÔºåÁî®‰∫éËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 
 	char buf[128];
 	uint16_t x, y;
@@ -177,36 +176,36 @@ void RadioMain(void)
 	BUTTON_T tBtn;
 	CHECK_T tCheck;
 
-	LCD_ClrScr(CL_BLUE);  	/* «Â∆¡£¨±≥æ∞¿∂…´ */
+	LCD_ClrScr(CL_BLUE); /* Ê∏ÖÂ±èÔºåËÉåÊôØËìùËâ≤ */
 
-	radio_LoadParam();	/* ∂¡»°µÁÃ®∫Õ“Ù¡ø≤Œ ˝ */
-	
-	/* …Ë÷√◊÷ÃÂ≤Œ ˝ */
+	radio_LoadParam(); /* ËØªÂèñÁîµÂè∞ÂíåÈü≥ÈáèÂèÇÊï∞ */
+
+	/* ËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	{
-		tFont.FontCode = FC_ST_16;	/* ◊÷ÃÂ¥˙¬Î 16µ„’Û */
-		tFont.FrontColor = CL_WHITE;	/* ◊÷ÃÂ—’…´ */
-		tFont.BackColor = CL_BLUE;	/* Œƒ◊÷±≥æ∞—’…´ */
-		tFont.Space = 0;				/* Œƒ◊÷º‰æ‡£¨µ•Œª = œÒÀÿ */
+		tFont.FontCode = FC_ST_16;	 /* Â≠ó‰Ωì‰ª£Á†Å 16ÁÇπÈòµ */
+		tFont.FrontColor = CL_WHITE; /* Â≠ó‰ΩìÈ¢úËâ≤ */
+		tFont.BackColor = CL_BLUE;	 /* ÊñáÂ≠óËÉåÊôØÈ¢úËâ≤ */
+		tFont.Space = 0;						 /* ÊñáÂ≠óÈó¥Ë∑ùÔºåÂçï‰Ωç = ÂÉèÁ¥† */
 
-		/* ∞¥≈•◊÷ÃÂ */
+		/* ÊåâÈíÆÂ≠ó‰Ωì */
 		tFontBtn.FontCode = FC_ST_16;
-		tFontBtn.BackColor = CL_MASK;	/* Õ∏√˜…´ */
+		tFontBtn.BackColor = CL_MASK; /* ÈÄèÊòéËâ≤ */
 		tFontBtn.FrontColor = CL_BLACK;
 		tFontBtn.Space = 0;
 
-		/* CheckBox ◊÷ÃÂ */
+		/* CheckBox Â≠ó‰Ωì */
 		tFontChk.FontCode = FC_ST_16;
-		tFontChk.BackColor = CL_MASK;	/* Õ∏√˜…´ */
+		tFontChk.BackColor = CL_MASK; /* ÈÄèÊòéËâ≤ */
 		tFontChk.FrontColor = CL_YELLOW;
 		tFontChk.Space = 0;
 	}
 
 	x = 5;
 	y = 3;
-	LCD_DispStr(x, y, "Si4730/Si4704  ’“Ùª˙", &tFont);			/* ‘⁄(8,3)◊¯±Í¥¶œ‘ æ“ª¥Æ∫∫◊÷ */
+	LCD_DispStr(x, y, "Si4730/Si4704 Êî∂Èü≥Êú∫", &tFont); /* Âú®(8,3)ÂùêÊ†áÂ§ÑÊòæÁ§∫‰∏Ä‰∏≤Ê±âÂ≠ó */
 	y += usLineCap;
 
-	/* ≤‚ ‘I2C…Ë±∏ */
+	/* ÊµãËØïI2CËÆæÂ§á */
 	{
 		if (i2c_CheckDevice(I2C_ADDR_SI4730_W) == 0)
 		{
@@ -214,44 +213,44 @@ void RadioMain(void)
 			printf("%s\r\n", buf);
 			LCD_DispStr(x, y, buf, &tFont);
 
-			wm8978_OutMute(1);		/* œ»æ≤“Ù ‰≥ˆ, ±‹√‚…œµÁ∏¬ﬂ’…˘ */
-			
+			wm8978_OutMute(1); /* ÂÖàÈùôÈü≥ËæìÂá∫, ÈÅøÂÖç‰∏äÁîµÂòéÂìíÂ£∞ */
+
 			SI4730_PowerUp_FM_Revice();
 			bsp_DelayMS(10);
-			
+
 			y += usLineCap;
-			/* ¥Ú”°–æ∆¨µƒ∞Ê±æ */
+			/* ÊâìÂç∞ËäØÁâáÁöÑÁâàÊú¨ */
 			{
 				uint8_t read_buf[8];
 
 				if (SI4730_GetRevision(read_buf))
 				{
-					sprintf(buf, "%d-%c%c-%02X%02X-%c%c-%c", 	/* Si4730 */
-						read_buf[0], read_buf[1], read_buf[2],	/* πÃº˛∞Ê±æ */
-						read_buf[3], read_buf[4],		/* ≤π∂°ID */
-						read_buf[5], read_buf[6],		/* ◊Èº˛∞Ê±æ */
-						read_buf[7]			/* –æ∆¨”≤º˛∞Ê±æ */
-						);					/* –æ∆¨–Õ∫≈±Í ∂ */
+					sprintf(buf, "%d-%c%c-%02X%02X-%c%c-%c",			 /* Si4730 */
+									read_buf[0], read_buf[1], read_buf[2], /* Âõ∫‰ª∂ÁâàÊú¨ */
+									read_buf[3], read_buf[4],							 /* Ë°•‰∏ÅID */
+									read_buf[5], read_buf[6],							 /* ÁªÑ‰ª∂ÁâàÊú¨ */
+									read_buf[7]														 /* ËäØÁâáÁ°¨‰ª∂ÁâàÊú¨ */
+					);																						 /* ËäØÁâáÂûãÂè∑Ê†áËØÜ */
 
 					if (strcmp(buf, "30-60-0000-70-D") == 0)
 					{
 						g_tRadio.ChipType = SI4730;
-						
+
 						LCD_DispStr(x, y, buf, &tFont);
 						LCD_DispStr(x + 130, y, "Si4730", &tFont);
 					}
 					else if (strcmp(buf, "4-60-0000-70-D") == 0 ||
-						strcmp(buf, "4-20-0000-20-B") == 0)
+									 strcmp(buf, "4-20-0000-20-B") == 0)
 					{
 						g_tRadio.ChipType = SI4704;
 						LCD_DispStr(x, y, buf, &tFont);
 						LCD_DispStr(x + 130, y, "Si4704", &tFont);
-						
+
 						g_tRadio.ucMode = FM_RX;
-						
-						//SI4704_SetFMIntput(1);	/* «–ªªÃÏœﬂŒ™PCBÃÏœﬂ */
-						// 0 ±Ì æFM“˝Ω≈ ‰»Î(∂˙ª˙ÃÏœﬂ)  1 ±Ì æLPIÃÏœﬂ ‰»Î(PCBÃÏœﬂ)
-						SI4704_SetFMIntput(0);	/* «–ªªÃÏœﬂŒ™∂˙ª˙ÃÏœﬂ */
+
+						//SI4704_SetFMIntput(1);	/* ÂàáÊç¢Â§©Á∫ø‰∏∫PCBÂ§©Á∫ø */
+						// 0 Ë°®Á§∫FMÂºïËÑöËæìÂÖ•(ËÄ≥Êú∫Â§©Á∫ø)  1 Ë°®Á§∫LPIÂ§©Á∫øËæìÂÖ•(PCBÂ§©Á∫ø)
+						SI4704_SetFMIntput(0); /* ÂàáÊç¢Â§©Á∫ø‰∏∫ËÄ≥Êú∫Â§©Á∫ø */
 					}
 					else
 					{
@@ -260,7 +259,7 @@ void RadioMain(void)
 						tFont.FrontColor = CL_WHITE;
 					}
 				}
-			}			
+			}
 		}
 		else
 		{
@@ -274,7 +273,7 @@ void RadioMain(void)
 		y += usLineCap;
 	}
 
-	/* œ‘ æ∞¥≈• */
+	/* ÊòæÁ§∫ÊåâÈíÆ */
 	{
 		tBtn.Font = &tFontBtn;
 
@@ -282,17 +281,17 @@ void RadioMain(void)
 		tBtn.Top = BUTTON_RET_Y;
 		tBtn.Height = BUTTON_RET_H;
 		tBtn.Width = BUTTON_RET_W;
-		tBtn.Focus = 0;		/* Œ¥—°÷– */
-		tBtn.pCaption = "∑µªÿ";
+		tBtn.Focus = 0; /* Êú™ÈÄâ‰∏≠ */
+		tBtn.pCaption = "ËøîÂõû";
 		LCD_DrawButton(&tBtn);
 
 		tBtn.Left = BUTTON_RET2_X;
 		tBtn.Top = BUTTON_RET2_Y;
 		tBtn.Height = BUTTON_RET2_H;
 		tBtn.Width = BUTTON_RET2_W;
-		tBtn.Focus = 0;		/* Œ¥—°÷– */
-		tBtn.pCaption = BUTTON_RET2_TEXT;	/* ±£≥÷ ’“Ù ∑µªÿ */
-		LCD_DrawButton(&tBtn);		
+		tBtn.Focus = 0;										/* Êú™ÈÄâ‰∏≠ */
+		tBtn.pCaption = BUTTON_RET2_TEXT; /* ‰øùÊåÅÊî∂Èü≥ ËøîÂõû */
+		LCD_DrawButton(&tBtn);
 
 		if (g_tRadio.ChipType == SI4730)
 		{
@@ -300,7 +299,7 @@ void RadioMain(void)
 			tBtn.Top = BUTTON_FM_Y;
 			tBtn.Height = BUTTON_FM_H;
 			tBtn.Width = BUTTON_FM_W;
-			tBtn.Focus = 0;		/*  ß»•Ωπµ„ */
+			tBtn.Focus = 0; /* Â§±ÂéªÁÑ¶ÁÇπ */
 			tBtn.pCaption = "FM";
 			LCD_DrawButton(&tBtn);
 
@@ -308,12 +307,12 @@ void RadioMain(void)
 			tBtn.Top = BUTTON_AM_Y;
 			tBtn.Height = BUTTON_AM_H;
 			tBtn.Width = BUTTON_AM_W;
-			tBtn.Focus = 0;		/*  ß»•Ωπµ„ */
+			tBtn.Focus = 0; /* Â§±ÂéªÁÑ¶ÁÇπ */
 			tBtn.pCaption = "AM";
 			LCD_DrawButton(&tBtn);
 		}
 
-		/* œ‘ æºÏ≤ÈøÚ */
+		/* ÊòæÁ§∫Ê£ÄÊü•Ê°Ü */
 		tCheck.Font = &tFontChk;
 
 		tCheck.Left = CHECK_SPK_X;
@@ -337,7 +336,7 @@ void RadioMain(void)
 		tCheck.Width = CHECK_RSSI_W;
 		tCheck.Checked = 0;
 		tCheck.pCaption = CHECK_RSSI_TEXT;
-		
+
 		LCD_DrawCheckBox(&tCheck);
 
 		tCheck.Left = CHECK_LIST_X;
@@ -359,12 +358,12 @@ void RadioMain(void)
 	{
 		if (g_tRadio.ucSpkOutEn == 0)
 		{
-			/* ≈‰÷√WM8978–æ∆¨£¨ ‰»ÎŒ™AUXΩ”ø⁄( ’“Ùª˙)£¨ ‰≥ˆŒ™∂˙ª˙ */
+			/* ÈÖçÁΩÆWM8978ËäØÁâáÔºåËæìÂÖ•‰∏∫AUXÊé•Âè£(Êî∂Èü≥Êú∫)ÔºåËæìÂá∫‰∏∫ËÄ≥Êú∫ */
 			wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON);
 		}
 		else
 		{
-			/* ≈‰÷√WM8978–æ∆¨£¨ ‰»ÎŒ™AUXΩ”ø⁄( ’“Ùª˙)£¨ ‰≥ˆŒ™∂˙ª˙ ∫Õ —Ô…˘∆˜ */
+			/* ÈÖçÁΩÆWM8978ËäØÁâáÔºåËæìÂÖ•‰∏∫AUXÊé•Âè£(Êî∂Èü≥Êú∫)ÔºåËæìÂá∫‰∏∫ËÄ≥Êú∫ Âíå Êâ¨Â£∞Âô® */
 			wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON | SPK_ON);
 		}
 
@@ -377,36 +376,36 @@ void RadioMain(void)
 		SI4730_PowerUp_FM_Revice();
 		bsp_DelayMS(10);
 
-		/* µ˜Ω⁄“Ù¡ø */
+		/* Ë∞ÉËäÇÈü≥Èáè */
 		radio_AdjustVolume(g_tRadio.ucVolume);
-		
+
 		tFont.FrontColor = CL_YELLOW;
-		LCD_DispStr(x, y, "«Î≤Ÿ◊˜“°∏ÀªªÃ®∫Õµ˜Ω⁄“Ù¡ø,K2 K3º¸Œ¢µ˜∆µ¬ ", &tFont);
+		LCD_DispStr(x, y, "ËØ∑Êìç‰ΩúÊëáÊùÜÊç¢Âè∞ÂíåË∞ÉËäÇÈü≥Èáè,K2 K3ÈîÆÂæÆË∞ÉÈ¢ëÁéá", &tFont);
 		if (g_tRadio.ChipType == SI4704)
 		{
-			LCD_DispStr(x, y + 75, "«ÎΩ´∂˙ª˙≤ÂµΩ¬Ã…´≤Â◊˘£¨”√◊˜FMÃÏœﬂ", &tFont);			/* ‘⁄(8,3)◊¯±Í¥¶œ‘ æ“ª¥Æ∫∫◊÷ */		
+			LCD_DispStr(x, y + 75, "ËØ∑Â∞ÜËÄ≥Êú∫ÊèíÂà∞ÁªøËâ≤ÊèíÂ∫ßÔºåÁî®‰ΩúFMÂ§©Á∫ø", &tFont); /* Âú®(8,3)ÂùêÊ†áÂ§ÑÊòæÁ§∫‰∏Ä‰∏≤Ê±âÂ≠ó */
 		}
-		tFont.FrontColor = CL_WHITE;		
+		tFont.FrontColor = CL_WHITE;
 
-		/* ‘§ÃÓŒ‰∫∫µÿ«¯µƒµÁÃ®¡–±Ì */
+		/* È¢ÑÂ°´Ê≠¶Ê±âÂú∞Âå∫ÁöÑÁîµÂè∞ÂàóË°® */
 		{
-			if (g_tRadio.ucListType == 0)	/* 0 ±Ì æ Œ‰∫∫µÿ«¯¡–±Ì 1 ±Ì æ»´π˙¡–±Ì */
+			if (g_tRadio.ucListType == 0) /* 0 Ë°®Á§∫ Ê≠¶Ê±âÂú∞Âå∫ÂàóË°® 1 Ë°®Á§∫ÂÖ®ÂõΩÂàóË°® */
 			{
-				radio_FM_FreqList(0);	/* ‘§…ËŒ‰∫∫µÿ«¯µƒFMµÁÃ®¡–±Ì */
-				radio_AM_FreqList(0);	/* ‘§…ËŒ‰∫∫µÿ«¯µƒAMµÁÃ®¡–±Ì */
-				//g_tRadio.ucIndexFM  = 1;
+				radio_FM_FreqList(0); /* È¢ÑËÆæÊ≠¶Ê±âÂú∞Âå∫ÁöÑFMÁîµÂè∞ÂàóË°® */
+				radio_AM_FreqList(0); /* È¢ÑËÆæÊ≠¶Ê±âÂú∞Âå∫ÁöÑAMÁîµÂè∞ÂàóË°® */
+															//g_tRadio.ucIndexFM  = 1;
 			}
 			else
 			{
-				radio_FM_FreqList(1);	/* ‘§…Ë»´π˙µÿ«¯µƒFMµÁÃ®¡–±Ì */
-				radio_AM_FreqList(1);	/* ‘§…Ë»´π˙µÿ«¯µƒAMµÁÃ®¡–±Ì */
-				//g_tRadio.ucIndexAM  = 1;
+				radio_FM_FreqList(1); /* È¢ÑËÆæÂÖ®ÂõΩÂú∞Âå∫ÁöÑFMÁîµÂè∞ÂàóË°® */
+				radio_AM_FreqList(1); /* È¢ÑËÆæÂÖ®ÂõΩÂú∞Âå∫ÁöÑAMÁîµÂè∞ÂàóË°® */
+															//g_tRadio.ucIndexAM  = 1;
 			}
-			//g_tRadio.ucMode = FM_RX;	/* »± ° «FMΩ” ’ */
-			//g_tRadio.ucMode = AM_RX;	/* »± ° «FMΩ” ’ */
+			//g_tRadio.ucMode = FM_RX;	/* Áº∫ÁúÅÊòØFMÊé•Êî∂ */
+			//g_tRadio.ucMode = AM_RX;	/* Áº∫ÁúÅÊòØFMÊé•Êî∂ */
 		}
 
-		bsp_DelayMS(300);	/* ±ÿ–Î—”≥Ÿ“ª∂Œ ±º‰∫Û£¨≤≈ƒ‹±£÷§√ø¥Œ…œµÁ∫Û£¨ƒ‹πª—°÷–“ª∏ˆÃ® */
+		bsp_DelayMS(300); /* ÂøÖÈ°ªÂª∂Ëøü‰∏ÄÊÆµÊó∂Èó¥ÂêéÔºåÊâçËÉΩ‰øùËØÅÊØèÊ¨°‰∏äÁîµÂêéÔºåËÉΩÂ§üÈÄâ‰∏≠‰∏Ä‰∏™Âè∞ */
 		if (g_tRadio.ucMode == FM_RX)
 		{
 			g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
@@ -418,12 +417,12 @@ void RadioMain(void)
 			SI4730_SetAMFreq(g_tRadio.usFreq);
 		}
 
-		bsp_DelayMS(100);	/* —”≥Ÿ100ms£¨±‹√‚«ø¡“µƒ∏¬ﬂ’…˘ */
+		bsp_DelayMS(100); /* Âª∂Ëøü100msÔºåÈÅøÂÖçÂº∫ÁÉàÁöÑÂòéÂìíÂ£∞ */
 
 		wm8978_OutMute(0);
 	}
 
-	fRefresh = 1;	/* 1±Ì æ–Ë“™À¢–¬LCD */
+	fRefresh = 1; /* 1Ë°®Á§∫ÈúÄË¶ÅÂà∑Êñ∞LCD */
 	bsp_StartAutoTimer(0, 1000);
 	while (fQuit == 0)
 	{
@@ -440,451 +439,451 @@ void RadioMain(void)
 		{
 			if (bsp_CheckTimer(0))
 			{
-				radio_SignalQuality();	/* À¢–¬–≈∫≈÷ ¡ø◊¥Ã¨¿∏ */
+				radio_SignalQuality(); /* Âà∑Êñ∞‰ø°Âè∑Ë¥®ÈáèÁä∂ÊÄÅÊ†è */
 			}
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ∂¡»°¥•√˛ ¬º˛ */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY); /* ËØªÂèñËß¶Êë∏‰∫ã‰ª∂ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ¥•± ∞¥œ¬ ¬º˛ */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+			case TOUCH_DOWN: /* Ëß¶Á¨îÊåâ‰∏ã‰∫ã‰ª∂ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 1; /* ÁÑ¶ÁÇπ */
+					tBtn.pCaption = "ËøîÂõû";
+					LCD_DrawButton(&tBtn);
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_RET2_X, BUTTON_RET2_Y, BUTTON_RET2_H, BUTTON_RET2_W))
+				{
+					tBtn.Left = BUTTON_RET2_X;
+					tBtn.Top = BUTTON_RET2_Y;
+					tBtn.Height = BUTTON_RET2_H;
+					tBtn.Width = BUTTON_RET2_W;
+					tBtn.Focus = 1; /* ÁÑ¶ÁÇπ */
+					tBtn.pCaption = BUTTON_RET2_TEXT;
+					LCD_DrawButton(&tBtn);
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_FM_X, BUTTON_FM_Y, BUTTON_FM_H, BUTTON_FM_W))
+				{
+					if (g_tRadio.ChipType == SI4730)
 					{
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 1;	/* Ωπµ„ */
-						tBtn.pCaption = "∑µªÿ";
+						tBtn.Left = BUTTON_FM_X;
+						tBtn.Top = BUTTON_FM_Y;
+						tBtn.Height = BUTTON_FM_H;
+						tBtn.Width = BUTTON_FM_W;
+						tBtn.Focus = 1; /* ÁÑ¶ÁÇπ */
+						tBtn.pCaption = "FM";
 						LCD_DrawButton(&tBtn);
 					}
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_RET2_X, BUTTON_RET2_Y, BUTTON_RET2_H, BUTTON_RET2_W))
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_AM_X, BUTTON_AM_Y, BUTTON_AM_H, BUTTON_AM_W))
+				{
+					if (g_tRadio.ChipType == SI4730)
 					{
-						tBtn.Left = BUTTON_RET2_X;
-						tBtn.Top = BUTTON_RET2_Y;
-						tBtn.Height = BUTTON_RET2_H;
-						tBtn.Width = BUTTON_RET2_W;
-						tBtn.Focus = 1;	/* Ωπµ„ */
-						tBtn.pCaption =  BUTTON_RET2_TEXT;
+						tBtn.Left = BUTTON_AM_X;
+						tBtn.Top = BUTTON_AM_Y;
+						tBtn.Height = BUTTON_AM_H;
+						tBtn.Width = BUTTON_AM_W;
+						tBtn.Focus = 1; /* ÁÑ¶ÁÇπ */
+						tBtn.pCaption = "AM";
 						LCD_DrawButton(&tBtn);
 					}
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_FM_X, BUTTON_FM_Y, BUTTON_FM_H, BUTTON_FM_W))
+				}
+				else if (TOUCH_InRect(tpX, tpY, CHECK_SPK_X, CHECK_SPK_Y, CHECK_SPK_H, CHECK_SPK_W))
+				{
+					if (g_tRadio.ucSpkOutEn)
 					{
-						if (g_tRadio.ChipType == SI4730)
-						{
-							tBtn.Left = BUTTON_FM_X;
-							tBtn.Top = BUTTON_FM_Y;
-							tBtn.Height = BUTTON_FM_H;
-							tBtn.Width = BUTTON_FM_W;
-							tBtn.Focus = 1;		/* Ωπµ„ */
-							tBtn.pCaption = "FM";
-							LCD_DrawButton(&tBtn);
-						}
+						g_tRadio.ucSpkOutEn = 0;
+						tCheck.Checked = 0;
+
+						/* ÈÖçÁΩÆWM8978ËäØÁâáÔºåËæìÂÖ•‰∏∫AUXÊé•Âè£(Êî∂Èü≥Êú∫)ÔºåËæìÂá∫‰∏∫ËÄ≥Êú∫ */
+						wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON);
 					}
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_AM_X, BUTTON_AM_Y, BUTTON_AM_H, BUTTON_AM_W))
+					else
 					{
-						if (g_tRadio.ChipType == SI4730)
-						{						
-							tBtn.Left = BUTTON_AM_X;
-							tBtn.Top = BUTTON_AM_Y;
-							tBtn.Height = BUTTON_AM_H;
-							tBtn.Width = BUTTON_AM_W;
-							tBtn.Focus = 1;		/* Ωπµ„ */
-							tBtn.pCaption = "AM";
-							LCD_DrawButton(&tBtn);
-						}
+						g_tRadio.ucSpkOutEn = 1;
+						tCheck.Checked = 1;
+
+						/* ÈÖçÁΩÆWM8978ËäØÁâáÔºåËæìÂÖ•‰∏∫AUXÊé•Âè£(Êî∂Èü≥Êú∫)ÔºåËæìÂá∫‰∏∫ËÄ≥Êú∫ Âíå Êâ¨Â£∞Âô® */
+						wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON | SPK_ON);
 					}
-					else if (TOUCH_InRect(tpX, tpY, CHECK_SPK_X, CHECK_SPK_Y, CHECK_SPK_H, CHECK_SPK_W))
+
+					tCheck.Left = CHECK_SPK_X;
+					tCheck.Top = CHECK_SPK_Y;
+					tCheck.Height = CHECK_SPK_H;
+					tCheck.Width = CHECK_SPK_W;
+					tCheck.pCaption = CHECK_SPK_TEXT;
+					LCD_DrawCheckBox(&tCheck);
+				}
+				else if (TOUCH_InRect(tpX, tpY, CHECK_RSSI_X, CHECK_RSSI_Y, CHECK_RSSI_H, CHECK_RSSI_W))
+				{
+					if (g_tRadio.ucRssiEn)
 					{
-						if (g_tRadio.ucSpkOutEn)
-						{
-							g_tRadio.ucSpkOutEn = 0;
-							tCheck.Checked = 0;
+						g_tRadio.ucRssiEn = 0;
+						tCheck.Checked = 0;
 
-							/* ≈‰÷√WM8978–æ∆¨£¨ ‰»ÎŒ™AUXΩ”ø⁄( ’“Ùª˙)£¨ ‰≥ˆŒ™∂˙ª˙ */
-							wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON);
-						}
-						else
-						{
-							g_tRadio.ucSpkOutEn = 1;
-							tCheck.Checked = 1;
-
-							/* ≈‰÷√WM8978–æ∆¨£¨ ‰»ÎŒ™AUXΩ”ø⁄( ’“Ùª˙)£¨ ‰≥ˆŒ™∂˙ª˙ ∫Õ —Ô…˘∆˜ */
-							wm8978_CfgAudioPath(AUX_ON, EAR_LEFT_ON | EAR_RIGHT_ON | SPK_ON);
-						}
-
-						tCheck.Left = CHECK_SPK_X;
-						tCheck.Top = CHECK_SPK_Y;
-						tCheck.Height = CHECK_SPK_H;
-						tCheck.Width = CHECK_SPK_W;
-						tCheck.pCaption = CHECK_SPK_TEXT;
-						LCD_DrawCheckBox(&tCheck);
+						/* Ê∏ÖÈô§‰ø°Âè∑Ë¥®ÈáèÊòæÁ§∫ÂÜÖÂÆπ */
+						LCD_DispStr(5, 100, "                                                     ", &tFont);
 					}
-					else if (TOUCH_InRect(tpX, tpY, CHECK_RSSI_X, CHECK_RSSI_Y, CHECK_RSSI_H, CHECK_RSSI_W))
+					else
 					{
-						if (g_tRadio.ucRssiEn)
-						{
-							g_tRadio.ucRssiEn = 0;
-							tCheck.Checked = 0;
-
-							/* «Â≥˝–≈∫≈÷ ¡øœ‘ æƒ⁄»› */
-							LCD_DispStr(5,100, "                                                     ", &tFont);
-						}
-						else
-						{
-							g_tRadio.ucRssiEn = 1;
-							tCheck.Checked = 1;
-						}
-
-						tCheck.Left = CHECK_RSSI_X;
-						tCheck.Top = CHECK_RSSI_Y;
-						tCheck.Height = CHECK_RSSI_H;
-						tCheck.Width = CHECK_RSSI_W;
-						tCheck.pCaption = CHECK_RSSI_TEXT;
-						LCD_DrawCheckBox(&tCheck);
+						g_tRadio.ucRssiEn = 1;
+						tCheck.Checked = 1;
 					}
-					else if (TOUCH_InRect(tpX, tpY, CHECK_LIST_X, CHECK_LIST_Y, CHECK_LIST_H, CHECK_LIST_W))
+
+					tCheck.Left = CHECK_RSSI_X;
+					tCheck.Top = CHECK_RSSI_Y;
+					tCheck.Height = CHECK_RSSI_H;
+					tCheck.Width = CHECK_RSSI_W;
+					tCheck.pCaption = CHECK_RSSI_TEXT;
+					LCD_DrawCheckBox(&tCheck);
+				}
+				else if (TOUCH_InRect(tpX, tpY, CHECK_LIST_X, CHECK_LIST_Y, CHECK_LIST_H, CHECK_LIST_W))
+				{
+					if (g_tRadio.ucListType)
 					{
-						if (g_tRadio.ucListType)
-						{
-							g_tRadio.ucListType = 0;	/* Œ‰∫∫µÿ«¯µÁÃ®¡–±Ì */
-							radio_FM_FreqList(0);
-							radio_AM_FreqList(0);
+						g_tRadio.ucListType = 0; /* Ê≠¶Ê±âÂú∞Âå∫ÁîµÂè∞ÂàóË°® */
+						radio_FM_FreqList(0);
+						radio_AM_FreqList(0);
 
-							tCheck.Checked = 0;
-						}
-						else
-						{
-							g_tRadio.ucListType = 1;	/* »´π˙µÁÃ®¡–±Ì */
-							radio_FM_FreqList(1);
-							radio_AM_FreqList(1);
+						tCheck.Checked = 0;
+					}
+					else
+					{
+						g_tRadio.ucListType = 1; /* ÂÖ®ÂõΩÁîµÂè∞ÂàóË°® */
+						radio_FM_FreqList(1);
+						radio_AM_FreqList(1);
 
-							tCheck.Checked = 1;
-						}
+						tCheck.Checked = 1;
+					}
 
-						g_tRadio.ucIndexFM = 0;
-						g_tRadio.ucIndexAM = 0;
+					g_tRadio.ucIndexFM = 0;
+					g_tRadio.ucIndexAM = 0;
 
-						tCheck.Left = CHECK_LIST_X;
-						tCheck.Top = CHECK_LIST_Y;
-						tCheck.Height = CHECK_LIST_H;
-						tCheck.Width = CHECK_LIST_W;
+					tCheck.Left = CHECK_LIST_X;
+					tCheck.Top = CHECK_LIST_Y;
+					tCheck.Height = CHECK_LIST_H;
+					tCheck.Width = CHECK_LIST_W;
 
-						tCheck.pCaption = CHECK_LIST_TEXT;
-						LCD_DrawCheckBox(&tCheck);
+					tCheck.pCaption = CHECK_LIST_TEXT;
+					LCD_DrawCheckBox(&tCheck);
+
+					fRefresh = 1;
+				}
+				break;
+
+			case TOUCH_RELEASE: /* Ëß¶Á¨îÈáäÊîæ‰∫ã‰ª∂ */
+				if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				{
+					tBtn.Font = &tFontBtn;
+
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.Focus = 0; /* ÁÑ¶ÁÇπ */
+					tBtn.pCaption = "ËøîÂõû";
+					LCD_DrawButton(&tBtn);
+
+					fQuit = 1; /* ËøîÂõû */
+										 //return;
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_RET2_X, BUTTON_RET2_Y, BUTTON_RET2_H, BUTTON_RET2_W))
+				{
+					tBtn.Font = &tFontBtn;
+
+					tBtn.Left = BUTTON_RET2_X;
+					tBtn.Top = BUTTON_RET2_Y;
+					tBtn.Height = BUTTON_RET2_H;
+					tBtn.Width = BUTTON_RET2_W;
+					tBtn.Focus = 0; /* ÁÑ¶ÁÇπ */
+					tBtn.pCaption = BUTTON_RET2_TEXT;
+					LCD_DrawButton(&tBtn);
+
+					fQuit = 2; /* ‰øùÁïôÊî∂Èü≥ ËøîÂõû */
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_FM_X, BUTTON_FM_Y, BUTTON_FM_H, BUTTON_FM_W))
+				{
+					if (g_tRadio.ChipType == SI4730)
+					{
+						tBtn.Font = &tFontBtn;
+
+						tBtn.Left = BUTTON_FM_X;
+						tBtn.Top = BUTTON_FM_Y;
+						tBtn.Height = BUTTON_FM_H;
+						tBtn.Width = BUTTON_FM_W;
+						tBtn.Focus = 0; /* Â§±ÂéªÁÑ¶ÁÇπ */
+						tBtn.pCaption = "FM";
+						LCD_DrawButton(&tBtn);
+
+						/* ÂàáÊç¢Âà∞ FM Áä∂ÊÄÅ */
+						//SI4730_SetOutVolume(0);		/* ÂÖàÈùôÈü≥ÔºåÈÅøÂÖçÂàáÊç¢Âô∂ÂóíÂ£∞ */
+						wm8978_OutMute(1);
+
+						g_tRadio.ucMode = FM_RX;
+
+						SI4730_PowerDown();
+						bsp_DelayMS(5);
+						SI4730_PowerUp_FM_Revice();
+						bsp_DelayMS(10);
+
+						SI4730_SetOutVolume(g_tRadio.ucVolume); /* Áº∫ÁúÅÈü≥ÈáèÊòØÊúÄÂ§ßÂÄº63, ‰øÆÊîπ‰∏∫32 */
+
+						g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
+						SI4730_SetFMFreq(g_tRadio.usFreq);
+
+						bsp_DelayMS(100); /* Âª∂Ëøü100msÔºåÈÅøÂÖçÂº∫ÁÉàÁöÑÂòéÂìíÂ£∞ */
+
+						wm8978_OutMute(0);
 
 						fRefresh = 1;
 					}
-					break;
-
-				case TOUCH_RELEASE:		/* ¥•±  Õ∑≈ ¬º˛ */
-					if (TOUCH_InRect(tpX, tpY, BUTTON_RET_X, BUTTON_RET_Y, BUTTON_RET_H, BUTTON_RET_W))
+				}
+				else if (TOUCH_InRect(tpX, tpY, BUTTON_AM_X, BUTTON_AM_Y, BUTTON_AM_H, BUTTON_AM_W))
+				{
+					if (g_tRadio.ChipType == SI4730)
 					{
-						tBtn.Font = &tFontBtn;
-
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.Focus = 0;	/* Ωπµ„ */
-						tBtn.pCaption = "∑µªÿ";
+						tBtn.Left = BUTTON_AM_X;
+						tBtn.Top = BUTTON_AM_Y;
+						tBtn.Height = BUTTON_AM_H;
+						tBtn.Width = BUTTON_AM_W;
+						tBtn.Focus = 0; /* Â§±ÂéªÁÑ¶ÁÇπ */
+						tBtn.pCaption = "AM";
 						LCD_DrawButton(&tBtn);
 
-						fQuit = 1;	/* ∑µªÿ */
-						//return;
+						/* ÂàáÊç¢Âà∞ AM Áä∂ÊÄÅ */
+						//SI4730_SetOutVolume(0);		/* ÂÖàÈùôÈü≥ÔºåÈÅøÂÖçÂàáÊç¢Âô∂ÂóíÂ£∞ */
+						wm8978_OutMute(1);
+
+						g_tRadio.ucMode = AM_RX; /* Áº∫ÁúÅÊòØAMÊé•Êî∂ */
+						SI4730_PowerDown();
+						bsp_DelayMS(5);
+						SI4730_PowerUp_AM_Revice();
+						bsp_DelayMS(10);
+
+						SI4730_SetOutVolume(g_tRadio.ucVolume); /* Áº∫ÁúÅÈü≥ÈáèÊòØÊúÄÂ§ßÂÄº63, ‰øÆÊîπ‰∏∫32 */
+
+						g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
+						SI4730_SetAMFreq(g_tRadio.usFreq);
+
+						bsp_DelayMS(100); /* Âª∂Ëøü100msÔºåÈÅøÂÖçÂº∫ÁÉàÁöÑÂòéÂìíÂ£∞ */
+
+						wm8978_OutMute(0);
+
+						fRefresh = 1;
 					}
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_RET2_X, BUTTON_RET2_Y, BUTTON_RET2_H, BUTTON_RET2_W))
+				}
+				else /* ÊåâÈíÆÂ§±ÂéªÁÑ¶ÁÇπ */
+				{
+					tBtn.Font = &tFontBtn;
+
+					tBtn.Focus = 0; /* Êú™ÈÄâ‰∏≠ */
+
+					tBtn.Left = BUTTON_RET_X;
+					tBtn.Top = BUTTON_RET_Y;
+					tBtn.Height = BUTTON_RET_H;
+					tBtn.Width = BUTTON_RET_W;
+					tBtn.pCaption = "ËøîÂõû";
+					LCD_DrawButton(&tBtn);
+
+					tBtn.Left = BUTTON_RET2_X;
+					tBtn.Top = BUTTON_RET2_Y;
+					tBtn.Height = BUTTON_RET2_H;
+					tBtn.Width = BUTTON_RET2_W;
+					tBtn.pCaption = BUTTON_RET2_TEXT;
+					LCD_DrawButton(&tBtn);
+
+					if (g_tRadio.ChipType == SI4730)
 					{
-						tBtn.Font = &tFontBtn;
-						
-						tBtn.Left = BUTTON_RET2_X;
-						tBtn.Top = BUTTON_RET2_Y;
-						tBtn.Height = BUTTON_RET2_H;
-						tBtn.Width = BUTTON_RET2_W;
-						tBtn.Focus = 0;	/* Ωπµ„ */
-						tBtn.pCaption =  BUTTON_RET2_TEXT;
-						LCD_DrawButton(&tBtn);
-						
-						fQuit = 2;	/* ±£¡Ù ’“Ù ∑µªÿ */
-					}					
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_FM_X, BUTTON_FM_Y, BUTTON_FM_H, BUTTON_FM_W))
-					{
-						if (g_tRadio.ChipType == SI4730)
-						{						
-							tBtn.Font = &tFontBtn;
-
-							tBtn.Left = BUTTON_FM_X;
-							tBtn.Top = BUTTON_FM_Y;
-							tBtn.Height = BUTTON_FM_H;
-							tBtn.Width = BUTTON_FM_W;
-							tBtn.Focus = 0;		/*  ß»•Ωπµ„ */
-							tBtn.pCaption = "FM";
-							LCD_DrawButton(&tBtn);
-
-							/* «–ªªµΩ FM ◊¥Ã¨ */
-							//SI4730_SetOutVolume(0);		/* œ»æ≤“Ù£¨±‹√‚«–ªª∏¡‡™…˘ */
-							wm8978_OutMute(1);
-
-							g_tRadio.ucMode = FM_RX;
-
-							SI4730_PowerDown();
-							bsp_DelayMS(5);
-							SI4730_PowerUp_FM_Revice();
-							bsp_DelayMS(10);
-
-							SI4730_SetOutVolume(g_tRadio.ucVolume);	/* »± °“Ù¡ø «◊Ó¥Û÷µ63, –ﬁ∏ƒŒ™32 */
-
-							g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
-							SI4730_SetFMFreq(g_tRadio.usFreq);
-
-							bsp_DelayMS(100);	/* —”≥Ÿ100ms£¨±‹√‚«ø¡“µƒ∏¬ﬂ’…˘ */
-
-							wm8978_OutMute(0);
-
-							fRefresh = 1;
-						}
-					}
-					else if (TOUCH_InRect(tpX, tpY, BUTTON_AM_X, BUTTON_AM_Y, BUTTON_AM_H, BUTTON_AM_W))
-					{
-						if (g_tRadio.ChipType == SI4730)
-						{							
-							tBtn.Left = BUTTON_AM_X;
-							tBtn.Top = BUTTON_AM_Y;
-							tBtn.Height = BUTTON_AM_H;
-							tBtn.Width = BUTTON_AM_W;
-							tBtn.Focus = 0;		/*  ß»•Ωπµ„ */
-							tBtn.pCaption = "AM";
-							LCD_DrawButton(&tBtn);
-
-							/* «–ªªµΩ AM ◊¥Ã¨ */
-							//SI4730_SetOutVolume(0);		/* œ»æ≤“Ù£¨±‹√‚«–ªª∏¡‡™…˘ */
-							wm8978_OutMute(1);
-
-							g_tRadio.ucMode = AM_RX;	/* »± ° «AMΩ” ’ */
-							SI4730_PowerDown();
-							bsp_DelayMS(5);
-							SI4730_PowerUp_AM_Revice();
-							bsp_DelayMS(10);
-
-							SI4730_SetOutVolume(g_tRadio.ucVolume);	/* »± °“Ù¡ø «◊Ó¥Û÷µ63, –ﬁ∏ƒŒ™32 */
-
-							g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
-							SI4730_SetAMFreq(g_tRadio.usFreq);
-
-							bsp_DelayMS(100);	/* —”≥Ÿ100ms£¨±‹√‚«ø¡“µƒ∏¬ﬂ’…˘ */
-
-							wm8978_OutMute(0);
-
-							fRefresh = 1;
-						}
-					}
-					else	/* ∞¥≈• ß»•Ωπµ„ */
-					{
-						tBtn.Font = &tFontBtn;
-
-						tBtn.Focus = 0;		/* Œ¥—°÷– */
-
-						tBtn.Left = BUTTON_RET_X;
-						tBtn.Top = BUTTON_RET_Y;
-						tBtn.Height = BUTTON_RET_H;
-						tBtn.Width = BUTTON_RET_W;
-						tBtn.pCaption = "∑µªÿ";
+						tBtn.Left = BUTTON_FM_X;
+						tBtn.Top = BUTTON_FM_Y;
+						tBtn.Height = BUTTON_FM_H;
+						tBtn.Width = BUTTON_FM_W;
+						tBtn.pCaption = "FM";
 						LCD_DrawButton(&tBtn);
 
-						tBtn.Left = BUTTON_RET2_X;
-						tBtn.Top = BUTTON_RET2_Y;
-						tBtn.Height = BUTTON_RET2_H;
-						tBtn.Width = BUTTON_RET2_W;
-						tBtn.pCaption = BUTTON_RET2_TEXT;
-						LCD_DrawButton(&tBtn);						
-						
-						if (g_tRadio.ChipType == SI4730)
-						{
-							tBtn.Left = BUTTON_FM_X;
-							tBtn.Top = BUTTON_FM_Y;
-							tBtn.Height = BUTTON_FM_H;
-							tBtn.Width = BUTTON_FM_W;
-							tBtn.pCaption = "FM";
-							LCD_DrawButton(&tBtn);
-
-							tBtn.Left = BUTTON_AM_X;
-							tBtn.Top = BUTTON_AM_Y;
-							tBtn.Height = BUTTON_AM_H;
-							tBtn.Width = BUTTON_AM_W;
-							tBtn.pCaption = "AM";
-							LCD_DrawButton(&tBtn);
-						}
+						tBtn.Left = BUTTON_AM_X;
+						tBtn.Top = BUTTON_AM_Y;
+						tBtn.Height = BUTTON_AM_H;
+						tBtn.Width = BUTTON_AM_W;
+						tBtn.pCaption = "AM";
+						LCD_DrawButton(&tBtn);
 					}
+				}
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ∂¡»°º¸÷µ, Œﬁº¸∞¥œ¬ ±∑µªÿ KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey(); /* ËØªÂèñÈîÆÂÄº, Êó†ÈîÆÊåâ‰∏ãÊó∂ËøîÂõû KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
 			/*
-				∂‘”⁄∞¥º¸µØ∆ ¬º˛£¨»± °µƒbsp_button.c ΩˆºÏ≤‚¡ÀTAMPER°¢WAKEUP°¢USERº¸°¢“°∏ÀOKº¸µƒµØ∆ ¬º˛
-				»Áπ˚ƒ˙µƒ”¶”√≥Ã–Ú–Ë“™∆‰À¸º¸£®±»»Á∑ΩœÚº¸£©µƒµØ∆ ¬º˛£¨ƒ˙–Ë“™ºÚµ•–ﬁ∏ƒ“ªœ¬bsp_button.cŒƒº˛
+				ÂØπ‰∫éÊåâÈîÆÂºπËµ∑‰∫ã‰ª∂ÔºåÁº∫ÁúÅÁöÑbsp_button.c ‰ªÖÊ£ÄÊµã‰∫ÜTAMPER„ÄÅWAKEUP„ÄÅUSERÈîÆ„ÄÅÊëáÊùÜOKÈîÆÁöÑÂºπËµ∑‰∫ã‰ª∂
+				Â¶ÇÊûúÊÇ®ÁöÑÂ∫îÁî®Á®ãÂ∫èÈúÄË¶ÅÂÖ∂ÂÆÉÈîÆÔºàÊØîÂ¶ÇÊñπÂêëÈîÆÔºâÁöÑÂºπËµ∑‰∫ã‰ª∂ÔºåÊÇ®ÈúÄË¶ÅÁÆÄÂçï‰øÆÊîπ‰∏Ä‰∏ãbsp_button.cÊñá‰ª∂
 			*/
 			switch (ucKeyCode)
 			{
-				case KEY_DOWN_K1:			/* K1º¸∞¥œ¬ */
+			case KEY_DOWN_K1: /* K1ÈîÆÊåâ‰∏ã */
 
-					break;
+				break;
 
-				case KEY_DOWN_K2:			/* K2º¸∞¥œ¬ */
-					
-					if (g_tRadio.ucMode == FM_RX)
+			case KEY_DOWN_K2: /* K2ÈîÆÊåâ‰∏ã */
+
+				if (g_tRadio.ucMode == FM_RX)
+				{
+					g_tRadio.usFreq -= 10;
+					SI4730_SetFMFreq(g_tRadio.usFreq);
+				}
+				else
+				{
+					g_tRadio.usFreq--;
+					SI4730_SetAMFreq(g_tRadio.usFreq);
+				}
+				fRefresh = 1;
+				break;
+
+			case KEY_DOWN_K3: /* K3ÈîÆÊåâ‰∏ã */
+
+				if (g_tRadio.ucMode == FM_RX)
+				{
+					g_tRadio.usFreq += 10;
+					SI4730_SetFMFreq(g_tRadio.usFreq);
+				}
+				else
+				{
+					g_tRadio.usFreq++;
+					SI4730_SetAMFreq(g_tRadio.usFreq);
+				}
+				fRefresh = 1;
+				break;
+
+			case JOY_DOWN_U: /* ÊëáÊùÜUPÈîÆÊåâ‰∏ã */
+				g_tRadio.ucVolume += VOLUME_STEP;
+				if (g_tRadio.ucVolume > VOLUME_MAX)
+				{
+					g_tRadio.ucVolume = VOLUME_MAX;
+				}
+				radio_AdjustVolume(g_tRadio.ucVolume);
+				fRefresh = 1;
+				break;
+
+			case JOY_DOWN_D: /* ÊëáÊùÜDOWNÈîÆÊåâ‰∏ã */
+				if (g_tRadio.ucVolume > 0)
+				{
+					g_tRadio.ucVolume -= VOLUME_STEP;
+				}
+				else
+				{
+					g_tRadio.ucVolume = 0;
+				}
+				radio_AdjustVolume(g_tRadio.ucVolume);
+				fRefresh = 1;
+				break;
+
+			case JOY_DOWN_L: /* ÊëáÊùÜLEFTÈîÆÊåâ‰∏ã */
+				if (g_tRadio.ucMode == FM_RX)
+				{
+					if (g_tRadio.ucIndexFM > 0)
 					{
-						g_tRadio.usFreq -= 10;
-						SI4730_SetFMFreq(g_tRadio.usFreq);						
+						g_tRadio.ucIndexFM--;
+						g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
+						SI4730_SetFMFreq(g_tRadio.usFreq);
+						fRefresh = 1;
 					}
-					else
+				}
+				else
+				{
+					if (g_tRadio.ucIndexAM > 0)
 					{
-						g_tRadio.usFreq--;
+						g_tRadio.ucIndexAM--;
+						g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
 						SI4730_SetAMFreq(g_tRadio.usFreq);
+						fRefresh = 1;
 					}
-					fRefresh = 1;
-					break;
+				}
+				break;
 
-				case KEY_DOWN_K3:			/* K3º¸∞¥œ¬ */
-					
-					if (g_tRadio.ucMode == FM_RX)
+			case JOY_DOWN_R: /* ÊëáÊùÜRIGHTÈîÆÊåâ‰∏ã */
+				if (g_tRadio.ucMode == FM_RX)
+				{
+					if (g_tRadio.ucIndexFM < g_tRadio.ucFMCount - 1)
 					{
-						g_tRadio.usFreq += 10;
-						SI4730_SetFMFreq(g_tRadio.usFreq);						
+						g_tRadio.ucIndexFM++;
+						g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
+						SI4730_SetFMFreq(g_tRadio.usFreq);
+						fRefresh = 1;
 					}
-					else
+				}
+				else
+				{
+					if (g_tRadio.ucIndexAM < g_tRadio.ucAMCount - 1)
 					{
-						g_tRadio.usFreq++;
+						g_tRadio.ucIndexAM++;
+						g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
 						SI4730_SetAMFreq(g_tRadio.usFreq);
+						fRefresh = 1;
 					}
-					fRefresh = 1;
-					break;
+				}
+				break;
 
-				case JOY_DOWN_U:			/* “°∏ÀUPº¸∞¥œ¬ */
-					g_tRadio.ucVolume += VOLUME_STEP;
-					if (g_tRadio.ucVolume > VOLUME_MAX)
-					{
-						g_tRadio.ucVolume = VOLUME_MAX;
-					}
-					radio_AdjustVolume(g_tRadio.ucVolume);				
-					fRefresh = 1;
-					break;
+			case JOY_DOWN_OK: /* ÊëáÊùÜOKÈîÆÊåâ‰∏ã */
+				break;
 
-				case JOY_DOWN_D:			/* “°∏ÀDOWNº¸∞¥œ¬ */
-					if (g_tRadio.ucVolume > 0)
-					{
-						g_tRadio.ucVolume -= VOLUME_STEP;
-					}
-					else
-					{
-						g_tRadio.ucVolume = 0;
-					}
-					radio_AdjustVolume(g_tRadio.ucVolume);	
-					fRefresh = 1;
-					break;
-
-				case JOY_DOWN_L:			/* “°∏ÀLEFTº¸∞¥œ¬ */
-					if (g_tRadio.ucMode == FM_RX)
-					{
-						if (g_tRadio.ucIndexFM > 0)
-						{
-							g_tRadio.ucIndexFM--;
-							g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
-							SI4730_SetFMFreq(g_tRadio.usFreq );
-							fRefresh = 1;
-						}
-					}
-					else
-					{
-						if (g_tRadio.ucIndexAM > 0)
-						{
-							g_tRadio.ucIndexAM--;
-							g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
-							SI4730_SetAMFreq(g_tRadio.usFreq );
-							fRefresh = 1;
-						}
-					}
-					break;
-
-				case JOY_DOWN_R:			/* “°∏ÀRIGHTº¸∞¥œ¬ */
-					if (g_tRadio.ucMode == FM_RX)
-					{
-						if (g_tRadio.ucIndexFM < g_tRadio.ucFMCount - 1)
-						{
-							g_tRadio.ucIndexFM++;
-							g_tRadio.usFreq = g_tRadio.usFMList[g_tRadio.ucIndexFM];
-							SI4730_SetFMFreq(g_tRadio.usFreq );
-							fRefresh = 1;
-						}
-					}
-					else
-					{
-						if (g_tRadio.ucIndexAM < g_tRadio.ucAMCount - 1)
-						{
-							g_tRadio.ucIndexAM++;
-							g_tRadio.usFreq = g_tRadio.usAMList[g_tRadio.ucIndexAM];
-							SI4730_SetAMFreq(g_tRadio.usFreq );
-							fRefresh = 1;
-						}
-					}
-					break;
-
-				case JOY_DOWN_OK:			/* “°∏ÀOKº¸∞¥œ¬ */
-					break;
-
-				default:
-					/* ∆‰À˚µƒº¸÷µ≤ª¥¶¿Ì */
-					break;
+			default:
+				/* ÂÖ∂‰ªñÁöÑÈîÆÂÄº‰∏çÂ§ÑÁêÜ */
+				break;
 			}
 		}
-	}	//while (fQuit == 0)
+	} //while (fQuit == 0)
 
 	if (fQuit == 1)
 	{
 		SI4730_PowerDown();
 	}
 
-	bsp_StopTimer(0);	/* Õ£÷π∂® ±∆˜0 */
+	bsp_StopTimer(0); /* ÂÅúÊ≠¢ÂÆöÊó∂Âô®0 */
 
-	radio_SaveParam();	/* ±£¥ÊµÁÃ®≤Œ ˝ */
+	radio_SaveParam(); /* ‰øùÂ≠òÁîµÂè∞ÂèÇÊï∞ */
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_DispStatus
-*	π¶ƒ‹Àµ√˜: œ‘ æµ±«∞◊¥Ã¨
-*	–Œ    ≤Œ£∫Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_DispStatus
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫ÂΩìÂâçÁä∂ÊÄÅ
+*	ÂΩ¢    ÂèÇÔºöÊó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_DispStatus(void)
 {
 	char buf[128];
-	FONT_T tFont;			/* ∂®“Â“ª∏ˆ◊÷ÃÂΩ·ππÃÂ±‰¡ø£¨”√”⁄…Ë÷√◊÷ÃÂ≤Œ ˝ */
+	FONT_T tFont; /* ÂÆö‰πâ‰∏Ä‰∏™Â≠ó‰ΩìÁªìÊûÑ‰ΩìÂèòÈáèÔºåÁî®‰∫éËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	uint16_t usLineCap = 18;
 	uint16_t x, y;
 
-	/* …Ë÷√◊÷ÃÂ≤Œ ˝ */
+	/* ËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	{
-		tFont.FontCode = FC_ST_16;	/* ◊÷ÃÂ¥˙¬Î 16µ„’Û */
-		tFont.FrontColor = CL_WHITE;	/* ◊÷ÃÂ—’…´ */
-		tFont.BackColor = CL_BLUE;	/* Œƒ◊÷±≥æ∞—’…´ */
-		tFont.Space = 0;				/* Œƒ◊÷º‰æ‡£¨µ•Œª = œÒÀÿ */
+		tFont.FontCode = FC_ST_16;	 /* Â≠ó‰Ωì‰ª£Á†Å 16ÁÇπÈòµ */
+		tFont.FrontColor = CL_WHITE; /* Â≠ó‰ΩìÈ¢úËâ≤ */
+		tFont.BackColor = CL_BLUE;	 /* ÊñáÂ≠óËÉåÊôØÈ¢úËâ≤ */
+		tFont.Space = 0;						 /* ÊñáÂ≠óÈó¥Ë∑ùÔºåÂçï‰Ωç = ÂÉèÁ¥† */
 	}
 
 	if (g_tRadio.ucMode == FM_RX)
 	{
-		sprintf(buf, "FM (%3d/%d) ∆µ¬ =%5d.%dMHz, Volume = %2d    ", g_tRadio.ucIndexFM + 1,
-			g_tRadio.ucFMCount, g_tRadio.usFreq / 100,
-			(g_tRadio.usFreq % 100) / 10, g_tRadio.ucVolume);
+		sprintf(buf, "FM (%3d/%d) È¢ëÁéá=%5d.%dMHz, Volume = %2d    ", g_tRadio.ucIndexFM + 1,
+						g_tRadio.ucFMCount, g_tRadio.usFreq / 100,
+						(g_tRadio.usFreq % 100) / 10, g_tRadio.ucVolume);
 	}
 	else
 	{
-		sprintf(buf, "AM (%3d/%d) ∆µ¬ =%5dKHz, Volume = %2d    ",g_tRadio.ucIndexAM + 1,
-			g_tRadio.ucAMCount,	g_tRadio.usFreq, g_tRadio.ucVolume);
+		sprintf(buf, "AM (%3d/%d) È¢ëÁéá=%5dKHz, Volume = %2d    ", g_tRadio.ucIndexAM + 1,
+						g_tRadio.ucAMCount, g_tRadio.usFreq, g_tRadio.ucVolume);
 	}
 
 	x = 5;
@@ -895,25 +894,25 @@ static void radio_DispStatus(void)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_SignalQuality
-*	π¶ƒ‹Àµ√˜: œ‘ æµ±«∞–≈∫≈÷ ¡ø RSSI  SNR
-*	–Œ    ≤Œ£∫Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_SignalQuality
+*	ÂäüËÉΩËØ¥Êòé: ÊòæÁ§∫ÂΩìÂâç‰ø°Âè∑Ë¥®Èáè RSSI  SNR
+*	ÂΩ¢    ÂèÇÔºöÊó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_SignalQuality(void)
 {
 	char buf[128];
-	FONT_T tFont;			/* ∂®“Â“ª∏ˆ◊÷ÃÂΩ·ππÃÂ±‰¡ø£¨”√”⁄…Ë÷√◊÷ÃÂ≤Œ ˝ */
+	FONT_T tFont; /* ÂÆö‰πâ‰∏Ä‰∏™Â≠ó‰ΩìÁªìÊûÑ‰ΩìÂèòÈáèÔºåÁî®‰∫éËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	uint8_t read_buf[7];
 	uint16_t x, y;
 
-	/* …Ë÷√◊÷ÃÂ≤Œ ˝ */
+	/* ËÆæÁΩÆÂ≠ó‰ΩìÂèÇÊï∞ */
 	{
-		tFont.FontCode = FC_ST_16;	/* ◊÷ÃÂ¥˙¬Î 16µ„’Û */
-		tFont.FrontColor = CL_WHITE;	/* ◊÷ÃÂ—’…´ */
-		tFont.BackColor = CL_BLUE;	/* Œƒ◊÷±≥æ∞—’…´ */
-		tFont.Space = 0;				/* Œƒ◊÷º‰æ‡£¨µ•Œª = œÒÀÿ */
+		tFont.FontCode = FC_ST_16;	 /* Â≠ó‰Ωì‰ª£Á†Å 16ÁÇπÈòµ */
+		tFont.FrontColor = CL_WHITE; /* Â≠ó‰ΩìÈ¢úËâ≤ */
+		tFont.BackColor = CL_BLUE;	 /* ÊñáÂ≠óËÉåÊôØÈ¢úËâ≤ */
+		tFont.Space = 0;						 /* ÊñáÂ≠óÈó¥Ë∑ùÔºåÂçï‰Ωç = ÂÉèÁ¥† */
 	}
 	x = 5;
 	y = 100;
@@ -930,14 +929,14 @@ static void radio_SignalQuality(void)
 			RESP1    ?0x00   No blend, SNR high, low, RSSI high or low interrupts.
 			RESP2    ?0x01   Soft mute is not engaged, no AFC rail, valid frequency.
 			RESP3    ?0xD9   Pilot presence, 89% blend
-			RESP4    ?0x2D   RSSI = 45 dB¶ÃV
+			RESP4    ?0x2D   RSSI = 45 dBŒºV
 			RESP5    ?0x33   SNR = 51 dB
 			RESP6    ?0x00
 			RESP7    ?0x00   Freq offset = 0 kHz
-		*/		
+		*/
 		rssi = read_buf[3];
 		snr = read_buf[4];
-		
+
 		SI4730_GetFMTuneStatus(read_buf);
 		/*
 			CMD      0x22     FM_TUNE_STATUS
@@ -947,23 +946,23 @@ static void radio_SignalQuality(void)
 			RESP1    ?0x01    Valid Frequency.
 			RESP2    ?0x27    Frequency = 0x27F6 = 102.3 MHz
 			RESP3    ?0xF6
-			RESP4    ?0x2D    RSSI = 45 dB¶ÃV
+			RESP4    ?0x2D    RSSI = 45 dBŒºV
 			RESP5    ?0x33    SNR = 51 dB
 			RESP6    ?0x00    MULT[7:0]
-			RESP7    ?0x00    Antenna tuning capacitor = 0 (range = 0®C191)  READANTCAP[7:0] (Si4704/05/06/2x only)
-		*/	
+			RESP7    ?0x00    Antenna tuning capacitor = 0 (range = 0‚Äì191)  READANTCAP[7:0] (Si4704/05/06/2x only)
+		*/
 		cap = read_buf[6];
-		
-		sprintf(buf, "RSSI = %ddBuV  SNR = %ddB CAP = %d",  rssi, snr, cap);
 
-		LCD_DispStrEx(x, y, buf, &tFont, 300, ALIGN_LEFT);			
+		sprintf(buf, "RSSI = %ddBuV  SNR = %ddB CAP = %d", rssi, snr, cap);
+
+		LCD_DispStrEx(x, y, buf, &tFont, 300, ALIGN_LEFT);
 	}
 	else
 	{
 		uint32_t cap;
 
-		/* ∂¡»°AMµ˜–≥◊¥Ã¨ */
-		SI4730_GetAMTuneStatus(read_buf);		
+		/* ËØªÂèñAMË∞ÉË∞êÁä∂ÊÄÅ */
+		SI4730_GetAMTuneStatus(read_buf);
 		/*
 			CMD       0x42           AM_TUNE_STATUS
 			ARG1      0x01           Clear STC interrupt.
@@ -972,44 +971,42 @@ static void radio_SignalQuality(void)
 			RESP1     ?0x01          Channel is valid
 			RESP2     ?0x03
 			RESP3     ?0xE8          Frequency = 0x03E8 = 1000 kHz
-			RESP4     ?0x2A          RSSI = 0x2A = 42d = 42 dB¶ÃV
+			RESP4     ?0x2A          RSSI = 0x2A = 42d = 42 dBŒºV
 			RESP5     ?0x1A          SNR = 0x1A = 26d = 26 dB
 			RESP6     ?0x0D          Value the antenna tuning capacitor is set to.
 			RESP7     ?0x95          0x0D95 = 3477 dec.
 
-			µÁ»›º∆À„ The tuning capacitance is 95 fF x READANTCAP + 7 pF			
-		*/	
+			ÁîµÂÆπËÆ°ÁÆó The tuning capacitance is 95 fF x READANTCAP + 7 pF			
+		*/
 		cap = (read_buf[5] << 8) | read_buf[6];
-		cap = (cap * 95)  + 7000;	/*  µ≤‚ 342pF -- 10pF */
-		
-		/* ∂¡»°AM–≈∫≈÷ ¡ø */
-		SI4730_GetAMSignalQuality(read_buf);
-		
-		sprintf(buf, "RSSI = %ddBuV  SNR = %ddB  Tuning Cap. = %d.%03dpF    ", 
-				read_buf[3], read_buf[4], cap / 1000, cap % 1000);
-		LCD_DispStr(x, y, buf, &tFont);					
-	}
+		cap = (cap * 95) + 7000; /* ÂÆûÊµã 342pF -- 10pF */
 
-	
+		/* ËØªÂèñAM‰ø°Âè∑Ë¥®Èáè */
+		SI4730_GetAMSignalQuality(read_buf);
+
+		sprintf(buf, "RSSI = %ddBuV  SNR = %ddB  Tuning Cap. = %d.%03dpF    ",
+						read_buf[3], read_buf[4], cap / 1000, cap % 1000);
+		LCD_DispStr(x, y, buf, &tFont);
+	}
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_FM_FreqList
-*	π¶ƒ‹Àµ√˜: ‘§…ËµÁÃ®¡–±Ì
-*	–Œ    ≤Œ£∫_ucAll = 0 ±Ì æŒ‰∫∫µÿ«¯FMÃ®£¨ 1 ±Ì æÀ˘”–µƒÃ®£¨≤Ω≥§0.1M
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_FM_FreqList
+*	ÂäüËÉΩËØ¥Êòé: È¢ÑËÆæÁîµÂè∞ÂàóË°®
+*	ÂΩ¢    ÂèÇÔºö_ucAll = 0 Ë°®Á§∫Ê≠¶Ê±âÂú∞Âå∫FMÂè∞Ôºå 1 Ë°®Á§∫ÊâÄÊúâÁöÑÂè∞ÔºåÊ≠•Èïø0.1M
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_FM_FreqList(uint8_t _ucAll)
 {
-	/* ‘§ÃÓŒ‰∫∫µÿ«¯µƒµÁÃ®¡–±Ì */
+	/* È¢ÑÂ°´Ê≠¶Ê±âÂú∞Âå∫ÁöÑÁîµÂè∞ÂàóË°® */
 	uint32_t i;
 
 	if (_ucAll == 0)
 	{
 		g_tRadio.ucFMCount = sizeof(g_InitListFM) / 2;
-		for (i = 0 ;i < g_tRadio.ucFMCount; i ++)
+		for (i = 0; i < g_tRadio.ucFMCount; i++)
 		{
 			g_tRadio.usFMList[i] = g_InitListFM[i];
 		}
@@ -1017,10 +1014,10 @@ static void radio_FM_FreqList(uint8_t _ucAll)
 	else
 	{
 		/*
-			÷–π˙∑∂Œß£∫ 88-108’◊∫’–≈∫≈µ˜÷∆∑Ω Ω «µ˜∆µ£®∆µ¬ µ˜÷∆£©√ø∏ˆ∆µµ¿µƒ∆µ¬ º‰∏Ù «0.1’◊∫’
+			‰∏≠ÂõΩËåÉÂõ¥Ôºö 88-108ÂÖÜËµ´‰ø°Âè∑Ë∞ÉÂà∂ÊñπÂºèÊòØË∞ÉÈ¢ëÔºàÈ¢ëÁéáË∞ÉÂà∂ÔºâÊØè‰∏™È¢ëÈÅìÁöÑÈ¢ëÁéáÈó¥ÈöîÊòØ0.1ÂÖÜËµ´
 		*/
 		g_tRadio.ucFMCount = 0;
-		for (i = 8800 ;i <= 10800; i += 10)
+		for (i = 8800; i <= 10800; i += 10)
 		{
 			g_tRadio.usFMList[g_tRadio.ucFMCount++] = i;
 		}
@@ -1029,21 +1026,21 @@ static void radio_FM_FreqList(uint8_t _ucAll)
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_AM_FreqList
-*	π¶ƒ‹Àµ√˜: ‘§…ËAMµÁÃ®¡–±Ì
-*	–Œ    ≤Œ£∫_ucAll = 0 ±Ì æŒ‰∫∫µÿ«¯AMÃ®£¨ 1 ±Ì æÀ˘”–µƒÃ®£¨≤Ω≥§9KHz
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_AM_FreqList
+*	ÂäüËÉΩËØ¥Êòé: È¢ÑËÆæAMÁîµÂè∞ÂàóË°®
+*	ÂΩ¢    ÂèÇÔºö_ucAll = 0 Ë°®Á§∫Ê≠¶Ê±âÂú∞Âå∫AMÂè∞Ôºå 1 Ë°®Á§∫ÊâÄÊúâÁöÑÂè∞ÔºåÊ≠•Èïø9KHz
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_AM_FreqList(uint8_t _ucAll)
 {
-	/* ‘§ÃÓŒ‰∫∫µÿ«¯µƒµÁÃ®¡–±Ì */
+	/* È¢ÑÂ°´Ê≠¶Ê±âÂú∞Âå∫ÁöÑÁîµÂè∞ÂàóË°® */
 	uint8_t i;
 
 	if (_ucAll == 0)
 	{
 		g_tRadio.ucAMCount = sizeof(g_InitListAM) / 2;
-		for (i = 0 ;i < g_tRadio.ucAMCount; i ++)
+		for (i = 0; i < g_tRadio.ucAMCount; i++)
 		{
 			g_tRadio.usAMList[i] = g_InitListAM[i];
 		}
@@ -1051,72 +1048,72 @@ static void radio_AM_FreqList(uint8_t _ucAll)
 	else
 	{
 		/*
-			≤Ω≥§ 9KHz
+			Ê≠•Èïø 9KHz
 		*/
 		g_tRadio.ucAMCount = 120;
-		for (i = 0 ;i < g_tRadio.ucAMCount; i ++)
+		for (i = 0; i < g_tRadio.ucAMCount; i++)
 		{
-			g_tRadio.usAMList[i] = 531 + i*9;
+			g_tRadio.usAMList[i] = 531 + i * 9;
 		}
-		g_tRadio.ucIndexAM  = 0;
+		g_tRadio.ucIndexAM = 0;
 	}
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_LoadParam
-*	π¶ƒ‹Àµ√˜: ∂¡»°µÁÃ®≤Œ ˝
-*	–Œ    ≤Œ£∫Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_LoadParam
+*	ÂäüËÉΩËØ¥Êòé: ËØªÂèñÁîµÂè∞ÂèÇÊï∞
+*	ÂΩ¢    ÂèÇÔºöÊó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_LoadParam(void)
 {
-	//LoadPara(); ≤ª–Ë“™∂¡»°£¨main() ÷–“—∂¡»°
+	//LoadPara(); ‰∏çÈúÄË¶ÅËØªÂèñÔºåmain() ‰∏≠Â∑≤ËØªÂèñ
 
-	g_tRadio.ucMode       = g_tParam.ucRadioMode;			/* AM ªÚ FM */
-	g_tRadio.ucListType   = g_tParam.ucRadioListType;		/* µÁÃ®¡–±Ì¿‡–Õ°£Œ‰∫∫µÿ«¯ªÚ»´π˙ */
-	g_tRadio.ucIndexFM    = g_tParam.ucIndexFM;				/* µ±«∞FMµÁÃ®À˜“˝ */
-	g_tRadio.ucIndexAM    = g_tParam.ucIndexAM;				/* µ±«∞µÁÃ®À˜“˝ */
-	g_tRadio.ucVolume     = g_tParam.ucRadioVolume;			/* “Ù¡ø */
-	g_tRadio.ucSpkOutEn   = g_tParam.ucSpkOutEn;			/* —Ô…˘∆˜ ‰≥ˆ πƒ‹ */
+	g_tRadio.ucMode = g_tParam.ucRadioMode;					/* AM Êàñ FM */
+	g_tRadio.ucListType = g_tParam.ucRadioListType; /* ÁîµÂè∞ÂàóË°®Á±ªÂûã„ÄÇÊ≠¶Ê±âÂú∞Âå∫ÊàñÂÖ®ÂõΩ */
+	g_tRadio.ucIndexFM = g_tParam.ucIndexFM;				/* ÂΩìÂâçFMÁîµÂè∞Á¥¢Âºï */
+	g_tRadio.ucIndexAM = g_tParam.ucIndexAM;				/* ÂΩìÂâçÁîµÂè∞Á¥¢Âºï */
+	g_tRadio.ucVolume = g_tParam.ucRadioVolume;			/* Èü≥Èáè */
+	g_tRadio.ucSpkOutEn = g_tParam.ucSpkOutEn;			/* Êâ¨Â£∞Âô®ËæìÂá∫‰ΩøËÉΩ */
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_LoadParam
-*	π¶ƒ‹Àµ√˜: ±£¥Êµ±«∞µƒµÁÃ®∫Õ“Ù¡ø
-*	–Œ    ≤Œ£∫Œﬁ
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_LoadParam
+*	ÂäüËÉΩËØ¥Êòé: ‰øùÂ≠òÂΩìÂâçÁöÑÁîµÂè∞ÂíåÈü≥Èáè
+*	ÂΩ¢    ÂèÇÔºöÊó†
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_SaveParam(void)
 {
-	g_tParam.ucRadioMode     = g_tRadio.ucMode;				/* AM ªÚ FM */
-	g_tParam.ucRadioListType = g_tRadio.ucListType;			/* µÁÃ®¡–±Ì¿‡–Õ°£Œ‰∫∫µÿ«¯ªÚ»´π˙ */
-	g_tParam.ucIndexFM       = g_tRadio.ucIndexFM;			/* µ±«∞FMµÁÃ®À˜“˝ */
-	g_tParam.ucIndexAM       = g_tRadio.ucIndexAM;			/* µ±«∞µÁÃ®À˜“˝ */
-	g_tParam.ucRadioVolume   = g_tRadio.ucVolume;			/* “Ù¡ø */
-	g_tParam.ucSpkOutEn      = g_tRadio.ucSpkOutEn;			/* —Ô…˘∆˜ ‰≥ˆ πƒ‹ */
+	g_tParam.ucRadioMode = g_tRadio.ucMode;					/* AM Êàñ FM */
+	g_tParam.ucRadioListType = g_tRadio.ucListType; /* ÁîµÂè∞ÂàóË°®Á±ªÂûã„ÄÇÊ≠¶Ê±âÂú∞Âå∫ÊàñÂÖ®ÂõΩ */
+	g_tParam.ucIndexFM = g_tRadio.ucIndexFM;				/* ÂΩìÂâçFMÁîµÂè∞Á¥¢Âºï */
+	g_tParam.ucIndexAM = g_tRadio.ucIndexAM;				/* ÂΩìÂâçÁîµÂè∞Á¥¢Âºï */
+	g_tParam.ucRadioVolume = g_tRadio.ucVolume;			/* Èü≥Èáè */
+	g_tParam.ucSpkOutEn = g_tRadio.ucSpkOutEn;			/* Êâ¨Â£∞Âô®ËæìÂá∫‰ΩøËÉΩ */
 
 	SaveParam();
 }
 
 /*
 *********************************************************************************************************
-*	∫Ø  ˝ √˚: radio_AdjustVolume
-*	π¶ƒ‹Àµ√˜: µ˜Ω⁄“Ù¡ø
-*	–Œ    ≤Œ: _ucVolume : 0-63
-*	∑µ ªÿ ÷µ: Œﬁ
+*	ÂáΩ Êï∞ Âêç: radio_AdjustVolume
+*	ÂäüËÉΩËØ¥Êòé: Ë∞ÉËäÇÈü≥Èáè
+*	ÂΩ¢    ÂèÇ: _ucVolume : 0-63
+*	Ëøî Âõû ÂÄº: Êó†
 *********************************************************************************************************
 */
 static void radio_AdjustVolume(uint8_t _ucVolume)
 {
 	uint8_t volume;
-	
+
 	wm8978_SetEarVolume(g_tRadio.ucVolume);
 	wm8978_SetSpkVolume(g_tRadio.ucVolume);
-	
+
 	if (g_tRadio.ucVolume == 0)
 	{
 		SI4730_SetOutVolume(0);
@@ -1124,8 +1121,8 @@ static void radio_AdjustVolume(uint8_t _ucVolume)
 	else
 	{
 		volume = 21 + (g_tRadio.ucVolume * 2) / 3;
-		SI4730_SetOutVolume(volume);		
+		SI4730_SetOutVolume(volume);
 	}
 }
 
-/***************************** ∞≤∏ª¿≥µÁ◊” www.armfly.com (END OF FILE) *********************************/
+/***************************** ÂÆâÂØåËé±ÁîµÂ≠ê www.armfly.com (END OF FILE) *********************************/

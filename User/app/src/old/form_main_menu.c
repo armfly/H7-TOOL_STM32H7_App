@@ -1,32 +1,32 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Ö÷½çÃæÄ£¿é¡£
-*	ÎÄ¼þÃû³Æ : main_menu.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ :
-*	ÐÞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v1.0    2012-08-08 armfly  ST¹Ì¼þ¿âV3.5.0°æ±¾¡£
+*	æ¨¡å—åç§° : ä¸»ç•Œé¢æ¨¡å—ã€‚
+*	æ–‡ä»¶åç§° : main_menu.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜Ž :
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜Ž
+*		v1.0    2012-08-08 armfly  STå›ºä»¶åº“V3.5.0ç‰ˆæœ¬ã€‚
 *
-*	Copyright (C), 2012-2013, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2012-2013, å®‰å¯ŒèŽ±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h"			/* printfº¯Êý¶¨ÏòÊä³öµ½´®¿Ú£¬ËùÒÔ±ØÐë°üº¬Õâ¸öÎÄ¼þ */
-#include "images.h"			/* Í¼±êÎÄ¼þ */
+#include "bsp.h"		/* printfå‡½æ•°å®šå‘è¾“å‡ºåˆ°ä¸²å£ï¼Œæ‰€ä»¥å¿…é¡»åŒ…å«è¿™ä¸ªæ–‡ä»¶ */
+#include "images.h" /* å›¾æ ‡æ–‡ä»¶ */
 #include "form_main_menu.h"
 #include "main.h"
 
-#define KEY_INFO	"K3:Ð£×¼ K1:±³¾° OK:ÏÔÊ¾·½Ïò"
+#define KEY_INFO "K3:æ ¡å‡† K1:èƒŒæ™¯ OK:æ˜¾ç¤ºæ–¹å‘"
 
-#define ICON_LEFT	16
-#define ICON_TOP	25
+#define ICON_LEFT 16
+#define ICON_TOP 25
 
-#define TOP_BAR_H		20	/* ¶¥²¿À¸¸ß¶È */
-#define BOTTOM_BAR_H	20	/* µ×²¿À¸¸ß¶È */
-#define CL_BAR			RGB(0, 73, 108)	/* ¶¥²¿À¸ºÍµ×²¿À¸±³¾°ÑÕÉ« */
+#define TOP_BAR_H 20					 /* é¡¶éƒ¨æ é«˜åº¦ */
+#define BOTTOM_BAR_H 20				 /* åº•éƒ¨æ é«˜åº¦ */
+#define CL_BAR RGB(0, 73, 108) /* é¡¶éƒ¨æ å’Œåº•éƒ¨æ èƒŒæ™¯é¢œè‰² */
 
 extern const unsigned char acRecorder[48 * 48 * 4];
 extern const unsigned char acTape[48 * 48 * 4];
@@ -34,142 +34,141 @@ extern const unsigned char acCamera[48 * 48 * 4];
 extern const unsigned char acChiLun[48 * 48 * 4];
 extern const unsigned char acchujiao[48 * 48 * 4];
 
-#define ICONS_COUNT     28
+#define ICONS_COUNT 28
 static ICON_T s_tMainIcons[ICONS_COUNT] =
-{
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)achwinfo, "Ó²¼þÐÅÏ¢"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acLCD, "´¥ÃþÆÁºÍ°´¼ü"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRadio, "ÊÕÒô»ú"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRecorder, "Â¼Òô»ú"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "MEMS´«¸ÐÆ÷"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acweb, "WEB·þÎñÆ÷"},
+		{
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)achwinfo, "ç¡¬ä»¶ä¿¡æ¯"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acLCD, "è§¦æ‘¸å±å’ŒæŒ‰é”®"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRadio, "æ”¶éŸ³æœº"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acRecorder, "å½•éŸ³æœº"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acchujiao, "MEMSä¼ æ„Ÿå™¨"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acweb, "WEBæœåŠ¡å™¨"},
 
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acGPS, "GPS¶¨Î»Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acPhone, "GPRSÄ£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acMP3, "MP3Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acUSBDisk, "Ä£ÄâUÅÌ"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acCamera, "ÉãÏñÍ·"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "OLEDÏÔÊ¾Æ÷"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acGPS, "GPSå®šä½æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acPhone, "GPRSæ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acMP3, "MP3æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acUSBDisk, "æ¨¡æ‹ŸUç›˜"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acCamera, "æ‘„åƒå¤´"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "OLEDæ˜¾ç¤ºå™¨"},
 
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "AD7606Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "AD7705Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "ADS1256Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "RS485ÊýÂë¹Ü"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "DAC8501"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "DAC8562"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "AD7606æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "AD7705æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acADC, "ADS1256æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "RS485æ•°ç ç®¡"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "DAC8501"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "DAC8562"},
 
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ê¾²¨Æ÷"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "´®¿ÚWiFi"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "CANÍøÂç"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "AD9833Ä£¿é"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô4"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "ç¤ºæ³¢å™¨"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "ä¸²å£WiFi"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "CANç½‘ç»œ"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "AD9833æ¨¡å—"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™4"},
 
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô5"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô6"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô7"},
-	{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "Ô¤Áô8"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™5"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™6"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™7"},
+				{ID_ICON, 0, 0, ICON_HEIGHT, ICON_WIDTH, (uint16_t *)acChiLun, "é¢„ç•™8"},
 
 };
 
-/* Í¼±êµã»÷ºó£¬ÇÐ»»³ÌÐò×´Ì¬ */
+/* å›¾æ ‡ç‚¹å‡»åŽï¼Œåˆ‡æ¢ç¨‹åºçŠ¶æ€ */
 static const uint8_t s_RetStatus[ICONS_COUNT] =
-{
-	MS_HARDWARE_INFO,	/* Ó²¼þÐÅÏ¢ */
-	MS_TEST_TOUCH,		/* ²âÊÔ´¥ÃþÆÁ */
-	MS_RADIO,			/* ÊÕÒô»ú */
-	MS_WM8978_REC,		/* Â¼Òô»ú */
-	MS_MEMS,			/* MEMS ´«¸ÐÆ÷²âÊÔ£¨I2C£© ÈýÖáÍÓÂÝÒÇ£¬´ÅÁ¦¼Æ£¬ÆøÑ¹¼Æ */
-	MS_ETH_WEB,			/* ÒÔÌ«ÍøDM9000ºÍDM9161 WEB·þÎñÆ÷ */
+		{
+				MS_HARDWARE_INFO, /* ç¡¬ä»¶ä¿¡æ¯ */
+				MS_TEST_TOUCH,		/* æµ‹è¯•è§¦æ‘¸å± */
+				MS_RADIO,					/* æ”¶éŸ³æœº */
+				MS_WM8978_REC,		/* å½•éŸ³æœº */
+				MS_MEMS,					/* MEMS ä¼ æ„Ÿå™¨æµ‹è¯•ï¼ˆI2Cï¼‰ ä¸‰è½´é™€èžºä»ªï¼Œç£åŠ›è®¡ï¼Œæ°”åŽ‹è®¡ */
+				MS_ETH_WEB,				/* ä»¥å¤ªç½‘DM9000å’ŒDM9161 WEBæœåŠ¡å™¨ */
 
-	MS_GPS,				/* GPS²âÊÔ */
-	MS_GPRS,			/* GPRSÄ£¿é²âÊÔ */
-	MS_MP3,				/* Ð£×¼´¥Ãþ×´Ì¬ */
-	MS_MASS_STORAGE,	/* SD¿¨£¬NANDÄ£ÄâUÅÌ */
-	MS_CAMERA,			/* ÉãÏñÍ· */
-	MS_OLED,			/* OLEDÏÔÊ¾Æ÷ */
+				MS_GPS,					 /* GPSæµ‹è¯• */
+				MS_GPRS,				 /* GPRSæ¨¡å—æµ‹è¯• */
+				MS_MP3,					 /* æ ¡å‡†è§¦æ‘¸çŠ¶æ€ */
+				MS_MASS_STORAGE, /* SDå¡ï¼ŒNANDæ¨¡æ‹ŸUç›˜ */
+				MS_CAMERA,			 /* æ‘„åƒå¤´ */
+				MS_OLED,				 /* OLEDæ˜¾ç¤ºå™¨ */
 
-	MS_AD7606,			/* ²âÊÔ AD7606 */
-	MS_AD7705,			/* AD7705Ä£¿é */
-	MS_ADS1256,			/* ADS1256Ä£¿é */
-	MS_RS485,			/* RS485Í¨ÐÅ */
-	MS_DAC8501,			/* DAC8501 Ä£¿é */
-	MS_DAC8562,			/* DAC8562 Ä£¿é */
+				MS_AD7606,	/* æµ‹è¯• AD7606 */
+				MS_AD7705,	/* AD7705æ¨¡å— */
+				MS_ADS1256, /* ADS1256æ¨¡å— */
+				MS_RS485,		/* RS485é€šä¿¡ */
+				MS_DAC8501, /* DAC8501 æ¨¡å— */
+				MS_DAC8562, /* DAC8562 æ¨¡å— */
 
-	MS_RA8875,			/* RA8875×Ö¿â */
-	MS_DSO,				/* Ê¾²¨Æ÷ */
-	MS_WIFI,			/* ´®¿ÚWIFI */
-	MS_CAN,				/* CANÍøÂç²âÊÔ */
-	MS_AD9833,			/* AD9833Ä£¿é */
-	MS_RESERVED,
+				MS_RA8875, /* RA8875å­—åº“ */
+				MS_DSO,		 /* ç¤ºæ³¢å™¨ */
+				MS_WIFI,	 /* ä¸²å£WIFI */
+				MS_CAN,		 /* CANç½‘ç»œæµ‹è¯• */
+				MS_AD9833, /* AD9833æ¨¡å— */
+				MS_RESERVED,
 
-	MS_RESERVED,
-	MS_RESERVED,
-	MS_RESERVED,
-	MS_RESERVED
-};
+				MS_RESERVED,
+				MS_RESERVED,
+				MS_RESERVED,
+				MS_RESERVED};
 
-static uint8_t s_IconsPageNo = 0;	/* Í¼±êÒ³Ãæ, Ò»ÆÁÏÔÊ¾²»ÏÂÊ±£¬×Ô¶¯ÅÅÁÐµ½µÚ2ÆÁ */
-static uint8_t s_IconsPageMax;		/* Í¼±êÒ³Ãæ¸öÊý */
-static uint8_t s_IconNumPerPage;		/* Ã¿Ò³Ãæ×î¶à°üº¬¼¸¸öÍ¼Æ¬ */
+static uint8_t s_IconsPageNo = 0; /* å›¾æ ‡é¡µé¢, ä¸€å±æ˜¾ç¤ºä¸ä¸‹æ—¶ï¼Œè‡ªåŠ¨æŽ’åˆ—åˆ°ç¬¬2å± */
+static uint8_t s_IconsPageMax;		/* å›¾æ ‡é¡µé¢ä¸ªæ•° */
+static uint8_t s_IconNumPerPage;	/* æ¯é¡µé¢æœ€å¤šåŒ…å«å‡ ä¸ªå›¾ç‰‡ */
 
-static int16_t s_IconsCursor = 0;	/* Ñ¡ÖÐµÄÍ¼±ê£¬ -1±íÊ¾ÎÞÑ¡ÖÐ */
-static uint16_t s_down_x;	/* ´¥±Ê°´ÏÂÊ±µÄx×ø±ê ; ÓÃÓÚÊ¶±ð»¬¶¯·½Ïò */
-static uint16_t s_down_y;	/* ´¥±Ê°´ÏÂÊ±µÄy×ø±ê ; ÓÃÓÚÊ¶±ð»¬¶¯·½Ïò */
+static int16_t s_IconsCursor = 0; /* é€‰ä¸­çš„å›¾æ ‡ï¼Œ -1è¡¨ç¤ºæ— é€‰ä¸­ */
+static uint16_t s_down_x;					/* è§¦ç¬”æŒ‰ä¸‹æ—¶çš„xåæ ‡ ; ç”¨äºŽè¯†åˆ«æ»‘åŠ¨æ–¹å‘ */
+static uint16_t s_down_y;					/* è§¦ç¬”æŒ‰ä¸‹æ—¶çš„yåæ ‡ ; ç”¨äºŽè¯†åˆ«æ»‘åŠ¨æ–¹å‘ */
 
-#define STYLE_COUNT			7		/* ÑÕÉ«·½°¸¸öÊý */
+#define STYLE_COUNT 7 /* é¢œè‰²æ–¹æ¡ˆä¸ªæ•° */
 
-/* Ö÷½çÃæ·ç¸ñ */
+/* ä¸»ç•Œé¢é£Žæ ¼ */
 typedef struct
 {
-	uint16_t *pBmp;			/* ±³¾°Í¼Æ¬Ö¸Õë£¬Èç¹ûÊÇ0, ÔòÈ¡µ¥É«±³¾°²ÎÊý BackColor */
-	uint16_t BackColor;		/* ±³¾°ÑÕÉ« */
-	uint16_t TextColor;		/* Í¼±êÎÄ±¾µÄÑÕÉ« */
-}STYLE_T;
+	uint16_t *pBmp;			/* èƒŒæ™¯å›¾ç‰‡æŒ‡é’ˆï¼Œå¦‚æžœæ˜¯0, åˆ™å–å•è‰²èƒŒæ™¯å‚æ•° BackColor */
+	uint16_t BackColor; /* èƒŒæ™¯é¢œè‰² */
+	uint16_t TextColor; /* å›¾æ ‡æ–‡æœ¬çš„é¢œè‰² */
+} STYLE_T;
 
 /*
-	±³¾°Í¼Æ¬£¨RGB565¸ñÊ½£¬´æ·ÅÔÚNOR Flash
-	NOR Flash »ùµØÖ· 0x6400 0000
+	èƒŒæ™¯å›¾ç‰‡ï¼ˆRGB565æ ¼å¼ï¼Œå­˜æ”¾åœ¨NOR Flash
+	NOR Flash åŸºåœ°å€ 0x6400 0000
 
-	0x0020 0000   255K×Ö½Ú 480x272_º£Ì².bin  + 0x3FC00
-	0x0023 FC00   255K×Ö½Ú 480x272_Ê÷Ò¶.bin
-	0x0027 F800   255K×Ö½Ú 480x272_Ë®Öé.bin
+	0x0020 0000   255Kå­—èŠ‚ 480x272_æµ·æ»©.bin  + 0x3FC00
+	0x0023 FC00   255Kå­—èŠ‚ 480x272_æ ‘å¶.bin
+	0x0027 F800   255Kå­—èŠ‚ 480x272_æ°´ç .bin
 
-	0x002B F400   755K×Ö½Ú 800x480_º£Ì².bin  + 0xBB800
-	0x0037 AC00   755K×Ö½Ú 800x480_Ê÷Ò¶.bin
-	0x0043 6400   755K×Ö½Ú 800x480_Ë®Öé.bin
+	0x002B F400   755Kå­—èŠ‚ 800x480_æµ·æ»©.bin  + 0xBB800
+	0x0037 AC00   755Kå­—èŠ‚ 800x480_æ ‘å¶.bin
+	0x0043 6400   755Kå­—èŠ‚ 800x480_æ°´ç .bin
 */
 
 static const STYLE_T s_UI480[STYLE_COUNT] =
-{
-	/* ±³¾°Í¼Æ¬,		±³¾°ÑÕÉ«,			Í¼±êÎÄ×ÖÑÕÉ« */
-	{0,					CL_WHITE,			CL_BLACK},	/* °×É«±³¾° */
-	{0,					RGB(0,78,152),		CL_WHITE},	/* XP×ÀÃæÀ¶±³¾° */
-	{0,					RGB(185,193,204),	CL_BLACK},	/* »ÒÉ«±³¾° */
-	{0,					RGB(38,38,38),		CL_WHITE},	/* ÉîºÚÉ«±³¾° */
+		{
+				/* èƒŒæ™¯å›¾ç‰‡,		èƒŒæ™¯é¢œè‰²,			å›¾æ ‡æ–‡å­—é¢œè‰² */
+				{0, CL_WHITE, CL_BLACK},					 /* ç™½è‰²èƒŒæ™¯ */
+				{0, RGB(0, 78, 152), CL_WHITE},		 /* XPæ¡Œé¢è“èƒŒæ™¯ */
+				{0, RGB(185, 193, 204), CL_BLACK}, /* ç°è‰²èƒŒæ™¯ */
+				{0, RGB(38, 38, 38), CL_WHITE},		 /* æ·±é»‘è‰²èƒŒæ™¯ */
 
-	{(uint16_t *)(0x64000000 + 0x00200000), 0,	CL_BLACK},	/* 480x272 É³Ì²±³¾° */
-	{(uint16_t *)(0x64000000 + 0x0023FC00), 0,	CL_WHITE},	/* 480x272 Ê÷Ò¶±³¾° */
-	{(uint16_t *)(0x64000000 + 0x0027F800), 0,	CL_BLACK},	/* 480x272 Ë®Öé±³¾° */
+				{(uint16_t *)(0x64000000 + 0x00200000), 0, CL_BLACK}, /* 480x272 æ²™æ»©èƒŒæ™¯ */
+				{(uint16_t *)(0x64000000 + 0x0023FC00), 0, CL_WHITE}, /* 480x272 æ ‘å¶èƒŒæ™¯ */
+				{(uint16_t *)(0x64000000 + 0x0027F800), 0, CL_BLACK}, /* 480x272 æ°´ç èƒŒæ™¯ */
 };
 
 static const STYLE_T s_UI800[STYLE_COUNT] =
-{
-	/* ±³¾°Í¼Æ¬,		±³¾°ÑÕÉ«,			Í¼±êÎÄ×ÖÑÕÉ« */
-	{0,					CL_WHITE,			CL_BLACK},	/* °×É«±³¾° */
-	{0,					RGB(0,78,152),		CL_WHITE},	/* XP×ÀÃæÀ¶±³¾° */
-	{0,					RGB(185,193,204),	CL_BLACK},	/* »ÒÉ«±³¾° */
-	{0,					RGB(38,38,38),		CL_WHITE},	/* ÉîºÚÉ«±³¾° */
+		{
+				/* èƒŒæ™¯å›¾ç‰‡,		èƒŒæ™¯é¢œè‰²,			å›¾æ ‡æ–‡å­—é¢œè‰² */
+				{0, CL_WHITE, CL_BLACK},					 /* ç™½è‰²èƒŒæ™¯ */
+				{0, RGB(0, 78, 152), CL_WHITE},		 /* XPæ¡Œé¢è“èƒŒæ™¯ */
+				{0, RGB(185, 193, 204), CL_BLACK}, /* ç°è‰²èƒŒæ™¯ */
+				{0, RGB(38, 38, 38), CL_WHITE},		 /* æ·±é»‘è‰²èƒŒæ™¯ */
 
-	{(uint16_t *)(0x64000000 + 0x002BF400), 0,	CL_BLACK},	/* 800x480 É³Ì²±³¾° */
-	{(uint16_t *)(0x64000000 + 0x0037AC00), 0,	CL_WHITE},	/* 800x480 Ê÷Ò¶±³¾° */
-	{(uint16_t *)(0x64000000 + 0x00436400), 0,	CL_BLACK},	/* 800x480 Ë®Öé±³¾° */
+				{(uint16_t *)(0x64000000 + 0x002BF400), 0, CL_BLACK}, /* 800x480 æ²™æ»©èƒŒæ™¯ */
+				{(uint16_t *)(0x64000000 + 0x0037AC00), 0, CL_WHITE}, /* 800x480 æ ‘å¶èƒŒæ™¯ */
+				{(uint16_t *)(0x64000000 + 0x00436400), 0, CL_BLACK}, /* 800x480 æ°´ç èƒŒæ™¯ */
 };
 
-static uint16_t s_ColorIndex = 0;	/* µ±Ç°Ñ¡ÖÐµÄÑÕÉ«·½°¸ÐòºÅ */
+static uint16_t s_ColorIndex = 0; /* å½“å‰é€‰ä¸­çš„é¢œè‰²æ–¹æ¡ˆåºå· */
 
-/* Í¼±êÎÄ×ÖÑÕÉ« */
-#define MAIN_TEXT_COLOR		((g_LcdWidth == 480)?s_UI480[s_ColorIndex].TextColor:s_UI800[s_ColorIndex].TextColor)
+/* å›¾æ ‡æ–‡å­—é¢œè‰² */
+#define MAIN_TEXT_COLOR ((g_LcdWidth == 480) ? s_UI480[s_ColorIndex].TextColor : s_UI800[s_ColorIndex].TextColor)
 
 static void DispBackground(void);
 static void ArrayIcon(void);
@@ -178,38 +177,38 @@ static void DispBottomBar(void);
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: MainMenu
-*	¹¦ÄÜËµÃ÷: Ö÷½çÃæ
-*	ÐÎ    ²Î£ºÎÞ
-*	·µ »Ø Öµ: ×´Ì¬×Ö
+*	å‡½ æ•° å: MainMenu
+*	åŠŸèƒ½è¯´æ˜Ž: ä¸»ç•Œé¢
+*	å½¢    å‚ï¼šæ— 
+*	è¿” å›ž å€¼: çŠ¶æ€å­—
 *********************************************************************************************************
 */
 uint8_t MainMenu(void)
 {
 #if 0	
-	uint8_t ucKeyCode;		/* °´¼ü´úÂë */
-	uint8_t ucTouch;		/* ´¥ÃþÊÂ¼þ */
-	uint8_t fRefresh;		/* Ë¢ÆÁÇëÇó±êÖ¾,1±íÊ¾ÐèÒªË¢ÐÂ */
-	FONT_T tIconFont;		/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÍ¼±êÎÄ±¾ */
+	uint8_t ucKeyCode;		/* æŒ‰é”®ä»£ç  */
+	uint8_t ucTouch;		/* è§¦æ‘¸äº‹ä»¶ */
+	uint8_t fRefresh;		/* åˆ·å±è¯·æ±‚æ ‡å¿—,1è¡¨ç¤ºéœ€è¦åˆ·æ–° */
+	FONT_T tIconFont;		/* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æž„ä½“å˜é‡ï¼Œç”¨äºŽå›¾æ ‡æ–‡æœ¬ */
 
 	int16_t tpX, tpY;
 	uint16_t i;
 
-	DispTopBar();		/* ÏÔÊ¾¶¥²¿À¸ */
-	DispBottomBar();	/* ÏÔÊ¾µ×²¿À¸ */
-	DispBackground();	/* ÏÔÊ¾Í¼±ê±³¾° */
+	DispTopBar();		/* æ˜¾ç¤ºé¡¶éƒ¨æ  */
+	DispBottomBar();	/* æ˜¾ç¤ºåº•éƒ¨æ  */
+	DispBackground();	/* æ˜¾ç¤ºå›¾æ ‡èƒŒæ™¯ */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊý */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tIconFont.FontCode = FC_ST_12;			/* ×ÖÌå´úÂë 16µãÕó */
-		tIconFont.FrontColor = MAIN_TEXT_COLOR;	/* ×ÖÌåÑÕÉ« */
-		tIconFont.BackColor = CL_MASK;			/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tIconFont.Space = 1;					/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tIconFont.FontCode = FC_ST_12;			/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tIconFont.FrontColor = MAIN_TEXT_COLOR;	/* å­—ä½“é¢œè‰² */
+		tIconFont.BackColor = CL_MASK;			/* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tIconFont.Space = 1;					/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 
-	//s_IconsPageNo = 0;	/* Í¼±êÒ³ÃæºÅ£¬²»ÒªÇåÁã¡£ */
+	//s_IconsPageNo = 0;	/* å›¾æ ‡é¡µé¢å·ï¼Œä¸è¦æ¸…é›¶ã€‚ */
 
-	fRefresh = 1;	/* 1±íÊ¾ÐèÒªË¢ÐÂLCD */
+	fRefresh = 1;	/* 1è¡¨ç¤ºéœ€è¦åˆ·æ–°LCD */
 	while (g_MainStatus == MS_MAIN_MENU)
 	{
 		bsp_Idle();
@@ -218,19 +217,19 @@ uint8_t MainMenu(void)
 		{
 			fRefresh = 0;
 
-			/* ÏÔÊ¾Í¼±êÕóÁÐ */
-			ArrayIcon();	/* ÅÅÁÐÍ¼±ê */
+			/* æ˜¾ç¤ºå›¾æ ‡é˜µåˆ— */
+			ArrayIcon();	/* æŽ’åˆ—å›¾æ ‡ */
 		}
 
-		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* ¶ÁÈ¡´¥ÃþÊÂ¼þ */
+		ucTouch = TOUCH_GetKey(&tpX, &tpY);	/* è¯»å–è§¦æ‘¸äº‹ä»¶ */
 		if (ucTouch != TOUCH_NONE)
 		{
 			switch (ucTouch)
 			{
-				case TOUCH_DOWN:		/* ´¥±Ê°´ÏÂÊÂ¼þ */
-					/* »æÖÆÍ¼±êÕóÁÐ */
+				case TOUCH_DOWN:		/* è§¦ç¬”æŒ‰ä¸‹äº‹ä»¶ */
+					/* ç»˜åˆ¶å›¾æ ‡é˜µåˆ— */
 					{
-						s_IconsCursor = -1;	/* -1 ±íÊ¾µ±Ç°Ã»ÓÐÍ¼±ê±»¼¤»îµãÁÁ */
+						s_IconsCursor = -1;	/* -1 è¡¨ç¤ºå½“å‰æ²¡æœ‰å›¾æ ‡è¢«æ¿€æ´»ç‚¹äº® */
 
 						for (i = s_IconNumPerPage * s_IconsPageNo;
 							i < s_IconNumPerPage * s_IconsPageNo + s_IconNumPerPage && i < ICONS_COUNT;
@@ -240,7 +239,7 @@ uint8_t MainMenu(void)
 								 s_tMainIcons[i].Height, s_tMainIcons[i].Width))
 							{
 								s_IconsCursor = i;
-								LCD_DrawIcon32(&s_tMainIcons[i], &tIconFont, 1);	/* 0 ±íÊ¾Õý³£ÏÔÊ¾£¬ 1±íÊ¾Ñ¡ÖÐ */
+								LCD_DrawIcon32(&s_tMainIcons[i], &tIconFont, 1);	/* 0 è¡¨ç¤ºæ­£å¸¸æ˜¾ç¤ºï¼Œ 1è¡¨ç¤ºé€‰ä¸­ */
 							}
 						}
 						s_down_x = tpX;
@@ -248,7 +247,7 @@ uint8_t MainMenu(void)
 					}
 					break;
 
-				case TOUCH_MOVE:		/* ´¥±ÊÒÆ¶¯ÊÂ¼þ */
+				case TOUCH_MOVE:		/* è§¦ç¬”ç§»åŠ¨äº‹ä»¶ */
 					if (s_IconsCursor >= 0)
 					{
 						if (TOUCH_InRect(tpX, tpY, s_tMainIcons[s_IconsCursor].Left, s_tMainIcons[s_IconsCursor].Top,
@@ -258,7 +257,7 @@ uint8_t MainMenu(void)
 						}
 						else
 						{
-							LCD_DrawIcon32(&s_tMainIcons[s_IconsCursor], &tIconFont, 0);	/* 0 ±íÊ¾Õý³£ÏÔÊ¾£¬ 1±íÊ¾Ñ¡ÖÐ */
+							LCD_DrawIcon32(&s_tMainIcons[s_IconsCursor], &tIconFont, 0);	/* 0 è¡¨ç¤ºæ­£å¸¸æ˜¾ç¤ºï¼Œ 1è¡¨ç¤ºé€‰ä¸­ */
 							s_IconsCursor = -1;
 						}
 					}
@@ -267,23 +266,23 @@ uint8_t MainMenu(void)
 					{
 						if (tpX - s_down_x > 50)
 						{
-							/* ÏòÓÒ»¬¶¯ */
+							/* å‘å³æ»‘åŠ¨ */
 							if (s_IconsPageNo > 0)
 							{
 								s_IconsPageNo--;
 								DispBackground();
-								ArrayIcon();	/* ÅÅÁÐÍ¼±ê */
+								ArrayIcon();	/* æŽ’åˆ—å›¾æ ‡ */
 							}
 							s_down_x = 0;
 						}
 						else if (tpX - s_down_x < -50)
 						{
-							/* Ïò×ó»¬¶¯ */
+							/* å‘å·¦æ»‘åŠ¨ */
 							if (s_IconsPageNo < s_IconsPageMax - 1)
 							{
 								s_IconsPageNo++;
 								DispBackground();
-								ArrayIcon();	/* ÅÅÁÐÍ¼±ê */
+								ArrayIcon();	/* æŽ’åˆ—å›¾æ ‡ */
 							}
 							s_down_x = 0;
 						}
@@ -291,20 +290,20 @@ uint8_t MainMenu(void)
 					}
 					break;
 
-				case TOUCH_RELEASE:		/* ´¥±ÊÊÍ·ÅÊÂ¼þ */
+				case TOUCH_RELEASE:		/* è§¦ç¬”é‡Šæ”¾äº‹ä»¶ */
 					if (s_IconsCursor >= 0)
 					{
-						/* °´ÏÂÊ±µÄ×ø±êºÍµ¯ÆðÊ±×ø±ê¶¼ÔÚÍ¼±êÄÚ²ÅËãÓÐÐ§µã»÷ */
+						/* æŒ‰ä¸‹æ—¶çš„åæ ‡å’Œå¼¹èµ·æ—¶åæ ‡éƒ½åœ¨å›¾æ ‡å†…æ‰ç®—æœ‰æ•ˆç‚¹å‡» */
 						if (TOUCH_InRect(tpX, tpY, s_tMainIcons[s_IconsCursor].Left, s_tMainIcons[s_IconsCursor].Top,
 								 s_tMainIcons[s_IconsCursor].Height, s_tMainIcons[s_IconsCursor].Width)
 							&& TOUCH_InRect(s_down_x, s_down_y, s_tMainIcons[s_IconsCursor].Left, s_tMainIcons[s_IconsCursor].Top,
 								 s_tMainIcons[s_IconsCursor].Height, s_tMainIcons[s_IconsCursor].Width))
 						{
-							g_MainStatus = s_RetStatus[s_IconsCursor];	/* ·µ»Ø³ÌÐò×´Ì¬ */
+							g_MainStatus = s_RetStatus[s_IconsCursor];	/* è¿”å›žç¨‹åºçŠ¶æ€ */
 						}
 						else
 						{
-							LCD_DrawIcon32(&s_tMainIcons[s_IconsCursor], &tIconFont, 0);	/* 0 ±íÊ¾Õý³£ÏÔÊ¾£¬ 1±íÊ¾Ñ¡ÖÐ */
+							LCD_DrawIcon32(&s_tMainIcons[s_IconsCursor], &tIconFont, 0);	/* 0 è¡¨ç¤ºæ­£å¸¸æ˜¾ç¤ºï¼Œ 1è¡¨ç¤ºé€‰ä¸­ */
 							s_IconsCursor = -1;
 						}
 					}
@@ -315,51 +314,51 @@ uint8_t MainMenu(void)
 			}
 		}
 
-		ucKeyCode = bsp_GetKey();	/* ¶ÁÈ¡¼üÖµ, ÎÞ¼ü°´ÏÂÊ±·µ»Ø KEY_NONE = 0 */
+		ucKeyCode = bsp_GetKey();	/* è¯»å–é”®å€¼, æ— é”®æŒ‰ä¸‹æ—¶è¿”å›ž KEY_NONE = 0 */
 		if (ucKeyCode != KEY_NONE)
 		{
-			/* ÓÐ¼ü°´ÏÂ */
+			/* æœ‰é”®æŒ‰ä¸‹ */
 			switch (ucKeyCode)
 			{
-				case  JOY_DOWN_L:	/* Ò£¸ËÓÒ¼ü 2014-08-22 */
-					return MS_RA8875;	/* ½øÈëRA8875½çÃæ */
+				case  JOY_DOWN_L:	/* é¥æ†å³é”® 2014-08-22 */
+					return MS_RA8875;	/* è¿›å…¥RA8875ç•Œé¢ */
 
-				case  JOY_DOWN_U:	/* Ò£¸ËÉÏ¼ü 2014-08-22 */
-					return MS_TEST_TOUCH;	/* ½øÈë´¥Ãþ½çÃæ */
+				case  JOY_DOWN_U:	/* é¥æ†ä¸Šé”® 2014-08-22 */
+					return MS_TEST_TOUCH;	/* è¿›å…¥è§¦æ‘¸ç•Œé¢ */
 
-				case  JOY_DOWN_OK:	/* Ò£¸ÐOK¼ü */
+				case  JOY_DOWN_OK:	/* é¥æ„ŸOKé”® */
 					if (++g_LcdDirection > 3)
 					{
 						g_LcdDirection = 0;
 					}
-					/* ÏÔÊ¾·½Ïò´úÂë 0 ºáÆÁÕý³£, 1=ºáÆÁ180¶È·­×ª, 2=ÊúÆÁ, 3=ÊúÆÁ180¶È·­×ª */
+					/* æ˜¾ç¤ºæ–¹å‘ä»£ç  0 æ¨ªå±æ­£å¸¸, 1=æ¨ªå±180åº¦ç¿»è½¬, 2=ç«–å±, 3=ç«–å±180åº¦ç¿»è½¬ */
 					LCD_SetDirection(g_LcdDirection);
 
-					DispTopBar();		/* ÏÔÊ¾¶¥²¿À¸ */
-					DispBottomBar();	/* ÏÔÊ¾µ×²¿À¸ */
-					DispBackground();	/* ÏÔÊ¾±³¾° */
+					DispTopBar();		/* æ˜¾ç¤ºé¡¶éƒ¨æ  */
+					DispBottomBar();	/* æ˜¾ç¤ºåº•éƒ¨æ  */
+					DispBackground();	/* æ˜¾ç¤ºèƒŒæ™¯ */
 					fRefresh = 1;
 					break;
 
-				case  KEY_DOWN_K3:	/* K3¼ü */
-					return MS_CALIBRATION;	/* ½øÈë´¥Ãþ½çÃæ */
+				case  KEY_DOWN_K3:	/* K3é”® */
+					return MS_CALIBRATION;	/* è¿›å…¥è§¦æ‘¸ç•Œé¢ */
 					//break;
 
-				case  KEY_DOWN_K1:	/* K1¼ü */
+				case  KEY_DOWN_K1:	/* K1é”® */
 					if (++s_ColorIndex >= STYLE_COUNT)
 					{
 						s_ColorIndex = 0;
 					}
-					/* ÖØÐÂ»æÖÆ±³¾° */
+					/* é‡æ–°ç»˜åˆ¶èƒŒæ™¯ */
 					{
-						DispBackground();	/* ÏÔÊ¾±³¾° */
+						DispBackground();	/* æ˜¾ç¤ºèƒŒæ™¯ */
 
-						/* ÉèÖÃ×ÖÌå²ÎÊý */
+						/* è®¾ç½®å­—ä½“å‚æ•° */
 						{
-							tIconFont.FontCode = FC_ST_12;		/* ×ÖÌå´úÂë 16µãÕó */
-							tIconFont.FrontColor = MAIN_TEXT_COLOR;	/* ×ÖÌåÑÕÉ« */
-							tIconFont.BackColor = CL_MASK;		/* ÎÄ×Ö±³¾°ÑÕÉ« */
-							tIconFont.Space = 1;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+							tIconFont.FontCode = FC_ST_12;		/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+							tIconFont.FrontColor = MAIN_TEXT_COLOR;	/* å­—ä½“é¢œè‰² */
+							tIconFont.BackColor = CL_MASK;		/* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+							tIconFont.Space = 1;				/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 						}
 					}
 					fRefresh = 1;
@@ -370,72 +369,72 @@ uint8_t MainMenu(void)
 			}
 		}
 	}
-#endif	
+#endif
 	return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: DispTopBar
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾Ì§Í·À¸£¨±êÌâÀ¸£©
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: DispTopBar
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤ºæŠ¬å¤´æ ï¼ˆæ ‡é¢˜æ ï¼‰
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispTopBar(void)
 {
-	FONT_T tFont;			/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊý */
+	FONT_T tFont; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æž„ä½“å˜é‡ï¼Œç”¨äºŽè®¾ç½®å­—ä½“å‚æ•° */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊý */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BAR;		/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BAR;		 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 	LCD_Fill_Rect(0, 0, TOP_BAR_H, g_LcdWidth, CL_BAR);
-	LCD_DispStr(5, 2, VER_INFO, &tFont);							/* ÏÔÊ¾Èí¼þ°æ±¾ÐÅÏ¢ */
+	LCD_DispStr(5, 2, VER_INFO, &tFont); /* æ˜¾ç¤ºè½¯ä»¶ç‰ˆæœ¬ä¿¡æ¯ */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: DispBottomBar
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾µ×²¿À¸
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: DispBottomBar
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤ºåº•éƒ¨æ 
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispBottomBar(void)
 {
-	FONT_T tFont;			/* ¶¨ÒåÒ»¸ö×ÖÌå½á¹¹Ìå±äÁ¿£¬ÓÃÓÚÉèÖÃ×ÖÌå²ÎÊý */
+	FONT_T tFont; /* å®šä¹‰ä¸€ä¸ªå­—ä½“ç»“æž„ä½“å˜é‡ï¼Œç”¨äºŽè®¾ç½®å­—ä½“å‚æ•° */
 
-	/* ÉèÖÃ×ÖÌå²ÎÊý */
+	/* è®¾ç½®å­—ä½“å‚æ•° */
 	{
-		tFont.FontCode = FC_ST_16;		/* ×ÖÌå´úÂë 16µãÕó */
-		tFont.FrontColor = CL_WHITE;	/* ×ÖÌåÑÕÉ« */
-		tFont.BackColor = CL_BAR;		/* ÎÄ×Ö±³¾°ÑÕÉ« */
-		tFont.Space = 0;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+		tFont.FontCode = FC_ST_16;	 /* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+		tFont.FrontColor = CL_WHITE; /* å­—ä½“é¢œè‰² */
+		tFont.BackColor = CL_BAR;		 /* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+		tFont.Space = 0;						 /* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 	}
 	LCD_Fill_Rect(0, g_LcdHeight - BOTTOM_BAR_H, BOTTOM_BAR_H, g_LcdWidth, CL_BAR);
-	LCD_DispStr(5, g_LcdHeight - 18, KEY_INFO, &tFont);			/* ÏÔÊ¾°´¼ü²Ù×÷ÌáÊ¾ */
+	LCD_DispStr(5, g_LcdHeight - 18, KEY_INFO, &tFont); /* æ˜¾ç¤ºæŒ‰é”®æ“ä½œæç¤º */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: DispBackground
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾½çÃæ±³¾°
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: DispBackground
+*	åŠŸèƒ½è¯´æ˜Ž: æ˜¾ç¤ºç•Œé¢èƒŒæ™¯
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void DispBackground(void)
 {
 #if 1
-	if ((g_LcdWidth == 480) && (g_LcdHeight == 272))	/* 480 x 272 */
+	if ((g_LcdWidth == 480) && (g_LcdHeight == 272)) /* 480 x 272 */
 	{
 		if (s_UI480[s_ColorIndex].pBmp == 0)
 		{
-			//LCD_ClrScr(s_UI480[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			//LCD_ClrScr(s_UI480[s_ColorIndex].BackColor);  	/* æ¸…å±, å¡«å……å•è‰² */
 			LCD_Fill_Rect(0, TOP_BAR_H, g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H, g_LcdWidth, s_UI480[s_ColorIndex].BackColor);
 		}
 		else
@@ -443,11 +442,11 @@ static void DispBackground(void)
 			LCD_DrawBMP(0, TOP_BAR_H, g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H, g_LcdWidth, s_UI480[s_ColorIndex].pBmp);
 		}
 	}
-	else if ((g_LcdWidth == 480) && (g_LcdHeight == 320))		/* 480 x 320 */
+	else if ((g_LcdWidth == 480) && (g_LcdHeight == 320)) /* 480 x 320 */
 	{
 		if (s_UI480[s_ColorIndex].pBmp == 0)
 		{
-			//LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			//LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* æ¸…å±, å¡«å……å•è‰² */
 			LCD_Fill_Rect(0, TOP_BAR_H, g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H, g_LcdWidth, s_UI800[s_ColorIndex].BackColor);
 		}
 		else
@@ -455,11 +454,11 @@ static void DispBackground(void)
 			LCD_DrawBMP(0, TOP_BAR_H, g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H, g_LcdWidth, s_UI800[s_ColorIndex].pBmp);
 		}
 	}
-	else	/* 800 x 480 */
+	else /* 800 x 480 */
 	{
 		if (s_UI800[s_ColorIndex].pBmp == 0)
 		{
-			//LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			//LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* æ¸…å±, å¡«å……å•è‰² */
 			LCD_Fill_Rect(0, TOP_BAR_H, g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H, g_LcdWidth, s_UI800[s_ColorIndex].BackColor);
 		}
 		else
@@ -468,33 +467,33 @@ static void DispBackground(void)
 		}
 	}
 #else
-	if ((g_LcdWidth == 480) && (g_LcdHeight == 272))	/* 480 x 272 */
+	if ((g_LcdWidth == 480) && (g_LcdHeight == 272)) /* 480 x 272 */
 	{
 		if (s_UI480[s_ColorIndex].pBmp == 0)
 		{
-			LCD_ClrScr(s_UI480[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			LCD_ClrScr(s_UI480[s_ColorIndex].BackColor); /* æ¸…å±, å¡«å……å•è‰² */
 		}
 		else
 		{
 			LCD_DrawBMP(0, 0, g_LcdHeight, g_LcdWidth, s_UI480[s_ColorIndex].pBmp);
 		}
 	}
-	else if ((g_LcdWidth == 480) && (g_LcdHeight == 320))		/* 480 x 320 */
+	else if ((g_LcdWidth == 480) && (g_LcdHeight == 320)) /* 480 x 320 */
 	{
 		if (s_UI480[s_ColorIndex].pBmp == 0)
 		{
-			LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			LCD_ClrScr(s_UI800[s_ColorIndex].BackColor); /* æ¸…å±, å¡«å……å•è‰² */
 		}
 		else
 		{
 			LCD_DrawBMP(0, 0, g_LcdHeight, g_LcdWidth, s_UI800[s_ColorIndex].pBmp);
 		}
 	}
-	else	/* 800 x 480 */
+	else /* 800 x 480 */
 	{
 		if (s_UI800[s_ColorIndex].pBmp == 0)
 		{
-			LCD_ClrScr(s_UI800[s_ColorIndex].BackColor);  	/* ÇåÆÁ, Ìî³äµ¥É« */
+			LCD_ClrScr(s_UI800[s_ColorIndex].BackColor); /* æ¸…å±, å¡«å……å•è‰² */
 		}
 		else
 		{
@@ -506,36 +505,36 @@ static void DispBackground(void)
 
 /*
 *********************************************************************************************************
-*	º¯ Êý Ãû: ArrayIcon
-*	¹¦ÄÜËµÃ÷: ÅÅÁÐÍ¼±ê s_tMainIcons µÄ×ø±ê£¬ È«¾Ö±äÁ¿ s_IconsPageNo ±íÊ¾Ò³ºÅ
-*	ÐÎ    ²Î: ÎÞ
-*	·µ »Ø Öµ: ÎÞ
+*	å‡½ æ•° å: ArrayIcon
+*	åŠŸèƒ½è¯´æ˜Ž: æŽ’åˆ—å›¾æ ‡ s_tMainIcons çš„åæ ‡ï¼Œ å…¨å±€å˜é‡ s_IconsPageNo è¡¨ç¤ºé¡µå·
+*	å½¢    å‚: æ— 
+*	è¿” å›ž å€¼: æ— 
 *********************************************************************************************************
 */
 static void ArrayIcon(void)
 {
 	uint16_t x;
 	uint16_t y;
-	uint8_t h_count;	/* Ë®Æ½·½ÏòÍ¼±êÅÅÁÐ¸öÊý */
-	uint8_t v_count;	/* ´¹Ö±·½ÏòÍ¼±êÅÅÁÐ¸öÊý */
-	uint16_t icon_index;	/* Í¼±êË÷Òý */
-	uint16_t icons_left;	/* Í¼±êÕóÁÐ X ×ø±ê */
-	uint16_t icons_top;		/* Í¼±êÕóÁÐ Y ×ø±ê */
+	uint8_t h_count;		 /* æ°´å¹³æ–¹å‘å›¾æ ‡æŽ’åˆ—ä¸ªæ•° */
+	uint8_t v_count;		 /* åž‚ç›´æ–¹å‘å›¾æ ‡æŽ’åˆ—ä¸ªæ•° */
+	uint16_t icon_index; /* å›¾æ ‡ç´¢å¼• */
+	uint16_t icons_left; /* å›¾æ ‡é˜µåˆ— X åæ ‡ */
+	uint16_t icons_top;	/* å›¾æ ‡é˜µåˆ— Y åæ ‡ */
 	uint8_t m, n;
 	FONT_T tIconFont;
 
-	tIconFont.FontCode = FC_ST_12;		/* ×ÖÌå´úÂë 16µãÕó */
-	tIconFont.FrontColor = MAIN_TEXT_COLOR;	/* ×ÖÌåÑÕÉ« */
-	tIconFont.BackColor = CL_MASK;		/* ÎÄ×Ö±³¾°ÑÕÉ« */
-	tIconFont.Space = 1;				/* ÎÄ×Ö¼ä¾à£¬µ¥Î» = ÏñËØ */
+	tIconFont.FontCode = FC_ST_12;					/* å­—ä½“ä»£ç  16ç‚¹é˜µ */
+	tIconFont.FrontColor = MAIN_TEXT_COLOR; /* å­—ä½“é¢œè‰² */
+	tIconFont.BackColor = CL_MASK;					/* æ–‡å­—èƒŒæ™¯é¢œè‰² */
+	tIconFont.Space = 1;										/* æ–‡å­—é—´è·ï¼Œå•ä½ = åƒç´  */
 
 	h_count = g_LcdWidth / ICON_STEP_X;
 	v_count = (g_LcdHeight - TOP_BAR_H - BOTTOM_BAR_H) / ICON_STEP_Y;
 
-	s_IconNumPerPage = h_count * v_count;	/* Ã¿¸öÒ³Ãæ°üº¬µÄÍ¼±ê¸öÊý */
+	s_IconNumPerPage = h_count * v_count; /* æ¯ä¸ªé¡µé¢åŒ…å«çš„å›¾æ ‡ä¸ªæ•° */
 
-	/* ¼ÆËãÐèÒª¼¸¸öÍ¼Æ¬Ò³Ãæ */
-	s_IconsPageMax = (ICONS_COUNT -  1) / (h_count * v_count) + 1;
+	/* è®¡ç®—éœ€è¦å‡ ä¸ªå›¾ç‰‡é¡µé¢ */
+	s_IconsPageMax = (ICONS_COUNT - 1) / (h_count * v_count) + 1;
 
 	icons_left = (g_LcdWidth - (h_count - 1) * ICON_STEP_X - ICON_WIDTH) / 2;
 	icons_top = ICON_TOP;
@@ -553,7 +552,7 @@ static void ArrayIcon(void)
 			s_tMainIcons[icon_index].Left = x;
 			s_tMainIcons[icon_index].Top = y;
 
-			LCD_DrawIcon32(&s_tMainIcons[icon_index], &tIconFont, 0);	/* 0 ±íÊ¾Õý³£ÏÔÊ¾£¬ 1±íÊ¾Ñ¡ÖÐ */
+			LCD_DrawIcon32(&s_tMainIcons[icon_index], &tIconFont, 0); /* 0 è¡¨ç¤ºæ­£å¸¸æ˜¾ç¤ºï¼Œ 1è¡¨ç¤ºé€‰ä¸­ */
 
 			icon_index++;
 			if (icon_index >= ICONS_COUNT)
@@ -567,8 +566,6 @@ static void ArrayIcon(void)
 			break;
 		}
 	}
-
-
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

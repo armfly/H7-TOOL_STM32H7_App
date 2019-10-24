@@ -48,7 +48,8 @@
 #define __APP_ETHERNET_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 
 /* Includes ------------------------------------------------------------------*/
@@ -57,21 +58,21 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* DHCP process states */
-#define DHCP_OFF                   (uint8_t) 0
-#define DHCP_START                 (uint8_t) 1
-#define DHCP_WAIT_ADDRESS          (uint8_t) 2
-#define DHCP_ADDRESS_ASSIGNED      (uint8_t) 3
-#define DHCP_TIMEOUT               (uint8_t) 4
-#define DHCP_LINK_DOWN             (uint8_t) 5
-   
-/* Exported macro ------------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */
-void ethernet_link_status_updated(struct netif *netif);
-void Ethernet_Link_Periodic_Handle(struct netif *netif);
+#define DHCP_OFF (uint8_t)0
+#define DHCP_START (uint8_t)1
+#define DHCP_WAIT_ADDRESS (uint8_t)2
+#define DHCP_ADDRESS_ASSIGNED (uint8_t)3
+#define DHCP_TIMEOUT (uint8_t)4
+#define DHCP_LINK_DOWN (uint8_t)5
+
+  /* Exported macro ------------------------------------------------------------*/
+  /* Exported functions ------------------------------------------------------- */
+  void ethernet_link_status_updated(struct netif *netif);
+  void Ethernet_Link_Periodic_Handle(struct netif *netif);
 #if LWIP_DHCP
-void DHCP_Process(struct netif *netif);
-void DHCP_Periodic_Handle(struct netif *netif);
-#endif  
+  void DHCP_Process(struct netif *netif);
+  void DHCP_Periodic_Handle(struct netif *netif);
+#endif
 
 #ifdef __cplusplus
 }
@@ -79,6 +80,4 @@ void DHCP_Periodic_Handle(struct netif *netif);
 
 #endif /* __APP_ETHERNET_H */
 
-
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-

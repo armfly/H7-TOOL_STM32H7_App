@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Çı¶¯Òº¾§
-*	ÎÄ¼şÃû³Æ : bsp_tft_st7735.h
-*	°æ    ±¾ : V2.0
-*	Ëµ    Ã÷ : Í·ÎÄ¼ş
+*	æ¨¡å—åç§° : é©±åŠ¨æ¶²æ™¶
+*	æ–‡ä»¶åç§° : bsp_tft_st7735.h
+*	ç‰ˆ    æœ¬ : V2.0
+*	è¯´    æ˜ : å¤´æ–‡ä»¶
 *
-*	Copyright (C), 2015-2020, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2020, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -22,9 +22,9 @@ void ST7735_DispOff(void);
 void ST7735_ClrScr(uint16_t _usColor);
 void ST7735_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor);
 uint16_t ST7735_GetPixel(uint16_t _usX, uint16_t _usY);
-void ST7735_DrawLine(uint16_t _usX1 , uint16_t _usY1 , uint16_t _usX2 , uint16_t _usY2 , uint16_t _usColor);
-void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen , uint16_t _usColor);
-void ST7735_DrawVLine(uint16_t _usX , uint16_t _usY , uint16_t _usLen , uint16_t _usColor);
+void ST7735_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor);
+void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor);
+void ST7735_DrawVLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor);
 void ST7735_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor);
 void ST7735_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor);
 void ST7735_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor);
@@ -35,5 +35,3 @@ void ST7735_GetChipDescribe(char *_str);
 void ST7735_WriteData16(uint16_t data2);
 
 #endif
-
-
