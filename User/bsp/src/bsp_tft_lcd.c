@@ -45,13 +45,23 @@
 *				(2) h文件中使能按键提示音 #define BUTTON_BEEP()	BEEP_KeyTone();
 *		V4.8   2019-03-23
 *				(1) 新增 LCD_DispStrEx0
-*	Copyright (C), 2015-2016, 安富莱电子 www.armfly.com
+*		V5.0   2019-10-27 H7-TOOL产品 增加UTF-8编码字符串支持。USE_UTF8 == 1启用。
+*					- LCD_DispStrEx0() 函数更新。
+*					- LCD_GetStrWidth() 函数更新。
+*
+*	Copyright (C), 2015-2030, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
 
 #include "bsp.h"
 #include "fonts.h"
+
+#define	USE_UTF8	1	/* 1表示启用字符串的UTF-8编码 */
+
+#if USE_UTF8 == 1
+#include "ff.h"
+#endif
 
 #define USE_RA8875
 
@@ -618,11 +628,59 @@ uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
 		}
 		else /* 汉字 */
 		{
-			code2 = *++p;
-			if (code2 == 0)
-			{
-				break;
-			}
+			#if USE_UTF8 == 1
+				/* 解读 UTF-8 编码非常简单。
+					如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
+					UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
+			
+					110XXXXX  10XXXXXX           -- 支持
+					1110XXXX  10XXXXXX 10XXXXXX  -- 支持
+					11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
+				*/
+				{			
+					uint8_t code3;
+					
+					if ((code1 & 0xE0) == 0xC0)	/* 2字节 */
+					{
+						code2 = *++p;
+						if (code2 == 0)
+						{
+							break;
+						}													
+					}
+					else if ((code1 & 0xF0) == 0xE0)	/* 3字节 */
+					{
+						code2 = *++p;
+						code3 = *++p;
+						if (code2 == 0 || code3 == 0)
+						{
+							break;
+						}
+					}
+					else if ((code1 & 0xF8) == 0xF0)	/* 4字节 */
+					{
+						code2 = *++p;
+						if (code2 == 0)
+						{
+							break;
+						}							
+					}	
+					else
+					{
+						code2 = *++p;
+						if (code2 == 0)
+						{
+							break;
+						}							
+					}
+				}
+			#else			
+				code2 = *++p;
+				if (code2 == 0)
+				{
+					break;
+				}
+			#endif
 			font_width = LCD_GetFontWidth(_tFont);
 		}
 		width += (font_width + _tFont->Space);
@@ -1400,11 +1458,75 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
 			else
 			{
 				RA8875_flag = 0;
-				code2 = *++_ptr;
-				if (code2 == 0)
-				{
-					break;
-				}
+				
+				#if USE_UTF8 == 1
+					/* 解读 UTF-8 编码非常简单。
+						如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
+						UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
+				
+						110XXXXX  10XXXXXX           -- 支持
+						1110XXXX  10XXXXXX 10XXXXXX  -- 支持
+						11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
+					*/
+					{			
+						uint8_t code3;
+						uint32_t unicode1;
+						uint16_t gb;
+						
+						if ((code1 & 0xE0) == 0xC0)	/* 2字节 */
+						{
+							code2 = *++_ptr;
+							if (code2 == 0)
+							{
+								break;
+							}							
+							unicode1 = ((uint32_t)(code1 & 0x1F) << 6) + (code2 & 0x3F);							
+						}
+						else if ((code1 & 0xF0) == 0xE0)	/* 3字节 */
+						{
+							code2 = *++_ptr;
+							code3 = *++_ptr;
+							if (code2 == 0 || code3 == 0)
+							{
+								break;
+							}
+							unicode1 = ((uint32_t)(code1 & 0x0F) << 12) + ((uint32_t)(code2 & 0x3F) << 6) + (code3 & 0x3F);
+						}
+						else if ((code1 & 0xF8) == 0xF0)	/* 4字节 */
+						{
+							code2 = *++_ptr;
+							if (code2 == 0)
+							{
+								break;
+							}							
+						}	
+						else
+						{
+							code2 = *++_ptr;
+							if (code2 == 0)
+							{
+								break;
+							}							
+						}
+						
+						/* 将UNICODE码转换为GB2312 */
+						if (unicode1 > 0xFFFF)
+						{
+							break;
+						}
+						gb = ff_convert(unicode1, 0);	/* Unicode -> OEM */
+						
+						code1 = gb >> 8;
+						code2 = gb;
+					}
+				#else
+					code2 = *++_ptr;				
+					if (code2 == 0)
+					{
+						break;
+					}
+				#endif
+				
 				/* 读1个汉字的点阵 */
 				_LCD_ReadHZDot(code1, code2, _tFont->FontCode, buf);
 				width = font_width;
