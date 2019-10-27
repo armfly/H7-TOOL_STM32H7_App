@@ -44,19 +44,10 @@ void status_SystemSetMain(void)
 {
 	uint8_t ucKeyCode; /* 按键代码 */
 	uint8_t fRefresh;
-	FONT_T tFont; /* 定义字体结构体变量 */
 	uint8_t ucFirstKey = 1;
 	static uint8_t s_enter_sub_menu = 0;
 
 	DispHeader("系统设置");
-
-	/* 设置字体参数 */
-	{
-		tFont.FontCode = FC_ST_16;				 /* 字体代码 16点阵 */
-		tFont.FrontColor = CL_WHITE;			 /* 字体颜色 */
-		tFont.BackColor = FORM_BACK_COLOR; /* 文字背景颜色 */
-		tFont.Space = 0;									 /* 文字间距，单位 = 像素 */
-	}
 
 	if (s_enter_sub_menu == 0)
 	{
