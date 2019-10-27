@@ -50,3 +50,23 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# 忽略文件
+
+*.[OoDd]
+*.[Oo][Bb][Jj]
+*.[Mm][Aa][Pp]
+*.[Cc][Rr][Ff]
+*.[Hh][Tt][Mm]
+*.[Bb][Aa][Kk]
+*.[Dd][Ee][Pp]
+*.[Ll][Ss][Tt]
+*.[Ii][Ee][Xx]
+[Jj][Ll][Ii][Nn][Kk]*
+[Pp]roject.uvgui.*
+**/**/[Oo]bjects/*
+**/**/[Ll]istings/*
+**/**/[Dd]ebug[Cc]onfig/*
+**/**/[Dd]ebug/*
+**/**/[Ff]lash/*
+**/**/[Ss]ettings/*
