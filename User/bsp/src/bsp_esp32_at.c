@@ -35,83 +35,83 @@
 #include "modbus_slave.h"
 
 /* ESP32 模块接线图
-	ESP32模块   
-		UTXD   ---  PH14/UART4_RX
-		URXD   ---  PH13/UART4_TX
-		GND    ---  GND
-		
-		CH_PD  ---  PF6/ESP32-S_RESET  ( 0表示掉电  1表示正常上电工作）
-		GPIO0  ---  PG4/BOOT_OPTION ( 0代表进入系统升级，1表示正常引导用户程序（AT指令）)
+  ESP32模块   
+    UTXD   ---  PH14/UART4_RX
+    URXD   ---  PH13/UART4_TX
+    GND    ---  GND
+    
+    CH_PD  ---  PF6/ESP32-S_RESET  ( 0表示掉电  1表示正常上电工作）
+    GPIO0  ---  PG4/BOOT_OPTION ( 0代表进入系统升级，1表示正常引导用户程序（AT指令）)
 
 
-	模块缺省波特率 9600;  支持的范围：110~460800bps          ---- 本例子会将模块波特率切换为 115200
-	在板子上电初始跑boot rom的一段log，需要在 74880 的波特率下正常打印。下面是打印出来的内容.
+  模块缺省波特率 9600;  支持的范围：110~460800bps          ---- 本例子会将模块波特率切换为 115200
+  在板子上电初始跑boot rom的一段log，需要在 74880 的波特率下正常打印。下面是打印出来的内容.
 
-	----------- PD = 1 之后 74880bps 打印如下内容 ------
+  ----------- PD = 1 之后 74880bps 打印如下内容 ------
 
-	 ets Jan  8 2013,rst cause:1, boot mode:(3,6)
+   ets Jan  8 2013,rst cause:1, boot mode:(3,6)
 
-	load 0x40100000, len 25052, room 16
-	tail 12
-	chksum 0x0b
-	ho 0 tail 12 room 4
-	load 0x3ffe8000, len 3312, room 12
-	tail 4
-	chksum 0x53
-	load 0x3ffe8cf0, len 6576, room 4
-	tail 12
-	chksum 0x0d
-	csum 0x0d
+  load 0x40100000, len 25052, room 16
+  tail 12
+  chksum 0x0b
+  ho 0 tail 12 room 4
+  load 0x3ffe8000, len 3312, room 12
+  tail 4
+  chksum 0x53
+  load 0x3ffe8cf0, len 6576, room 4
+  tail 12
+  chksum 0x0d
+  csum 0x0d
 
-	----------- 之后是 9600bps 打印 ---------------
+  ----------- 之后是 9600bps 打印 ---------------
 
-	[Vendor:www.ai-thinker.com Version:0.9.2.4]
+  [Vendor:www.ai-thinker.com Version:0.9.2.4]
 
-	ready
-
-
-	使用串口超级终端软件时，需要设置 终端 - 仿真 - 模式 页面勾选“新行模式”.
+  ready
 
 
-	【修改波特率】
-	AT+CIOBAUD=?     ---- 查询命令参数
-	+CIOBAUD:(9600-921600)
+  使用串口超级终端软件时，需要设置 终端 - 仿真 - 模式 页面勾选“新行模式”.
 
-	OK
 
-	AT+CIOBAUD=115200
-	BAUD->115200
+  【修改波特率】
+  AT+CIOBAUD=?     ---- 查询命令参数
+  +CIOBAUD:(9600-921600)
 
-	【选择 WIFI 应用模式 】
-	AT+CWMODE=1
-		1   Station 模式
-		2   AP 模式
-		3   AP 兼 Station 模式
+  OK
 
-	【列出当前可用 AP】
-	AT+CWLAP=<ssid>,< mac >,<ch>
-	AT+CWLAP
+  AT+CIOBAUD=115200
+  BAUD->115200
 
-	【AT+CWJAP加入 AP】
-	AT+CWJAP=<ssid>,< pwd >
-	
-	
-	"AT+CWJAP="Tenda_4FD138","123456887mdh"
+  【选择 WIFI 应用模式 】
+  AT+CWMODE=1
+    1   Station 模式
+    2   AP 模式
+    3   AP 兼 Station 模式
+
+  【列出当前可用 AP】
+  AT+CWLAP=<ssid>,< mac >,<ch>
+  AT+CWLAP
+
+  【AT+CWJAP加入 AP】
+  AT+CWJAP=<ssid>,< pwd >
+  
+  
+  "AT+CWJAP="Tenda_4FD138","123456887mdh"
 
 */
 
 /*
-	获得版本信息
-	AT+GMR
-	AT version:0.21.0.0
-	SDK version:0.9.5
-	
-	
-	
-	AT+CWMODE?     
-	1： station模式
-	2： softAP模式
-	3： softAp + station
+  获得版本信息
+  AT+GMR
+  AT version:0.21.0.0
+  SDK version:0.9.5
+  
+  
+  
+  AT+CWMODE?     
+  1： station模式
+  2： softAP模式
+  3： softAp + station
 */
 
 /*
@@ -129,8 +129,8 @@ MTDO   GPIO0   GPIO2   Mode  Description
 #define AT_LF '\n'
 
 #define ALL_ESP_GPIO_CLK_ENABLE() \
-	__HAL_RCC_GPIOF_CLK_ENABLE();   \
-	__HAL_RCC_GPIOG_CLK_ENABLE()
+  __HAL_RCC_GPIOF_CLK_ENABLE();   \
+  __HAL_RCC_GPIOG_CLK_ENABLE()
 
 /* 硬件掉电控制引脚 -- 接 3.3V 开始工作  */
 #define GPIO_CH_PD GPIOF
@@ -152,12 +152,12 @@ uint8_t g_RxMsgLen;
 
 static void ESP32_CH_PD_0(void)
 {
-	ESP_CH_PD_0();
+  ESP_CH_PD_0();
 }
 
 static void ESP32_CH_PD_1(void)
 {
-	ESP_CH_PD_1();
+  ESP_CH_PD_1();
 }
 
 /*
@@ -170,24 +170,24 @@ static void ESP32_CH_PD_1(void)
 */
 void bsp_InitESP32(void)
 {
-	GPIO_InitTypeDef gpio_init;
+  GPIO_InitTypeDef gpio_init;
 
-	/* 第1步：打开GPIO时钟 */
-	ALL_ESP_GPIO_CLK_ENABLE();
+  /* 第1步：打开GPIO时钟 */
+  ALL_ESP_GPIO_CLK_ENABLE();
 
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* 设置开漏输出 */
-	gpio_init.Pull = GPIO_NOPULL;						/* 上下拉电阻不使能 */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+  gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 设置开漏输出 */
+  gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+  gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-	gpio_init.Pin = PIN_CH_PD;
-	HAL_GPIO_Init(GPIO_CH_PD, &gpio_init);
+  gpio_init.Pin = PIN_CH_PD;
+  HAL_GPIO_Init(GPIO_CH_PD, &gpio_init);
 
-	gpio_init.Pin = PIN_GPIO0;
-	HAL_GPIO_Init(GPIO_GPIO0, &gpio_init);
+  gpio_init.Pin = PIN_GPIO0;
+  HAL_GPIO_Init(GPIO_GPIO0, &gpio_init);
 
-	ESP_CH_PD_0(); /* 先让ESP模块处于掉电状态 */
+  ESP_CH_PD_0(); /* 先让ESP模块处于掉电状态 */
 
-	ESP_GPIO0_1(); /* 1表示正常运行 */
+  ESP_GPIO0_1(); /* 1表示正常运行 */
 }
 
 /*
@@ -201,41 +201,41 @@ void bsp_InitESP32(void)
 */
 uint8_t WIFI_CheckAck(uint8_t *_str, int32_t _timeout)
 {
-	uint8_t ch;
-	static uint8_t s_cmp_len = 0;
-	static int32_t s_time = 0;
+  uint8_t ch;
+  static uint8_t s_cmp_len = 0;
+  static int32_t s_time = 0;
 
-	if (_str[0] == 0)
-	{
-		s_cmp_len = 0;
-		s_time = bsp_GetRunTime();
-		return 0;
-	}
+  if (_str[0] == 0)
+  {
+    s_cmp_len = 0;
+    s_time = bsp_GetRunTime();
+    return 0;
+  }
 
-	if (ESP32_GetChar(&ch))
-	{
-		if (ch == _str[s_cmp_len])
-		{
-			s_cmp_len++;
-			if (_str[s_cmp_len] == 0)
-			{
-				return 1; /* 收到正确应答 */
-			}
-		}
-		else
-		{
-			s_cmp_len = 0;
-		}
-	}
+  if (ESP32_GetChar(&ch))
+  {
+    if (ch == _str[s_cmp_len])
+    {
+      s_cmp_len++;
+      if (_str[s_cmp_len] == 0)
+      {
+        return 1; /* 收到正确应答 */
+      }
+    }
+    else
+    {
+      s_cmp_len = 0;
+    }
+  }
 
-	if (_timeout > 0)
-	{
-		if (bsp_CheckRunTime(s_time) > _timeout)
-		{
-			return 2;
-		}
-	}
-	return 0;
+  if (_timeout > 0)
+  {
+    if (bsp_CheckRunTime(s_time) > _timeout)
+    {
+      return 2;
+    }
+  }
+  return 0;
 }
 
 /*
@@ -249,26 +249,26 @@ uint8_t WIFI_CheckAck(uint8_t *_str, int32_t _timeout)
 */
 void ESP32_SendBuf(uint8_t *_cmd, uint16_t _len)
 {
-	//#ifdef ESP32_TO_COM1_EN
-	if (g_tVar.WiFiDebugEn == 1) /* RS485串口输入AT指令时，进入WiFi Debug状态，持续120秒自动退出 */
-	{
-		//		{
-		//			char buf[20];
-		//
-		//			static int32_t s_time = 0;
-		//
-		//			if (bsp_CheckRunTime(s_time) > 10)
-		//			{
-		//				sprintf(buf, "\r\n(%d)=>", bsp_GetRunTime());
-		//				comSendBuf(COM_DEBUG, (uint8_t *)buf, strlen(buf));
-		//			}
-		//			s_time = bsp_GetRunTime();
-		//		}
-		//		comSendBuf(COM_DEBUG, _cmd, _len);		/* 将接收到数据打印到调试串口1 */
-	}
-	//#endif
+  //#ifdef ESP32_TO_COM1_EN
+  if (g_tVar.WiFiDebugEn == 1) /* RS485串口输入AT指令时，进入WiFi Debug状态，持续120秒自动退出 */
+  {
+    //		{
+    //			char buf[20];
+    //
+    //			static int32_t s_time = 0;
+    //
+    //			if (bsp_CheckRunTime(s_time) > 10)
+    //			{
+    //				sprintf(buf, "\r\n(%d)=>", bsp_GetRunTime());
+    //				comSendBuf(COM_DEBUG, (uint8_t *)buf, strlen(buf));
+    //			}
+    //			s_time = bsp_GetRunTime();
+    //		}
+    //		comSendBuf(COM_DEBUG, _cmd, _len);		/* 将接收到数据打印到调试串口1 */
+  }
+  //#endif
 
-	comSendBuf(COM_ESP32, _cmd, _len);
+  comSendBuf(COM_ESP32, _cmd, _len);
 }
 
 /*
@@ -282,131 +282,131 @@ void ESP32_SendBuf(uint8_t *_cmd, uint16_t _len)
 extern uint8_t link_id;
 uint8_t ESP32_GetChar(uint8_t *_data)
 {
-	uint8_t re;
+  uint8_t re;
 
-	re = comGetChar(COM_ESP32, _data);
-	if (re != 0)
-	{
-		if (g_tVar.WiFiDebugEn == 1) /* RS485串口输入AT指令时，进入WiFi Debug状态，持续120秒自动退出 */
-		{
-			//			{
-			//				static int32_t s_time = 0;
-			//
-			//				if (bsp_CheckRunTime(s_time) > 20)
-			//				{
-			//					char buf[20];
-			//
-			//					sprintf(buf, "\r\n(%d)<==", bsp_GetRunTime());
-			//					comSendBuf(COM_DEBUG, (uint8_t *)buf, strlen(buf));
-			//				}
-			//				s_time = bsp_GetRunTime();
-			//				comSendChar(COM_DEBUG, *_data);		/* 将接收到数据打印到调试串口1 */
-			//			}
-		}
+  re = comGetChar(COM_ESP32, _data);
+  if (re != 0)
+  {
+    if (g_tVar.WiFiDebugEn == 1) /* RS485串口输入AT指令时，进入WiFi Debug状态，持续120秒自动退出 */
+    {
+      //			{
+      //				static int32_t s_time = 0;
+      //
+      //				if (bsp_CheckRunTime(s_time) > 20)
+      //				{
+      //					char buf[20];
+      //
+      //					sprintf(buf, "\r\n(%d)<==", bsp_GetRunTime());
+      //					comSendBuf(COM_DEBUG, (uint8_t *)buf, strlen(buf));
+      //				}
+      //				s_time = bsp_GetRunTime();
+      //				comSendChar(COM_DEBUG, *_data);		/* 将接收到数据打印到调试串口1 */
+      //			}
+    }
 
-		/* 	
-			#define RX_MSG_MAX	32;
-			uint8_t g_RxMsgBuf[RX_MSG_MAX]; 
-			uint8_t g_RxMsgLen;
-		*/
-		{
-			uint8_t ucData;
-			static uint8_t s_flag = 0;			/* IPD 还是其他消息 */
-			static uint16_t s_data_len = 0; /* UDP TCP数据长度 */
-			char *p1;
-			static int32_t s_last_rx_time = 0;
-			static uint16_t s_ipd_pos = 0;
+    /* 	
+      #define RX_MSG_MAX	32;
+      uint8_t g_RxMsgBuf[RX_MSG_MAX]; 
+      uint8_t g_RxMsgLen;
+    */
+    {
+      uint8_t ucData;
+      static uint8_t s_flag = 0;      /* IPD 还是其他消息 */
+      static uint16_t s_data_len = 0; /* UDP TCP数据长度 */
+      char *p1;
+      static int32_t s_last_rx_time = 0;
+      static uint16_t s_ipd_pos = 0;
 
-			/* +IPD,0,7:ledon 1 */
-			ucData = *_data;
+      /* +IPD,0,7:ledon 1 */
+      ucData = *_data;
 
-			/* 如果上次收到的数据距今超过100ms，则重新做帧同步 */
-			if (bsp_CheckRunTime(s_last_rx_time) > 1000)
-			{
-				s_flag = 0;
-				g_RxMsgLen = 0;
-				s_ipd_pos = 0;
-			}
+      /* 如果上次收到的数据距今超过100ms，则重新做帧同步 */
+      if (bsp_CheckRunTime(s_last_rx_time) > 1000)
+      {
+        s_flag = 0;
+        g_RxMsgLen = 0;
+        s_ipd_pos = 0;
+      }
 
-			if (s_flag == 0)
-			{
-				if (ucData == 0x0D || ucData == 0xA)
-				{
-					if (s_ipd_pos >= 2)
-					{
-						g_RxMsgLen = s_ipd_pos; /* 接收到非数据包的应答 */
+      if (s_flag == 0)
+      {
+        if (ucData == 0x0D || ucData == 0xA)
+        {
+          if (s_ipd_pos >= 2)
+          {
+            g_RxMsgLen = s_ipd_pos; /* 接收到非数据包的应答 */
 
-						/* 识别断线消息 - 此处不处理。交给上层处理 */
-						{
-							/* TCP服务器关闭了TCP连接 */
-							if (g_RxMsgLen >= 8 && memcmp(g_RxMsgBuf, "4,CLOSED", 8) == 0)
-							{
-								g_tVar.RemoteTCPServerOk = 0;
-							}
+            /* 识别断线消息 - 此处不处理。交给上层处理 */
+            {
+              /* TCP服务器关闭了TCP连接 */
+              if (g_RxMsgLen >= 8 && memcmp(g_RxMsgBuf, "4,CLOSED", 8) == 0)
+              {
+                g_tVar.RemoteTCPServerOk = 0;
+              }
 
-							/* WIFI路由器断网 */
-							if (g_RxMsgLen >= 15 && memcmp(g_RxMsgBuf, "WIFI DISCONNECT", 15) == 0)
-							{
-								g_tVar.HomeWiFiLinkOk = 0;
-								g_tVar.RemoteTCPServerOk = 0;
-							}
-						}
+              /* WIFI路由器断网 */
+              if (g_RxMsgLen >= 15 && memcmp(g_RxMsgBuf, "WIFI DISCONNECT", 15) == 0)
+              {
+                g_tVar.HomeWiFiLinkOk = 0;
+                g_tVar.RemoteTCPServerOk = 0;
+              }
+            }
 
-						s_ipd_pos = 0;
-					}
-					else
-					{
-						g_RxMsgLen = 0;
-						s_data_len = 0;
-						s_ipd_pos = 0;
-					}
-				}
-				else
-				{
-					if (s_ipd_pos < RX_MSG_MAX)
-					{
-						g_RxMsgBuf[s_ipd_pos++] = ucData; /* 保存接收到的数据 */
-					}
+            s_ipd_pos = 0;
+          }
+          else
+          {
+            g_RxMsgLen = 0;
+            s_data_len = 0;
+            s_ipd_pos = 0;
+          }
+        }
+        else
+        {
+          if (s_ipd_pos < RX_MSG_MAX)
+          {
+            g_RxMsgBuf[s_ipd_pos++] = ucData; /* 保存接收到的数据 */
+          }
 
-					if (g_RxMsgBuf[0] == '+' && s_ipd_pos > 7 && ucData == ':')
-					{
-						p1 = (char *)&g_RxMsgBuf[5];
-						link_id = str_to_int(p1); /* 解析出连接id */
+          if (g_RxMsgBuf[0] == '+' && s_ipd_pos > 7 && ucData == ':')
+          {
+            p1 = (char *)&g_RxMsgBuf[5];
+            link_id = str_to_int(p1); /* 解析出连接id */
 
-						p1 = (char *)&g_RxMsgBuf[7];
-						s_data_len = str_to_int(p1); /* 解析出数据包长度 */
-						s_flag = 1;									 /* 进入数据包接收状态 */
-						s_ipd_pos = 0;
-					}
-				}
-			}
-			else /* 这是接收 +IPD数据包的分之 */
-			{
-				if (s_ipd_pos < RX_BUF_SIZE)
-				{
-					g_EspBuf[s_ipd_pos++] = ucData; /* 保存接收到的UDP,TCP数据体 */
+            p1 = (char *)&g_RxMsgBuf[7];
+            s_data_len = str_to_int(p1); /* 解析出数据包长度 */
+            s_flag = 1;                  /* 进入数据包接收状态 */
+            s_ipd_pos = 0;
+          }
+        }
+      }
+      else /* 这是接收 +IPD数据包的分之 */
+      {
+        if (s_ipd_pos < RX_BUF_SIZE)
+        {
+          g_EspBuf[s_ipd_pos++] = ucData; /* 保存接收到的UDP,TCP数据体 */
 
-					if (s_ipd_pos == s_data_len)
-					{
-						s_flag = 0;
-						g_tModS.RxCount = s_data_len; /* wifi_poll 会处理modbus帧 */
-						g_tVar.WiFiRecivedIPD = 1;		/* 收到UDP, TCP数据包 */
+          if (s_ipd_pos == s_data_len)
+          {
+            s_flag = 0;
+            g_tModS.RxCount = s_data_len; /* wifi_poll 会处理modbus帧 */
+            g_tVar.WiFiRecivedIPD = 1;    /* 收到UDP, TCP数据包 */
 
-						s_ipd_pos = 0;
-					}
-				}
-				else
-				{
-					s_flag = 0;
-				}
-			}
+            s_ipd_pos = 0;
+          }
+        }
+        else
+        {
+          s_flag = 0;
+        }
+      }
 
-			s_last_rx_time = bsp_GetRunTime();
-		}
+      s_last_rx_time = bsp_GetRunTime();
+    }
 
-		return 1;
-	}
-	return 0;
+    return 1;
+  }
+  return 0;
 }
 
 /*
@@ -419,107 +419,107 @@ uint8_t ESP32_GetChar(uint8_t *_data)
 */
 uint8_t ESP32_PowerOn(void)
 {
-	/*
-		2018-08-08 采购ESP-01模块，固件更新过。打印信息如下：
-	从上电脉冲，到发送完毕，266ms  ( 74880 bsp)
-	到发送ready信号。
+  /*
+    2018-08-08 采购ESP-01模块，固件更新过。打印信息如下：
+  从上电脉冲，到发送完毕，266ms  ( 74880 bsp)
+  到发送ready信号。
 
-	 ets Jan  8 2013,rst cause:1, boot mode:(3,6)
+   ets Jan  8 2013,rst cause:1, boot mode:(3,6)
 
-	load 0x40100000, len 1856, room 16 
-	tail 0
-	chksum 0x63
-	load 0x3ffe8000, len 776, room 8 
-	tail 0
-	chksum 0x02
-	load 0x3ffe8310, len 552, room 8 
-	tail 0
-	chksum 0x79
-	csum 0x79
+  load 0x40100000, len 1856, room 16 
+  tail 0
+  chksum 0x63
+  load 0x3ffe8000, len 776, room 8 
+  tail 0
+  chksum 0x02
+  load 0x3ffe8310, len 552, room 8 
+  tail 0
+  chksum 0x79
+  csum 0x79
 
-	2nd boot version : 1.5
-	  SPI Speed      : 40MHz
-	  SPI Mode       : DIO
-	  SPI Flash Size & Map: 8Mbit(512KB+512KB)
-	jump to run user1 @ 1000
+  2nd boot version : 1.5
+    SPI Speed      : 40MHz
+    SPI Mode       : DIO
+    SPI Flash Size & Map: 8Mbit(512KB+512KB)
+  jump to run user1 @ 1000
 
 
-	(219)<==rf cal sector: 249
-	rf[112] : 00
-	rf[113] : 00
-	rf[114] : 01
+  (219)<==rf cal sector: 249
+  rf[112] : 00
+  rf[113] : 00
+  rf[114] : 01
 
-	SDK ver: 1.5.4.1(39cb9a32) compiled @ Jul  1 2016 20:04:35
-	phy ver: 972, pp ver: 10.1
-	*/
+  SDK ver: 1.5.4.1(39cb9a32) compiled @ Jul  1 2016 20:04:35
+  phy ver: 972, pp ver: 10.1
+  */
 
-	/*  旧版本
-		ESP-01 模块上电时，会以74880波特率打印如下信息:
-	
-		 ets Jan  8 2013,rst cause:1, boot mode:(3,6)
+  /*  旧版本
+    ESP-01 模块上电时，会以74880波特率打印如下信息:
+  
+     ets Jan  8 2013,rst cause:1, boot mode:(3,6)
 
-		load 0x40100000, len 25052, room 16
-		tail 12
-		chksum 0x0b
-		ho 0 tail 12 room 4
-		load 0x3ffe8000, len 3312, room 12
-		tail 4
-		chksum 0x53
-		load 0x3ffe8cf0, len 6576, room 4
-		tail 12
-		chksum 0x0d
-		csum 0x0d	    <-----  程序识别 csum 后，再自动切换到正常波特率
-	*/
+    load 0x40100000, len 25052, room 16
+    tail 12
+    chksum 0x0b
+    ho 0 tail 12 room 4
+    load 0x3ffe8000, len 3312, room 12
+    tail 4
+    chksum 0x53
+    load 0x3ffe8cf0, len 6576, room 4
+    tail 12
+    chksum 0x0d
+    csum 0x0d	    <-----  程序识别 csum 后，再自动切换到正常波特率
+  */
 
-	/* 
-		ESP-07 模块上电时，会以74880波特率打印如下信息:  (实测 310ms后收到ready）
-	
-		 ets Jan  8 2013,rst cause:1, boot mode:(3,7)
+  /* 
+    ESP-07 模块上电时，会以74880波特率打印如下信息:  (实测 310ms后收到ready）
+  
+     ets Jan  8 2013,rst cause:1, boot mode:(3,7)
 
-		load 0x40100000, len 816, room 16 
-		tail 0
-		chksum 0x8d
-		load 0x3ffe8000, len 788, room 8 
-		tail 12
-		chksum 0xcf
-		ho 0 tail 12 room 4
-		load 0x3ffe8314, len 288, room 12 
-		tail 4
-		chksum 0xcf
-		csum 0xcf
+    load 0x40100000, len 816, room 16 
+    tail 0
+    chksum 0x8d
+    load 0x3ffe8000, len 788, room 8 
+    tail 12
+    chksum 0xcf
+    ho 0 tail 12 room 4
+    load 0x3ffe8314, len 288, room 12 
+    tail 4
+    chksum 0xcf
+    csum 0xcf
 
-		2nd boot version : 1.2
-		  SPI Speed      : 40MHz
-		  SPI Mode       : QIO
-		  SPI Flash Size : 4Mbit
-		jump to run user1
-	*/
-	uint8_t re;
+    2nd boot version : 1.2
+      SPI Speed      : 40MHz
+      SPI Mode       : QIO
+      SPI Flash Size : 4Mbit
+    jump to run user1
+  */
+  uint8_t re;
 
-	ESP32_CH_PD_0();
+  ESP32_CH_PD_0();
 
-	bsp_DelayMS(20);
+  bsp_DelayMS(20);
 
-	ESP32_CH_PD_1();
+  ESP32_CH_PD_1();
 
 #if 0
-	bsp_SetUartBaud(74880);
-	ESP32_WaitResponse("phy ver", 5000);
+  bsp_SetUartBaud(74880);
+  ESP32_WaitResponse("phy ver", 5000);
 #endif
 
-	/* 等待模块完成上电，判断是否接收到 ready */
-	comSetBaud(COM_ESP32, 115200);
-	re = ESP32_WaitResponse("ready", 300);
-	if (re == 0)
-	{
-		return 0;
-	}
+  /* 等待模块完成上电，判断是否接收到 ready */
+  comSetBaud(COM_ESP32, 115200);
+  re = ESP32_WaitResponse("ready", 300);
+  if (re == 0)
+  {
+    return 0;
+  }
 
-	/* 关闭回显功能，主机发送的字符，模块无需返回 */
-	ESP32_SendAT("ATE0");
-	ESP32_WaitResponse("OK\r\n", 100);
+  /* 关闭回显功能，主机发送的字符，模块无需返回 */
+  ESP32_SendAT("ATE0");
+  ESP32_WaitResponse("OK\r\n", 100);
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -532,7 +532,7 @@ uint8_t ESP32_PowerOn(void)
 */
 void ESP32_PowerOff(void)
 {
-	ESP32_CH_PD_0();
+  ESP32_CH_PD_0();
 }
 
 /*
@@ -545,11 +545,11 @@ void ESP32_PowerOff(void)
 */
 void ESP32_Reset(void)
 {
-	ESP32_CH_PD_0();
-	bsp_DelayMS(20);
-	ESP32_CH_PD_1();
+  ESP32_CH_PD_0();
+  bsp_DelayMS(20);
+  ESP32_CH_PD_1();
 
-	bsp_DelayMS(10);
+  bsp_DelayMS(10);
 }
 
 /*
@@ -562,10 +562,10 @@ void ESP32_Reset(void)
 */
 void ESP32_EnterISP(void)
 {
-	ESP_CH_PD_0();
-	ESP_GPIO0_0(); /* 0 表示进入固件升级模式 */
-	bsp_DelayMS(10);
-	ESP_CH_PD_1();
+  ESP_CH_PD_0();
+  ESP_GPIO0_0(); /* 0 表示进入固件升级模式 */
+  bsp_DelayMS(10);
+  ESP_CH_PD_1();
 }
 
 /*
@@ -578,10 +578,10 @@ void ESP32_EnterISP(void)
 */
 void ESP32_EnterAT(void)
 {
-	ESP_CH_PD_0();
-	ESP_GPIO0_1(); /* 1 表示进入用户程序（AT指令）模式 */
-	bsp_DelayMS(10);
-	ESP_CH_PD_1();
+  ESP_CH_PD_0();
+  ESP_GPIO0_1(); /* 1 表示进入用户程序（AT指令）模式 */
+  bsp_DelayMS(10);
+  ESP_CH_PD_1();
 }
 
 /*
@@ -594,17 +594,17 @@ void ESP32_EnterAT(void)
 */
 void ESP32_9600to115200(void)
 {
-	comSetBaud(COM_ESP32, 9600);
-	ESP32_SendAT("AT+CIOBAUD=115200");	/* 按 9600bps 发送指令切换为 115200 */
-	ESP32_WaitResponse("OK\r\n", 2000); /* 这个 OK 是模块按 9600 应答的 */
-	comSetBaud(COM_ESP32, 115200);			/* 切换STM32的波特率为 115200 */
+  comSetBaud(COM_ESP32, 9600);
+  ESP32_SendAT("AT+CIOBAUD=115200");  /* 按 9600bps 发送指令切换为 115200 */
+  ESP32_WaitResponse("OK\r\n", 2000); /* 这个 OK 是模块按 9600 应答的 */
+  comSetBaud(COM_ESP32, 115200);      /* 切换STM32的波特率为 115200 */
 
-	/* 切换为 Station模式 */
-	bsp_DelayMS(100);
-	ESP32_SendAT("AT+CWMODE=1");
-	ESP32_WaitResponse("OK\r\n", 2000);
-	bsp_DelayMS(1500);
-	ESP32_SendAT("AT+RST");
+  /* 切换为 Station模式 */
+  bsp_DelayMS(100);
+  ESP32_SendAT("AT+CWMODE=1");
+  ESP32_WaitResponse("OK\r\n", 2000);
+  bsp_DelayMS(1500);
+  ESP32_SendAT("AT+RST");
 }
 
 /*
@@ -618,54 +618,54 @@ void ESP32_9600to115200(void)
 */
 uint8_t ESP32_WaitResponse(char *_pAckStr, uint16_t _usTimeOut)
 {
-	uint8_t ucData;
-	uint16_t pos = 0;
-	uint32_t len;
-	uint8_t ret;
-	int32_t time1;
+  uint8_t ucData;
+  uint16_t pos = 0;
+  uint32_t len;
+  uint8_t ret;
+  int32_t time1;
 
-	len = strlen(_pAckStr);
-	if (len > 255)
-	{
-		return 0;
-	}
+  len = strlen(_pAckStr);
+  if (len > 255)
+  {
+    return 0;
+  }
 
-	time1 = bsp_GetRunTime();
-	while (1)
-	{
-		bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
+  time1 = bsp_GetRunTime();
+  while (1)
+  {
+    bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
 
-		if (_usTimeOut > 0) /* _usTimeOut == 0 表示无限等待 */
-		{
-			if (bsp_CheckRunTime(time1) >= _usTimeOut)
-			{
-				ret = 0; /* 超时 */
-				break;
-			}
-		}
+    if (_usTimeOut > 0) /* _usTimeOut == 0 表示无限等待 */
+    {
+      if (bsp_CheckRunTime(time1) >= _usTimeOut)
+      {
+        ret = 0; /* 超时 */
+        break;
+      }
+    }
 
-		if (ESP32_GetChar(&ucData))
-		{
+    if (ESP32_GetChar(&ucData))
+    {
 
-			{
-				if (ucData == _pAckStr[pos])
-				{
-					pos++;
+      {
+        if (ucData == _pAckStr[pos])
+        {
+          pos++;
 
-					if (pos == len)
-					{
-						ret = 1; /* 收到指定的应答数据，返回成功 */
-						break;
-					}
-				}
-				else
-				{
-					pos = 0;
-				}
-			}
-		}
-	}
-	return ret;
+          if (pos == len)
+          {
+            ret = 1; /* 收到指定的应答数据，返回成功 */
+            break;
+          }
+        }
+        else
+        {
+          pos = 0;
+        }
+      }
+    }
+  }
+  return ret;
 }
 
 /*
@@ -680,46 +680,46 @@ uint8_t ESP32_WaitResponse(char *_pAckStr, uint16_t _usTimeOut)
 */
 uint16_t ESP32_ReadLine(char *_pBuf, uint16_t _usBufSize, uint16_t _usTimeOut)
 {
-	uint8_t ucData;
-	uint16_t pos = 0;
-	uint8_t ret;
-	int32_t time1;
-	uint16_t time_out;
+  uint8_t ucData;
+  uint16_t pos = 0;
+  uint8_t ret;
+  int32_t time1;
+  uint16_t time_out;
 
-	time1 = bsp_GetRunTime();
-	time_out = _usTimeOut; /* 首次超时 */
-	while (1)
-	{
-		bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
+  time1 = bsp_GetRunTime();
+  time_out = _usTimeOut; /* 首次超时 */
+  while (1)
+  {
+    bsp_Idle(); /* CPU空闲执行的操作， 见 bsp.c 和 bsp.h 文件 */
 
-		if (_usTimeOut > 0)
-		{
-			if (bsp_CheckRunTime(time1) >= time_out)
-			{
-				_pBuf[pos] = 0; /* 结尾加0， 便于函数调用者识别字符串结束 */
-				ret = pos;			/* 成功。 返回数据长度 */
-				break;
-			}
-		}
+    if (_usTimeOut > 0)
+    {
+      if (bsp_CheckRunTime(time1) >= time_out)
+      {
+        _pBuf[pos] = 0; /* 结尾加0， 便于函数调用者识别字符串结束 */
+        ret = pos;      /* 成功。 返回数据长度 */
+        break;
+      }
+    }
 
-		if (ESP32_GetChar(&ucData))
-		{
-			time1 = bsp_GetRunTime(); /* 收到首字符后，字符间超时设置为 0.5秒 */
-			time_out = 500;
+    if (ESP32_GetChar(&ucData))
+    {
+      time1 = bsp_GetRunTime(); /* 收到首字符后，字符间超时设置为 0.5秒 */
+      time_out = 500;
 
-			if (pos < _usBufSize)
-			{
-				_pBuf[pos++] = ucData; /* 保存接收到的数据 */
-			}
-			if (ucData == 0x0A)
-			{
-				_pBuf[pos] = 0;
-				ret = pos; /* 成功。 返回数据长度 */
-				break;
-			}
-		}
-	}
-	return ret;
+      if (pos < _usBufSize)
+      {
+        _pBuf[pos++] = ucData; /* 保存接收到的数据 */
+      }
+      if (ucData == 0x0A)
+      {
+        _pBuf[pos] = 0;
+        ret = pos; /* 成功。 返回数据长度 */
+        break;
+      }
+    }
+  }
+  return ret;
 }
 
 /*
@@ -734,24 +734,24 @@ uint16_t ESP32_ReadLine(char *_pBuf, uint16_t _usBufSize, uint16_t _usTimeOut)
 */
 uint16_t ESP32_ReadLineNoWait(char *_pBuf, uint16_t _usBufSize)
 {
-	static uint16_t s_pos = 0;
-	uint8_t ucData;
-	uint8_t ret = 0;
+  static uint16_t s_pos = 0;
+  uint8_t ucData;
+  uint8_t ret = 0;
 
-	if (ESP32_GetChar(&ucData))
-	{
-		if (s_pos < _usBufSize)
-		{
-			_pBuf[s_pos++] = ucData; /* 保存接收到的数据 */
-		}
-		if (ucData == 0x0A)
-		{
-			_pBuf[s_pos] = 0;
-			ret = s_pos; /* 成功。 返回数据长度 */
-			s_pos = 0;
-		}
-	}
-	return ret;
+  if (ESP32_GetChar(&ucData))
+  {
+    if (s_pos < _usBufSize)
+    {
+      _pBuf[s_pos++] = ucData; /* 保存接收到的数据 */
+    }
+    if (ucData == 0x0A)
+    {
+      _pBuf[s_pos] = 0;
+      ret = s_pos; /* 成功。 返回数据长度 */
+      s_pos = 0;
+    }
+  }
+  return ret;
 }
 
 /*
@@ -764,14 +764,14 @@ uint16_t ESP32_ReadLineNoWait(char *_pBuf, uint16_t _usBufSize)
 */
 void ESP32_SendAT(char *_Cmd)
 {
-	//comClearRxFifo(COM_ESP32);
+  //comClearRxFifo(COM_ESP32);
 
-	/* 等待上包发送完毕 */
-	while (comTxEmpty(COM_ESP32) == 0)
-		;
+  /* 等待上包发送完毕 */
+  while (comTxEmpty(COM_ESP32) == 0)
+    ;
 
-	ESP32_SendBuf((uint8_t *)_Cmd, strlen(_Cmd));
-	ESP32_SendBuf("\r\n", 2);
+  ESP32_SendBuf((uint8_t *)_Cmd, strlen(_Cmd));
+  ESP32_SendBuf("\r\n", 2);
 }
 
 /*
@@ -784,20 +784,20 @@ void ESP32_SendAT(char *_Cmd)
 */
 uint8_t ESP32_SetWiFiMode(uint8_t _mode)
 {
-	char cmd_buf[30];
+  char cmd_buf[30];
 
-	if (_mode == 0 || _mode > 3)
-	{
-		_mode = 3;
-	}
-	sprintf(cmd_buf, "AT+CWMODE_CUR=%d", _mode);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
-	{
-		return 0;
-	}
+  if (_mode == 0 || _mode > 3)
+  {
+    _mode = 3;
+  }
+  sprintf(cmd_buf, "AT+CWMODE_CUR=%d", _mode);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -810,48 +810,48 @@ uint8_t ESP32_SetWiFiMode(uint8_t _mode)
 */
 uint8_t ESP32_GetMac(uint8_t *_mac)
 {
-	/*
-		AT+CIPSTAMAC_CUR?
-	
-		+CIPSTAMAC_CUR:"18:fe:34:d1:b0:07"
-		OK	
-	*/
-	char buf[64];
+  /*
+    AT+CIPSTAMAC_CUR?
+  
+    +CIPSTAMAC_CUR:"18:fe:34:d1:b0:07"
+    OK	
+  */
+  char buf[64];
 
-	memset(_mac, 0, 6);
-	ESP32_SendAT("AT+CIPSTAMAC_CUR?");
-	while (1)
-	{
-		if (ESP32_ReadLine(buf, sizeof(buf), 200))
-		{
-			if (memcmp(buf, "+CIPSTAMAC_CUR:", 15) == 0)
-			{
-				/* 解析mac地址 */
-				char *p = &buf[16];
+  memset(_mac, 0, 6);
+  ESP32_SendAT("AT+CIPSTAMAC_CUR?");
+  while (1)
+  {
+    if (ESP32_ReadLine(buf, sizeof(buf), 200))
+    {
+      if (memcmp(buf, "+CIPSTAMAC_CUR:", 15) == 0)
+      {
+        /* 解析mac地址 */
+        char *p = &buf[16];
 
-				_mac[0] = TwoCharToInt(p);
-				p += 3;
-				_mac[1] = TwoCharToInt(p);
-				p += 3;
-				_mac[2] = TwoCharToInt(p);
-				p += 3;
-				_mac[3] = TwoCharToInt(p);
-				p += 3;
-				_mac[4] = TwoCharToInt(p);
-				p += 3;
-				_mac[5] = TwoCharToInt(p);
-			}
-			else if (memcmp(buf, "OK", 2) == 0)
-			{
-				return 1;
-			}
-		}
-		else /* 读超时 */
-		{
-			break;
-		}
-	}
-	return 0;
+        _mac[0] = TwoCharToInt(p);
+        p += 3;
+        _mac[1] = TwoCharToInt(p);
+        p += 3;
+        _mac[2] = TwoCharToInt(p);
+        p += 3;
+        _mac[3] = TwoCharToInt(p);
+        p += 3;
+        _mac[4] = TwoCharToInt(p);
+        p += 3;
+        _mac[5] = TwoCharToInt(p);
+      }
+      else if (memcmp(buf, "OK", 2) == 0)
+      {
+        return 1;
+      }
+    }
+    else /* 读超时 */
+    {
+      break;
+    }
+  }
+  return 0;
 }
 
 /*
@@ -864,19 +864,19 @@ uint8_t ESP32_GetMac(uint8_t *_mac)
 */
 uint8_t ESP32_SetMac(uint8_t *_mac)
 {
-	/*
-		AT+CIPSTAMAC_CUR="18:fe:35:98:d3:7b"
-	*/
-	char cmd_buf[64];
+  /*
+    AT+CIPSTAMAC_CUR="18:fe:35:98:d3:7b"
+  */
+  char cmd_buf[64];
 
-	sprintf(cmd_buf, "AT+CIPSTAMAC_CUR=\"%02x:%02x:%02x:%02x:%02x:%02x\"",
-					_mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 200) == 0)
-	{
-		return 0;
-	}
-	return 1;
+  sprintf(cmd_buf, "AT+CIPSTAMAC_CUR=\"%02x:%02x:%02x:%02x:%02x:%02x\"",
+          _mac[0], _mac[1], _mac[2], _mac[3], _mac[4], _mac[5]);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 200) == 0)
+  {
+    return 0;
+  }
+  return 1;
 }
 
 /*
@@ -889,20 +889,20 @@ uint8_t ESP32_SetMac(uint8_t *_mac)
 */
 uint8_t ESP32_CIPMUX(uint8_t _mode)
 {
-	char cmd_buf[30];
+  char cmd_buf[30];
 
-	if (_mode > 0)
-	{
-		_mode = 1;
-	}
-	sprintf(cmd_buf, "AT+CIPMUX=%d", _mode);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 200) == 0)
-	{
-		return 0;
-	}
+  if (_mode > 0)
+  {
+    _mode = 1;
+  }
+  sprintf(cmd_buf, "AT+CIPMUX=%d", _mode);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 200) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -915,16 +915,16 @@ uint8_t ESP32_CIPMUX(uint8_t _mode)
 */
 uint8_t ESP32_Set_AP_IP(char *_ip)
 {
-	char cmd_buf[30];
+  char cmd_buf[30];
 
-	sprintf(cmd_buf, "AT+CIPAP=\"%s\"", _ip);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 500) == 0)
-	{
-		return 0;
-	}
+  sprintf(cmd_buf, "AT+CIPAP=\"%s\"", _ip);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 500) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -939,17 +939,17 @@ uint8_t ESP32_Set_AP_IP(char *_ip)
 */
 uint8_t ESP32_Set_AP_NamePass(char *_name, char *_pwd, uint8_t _ch, uint8_t _ecn)
 {
-	char cmd_buf[40];
+  char cmd_buf[40];
 
-	/* AT+CWSAP="ESP32","1234567890",5,3 */
-	sprintf(cmd_buf, "AT+CWSAP_DEF=\"%s\",\"%s\",%d,%d", _name, _pwd, _ch, _ecn);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
-	{
-		return 0;
-	}
+  /* AT+CWSAP="ESP32","1234567890",5,3 */
+  sprintf(cmd_buf, "AT+CWSAP_DEF=\"%s\",\"%s\",%d,%d", _name, _pwd, _ch, _ecn);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -962,17 +962,17 @@ uint8_t ESP32_Set_AP_NamePass(char *_name, char *_pwd, uint8_t _ch, uint8_t _ecn
 */
 uint8_t ESP32_CreateTCPServer(uint16_t _TcpPort)
 {
-	char cmd_buf[30];
+  char cmd_buf[30];
 
-	/* 开启TCP server, 端口为 _TcpPort */
-	sprintf(cmd_buf, "AT+CIPSERVER=1,%d", _TcpPort);
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
-	{
-		return 0;
-	}
+  /* 开启TCP server, 端口为 _TcpPort */
+  sprintf(cmd_buf, "AT+CIPSERVER=1,%d", _TcpPort);
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 2000) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -986,19 +986,19 @@ uint8_t ESP32_CreateTCPServer(uint16_t _TcpPort)
 */
 uint8_t ESP32_CreateUDPServer(uint8_t _id, uint16_t _LaocalPort)
 {
-	char cmd_buf[64];
+  char cmd_buf[64];
 
-	/* 多连接 UDP */
-	//AT+CIPSTART=0,"UDP","255.255.255.255",8080,8080,0           <----- 没有试通
-	sprintf(cmd_buf, "AT+CIPSTART=%d,\"UDP\",\"255.255.255.255\",8080,%d,2", _id, _LaocalPort);
+  /* 多连接 UDP */
+  //AT+CIPSTART=0,"UDP","255.255.255.255",8080,8080,0           <----- 没有试通
+  sprintf(cmd_buf, "AT+CIPSTART=%d,\"UDP\",\"255.255.255.255\",8080,%d,2", _id, _LaocalPort);
 
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 3000) == 0)
-	{
-		return 0;
-	}
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 3000) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -1013,22 +1013,22 @@ uint8_t ESP32_CreateUDPServer(uint8_t _id, uint16_t _LaocalPort)
 */
 uint8_t ESP32_LinkTCPServer(uint8_t _id, char *_server_ip, uint16_t _TcpPort)
 {
-	char cmd_buf[64];
+  char cmd_buf[64];
 
 #if 0 /* 单连接 */
-	//AT+CIPSTART="TCP","192.168.101.110",1000
-	sprintf(cmd_buf, "AT+CIPSTART=\"TCP\",\"%s\",%d",_server_ip, _TcpPort);
+  //AT+CIPSTART="TCP","192.168.101.110",1000
+  sprintf(cmd_buf, "AT+CIPSTART=\"TCP\",\"%s\",%d",_server_ip, _TcpPort);
 #else /* 多连接 */
-	//AT+CIPSTART=0, "TCP","192.168.101.110",1000
-	sprintf(cmd_buf, "AT+CIPSTART=%d,\"TCP\",\"%s\",%d", _id, _server_ip, _TcpPort);
+  //AT+CIPSTART=0, "TCP","192.168.101.110",1000
+  sprintf(cmd_buf, "AT+CIPSTART=%d,\"TCP\",\"%s\",%d", _id, _server_ip, _TcpPort);
 #endif
-	ESP32_SendAT(cmd_buf);
-	if (ESP32_WaitResponse("OK\r\n", 3000) == 0)
-	{
-		return 0;
-	}
+  ESP32_SendAT(cmd_buf);
+  if (ESP32_WaitResponse("OK\r\n", 3000) == 0)
+  {
+    return 0;
+  }
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -1043,28 +1043,28 @@ uint8_t ESP32_LinkTCPServer(uint8_t _id, char *_server_ip, uint16_t _TcpPort)
 */
 uint8_t ESP32_SendUdp(char *_RemoteIP, uint16_t _RemotePort, uint8_t *_databuf, uint16_t _len)
 {
-	char buf[48];
+  char buf[48];
 
-	if (_len > 2048)
-	{
-		_len = 2048;
-	}
-	/* AT+CIPSEND=0,"192.168.168.168",6200,200 */
-	sprintf(buf, "AT+CIPSEND=0,%d,\"%s\",%d\r\n", _len, _RemoteIP, _RemotePort);
-	ESP32_SendBuf((uint8_t *)buf, strlen(buf));
+  if (_len > 2048)
+  {
+    _len = 2048;
+  }
+  /* AT+CIPSEND=0,"192.168.168.168",6200,200 */
+  sprintf(buf, "AT+CIPSEND=0,%d,\"%s\",%d\r\n", _len, _RemoteIP, _RemotePort);
+  ESP32_SendBuf((uint8_t *)buf, strlen(buf));
 
-	/* 模块先返回OK, 然后返回 > 表示等待数据输入 */
-	if (ESP32_WaitResponse(">", 50) == 0)
-	{
-		return 0;
-	}
+  /* 模块先返回OK, 然后返回 > 表示等待数据输入 */
+  if (ESP32_WaitResponse(">", 50) == 0)
+  {
+    return 0;
+  }
 
-	ESP32_SendBuf(_databuf, _len);
+  ESP32_SendBuf(_databuf, _len);
 
-	/* 2018-08-21 在等待SEND OK的时间（大概20ms）内，服务器客户发送 +IPD 数据包. */
-	ESP32_WaitResponse("SEND OK\r\n", 200);
+  /* 2018-08-21 在等待SEND OK的时间（大概20ms）内，服务器客户发送 +IPD 数据包. */
+  ESP32_WaitResponse("SEND OK\r\n", 200);
 
-	return 1;
+  return 1;
 }
 
 /*
@@ -1079,27 +1079,27 @@ uint8_t ESP32_SendUdp(char *_RemoteIP, uint16_t _RemotePort, uint8_t *_databuf, 
 */
 uint8_t ESP32_SendTcpUdp(uint8_t _id, uint8_t *_databuf, uint16_t _len)
 {
-	char buf[32];
+  char buf[32];
 
-	if (_len > 2048)
-	{
-		_len = 2048;
-	}
+  if (_len > 2048)
+  {
+    _len = 2048;
+  }
 
-	sprintf(buf, "AT+CIPSEND=%d,%d\r\n", _id, _len);
-	ESP32_SendBuf((uint8_t *)buf, strlen(buf));
+  sprintf(buf, "AT+CIPSEND=%d,%d\r\n", _id, _len);
+  ESP32_SendBuf((uint8_t *)buf, strlen(buf));
 
-	/* 模块先返回OK, 然后返回 > 表示等待数据输入 */
-	if (ESP32_WaitResponse(">", 200) == 0) /* 2018-12-12, 增加延迟 50 -> 200 */
-	{
-		return 0;
-	}
+  /* 模块先返回OK, 然后返回 > 表示等待数据输入 */
+  if (ESP32_WaitResponse(">", 200) == 0) /* 2018-12-12, 增加延迟 50 -> 200 */
+  {
+    return 0;
+  }
 
-	ESP32_SendBuf(_databuf, _len);
+  ESP32_SendBuf(_databuf, _len);
 
-	/* 2018-08-21 在等待SEND OK的时间（大概20ms）内，服务器客户发送 +IPD 数据包. */
+  /* 2018-08-21 在等待SEND OK的时间（大概20ms）内，服务器客户发送 +IPD 数据包. */
 
-	return ESP32_WaitResponse("SEND OK\r\n", 1000); /* 2018-12-12， 增加延迟，200 -> 1000 */
+  return ESP32_WaitResponse("SEND OK\r\n", 1000); /* 2018-12-12， 增加延迟，200 -> 1000 */
 }
 
 /*
@@ -1113,16 +1113,16 @@ uint8_t ESP32_SendTcpUdp(uint8_t _id, uint8_t *_databuf, uint16_t _len)
 */
 void ESP32_CloseTcpUdp(uint8_t _id)
 {
-	char buf[32];
+  char buf[32];
 
-	//ESP32_SendAT("ATE0");		/* 关闭回显功能 */
-	//ESP32_WaitResponse("SEND OK", 50);
+  //ESP32_SendAT("ATE0");		/* 关闭回显功能 */
+  //ESP32_WaitResponse("SEND OK", 50);
 
-	sprintf(buf, "AT+CIPCLOSE=%d", _id);
-	ESP32_SendAT(buf);
-	ESP32_WaitResponse("OK", 1000);
+  sprintf(buf, "AT+CIPCLOSE=%d", _id);
+  ESP32_SendAT(buf);
+  ESP32_WaitResponse("OK", 1000);
 
-	/* ZHG : ---- 此处需要处理应答 */
+  /* ZHG : ---- 此处需要处理应答 */
 }
 
 /*
@@ -1135,43 +1135,43 @@ void ESP32_CloseTcpUdp(uint8_t _id)
 */
 uint8_t ESP32_QueryIPStatus(void)
 {
-	char buf[64];
-	uint8_t i;
-	uint8_t ret = IPS_TIMEOUT;
+  char buf[64];
+  uint8_t i;
+  uint8_t ret = IPS_TIMEOUT;
 
-	ESP32_SendAT("AT+CIPSTATUS");
+  ESP32_SendAT("AT+CIPSTATUS");
 
-	/*　模块将应答:
-		
-		AT+CIPSTATUS
-		STATUS:4
+  /*　模块将应答:
+    
+    AT+CIPSTATUS
+    STATUS:4
 
-		OK
-	
-	
-	有一种异常情况，模块内部忙。
-	手机频繁关闭TCP连接，立即发送数据，可能导致wifi模块出现发送数据忙的情况
-	
-	busy s...
-	*/
+    OK
+  
+  
+  有一种异常情况，模块内部忙。
+  手机频繁关闭TCP连接，立即发送数据，可能导致wifi模块出现发送数据忙的情况
+  
+  busy s...
+  */
 
-	for (i = 0; i < 8; i++)
-	{
-		ESP32_ReadLine(buf, sizeof(buf), 50); /* 100ms超时 */
-		if (memcmp(buf, "STATUS:", 7) == 0)
-		{
-			ret = buf[7];
-		}
-		else if (memcmp(buf, "OK", 2) == 0)
-		{
-			break;
-		}
-		else if (memcmp(buf, "busy", 4) == 0)
-		{
-			ret = IPS_BUSY;
-		}
-	}
-	return ret;
+  for (i = 0; i < 8; i++)
+  {
+    ESP32_ReadLine(buf, sizeof(buf), 50); /* 100ms超时 */
+    if (memcmp(buf, "STATUS:", 7) == 0)
+    {
+      ret = buf[7];
+    }
+    else if (memcmp(buf, "OK", 2) == 0)
+    {
+      break;
+    }
+    else if (memcmp(buf, "busy", 4) == 0)
+    {
+      ret = IPS_BUSY;
+    }
+  }
+  return ret;
 }
 
 /*
@@ -1185,60 +1185,60 @@ uint8_t ESP32_QueryIPStatus(void)
 */
 uint8_t ESP32_GetLocalIP(char *_ip, char *_mac)
 {
-	char buf[64];
-	uint8_t i, m;
-	uint8_t ret = 0;
-	uint8_t temp;
+  char buf[64];
+  uint8_t i, m;
+  uint8_t ret = 0;
+  uint8_t temp;
 
-	ESP32_SendAT("AT+CIFSR");
+  ESP32_SendAT("AT+CIFSR");
 
-	/*　模块将应答:
-		
-	+CIFSR:STAIP,"192.168.1.18"
-	+CIFSR:STAMAC,"18:fe:34:a6:44:75"
-	
-	OK	
-	*/
+  /*　模块将应答:
+    
+  +CIFSR:STAIP,"192.168.1.18"
+  +CIFSR:STAMAC,"18:fe:34:a6:44:75"
+  
+  OK	
+  */
 
-	_ip[0] = 0;
-	_mac[0] = 0;
-	for (i = 0; i < 6; i++)
-	{
-		ESP32_ReadLine(buf, sizeof(buf), 500);
-		if (memcmp(buf, "+CIFSR:STAIP", 12) == 0)
-		{
+  _ip[0] = 0;
+  _mac[0] = 0;
+  for (i = 0; i < 6; i++)
+  {
+    ESP32_ReadLine(buf, sizeof(buf), 500);
+    if (memcmp(buf, "+CIFSR:STAIP", 12) == 0)
+    {
 
-			for (m = 0; m < 20; m++)
-			{
-				temp = buf[14 + m];
-				_ip[m] = temp;
-				if (temp == '"')
-				{
-					_ip[m] = 0;
-					ret = 1;
-					break;
-				}
-			}
-		}
-		else if (memcmp(buf, "+CIFSR:STAMAC,", 14) == 0)
-		{
-			for (m = 0; m < 20; m++)
-			{
-				temp = buf[15 + m];
-				_mac[m] = temp;
-				if (temp == '"')
-				{
-					_mac[m] = 0;
-					break;
-				}
-			}
-		}
-		else if (memcmp(buf, "OK", 2) == 0)
-		{
-			break;
-		}
-	}
-	return ret;
+      for (m = 0; m < 20; m++)
+      {
+        temp = buf[14 + m];
+        _ip[m] = temp;
+        if (temp == '"')
+        {
+          _ip[m] = 0;
+          ret = 1;
+          break;
+        }
+      }
+    }
+    else if (memcmp(buf, "+CIFSR:STAMAC,", 14) == 0)
+    {
+      for (m = 0; m < 20; m++)
+      {
+        temp = buf[15 + m];
+        _mac[m] = temp;
+        if (temp == '"')
+        {
+          _mac[m] = 0;
+          break;
+        }
+      }
+    }
+    else if (memcmp(buf, "OK", 2) == 0)
+    {
+      break;
+    }
+  }
+  return ret;
 }
 
 /*
@@ -1253,17 +1253,17 @@ uint8_t ESP32_GetLocalIP(char *_ip, char *_mac)
 */
 uint8_t ESP32_SetLocalIP(uint8_t *_ip, uint8_t *_netmask, uint8_t *_gateway)
 {
-	char buf[64];
+  char buf[64];
 
-	// AT+CIPSTA_DEF="192.168.6.100","192.168.6.1","255.255.255.0"
+  // AT+CIPSTA_DEF="192.168.6.100","192.168.6.1","255.255.255.0"
 
-	sprintf(buf, "AT+CIPSTA_DEF=\"%d.%d.%d.%d\",\"%d.%d.%d.%d\",\"%d.%d.%d.%d\"",
-					_ip[0], _ip[1], _ip[2], _ip[3],
-					_gateway[0], _gateway[1], _gateway[2], _gateway[3],
-					_netmask[0], _netmask[1], _netmask[2], _netmask[3]);
-	ESP32_SendAT(buf);
+  sprintf(buf, "AT+CIPSTA_DEF=\"%d.%d.%d.%d\",\"%d.%d.%d.%d\",\"%d.%d.%d.%d\"",
+          _ip[0], _ip[1], _ip[2], _ip[3],
+          _gateway[0], _gateway[1], _gateway[2], _gateway[3],
+          _netmask[0], _netmask[1], _netmask[2], _netmask[3]);
+  ESP32_SendAT(buf);
 
-	return ESP32_WaitResponse("OK", 200);
+  return ESP32_WaitResponse("OK", 200);
 }
 
 /*
@@ -1285,86 +1285,86 @@ uint8_t ESP32_SetLocalIP(uint8_t *_ip, uint8_t *_netmask, uint8_t *_gateway)
 uint8_t ESP32_JoinAP(char *_ssid, char *_pwd, uint16_t _timeout)
 {
 
-	/*  如果已经连接上了，则会返回如下信息：
-	
-		(268)=>AT+CWJAP="MERCURY_603","123456887af"
-		(269)=>
+  /*  如果已经连接上了，则会返回如下信息：
+  
+    (268)=>AT+CWJAP="MERCURY_603","123456887af"
+    (269)=>
 
-		(2488)<==WIFI CONNECTED
+    (2488)<==WIFI CONNECTED
 
-		(3208)<==WIFI GOT IP
+    (3208)<==WIFI GOT IP
 
-		(3274)<==
-		OK
-	
+    (3274)<==
+    OK
+  
 
-		OK
-		(320583)=>AT+CWJAP="Tenda_446248","123456887af"
-		(320634)=>
+    OK
+    (320583)=>AT+CWJAP="Tenda_446248","123456887af"
+    (320634)=>
 
-		(320648)<==
-		WIFI DISCONNECT
+    (320648)<==
+    WIFI DISCONNECT
 
-		(322820)<==WIFI CONNECTED
-		WIFI GOT IP
+    (322820)<==WIFI CONNECTED
+    WIFI GOT IP
 
-		(323649)<==
-		OK	
-		
-		----------- SSID 和 密码不对的情况 ----------
-		(158892)=>AT+CWJAP="Tenda_446248","123456887af"
-		(158893)=>
+    (323649)<==
+    OK	
+    
+    ----------- SSID 和 密码不对的情况 ----------
+    (158892)=>AT+CWJAP="Tenda_446248","123456887af"
+    (158893)=>
 
 
-		(173898)<==+CWJAP:3
+    (173898)<==+CWJAP:3
 
-		FAIL
-	*/
+    FAIL
+  */
 
-	char buf[64];
-	uint8_t err_code = 4;
+  char buf[64];
+  uint8_t err_code = 4;
 
-	if (ESP32_ValidSSID(_ssid) == 0 || ESP32_ValidPassword(_pwd) == 0)
-	{
-		//printf("WiFi SSID和密码参数异常\r\n");
-		return 0;
-	}
+  if (ESP32_ValidSSID(_ssid) == 0 || ESP32_ValidPassword(_pwd) == 0)
+  {
+    //printf("WiFi SSID和密码参数异常\r\n");
+    return 0;
+  }
 
-	sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", _ssid, _pwd);
-	ESP32_SendAT(buf);
+  sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", _ssid, _pwd);
+  ESP32_SendAT(buf);
 
-	while (1)
-	{
-		if (ESP32_ReadLine(buf, 64, _timeout))
-		{
-			if (memcmp(buf, "AT+CWJAP_CUR", 12) == 0) /* ATE1回显情况，第1次读到的是 命令本身 */
-			{
-				;
-			}
-			else if (memcmp(buf, "WIFI CONNECTED", 14) == 0)
-			{
-				;
-			}
-			else if (memcmp(buf, "OK", 2) == 0)
-			{
-				return 0; /* 连接AP OK */
-			}
-			else if (memcmp(buf, "+CWJAP:", 7) == 0)
-			{
-				err_code = buf[7] - '0'; /* 错误代码，ASCII */
-			}
-			else if (memcmp(buf, "FAIL", 4) == 0)
-			{
-				break;
-			}
-		}
-		else /* 读超时 */
-		{
-			err_code = 1;
-			break;
-		}
-	}
-	return err_code;
+  while (1)
+  {
+    if (ESP32_ReadLine(buf, 64, _timeout))
+    {
+      if (memcmp(buf, "AT+CWJAP_CUR", 12) == 0) /* ATE1回显情况，第1次读到的是 命令本身 */
+      {
+        ;
+      }
+      else if (memcmp(buf, "WIFI CONNECTED", 14) == 0)
+      {
+        ;
+      }
+      else if (memcmp(buf, "OK", 2) == 0)
+      {
+        return 0; /* 连接AP OK */
+      }
+      else if (memcmp(buf, "+CWJAP:", 7) == 0)
+      {
+        err_code = buf[7] - '0'; /* 错误代码，ASCII */
+      }
+      else if (memcmp(buf, "FAIL", 4) == 0)
+      {
+        break;
+      }
+    }
+    else /* 读超时 */
+    {
+      err_code = 1;
+      break;
+    }
+  }
+  return err_code;
 }
 
 /*
@@ -1377,7 +1377,7 @@ uint8_t ESP32_JoinAP(char *_ssid, char *_pwd, uint16_t _timeout)
 */
 void ESP32_QuitAP(void)
 {
-	ESP32_SendAT("AT+ CWQAP");
+  ESP32_SendAT("AT+ CWQAP");
 }
 
 /*
@@ -1391,74 +1391,74 @@ void ESP32_QuitAP(void)
 */
 int16_t ESP32_ScanAP(WIFI_AP_T *_pList, uint16_t _MaxNum)
 {
-	uint16_t i;
-	uint16_t count;
-	char buf[128];
-	WIFI_AP_T *p;
-	char *p1, *p2;
-	uint16_t timeout;
+  uint16_t i;
+  uint16_t count;
+  char buf[128];
+  WIFI_AP_T *p;
+  char *p1, *p2;
+  uint16_t timeout;
 
-	buf[127] = 0;
-	ESP32_SendAT("AT+CWLAP");
+  buf[127] = 0;
+  ESP32_SendAT("AT+CWLAP");
 
-	p = (WIFI_AP_T *)_pList;
-	count = 0;
-	timeout = 8000;
-	for (i = 0; i < _MaxNum; i++)
-	{
-		ESP32_ReadLine(buf, 128, timeout);
-		if (memcmp(buf, "OK", 2) == 0)
-		{
-			break;
-		}
-		else if (memcmp(buf, "ERROR", 5) == 0)
-		{
-			break;
-		}
-		else if (memcmp(buf, "+CWLAP:", 7) == 0)
-		{
-			p1 = buf;
+  p = (WIFI_AP_T *)_pList;
+  count = 0;
+  timeout = 8000;
+  for (i = 0; i < _MaxNum; i++)
+  {
+    ESP32_ReadLine(buf, 128, timeout);
+    if (memcmp(buf, "OK", 2) == 0)
+    {
+      break;
+    }
+    else if (memcmp(buf, "ERROR", 5) == 0)
+    {
+      break;
+    }
+    else if (memcmp(buf, "+CWLAP:", 7) == 0)
+    {
+      p1 = buf;
 
-			/* +CWLAP:(4,"BaiTu",-87,"9c:21:6a:3c:89:52",1) */
-			/* 解析加密方式 */
-			p1 = strchr(p1, '('); /* 搜索到(*/
-			p1++;
-			p->ecn = str_to_int(p1);
+      /* +CWLAP:(4,"BaiTu",-87,"9c:21:6a:3c:89:52",1) */
+      /* 解析加密方式 */
+      p1 = strchr(p1, '('); /* 搜索到(*/
+      p1++;
+      p->ecn = str_to_int(p1);
 
-			/* 解析ssid */
-			p1 = strchr(p1, '"'); /* 搜索到第1个分号 */
-			p1++;
-			p2 = strchr(p1, '"'); /* 搜索到第2个分号 */
-			memcpy(p->ssid, p1, p2 - p1);
-			p->ssid[p2 - p1] = 0;
+      /* 解析ssid */
+      p1 = strchr(p1, '"'); /* 搜索到第1个分号 */
+      p1++;
+      p2 = strchr(p1, '"'); /* 搜索到第2个分号 */
+      memcpy(p->ssid, p1, p2 - p1);
+      p->ssid[p2 - p1] = 0;
 
-			/* 解析 rssi */
-			p1 = strchr(p2, ','); /* 搜索到逗号*/
-			p1++;
-			p->rssi = str_to_int(p1);
+      /* 解析 rssi */
+      p1 = strchr(p2, ','); /* 搜索到逗号*/
+      p1++;
+      p->rssi = str_to_int(p1);
 
-			/* 解析mac */
-			p1 = strchr(p1, '"'); /* 搜索到分号*/
-			p1++;
-			p2 = strchr(p1, '"'); /* 搜索到分号*/
-			memcpy(p->mac, p1, p2 - p1);
-			p->mac[p2 - p1] = 0;
+      /* 解析mac */
+      p1 = strchr(p1, '"'); /* 搜索到分号*/
+      p1++;
+      p2 = strchr(p1, '"'); /* 搜索到分号*/
+      memcpy(p->mac, p1, p2 - p1);
+      p->mac[p2 - p1] = 0;
 
-			/* 解析ch */
-			p1 = strchr(p2, ','); /* 搜索到逗号*/
-			p1++;
-			p->ch = str_to_int(p1);
+      /* 解析ch */
+      p1 = strchr(p2, ','); /* 搜索到逗号*/
+      p1++;
+      p->ch = str_to_int(p1);
 
-			/* 有效的AP名字 */
-			count++;
+      /* 有效的AP名字 */
+      count++;
 
-			p++;
+      p++;
 
-			timeout = 2000;
-		}
-	}
+      timeout = 2000;
+    }
+  }
 
-	return count;
+  return count;
 }
 
 /*
@@ -1476,89 +1476,89 @@ int16_t ESP32_ScanAP(WIFI_AP_T *_pList, uint16_t _MaxNum)
 */
 uint8_t ESP32_RxData(uint8_t *_buf, uint16_t *_len, uint16_t _buf_size, uint8_t *_link_id)
 {
-	uint8_t ucData;
-	uint8_t rx_flag = 0;
-	static uint8_t s_flag = 0;
-	static uint16_t s_data_len = 0; /* UDP TCP数据长度 */
-	char *p1;
-	static int32_t s_last_rx_time = 0;
+  uint8_t ucData;
+  uint8_t rx_flag = 0;
+  static uint8_t s_flag = 0;
+  static uint16_t s_data_len = 0; /* UDP TCP数据长度 */
+  char *p1;
+  static int32_t s_last_rx_time = 0;
 
-	/* +IPD,0,7:ledon 1 */
+  /* +IPD,0,7:ledon 1 */
 
-	while (ESP32_GetChar(&ucData))
-	{
-		rx_flag = 1; /* 表示收到1个字节 */
+  while (ESP32_GetChar(&ucData))
+  {
+    rx_flag = 1; /* 表示收到1个字节 */
 
-		/* 如果上次收到的数据距今超过100ms，则重新做帧同步 */
-		if (bsp_CheckRunTime(s_last_rx_time) > 1000)
-		{
-			s_flag = 0;
-			*_len = 0;
-		}
+    /* 如果上次收到的数据距今超过100ms，则重新做帧同步 */
+    if (bsp_CheckRunTime(s_last_rx_time) > 1000)
+    {
+      s_flag = 0;
+      *_len = 0;
+    }
 
-		if (s_flag == 0)
-		{
-			if (*_len < _buf_size)
-			{
-				if (ucData == 0x0D || ucData == 0xA)
-				{
-					if (*_len >= 2)
-					{
-						s_data_len = 0;
-						return ESP_RX_OTHER; /* 接收到非数据包的应答 */
-					}
-					else
-					{
-						*_len = 0;
-						s_data_len = 0;
-					}
-				}
-				else
-				{
-					_buf[(*_len)++] = ucData; /* 保存接收到的数据 */
+    if (s_flag == 0)
+    {
+      if (*_len < _buf_size)
+      {
+        if (ucData == 0x0D || ucData == 0xA)
+        {
+          if (*_len >= 2)
+          {
+            s_data_len = 0;
+            return ESP_RX_OTHER; /* 接收到非数据包的应答 */
+          }
+          else
+          {
+            *_len = 0;
+            s_data_len = 0;
+          }
+        }
+        else
+        {
+          _buf[(*_len)++] = ucData; /* 保存接收到的数据 */
 
-					if (_buf[0] == '+' && (*_len) > 7 && ucData == ':')
-					{
-						p1 = (char *)&_buf[5];
-						*_link_id = str_to_int(p1); /* 解析出连接id */
+          if (_buf[0] == '+' && (*_len) > 7 && ucData == ':')
+          {
+            p1 = (char *)&_buf[5];
+            *_link_id = str_to_int(p1); /* 解析出连接id */
 
-						p1 = (char *)&_buf[7];
-						s_data_len = str_to_int(p1); /* 解析出数据包长度 */
-						s_flag = 1;									 /* 进入数据包接收状态 */
-						*_len = 0;
-					}
-				}
-			}
-		}
-		else /* 这是接收 +IPD数据包的分之 */
-		{
-			if (*_len < _buf_size)
-			{
-				_buf[(*_len)++] = ucData; /* 保存接收到的数据 */
+            p1 = (char *)&_buf[7];
+            s_data_len = str_to_int(p1); /* 解析出数据包长度 */
+            s_flag = 1;                  /* 进入数据包接收状态 */
+            *_len = 0;
+          }
+        }
+      }
+    }
+    else /* 这是接收 +IPD数据包的分之 */
+    {
+      if (*_len < _buf_size)
+      {
+        _buf[(*_len)++] = ucData; /* 保存接收到的数据 */
 
-				if (*_len == s_data_len)
-				{
-					s_flag = 0;
-					//*_len = 0;
+        if (*_len == s_data_len)
+        {
+          s_flag = 0;
+          //*_len = 0;
 
-					return ESP_RX_IPD; /* 表示接收到+IPD数据包 */
-				}
-			}
-			else
-			{
-				s_flag = 0;
-			}
-		}
+          return ESP_RX_IPD; /* 表示接收到+IPD数据包 */
+        }
+      }
+      else
+      {
+        s_flag = 0;
+      }
+    }
 
-		s_last_rx_time = bsp_GetRunTime();
-	}
+    s_last_rx_time = bsp_GetRunTime();
+  }
 
-	if (rx_flag == 1)
-	{
-		return ESP_RX_BYTE; /* 表示收到至少1个字节 */
-	}
+  if (rx_flag == 1)
+  {
+    return ESP_RX_BYTE; /* 表示收到至少1个字节 */
+  }
 
-	return ESP_RX_NONE; /* 表示未收到任何数据 */
+  return ESP_RX_NONE; /* 表示未收到任何数据 */
 }
 
 /*
@@ -1571,68 +1571,68 @@ uint8_t ESP32_RxData(uint8_t *_buf, uint16_t *_len, uint16_t _buf_size, uint8_t 
 */
 uint8_t ESP32_GetIPStatus(uint8_t *_mac)
 {
-	/*
-	正确的应答包：
-	
-	(4451)=>AT+CIPSTATUS
-	(4451)=>
-	STATUS:3		<- 
-	+CIPSTATUS:0,"UDP","255.255.255.255",8080,6200,0
-	+CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0
+  /*
+  正确的应答包：
+  
+  (4451)=>AT+CIPSTATUS
+  (4451)=>
+  STATUS:3		<- 
+  +CIPSTATUS:0,"UDP","255.255.255.255",8080,6200,0
+  +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0
 
-	OK
-	
-	----------------------
-	
-	STATUS: 定义
-		2: ESP32 station 已连接AP，获得IP地址
-		3: 已建立TCP或UDP传输
-		4：ESP32 已断开网络连接
-		5：未连接到AP
-	
-	
-	----------------------- 断网，复位后 ---
-	AT+CIPSTATUS
-	STATUS:5
+  OK
+  
+  ----------------------
+  
+  STATUS: 定义
+    2: ESP32 station 已连接AP，获得IP地址
+    3: 已建立TCP或UDP传输
+    4：ESP32 已断开网络连接
+    5：未连接到AP
+  
+  
+  ----------------------- 断网，复位后 ---
+  AT+CIPSTATUS
+  STATUS:5
 
-	OK
-	*/
-	char buf[64];
+  OK
+  */
+  char buf[64];
 
-	memset(_mac, 0, 6);
-	ESP32_SendAT("AT+CIPSTAMAC_CUR?");
-	while (1)
-	{
-		if (ESP32_ReadLine(buf, sizeof(buf), 200))
-		{
-			if (memcmp(buf, "+CIPSTAMAC_CUR:", 15) == 0)
-			{
-				/* 解析mac地址 */
-				char *p = &buf[16];
+  memset(_mac, 0, 6);
+  ESP32_SendAT("AT+CIPSTAMAC_CUR?");
+  while (1)
+  {
+    if (ESP32_ReadLine(buf, sizeof(buf), 200))
+    {
+      if (memcmp(buf, "+CIPSTAMAC_CUR:", 15) == 0)
+      {
+        /* 解析mac地址 */
+        char *p = &buf[16];
 
-				_mac[0] = TwoCharToInt(p);
-				p += 3;
-				_mac[1] = TwoCharToInt(p);
-				p += 3;
-				_mac[2] = TwoCharToInt(p);
-				p += 3;
-				_mac[3] = TwoCharToInt(p);
-				p += 3;
-				_mac[4] = TwoCharToInt(p);
-				p += 3;
-				_mac[5] = TwoCharToInt(p);
-			}
-			else if (memcmp(buf, "OK", 2) == 0)
-			{
-				return 1;
-			}
-		}
-		else /* 读超时 */
-		{
-			break;
-		}
-	}
-	return 0;
+        _mac[0] = TwoCharToInt(p);
+        p += 3;
+        _mac[1] = TwoCharToInt(p);
+        p += 3;
+        _mac[2] = TwoCharToInt(p);
+        p += 3;
+        _mac[3] = TwoCharToInt(p);
+        p += 3;
+        _mac[4] = TwoCharToInt(p);
+        p += 3;
+        _mac[5] = TwoCharToInt(p);
+      }
+      else if (memcmp(buf, "OK", 2) == 0)
+      {
+        return 1;
+      }
+    }
+    else /* 读超时 */
+    {
+      break;
+    }
+  }
+  return 0;
 }
 
 /*
@@ -1645,26 +1645,26 @@ uint8_t ESP32_GetIPStatus(uint8_t *_mac)
 */
 uint8_t ESP32_ValidSSID(char *_ssid)
 {
-	uint8_t i;
+  uint8_t i;
 
-	for (i = 0; i < SSID_MAX_LEN + 2; i++)
-	{
-		if (_ssid[i] > 127)
-		{
-			return 0;
-		}
+  for (i = 0; i < SSID_MAX_LEN + 2; i++)
+  {
+    if (_ssid[i] > 127)
+    {
+      return 0;
+    }
 
-		if (_ssid[i] == 0)
-		{
-			break;
-		}
-	}
+    if (_ssid[i] == 0)
+    {
+      break;
+    }
+  }
 
-	if (i <= SSID_MAX_LEN)
-	{
-		return 1;
-	}
-	return 0;
+  if (i <= SSID_MAX_LEN)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 /*
@@ -1677,26 +1677,26 @@ uint8_t ESP32_ValidSSID(char *_ssid)
 */
 uint8_t ESP32_ValidPassword(char *_pass)
 {
-	uint8_t i;
+  uint8_t i;
 
-	for (i = 0; i < PASSWORD_MAX_LEN + 2; i++)
-	{
-		if (_pass[i] > 127)
-		{
-			return 0;
-		}
+  for (i = 0; i < PASSWORD_MAX_LEN + 2; i++)
+  {
+    if (_pass[i] > 127)
+    {
+      return 0;
+    }
 
-		if (_pass[i] == 0)
-		{
-			break;
-		}
-	}
+    if (_pass[i] == 0)
+    {
+      break;
+    }
+  }
 
-	if (i <= PASSWORD_MAX_LEN)
-	{
-		return 1;
-	}
-	return 0;
+  if (i <= PASSWORD_MAX_LEN)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 #if 0
@@ -1717,25 +1717,25 @@ uint8_t ESP32_ValidPassword(char *_pass)
 */
 void ESP32_PT_JoinAP(char *_ssid, char *_pwd, uint16_t _timeout)
 {
-	char buf[64];
+  char buf[64];
 
-	if (ESP32_ValidSSID(_ssid) == 0 || ESP32_ValidPassword(_pwd) == 0)
-	{
-		printf("WiFi SSID和密码参数异常\r\n");
-		return;
-	}
-	
-	sprintf(buf, "AT+CWJAP=\"%s\",\"%s\"", _ssid, _pwd);
-	ESP32_SendAT(buf);
-	
-	s_tAT.Len1 = 0;
-	s_tAT.Len2 = 0;
-	s_tAT.Timeout = _timeout;
-	
-	s_tAT.pStr1 = "OK\r\n";
-	s_tAT.pStr2 = "FAIL\r\n";
-	
-	s_tAT.LastTime = bsp_GetRunTime();
+  if (ESP32_ValidSSID(_ssid) == 0 || ESP32_ValidPassword(_pwd) == 0)
+  {
+    printf("WiFi SSID和密码参数异常\r\n");
+    return;
+  }
+  
+  sprintf(buf, "AT+CWJAP=\"%s\",\"%s\"", _ssid, _pwd);
+  ESP32_SendAT(buf);
+  
+  s_tAT.Len1 = 0;
+  s_tAT.Len2 = 0;
+  s_tAT.Timeout = _timeout;
+  
+  s_tAT.pStr1 = "OK\r\n";
+  s_tAT.pStr2 = "FAIL\r\n";
+  
+  s_tAT.LastTime = bsp_GetRunTime();
 }
 
 /*
@@ -1748,54 +1748,54 @@ void ESP32_PT_JoinAP(char *_ssid, char *_pwd, uint16_t _timeout)
 */
 uint8_t ESP32_PT_WaitResonse(void)
 {
-	{	
-		uint8_t ucData;
-		uint8_t ch;
-		
-		if (ESP32_GetChar(&ucData))
-		{							
-			/* 比较执行成功的应答字符串 */
-			ch = s_tAT.pStr1[s_tAT.Len1];
-			if (ucData == ch)
-			{
-				s_tAT.Len1++;
-				
-				if (s_tAT.Len1 == strlen(s_tAT.pStr1))
-				{
-					return PT_OK;
-				}
-			}
-			else
-			{
-				s_tAT.Len1 = 0;
-			}
+  {	
+    uint8_t ucData;
+    uint8_t ch;
+    
+    if (ESP32_GetChar(&ucData))
+    {							
+      /* 比较执行成功的应答字符串 */
+      ch = s_tAT.pStr1[s_tAT.Len1];
+      if (ucData == ch)
+      {
+        s_tAT.Len1++;
+        
+        if (s_tAT.Len1 == strlen(s_tAT.pStr1))
+        {
+          return PT_OK;
+        }
+      }
+      else
+      {
+        s_tAT.Len1 = 0;
+      }
 
-			/* 比较执行失败的应答字符串 */
-			ch = s_tAT.pStr2[s_tAT.Len2];
-			if (ucData == ch)
-			{
-				s_tAT.Len2++;
-				
-				if (s_tAT.Len2 == strlen(s_tAT.pStr2))
-				{
-					return PT_ERR;
-				}
-			}
-			else
-			{
-				s_tAT.Len2 = 0;
-			}		
-		}
+      /* 比较执行失败的应答字符串 */
+      ch = s_tAT.pStr2[s_tAT.Len2];
+      if (ucData == ch)
+      {
+        s_tAT.Len2++;
+        
+        if (s_tAT.Len2 == strlen(s_tAT.pStr2))
+        {
+          return PT_ERR;
+        }
+      }
+      else
+      {
+        s_tAT.Len2 = 0;
+      }		
+    }
 
-		if (s_tAT.Timeout > 0)
-		{
-			if (bsp_CheckRunTime(s_tAT.LastTime) >= s_tAT.Timeout)
-			{
-				return PT_TIMEOUT;	/* 命令超时 */
-			}
-		}
-	}
-	return PT_NULL;
+    if (s_tAT.Timeout > 0)
+    {
+      if (bsp_CheckRunTime(s_tAT.LastTime) >= s_tAT.Timeout)
+      {
+        return PT_TIMEOUT;	/* 命令超时 */
+      }
+    }
+  }
+  return PT_NULL;
 }
 
 /*
@@ -1811,17 +1811,17 @@ uint8_t ESP32_PT_WaitResonse(void)
 */
 void ESP32_PT_SmartStrat(uint8_t _mode)
 {
-	ESP32_SendAT("AT+CWSMARTSTART=0");
+  ESP32_SendAT("AT+CWSMARTSTART=0");
 
-	s_tAT.Len1 = 0;
-	s_tAT.Len2 = 0;
-	s_tAT.Len3 = 0;	
-	
-	s_tAT.pStr1 = "\r\nSSID:";
-	s_tAT.pStr2 = "\r\nPASSWORD:";
-	s_tAT.pStr3 = "OK\r\n";	
-	
-	s_tAT.RunFirst = 1;
+  s_tAT.Len1 = 0;
+  s_tAT.Len2 = 0;
+  s_tAT.Len3 = 0;	
+  
+  s_tAT.pStr1 = "\r\nSSID:";
+  s_tAT.pStr2 = "\r\nPASSWORD:";
+  s_tAT.pStr3 = "OK\r\n";	
+  
+  s_tAT.RunFirst = 1;
 }
 
 /*
@@ -1835,126 +1835,126 @@ void ESP32_PT_SmartStrat(uint8_t _mode)
 */
 uint8_t ESP32_PT_SmartWait(char *_ssid,  char *_password)
 {
-	/* 指令执行过程 : 
+  /* 指令执行过程 : 
 
-	AT+CWSMARTSTART=0
+  AT+CWSMARTSTART=0
 
-	OK
-	
-	-------当手机发送配置信息过来是，模块会返回 --------
-	SMART SUCCESS
-	SSID:Tenda_4FD138
-	PASSWORD:123456887mdh
+  OK
+  
+  -------当手机发送配置信息过来是，模块会返回 --------
+  SMART SUCCESS
+  SSID:Tenda_4FD138
+  PASSWORD:123456887mdh
 
-	OK
-			
-	*/	
-	uint8_t ucData;
-	uint8_t ch;
-	static uint8_t s_ssid_len;
-	static uint8_t s_password_len;
-	static uint8_t s_RxSSID;
-	static uint8_t s_RxPASSWORD;
-	
-	if (s_tAT.RunFirst == 1)
-	{
-		s_tAT.RunFirst = 0;
-		
-		s_ssid_len = 0;
-		s_password_len = 0;
-		
-		s_RxSSID = 0;
-		s_RxPASSWORD = 0;		
-	}
-	
-	if (ESP32_GetChar(&ucData))
-	{				
-		/* 接收保存 SSID */
-		if (s_RxSSID == 1)
-		{
-			if (s_ssid_len < SSID_MAX_LEN)
-			{
-				_ssid[s_ssid_len++] = ucData;
-			}
-			
-			if (ucData == 0x0D || ucData == 0x0A)
-			{
-				_ssid[s_ssid_len - 1] = 0;	/* 字符串末尾加0 */
-				s_RxSSID = 2;		/* 表示成功接收到SSID */
-			}
-		}
+  OK
+      
+  */	
+  uint8_t ucData;
+  uint8_t ch;
+  static uint8_t s_ssid_len;
+  static uint8_t s_password_len;
+  static uint8_t s_RxSSID;
+  static uint8_t s_RxPASSWORD;
+  
+  if (s_tAT.RunFirst == 1)
+  {
+    s_tAT.RunFirst = 0;
+    
+    s_ssid_len = 0;
+    s_password_len = 0;
+    
+    s_RxSSID = 0;
+    s_RxPASSWORD = 0;		
+  }
+  
+  if (ESP32_GetChar(&ucData))
+  {				
+    /* 接收保存 SSID */
+    if (s_RxSSID == 1)
+    {
+      if (s_ssid_len < SSID_MAX_LEN)
+      {
+        _ssid[s_ssid_len++] = ucData;
+      }
+      
+      if (ucData == 0x0D || ucData == 0x0A)
+      {
+        _ssid[s_ssid_len - 1] = 0;	/* 字符串末尾加0 */
+        s_RxSSID = 2;		/* 表示成功接收到SSID */
+      }
+    }
 
-		/* 接收保存密码 */
-		if (s_RxPASSWORD == 1)
-		{
-			if (s_password_len < PASSWORD_MAX_LEN)
-			{			
-				_password[s_password_len++] = ucData;
-			}
-			
-			if (ucData == 0x0D || ucData == 0x0A)
-			{
-				_password[s_password_len - 1] = 0;	/* 字符串末尾加0 */
-				s_RxPASSWORD = 2;		/* 表示成功接收到密码*/
-			}
-		}		
-		
-		/* 比较第1个字符串 SSID: */
-		ch = s_tAT.pStr1[s_tAT.Len1];
-		if (ucData == ch)
-		{
-			s_tAT.Len1++;
-			
-			if (s_tAT.Len1 == strlen(s_tAT.pStr1))
-			{
-				s_RxSSID = 1;	/* 以后的数据是SSID, 直到 0x0D 0x0A结束  */
-			}
-		}
-		else
-		{
-			s_tAT.Len1 = 0;
-		}
+    /* 接收保存密码 */
+    if (s_RxPASSWORD == 1)
+    {
+      if (s_password_len < PASSWORD_MAX_LEN)
+      {			
+        _password[s_password_len++] = ucData;
+      }
+      
+      if (ucData == 0x0D || ucData == 0x0A)
+      {
+        _password[s_password_len - 1] = 0;	/* 字符串末尾加0 */
+        s_RxPASSWORD = 2;		/* 表示成功接收到密码*/
+      }
+    }		
+    
+    /* 比较第1个字符串 SSID: */
+    ch = s_tAT.pStr1[s_tAT.Len1];
+    if (ucData == ch)
+    {
+      s_tAT.Len1++;
+      
+      if (s_tAT.Len1 == strlen(s_tAT.pStr1))
+      {
+        s_RxSSID = 1;	/* 以后的数据是SSID, 直到 0x0D 0x0A结束  */
+      }
+    }
+    else
+    {
+      s_tAT.Len1 = 0;
+    }
 
-		/* 比较第2个字符串  PASSWORD: */
-		ch = s_tAT.pStr2[s_tAT.Len2];
-		if (ucData == ch)
-		{
-			s_tAT.Len2++;
-			
-			if (s_tAT.Len2 == strlen(s_tAT.pStr2))
-			{
-				s_RxPASSWORD = 1;	/* 以后的数据是密码, 直到 0x0D 0x0A结束  */
-			}
-		}
-		else
-		{
-			s_tAT.Len2 = 0;
-		}
-		
-		/* 比较第3个字符串 OK */
-		ch = s_tAT.pStr3[s_tAT.Len3];
-		if (ucData == ch)
-		{
-			s_tAT.Len3++;
-			
-			if (s_tAT.Len3 == strlen(s_tAT.pStr3))
-			{
-				
-				if (s_RxSSID == 2 && s_RxPASSWORD == 2)
-				{				
-					return PT_OK;
-				}
-				
-				/* 忽略第一个OK, 这是AT指令的 OK */
-				s_tAT.Len3 = 0;
-			}
-		}
-		else
-		{
-			s_tAT.Len3 = 0;
-		}			
-	}
-	return PT_NULL;
+    /* 比较第2个字符串  PASSWORD: */
+    ch = s_tAT.pStr2[s_tAT.Len2];
+    if (ucData == ch)
+    {
+      s_tAT.Len2++;
+      
+      if (s_tAT.Len2 == strlen(s_tAT.pStr2))
+      {
+        s_RxPASSWORD = 1;	/* 以后的数据是密码, 直到 0x0D 0x0A结束  */
+      }
+    }
+    else
+    {
+      s_tAT.Len2 = 0;
+    }
+    
+    /* 比较第3个字符串 OK */
+    ch = s_tAT.pStr3[s_tAT.Len3];
+    if (ucData == ch)
+    {
+      s_tAT.Len3++;
+      
+      if (s_tAT.Len3 == strlen(s_tAT.pStr3))
+      {
+        
+        if (s_RxSSID == 2 && s_RxPASSWORD == 2)
+        {				
+          return PT_OK;
+        }
+        
+        /* 忽略第一个OK, 这是AT指令的 OK */
+        s_tAT.Len3 = 0;
+      }
+    }
+    else
+    {
+      s_tAT.Len3 = 0;
+    }			
+  }
+  return PT_NULL;
 }
 #endif
 

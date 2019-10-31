@@ -4,7 +4,6 @@
 ** See Copyright Notice in lua.h
 */
 
-
 #define linit_c
 #define LUA_LIB
 
@@ -26,7 +25,6 @@
 
 #include "lprefix.h"
 
-
 #include <stddef.h>
 
 #include "lua.h"
@@ -34,35 +32,33 @@
 #include "lualib.h"
 #include "lauxlib.h"
 
-
 /*
 ** these libs are loaded by lua.c and are readily available to any Lua
 ** program
 */
 static const luaL_Reg loadedlibs[] = {
-  {"_G", luaopen_base},
-  {LUA_LOADLIBNAME, luaopen_package},
-  {LUA_COLIBNAME, luaopen_coroutine},
-  {LUA_TABLIBNAME, luaopen_table},
-  {LUA_IOLIBNAME, luaopen_io},
-  {LUA_OSLIBNAME, luaopen_os},
-  {LUA_STRLIBNAME, luaopen_string},
-  {LUA_MATHLIBNAME, luaopen_math},
-  {LUA_UTF8LIBNAME, luaopen_utf8},
-  {LUA_DBLIBNAME, luaopen_debug},
+    {"_G", luaopen_base},
+    {LUA_LOADLIBNAME, luaopen_package},
+    {LUA_COLIBNAME, luaopen_coroutine},
+    {LUA_TABLIBNAME, luaopen_table},
+    {LUA_IOLIBNAME, luaopen_io},
+    {LUA_OSLIBNAME, luaopen_os},
+    {LUA_STRLIBNAME, luaopen_string},
+    {LUA_MATHLIBNAME, luaopen_math},
+    {LUA_UTF8LIBNAME, luaopen_utf8},
+    {LUA_DBLIBNAME, luaopen_debug},
 #if defined(LUA_COMPAT_BITLIB)
-  {LUA_BITLIBNAME, luaopen_bit32},
+    {LUA_BITLIBNAME, luaopen_bit32},
 #endif
-  {NULL, NULL}
-};
+    {NULL, NULL}};
 
-
-LUALIB_API void luaL_openlibs (lua_State *L) {
+LUALIB_API void luaL_openlibs(lua_State *L)
+{
   const luaL_Reg *lib;
   /* "require" functions from 'loadedlibs' and set results to global table */
-  for (lib = loadedlibs; lib->func; lib++) {
+  for (lib = loadedlibs; lib->func; lib++)
+  {
     luaL_requiref(L, lib->name, lib->func, 1);
-    lua_pop(L, 1);  /* remove lib */
+    lua_pop(L, 1); /* remove lib */
   }
 }
-

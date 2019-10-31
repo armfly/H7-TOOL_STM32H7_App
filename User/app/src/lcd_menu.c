@@ -30,21 +30,21 @@
 */
 void LCD_InitMenu(MENU_T *_pMenu, char **_Text)
 {
-	uint8_t i;
+  uint8_t i;
 
-	_pMenu->Text = (uint8_t **)_Text; /* 菜单文本 */
+  _pMenu->Text = (uint8_t **)_Text; /* 菜单文本 */
 
-	for (i = 0; i < 255; i++)
-	{
-		if (_pMenu->Text[i][0] == '&')
-		{
-			_pMenu->Count = i;
-			break;
-		}
-	}
+  for (i = 0; i < 255; i++)
+  {
+    if (_pMenu->Text[i][0] == '&')
+    {
+      _pMenu->Count = i;
+      break;
+    }
+  }
 
-	_pMenu->Cursor = 0; /* 当前屏幕第1行对应的索引 */
-	_pMenu->Offset = 0; /* 选中行的索引 */
+  _pMenu->Cursor = 0; /* 当前屏幕第1行对应的索引 */
+  _pMenu->Offset = 0; /* 选中行的索引 */
 }
 
 /*
@@ -60,47 +60,47 @@ void LCD_InitMenu(MENU_T *_pMenu, char **_Text)
 */
 void LCD_DispMenu(MENU_T *_pMenu)
 {
-	uint8_t i;
-	uint8_t FontHeight;
-	uint16_t y;
-	uint8_t line_cap1, line_cap2;
+  uint8_t i;
+  uint8_t FontHeight;
+  uint16_t y;
+  uint8_t line_cap1, line_cap2;
 
-	FontHeight = LCD_GetFontWidth(&_pMenu->Font);
+  FontHeight = LCD_GetFontWidth(&_pMenu->Font);
 
-	line_cap1 = _pMenu->LineCap / 2;				 /* 菜单文本前的高度 */
-	line_cap2 = _pMenu->LineCap - line_cap1; /* 菜单文本后的高度 */
-	for (i = 0; i < _pMenu->ViewLine; i++)
-	{
-		if (i >= _pMenu->Count)
-		{
-			break;
-		}
+  line_cap1 = _pMenu->LineCap / 2;         /* 菜单文本前的高度 */
+  line_cap2 = _pMenu->LineCap - line_cap1; /* 菜单文本后的高度 */
+  for (i = 0; i < _pMenu->ViewLine; i++)
+  {
+    if (i >= _pMenu->Count)
+    {
+      break;
+    }
 
-		if (i + _pMenu->Offset == _pMenu->Cursor)
-		{
-			/* 设置为反白 */
-			_pMenu->Font.FrontColor = CL_MENU_TEXT2;
-			_pMenu->Font.BackColor = CL_MENU_BACK2;
-		}
-		else
-		{
-			/* 恢复正常底色 */
-			_pMenu->Font.FrontColor = CL_MENU_TEXT1;
-			_pMenu->Font.BackColor = CL_MENU_BACK1;
-		}
+    if (i + _pMenu->Offset == _pMenu->Cursor)
+    {
+      /* 设置为反白 */
+      _pMenu->Font.FrontColor = CL_MENU_TEXT2;
+      _pMenu->Font.BackColor = CL_MENU_BACK2;
+    }
+    else
+    {
+      /* 恢复正常底色 */
+      _pMenu->Font.FrontColor = CL_MENU_TEXT1;
+      _pMenu->Font.BackColor = CL_MENU_BACK1;
+    }
 
-		y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
+    y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
 
-		/* 清段前背景 */
-		LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
+    /* 清段前背景 */
+    LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
 
-		/* 刷新文本 */
-		LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
-									_pMenu->Width, ALIGN_LEFT);
+    /* 刷新文本 */
+    LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+                  _pMenu->Width, ALIGN_LEFT);
 
-		/* 清段后背景 */
-		LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);
-	}
+    /* 清段后背景 */
+    LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);
+  }
 }
 
 /*
@@ -113,23 +113,23 @@ void LCD_DispMenu(MENU_T *_pMenu)
 */
 void LCD_MoveDownMenu(MENU_T *_pMenu)
 {
-	if (_pMenu->Cursor < _pMenu->Count - 1)
-	{
-		_pMenu->Cursor++;
+  if (_pMenu->Cursor < _pMenu->Count - 1)
+  {
+    _pMenu->Cursor++;
 
-		if (_pMenu->Cursor - _pMenu->Offset >= _pMenu->ViewLine)
-		{
-			_pMenu->Offset++;
-		}
+    if (_pMenu->Cursor - _pMenu->Offset >= _pMenu->ViewLine)
+    {
+      _pMenu->Offset++;
+    }
 
-		LCD_DispMenu(_pMenu); /* 刷新显示 */
-	}
-	else
-	{
-		_pMenu->Cursor = 0;
-		_pMenu->Offset = 0;
-		LCD_DispMenu(_pMenu); /* 刷新显示 */
-	}
+    LCD_DispMenu(_pMenu); /* 刷新显示 */
+  }
+  else
+  {
+    _pMenu->Cursor = 0;
+    _pMenu->Offset = 0;
+    LCD_DispMenu(_pMenu); /* 刷新显示 */
+  }
 }
 
 /*
@@ -142,30 +142,30 @@ void LCD_MoveDownMenu(MENU_T *_pMenu)
 */
 void LCD_MoveUpMenu(MENU_T *_pMenu)
 {
-	if (_pMenu->Cursor > 0)
-	{
-		_pMenu->Cursor--;
+  if (_pMenu->Cursor > 0)
+  {
+    _pMenu->Cursor--;
 
-		if (_pMenu->Cursor < _pMenu->Offset)
-		{
-			_pMenu->Offset--;
-		}
+    if (_pMenu->Cursor < _pMenu->Offset)
+    {
+      _pMenu->Offset--;
+    }
 
-		LCD_DispMenu(_pMenu); /* 刷新显示 */
-	}
-	else
-	{
-		_pMenu->Cursor = _pMenu->Count - 1;
-		if (_pMenu->Count > _pMenu->ViewLine)
-		{
-			_pMenu->Offset = _pMenu->Count - _pMenu->ViewLine;
-		}
-		else
-		{
-			_pMenu->Offset = 0;
-		}
-		LCD_DispMenu(_pMenu); /* 刷新显示 */
-	}
+    LCD_DispMenu(_pMenu); /* 刷新显示 */
+  }
+  else
+  {
+    _pMenu->Cursor = _pMenu->Count - 1;
+    if (_pMenu->Count > _pMenu->ViewLine)
+    {
+      _pMenu->Offset = _pMenu->Count - _pMenu->ViewLine;
+    }
+    else
+    {
+      _pMenu->Offset = 0;
+    }
+    LCD_DispMenu(_pMenu); /* 刷新显示 */
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

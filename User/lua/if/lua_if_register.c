@@ -7,253 +7,251 @@
 #include "modbus_reg_addr.h"
 #include "modbus_register.h"
 
-/* ÎªÁË±ÜÃâºÍDAPÇı¶¯ÖĞµÄº¯Êı»ìÏı£¬±¾Ä£¿éº¯ÊıÃûÇ°×ºÓÃ h7swd */
-static int lua_WriteReg16(lua_State* L);
-static int lua_WriteReg32(lua_State* L);
-static int lua_WriteRegFloat(lua_State* L);
+/* ä¸ºäº†é¿å…å’ŒDAPé©±åŠ¨ä¸­çš„å‡½æ•°æ··æ·†ï¼Œæœ¬æ¨¡å—å‡½æ•°åå‰ç¼€ç”¨ h7swd */
+static int lua_WriteReg16(lua_State *L);
+static int lua_WriteReg32(lua_State *L);
+static int lua_WriteRegFloat(lua_State *L);
 
-static int lua_ReadReg16(lua_State* L);
-static int lua_ReadReg32(lua_State* L);
-static int lua_ReadRegFloat(lua_State* L);
-static int lua_SaveParam(lua_State* L);
+static int lua_ReadReg16(lua_State *L);
+static int lua_ReadReg32(lua_State *L);
+static int lua_ReadRegFloat(lua_State *L);
+static int lua_SaveParam(lua_State *L);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_reg_RegisterFun
-*	¹¦ÄÜËµÃ÷: ×¢²álua CÓïÑÔ½Ó¿Úº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_reg_RegisterFun
+*	åŠŸèƒ½è¯´æ˜: æ³¨å†Œlua Cè¯­è¨€æ¥å£å‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lua_reg_RegisterFun(void)
 {
-	//½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
-    lua_register(g_Lua, "write_reg16", lua_WriteReg16);	
-	lua_register(g_Lua, "write_reg32", lua_WriteReg32);
-	lua_register(g_Lua, "write_regfloat", lua_WriteRegFloat);
+  //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+  //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
+  lua_register(g_Lua, "write_reg16", lua_WriteReg16);
+  lua_register(g_Lua, "write_reg32", lua_WriteReg32);
+  lua_register(g_Lua, "write_regfloat", lua_WriteRegFloat);
 
-    lua_register(g_Lua, "read_reg16", lua_ReadReg16);	
-	lua_register(g_Lua, "read_reg32", lua_ReadReg32);
-	lua_register(g_Lua, "read_regfloat", lua_ReadRegFloat);	
-	
-	lua_register(g_Lua, "save_param", lua_SaveParam);
+  lua_register(g_Lua, "read_reg16", lua_ReadReg16);
+  lua_register(g_Lua, "read_reg32", lua_ReadReg32);
+  lua_register(g_Lua, "read_regfloat", lua_ReadRegFloat);
+
+  lua_register(g_Lua, "save_param", lua_SaveParam);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_SaveParam
-*	¹¦ÄÜËµÃ÷: Ğ´²ÎÊı¡£½«²ÎÊıË¢ĞÂµ½eeprom
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_SaveParam
+*	åŠŸèƒ½è¯´æ˜: å†™å‚æ•°ã€‚å°†å‚æ•°åˆ·æ–°åˆ°eeprom
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_SaveParam(lua_State* L)
+static int lua_SaveParam(lua_State *L)
 {
-	SaveParam();
-	
-	if (g_tVar.CalibEnable == 1)
-	{
-		SaveCalibParam();
-	}
-	return 1;
+  SaveParam();
+
+  if (g_tVar.CalibEnable == 1)
+  {
+    SaveCalibParam();
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_WriteReg16
-*	¹¦ÄÜËµÃ÷: Ğ´¼Ä´æÆ÷ 16bit
-*	ĞÎ    ²Î: AddrµØÖ· ºÍ ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_WriteReg16
+*	åŠŸèƒ½è¯´æ˜: å†™å¯„å­˜å™¨ 16bit
+*	å½¢    å‚: Addråœ°å€ å’Œ å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_WriteReg16(lua_State* L)
+static int lua_WriteReg16(lua_State *L)
 {
-	uint16_t addr;
-	int16_t value;
+  uint16_t addr;
+  int16_t value;
 
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    value = luaL_checknumber(L, 2); /* å¯„å­˜å™¨å€¼ */
+  }
 
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		value = luaL_checknumber(L, 2);	/* ¼Ä´æÆ÷Öµ */
-	}	
-	
-	WriteRegValue_06H(addr, (uint16_t)value);
-	
-	return 1;
+  WriteRegValue_06H(addr, (uint16_t)value);
+
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_ReadReg16
-*	¹¦ÄÜËµÃ÷: ¶Á¼Ä´æÆ÷ 16bit
-*	ĞÎ    ²Î: AddrµØÖ·
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: lua_ReadReg16
+*	åŠŸèƒ½è¯´æ˜: è¯»å¯„å­˜å™¨ 16bit
+*	å½¢    å‚: Addråœ°å€
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
 *********************************************************************************************************
 */
-static int lua_ReadReg16(lua_State* L)
+static int lua_ReadReg16(lua_State *L)
 {
-	uint16_t addr;
-	uint16_t value;
+  uint16_t addr;
+  uint16_t value;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
-	
-	if (ReadRegValue_03H(addr, &value) == 1)
-	{
-		lua_pushnumber(L, value);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	else
-	{
-		lua_pushnumber(L, 0);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	
-	return 1;
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
+
+  if (ReadRegValue_03H(addr, &value) == 1)
+  {
+    lua_pushnumber(L, value); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
+  else
+  {
+    lua_pushnumber(L, 0); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
+
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_WriteReg32
-*	¹¦ÄÜËµÃ÷: Ğ´¼Ä´æÆ÷ 32BitÕûÊı
-*	ĞÎ    ²Î: AddrµØÖ· ºÍ ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_WriteReg32
+*	åŠŸèƒ½è¯´æ˜: å†™å¯„å­˜å™¨ 32Bitæ•´æ•°
+*	å½¢    å‚: Addråœ°å€ å’Œ å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_WriteReg32(lua_State* L)
+static int lua_WriteReg32(lua_State *L)
 {
-	uint16_t addr;
-	int32_t value;
+  uint16_t addr;
+  int32_t value;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
 
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{
-		value = luaL_checknumber(L, 2);	/* ¼Ä´æÆ÷µØÖ· */
-	}	
-	
-	WriteRegValue_06H(addr, (uint32_t)value >> 16);
-	WriteRegValue_06H(addr + 1, (uint32_t)value);
-	return 1;
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    value = luaL_checknumber(L, 2); /* å¯„å­˜å™¨åœ°å€ */
+  }
+
+  WriteRegValue_06H(addr, (uint32_t)value >> 16);
+  WriteRegValue_06H(addr + 1, (uint32_t)value);
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_ReadReg32
-*	¹¦ÄÜËµÃ÷: ¶Á¼Ä´æÆ÷ 32bit ÓĞ·ûºÅ
-*	ĞÎ    ²Î: AddrµØÖ·
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: lua_ReadReg32
+*	åŠŸèƒ½è¯´æ˜: è¯»å¯„å­˜å™¨ 32bit æœ‰ç¬¦å·
+*	å½¢    å‚: Addråœ°å€
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
 *********************************************************************************************************
 */
-static int lua_ReadReg32(lua_State* L)
+static int lua_ReadReg32(lua_State *L)
 {
-	uint16_t addr;
-	uint16_t value1;
-	uint16_t value2;
-	int32_t value32;
-	uint8_t re = 0;
+  uint16_t addr;
+  uint16_t value1;
+  uint16_t value2;
+  int32_t value32;
+  uint8_t re = 0;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
-	
-	re = ReadRegValue_03H(addr, &value1);
-	re += ReadRegValue_03H(addr + 1, &value2);
-	
-	if (re == 2)
-	{
-		value32 =(value1 << 8) + value2;
-		lua_pushnumber(L, value32);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	else
-	{
-		lua_pushnumber(L, 0);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	
-	return 1;
-}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
 
+  re = ReadRegValue_03H(addr, &value1);
+  re += ReadRegValue_03H(addr + 1, &value2);
 
-/*
-*********************************************************************************************************
-*	º¯ Êı Ãû: lua_WriteRegFloat
-*	¹¦ÄÜËµÃ÷: Ğ´¼Ä´æÆ÷ 32Bit¸¡µã
-*	ĞÎ    ²Î: AddrµØÖ· ºÍ ¼Ä´æÆ÷Öµ
-*	·µ »Ø Öµ: ÎŞ
-*********************************************************************************************************
-*/
-static int lua_WriteRegFloat(lua_State* L)
-{
-	uint16_t addr;
-	float ff;
+  if (re == 2)
+  {
+    value32 = (value1 << 8) + value2;
+    lua_pushnumber(L, value32); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
+  else
+  {
+    lua_pushnumber(L, 0); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
-
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{
-		ff = luaL_checknumber(L, 2);	/* ¼Ä´æÆ÷µØÖ· */
-	}	
-	
-	WriteRegValue_06H(addr, GetHigh16OfFloat(ff));
-	WriteRegValue_06H(addr + 1, GetLow16OfFloat(ff));
-	return 1;
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_ReadRegFloat
-*	¹¦ÄÜËµÃ÷: ¶Á¼Ä´æÆ÷ ¸¡µã
-*	ĞÎ    ²Î: AddrµØÖ·
-*	·µ »Ø Öµ: ¼Ä´æÆ÷Öµ
+*	å‡½ æ•° å: lua_WriteRegFloat
+*	åŠŸèƒ½è¯´æ˜: å†™å¯„å­˜å™¨ 32Bitæµ®ç‚¹
+*	å½¢    å‚: Addråœ°å€ å’Œ å¯„å­˜å™¨å€¼
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_ReadRegFloat(lua_State* L)
+static int lua_WriteRegFloat(lua_State *L)
 {
-	uint16_t addr;
-	uint16_t value1;
-	uint16_t value2;
-	float ff;
-	uint8_t re = 0;
-	uint8_t buf[4];
+  uint16_t addr;
+  float ff;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* ¼Ä´æÆ÷µØÖ· */
-	}
-	
-	re = ReadRegValue_03H(addr, &value1);
-	re += ReadRegValue_03H(addr + 1, &value2);
-	
-	if (re == 2)
-	{
-		buf[0] = value1 >> 8;
-		buf[1] = value1;
-		buf[2] = value2 >> 8;
-		buf[3] = value2;
-		
-		ff = BEBufToFloat(buf);
-		
-		lua_pushnumber(L, ff);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	else
-	{
-		lua_pushnumber(L, 0);	/* ³É¹¦,·µ»ØÊı¾İ */
-	}
-	
-	return 1;
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
+
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    ff = luaL_checknumber(L, 2); /* å¯„å­˜å™¨åœ°å€ */
+  }
+
+  WriteRegValue_06H(addr, GetHigh16OfFloat(ff));
+  WriteRegValue_06H(addr + 1, GetLow16OfFloat(ff));
+  return 1;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/*
+*********************************************************************************************************
+*	å‡½ æ•° å: lua_ReadRegFloat
+*	åŠŸèƒ½è¯´æ˜: è¯»å¯„å­˜å™¨ æµ®ç‚¹
+*	å½¢    å‚: Addråœ°å€
+*	è¿” å› å€¼: å¯„å­˜å™¨å€¼
+*********************************************************************************************************
+*/
+static int lua_ReadRegFloat(lua_State *L)
+{
+  uint16_t addr;
+  uint16_t value1;
+  uint16_t value2;
+  float ff;
+  uint8_t re = 0;
+  uint8_t buf[4];
+
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* å¯„å­˜å™¨åœ°å€ */
+  }
+
+  re = ReadRegValue_03H(addr, &value1);
+  re += ReadRegValue_03H(addr + 1, &value2);
+
+  if (re == 2)
+  {
+    buf[0] = value1 >> 8;
+    buf[1] = value1;
+    buf[2] = value2 >> 8;
+    buf[3] = value2;
+
+    ff = BEBufToFloat(buf);
+
+    lua_pushnumber(L, ff); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
+  else
+  {
+    lua_pushnumber(L, 0); /* æˆåŠŸ,è¿”å›æ•°æ® */
+  }
+
+  return 1;
+}
+
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

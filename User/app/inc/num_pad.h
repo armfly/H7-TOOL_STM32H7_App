@@ -15,24 +15,24 @@
 
 typedef enum
 {
-	NUMPAD_IP = 0,	/* IP地址 */
-	NUMPAD_TEL = 1, /* 电话号码 */
-	NUMPAD_INT = 2, /* 整数（带范围判断） */
-	NUMPAD_STR = 3	/* 任意字母数字 小数点 */
+  NUMPAD_IP = 0,  /* IP地址 */
+  NUMPAD_TEL = 1, /* 电话号码 */
+  NUMPAD_INT = 2, /* 整数（带范围判断） */
+  NUMPAD_STR = 3  /* 任意字母数字 小数点 */
 } NUMPAD_MODE_E;
 
 /* 形参类型0： IP地址 */
 typedef struct
 {
-	uint8_t ip_buf[4];
+  uint8_t ip_buf[4];
 } NUMPAD_IP_T;
 
 /* 形参类型1：支持小数点 */
 typedef struct
 {
-	int32_t Min;		/* 最小值 */
-	int32_t Max;		/* 最大值 */
-	uint8_t DotNum; /* 小数点位数 */
+  int32_t Min;    /* 最小值 */
+  int32_t Max;    /* 最大值 */
+  uint8_t DotNum; /* 小数点位数 */
 } NUMPAD_INT_T;
 
 void DispInvlidInput(void);

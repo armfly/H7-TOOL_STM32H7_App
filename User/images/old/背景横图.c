@@ -1,22 +1,22 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : Í¼Æ¬×ÊÔ´Ä£¿é¡£
-*	ÎÄ¼şÃû³Æ : image.c
-*	°æ    ±¾ : V2.0
-*	Ëµ    Ã÷ : Í¼Æ¬Êı¾İ
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ       ×÷Õß    ËµÃ÷
-*		v2.0    2011-10-16 armfly  ´´½¨
+*	æ¨¡å—åç§° : å›¾ç‰‡èµ„æºæ¨¡å—ã€‚
+*	æ–‡ä»¶åç§° : image.c
+*	ç‰ˆ    æœ¬ : V2.0
+*	è¯´    æ˜ : å›¾ç‰‡æ•°æ®
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ       ä½œè€…    è¯´æ˜
+*		v2.0    2011-10-16 armfly  åˆ›å»º
 *
-*	Copyright (C), 2010-2011, °²¸»À³µç×Ó
+*	Copyright (C), 2010-2011, å®‰å¯Œè±ç”µå­
 *
 *********************************************************************************************************
 */
 
 #include "stm32f10x.h"
 
-/* 64x64µÄUÅÌÍ¼±ê */
+/* 64x64çš„Uç›˜å›¾æ ‡ */
 const unsigned char gIcon_USB[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X1B, */
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
@@ -532,7 +532,7 @@ const unsigned char gIcon_USB[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
 };
 
-/* 64 x 64 µç³ØÍ¼±ê */
+/* 64 x 64 ç”µæ± å›¾æ ‡ */
 const unsigned char gIcon_Bat[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X1B, */
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
@@ -1048,7 +1048,7 @@ const unsigned char gIcon_Bat[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
 };
 
-/* 64x64 QQÍ¼±ê */
+/* 64x64 QQå›¾æ ‡ */
 const unsigned char gIcon_QQ[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X1B, */
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
 0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,0XFF,
@@ -1565,7 +1565,7 @@ const unsigned char gIcon_QQ[8192] = { /* 0X00,0X10,0X40,0X00,0X40,0X00,0X01,0X1
 };
 
 #if 0
-/* ÏÂÃæÊÇÒ»¸±ºáÆÁµÄ·ç¾°Í¼Æ¬. Í¨¹ı"²ÊÉ«Í¼Ïñ×ª»»Èí¼şImage2Lcd"½«Í¼Æ¬×ª»»ÎªcÓïÑÔ³£Á¿Êı×é */
+/* ä¸‹é¢æ˜¯ä¸€å‰¯æ¨ªå±çš„é£æ™¯å›¾ç‰‡. é€šè¿‡"å½©è‰²å›¾åƒè½¬æ¢è½¯ä»¶Image2Lcd"å°†å›¾ç‰‡è½¬æ¢ä¸ºcè¯­è¨€å¸¸é‡æ•°ç»„ */
 
 const unsigned char gImage_1[192000] = { /* 0X00,0X10,0X90,0X01,0XF0,0X00,0X01,0X1B, */
 0XA2,0X29,0X24,0X3A,0X86,0X42,0X04,0X3A,0X04,0X32,0X45,0X3A,0XB9,0XCE,0X55,0XBE,

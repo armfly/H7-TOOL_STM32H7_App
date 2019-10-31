@@ -17,7 +17,7 @@
 
 typedef struct
 {
-	uint8_t CaptureOk; /* 捕获完成 */
+  uint8_t CaptureOk; /* 捕获完成 */
 } CAM_T;
 
 void bsp_InitCamera(void);

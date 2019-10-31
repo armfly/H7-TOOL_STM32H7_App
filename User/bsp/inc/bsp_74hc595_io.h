@@ -19,4 +19,3 @@ void HC595_WriteGPIO(uint8_t _pin, uint8_t _value);
 void HC595_LockData(void);
 
 #endif
-

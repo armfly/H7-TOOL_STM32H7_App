@@ -15,10 +15,10 @@
 */
 
 /*
-	应用层协议:（自定义简单协议）	
-	01  01 01 --- 控制LED指示灯点亮， 第1个字节是命令代码，第2个字节表示00表示关闭，01表示点亮。
-			    第3个字节表示指示灯序号(1-4)
-	02  00    --- 控制蜂鸣器，第1个字节表示命令代码，第2个字节 00 表示关闭，01表示持续鸣叫， 02表示鸣叫1次
+  应用层协议:（自定义简单协议）	
+  01  01 01 --- 控制LED指示灯点亮， 第1个字节是命令代码，第2个字节表示00表示关闭，01表示点亮。
+          第3个字节表示指示灯序号(1-4)
+  02  00    --- 控制蜂鸣器，第1个字节表示命令代码，第2个字节 00 表示关闭，01表示持续鸣叫， 02表示鸣叫1次
 */
 
 #include "bsp.h"
@@ -37,12 +37,12 @@ uint8_t g_ucLedNo = 0; /* 点亮的LED灯序号，0-3 */
 */
 void can_LedOn(uint8_t _addr, uint8_t _led_no)
 {
-	uint8_t tx_buf[8];
+  uint8_t tx_buf[8];
 
-	tx_buf[0] = 0x01;
-	tx_buf[1] = 0x01; /* 点亮 */
-	tx_buf[2] = _led_no;
-	can1_SendPacket(tx_buf, 3);
+  tx_buf[0] = 0x01;
+  tx_buf[1] = 0x01; /* 点亮 */
+  tx_buf[2] = _led_no;
+  can1_SendPacket(tx_buf, 3);
 }
 
 /*
@@ -56,12 +56,12 @@ void can_LedOn(uint8_t _addr, uint8_t _led_no)
 */
 void can_LedOff(uint8_t _addr, uint8_t _led_no)
 {
-	uint8_t tx_buf[8];
+  uint8_t tx_buf[8];
 
-	tx_buf[0] = 0x01;
-	tx_buf[1] = 0x00; /* 关闭 */
-	tx_buf[2] = _led_no;
-	can1_SendPacket(tx_buf, 3);
+  tx_buf[0] = 0x01;
+  tx_buf[1] = 0x00; /* 关闭 */
+  tx_buf[2] = _led_no;
+  can1_SendPacket(tx_buf, 3);
 }
 
 /*
@@ -75,11 +75,11 @@ void can_LedOff(uint8_t _addr, uint8_t _led_no)
 */
 void can_BeepCtrl(uint8_t _addr, uint8_t _cmd)
 {
-	uint8_t tx_buf[8];
+  uint8_t tx_buf[8];
 
-	tx_buf[0] = 0x01;
-	tx_buf[1] = _cmd; /* 第2个字节 00 表示关闭，01表示持续鸣叫， 02表示鸣叫1次 */
-	can1_SendPacket(tx_buf, 2);
+  tx_buf[0] = 0x01;
+  tx_buf[1] = _cmd; /* 第2个字节 00 表示关闭，01表示持续鸣叫， 02表示鸣叫1次 */
+  can1_SendPacket(tx_buf, 2);
 }
 
 /*
@@ -92,8 +92,8 @@ void can_BeepCtrl(uint8_t _addr, uint8_t _cmd)
 */
 void can_Init(void)
 {
-	bsp_InitCan1();
-	bsp_InitCan2();
+  bsp_InitCan1();
+  bsp_InitCan2();
 }
 
 /*
@@ -106,8 +106,8 @@ void can_Init(void)
 */
 void can_DeInit(void)
 {
-	bsp_DeInitCan1();
-	bsp_DeInitCan2();
+  bsp_DeInitCan1();
+  bsp_DeInitCan2();
 }
 
 /*
@@ -120,20 +120,20 @@ void can_DeInit(void)
 */
 void can1_Analyze(void)
 {
-	if (g_Can1RxHeader.DataLength == 3)
-	{
-		if (g_Can1RxData[0] == 0x02)
-		{
-			if (g_Can1RxData[1] == 0)
-			{
-				BEEP_Stop(); /* 关闭蜂鸣器 */
-			}
-			else
-			{
-				BEEP_Start(8, 8, g_Can1RxData[1]); /* 鸣叫80ms，停80ms， n次 */
-			}
-		}
-	}
+  if (g_Can1RxHeader.DataLength == 3)
+  {
+    if (g_Can1RxData[0] == 0x02)
+    {
+      if (g_Can1RxData[1] == 0)
+      {
+        BEEP_Stop(); /* 关闭蜂鸣器 */
+      }
+      else
+      {
+        BEEP_Start(8, 8, g_Can1RxData[1]); /* 鸣叫80ms，停80ms， n次 */
+      }
+    }
+  }
 }
 
 /*
@@ -146,20 +146,20 @@ void can1_Analyze(void)
 */
 void can2_Analyze(void)
 {
-	if (g_Can2RxHeader.DataLength == 2)
-	{
-		if (g_Can1RxData[0] == 0x01)
-		{
-			if (g_Can1RxData[1] == 0)
-			{
-				bsp_LedOff(g_Can1RxData[2]); /* 关闭LED */
-			}
-			else
-			{
-				bsp_LedOn(g_Can1RxData[2]); /* 打开LED */
-			}
-		}
-	}
+  if (g_Can2RxHeader.DataLength == 2)
+  {
+    if (g_Can1RxData[0] == 0x01)
+    {
+      if (g_Can1RxData[1] == 0)
+      {
+        bsp_LedOff(g_Can1RxData[2]); /* 关闭LED */
+      }
+      else
+      {
+        bsp_LedOn(g_Can1RxData[2]); /* 打开LED */
+      }
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

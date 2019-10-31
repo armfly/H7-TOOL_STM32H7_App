@@ -57,24 +57,24 @@ HCD_HandleTypeDef hhcd;
   * @param  hhcd: HCD handle
   * @retval None
   */
-void HAL_HCD_MspInit(HCD_HandleTypeDef * hhcd)
+void HAL_HCD_MspInit(HCD_HandleTypeDef *hhcd)
 {
-	GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct;
 
-	if (hhcd->Instance == USB2_OTG_FS)
-	{
-		/* Configure USB FS GPIOs */
-		__HAL_RCC_GPIOA_CLK_ENABLE();
+  if (hhcd->Instance == USB2_OTG_FS)
+  {
+    /* Configure USB FS GPIOs */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
 
-		/* Configure DM DP Pins */
-		GPIO_InitStruct.Pin = (GPIO_PIN_11 | GPIO_PIN_12);
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG1_FS;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /* Configure DM DP Pins */
+    GPIO_InitStruct.Pin = (GPIO_PIN_11 | GPIO_PIN_12);
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG1_FS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-		#if 0	/* STM32-V7¿ª·¢°åÃ»ÓĞ ID¡¢VBUS¡¢µçÔ´¿ª¹ØÒı½Å */
+#if 0 /* STM32-V7å¼€å‘æ¿æ²¡æœ‰ IDã€VBUSã€ç”µæºå¼€å…³å¼•è„š */
 		/* Configure ID pin */
 		GPIO_InitStruct.Pin = GPIO_PIN_10;
 		GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
@@ -90,115 +90,115 @@ void HAL_HCD_MspInit(HCD_HandleTypeDef * hhcd)
 
 		/* Configure POWER_SWITCH IO pin */
 		BSP_IO_ConfigPin(OTG_FS1_POWER_SWITCH_PIN, IO_MODE_OUTPUT);
-		#endif	
+#endif
 
-		/* Enable USB FS Clocks */
-		__HAL_RCC_USB2_OTG_FS_CLK_ENABLE();
+    /* Enable USB FS Clocks */
+    __HAL_RCC_USB2_OTG_FS_CLK_ENABLE();
 
-		/* Set USBFS Interrupt priority */
-		HAL_NVIC_SetPriority(OTG_FS_IRQn, 6, 0);
+    /* Set USBFS Interrupt priority */
+    HAL_NVIC_SetPriority(OTG_FS_IRQn, 6, 0);
 
-		/* Enable USBFS Interrupt */
-		HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
-	}
-	else if (hhcd->Instance == USB1_OTG_HS)
-	{
-	#if 1	/* ÄÚ²¿PHY ·ÖÖ®, ·Ç¸ßËÙ¡£ PB14 PB15 */	
-	    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /* Enable USBFS Interrupt */
+    HAL_NVIC_EnableIRQ(OTG_FS_IRQn);
+  }
+  else if (hhcd->Instance == USB1_OTG_HS)
+  {
+#if 1 /* å†…éƒ¨PHY åˆ†ä¹‹, éé«˜é€Ÿã€‚ PB14 PB15 */
+    __HAL_RCC_GPIOB_CLK_ENABLE();
 
-		/* Configure DM DP Pins */
-		GPIO_InitStruct.Pin = (GPIO_PIN_14 | GPIO_PIN_15);
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;	// GPIO_SPEED_FREQ_VERY_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF12_OTG2_FS;		// GPIO_AF12_OTG2_FS GPIO_AF10_OTG2_HS  GPIO_AF11_OTG1_HS
-		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /* Configure DM DP Pins */
+    GPIO_InitStruct.Pin = (GPIO_PIN_14 | GPIO_PIN_15);
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;   // GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF12_OTG2_FS; // GPIO_AF12_OTG2_FS GPIO_AF10_OTG2_HS  GPIO_AF11_OTG1_HS
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-//		/* Configure VBUS Pin */
-//		GPIO_InitStruct.Pin = GPIO_PIN_9;
-//		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-//		GPIO_InitStruct.Pull = GPIO_NOPULL;
-//		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    //		/* Configure VBUS Pin */
+    //		GPIO_InitStruct.Pin = GPIO_PIN_9;
+    //		GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    //		GPIO_InitStruct.Pull = GPIO_NOPULL;
+    //		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-//		/* Configure ID pin */
-//		GPIO_InitStruct.Pin = GPIO_PIN_10;
-//		GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
-//		GPIO_InitStruct.Pull = GPIO_PULLUP;
-//		GPIO_InitStruct.Alternate = GPIO_AF10_OTG1_FS;
-//		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    //		/* Configure ID pin */
+    //		GPIO_InitStruct.Pin = GPIO_PIN_10;
+    //		GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    //		GPIO_InitStruct.Pull = GPIO_PULLUP;
+    //		GPIO_InitStruct.Alternate = GPIO_AF10_OTG1_FS;
+    //		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-		/* Enable USB HS Clocks */
-		__HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+    /* Enable USB HS Clocks */
+    __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
 
-		/* Set USBFS Interrupt to the lowest priority */
-		HAL_NVIC_SetPriority(OTG_HS_IRQn, 6, 0);
+    /* Set USBFS Interrupt to the lowest priority */
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 6, 0);
 
-		/* Enable USBFS Interrupt */
-		HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
-	#else
-		/* Configure USB FS GPIOs */
-		__GPIOA_CLK_ENABLE();
-		__GPIOB_CLK_ENABLE();
-		__GPIOC_CLK_ENABLE();
-		__GPIOH_CLK_ENABLE();
-		__GPIOI_CLK_ENABLE();
+    /* Enable USBFS Interrupt */
+    HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+#else
+    /* Configure USB FS GPIOs */
+    __GPIOA_CLK_ENABLE();
+    __GPIOB_CLK_ENABLE();
+    __GPIOC_CLK_ENABLE();
+    __GPIOH_CLK_ENABLE();
+    __GPIOI_CLK_ENABLE();
 
-		/* CLK */
-		GPIO_InitStruct.Pin = GPIO_PIN_5;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /* CLK */
+    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-		/* D0 */
-		GPIO_InitStruct.Pin = GPIO_PIN_3;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    /* D0 */
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-		/* D1 D2 D3 D4 D5 D6 D7 */
-		GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 |
-		GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /* D1 D2 D3 D4 D5 D6 D7 */
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 |
+                          GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-		/* STP */
-		GPIO_InitStruct.Pin = GPIO_PIN_0;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    /* STP */
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-		/* NXT */
-		GPIO_InitStruct.Pin = GPIO_PIN_4;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+    /* NXT */
+    GPIO_InitStruct.Pin = GPIO_PIN_4;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-		/* DIR */
-		GPIO_InitStruct.Pin = GPIO_PIN_11;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
-		GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-		HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
-		__HAL_RCC_USB1_OTG_HS_ULPI_CLK_ENABLE();
+    /* DIR */
+    GPIO_InitStruct.Pin = GPIO_PIN_11;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
+    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
+    __HAL_RCC_USB1_OTG_HS_ULPI_CLK_ENABLE();
 
-		/* Enable USB HS Clocks */
-		__HAL_RCC_USB1_OTG_HS_CLK_ENABLE();
+    /* Enable USB HS Clocks */
+    __HAL_RCC_USB1_OTG_HS_CLK_ENABLE();
 
-		/* Set USBHS Interrupt priority */
-		HAL_NVIC_SetPriority(OTG_HS_IRQn, 6, 0);
+    /* Set USBHS Interrupt priority */
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 6, 0);
 
-		/* Enable USBHS Interrupt */
-		HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
-	#endif
-	}
+    /* Enable USBHS Interrupt */
+    HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+#endif
+  }
 }
 
 /**
@@ -206,7 +206,7 @@ void HAL_HCD_MspInit(HCD_HandleTypeDef * hhcd)
   * @param  hhcd: HCD handle
   * @retval None
   */
-void HAL_HCD_MspDeInit(HCD_HandleTypeDef * hhcd)
+void HAL_HCD_MspDeInit(HCD_HandleTypeDef *hhcd)
 {
   if (hhcd->Instance == USB2_OTG_FS)
   {
@@ -217,16 +217,16 @@ void HAL_HCD_MspDeInit(HCD_HandleTypeDef * hhcd)
   {
     /* Disable USB HS Clocks */
     __HAL_RCC_USB_OTG_HS_CLK_DISABLE();
-//    __HAL_RCC_USB1_OTG_HS_ULPI_CLK_DISABLE();
-	  
+    //    __HAL_RCC_USB1_OTG_HS_ULPI_CLK_DISABLE();
+
     /**USB_OTG_HS GPIO Configuration    
     PB14     ------> USB_OTG_HS_DM
     PB15     ------> USB_OTG_HS_DP 
     */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14|GPIO_PIN_15);	
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14 | GPIO_PIN_15);
 
     /* Peripheral interrupt Deinit*/
-    HAL_NVIC_DisableIRQ(OTG_HS_IRQn);	  
+    HAL_NVIC_DisableIRQ(OTG_HS_IRQn);
   }
 }
 
@@ -239,7 +239,7 @@ void HAL_HCD_MspDeInit(HCD_HandleTypeDef * hhcd)
   * @param  hhcd: HCD handle
   * @retval None
   */
-void HAL_HCD_SOF_Callback(HCD_HandleTypeDef * hhcd)
+void HAL_HCD_SOF_Callback(HCD_HandleTypeDef *hhcd)
 {
   USBH_LL_IncTimer(hhcd->pData);
 }
@@ -249,7 +249,7 @@ void HAL_HCD_SOF_Callback(HCD_HandleTypeDef * hhcd)
   * @param  hhcd: HCD handle
   * @retval None
   */
-void HAL_HCD_Connect_Callback(HCD_HandleTypeDef * hhcd)
+void HAL_HCD_Connect_Callback(HCD_HandleTypeDef *hhcd)
 {
   USBH_LL_Connect(hhcd->pData);
 }
@@ -259,11 +259,10 @@ void HAL_HCD_Connect_Callback(HCD_HandleTypeDef * hhcd)
   * @param  hhcd: HCD handle
   * @retval None
   */
-void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef * hhcd)
+void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef *hhcd)
 {
   USBH_LL_Disconnect(hhcd->pData);
 }
-
 
 /**
   * @brief  Notify URB state change callback.
@@ -272,7 +271,7 @@ void HAL_HCD_Disconnect_Callback(HCD_HandleTypeDef * hhcd)
   * @param  urb_state: URB State
   * @retval None
   */
-void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef * hhcd,
+void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef *hhcd,
                                          uint8_t chnum,
                                          HCD_URBStateTypeDef urb_state)
 {
@@ -288,7 +287,7 @@ void HAL_HCD_HC_NotifyURBChange_Callback(HCD_HandleTypeDef * hhcd,
   * @param  phost: Host handle
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef * phost)
+USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef *phost)
 {
 #ifdef USE_USBH_FS
   /* Set the LL Driver parameters */
@@ -316,11 +315,11 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef * phost)
   hhcd.Init.Host_channels = 16;
   hhcd.Init.dma_enable = 0;
   hhcd.Init.low_power_enable = 0;
-  hhcd.Init.phy_itface = USB_OTG_EMBEDDED_PHY;		/* HCD_PHY_EMBEDDED±íÊ¾ÄÚÇ¶PHY,  HCD_PHY_ULPI±íÊ¾Íâ²¿¸ßËÙPHY */
+  hhcd.Init.phy_itface = USB_OTG_EMBEDDED_PHY; /* HCD_PHY_EMBEDDEDè¡¨ç¤ºå†…åµŒPHY,  HCD_PHY_ULPIè¡¨ç¤ºå¤–éƒ¨é«˜é€ŸPHY */
   hhcd.Init.Sof_enable = 0;
-  hhcd.Init.speed = HCD_SPEED_FULL;				/* HCD_SPEED_HIGH;  HCD_SPEED_FULL */
+  hhcd.Init.speed = HCD_SPEED_FULL; /* HCD_SPEED_HIGH;  HCD_SPEED_FULL */
   hhcd.Init.vbus_sensing_enable = 0;
-  hhcd.Init.use_external_vbus = 0;		/* vbus = 0 */
+  hhcd.Init.use_external_vbus = 0; /* vbus = 0 */
   hhcd.Init.lpm_enable = 0;
 
   /* Link the driver to the stack */
@@ -330,7 +329,7 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef * phost)
   /* Initialize the LL driver */
   HAL_HCD_Init(&hhcd);
 
-#endif                          /* USE_USB_HS */
+#endif /* USE_USB_HS */
 
   USBH_LL_SetTimer(phost, HAL_HCD_GetCurrentFrame(&hhcd));
 
@@ -342,7 +341,7 @@ USBH_StatusTypeDef USBH_LL_Init(USBH_HandleTypeDef * phost)
   * @param  phost: Host handle
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef * phost)
+USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef *phost)
 {
   HAL_HCD_DeInit(phost->pData);
   return USBH_OK;
@@ -353,7 +352,7 @@ USBH_StatusTypeDef USBH_LL_DeInit(USBH_HandleTypeDef * phost)
   * @param  phost: Host handle
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef * phost)
+USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef *phost)
 {
   HAL_HCD_Start(phost->pData);
   return USBH_OK;
@@ -364,7 +363,7 @@ USBH_StatusTypeDef USBH_LL_Start(USBH_HandleTypeDef * phost)
   * @param  phost: Host handle
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef * phost)
+USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef *phost)
 {
   HAL_HCD_Stop(phost->pData);
   return USBH_OK;
@@ -375,7 +374,7 @@ USBH_StatusTypeDef USBH_LL_Stop(USBH_HandleTypeDef * phost)
   * @param  phost: Host handle
   * @retval USBH Speeds
   */
-USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef * phost)
+USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef *phost)
 {
   USBH_SpeedTypeDef speed = USBH_SPEED_FULL;
 
@@ -405,7 +404,7 @@ USBH_SpeedTypeDef USBH_LL_GetSpeed(USBH_HandleTypeDef * phost)
   * @param  phost: Host handle
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef * phost)
+USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef *phost)
 {
   HAL_HCD_ResetPort(phost->pData);
   return USBH_OK;
@@ -417,7 +416,7 @@ USBH_StatusTypeDef USBH_LL_ResetPort(USBH_HandleTypeDef * phost)
   * @param  pipe: Pipe index   
   * @retval Packet Size
   */
-uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef * phost, uint8_t pipe)
+uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef *phost, uint8_t pipe)
 {
   return HAL_HCD_HC_GetXferCount(phost->pData, pipe);
 }
@@ -433,7 +432,7 @@ uint32_t USBH_LL_GetLastXferSize(USBH_HandleTypeDef * phost, uint8_t pipe)
   * @param  mps: Endpoint Max Packet Size
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef * phost,
+USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef *phost,
                                     uint8_t pipe,
                                     uint8_t epnum,
                                     uint8_t dev_address,
@@ -450,7 +449,7 @@ USBH_StatusTypeDef USBH_LL_OpenPipe(USBH_HandleTypeDef * phost,
   * @param  pipe: Pipe index
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef * phost, uint8_t pipe)
+USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef *phost, uint8_t pipe)
 {
   HAL_HCD_HC_Halt(phost->pData, pipe);
   return USBH_OK;
@@ -483,12 +482,12 @@ USBH_StatusTypeDef USBH_LL_ClosePipe(USBH_HandleTypeDef * phost, uint8_t pipe)
   *           1: do ping active 
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef * phost,
+USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef *phost,
                                      uint8_t pipe,
                                      uint8_t direction,
                                      uint8_t ep_type,
                                      uint8_t token,
-                                     uint8_t * pbuff,
+                                     uint8_t *pbuff,
                                      uint16_t length, uint8_t do_ping)
 {
   HAL_HCD_HC_SubmitRequest(phost->pData,
@@ -511,10 +510,10 @@ USBH_StatusTypeDef USBH_LL_SubmitURB(USBH_HandleTypeDef * phost,
   *            @arg URB_ERROR  
   *            @arg URB_STALL      
   */
-USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef * phost,
+USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef *phost,
                                          uint8_t pipe)
 {
-  return (USBH_URBStateTypeDef) HAL_HCD_HC_GetURBState(phost->pData, pipe);
+  return (USBH_URBStateTypeDef)HAL_HCD_HC_GetURBState(phost->pData, pipe);
 }
 
 /**
@@ -526,10 +525,10 @@ USBH_URBStateTypeDef USBH_LL_GetURBState(USBH_HandleTypeDef * phost,
   *           1: VBUS Inactive
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef * phost, uint8_t state)
+USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef *phost, uint8_t state)
 {
-#if 0	/* °²¸»À³: STM32-V6Ö÷°åÎ´×öµçÔ´Êä³ö¿ØÖÆ */
-	#ifdef USE_USB_FS
+#if 0 /* å®‰å¯Œè±: STM32-V6ä¸»æ¿æœªåšç”µæºè¾“å‡ºæ§åˆ¶ */
+#ifdef USE_USB_FS
 	  if (state == 0)
 	  {
 		/* Configure Low Charge pump */
@@ -540,9 +539,9 @@ USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef * phost, uint8_t state)
 		/* Drive High Charge pump */
 		BSP_IO_WritePin(OTG_FS1_POWER_SWITCH_PIN, BSP_IO_PIN_SET);
 	  }
-	#endif
-#endif	
-  HAL_Delay(200);	/* 200ms */
+#endif
+#endif
+  HAL_Delay(200); /* 200ms */
   return USBH_OK;
 }
 
@@ -553,7 +552,7 @@ USBH_StatusTypeDef USBH_LL_DriverVBUS(USBH_HandleTypeDef * phost, uint8_t state)
   * @param  toggle: toggle (0/1)
   * @retval USBH Status
   */
-USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef * phost, uint8_t pipe,
+USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef *phost, uint8_t pipe,
                                      uint8_t toggle)
 {
   if (hhcd.hc[pipe].ep_is_in)
@@ -573,7 +572,7 @@ USBH_StatusTypeDef USBH_LL_SetToggle(USBH_HandleTypeDef * phost, uint8_t pipe,
   * @param  pipe: Pipe index
   * @retval toggle (0/1)
   */
-uint8_t USBH_LL_GetToggle(USBH_HandleTypeDef * phost, uint8_t pipe)
+uint8_t USBH_LL_GetToggle(USBH_HandleTypeDef *phost, uint8_t pipe)
 {
   uint8_t toggle = 0;
 

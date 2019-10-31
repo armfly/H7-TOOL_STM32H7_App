@@ -45,12 +45,12 @@
 /* AT+CREG? 命令应答中的网络状态定义 	当前网络注册状态  SIM800_GetNetStatus() */
 enum
 {
-	CREG_NO_REG = 0,		/* 0：没有注册，ME现在并没有在搜寻要注册的新的运营商 */
-	CREG_LOCAL_OK = 1,	/* 1：注册了本地网络 */
-	CREG_SEARCH = 2,		/* 2：没有注册，但MS正在搜寻要注册的新的运营商 */
-	CREG_REJECT = 3,		/* 3：注册被拒绝 */
-	CREG_UNKNOW = 4,		/* 4：未知原因 */
-	CREG_REMOTE_OK = 5, /* 5：注册了漫游网络 */
+  CREG_NO_REG = 0,    /* 0：没有注册，ME现在并没有在搜寻要注册的新的运营商 */
+  CREG_LOCAL_OK = 1,  /* 1：注册了本地网络 */
+  CREG_SEARCH = 2,    /* 2：没有注册，但MS正在搜寻要注册的新的运营商 */
+  CREG_REJECT = 3,    /* 3：注册被拒绝 */
+  CREG_UNKNOW = 4,    /* 4：未知原因 */
+  CREG_REMOTE_OK = 5, /* 5：注册了漫游网络 */
 };
 
 /* 通过 ATI 指令，可以查询模块的硬件信息 
@@ -65,10 +65,10 @@ OK
 */
 typedef struct
 {
-	char Manfacture[12];	 /* 厂商 SIMCOM_Ltd */
-	char Model[12];				 /* 型号 SIM800 */
-	char Revision[15 + 1]; /* 固件版本 R13.08 */
-												 //char IMEI[15 + 1];		/* IMEI 码 需要通过AT+GSN获得 */
+  char Manfacture[12];   /* 厂商 SIMCOM_Ltd */
+  char Model[12];        /* 型号 SIM800 */
+  char Revision[15 + 1]; /* 固件版本 R13.08 */
+                         //char IMEI[15 + 1];		/* IMEI 码 需要通过AT+GSN获得 */
 } SIM800_INFO_T;
 
 /* 供外部调用的函数声明 */

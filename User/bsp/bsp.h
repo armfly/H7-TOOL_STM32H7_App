@@ -25,7 +25,7 @@
 //#define CPU_IDLE()		bsp_Idle()
 
 /* 开关全局中断的宏 */
-#define ENABLE_INT() __set_PRIMASK(0)	/* 使能全局中断 */
+#define ENABLE_INT() __set_PRIMASK(0)  /* 使能全局中断 */
 #define DISABLE_INT() __set_PRIMASK(1) /* 禁止全局中断 */
 
 /* 这个宏仅用于调试阶段排错 */

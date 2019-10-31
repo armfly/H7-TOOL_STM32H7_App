@@ -26,4 +26,3 @@ void DAC8562_SetDacData(uint8_t _ch, uint16_t _dac);
 int16_t AD7606_ReadAdc(uint8_t _ch);
 
 #endif
-

@@ -61,7 +61,7 @@
   * @param huart: UART handle pointer
   * @retval None
   */
-void HAL_UART_MspInit(UART_HandleTypeDef * huart)
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
   static DMA_HandleTypeDef hdma_tx;
   GPIO_InitTypeDef GPIO_InitStruct;
@@ -118,7 +118,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef * huart)
   hdma_tx.Init.MemBurst = DMA_MBURST_INC4;
   hdma_tx.Init.PeriphBurst = DMA_PBURST_INC4;
 
-
   HAL_DMA_Init(&hdma_tx);
 
   /* Associate the initialized DMA handle to the UART handle */
@@ -134,7 +133,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef * huart)
    */
   HAL_NVIC_SetPriority(USARTx_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(USARTx_IRQn);
-
 
   /* ##-7- Enable TIM peripherals Clock ####################################### 
    */
@@ -157,7 +155,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef * huart)
   * @param huart: UART handle pointer
   * @retval None
   */
-void HAL_UART_MspDeInit(UART_HandleTypeDef * huart)
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
   /* ##-1- Reset peripherals ################################################## 
    */

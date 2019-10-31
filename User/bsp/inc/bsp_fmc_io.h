@@ -17,39 +17,39 @@
 /* 供外部调用的函数声明 */
 enum
 {
-	EIO_D0 = 0,
-	EIO_D1,
-	EIO_D2,
-	EIO_D3,
-	EIO_D4,
-	EIO_D5,
-	EIO_D6,
-	EIO_D7,
+  EIO_D0 = 0,
+  EIO_D1,
+  EIO_D2,
+  EIO_D3,
+  EIO_D4,
+  EIO_D5,
+  EIO_D6,
+  EIO_D7,
 
-	EIO_D8,
-	EIO_D9,
+  EIO_D8,
+  EIO_D9,
 
-	EIO_D10, /* TTL_TX */
-	EIO_D11, /* TTL_RX */
+  EIO_D10, /* TTL_TX */
+  EIO_D11, /* TTL_RX */
 
-	EIO_D12, /* CAM_TX */
-	EIO_D13, /* CAM_RX */
+  EIO_D12, /* CAM_TX */
+  EIO_D13, /* CAM_RX */
 
-	EIO_485_TXEN = 100, /* RS485方向控制 */
+  EIO_485_TXEN = 100, /* RS485方向控制 */
 };
 
 /* IO功能选择 */
 typedef enum
 {
-	ES_GPIO_IN = 0,	/* GPIO 输入， FMC输入 */
-	ES_GPIO_OUT = 1, /* GPIO 输出， FMC输入 */
-	ES_FMC_OUT = 2,	/* GPIO 输入， FMC输出 */
+  ES_GPIO_IN = 0,  /* GPIO 输入， FMC输入 */
+  ES_GPIO_OUT = 1, /* GPIO 输出， FMC输入 */
+  ES_FMC_OUT = 2,  /* GPIO 输入， FMC输出 */
 
-	ES_FMC_NOE = 3, /* D8专用，FMC_D8和FMC_NOE并联 */
-	ES_FMC_NWE = 4, /* D9专用，FMC_D9和FMC_NWE并联 */
+  ES_FMC_NOE = 3, /* D8专用，FMC_D8和FMC_NOE并联 */
+  ES_FMC_NWE = 4, /* D9专用，FMC_D9和FMC_NWE并联 */
 
-	ES_GPIO_UART = 5, /* 作为GPIO串口功能 */
-	ES_GPIO_CAN = 6,	/* CAN功能 */
+  ES_GPIO_UART = 5, /* 作为GPIO串口功能 */
+  ES_GPIO_CAN = 6,  /* CAN功能 */
 } EIO_SELECT_E;
 
 void bsp_InitExtIO(void);

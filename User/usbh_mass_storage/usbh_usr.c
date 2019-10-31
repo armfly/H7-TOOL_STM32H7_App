@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : UÅÌÇı¶¯ÓÃ»§½Ó¿Ú
-*	ÎÄ¼şÃû³Æ : usbh_usr.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ·â×°UÅÌ²Ù×÷º¯Êı£¬Ìá¹©¸øAPPÊ¹ÓÃ.
+*	æ¨¡å—åç§° : Uç›˜é©±åŠ¨ç”¨æˆ·æ¥å£
+*	æ–‡ä»¶åç§° : usbh_usr.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å°è£…Uç›˜æ“ä½œå‡½æ•°ï¼Œæä¾›ç»™APPä½¿ç”¨.
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-09-05 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-09-05 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,108 +20,108 @@
 #include "usbh_msc.h"
 #include "ff_gen_drv.h"
 #include "usbh_diskio.h"
- 
-#define usbh_printf	printf
- 
+
+#define usbh_printf printf
+
 USBH_HandleTypeDef hUSBHost;
 FATFS USBH_fatfs;
-char USBDISKPath[4];            /* USB Host logical drive path */
-  
-static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id);
+char USBDISKPath[4]; /* USB Host logical drive path */
+
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: USBH_UserProcess
-*	¹¦ÄÜËµÃ÷: USB host »Øµ÷º¯Êı. ¿ÉÒÔÔÚ´Ë¸øapp·¢ËÍÏûÏ¢
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: USBH_UserProcess
+*	åŠŸèƒ½è¯´æ˜: USB host å›è°ƒå‡½æ•°. å¯ä»¥åœ¨æ­¤ç»™appå‘é€æ¶ˆæ¯
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static void USBH_UserProcess(USBH_HandleTypeDef * phost, uint8_t id)
+static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id)
 {
-	switch (id)
-	{
-		case HOST_USER_SELECT_CONFIGURATION:
-			break;
+  switch (id)
+  {
+  case HOST_USER_SELECT_CONFIGURATION:
+    break;
 
-		case HOST_USER_DISCONNECTION:		/* UÅÌ¶Ï¿ª */
-			if (f_mount(NULL, "", 0) != FR_OK)
-			{
-				usbh_printf("ERROR : Cannot DeInitialize FatFs! \n");
-			}
-			if (FATFS_UnLinkDriver(USBDISKPath) != 0)
-			{
-				usbh_printf("ERROR : Cannot UnLink FatFS Driver! \n");
-			}
-			break;
+  case HOST_USER_DISCONNECTION: /* Uç›˜æ–­å¼€ */
+    if (f_mount(NULL, "", 0) != FR_OK)
+    {
+      usbh_printf("ERROR : Cannot DeInitialize FatFs! \n");
+    }
+    if (FATFS_UnLinkDriver(USBDISKPath) != 0)
+    {
+      usbh_printf("ERROR : Cannot UnLink FatFS Driver! \n");
+    }
+    break;
 
-		case HOST_USER_CLASS_ACTIVE:
-			break;
+  case HOST_USER_CLASS_ACTIVE:
+    break;
 
-		case HOST_USER_CONNECTION:		/* UÅÌ²åÈë */
-			if (FATFS_LinkDriver(&USBH_Driver, USBDISKPath) == 0)
-			{
-				if (f_mount(&USBH_fatfs, "", 0) != FR_OK)
-				{
-					usbh_printf("ERROR : Cannot Initialize FatFs! \n");
-				}
-			}
-			break;
+  case HOST_USER_CONNECTION: /* Uç›˜æ’å…¥ */
+    if (FATFS_LinkDriver(&USBH_Driver, USBDISKPath) == 0)
+    {
+      if (f_mount(&USBH_fatfs, "", 0) != FR_OK)
+      {
+        usbh_printf("ERROR : Cannot Initialize FatFs! \n");
+      }
+    }
+    break;
 
-		default:
-		break;
-	}
+  default:
+    break;
+  }
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbh_OpenMassStorage
-*	¹¦ÄÜËµÃ÷: ´ò¿ªUÅÌÉè±¸
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbh_OpenMassStorage
+*	åŠŸèƒ½è¯´æ˜: æ‰“å¼€Uç›˜è®¾å¤‡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbh_OpenMassStorage(void)
 {
-	/* Init Host Library */
-	USBH_Init(&hUSBHost, USBH_UserProcess, 0);
+  /* Init Host Library */
+  USBH_Init(&hUSBHost, USBH_UserProcess, 0);
 
-	/* Add Supported Class */
-	USBH_RegisterClass(&hUSBHost, USBH_MSC_CLASS);
+  /* Add Supported Class */
+  USBH_RegisterClass(&hUSBHost, USBH_MSC_CLASS);
 
-	/* Start Host Process */
-	USBH_Start(&hUSBHost);
-	
-	HAL_PWREx_EnableUSBVoltageDetector();
+  /* Start Host Process */
+  USBH_Start(&hUSBHost);
+
+  HAL_PWREx_EnableUSBVoltageDetector();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbh_CloseMassStorage
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕUÅÌÉè±¸
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbh_CloseMassStorage
+*	åŠŸèƒ½è¯´æ˜: å…³é—­Uç›˜è®¾å¤‡
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbh_CloseMassStorage(void)
 {
-	USBH_Stop(&hUSBHost);
-	
-	USBH_DeInit(&hUSBHost);
+  USBH_Stop(&hUSBHost);
+
+  USBH_DeInit(&hUSBHost);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbh_Poll
-*	¹¦ÄÜËµÃ÷: Ö÷³ÌĞòĞèÒªÂÖÑ¯Ö´ĞĞ±¾º¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbh_Poll
+*	åŠŸèƒ½è¯´æ˜: ä¸»ç¨‹åºéœ€è¦è½®è¯¢æ‰§è¡Œæœ¬å‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbh_Poll(void)
 {
-	/* USB Host Background task , ÔÚ usbh_core.c ÖĞµ÷ÓÃ */
-    USBH_Process(&hUSBHost);
+  /* USB Host Background task , åœ¨ usbh_core.c ä¸­è°ƒç”¨ */
+  USBH_Process(&hUSBHost);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

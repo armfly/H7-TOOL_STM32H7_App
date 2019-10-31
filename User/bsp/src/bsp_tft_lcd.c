@@ -57,7 +57,7 @@
 #include "bsp.h"
 #include "fonts.h"
 
-#define	USE_UTF8	1	/* 1表示启用字符串的UTF-8编码 */
+#define USE_UTF8 1 /* 1表示启用字符串的UTF-8编码 */
 
 #if USE_UTF8 == 1
 #include "ff.h"
@@ -67,14 +67,14 @@
 
 /* 下面3个变量，主要用于使程序同时支持不同的屏 */
 uint16_t g_LcdHeight = 128; /* 显示屏分辨率-高度 */
-uint16_t g_LcdWidth = 128;	/* 显示屏分辨率-宽度 */
-uint8_t s_ucBright;					/* 背光亮度参数 */
+uint16_t g_LcdWidth = 128;  /* 显示屏分辨率-宽度 */
+uint8_t s_ucBright;         /* 背光亮度参数 */
 uint8_t g_LcdDirection = 0; /* 显示方向.0，1，2，3 */
 
 static void LCD_HardReset(void);
 static void LCD_SetPwmBackLight(uint8_t _bright);
 static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-													 uint8_t _Align);
+                           uint8_t _Align);
 
 #if 1
 #define LCDX_InitHard ST7789_InitHard
@@ -114,16 +114,16 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
 */
 void LCD_InitHard(void)
 {
-	LCD_HardReset(); /* 硬件复位 （STM32-V5, V6 无需），针对其他GPIO控制LCD复位的产品 */
+  LCD_HardReset(); /* 硬件复位 （STM32-V5, V6 无需），针对其他GPIO控制LCD复位的产品 */
 
-	LCDX_InitHard();
+  LCDX_InitHard();
 
-	LCD_SetDirection(0);
+  LCD_SetDirection(0);
 
 #if 0 /* 此处不开背光。等主界面初始化完毕后再开，避免开机显示黑屏颜色不均 */
-	LCD_ClrScr(CL_BLACK);	/* 清屏，显示全黑 */
+  LCD_ClrScr(CL_BLACK);	/* 清屏，显示全黑 */
 
-	LCD_SetBackLight(BRIGHT_DEFAULT);	 /* 打开背光，设置为缺省亮度 */
+  LCD_SetBackLight(BRIGHT_DEFAULT);	 /* 打开背光，设置为缺省亮度 */
 #endif
 }
 
@@ -138,8 +138,8 @@ void LCD_InitHard(void)
 */
 void LCD_SetPwmBackLight(uint8_t _bright)
 {
-	/* 背光有CPU输出PWM控制，PA0/TIM5_CH1/TIM2_CH1 */
-	bsp_SetTIMOutPWM(GPIOH, GPIO_PIN_9, TIM12, 2, 20000, (_bright * 10000) / 255);
+  /* 背光有CPU输出PWM控制，PA0/TIM5_CH1/TIM2_CH1 */
+  bsp_SetTIMOutPWM(GPIOH, GPIO_PIN_9, TIM12, 2, 20000, (_bright * 10000) / 255);
 }
 
 /*
@@ -153,9 +153,9 @@ void LCD_SetPwmBackLight(uint8_t _bright)
 */
 void LCD_SetBackLight(uint8_t _bright)
 {
-	s_ucBright = _bright; /* 保存背光值 */
+  s_ucBright = _bright; /* 保存背光值 */
 
-	LCD_SetPwmBackLight(_bright);
+  LCD_SetPwmBackLight(_bright);
 }
 
 /*
@@ -168,7 +168,7 @@ void LCD_SetBackLight(uint8_t _bright)
 */
 uint8_t LCD_GetBackLight(void)
 {
-	return s_ucBright;
+  return s_ucBright;
 }
 
 /*
@@ -182,22 +182,22 @@ uint8_t LCD_GetBackLight(void)
 void LCD_HardReset(void)
 {
 #if 0	
-	GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitTypeDef GPIO_InitStructure;
 
-	/* 使能 GPIO时钟 */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	
-	/* 配置背光GPIO为推挽输出模式 */
-	GPIO_InitStructure.GPIO_Pin = GPIO_PIN_1;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+  /* 使能 GPIO时钟 */
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+  
+  /* 配置背光GPIO为推挽输出模式 */
+  GPIO_InitStructure.GPIO_Pin = GPIO_PIN_1;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	GPIO_ResetBits(GPIOB, GPIO_PIN_1);
-	bsp_DelayMS(20);
-	GPIO_SetBits(GPIOB, GPIO_PIN_1);
+  GPIO_ResetBits(GPIOB, GPIO_PIN_1);
+  bsp_DelayMS(20);
+  GPIO_SetBits(GPIOB, GPIO_PIN_1);
 #endif
 }
 
@@ -211,9 +211,9 @@ void LCD_HardReset(void)
 */
 void LCD_SetDirection(uint8_t _dir)
 {
-	g_LcdDirection = _dir; /* 保存在全局变量 */
+  g_LcdDirection = _dir; /* 保存在全局变量 */
 
-	LCDX_SetDirection(_dir);
+  LCDX_SetDirection(_dir);
 }
 
 /*
@@ -226,7 +226,7 @@ void LCD_SetDirection(uint8_t _dir)
 */
 void LCD_GetChipDescribe(char *_str)
 {
-	LCDX_GetChipDescribe(_str);
+  LCDX_GetChipDescribe(_str);
 }
 
 /*
@@ -239,7 +239,7 @@ void LCD_GetChipDescribe(char *_str)
 */
 uint16_t LCD_GetHeight(void)
 {
-	return g_LcdHeight;
+  return g_LcdHeight;
 }
 
 /*
@@ -252,7 +252,7 @@ uint16_t LCD_GetHeight(void)
 */
 uint16_t LCD_GetWidth(void)
 {
-	return g_LcdWidth;
+  return g_LcdWidth;
 }
 
 /*
@@ -265,7 +265,7 @@ uint16_t LCD_GetWidth(void)
 */
 void LCD_DispOn(void)
 {
-	;
+  ;
 }
 
 /*
@@ -278,7 +278,7 @@ void LCD_DispOn(void)
 */
 void LCD_DispOff(void)
 {
-	;
+  ;
 }
 
 /*
@@ -291,7 +291,7 @@ void LCD_DispOff(void)
 */
 void LCD_ClrScr(uint16_t _usColor)
 {
-	LCDX_ClrScr(_usColor);
+  LCDX_ClrScr(_usColor);
 }
 
 /*
@@ -308,7 +308,7 @@ void LCD_ClrScr(uint16_t _usColor)
 */
 void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont)
 {
-	LCD_DispStrEx0(_usX, _usY, _ptr, _tFont, 0, 0);
+  LCD_DispStrEx0(_usX, _usY, _ptr, _tFont, 0, 0);
 }
 
 /*
@@ -329,64 +329,64 @@ void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont)
 *********************************************************************************************************
 */
 void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-									 uint8_t _Align)
+                   uint8_t _Align)
 {
-	uint16_t i = 0;
-	char str_buf[128] = {0};
-	uint16_t len;
-	uint16_t x, y;
-	uint8_t ch;
+  uint16_t i = 0;
+  char str_buf[128] = {0};
+  uint16_t len;
+  uint16_t x, y;
+  uint8_t ch;
 
-	len = 0;
-	x = _usX;
-	y = _usY;
-	str_buf[0] = 0;
+  len = 0;
+  x = _usX;
+  y = _usY;
+  str_buf[0] = 0;
 
-	for (i = 0; i < 1024; i++)
-	{
-		ch = _ptr[i];
+  for (i = 0; i < 1024; i++)
+  {
+    ch = _ptr[i];
 
-		if (ch == 0)
-		{
-			LCD_DispStrEx0(x, y, str_buf, _tFont, _Width, _Align);
-			break;
-		}
-		else if (ch == '\r') /* 换行指令，后面2个字符表示垂直间距（单位像素） 支持重叠 */
-		{
-			uint8_t cap;
+    if (ch == 0)
+    {
+      LCD_DispStrEx0(x, y, str_buf, _tFont, _Width, _Align);
+      break;
+    }
+    else if (ch == '\r') /* 换行指令，后面2个字符表示垂直间距（单位像素） 支持重叠 */
+    {
+      uint8_t cap;
 
-			LCD_DispStrEx0(x, y, str_buf, _tFont, _Width, _Align);
+      LCD_DispStrEx0(x, y, str_buf, _tFont, _Width, _Align);
 
-			len = 0;
+      len = 0;
 
-			x = _usX;
+      x = _usX;
 
-			cap = (_ptr[i + 1] - '0') * 10 + _ptr[i + 2] - '0'; /* 间距 */
-			y += cap;
-			i += 2;
-		}
-		else if (ch == '\t') /* 划线指令，后面8个字符表示 X1, Y2, X2,  Y2 00 99 02 02 */
-		{
-			uint16_t x1, x2, y1, y2;
+      cap = (_ptr[i + 1] - '0') * 10 + _ptr[i + 2] - '0'; /* 间距 */
+      y += cap;
+      i += 2;
+    }
+    else if (ch == '\t') /* 划线指令，后面8个字符表示 X1, Y2, X2,  Y2 00 99 02 02 */
+    {
+      uint16_t x1, x2, y1, y2;
 
-			x1 = _usX + (_ptr[i + 1] - '0') * 10 + (_ptr[i + 2] - '0');
-			y1 = _usY + (_ptr[i + 3] - '0') * 10 + (_ptr[i + 4] - '0');
-			x2 = _usX + (_ptr[i + 5] - '0') * 10 + (_ptr[i + 6] - '0');
-			y2 = _usY + (_ptr[i + 7] - '0') * 10 + (_ptr[i + 8] - '0');
-			LCD_DrawLine(x1, y1, x2, y2, _tFont->FrontColor);
+      x1 = _usX + (_ptr[i + 1] - '0') * 10 + (_ptr[i + 2] - '0');
+      y1 = _usY + (_ptr[i + 3] - '0') * 10 + (_ptr[i + 4] - '0');
+      x2 = _usX + (_ptr[i + 5] - '0') * 10 + (_ptr[i + 6] - '0');
+      y2 = _usY + (_ptr[i + 7] - '0') * 10 + (_ptr[i + 8] - '0');
+      LCD_DrawLine(x1, y1, x2, y2, _tFont->FrontColor);
 
-			i += 8;
-		}
-		else
-		{
-			if (len < sizeof(str_buf) - 1)
-			{
-				str_buf[len++] = ch;
+      i += 8;
+    }
+    else
+    {
+      if (len < sizeof(str_buf) - 1)
+      {
+        str_buf[len++] = ch;
 
-				str_buf[len] = 0;
-			}
-		}
-	}
+        str_buf[len] = 0;
+      }
+    }
+  }
 }
 
 /*
@@ -400,38 +400,38 @@ void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uin
 */
 uint16_t LCD_GetFontWidth(FONT_T *_tFont)
 {
-	uint16_t font_width = 16;
+  uint16_t font_width = 16;
 
-	switch (_tFont->FontCode)
-	{
-	case FC_ST_12:
-		font_width = 12;
-		break;
+  switch (_tFont->FontCode)
+  {
+  case FC_ST_12:
+    font_width = 12;
+    break;
 
-	case FC_ST_16:
-	case FC_RA8875_16:
-		font_width = 16;
-		break;
+  case FC_ST_16:
+  case FC_RA8875_16:
+    font_width = 16;
+    break;
 
-	case FC_RA8875_24:
-	case FC_ST_24:
-		font_width = 24;
-		break;
+  case FC_RA8875_24:
+  case FC_ST_24:
+    font_width = 24;
+    break;
 
-	case FC_ST_32:
-	case FC_RA8875_32:
-		font_width = 32;
-		break;
+  case FC_ST_32:
+  case FC_RA8875_32:
+    font_width = 32;
+    break;
 
-	case FC_ST_62X40:
-		font_width = 40;
-		break;
+  case FC_ST_62X40:
+    font_width = 40;
+    break;
 
-	case FC_ST_96X40:
-		font_width = 40;
-		break;
-	}
-	return font_width;
+  case FC_ST_96X40:
+    font_width = 40;
+    break;
+  }
+  return font_width;
 }
 
 /*
@@ -445,38 +445,38 @@ uint16_t LCD_GetFontWidth(FONT_T *_tFont)
 */
 uint16_t LCD_GetFontHeight(FONT_T *_tFont)
 {
-	uint16_t height = 16;
+  uint16_t height = 16;
 
-	switch (_tFont->FontCode)
-	{
-	case FC_ST_12:
-		height = 12;
-		break;
+  switch (_tFont->FontCode)
+  {
+  case FC_ST_12:
+    height = 12;
+    break;
 
-	case FC_ST_16:
-	case FC_RA8875_16:
-		height = 16;
-		break;
+  case FC_ST_16:
+  case FC_RA8875_16:
+    height = 16;
+    break;
 
-	case FC_RA8875_24:
-	case FC_ST_24:
-		height = 24;
-		break;
+  case FC_RA8875_24:
+  case FC_ST_24:
+    height = 24;
+    break;
 
-	case FC_ST_32:
-	case FC_RA8875_32:
-		height = 32;
-		break;
+  case FC_ST_32:
+  case FC_RA8875_32:
+    height = 32;
+    break;
 
-	case FC_ST_62X40:
-		height = 62;
-		break;
+  case FC_ST_62X40:
+    height = 62;
+    break;
 
-	case FC_ST_96X40:
-		height = 96;
-		break;
-	}
-	return height;
+  case FC_ST_96X40:
+    height = 96;
+    break;
+  }
+  return height;
 }
 
 /*
@@ -491,203 +491,203 @@ uint16_t LCD_GetFontHeight(FONT_T *_tFont)
 */
 uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
 {
-	char *p = _ptr;
-	uint16_t width = 0;
-	uint8_t code1, code2;
-	uint16_t font_width;
-	uint16_t m;
-	uint16_t address;
-	uint8_t a_flag = 0;
+  char *p = _ptr;
+  uint16_t width = 0;
+  uint8_t code1, code2;
+  uint16_t font_width;
+  uint16_t m;
+  uint16_t address;
+  uint8_t a_flag = 0;
 
-	font_width = LCD_GetFontWidth(_tFont);
+  font_width = LCD_GetFontWidth(_tFont);
 
-	while (*p != 0)
-	{
-		code1 = *p;				/* 读取字符串数据， 该数据可能是ascii代码，也可能汉字代码的高字节 */
-		if (code1 < 0x80) /* ASCII */
-		{
-			if (code1 == '\a')
-			{
-				a_flag = 1;
-				p++;
-				code1 = *p;
-			}
-			else
-			{
-				a_flag = 0;
-			}
+  while (*p != 0)
+  {
+    code1 = *p;       /* 读取字符串数据， 该数据可能是ascii代码，也可能汉字代码的高字节 */
+    if (code1 < 0x80) /* ASCII */
+    {
+      if (code1 == '\a')
+      {
+        a_flag = 1;
+        p++;
+        code1 = *p;
+      }
+      else
+      {
+        a_flag = 0;
+      }
 
-			switch (_tFont->FontCode)
-			{
-			case FC_RA8875_16:
-				font_width = g_RA8875_Ascii16_width[code1 - 0x20];
-				break;
+      switch (_tFont->FontCode)
+      {
+      case FC_RA8875_16:
+        font_width = g_RA8875_Ascii16_width[code1 - 0x20];
+        break;
 
-			case FC_RA8875_24:
-				if (a_flag == 0)
-				{
-					font_width = g_RA8875_Ascii24_width[code1 - 0x20];
-				}
-				else
-				{
-					{
-						m = 0;
-						while (1)
-						{
-							address = m * (72 + 2);
-							m++;
-							if (code1 == g_Ascii24_VarWidth[address + 0])
-							{
-								font_width = g_Ascii24_VarWidth[address + 1];
-								break;
-							}
-							else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
-							{
-								//							  /* 字库搜索完毕，未找到，则填充全FF */
-								//							  memset(g_Ascii32_VarWidth, 0xFF, 128);
-								break;
-							}
-						}
-					}
-				}
-				break;
+      case FC_RA8875_24:
+        if (a_flag == 0)
+        {
+          font_width = g_RA8875_Ascii24_width[code1 - 0x20];
+        }
+        else
+        {
+          {
+            m = 0;
+            while (1)
+            {
+              address = m * (72 + 2);
+              m++;
+              if (code1 == g_Ascii24_VarWidth[address + 0])
+              {
+                font_width = g_Ascii24_VarWidth[address + 1];
+                break;
+              }
+              else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
+              {
+                //							  /* 字库搜索完毕，未找到，则填充全FF */
+                //							  memset(g_Ascii32_VarWidth, 0xFF, 128);
+                break;
+              }
+            }
+          }
+        }
+        break;
 
-			case FC_RA8875_32:
-				if (a_flag == 0)
-				{
-					font_width = g_RA8875_Ascii32_width[code1 - 0x20];
-				}
-				else
-				{
-					{
-						m = 0;
-						while (1)
-						{
-							address = m * (128 + 2);
-							m++;
-							if (code1 == g_Ascii32_VarWidth[address + 0])
-							{
-								font_width = g_Ascii32_VarWidth[address + 1];
-								break;
-							}
-							else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
-							{
-								//							  /* 字库搜索完毕，未找到，则填充全FF */
-								//							  memset(g_Ascii32_VarWidth, 0xFF, 128);
-								break;
-							}
-						}
-					}
-				}
-				break;
+      case FC_RA8875_32:
+        if (a_flag == 0)
+        {
+          font_width = g_RA8875_Ascii32_width[code1 - 0x20];
+        }
+        else
+        {
+          {
+            m = 0;
+            while (1)
+            {
+              address = m * (128 + 2);
+              m++;
+              if (code1 == g_Ascii32_VarWidth[address + 0])
+              {
+                font_width = g_Ascii32_VarWidth[address + 1];
+                break;
+              }
+              else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
+              {
+                //							  /* 字库搜索完毕，未找到，则填充全FF */
+                //							  memset(g_Ascii32_VarWidth, 0xFF, 128);
+                break;
+              }
+            }
+          }
+        }
+        break;
 
-			case FC_ST_12:
-				font_width = 6;
-				break;
+      case FC_ST_12:
+        font_width = 6;
+        break;
 
-			case FC_ST_16:
-				font_width = 8;
-				break;
+      case FC_ST_16:
+        font_width = 8;
+        break;
 
-			case FC_ST_24:
-				font_width = 12;
-				break;
+      case FC_ST_24:
+        font_width = 12;
+        break;
 
-			case FC_ST_32:
-				font_width = 16;
-				break;
+      case FC_ST_32:
+        font_width = 16;
+        break;
 
-			case FC_ST_62X40:
-				//对秒进行特殊处理
-				if (code1 == 0x5E)
-				{
-					font_width = 28;
-				}
-				else
-				{
-					font_width = 40;
-				}
-				break;
+      case FC_ST_62X40:
+        //对秒进行特殊处理
+        if (code1 == 0x5E)
+        {
+          font_width = 28;
+        }
+        else
+        {
+          font_width = 40;
+        }
+        break;
 
-			case FC_ST_96X40:
-				//对秒进行特殊处理
-				if (code1 == 0x5E)
-				{
-					font_width = 28;
-				}
-				else
-				{
-					font_width = 40;
-				}
-				break;
+      case FC_ST_96X40:
+        //对秒进行特殊处理
+        if (code1 == 0x5E)
+        {
+          font_width = 28;
+        }
+        else
+        {
+          font_width = 40;
+        }
+        break;
 
-			default:
-				font_width = 8;
-				break;
-			}
-		}
-		else /* 汉字 */
-		{
-			#if USE_UTF8 == 1
-				/* 解读 UTF-8 编码非常简单。
-					如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
-					UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
-			
-					110XXXXX  10XXXXXX           -- 支持
-					1110XXXX  10XXXXXX 10XXXXXX  -- 支持
-					11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
-				*/
-				{			
-					uint8_t code3;
-					
-					if ((code1 & 0xE0) == 0xC0)	/* 2字节 */
-					{
-						code2 = *++p;
-						if (code2 == 0)
-						{
-							break;
-						}													
-					}
-					else if ((code1 & 0xF0) == 0xE0)	/* 3字节 */
-					{
-						code2 = *++p;
-						code3 = *++p;
-						if (code2 == 0 || code3 == 0)
-						{
-							break;
-						}
-					}
-					else if ((code1 & 0xF8) == 0xF0)	/* 4字节 */
-					{
-						code2 = *++p;
-						if (code2 == 0)
-						{
-							break;
-						}							
-					}	
-					else
-					{
-						code2 = *++p;
-						if (code2 == 0)
-						{
-							break;
-						}							
-					}
-				}
-			#else			
-				code2 = *++p;
-				if (code2 == 0)
-				{
-					break;
-				}
-			#endif
-			font_width = LCD_GetFontWidth(_tFont);
-		}
-		width += (font_width + _tFont->Space);
-		p++;
-	}
+      default:
+        font_width = 8;
+        break;
+      }
+    }
+    else /* 汉字 */
+    {
+#if USE_UTF8 == 1
+      /* 解读 UTF-8 编码非常简单。
+          如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
+          UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
+      
+          110XXXXX  10XXXXXX           -- 支持
+          1110XXXX  10XXXXXX 10XXXXXX  -- 支持
+          11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
+        */
+      {
+        uint8_t code3;
 
-	return width;
+        if ((code1 & 0xE0) == 0xC0) /* 2字节 */
+        {
+          code2 = *++p;
+          if (code2 == 0)
+          {
+            break;
+          }
+        }
+        else if ((code1 & 0xF0) == 0xE0) /* 3字节 */
+        {
+          code2 = *++p;
+          code3 = *++p;
+          if (code2 == 0 || code3 == 0)
+          {
+            break;
+          }
+        }
+        else if ((code1 & 0xF8) == 0xF0) /* 4字节 */
+        {
+          code2 = *++p;
+          if (code2 == 0)
+          {
+            break;
+          }
+        }
+        else
+        {
+          code2 = *++p;
+          if (code2 == 0)
+          {
+            break;
+          }
+        }
+      }
+#else
+      code2 = *++p;
+      if (code2 == 0)
+      {
+        break;
+      }
+#endif
+      font_width = LCD_GetFontWidth(_tFont);
+    }
+    width += (font_width + _tFont->Space);
+    p++;
+  }
+
+  return width;
 }
 
 /*
@@ -704,169 +704,169 @@ uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
 static void _LCD_ReadSmallDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
 {
 #ifdef USE_SMALL_FONT /* 使用CPU 内部Flash 小字库 */
-	const uint8_t *pAscDot;
-	uint32_t font_bytes = 0;
-	uint16_t m;
-	uint16_t address;
-	uint8_t fAllHz = 0; /* 1表示程序中内嵌全部的ASCII字符集 */
+  const uint8_t *pAscDot;
+  uint32_t font_bytes = 0;
+  uint16_t m;
+  uint16_t address;
+  uint8_t fAllHz = 0; /* 1表示程序中内嵌全部的ASCII字符集 */
 
-	pAscDot = 0;
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 24 / 2;
-		pAscDot = g_Ascii12;
-		fAllHz = 1;
-		break;
+  pAscDot = 0;
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 24 / 2;
+    pAscDot = g_Ascii12;
+    fAllHz = 1;
+    break;
 
-	case FC_ST_16:
-		/* 缺省是16点阵 */
-		font_bytes = 32 / 2;
-		pAscDot = g_Ascii16;
-		fAllHz = 1;
-		break;
+  case FC_ST_16:
+    /* 缺省是16点阵 */
+    font_bytes = 32 / 2;
+    pAscDot = g_Ascii16;
+    fAllHz = 1;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 48;
-		pAscDot = g_Ascii24;
-		break;
+  case FC_ST_24:
+    font_bytes = 48;
+    pAscDot = g_Ascii24;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 64;
-		pAscDot = g_Ascii32;
-		break;
+  case FC_ST_32:
+    font_bytes = 64;
+    pAscDot = g_Ascii32;
+    break;
 
-	case FC_ST_62X40:
-		font_bytes = 310;
-		pAscDot = g_Ascii62x40;
-		break;
+  case FC_ST_62X40:
+    font_bytes = 310;
+    pAscDot = g_Ascii62x40;
+    break;
 
-	case FC_ST_96X40:
-		font_bytes = 480;
-		pAscDot = g_Ascii96x40;
-		break;
+  case FC_ST_96X40:
+    font_bytes = 480;
+    pAscDot = g_Ascii96x40;
+    break;
 
-	case FC_RA8875_24:
-		font_bytes = 72;
-		pAscDot = g_Ascii24_VarWidth;
-		fAllHz = 2;
-		break;
+  case FC_RA8875_24:
+    font_bytes = 72;
+    pAscDot = g_Ascii24_VarWidth;
+    fAllHz = 2;
+    break;
 
-	case FC_RA8875_32:
-		font_bytes = 128;
-		pAscDot = g_Ascii32_VarWidth;
-		fAllHz = 2;
-		break;
+  case FC_RA8875_32:
+    font_bytes = 128;
+    pAscDot = g_Ascii32_VarWidth;
+    fAllHz = 2;
+    break;
 
-	default:
-		return;
-	}
+  default:
+    return;
+  }
 
-	if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
-	{
-		/* 将CPU内部Flash中的ascii字符点阵复制到buf */
-		memcpy(_pBuf, &pAscDot[_code * (font_bytes)], (font_bytes));
-	}
-	else if (fAllHz == 2)
-	{
-		m = 0;
-		while (1)
-		{
-			address = m * (font_bytes + 2);
-			m++;
-			if (_code == pAscDot[address + 0])
-			{
-				address += 2;
-				memcpy(_pBuf, &pAscDot[address], font_bytes);
-				break;
-			}
-			else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
-			{
-				/* 字库搜索完毕，未找到，则填充全FF */
-				memset(_pBuf, 0xFF, font_bytes);
-				break;
-			}
-		}
-	}
-	else /* 内嵌部分字符，字模数组首字节是ASCII码 */
-	{
-		m = 0;
-		while (1)
-		{
-			address = m * (font_bytes + 1);
-			m++;
-			if (_code == pAscDot[address + 0])
-			{
-				address += 1;
-				memcpy(_pBuf, &pAscDot[address], font_bytes);
-				break;
-			}
-			else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
-			{
-				/* 字库搜索完毕，未找到，则填充全FF */
-				memset(_pBuf, 0xFF, font_bytes);
-				break;
-			}
-		}
-	}
+  if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
+  {
+    /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+    memcpy(_pBuf, &pAscDot[_code * (font_bytes)], (font_bytes));
+  }
+  else if (fAllHz == 2)
+  {
+    m = 0;
+    while (1)
+    {
+      address = m * (font_bytes + 2);
+      m++;
+      if (_code == pAscDot[address + 0])
+      {
+        address += 2;
+        memcpy(_pBuf, &pAscDot[address], font_bytes);
+        break;
+      }
+      else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
+      {
+        /* 字库搜索完毕，未找到，则填充全FF */
+        memset(_pBuf, 0xFF, font_bytes);
+        break;
+      }
+    }
+  }
+  else /* 内嵌部分字符，字模数组首字节是ASCII码 */
+  {
+    m = 0;
+    while (1)
+    {
+      address = m * (font_bytes + 1);
+      m++;
+      if (_code == pAscDot[address + 0])
+      {
+        address += 1;
+        memcpy(_pBuf, &pAscDot[address], font_bytes);
+        break;
+      }
+      else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
+      {
+        /* 字库搜索完毕，未找到，则填充全FF */
+        memset(_pBuf, 0xFF, font_bytes);
+        break;
+      }
+    }
+  }
 #else /* 用全字库 */
-	uint32_t pAscDot;
-	uint8_t font_bytes = 0;
+  uint32_t pAscDot;
+  uint8_t font_bytes = 0;
 
-	pAscDot = 0;
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 12;
+  pAscDot = 0;
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 12;
 #if 0
-				pAscDot = ASC12_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+        pAscDot = ASC12_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
 #else
-		pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
+    pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
 #endif
-		break;
+    break;
 
-	case FC_ST_16:
-		font_bytes = 16;
+  case FC_ST_16:
+    font_bytes = 16;
 #if 0
-				pAscDot = ASC16_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+        pAscDot = ASC16_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
 #else
-		pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
+    pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
 #endif
-		break;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 48;
-		pAscDot = ASC24_ADDR;
-		break;
+  case FC_ST_24:
+    font_bytes = 48;
+    pAscDot = ASC24_ADDR;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 64;
-		pAscDot = ASC32_ADDR;
-		break;
+  case FC_ST_32:
+    font_bytes = 64;
+    pAscDot = ASC32_ADDR;
+    break;
 
-	default:
-		return;
-	}
-	if (_code >= 0x20 && _code <= 0x7E)
-	{
-		pAscDot = ((uint32_t)_code - 0x20) * font_bytes + pAscDot;
-	}
+  default:
+    return;
+  }
+  if (_code >= 0x20 && _code <= 0x7E)
+  {
+    pAscDot = ((uint32_t)_code - 0x20) * font_bytes + pAscDot;
+  }
 
 #ifdef USE_NOR_FONT /* NOR Flash全字库 */
-	/* 将CPU内部Flash中的ascii字符点阵复制到buf */
-	memcpy(_pBuf, (char *)pAscDot, font_bytes);
+  /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+  memcpy(_pBuf, (char *)pAscDot, font_bytes);
 #endif
 
 #ifdef USE_SPI_FONT /* 串行 Flash全字库 */
-	if (_fontcode == FC_ST_12 || _fontcode == FC_ST_16)
-	{
-		memcpy(_pBuf, (char *)pAscDot, font_bytes);
-	}
-	else
-	{
-		/* 字库芯片的12点阵和16点阵字符不好看,笔画细了，而且是非等宽字体 */
-		sf_ReadBuffer(_pBuf, pAscDot, font_bytes);
-	}
+  if (_fontcode == FC_ST_12 || _fontcode == FC_ST_16)
+  {
+    memcpy(_pBuf, (char *)pAscDot, font_bytes);
+  }
+  else
+  {
+    /* 字库芯片的12点阵和16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    sf_ReadBuffer(_pBuf, pAscDot, font_bytes);
+  }
 #endif
 
 #endif
@@ -886,136 +886,136 @@ static void _LCD_ReadSmallDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
 static void _LCD_ReadAsciiDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
 {
 #ifdef USE_SMALL_FONT /* 使用CPU 内部Flash 小字库 */
-	const uint8_t *pAscDot;
-	uint32_t font_bytes = 0;
-	uint16_t m;
-	uint16_t address;
-	uint8_t fAllHz = 0; /* 1表示程序中内嵌全部的ASCII字符集 */
+  const uint8_t *pAscDot;
+  uint32_t font_bytes = 0;
+  uint16_t m;
+  uint16_t address;
+  uint8_t fAllHz = 0; /* 1表示程序中内嵌全部的ASCII字符集 */
 
-	pAscDot = 0;
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 24 / 2;
-		pAscDot = g_Ascii12;
-		fAllHz = 1;
-		break;
+  pAscDot = 0;
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 24 / 2;
+    pAscDot = g_Ascii12;
+    fAllHz = 1;
+    break;
 
-	case FC_ST_16:
-		/* 缺省是16点阵 */
-		font_bytes = 32 / 2;
-		pAscDot = g_Ascii16;
-		fAllHz = 1;
-		break;
+  case FC_ST_16:
+    /* 缺省是16点阵 */
+    font_bytes = 32 / 2;
+    pAscDot = g_Ascii16;
+    fAllHz = 1;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 48;
-		pAscDot = g_Ascii24;
-		break;
+  case FC_ST_24:
+    font_bytes = 48;
+    pAscDot = g_Ascii24;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 64;
-		pAscDot = g_Ascii32;
-		break;
+  case FC_ST_32:
+    font_bytes = 64;
+    pAscDot = g_Ascii32;
+    break;
 
-	case FC_ST_62X40:
-		font_bytes = 310;
-		pAscDot = g_Ascii62x40;
-		break;
+  case FC_ST_62X40:
+    font_bytes = 310;
+    pAscDot = g_Ascii62x40;
+    break;
 
-	case FC_ST_96X40:
-		font_bytes = 480;
-		pAscDot = g_Ascii96x40;
-		break;
+  case FC_ST_96X40:
+    font_bytes = 480;
+    pAscDot = g_Ascii96x40;
+    break;
 
-	default:
-		return;
-	}
+  default:
+    return;
+  }
 
-	if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
-	{
-		/* 将CPU内部Flash中的ascii字符点阵复制到buf */
-		memcpy(_pBuf, &pAscDot[_code * (font_bytes)], (font_bytes));
-	}
-	else /* 内嵌部分字符，字模数组首字节是ASCII码 */
-	{
-		m = 0;
-		while (1)
-		{
-			address = m * (font_bytes + 1);
-			m++;
-			if (_code == pAscDot[address + 0])
-			{
-				address += 1;
-				memcpy(_pBuf, &pAscDot[address], font_bytes);
-				break;
-			}
-			else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
-			{
-				/* 字库搜索完毕，未找到，则填充全FF */
-				memset(_pBuf, 0xFF, font_bytes);
-				break;
-			}
-		}
-	}
+  if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
+  {
+    /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+    memcpy(_pBuf, &pAscDot[_code * (font_bytes)], (font_bytes));
+  }
+  else /* 内嵌部分字符，字模数组首字节是ASCII码 */
+  {
+    m = 0;
+    while (1)
+    {
+      address = m * (font_bytes + 1);
+      m++;
+      if (_code == pAscDot[address + 0])
+      {
+        address += 1;
+        memcpy(_pBuf, &pAscDot[address], font_bytes);
+        break;
+      }
+      else if ((pAscDot[address + 0] == 0xFF) && (pAscDot[address + 1] == 0xFF))
+      {
+        /* 字库搜索完毕，未找到，则填充全FF */
+        memset(_pBuf, 0xFF, font_bytes);
+        break;
+      }
+    }
+  }
 #else /* 用全字库 */
-	uint32_t pAscDot;
-	uint8_t font_bytes = 0;
+  uint32_t pAscDot;
+  uint8_t font_bytes = 0;
 
-	pAscDot = 0;
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 12;
+  pAscDot = 0;
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 12;
 #if 0
-				pAscDot = ASC12_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+        pAscDot = ASC12_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
 #else
-		pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
+    pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
 #endif
-		break;
+    break;
 
-	case FC_ST_16:
-		font_bytes = 16;
+  case FC_ST_16:
+    font_bytes = 16;
 #if 0
-				pAscDot = ASC16_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+        pAscDot = ASC16_ADDR;	/* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
 #else
-		pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
+    pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
 #endif
-		break;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 48;
-		pAscDot = ASC24_ADDR;
-		break;
+  case FC_ST_24:
+    font_bytes = 48;
+    pAscDot = ASC24_ADDR;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 64;
-		pAscDot = ASC32_ADDR;
-		break;
+  case FC_ST_32:
+    font_bytes = 64;
+    pAscDot = ASC32_ADDR;
+    break;
 
-	default:
-		return;
-	}
-	if (_code >= 0x20 && _code <= 0x7E)
-	{
-		pAscDot = ((uint32_t)_code - 0x20) * font_bytes + pAscDot;
-	}
+  default:
+    return;
+  }
+  if (_code >= 0x20 && _code <= 0x7E)
+  {
+    pAscDot = ((uint32_t)_code - 0x20) * font_bytes + pAscDot;
+  }
 
 #ifdef USE_NOR_FONT /* NOR Flash全字库 */
-	/* 将CPU内部Flash中的ascii字符点阵复制到buf */
-	memcpy(_pBuf, (char *)pAscDot, font_bytes);
+  /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+  memcpy(_pBuf, (char *)pAscDot, font_bytes);
 #endif
 
 #ifdef USE_SPI_FONT /* 串行 Flash全字库 */
-	if (_fontcode == FC_ST_12 || _fontcode == FC_ST_16)
-	{
-		memcpy(_pBuf, (char *)pAscDot, font_bytes);
-	}
-	else
-	{
-		/* 字库芯片的12点阵和16点阵字符不好看,笔画细了，而且是非等宽字体 */
-		sf_ReadBuffer(_pBuf, pAscDot, font_bytes);
-	}
+  if (_fontcode == FC_ST_12 || _fontcode == FC_ST_16)
+  {
+    memcpy(_pBuf, (char *)pAscDot, font_bytes);
+  }
+  else
+  {
+    /* 字库芯片的12点阵和16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    sf_ReadBuffer(_pBuf, pAscDot, font_bytes);
+  }
 #endif
 
 #endif
@@ -1035,168 +1035,168 @@ static void _LCD_ReadAsciiDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
 static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, uint8_t *_pBuf)
 {
 #ifdef USE_SMALL_FONT /* 使用CPU 内部Flash 小字库 */
-	uint8_t *pDot;
-	uint8_t font_bytes = 0;
-	uint32_t address;
-	uint16_t m;
+  uint8_t *pDot;
+  uint8_t font_bytes = 0;
+  uint32_t address;
+  uint16_t m;
 
-	pDot = 0; /* 仅仅用于避免告警 */
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 24;
-		pDot = (uint8_t *)g_Hz12;
-		break;
+  pDot = 0; /* 仅仅用于避免告警 */
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 24;
+    pDot = (uint8_t *)g_Hz12;
+    break;
 
-	case FC_ST_16:
-		font_bytes = 32;
-		pDot = (uint8_t *)g_Hz16;
-		break;
+  case FC_ST_16:
+    font_bytes = 32;
+    pDot = (uint8_t *)g_Hz16;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 72;
-		pDot = (uint8_t *)g_Hz24;
-		break;
+  case FC_ST_24:
+    font_bytes = 72;
+    pDot = (uint8_t *)g_Hz24;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 128;
-		pDot = (uint8_t *)g_Hz32;
-		break;
+  case FC_ST_32:
+    font_bytes = 128;
+    pDot = (uint8_t *)g_Hz32;
+    break;
 
-	default:
-		return;
-	}
+  default:
+    return;
+  }
 
-	m = 0;
-	while (1)
-	{
-		address = m * (font_bytes + 2);
-		m++;
-		if ((_code1 == pDot[address + 0]) && (_code2 == pDot[address + 1]))
-		{
-			address += 2;
-			memcpy(_pBuf, &pDot[address], font_bytes);
-			break;
-		}
-		else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
-		{
-			/* 字库搜索完毕，未找到，则填充全FF */
-			memset(_pBuf, 0xFF, font_bytes);
-			break;
-		}
-	}
+  m = 0;
+  while (1)
+  {
+    address = m * (font_bytes + 2);
+    m++;
+    if ((_code1 == pDot[address + 0]) && (_code2 == pDot[address + 1]))
+    {
+      address += 2;
+      memcpy(_pBuf, &pDot[address], font_bytes);
+      break;
+    }
+    else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
+    {
+      /* 字库搜索完毕，未找到，则填充全FF */
+      memset(_pBuf, 0xFF, font_bytes);
+      break;
+    }
+  }
 #else /* 用全字库 */
-	uint32_t offset = 0;
-	uint8_t font_bytes = 0;
+  uint32_t offset = 0;
+  uint8_t font_bytes = 0;
 
-	switch (_fontcode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_bytes = 24;
-		offset = HZK12_ADDR;
-		break;
+  switch (_fontcode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_bytes = 24;
+    offset = HZK12_ADDR;
+    break;
 
-	case FC_ST_16:
-		font_bytes = 32;
-		offset = HZK16_ADDR;
-		break;
+  case FC_ST_16:
+    font_bytes = 32;
+    offset = HZK16_ADDR;
+    break;
 
-	case FC_ST_24:
-		font_bytes = 72;
-		offset = HZK24_ADDR;
-		break;
+  case FC_ST_24:
+    font_bytes = 72;
+    offset = HZK24_ADDR;
+    break;
 
-	case FC_ST_32:
-		font_bytes = 128;
-		offset = HZK32_ADDR;
-		break;
+  case FC_ST_32:
+    font_bytes = 128;
+    offset = HZK32_ADDR;
+    break;
 
-	default:
-		return;
-	}
+  default:
+    return;
+  }
 
-	/* 此处需要根据字库文件存放位置进行修改 
-		GB2312范围： 0xA1A1 - 0xFEFE
-		其中汉字范围 : 0xB0A1 - 0xF7FE
-	
-		GBK 范围： 0x8140 - 0xFEFE 
-	
-		安富莱自定义汉字编码错开GBK和GB2312编码空间： 0x8000 - 0x813F （319个）		
-	*/
-	if (_code1 >= 0xA1 && _code1 <= 0xA9 && _code2 >= 0xA1)
-	{
-		offset += ((_code1 - 0xA1) * 94 + (_code2 - 0xA1)) * font_bytes;
-	}
-	else if (_code1 >= 0xB0 && _code1 <= 0xF7 && _code2 >= 0xA1)
-	{
-		offset += ((_code1 - 0xB0) * 94 + (_code2 - 0xA1) + 846) * font_bytes;
-	}
-	else /* 2018-03-13 增加自定义汉字编码，用于实现特殊图标符号 */
-	{
-		uint16_t code16;
-		uint8_t *pDot;
-		uint32_t address;
-		uint16_t m;
+  /* 此处需要根据字库文件存放位置进行修改 
+    GB2312范围： 0xA1A1 - 0xFEFE
+    其中汉字范围 : 0xB0A1 - 0xF7FE
+  
+    GBK 范围： 0x8140 - 0xFEFE 
+  
+    安富莱自定义汉字编码错开GBK和GB2312编码空间： 0x8000 - 0x813F （319个）		
+  */
+  if (_code1 >= 0xA1 && _code1 <= 0xA9 && _code2 >= 0xA1)
+  {
+    offset += ((_code1 - 0xA1) * 94 + (_code2 - 0xA1)) * font_bytes;
+  }
+  else if (_code1 >= 0xB0 && _code1 <= 0xF7 && _code2 >= 0xA1)
+  {
+    offset += ((_code1 - 0xB0) * 94 + (_code2 - 0xA1) + 846) * font_bytes;
+  }
+  else /* 2018-03-13 增加自定义汉字编码，用于实现特殊图标符号 */
+  {
+    uint16_t code16;
+    uint8_t *pDot;
+    uint32_t address;
+    uint16_t m;
 
-		code16 = _code1 * 256 + _code2;
-		if (code16 >= 0x8000 && code16 <= 0x813F) /* 自定义汉字点阵，固定使用CPU片内部小字库 */
-		{
-			pDot = 0; /* 仅仅用于避免告警 */
-			switch (_fontcode)
-			{
-			case FC_ST_12: /* 12点阵 */
-				font_bytes = 24;
-				pDot = (uint8_t *)g_Hz12;
-				break;
+    code16 = _code1 * 256 + _code2;
+    if (code16 >= 0x8000 && code16 <= 0x813F) /* 自定义汉字点阵，固定使用CPU片内部小字库 */
+    {
+      pDot = 0; /* 仅仅用于避免告警 */
+      switch (_fontcode)
+      {
+      case FC_ST_12: /* 12点阵 */
+        font_bytes = 24;
+        pDot = (uint8_t *)g_Hz12;
+        break;
 
-			case FC_ST_16:
-				font_bytes = 32;
-				pDot = (uint8_t *)g_Hz16;
-				break;
+      case FC_ST_16:
+        font_bytes = 32;
+        pDot = (uint8_t *)g_Hz16;
+        break;
 
-			case FC_ST_24:
-				font_bytes = 72;
-				pDot = (uint8_t *)g_Hz24;
-				break;
+      case FC_ST_24:
+        font_bytes = 72;
+        pDot = (uint8_t *)g_Hz24;
+        break;
 
-			case FC_ST_32:
-				font_bytes = 128;
-				pDot = (uint8_t *)g_Hz32;
-				break;
+      case FC_ST_32:
+        font_bytes = 128;
+        pDot = (uint8_t *)g_Hz32;
+        break;
 
-			default:
-				break;
-			}
+      default:
+        break;
+      }
 
-			m = 0;
-			while (1)
-			{
-				address = m * (font_bytes + 2);
-				m++;
-				if ((_code1 == pDot[address + 0]) && (_code2 == pDot[address + 1]))
-				{
-					address += 2;
-					memcpy(_pBuf, &pDot[address], font_bytes);
-					break;
-				}
-				else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
-				{
-					/* 字库搜索完毕，未找到，则填充全FF */
-					memset(_pBuf, 0xFF, font_bytes);
-					break;
-				}
-			}
-			return;
-		}
-	}
+      m = 0;
+      while (1)
+      {
+        address = m * (font_bytes + 2);
+        m++;
+        if ((_code1 == pDot[address + 0]) && (_code2 == pDot[address + 1]))
+        {
+          address += 2;
+          memcpy(_pBuf, &pDot[address], font_bytes);
+          break;
+        }
+        else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
+        {
+          /* 字库搜索完毕，未找到，则填充全FF */
+          memset(_pBuf, 0xFF, font_bytes);
+          break;
+        }
+      }
+      return;
+    }
+  }
 
 #ifdef USE_NOR_FONT /* NOR Flash全字库 */
-	/* 将CPU内部Flash中的ascii字符点阵复制到buf */
-	memcpy(_pBuf, (char *)offset, font_bytes);
+  /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+  memcpy(_pBuf, (char *)offset, font_bytes);
 #endif
 
 #ifdef USE_SPI_FONT /* NOR Flash全字库 */
-	sf_ReadBuffer(_pBuf, offset, font_bytes);
+  sf_ReadBuffer(_pBuf, offset, font_bytes);
 #endif
 
 #endif
@@ -1247,346 +1247,346 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
 *********************************************************************************************************
 */
 static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-													 uint8_t _Align)
+                           uint8_t _Align)
 {
-	uint32_t i;
-	uint8_t code1;
-	uint8_t code2;
-	//uint8_t buf[32 * 32 / 8];	/* 最大支持32点阵汉字 */
-	uint8_t buf[96 * 40 / 8]; /* 最大支持96x40点阵字符 */
-	uint8_t width;
-	uint16_t m;
-	uint8_t font_width = 0;
-	uint8_t font_height = 0;
-	uint16_t x, y;
-	uint16_t offset;
-	uint16_t str_width; /* 字符串实际宽度  */
-											//	uint8_t ra8875_use = 0;
-											//	uint8_t ra8875_font_code = 0;
-	uint16_t address;
-	uint8_t a_flag = 0;
-	uint8_t RA8875_flag = 0;
+  uint32_t i;
+  uint8_t code1;
+  uint8_t code2;
+  //uint8_t buf[32 * 32 / 8];	/* 最大支持32点阵汉字 */
+  uint8_t buf[96 * 40 / 8]; /* 最大支持96x40点阵字符 */
+  uint8_t width;
+  uint16_t m;
+  uint8_t font_width = 0;
+  uint8_t font_height = 0;
+  uint16_t x, y;
+  uint16_t offset;
+  uint16_t str_width; /* 字符串实际宽度  */
+                      //	uint8_t ra8875_use = 0;
+                      //	uint8_t ra8875_font_code = 0;
+  uint16_t address;
+  uint8_t a_flag = 0;
+  uint8_t RA8875_flag = 0;
 
-	uint8_t line_bytes;
-	uint8_t asc_bytes = 0;
-	uint8_t hz_bytes = 0;
+  uint8_t line_bytes;
+  uint8_t asc_bytes = 0;
+  uint8_t hz_bytes = 0;
 
-	switch (_tFont->FontCode)
-	{
-	case FC_ST_12: /* 12点阵 */
-		font_height = 12;
-		font_width = 12;
-		asc_bytes = 1;
-		hz_bytes = 2;
-		break;
+  switch (_tFont->FontCode)
+  {
+  case FC_ST_12: /* 12点阵 */
+    font_height = 12;
+    font_width = 12;
+    asc_bytes = 1;
+    hz_bytes = 2;
+    break;
 
-	case FC_ST_16:
-		font_height = 16;
-		font_width = 16;
-		asc_bytes = 1;
-		hz_bytes = 2;
-		break;
+  case FC_ST_16:
+    font_height = 16;
+    font_width = 16;
+    asc_bytes = 1;
+    hz_bytes = 2;
+    break;
 
-	case FC_ST_24:
-		font_height = 24;
-		font_width = 24;
-		asc_bytes = 2;
-		hz_bytes = 3;
-		break;
+  case FC_ST_24:
+    font_height = 24;
+    font_width = 24;
+    asc_bytes = 2;
+    hz_bytes = 3;
+    break;
 
-	case FC_ST_32:
-		font_height = 32;
-		font_width = 32;
-		asc_bytes = 2;
-		hz_bytes = 4;
-		break;
+  case FC_ST_32:
+    font_height = 32;
+    font_width = 32;
+    asc_bytes = 2;
+    hz_bytes = 4;
+    break;
 
-	case FC_ST_62X40:
-		font_height = 62;
-		font_width = 80;
-		asc_bytes = 5;
-		hz_bytes = 10;
-		break;
+  case FC_ST_62X40:
+    font_height = 62;
+    font_width = 80;
+    asc_bytes = 5;
+    hz_bytes = 10;
+    break;
 
-	case FC_ST_96X40:
-		font_height = 96;
-		font_width = 80;
-		asc_bytes = 5;
-		hz_bytes = 10;
-		break;
-	}
+  case FC_ST_96X40:
+    font_height = 96;
+    font_width = 80;
+    asc_bytes = 5;
+    hz_bytes = 10;
+    break;
+  }
 
-	str_width = LCD_GetStrWidth(_ptr, _tFont); /* 计算字符串实际宽度(RA8875内部ASCII点阵宽度为变长 */
-	offset = 0;
-	if (_Width > str_width)
-	{
-		if (_Align == ALIGN_RIGHT) /* 右对齐 */
-		{
-			offset = _Width - str_width;
-		}
-		else if (_Align == ALIGN_CENTER) /* 左对齐 */
-		{
-			offset = (_Width - str_width) / 2;
-		}
-		else /* 左对齐 ALIGN_LEFT */
-		{
-			;
-		}
-	}
+  str_width = LCD_GetStrWidth(_ptr, _tFont); /* 计算字符串实际宽度(RA8875内部ASCII点阵宽度为变长 */
+  offset = 0;
+  if (_Width > str_width)
+  {
+    if (_Align == ALIGN_RIGHT) /* 右对齐 */
+    {
+      offset = _Width - str_width;
+    }
+    else if (_Align == ALIGN_CENTER) /* 左对齐 */
+    {
+      offset = (_Width - str_width) / 2;
+    }
+    else /* 左对齐 ALIGN_LEFT */
+    {
+      ;
+    }
+  }
 
-	/* 左侧填背景色, 中间对齐和右边对齐  */
-	if (offset > 0)
-	{
-		if (_tFont->BackColor != CL_MASK) /* 透明色 */
-		{
-			LCD_Fill_Rect(_usX, _usY, LCD_GetFontHeight(_tFont), offset, _tFont->BackColor);
-		}
-		_usX += offset;
-	}
+  /* 左侧填背景色, 中间对齐和右边对齐  */
+  if (offset > 0)
+  {
+    if (_tFont->BackColor != CL_MASK) /* 透明色 */
+    {
+      LCD_Fill_Rect(_usX, _usY, LCD_GetFontHeight(_tFont), offset, _tFont->BackColor);
+    }
+    _usX += offset;
+  }
 
-	/* 右侧填背景色 */
-	if (_Width > str_width)
-	{
-		if (_tFont->BackColor != CL_MASK) /* 透明色 */
-		{
-			LCD_Fill_Rect(_usX + str_width, _usY, LCD_GetFontHeight(_tFont), _Width - str_width - offset, _tFont->BackColor);
-		}
-	}
+  /* 右侧填背景色 */
+  if (_Width > str_width)
+  {
+    if (_tFont->BackColor != CL_MASK) /* 透明色 */
+    {
+      LCD_Fill_Rect(_usX + str_width, _usY, LCD_GetFontHeight(_tFont), _Width - str_width - offset, _tFont->BackColor);
+    }
+  }
 
-	/* 使用CPU内部字库. 点阵信息由CPU读取 */
-	{
-		/* 开始循环处理字符 */
-		while (*_ptr != 0)
-		{
-			code1 = *_ptr; /* 读取字符串数据， 该数据可能是ascii代码，也可能汉字代码的高字节 */
-			if (code1 < 0x80)
-			{
-				if (a_flag == 0)
-				{
-					RA8875_flag = 0;
-					/* 将ascii字符点阵复制到buf */
-					_LCD_ReadAsciiDot(code1, _tFont->FontCode, buf); /* 读取ASCII字符点阵 */
+  /* 使用CPU内部字库. 点阵信息由CPU读取 */
+  {
+    /* 开始循环处理字符 */
+    while (*_ptr != 0)
+    {
+      code1 = *_ptr; /* 读取字符串数据， 该数据可能是ascii代码，也可能汉字代码的高字节 */
+      if (code1 < 0x80)
+      {
+        if (a_flag == 0)
+        {
+          RA8875_flag = 0;
+          /* 将ascii字符点阵复制到buf */
+          _LCD_ReadAsciiDot(code1, _tFont->FontCode, buf); /* 读取ASCII字符点阵 */
 
-					//对秒进行特殊处理,避免宽度过大
-					if (_tFont->FontCode == FC_ST_62X40 || _tFont->FontCode == FC_ST_96X40)
-					{
-						if (code1 == 0x5E)
-						{
-							width = 28;
-						}
-						else
-						{
-							width = font_width / 2;
-						}
-					}
-					else
-					{
-						width = font_width / 2;
-					}
+          //对秒进行特殊处理,避免宽度过大
+          if (_tFont->FontCode == FC_ST_62X40 || _tFont->FontCode == FC_ST_96X40)
+          {
+            if (code1 == 0x5E)
+            {
+              width = 28;
+            }
+            else
+            {
+              width = font_width / 2;
+            }
+          }
+          else
+          {
+            width = font_width / 2;
+          }
 
-					line_bytes = asc_bytes;
-				}
-				else
-				{
-					if (code1 == '\a')
-					{
-						RA8875_flag = 0;
-						_ptr++;
-						code1 = *_ptr;
-						if (_tFont->FontCode == FC_RA8875_32)
-						{
-							m = 0;
-							while (1)
-							{
-								address = m * (128 + 2);
-								m++;
-								if (code1 == g_Ascii32_VarWidth[address + 0])
-								{
-									font_width = g_Ascii32_VarWidth[address + 1];
-									break;
-								}
-								else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
-								{
-									//							  /* 字库搜索完毕，未找到，则填充全FF */
-									//							  memset(g_Ascii32_VarWidth, 0xFF, 128);
-									break;
-								}
-							}
-						}
-						else if (_tFont->FontCode == FC_RA8875_24)
-						{
-							m = 0;
-							while (1)
-							{
-								address = m * (72 + 2);
-								m++;
-								if (code1 == g_Ascii24_VarWidth[address + 0])
-								{
-									font_width = g_Ascii24_VarWidth[address + 1];
-									break;
-								}
-								else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
-								{
-									//							  /* 字库搜索完毕，未找到，则填充全FF */
-									//							  memset(g_Ascii32_VarWidth, 0xFF, 128);
-									break;
-								}
-							}
-						}
-						_LCD_ReadSmallDot(code1, _tFont->FontCode, buf);
+          line_bytes = asc_bytes;
+        }
+        else
+        {
+          if (code1 == '\a')
+          {
+            RA8875_flag = 0;
+            _ptr++;
+            code1 = *_ptr;
+            if (_tFont->FontCode == FC_RA8875_32)
+            {
+              m = 0;
+              while (1)
+              {
+                address = m * (128 + 2);
+                m++;
+                if (code1 == g_Ascii32_VarWidth[address + 0])
+                {
+                  font_width = g_Ascii32_VarWidth[address + 1];
+                  break;
+                }
+                else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
+                {
+                  //							  /* 字库搜索完毕，未找到，则填充全FF */
+                  //							  memset(g_Ascii32_VarWidth, 0xFF, 128);
+                  break;
+                }
+              }
+            }
+            else if (_tFont->FontCode == FC_RA8875_24)
+            {
+              m = 0;
+              while (1)
+              {
+                address = m * (72 + 2);
+                m++;
+                if (code1 == g_Ascii24_VarWidth[address + 0])
+                {
+                  font_width = g_Ascii24_VarWidth[address + 1];
+                  break;
+                }
+                else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
+                {
+                  //							  /* 字库搜索完毕，未找到，则填充全FF */
+                  //							  memset(g_Ascii32_VarWidth, 0xFF, 128);
+                  break;
+                }
+              }
+            }
+            _LCD_ReadSmallDot(code1, _tFont->FontCode, buf);
 
-						width = font_width;
+            width = font_width;
 
-						line_bytes = asc_bytes;
-					}
-					//					else
-					//					{
-					//						RA8875_flag = 1;
-					//						if (_tFont->FontCode == FC_RA8875_32)
-					//						{
-					//							font_width = g_RA8875_Ascii32_width[code1 - 0x20];
-					//						}
-					//						else if (_tFont->FontCode == FC_RA8875_24)
-					//						{
-					//							font_width = g_RA8875_Ascii24_width[code1 - 0x20];
-					//						}
-					//						width = font_width;
-					//						line_bytes = asc_bytes;
-					//					}
-				}
-			}
-			else
-			{
-				RA8875_flag = 0;
-				
-				#if USE_UTF8 == 1
-					/* 解读 UTF-8 编码非常简单。
-						如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
-						UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
-				
-						110XXXXX  10XXXXXX           -- 支持
-						1110XXXX  10XXXXXX 10XXXXXX  -- 支持
-						11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
-					*/
-					{			
-						uint8_t code3;
-						uint32_t unicode1;
-						uint16_t gb;
-						
-						if ((code1 & 0xE0) == 0xC0)	/* 2字节 */
-						{
-							code2 = *++_ptr;
-							if (code2 == 0)
-							{
-								break;
-							}							
-							unicode1 = ((uint32_t)(code1 & 0x1F) << 6) + (code2 & 0x3F);							
-						}
-						else if ((code1 & 0xF0) == 0xE0)	/* 3字节 */
-						{
-							code2 = *++_ptr;
-							code3 = *++_ptr;
-							if (code2 == 0 || code3 == 0)
-							{
-								break;
-							}
-							unicode1 = ((uint32_t)(code1 & 0x0F) << 12) + ((uint32_t)(code2 & 0x3F) << 6) + (code3 & 0x3F);
-						}
-						else if ((code1 & 0xF8) == 0xF0)	/* 4字节 */
-						{
-							code2 = *++_ptr;
-							if (code2 == 0)
-							{
-								break;
-							}							
-						}	
-						else
-						{
-							code2 = *++_ptr;
-							if (code2 == 0)
-							{
-								break;
-							}							
-						}
-						
-						/* 将UNICODE码转换为GB2312 */
-						if (unicode1 > 0xFFFF)
-						{
-							break;
-						}
-						gb = ff_convert(unicode1, 0);	/* Unicode -> OEM */
-						
-						code1 = gb >> 8;
-						code2 = gb;
-					}
-				#else
-					code2 = *++_ptr;				
-					if (code2 == 0)
-					{
-						break;
-					}
-				#endif
-				
-				/* 读1个汉字的点阵 */
-				_LCD_ReadHZDot(code1, code2, _tFont->FontCode, buf);
-				width = font_width;
-				line_bytes = hz_bytes;
-			}
+            line_bytes = asc_bytes;
+          }
+          //					else
+          //					{
+          //						RA8875_flag = 1;
+          //						if (_tFont->FontCode == FC_RA8875_32)
+          //						{
+          //							font_width = g_RA8875_Ascii32_width[code1 - 0x20];
+          //						}
+          //						else if (_tFont->FontCode == FC_RA8875_24)
+          //						{
+          //							font_width = g_RA8875_Ascii24_width[code1 - 0x20];
+          //						}
+          //						width = font_width;
+          //						line_bytes = asc_bytes;
+          //					}
+        }
+      }
+      else
+      {
+        RA8875_flag = 0;
 
-			y = _usY;
-			if (RA8875_flag == 0)
-			{
-				/* 开始刷LCD */
-				for (m = 0; m < font_height; m++) /* 字符高度 */
-				{
-					x = _usX;
-					for (i = 0; i < width; i++) /* 字符宽度 */
-					{
-						if ((buf[m * line_bytes + i / 8] & (0x80 >> (i % 8))) != 0x00)
-						{
-							LCD_PutPixel(x, y, _tFont->FrontColor); /* 设置像素颜色为文字色 */
-						}
-						else
-						{
-							if (_tFont->BackColor != CL_MASK) /* 透明色 */
-							{
-								LCD_PutPixel(x, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
-							}
-						}
+#if USE_UTF8 == 1
+        /* 解读 UTF-8 编码非常简单。
+            如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
+            UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
+        
+            110XXXXX  10XXXXXX           -- 支持
+            1110XXXX  10XXXXXX 10XXXXXX  -- 支持
+            11110XXX  10XXXXXX 10XXXXXX 10XXXXXX  -- 本转换程序不支持
+          */
+        {
+          uint8_t code3;
+          uint32_t unicode1;
+          uint16_t gb;
 
-						x++;
-					}
+          if ((code1 & 0xE0) == 0xC0) /* 2字节 */
+          {
+            code2 = *++_ptr;
+            if (code2 == 0)
+            {
+              break;
+            }
+            unicode1 = ((uint32_t)(code1 & 0x1F) << 6) + (code2 & 0x3F);
+          }
+          else if ((code1 & 0xF0) == 0xE0) /* 3字节 */
+          {
+            code2 = *++_ptr;
+            code3 = *++_ptr;
+            if (code2 == 0 || code3 == 0)
+            {
+              break;
+            }
+            unicode1 = ((uint32_t)(code1 & 0x0F) << 12) + ((uint32_t)(code2 & 0x3F) << 6) + (code3 & 0x3F);
+          }
+          else if ((code1 & 0xF8) == 0xF0) /* 4字节 */
+          {
+            code2 = *++_ptr;
+            if (code2 == 0)
+            {
+              break;
+            }
+          }
+          else
+          {
+            code2 = *++_ptr;
+            if (code2 == 0)
+            {
+              break;
+            }
+          }
 
-					for (i = 0; i < _tFont->Space; i++) /* 字符宽度 */
-					{
-						if (_tFont->BackColor != CL_MASK) /* 透明色 */
-						{
-							/* 如果文字底色按_tFont->usBackColor，并且字间距大于点阵的宽度，那么需要在文字之间填充(暂时未实现) */
-							LCD_PutPixel(x + i, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
-						}
-					}
-					y++;
-				}
-			}
-			//			else
-			//			{
-			//				if (_tFont->BackColor == CL_MASK)	/* 透明色 */
-			//				{
-			//					RA8875_SetTextTransp(1);
-			//				}
-			//				RA8875_SetFrontColor(_tFont->FrontColor);			/* 设置字体前景色 */
-			//				RA8875_SetBackColor(_tFont->BackColor);				/* 设置字体背景色 */
-			//				RA8875_SetFont(ra8875_font_code, 0, _tFont->Space);	/* 字体代码，行间距，字间距 */
-			//				RA8875_DispStr(_usX, _usY, (char *)&code1);
-			//				if (_tFont->BackColor == CL_MASK)	/* 透明色 */
-			//				{
-			//					RA8875_SetTextTransp(0);
-			//				}
-			//			}
-			_usX += width + _tFont->Space; /* 列地址递增 */
-			_ptr++;												 /* 指向下一个字符 */
-		}
-	}
+          /* 将UNICODE码转换为GB2312 */
+          if (unicode1 > 0xFFFF)
+          {
+            break;
+          }
+          gb = ff_convert(unicode1, 0); /* Unicode -> OEM */
+
+          code1 = gb >> 8;
+          code2 = gb;
+        }
+#else
+        code2 = *++_ptr;
+        if (code2 == 0)
+        {
+          break;
+        }
+#endif
+
+        /* 读1个汉字的点阵 */
+        _LCD_ReadHZDot(code1, code2, _tFont->FontCode, buf);
+        width = font_width;
+        line_bytes = hz_bytes;
+      }
+
+      y = _usY;
+      if (RA8875_flag == 0)
+      {
+        /* 开始刷LCD */
+        for (m = 0; m < font_height; m++) /* 字符高度 */
+        {
+          x = _usX;
+          for (i = 0; i < width; i++) /* 字符宽度 */
+          {
+            if ((buf[m * line_bytes + i / 8] & (0x80 >> (i % 8))) != 0x00)
+            {
+              LCD_PutPixel(x, y, _tFont->FrontColor); /* 设置像素颜色为文字色 */
+            }
+            else
+            {
+              if (_tFont->BackColor != CL_MASK) /* 透明色 */
+              {
+                LCD_PutPixel(x, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+              }
+            }
+
+            x++;
+          }
+
+          for (i = 0; i < _tFont->Space; i++) /* 字符宽度 */
+          {
+            if (_tFont->BackColor != CL_MASK) /* 透明色 */
+            {
+              /* 如果文字底色按_tFont->usBackColor，并且字间距大于点阵的宽度，那么需要在文字之间填充(暂时未实现) */
+              LCD_PutPixel(x + i, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+            }
+          }
+          y++;
+        }
+      }
+      //			else
+      //			{
+      //				if (_tFont->BackColor == CL_MASK)	/* 透明色 */
+      //				{
+      //					RA8875_SetTextTransp(1);
+      //				}
+      //				RA8875_SetFrontColor(_tFont->FrontColor);			/* 设置字体前景色 */
+      //				RA8875_SetBackColor(_tFont->BackColor);				/* 设置字体背景色 */
+      //				RA8875_SetFont(ra8875_font_code, 0, _tFont->Space);	/* 字体代码，行间距，字间距 */
+      //				RA8875_DispStr(_usX, _usY, (char *)&code1);
+      //				if (_tFont->BackColor == CL_MASK)	/* 透明色 */
+      //				{
+      //					RA8875_SetTextTransp(0);
+      //				}
+      //			}
+      _usX += width + _tFont->Space; /* 列地址递增 */
+      _ptr++;                        /* 指向下一个字符 */
+    }
+  }
 }
 
 /*
@@ -1601,7 +1601,7 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
 */
 void LCD_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 {
-	LCDX_PutPixel(_usX, _usY, _usColor);
+  LCDX_PutPixel(_usX, _usY, _usColor);
 }
 
 /*
@@ -1616,10 +1616,10 @@ void LCD_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 */
 uint16_t LCD_GetPixel(uint16_t _usX, uint16_t _usY)
 {
-	uint16_t usRGB;
+  uint16_t usRGB;
 
-	usRGB = LCDX_GetPixel(_usX, _usY);
-	return usRGB;
+  usRGB = LCDX_GetPixel(_usX, _usY);
+  return usRGB;
 }
 
 /*
@@ -1635,7 +1635,7 @@ uint16_t LCD_GetPixel(uint16_t _usX, uint16_t _usY)
 */
 void LCD_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor)
 {
-	LCDX_DrawLine(_usX1, _usY1, _usX2, _usY2, _usColor);
+  LCDX_DrawLine(_usX1, _usY1, _usX2, _usY2, _usColor);
 }
 
 /*
@@ -1650,12 +1650,12 @@ void LCD_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2
 */
 void LCD_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor)
 {
-	uint16_t i;
+  uint16_t i;
 
-	for (i = 0; i < _usSize - 1; i++)
-	{
-		LCD_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
-	}
+  for (i = 0; i < _usSize - 1; i++)
+  {
+    LCD_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
+  }
 }
 
 /*
@@ -1671,7 +1671,7 @@ void LCD_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColo
 */
 void LCD_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
-	LCDX_DrawRect(_usX, _usY, _usHeight, _usWidth, _usColor);
+  LCDX_DrawRect(_usX, _usY, _usHeight, _usWidth, _usColor);
 }
 
 /*
@@ -1687,7 +1687,7 @@ void LCD_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _us
 */
 void LCD_Fill_Rect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
-	LCDX_FillRect(_usX, _usY, _usHeight, _usWidth, _usColor);
+  LCDX_FillRect(_usX, _usY, _usHeight, _usWidth, _usColor);
 }
 
 /*
@@ -1702,7 +1702,7 @@ void LCD_Fill_Rect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _u
 */
 void LCD_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor)
 {
-	LCDX_DrawCircle(_usX, _usY, _usRadius, _usColor);
+  LCDX_DrawCircle(_usX, _usY, _usRadius, _usColor);
 }
 
 /*
@@ -1719,7 +1719,7 @@ void LCD_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _
 */
 void LCD_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t *_ptr)
 {
-	LCDX_DrawBMP(_usX, _usY, _usHeight, _usWidth, _ptr);
+  LCDX_DrawBMP(_usX, _usY, _usHeight, _usWidth, _ptr);
 }
 
 /*
@@ -1732,22 +1732,22 @@ void LCD_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usW
 */
 void LCD_DrawWin(WIN_T *_pWin)
 {
-	uint16_t TitleHegiht;
+  uint16_t TitleHegiht;
 
-	TitleHegiht = 20;
+  TitleHegiht = 20;
 
-	/* 绘制窗口外框 */
-	LCD_DrawRect(_pWin->Left, _pWin->Top, _pWin->Height, _pWin->Width, WIN_BORDER_COLOR);
-	LCD_DrawRect(_pWin->Left + 1, _pWin->Top + 1, _pWin->Height - 2, _pWin->Width - 2, WIN_BORDER_COLOR);
+  /* 绘制窗口外框 */
+  LCD_DrawRect(_pWin->Left, _pWin->Top, _pWin->Height, _pWin->Width, WIN_BORDER_COLOR);
+  LCD_DrawRect(_pWin->Left + 1, _pWin->Top + 1, _pWin->Height - 2, _pWin->Width - 2, WIN_BORDER_COLOR);
 
-	/* 窗口标题栏 */
-	LCD_Fill_Rect(_pWin->Left + 2, _pWin->Top + 2, TitleHegiht, _pWin->Width - 4, WIN_TITLE_COLOR);
+  /* 窗口标题栏 */
+  LCD_Fill_Rect(_pWin->Left + 2, _pWin->Top + 2, TitleHegiht, _pWin->Width - 4, WIN_TITLE_COLOR);
 
-	/* 窗体填充 */
-	LCD_Fill_Rect(_pWin->Left + 2, _pWin->Top + TitleHegiht + 2, _pWin->Height - 4 - TitleHegiht,
-								_pWin->Width - 4, WIN_BODY_COLOR);
+  /* 窗体填充 */
+  LCD_Fill_Rect(_pWin->Left + 2, _pWin->Top + TitleHegiht + 2, _pWin->Height - 4 - TitleHegiht,
+                _pWin->Width - 4, WIN_BODY_COLOR);
 
-	LCD_DispStr(_pWin->Left + 3, _pWin->Top + 2, _pWin->pCaption, _pWin->Font);
+  LCD_DispStr(_pWin->Left + 3, _pWin->Top + 2, _pWin->pCaption, _pWin->Font);
 }
 
 /*
@@ -1762,104 +1762,104 @@ void LCD_DrawWin(WIN_T *_pWin)
 */
 void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode)
 {
-	const uint16_t *p;
-	uint16_t usNewRGB;
-	uint16_t x, y; /* 用于记录窗口内的相对坐标 */
+  const uint16_t *p;
+  uint16_t usNewRGB;
+  uint16_t x, y; /* 用于记录窗口内的相对坐标 */
 
-	p = _tIcon->pBmp;
-	for (y = 0; y < _tIcon->Height; y++)
-	{
-		for (x = 0; x < _tIcon->Width; x++)
-		{
-			usNewRGB = *p++; /* 读取图标的颜色值后指针加1 */
-			/* 将图标的4个直角切割为弧角，弧角外是背景图标 */
-			if ((y == 0 && (x < 6 || x > _tIcon->Width - 7)) ||
-					(y == 1 && (x < 4 || x > _tIcon->Width - 5)) ||
-					(y == 2 && (x < 3 || x > _tIcon->Width - 4)) ||
-					(y == 3 && (x < 2 || x > _tIcon->Width - 3)) ||
-					(y == 4 && (x < 1 || x > _tIcon->Width - 2)) ||
-					(y == 5 && (x < 1 || x > _tIcon->Width - 2)) ||
+  p = _tIcon->pBmp;
+  for (y = 0; y < _tIcon->Height; y++)
+  {
+    for (x = 0; x < _tIcon->Width; x++)
+    {
+      usNewRGB = *p++; /* 读取图标的颜色值后指针加1 */
+      /* 将图标的4个直角切割为弧角，弧角外是背景图标 */
+      if ((y == 0 && (x < 6 || x > _tIcon->Width - 7)) ||
+          (y == 1 && (x < 4 || x > _tIcon->Width - 5)) ||
+          (y == 2 && (x < 3 || x > _tIcon->Width - 4)) ||
+          (y == 3 && (x < 2 || x > _tIcon->Width - 3)) ||
+          (y == 4 && (x < 1 || x > _tIcon->Width - 2)) ||
+          (y == 5 && (x < 1 || x > _tIcon->Width - 2)) ||
 
-					(y == _tIcon->Height - 1 && (x < 6 || x > _tIcon->Width - 7)) ||
-					(y == _tIcon->Height - 2 && (x < 4 || x > _tIcon->Width - 5)) ||
-					(y == _tIcon->Height - 3 && (x < 3 || x > _tIcon->Width - 4)) ||
-					(y == _tIcon->Height - 4 && (x < 2 || x > _tIcon->Width - 3)) ||
-					(y == _tIcon->Height - 5 && (x < 1 || x > _tIcon->Width - 2)) ||
-					(y == _tIcon->Height - 6 && (x < 1 || x > _tIcon->Width - 2)))
-			{
-				;
-			}
-			else
-			{
-				if (_ucFocusMode != 0) /* 1表示选中的图标 */
-				{
-					/* 降低原始像素的亮度，实现图标被激活选中的效果 */
-					uint16_t R, G, B;
-					uint16_t bright = 15;
+          (y == _tIcon->Height - 1 && (x < 6 || x > _tIcon->Width - 7)) ||
+          (y == _tIcon->Height - 2 && (x < 4 || x > _tIcon->Width - 5)) ||
+          (y == _tIcon->Height - 3 && (x < 3 || x > _tIcon->Width - 4)) ||
+          (y == _tIcon->Height - 4 && (x < 2 || x > _tIcon->Width - 3)) ||
+          (y == _tIcon->Height - 5 && (x < 1 || x > _tIcon->Width - 2)) ||
+          (y == _tIcon->Height - 6 && (x < 1 || x > _tIcon->Width - 2)))
+      {
+        ;
+      }
+      else
+      {
+        if (_ucFocusMode != 0) /* 1表示选中的图标 */
+        {
+          /* 降低原始像素的亮度，实现图标被激活选中的效果 */
+          uint16_t R, G, B;
+          uint16_t bright = 15;
 
-					/* rrrr rggg gggb bbbb */
-					R = (usNewRGB & 0xF800) >> 11;
-					G = (usNewRGB & 0x07E0) >> 5;
-					B = usNewRGB & 0x001F;
-					if (R > bright)
-					{
-						R -= bright;
-					}
-					else
-					{
-						R = 0;
-					}
-					if (G > 2 * bright)
-					{
-						G -= 2 * bright;
-					}
-					else
-					{
-						G = 0;
-					}
-					if (B > bright)
-					{
-						B -= bright;
-					}
-					else
-					{
-						B = 0;
-					}
-					usNewRGB = (R << 11) + (G << 5) + B;
-				}
+          /* rrrr rggg gggb bbbb */
+          R = (usNewRGB & 0xF800) >> 11;
+          G = (usNewRGB & 0x07E0) >> 5;
+          B = usNewRGB & 0x001F;
+          if (R > bright)
+          {
+            R -= bright;
+          }
+          else
+          {
+            R = 0;
+          }
+          if (G > 2 * bright)
+          {
+            G -= 2 * bright;
+          }
+          else
+          {
+            G = 0;
+          }
+          if (B > bright)
+          {
+            B -= bright;
+          }
+          else
+          {
+            B = 0;
+          }
+          usNewRGB = (R << 11) + (G << 5) + B;
+        }
 
-				LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
-			}
-		}
-	}
+        LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
+      }
+    }
+  }
 
-	/* 绘制图标下的文字 */
-	{
-		uint16_t len;
-		uint16_t width;
+  /* 绘制图标下的文字 */
+  {
+    uint16_t len;
+    uint16_t width;
 
-		len = strlen(_tIcon->Text);
+    len = strlen(_tIcon->Text);
 
-		if (len == 0)
-		{
-			return; /* 如果图标文本长度为0，则不显示 */
-		}
+    if (len == 0)
+    {
+      return; /* 如果图标文本长度为0，则不显示 */
+    }
 
-		/* 计算文本的总宽度 */
-		if (_tFont->FontCode == FC_ST_12) /* 12点阵 */
-		{
-			width = 6 * (len + _tFont->Space);
-		}
-		else /* FC_ST_16 */
-		{
-			width = 8 * (len + _tFont->Space);
-		}
+    /* 计算文本的总宽度 */
+    if (_tFont->FontCode == FC_ST_12) /* 12点阵 */
+    {
+      width = 6 * (len + _tFont->Space);
+    }
+    else /* FC_ST_16 */
+    {
+      width = 8 * (len + _tFont->Space);
+    }
 
-		/* 水平居中 */
-		x = (_tIcon->Left + _tIcon->Width / 2) - width / 2;
-		y = _tIcon->Top + _tIcon->Height + 2;
-		LCD_DispStr(x, y, (char *)_tIcon->Text, _tFont);
-	}
+    /* 水平居中 */
+    x = (_tIcon->Left + _tIcon->Width / 2) - width / 2;
+    y = _tIcon->Top + _tIcon->Height + 2;
+    LCD_DispStr(x, y, (char *)_tIcon->Text, _tFont);
+  }
 }
 
 /*
@@ -1874,13 +1874,13 @@ void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode)
 */
 uint16_t LCD_Blend565(uint16_t src, uint16_t dst, uint8_t alpha)
 {
-	uint32_t src2;
-	uint32_t dst2;
+  uint32_t src2;
+  uint32_t dst2;
 
-	src2 = ((src << 16) | src) & 0x07E0F81F;
-	dst2 = ((dst << 16) | dst) & 0x07E0F81F;
-	dst2 = ((((dst2 - src2) * alpha) >> 5) + src2) & 0x07E0F81F;
-	return (dst2 >> 16) | dst2;
+  src2 = ((src << 16) | src) & 0x07E0F81F;
+  dst2 = ((dst << 16) | dst) & 0x07E0F81F;
+  dst2 = ((((dst2 - src2) * alpha) >> 5) + src2) & 0x07E0F81F;
+  return (dst2 >> 16) | dst2;
 }
 
 /*
@@ -1895,88 +1895,88 @@ uint16_t LCD_Blend565(uint16_t src, uint16_t dst, uint8_t alpha)
 */
 void LCD_DrawIcon32(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode)
 {
-	const uint8_t *p;
-	uint16_t usOldRGB, usNewRGB;
-	int16_t x, y;					 /* 用于记录窗口内的相对坐标 */
-	uint8_t R1, G1, B1, A; /* 新像素色彩分量 */
-	uint8_t R0, G0, B0;		 /* 旧像素色彩分量 */
+  const uint8_t *p;
+  uint16_t usOldRGB, usNewRGB;
+  int16_t x, y;          /* 用于记录窗口内的相对坐标 */
+  uint8_t R1, G1, B1, A; /* 新像素色彩分量 */
+  uint8_t R0, G0, B0;    /* 旧像素色彩分量 */
 
-	p = (const uint8_t *)_tIcon->pBmp;
-	p += 54; /* 直接指向图像数据区 */
+  p = (const uint8_t *)_tIcon->pBmp;
+  p += 54; /* 直接指向图像数据区 */
 
-	/* 按照BMP位图次序，从左至右，从上至下扫描 */
-	for (y = _tIcon->Height - 1; y >= 0; y--)
-	{
-		for (x = 0; x < _tIcon->Width; x++)
-		{
-			B1 = *p++;
-			G1 = *p++;
-			R1 = *p++;
-			A = *p++; /* Alpha 值(透明度)，0-255, 0表示透明，1表示不透明, 中间值表示透明度 */
+  /* 按照BMP位图次序，从左至右，从上至下扫描 */
+  for (y = _tIcon->Height - 1; y >= 0; y--)
+  {
+    for (x = 0; x < _tIcon->Width; x++)
+    {
+      B1 = *p++;
+      G1 = *p++;
+      R1 = *p++;
+      A = *p++; /* Alpha 值(透明度)，0-255, 0表示透明，1表示不透明, 中间值表示透明度 */
 
-			if (A == 0x00) /* 需要透明,显示背景 */
-			{
-				; /* 不用刷新背景 */
-			}
-			else if (A == 0xFF) /* 完全不透明， 显示新像素 */
-			{
-				usNewRGB = RGB(R1, G1, B1);
-				if (_ucFocusMode == 1)
-				{
-					usNewRGB = LCD_Blend565(usNewRGB, CL_YELLOW, 10);
-				}
-				LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
-			}
-			else /* 半透明 */
-			{
-				/* 计算公式： 实际显示颜色 = 前景颜色 * Alpha / 255 + 背景颜色 * (255-Alpha) / 255 */
-				usOldRGB = LCD_GetPixel(x + _tIcon->Left, y + _tIcon->Top);
+      if (A == 0x00) /* 需要透明,显示背景 */
+      {
+        ; /* 不用刷新背景 */
+      }
+      else if (A == 0xFF) /* 完全不透明， 显示新像素 */
+      {
+        usNewRGB = RGB(R1, G1, B1);
+        if (_ucFocusMode == 1)
+        {
+          usNewRGB = LCD_Blend565(usNewRGB, CL_YELLOW, 10);
+        }
+        LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
+      }
+      else /* 半透明 */
+      {
+        /* 计算公式： 实际显示颜色 = 前景颜色 * Alpha / 255 + 背景颜色 * (255-Alpha) / 255 */
+        usOldRGB = LCD_GetPixel(x + _tIcon->Left, y + _tIcon->Top);
 
-				//usOldRGB = 0xFFFF;
-				R0 = RGB565_R(usOldRGB);
-				G0 = RGB565_G(usOldRGB);
-				B0 = RGB565_B(usOldRGB);
+        //usOldRGB = 0xFFFF;
+        R0 = RGB565_R(usOldRGB);
+        G0 = RGB565_G(usOldRGB);
+        B0 = RGB565_B(usOldRGB);
 
-				R1 = (R1 * A) / 255 + R0 * (255 - A) / 255;
-				G1 = (G1 * A) / 255 + G0 * (255 - A) / 255;
-				B1 = (B1 * A) / 255 + B0 * (255 - A) / 255;
-				usNewRGB = RGB(R1, G1, B1);
-				if (_ucFocusMode == 1)
-				{
-					usNewRGB = LCD_Blend565(usNewRGB, CL_YELLOW, 10);
-				}
-				LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
-			}
-		}
-	}
+        R1 = (R1 * A) / 255 + R0 * (255 - A) / 255;
+        G1 = (G1 * A) / 255 + G0 * (255 - A) / 255;
+        B1 = (B1 * A) / 255 + B0 * (255 - A) / 255;
+        usNewRGB = RGB(R1, G1, B1);
+        if (_ucFocusMode == 1)
+        {
+          usNewRGB = LCD_Blend565(usNewRGB, CL_YELLOW, 10);
+        }
+        LCD_PutPixel(x + _tIcon->Left, y + _tIcon->Top, usNewRGB);
+      }
+    }
+  }
 
-	/* 绘制图标下的文字 */
-	{
-		uint16_t len;
-		uint16_t width;
+  /* 绘制图标下的文字 */
+  {
+    uint16_t len;
+    uint16_t width;
 
-		len = strlen(_tIcon->Text);
+    len = strlen(_tIcon->Text);
 
-		if (len == 0)
-		{
-			return; /* 如果图标文本长度为0，则不显示 */
-		}
+    if (len == 0)
+    {
+      return; /* 如果图标文本长度为0，则不显示 */
+    }
 
-		/* 计算文本的总宽度 */
-		if (_tFont->FontCode == FC_ST_12) /* 12点阵 */
-		{
-			width = 6 * (len + _tFont->Space);
-		}
-		else /* FC_ST_16 */
-		{
-			width = 8 * (len + _tFont->Space);
-		}
+    /* 计算文本的总宽度 */
+    if (_tFont->FontCode == FC_ST_12) /* 12点阵 */
+    {
+      width = 6 * (len + _tFont->Space);
+    }
+    else /* FC_ST_16 */
+    {
+      width = 8 * (len + _tFont->Space);
+    }
 
-		/* 水平居中 */
-		x = (_tIcon->Left + _tIcon->Width / 2) - width / 2;
-		y = _tIcon->Top + _tIcon->Height + 2;
-		LCD_DispStr(x, y, (char *)_tIcon->Text, _tFont);
-	}
+    /* 水平居中 */
+    x = (_tIcon->Left + _tIcon->Width / 2) - width / 2;
+    y = _tIcon->Top + _tIcon->Height + 2;
+    LCD_DispStr(x, y, (char *)_tIcon->Text, _tFont);
+  }
 }
 
 /*
@@ -1991,58 +1991,58 @@ void LCD_DrawIcon32(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode)
 */
 void LCD_DrawBmp32(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint8_t *_pBmp)
 {
-	const uint8_t *p;
-	uint16_t usOldRGB, usNewRGB;
-	int16_t x, y;					 /* 用于记录窗口内的相对坐标 */
-	uint8_t R1, G1, B1, A; /* 新像素色彩分量 */
-	uint8_t R0, G0, B0;		 /* 旧像素色彩分量 */
+  const uint8_t *p;
+  uint16_t usOldRGB, usNewRGB;
+  int16_t x, y;          /* 用于记录窗口内的相对坐标 */
+  uint8_t R1, G1, B1, A; /* 新像素色彩分量 */
+  uint8_t R0, G0, B0;    /* 旧像素色彩分量 */
 
-	p = (const uint8_t *)_pBmp;
-	p += 54; /* 直接指向图像数据区 */
+  p = (const uint8_t *)_pBmp;
+  p += 54; /* 直接指向图像数据区 */
 
-	/* 按照BMP位图次序，从左至右，从上至下扫描 */
-	for (y = _usHeight - 1; y >= 0; y--)
-	{
-		for (x = 0; x < _usWidth; x++)
-		{
-			B1 = *p++;
-			G1 = *p++;
-			R1 = *p++;
-			A = *p++; /* Alpha 值(透明度)，0-255, 0表示透明，1表示不透明, 中间值表示透明度 */
+  /* 按照BMP位图次序，从左至右，从上至下扫描 */
+  for (y = _usHeight - 1; y >= 0; y--)
+  {
+    for (x = 0; x < _usWidth; x++)
+    {
+      B1 = *p++;
+      G1 = *p++;
+      R1 = *p++;
+      A = *p++; /* Alpha 值(透明度)，0-255, 0表示透明，1表示不透明, 中间值表示透明度 */
 
-			if (A == 0x00) /* 需要透明,显示背景 */
-			{
-				; /* 不用刷新背景 */
-			}
-			else if (A == 0xFF) /* 完全不透明， 显示新像素 */
-			{
-				usNewRGB = RGB(R1, G1, B1);
-				//if (_ucFocusMode == 1)
-				//{
-				//	usNewRGB = Blend565(usNewRGB, CL_YELLOW, 10);
-				//}
-				LCD_PutPixel(x + _usX, y + _usY, usNewRGB);
-			}
-			else /* 半透明 */
-			{
-				/* 计算公式： 实际显示颜色 = 前景颜色 * Alpha / 255 + 背景颜色 * (255-Alpha) / 255 */
-				usOldRGB = LCD_GetPixel(x + _usX, y + _usY);
-				R0 = RGB565_R(usOldRGB);
-				G0 = RGB565_G(usOldRGB);
-				B0 = RGB565_B(usOldRGB);
+      if (A == 0x00) /* 需要透明,显示背景 */
+      {
+        ; /* 不用刷新背景 */
+      }
+      else if (A == 0xFF) /* 完全不透明， 显示新像素 */
+      {
+        usNewRGB = RGB(R1, G1, B1);
+        //if (_ucFocusMode == 1)
+        //{
+        //	usNewRGB = Blend565(usNewRGB, CL_YELLOW, 10);
+        //}
+        LCD_PutPixel(x + _usX, y + _usY, usNewRGB);
+      }
+      else /* 半透明 */
+      {
+        /* 计算公式： 实际显示颜色 = 前景颜色 * Alpha / 255 + 背景颜色 * (255-Alpha) / 255 */
+        usOldRGB = LCD_GetPixel(x + _usX, y + _usY);
+        R0 = RGB565_R(usOldRGB);
+        G0 = RGB565_G(usOldRGB);
+        B0 = RGB565_B(usOldRGB);
 
-				R1 = (R1 * A) / 255 + R0 * (255 - A) / 255;
-				G1 = (G1 * A) / 255 + G0 * (255 - A) / 255;
-				B1 = (B1 * A) / 255 + B0 * (255 - A) / 255;
-				usNewRGB = RGB(R1, G1, B1);
-				//if (_ucFocusMode == 1)
-				//{
-				//	usNewRGB = Blend565(usNewRGB, CL_YELLOW, 10);
-				//}
-				LCD_PutPixel(x + _usX, y + _usY, usNewRGB);
-			}
-		}
-	}
+        R1 = (R1 * A) / 255 + R0 * (255 - A) / 255;
+        G1 = (G1 * A) / 255 + G0 * (255 - A) / 255;
+        B1 = (B1 * A) / 255 + B0 * (255 - A) / 255;
+        usNewRGB = RGB(R1, G1, B1);
+        //if (_ucFocusMode == 1)
+        //{
+        //	usNewRGB = Blend565(usNewRGB, CL_YELLOW, 10);
+        //}
+        LCD_PutPixel(x + _usX, y + _usY, usNewRGB);
+      }
+    }
+  }
 }
 
 /*
@@ -2054,16 +2054,16 @@ void LCD_DrawBmp32(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _u
 *********************************************************************************************************
 */
 void LCD_InitLabel(LABEL_T *_pLabel, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w,
-									 char *_Text, FONT_T *_tFont)
+                   char *_Text, FONT_T *_tFont)
 {
-	_pLabel->Left = _x;
-	_pLabel->Top = _y;
-	_pLabel->Height = _h;
-	_pLabel->Width = _w;
-	_pLabel->pCaption = _Text;
-	_pLabel->Font = _tFont;
+  _pLabel->Left = _x;
+  _pLabel->Top = _y;
+  _pLabel->Height = _h;
+  _pLabel->Width = _w;
+  _pLabel->pCaption = _Text;
+  _pLabel->Font = _tFont;
 
-	_pLabel->MaxLen = 0;
+  _pLabel->MaxLen = 0;
 }
 
 /*
@@ -2076,30 +2076,30 @@ void LCD_InitLabel(LABEL_T *_pLabel, uint16_t _x, uint16_t _y, uint16_t _h, uint
 */
 void LCD_DrawLabel(LABEL_T *_pLabel)
 {
-	char dispbuf[256];
-	uint16_t i;
-	uint16_t NewLen;
+  char dispbuf[256];
+  uint16_t i;
+  uint16_t NewLen;
 
-	NewLen = strlen(_pLabel->pCaption);
+  NewLen = strlen(_pLabel->pCaption);
 
-	if (NewLen > _pLabel->MaxLen)
-	{
-		LCD_DispStr(_pLabel->Left, _pLabel->Top, _pLabel->pCaption, _pLabel->Font);
-		_pLabel->MaxLen = NewLen;
-	}
-	else
-	{
-		for (i = 0; i < NewLen; i++)
-		{
-			dispbuf[i] = _pLabel->pCaption[i];
-		}
-		for (; i < _pLabel->MaxLen; i++)
-		{
-			dispbuf[i] = ' '; /* 末尾填充空格 */
-		}
-		dispbuf[i] = 0;
-		LCD_DispStr(_pLabel->Left, _pLabel->Top, dispbuf, _pLabel->Font);
-	}
+  if (NewLen > _pLabel->MaxLen)
+  {
+    LCD_DispStr(_pLabel->Left, _pLabel->Top, _pLabel->pCaption, _pLabel->Font);
+    _pLabel->MaxLen = NewLen;
+  }
+  else
+  {
+    for (i = 0; i < NewLen; i++)
+    {
+      dispbuf[i] = _pLabel->pCaption[i];
+    }
+    for (; i < _pLabel->MaxLen; i++)
+    {
+      dispbuf[i] = ' '; /* 末尾填充空格 */
+    }
+    dispbuf[i] = 0;
+    LCD_DispStr(_pLabel->Left, _pLabel->Top, dispbuf, _pLabel->Font);
+  }
 }
 
 /*
@@ -2112,32 +2112,32 @@ void LCD_DrawLabel(LABEL_T *_pLabel)
 */
 void LCD_DrawCheckBox(CHECK_T *_pCheckBox)
 {
-	uint16_t x, y;
+  uint16_t x, y;
 
-	/* 目前只做了16点阵汉字的大小 */
+  /* 目前只做了16点阵汉字的大小 */
 
-	/* 绘制外框 */
-	x = _pCheckBox->Left;
-	LCD_DrawRect(x, _pCheckBox->Top, CHECK_BOX_H, CHECK_BOX_W, CHECK_BOX_BORDER_COLOR);
-	LCD_DrawRect(x + 1, _pCheckBox->Top + 1, CHECK_BOX_H - 2, CHECK_BOX_W - 2, CHECK_BOX_BORDER_COLOR);
-	LCD_Fill_Rect(x + 2, _pCheckBox->Top + 2, CHECK_BOX_H - 4, CHECK_BOX_W - 4, CHECK_BOX_BACK_COLOR);
+  /* 绘制外框 */
+  x = _pCheckBox->Left;
+  LCD_DrawRect(x, _pCheckBox->Top, CHECK_BOX_H, CHECK_BOX_W, CHECK_BOX_BORDER_COLOR);
+  LCD_DrawRect(x + 1, _pCheckBox->Top + 1, CHECK_BOX_H - 2, CHECK_BOX_W - 2, CHECK_BOX_BORDER_COLOR);
+  LCD_Fill_Rect(x + 2, _pCheckBox->Top + 2, CHECK_BOX_H - 4, CHECK_BOX_W - 4, CHECK_BOX_BACK_COLOR);
 
-	/* 绘制文本标签 */
-	x = _pCheckBox->Left + CHECK_BOX_W + 2;
-	y = _pCheckBox->Top + CHECK_BOX_H / 2 - 8;
-	LCD_DispStr(x, y, _pCheckBox->pCaption, _pCheckBox->Font);
+  /* 绘制文本标签 */
+  x = _pCheckBox->Left + CHECK_BOX_W + 2;
+  y = _pCheckBox->Top + CHECK_BOX_H / 2 - 8;
+  LCD_DispStr(x, y, _pCheckBox->pCaption, _pCheckBox->Font);
 
-	if (_pCheckBox->Checked)
-	{
-		FONT_T font;
+  if (_pCheckBox->Checked)
+  {
+    FONT_T font;
 
-		font.FontCode = FC_ST_16;
-		font.BackColor = CL_MASK;
-		font.FrontColor = CHECK_BOX_CHECKED_COLOR; /* 钩的颜色 */
-		font.Space = 0;
-		x = _pCheckBox->Left;
-		LCD_DispStr(x + 3, _pCheckBox->Top + 3, "√", &font);
-	}
+    font.FontCode = FC_ST_16;
+    font.BackColor = CL_MASK;
+    font.FrontColor = CHECK_BOX_CHECKED_COLOR; /* 钩的颜色 */
+    font.Space = 0;
+    x = _pCheckBox->Left;
+    LCD_DispStr(x + 3, _pCheckBox->Top + 3, "√", &font);
+  }
 }
 
 /*
@@ -2150,42 +2150,42 @@ void LCD_DrawCheckBox(CHECK_T *_pCheckBox)
 */
 void LCD_DrawEdit(EDIT_T *_pEdit)
 {
-	uint16_t len, x, y;
+  uint16_t len, x, y;
 
-	/* 仿XP风格，平面编辑框 */
-	if (_pEdit->Focus == 0)
-	{
-		LCD_DrawRect(_pEdit->Left, _pEdit->Top, _pEdit->Height, _pEdit->Width, EDIT_BORDER_COLOR);
-		LCD_Fill_Rect(_pEdit->Left + 1, _pEdit->Top + 1, _pEdit->Height - 2, _pEdit->Width - 2, EDIT_BACK_COLOR);
-	}
-	else
-	{
-		LCD_DrawRect(_pEdit->Left, _pEdit->Top, _pEdit->Height, _pEdit->Width, EDIT_BORDER_COLOR2);
-		LCD_Fill_Rect(_pEdit->Left + 1, _pEdit->Top + 1, _pEdit->Height - 2, _pEdit->Width - 2, EDIT_BACK_COLOR2);
-	}
+  /* 仿XP风格，平面编辑框 */
+  if (_pEdit->Focus == 0)
+  {
+    LCD_DrawRect(_pEdit->Left, _pEdit->Top, _pEdit->Height, _pEdit->Width, EDIT_BORDER_COLOR);
+    LCD_Fill_Rect(_pEdit->Left + 1, _pEdit->Top + 1, _pEdit->Height - 2, _pEdit->Width - 2, EDIT_BACK_COLOR);
+  }
+  else
+  {
+    LCD_DrawRect(_pEdit->Left, _pEdit->Top, _pEdit->Height, _pEdit->Width, EDIT_BORDER_COLOR2);
+    LCD_Fill_Rect(_pEdit->Left + 1, _pEdit->Top + 1, _pEdit->Height - 2, _pEdit->Width - 2, EDIT_BACK_COLOR2);
+  }
 
-	if (_pEdit->pCaption > 0)
-	{
-		for (len = 0; len < 32; len++)
-		{
-			_pEdit->Text[len] = _pEdit->pCaption[len];
+  if (_pEdit->pCaption > 0)
+  {
+    for (len = 0; len < 32; len++)
+    {
+      _pEdit->Text[len] = _pEdit->pCaption[len];
 
-			if (_pEdit->pCaption[len] == 0)
-			{
-				break;
-			}
-		}
-		_pEdit->Text[32] = 0;
+      if (_pEdit->pCaption[len] == 0)
+      {
+        break;
+      }
+    }
+    _pEdit->Text[32] = 0;
 
-		//_pEdit->pCaption = 0;
-	}
+    //_pEdit->pCaption = 0;
+  }
 
-	/* 文字居中 */
-	len = LCD_GetStrWidth(_pEdit->Text, _pEdit->Font);
-	x = _pEdit->Left + (_pEdit->Width - len) / 2;
-	y = _pEdit->Top + (_pEdit->Height - LCD_GetFontHeight(_pEdit->Font)) / 2;
+  /* 文字居中 */
+  len = LCD_GetStrWidth(_pEdit->Text, _pEdit->Font);
+  x = _pEdit->Left + (_pEdit->Width - len) / 2;
+  y = _pEdit->Top + (_pEdit->Height - LCD_GetFontHeight(_pEdit->Font)) / 2;
 
-	LCD_DispStr(x, y, _pEdit->Text, _pEdit->Font);
+  LCD_DispStr(x, y, _pEdit->Text, _pEdit->Font);
 }
 
 /*
@@ -2199,17 +2199,17 @@ void LCD_DrawEdit(EDIT_T *_pEdit)
 */
 uint8_t LCD_EditTouchDown(EDIT_T *_Edit, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _Edit->Left) && (_usX < _Edit->Left + _Edit->Width) && (_usY > _Edit->Top) && (_usY < _Edit->Top + _Edit->Height))
-	{
-		BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
-		_Edit->Focus = 1;
-		LCD_DrawEdit(_Edit);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _Edit->Left) && (_usX < _Edit->Left + _Edit->Width) && (_usY > _Edit->Top) && (_usY < _Edit->Top + _Edit->Height))
+  {
+    BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
+    _Edit->Focus = 1;
+    LCD_DrawEdit(_Edit);
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2222,8 +2222,8 @@ uint8_t LCD_EditTouchDown(EDIT_T *_Edit, uint16_t _usX, uint16_t _usY)
 */
 void LCD_EditRefresh(EDIT_T *_Edit)
 {
-	_Edit->Focus = 0;
-	LCD_DrawEdit(_Edit);
+  _Edit->Focus = 0;
+  LCD_DrawEdit(_Edit);
 }
 
 /*
@@ -2235,14 +2235,14 @@ void LCD_EditRefresh(EDIT_T *_Edit)
 *********************************************************************************************************
 */
 void LCD_InitGroupBox(GROUP_T *_pBox, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w,
-											char *pCaption, FONT_T *Font)
+                      char *pCaption, FONT_T *Font)
 {
-	_pBox->Left = _x;
-	_pBox->Top = _y;
-	_pBox->Height = _h;
-	_pBox->Width = _w;
-	_pBox->pCaption = pCaption;
-	_pBox->Font = Font;
+  _pBox->Left = _x;
+  _pBox->Top = _y;
+  _pBox->Height = _h;
+  _pBox->Width = _w;
+  _pBox->pCaption = pCaption;
+  _pBox->Font = Font;
 }
 
 /*
@@ -2255,43 +2255,43 @@ void LCD_InitGroupBox(GROUP_T *_pBox, uint16_t _x, uint16_t _y, uint16_t _h, uin
 */
 void LCD_DrawGroupBox(GROUP_T *_pBox)
 {
-	uint16_t x, y;
-	uint16_t x1, y1; /* 矩形左上角 */
-	uint16_t x2, y2; /* 矩形右下角 */
-	uint16_t len;
+  uint16_t x, y;
+  uint16_t x1, y1; /* 矩形左上角 */
+  uint16_t x2, y2; /* 矩形右下角 */
+  uint16_t len;
 
-	len = LCD_GetStrWidth(_pBox->pCaption, _pBox->Font); /* 字符串的总宽度 */
+  len = LCD_GetStrWidth(_pBox->pCaption, _pBox->Font); /* 字符串的总宽度 */
 
-	/* 画阴影线 */
-	//LCD_DrawRect(_pBox->Left + 1, _pBox->Top + 5, _pBox->Height, _pBox->Width - 1, CL_BOX_BORDER2);
-	x1 = _pBox->Left + 1;
-	y1 = _pBox->Top + 5;
-	x2 = _pBox->Left + 1 + _pBox->Width - 2;
-	y2 = _pBox->Top + 5 + _pBox->Height - 1;
+  /* 画阴影线 */
+  //LCD_DrawRect(_pBox->Left + 1, _pBox->Top + 5, _pBox->Height, _pBox->Width - 1, CL_BOX_BORDER2);
+  x1 = _pBox->Left + 1;
+  y1 = _pBox->Top + 5;
+  x2 = _pBox->Left + 1 + _pBox->Width - 2;
+  y2 = _pBox->Top + 5 + _pBox->Height - 1;
 
-	LCD_DrawLine(x1, y1, x1 + 6, y1, CL_BOX_BORDER2);						/* 顶1 */
-	LCD_DrawLine(x1 + 8 + len + 1, y1, x2, y1, CL_BOX_BORDER2); /* 顶2 */
-	LCD_DrawLine(x1, y2, x2, y2, CL_BOX_BORDER2);								/* 底 */
-	LCD_DrawLine(x1, y1, x1, y2, CL_BOX_BORDER2);								/* 左 */
-	LCD_DrawLine(x2, y1, x2, y2, CL_BOX_BORDER2);								/* 右 */
+  LCD_DrawLine(x1, y1, x1 + 6, y1, CL_BOX_BORDER2);           /* 顶1 */
+  LCD_DrawLine(x1 + 8 + len + 1, y1, x2, y1, CL_BOX_BORDER2); /* 顶2 */
+  LCD_DrawLine(x1, y2, x2, y2, CL_BOX_BORDER2);               /* 底 */
+  LCD_DrawLine(x1, y1, x1, y2, CL_BOX_BORDER2);               /* 左 */
+  LCD_DrawLine(x2, y1, x2, y2, CL_BOX_BORDER2);               /* 右 */
 
-	/* 画主框线 */
-	//LCD_DrawRect(_pBox->Left, _pBox->Top + 4, _pBox->Height, _pBox->Width - 1, CL_BOX_BORDER1);
-	x1 = _pBox->Left;
-	y1 = _pBox->Top + 4;
-	x2 = _pBox->Left + _pBox->Width - 2;
-	y2 = _pBox->Top + 4 + _pBox->Height - 1;
+  /* 画主框线 */
+  //LCD_DrawRect(_pBox->Left, _pBox->Top + 4, _pBox->Height, _pBox->Width - 1, CL_BOX_BORDER1);
+  x1 = _pBox->Left;
+  y1 = _pBox->Top + 4;
+  x2 = _pBox->Left + _pBox->Width - 2;
+  y2 = _pBox->Top + 4 + _pBox->Height - 1;
 
-	LCD_DrawLine(x1, y1, x1 + 6, y1, CL_BOX_BORDER1);						/* 顶1 */
-	LCD_DrawLine(x1 + 9 + len + 1, y1, x2, y1, CL_BOX_BORDER1); /* 顶2 */
-	LCD_DrawLine(x1, y2, x2, y2, CL_BOX_BORDER1);								/* 底 */
-	LCD_DrawLine(x1, y1, x1, y2, CL_BOX_BORDER1);								/* 左 */
-	LCD_DrawLine(x2, y1, x2, y2, CL_BOX_BORDER1);								/* 右 */
+  LCD_DrawLine(x1, y1, x1 + 6, y1, CL_BOX_BORDER1);           /* 顶1 */
+  LCD_DrawLine(x1 + 9 + len + 1, y1, x2, y1, CL_BOX_BORDER1); /* 顶2 */
+  LCD_DrawLine(x1, y2, x2, y2, CL_BOX_BORDER1);               /* 底 */
+  LCD_DrawLine(x1, y1, x1, y2, CL_BOX_BORDER1);               /* 左 */
+  LCD_DrawLine(x2, y1, x2, y2, CL_BOX_BORDER1);               /* 右 */
 
-	/* 显示分组框标题（文字在左上角） */
-	x = _pBox->Left + 9;
-	y = _pBox->Top;
-	LCD_DispStr(x, y, _pBox->pCaption, _pBox->Font);
+  /* 显示分组框标题（文字在左上角） */
+  x = _pBox->Left + 9;
+  y = _pBox->Top;
+  LCD_DispStr(x, y, _pBox->pCaption, _pBox->Font);
 }
 
 /*
@@ -2304,40 +2304,40 @@ void LCD_DrawGroupBox(GROUP_T *_pBox)
 */
 void LCD_DispControl(void *_pControl)
 {
-	uint8_t id;
+  uint8_t id;
 
-	id = *(uint8_t *)_pControl; /* 读取ID */
+  id = *(uint8_t *)_pControl; /* 读取ID */
 
-	switch (id)
-	{
-	case ID_ICON:
-		//void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode);
-		break;
+  switch (id)
+  {
+  case ID_ICON:
+    //void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode);
+    break;
 
-	case ID_WIN:
-		LCD_DrawWin((WIN_T *)_pControl);
-		break;
+  case ID_WIN:
+    LCD_DrawWin((WIN_T *)_pControl);
+    break;
 
-	case ID_LABEL:
-		LCD_DrawLabel((LABEL_T *)_pControl);
-		break;
+  case ID_LABEL:
+    LCD_DrawLabel((LABEL_T *)_pControl);
+    break;
 
-	case ID_BUTTON:
-		LCD_DrawButton((BUTTON_T *)_pControl);
-		break;
+  case ID_BUTTON:
+    LCD_DrawButton((BUTTON_T *)_pControl);
+    break;
 
-	case ID_CHECK:
-		LCD_DrawCheckBox((CHECK_T *)_pControl);
-		break;
+  case ID_CHECK:
+    LCD_DrawCheckBox((CHECK_T *)_pControl);
+    break;
 
-	case ID_EDIT:
-		LCD_DrawEdit((EDIT_T *)_pControl);
-		break;
+  case ID_EDIT:
+    LCD_DrawEdit((EDIT_T *)_pControl);
+    break;
 
-	case ID_GROUP:
-		LCD_DrawGroupBox((GROUP_T *)_pControl);
-		break;
-	}
+  case ID_GROUP:
+    LCD_DrawGroupBox((GROUP_T *)_pControl);
+    break;
+  }
 }
 
 /*
@@ -2353,13 +2353,13 @@ void LCD_DispControl(void *_pControl)
 */
 void LCD_InitButton(BUTTON_T *_btn, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w, char *_pCaption, FONT_T *_pFont)
 {
-	_btn->Left = _x;
-	_btn->Top = _y;
-	_btn->Height = _h;
-	_btn->Width = _w;
-	_btn->pCaption = _pCaption;
-	_btn->Font = _pFont;
-	_btn->Focus = 0;
+  _btn->Left = _x;
+  _btn->Top = _y;
+  _btn->Height = _h;
+  _btn->Width = _w;
+  _btn->pCaption = _pCaption;
+  _btn->Font = _pFont;
+  _btn->Focus = 0;
 }
 
 /*
@@ -2376,96 +2376,96 @@ void LCD_InitButton(BUTTON_T *_btn, uint16_t _x, uint16_t _y, uint16_t _h, uint1
 */
 void LCD_DrawButton(BUTTON_T *_pBtn)
 {
-	uint16_t x, y;
-	uint8_t muti_line = 0;
+  uint16_t x, y;
+  uint8_t muti_line = 0;
 
-	{
-		uint16_t i;
+  {
+    uint16_t i;
 
-		for (i = 0; i < 1024; i++)
-		{
-			if (_pBtn->pCaption[i] == '\r' || _pBtn->pCaption[i] == '\t')
-			{
-				muti_line = 1;
-				break;
-			}
-			if (_pBtn->pCaption[i] == 0)
-			{
-				break;
-			}
-		}
-	}
-	x = _pBtn->Left;
-	if (muti_line == 0)
-	{
-		y = _pBtn->Top + (_pBtn->Height - LCD_GetFontHeight(_pBtn->Font)) / 2; /* 单行文本垂直居中 */
-	}
-	else
-	{
-		y = _pBtn->Top; /* 多行文本,垂直坐标从顶部开始 */
-	}
+    for (i = 0; i < 1024; i++)
+    {
+      if (_pBtn->pCaption[i] == '\r' || _pBtn->pCaption[i] == '\t')
+      {
+        muti_line = 1;
+        break;
+      }
+      if (_pBtn->pCaption[i] == 0)
+      {
+        break;
+      }
+    }
+  }
+  x = _pBtn->Left;
+  if (muti_line == 0)
+  {
+    y = _pBtn->Top + (_pBtn->Height - LCD_GetFontHeight(_pBtn->Font)) / 2; /* 单行文本垂直居中 */
+  }
+  else
+  {
+    y = _pBtn->Top; /* 多行文本,垂直坐标从顶部开始 */
+  }
 
-	//	if (g_ChipID == IC_8875)
-	//	{
-	//		uint8_t Arc = 5;
-	//
-	//		if (_pBtn->Focus == 0)
-	//		{
-	//			RA8875_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR1);
-	//			RA8875_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc,  BTN_BODY_COLOR1);
-	//			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1);	/* 画阴影对比色 */
-	//		}
-	//		else
-	//		{
-	//			RA8875_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR2);
-	//			RA8875_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc, BTN_BODY_COLOR2);
-	//			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2);	/* 画阴影对比色 */
-	//		}
+  //	if (g_ChipID == IC_8875)
+  //	{
+  //		uint8_t Arc = 5;
+  //
+  //		if (_pBtn->Focus == 0)
+  //		{
+  //			RA8875_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR1);
+  //			RA8875_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc,  BTN_BODY_COLOR1);
+  //			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1);	/* 画阴影对比色 */
+  //		}
+  //		else
+  //		{
+  //			RA8875_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR2);
+  //			RA8875_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc, BTN_BODY_COLOR2);
+  //			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2);	/* 画阴影对比色 */
+  //		}
 
-	//		RA8875_SetTextTransp(1);
-	//		LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
-	//		RA8875_SetTextTransp(0);
-	//	}
-	//	else if (g_ChipID == IC_8876)
-	//	{
-	//		uint8_t Arc = 5;
-	//
-	//		if (_pBtn->Focus == 0)
-	//		{
-	//			RA8876_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR1);
-	//			RA8876_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc,  BTN_BODY_COLOR1);
-	//			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1);	/* 画阴影对比色 */
-	//		}
-	//		else
-	//		{
-	//			RA8876_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR2);
-	//			RA8876_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc, BTN_BODY_COLOR2);
-	//			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2);	/* 画阴影对比色 */
-	//		}
-	//
-	//		RA8876_SetTextTransp(1);
-	//		LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
-	//		RA8876_SetTextTransp(0);
-	//	}
-	//	else
-	{
-		uint8_t Arc = 5;
+  //		RA8875_SetTextTransp(1);
+  //		LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
+  //		RA8875_SetTextTransp(0);
+  //	}
+  //	else if (g_ChipID == IC_8876)
+  //	{
+  //		uint8_t Arc = 5;
+  //
+  //		if (_pBtn->Focus == 0)
+  //		{
+  //			RA8876_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR1);
+  //			RA8876_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc,  BTN_BODY_COLOR1);
+  //			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1);	/* 画阴影对比色 */
+  //		}
+  //		else
+  //		{
+  //			RA8876_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc,  BTN_BORDER_COLOR2);
+  //			RA8876_FillRoundRect(_pBtn->Left + 1, _pBtn->Top + 1, _pBtn->Height - 2, _pBtn->Width - 2, Arc, BTN_BODY_COLOR2);
+  //			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2);	/* 画阴影对比色 */
+  //		}
+  //
+  //		RA8876_SetTextTransp(1);
+  //		LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
+  //		RA8876_SetTextTransp(0);
+  //	}
+  //	else
+  {
+    uint8_t Arc = 5;
 
-		if (_pBtn->Focus == 0)
-		{
-			LCD_FillRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BODY_COLOR1);
-			LCD_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BORDER_COLOR1);
-			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1); /* 画阴影对比色 */
-		}
-		else
-		{
-			LCD_FillRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BODY_COLOR2);
-			LCD_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BORDER_COLOR2);
-			LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2); /* 画阴影对比色 */
-		}
+    if (_pBtn->Focus == 0)
+    {
+      LCD_FillRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BODY_COLOR1);
+      LCD_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BORDER_COLOR1);
+      LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR1); /* 画阴影对比色 */
+    }
+    else
+    {
+      LCD_FillRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BODY_COLOR2);
+      LCD_DrawRoundRect(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, Arc, BTN_BORDER_COLOR2);
+      LCD_Fill_Rect(_pBtn->Left + Arc, _pBtn->Top + 1, _pBtn->Height / 2, _pBtn->Width - 2 * Arc, BTN_SHADOW_COLOR2); /* 画阴影对比色 */
+    }
 
-		LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
-	}
+    LCD_DispStrEx(x, y, _pBtn->pCaption, _pBtn->Font, _pBtn->Width, ALIGN_CENTER);
+  }
 }
 
 /*
@@ -2479,17 +2479,17 @@ void LCD_DrawButton(BUTTON_T *_pBtn)
 */
 uint8_t LCD_ButtonTouchDown(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
-	{
-		BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
-		_btn->Focus = 1;
-		LCD_DrawButton(_btn);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
+  {
+    BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
+    _btn->Focus = 1;
+    LCD_DrawButton(_btn);
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2503,22 +2503,22 @@ uint8_t LCD_ButtonTouchDown(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 */
 uint8_t LCD_ButtonTouchRelease(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 {
-	/* 2016-04-24 避免闪屏 */
-	if (_btn->Focus != 0)
-	{
-		_btn->Focus = 0;
-		LCD_DrawButton(_btn);
-	}
+  /* 2016-04-24 避免闪屏 */
+  if (_btn->Focus != 0)
+  {
+    _btn->Focus = 0;
+    LCD_DrawButton(_btn);
+  }
 
-	if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
-	{
+  if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
+  {
 
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2535,14 +2535,14 @@ uint8_t LCD_ButtonTouchRelease(BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 */
 void LCD_DrawBmpButton(BMP_BUTTON_T *_pBtn)
 {
-	//	if (_pBtn->Focus == 1)
-	//	{
-	//		RA8875_DispBmpInFlash(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, _pBtn->Pic2);
-	//	}
-	//	else
-	//	{
-	//		RA8875_DispBmpInFlash(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, _pBtn->Pic1);
-	//	}
+  //	if (_pBtn->Focus == 1)
+  //	{
+  //		RA8875_DispBmpInFlash(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, _pBtn->Pic2);
+  //	}
+  //	else
+  //	{
+  //		RA8875_DispBmpInFlash(_pBtn->Left, _pBtn->Top, _pBtn->Height, _pBtn->Width, _pBtn->Pic1);
+  //	}
 }
 
 /*
@@ -2556,17 +2556,17 @@ void LCD_DrawBmpButton(BMP_BUTTON_T *_pBtn)
 */
 uint8_t LCD_BmpButtonTouchDown(BMP_BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
-	{
-		BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
-		_btn->Focus = 1;
-		LCD_DrawBmpButton(_btn);
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
+  {
+    BUTTON_BEEP(); /* 按键提示音 bsp_tft_lcd.h 文件开头可以使能和关闭 */
+    _btn->Focus = 1;
+    LCD_DrawBmpButton(_btn);
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2580,17 +2580,17 @@ uint8_t LCD_BmpButtonTouchDown(BMP_BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 */
 uint8_t LCD_BmpButtonTouchRelease(BMP_BUTTON_T *_btn, uint16_t _usX, uint16_t _usY)
 {
-	_btn->Focus = 0;
-	LCD_DrawBmpButton(_btn);
+  _btn->Focus = 0;
+  LCD_DrawBmpButton(_btn);
 
-	if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _btn->Left) && (_usX < _btn->Left + _btn->Width) && (_usY > _btn->Top) && (_usY < _btn->Top + _btn->Height))
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2604,15 +2604,15 @@ uint8_t LCD_BmpButtonTouchRelease(BMP_BUTTON_T *_btn, uint16_t _usX, uint16_t _u
 */
 uint8_t LCD_SelectTouchDown(SELECT_T *_slt, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _slt->Left) && (_usX < _slt->Left + _slt->Width) && (_usY > _slt->Top) && (_usY < _slt->Top + _slt->Height))
-	{
-		BUTTON_BEEP();
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _slt->Left) && (_usX < _slt->Left + _slt->Width) && (_usY > _slt->Top) && (_usY < _slt->Top + _slt->Height))
+  {
+    BUTTON_BEEP();
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2629,12 +2629,12 @@ uint8_t LCD_SelectTouchDown(SELECT_T *_slt, uint16_t _usX, uint16_t _usY)
 */
 void LCD_InitPannel(PANNEL_T *_pnl, uint16_t _x, uint16_t _y, uint16_t _h, uint16_t _w, uint16_t _arc, uint16_t _color)
 {
-	_pnl->Left = _x;
-	_pnl->Top = _y;
-	_pnl->Height = _h;
-	_pnl->Width = _w;
-	_pnl->Arc = _arc;
-	_pnl->Color = _color;
+  _pnl->Left = _x;
+  _pnl->Top = _y;
+  _pnl->Height = _h;
+  _pnl->Width = _w;
+  _pnl->Arc = _arc;
+  _pnl->Color = _color;
 }
 
 /*
@@ -2647,15 +2647,15 @@ void LCD_InitPannel(PANNEL_T *_pnl, uint16_t _x, uint16_t _y, uint16_t _h, uint1
 */
 void LCD_DrawPannel(PANNEL_T *_pnl)
 {
-	//	if (g_ChipID == IC_8875)
-	//	{
-	//		/* 绘制一个圆角矩形，填充底色 */
-	//		RA8875_FillRoundRect(_pnl->Left, _pnl->Top, _pnl->Height, _pnl->Width, _pnl->Arc, _pnl->Color);
-	//	}
-	//	else
-	//	{
-	//		;
-	//	}
+  //	if (g_ChipID == IC_8875)
+  //	{
+  //		/* 绘制一个圆角矩形，填充底色 */
+  //		RA8875_FillRoundRect(_pnl->Left, _pnl->Top, _pnl->Height, _pnl->Width, _pnl->Arc, _pnl->Color);
+  //	}
+  //	else
+  //	{
+  //		;
+  //	}
 }
 
 /*
@@ -2669,14 +2669,14 @@ void LCD_DrawPannel(PANNEL_T *_pnl)
 */
 uint8_t LCD_PannelClick(PANNEL_T *_obj, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _obj->Left) && (_usX < _obj->Left + _obj->Width) && (_usY > _obj->Top) && (_usY < _obj->Top + _obj->Height))
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _obj->Left) && (_usX < _obj->Left + _obj->Width) && (_usY > _obj->Top) && (_usY < _obj->Top + _obj->Height))
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2690,14 +2690,14 @@ uint8_t LCD_PannelClick(PANNEL_T *_obj, uint16_t _usX, uint16_t _usY)
 */
 uint8_t LCD_LabelClick(LABEL_T *_obj, uint16_t _usX, uint16_t _usY)
 {
-	if ((_usX > _obj->Left) && (_usX < _obj->Left + _obj->Width) && (_usY > _obj->Top) && (_usY < _obj->Top + _obj->Height))
-	{
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
+  if ((_usX > _obj->Left) && (_usX < _obj->Left + _obj->Width) && (_usY > _obj->Top) && (_usY < _obj->Top + _obj->Height))
+  {
+    return 1;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 /*
@@ -2715,16 +2715,16 @@ uint8_t LCD_LabelClick(LABEL_T *_obj, uint16_t _usX, uint16_t _usY)
 */
 void LCD_DrawArc(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, float _StartRnd, float _EndRnd, uint16_t _usColor)
 {
-	float CurX, CurY, rnd;
+  float CurX, CurY, rnd;
 
-	rnd = _StartRnd;
-	while (rnd <= _EndRnd)
-	{
-		CurX = _usRadius * cos(rnd);
-		CurY = _usRadius * sin(rnd);
-		LCD_PutPixel(_usX + CurX, _usY - CurY, _usColor);
-		rnd = rnd + 0.01f;
-	}
+  rnd = _StartRnd;
+  while (rnd <= _EndRnd)
+  {
+    CurX = _usRadius * cos(rnd);
+    CurY = _usRadius * sin(rnd);
+    LCD_PutPixel(_usX + CurX, _usY - CurY, _usColor);
+    rnd = rnd + 0.01f;
+  }
 }
 
 /*
@@ -2740,49 +2740,49 @@ void LCD_DrawArc(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, float _StartR
 */
 void LCD_DrawQuterCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor, uint8_t _ucMode)
 {
-	int32_t D;		 /* Decision Variable */
-	uint32_t CurX; /* 当前 X 值 */
-	uint32_t CurY; /* 当前 Y 值 */
+  int32_t D;     /* Decision Variable */
+  uint32_t CurX; /* 当前 X 值 */
+  uint32_t CurY; /* 当前 Y 值 */
 
-	D = 3 - (_usRadius << 1);
+  D = 3 - (_usRadius << 1);
 
-	CurX = 0;
-	CurY = _usRadius;
+  CurX = 0;
+  CurY = _usRadius;
 
-	while (CurX <= CurY)
-	{
-		if (_ucMode == 0)
-		{
-			LCD_PutPixel(_usX - CurY, _usY - CurX, _usColor); // 左 -> 上
-			LCD_PutPixel(_usX - CurX, _usY - CurY, _usColor); // 上 -> 左
-		}
-		else if (_ucMode == 1)
-		{
-			LCD_PutPixel(_usX + CurX, _usY - CurY, _usColor); // 上 -> 右
-			LCD_PutPixel(_usX + CurY, _usY - CurX, _usColor); // 右 -> 上
-		}
-		else if (_ucMode == 2)
-		{
-			LCD_PutPixel(_usX + CurX, _usY + CurY, _usColor); // 下 -> 右
-			LCD_PutPixel(_usX + CurY, _usY + CurX, _usColor); // 右 -> 下
-		}
-		else if (_ucMode == 3)
-		{
-			LCD_PutPixel(_usX - CurX, _usY + CurY, _usColor); // 下 -> 左
-			LCD_PutPixel(_usX - CurY, _usY + CurX, _usColor); // 左 -> 下
-		}
+  while (CurX <= CurY)
+  {
+    if (_ucMode == 0)
+    {
+      LCD_PutPixel(_usX - CurY, _usY - CurX, _usColor); // 左 -> 上
+      LCD_PutPixel(_usX - CurX, _usY - CurY, _usColor); // 上 -> 左
+    }
+    else if (_ucMode == 1)
+    {
+      LCD_PutPixel(_usX + CurX, _usY - CurY, _usColor); // 上 -> 右
+      LCD_PutPixel(_usX + CurY, _usY - CurX, _usColor); // 右 -> 上
+    }
+    else if (_ucMode == 2)
+    {
+      LCD_PutPixel(_usX + CurX, _usY + CurY, _usColor); // 下 -> 右
+      LCD_PutPixel(_usX + CurY, _usY + CurX, _usColor); // 右 -> 下
+    }
+    else if (_ucMode == 3)
+    {
+      LCD_PutPixel(_usX - CurX, _usY + CurY, _usColor); // 下 -> 左
+      LCD_PutPixel(_usX - CurY, _usY + CurX, _usColor); // 左 -> 下
+    }
 
-		if (D < 0)
-		{
-			D += (CurX << 2) + 6;
-		}
-		else
-		{
-			D += ((CurX - CurY) << 2) + 10;
-			CurY--;
-		}
-		CurX++;
-	}
+    if (D < 0)
+    {
+      D += (CurX << 2) + 6;
+    }
+    else
+    {
+      D += ((CurX - CurY) << 2) + 10;
+      CurY--;
+    }
+    CurX++;
+  }
 }
 
 /*
@@ -2799,48 +2799,48 @@ void LCD_DrawQuterCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint1
 */
 void LCD_FillQuterCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor, uint8_t _ucMode)
 {
-	int32_t D;
-	uint32_t CurX; /* 当前 X 值 */
-	uint32_t CurY; /* 当前 Y 值 */
+  int32_t D;
+  uint32_t CurX; /* 当前 X 值 */
+  uint32_t CurY; /* 当前 Y 值 */
 
-	D = 3 - (_usRadius << 1);
-	CurX = 0;
-	CurY = _usRadius;
+  D = 3 - (_usRadius << 1);
+  CurX = 0;
+  CurY = _usRadius;
 
-	while (CurX <= CurY)
-	{
-		if (_ucMode == 0)
-		{
-			LCD_DrawLine(_usX - CurY, _usY - CurX, _usX, _usY - CurX, _usColor); // 左 -> 上
-			LCD_DrawLine(_usX - CurX, _usY - CurY, _usX, _usY - CurY, _usColor); // 上 -> 左
-		}
-		else if (_ucMode == 1)
-		{
-			LCD_DrawLine(_usX + CurX, _usY - CurY, _usX, _usY - CurY, _usColor); // 上 -> 右
-			LCD_DrawLine(_usX + CurY, _usY - CurX, _usX, _usY - CurX, _usColor); // 右 -> 上
-		}
-		else if (_ucMode == 2)
-		{
-			LCD_DrawLine(_usX + CurX, _usY + CurY, _usX, _usY + CurY, _usColor); // 下 -> 右
-			LCD_DrawLine(_usX + CurY, _usY + CurX, _usX, _usY + CurX, _usColor); // 右 -> 下
-		}
-		else if (_ucMode == 3)
-		{
-			LCD_DrawLine(_usX - CurX, _usY + CurY, _usX, _usY + CurY, _usColor); // 下 -> 左
-			LCD_DrawLine(_usX - CurY, _usY + CurX, _usX, _usY + CurX, _usColor); // 左 -> 下
-		}
+  while (CurX <= CurY)
+  {
+    if (_ucMode == 0)
+    {
+      LCD_DrawLine(_usX - CurY, _usY - CurX, _usX, _usY - CurX, _usColor); // 左 -> 上
+      LCD_DrawLine(_usX - CurX, _usY - CurY, _usX, _usY - CurY, _usColor); // 上 -> 左
+    }
+    else if (_ucMode == 1)
+    {
+      LCD_DrawLine(_usX + CurX, _usY - CurY, _usX, _usY - CurY, _usColor); // 上 -> 右
+      LCD_DrawLine(_usX + CurY, _usY - CurX, _usX, _usY - CurX, _usColor); // 右 -> 上
+    }
+    else if (_ucMode == 2)
+    {
+      LCD_DrawLine(_usX + CurX, _usY + CurY, _usX, _usY + CurY, _usColor); // 下 -> 右
+      LCD_DrawLine(_usX + CurY, _usY + CurX, _usX, _usY + CurX, _usColor); // 右 -> 下
+    }
+    else if (_ucMode == 3)
+    {
+      LCD_DrawLine(_usX - CurX, _usY + CurY, _usX, _usY + CurY, _usColor); // 下 -> 左
+      LCD_DrawLine(_usX - CurY, _usY + CurX, _usX, _usY + CurX, _usColor); // 左 -> 下
+    }
 
-		if (D < 0)
-		{
-			D += (CurX << 2) + 6;
-		}
-		else
-		{
-			D += ((CurX - CurY) << 2) + 10;
-			CurY--;
-		}
-		CurX++;
-	}
+    if (D < 0)
+    {
+      D += (CurX << 2) + 6;
+    }
+    else
+    {
+      D += ((CurX - CurY) << 2) + 10;
+      CurY--;
+    }
+    CurX++;
+  }
 }
 
 /*
@@ -2857,29 +2857,29 @@ void LCD_FillQuterCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint1
 *********************************************************************************************************
 */
 void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
-											 uint16_t _usRadius, uint16_t _usColor)
+                       uint16_t _usRadius, uint16_t _usColor)
 {
-	if (_usHeight < 2 * _usRadius)
-	{
-		_usHeight = 2 * _usRadius;
-	}
+  if (_usHeight < 2 * _usRadius)
+  {
+    _usHeight = 2 * _usRadius;
+  }
 
-	if (_usWidth < 2 * _usRadius)
-	{
-		_usWidth = 2 * _usRadius;
-	}
+  if (_usWidth < 2 * _usRadius)
+  {
+    _usWidth = 2 * _usRadius;
+  }
 
-	LCD_DrawQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
-	LCD_DrawLine(_usX + _usRadius, _usY, _usX + _usWidth - _usRadius - 1, _usY, _usColor);
+  LCD_DrawQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
+  LCD_DrawLine(_usX + _usRadius, _usY, _usX + _usWidth - _usRadius - 1, _usY, _usColor);
 
-	LCD_DrawQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
-	LCD_DrawLine(_usX + _usWidth - 1, _usY + _usRadius, _usX + _usWidth - 1, _usY + _usHeight - _usRadius - 1, _usColor);
+  LCD_DrawQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
+  LCD_DrawLine(_usX + _usWidth - 1, _usY + _usRadius, _usX + _usWidth - 1, _usY + _usHeight - _usRadius - 1, _usColor);
 
-	LCD_DrawQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
-	LCD_DrawLine(_usX + _usRadius, _usY + _usHeight - 1, _usX + _usWidth - _usRadius - 1, _usY + _usHeight - 1, _usColor);
+  LCD_DrawQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
+  LCD_DrawLine(_usX + _usRadius, _usY + _usHeight - 1, _usX + _usWidth - _usRadius - 1, _usY + _usHeight - 1, _usColor);
 
-	LCD_DrawQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
-	LCD_DrawLine(_usX, _usY + _usRadius, _usX, _usY + _usHeight - _usRadius - 1, _usColor);
+  LCD_DrawQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
+  LCD_DrawLine(_usX, _usY + _usRadius, _usX, _usY + _usHeight - _usRadius - 1, _usColor);
 }
 
 /*
@@ -2896,31 +2896,31 @@ void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 *********************************************************************************************************
 */
 void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
-											 uint16_t _usRadius, uint16_t _usColor)
+                       uint16_t _usRadius, uint16_t _usColor)
 {
-	if (_usHeight < 2 * _usRadius)
-	{
-		_usHeight = 2 * _usRadius;
-	}
+  if (_usHeight < 2 * _usRadius)
+  {
+    _usHeight = 2 * _usRadius;
+  }
 
-	if (_usWidth < 2 * _usRadius)
-	{
-		_usWidth = 2 * _usRadius;
-	}
+  if (_usWidth < 2 * _usRadius)
+  {
+    _usWidth = 2 * _usRadius;
+  }
 
-	LCD_FillQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
+  LCD_FillQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
 
-	LCD_Fill_Rect(_usX + _usRadius + 1, _usY, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
+  LCD_Fill_Rect(_usX + _usRadius + 1, _usY, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
 
-	LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
+  LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
 
-	LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
+  LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
 
-	LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
+  LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
 
-	LCD_Fill_Rect(_usX + _usRadius + 1, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
+  LCD_Fill_Rect(_usX + _usRadius + 1, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
 
-	LCD_FillQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
+  LCD_FillQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

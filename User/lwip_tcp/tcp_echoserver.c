@@ -40,15 +40,14 @@
  *
  **/
 
- /* This file was modified by ST */
-
+/* This file was modified by ST */
 
 #include "lwip/debug.h"
 #include "lwip/stats.h"
 #include "lwip/tcp.h"
 
 #include "bsp.h"
-#include "modbus_slave.h"	/* tcp + modbus协议 */
+#include "modbus_slave.h" /* tcp + modbus协议 */
 #include "param.h"
 
 #if LWIP_TCP
@@ -68,11 +67,10 @@ enum tcp_echoserver_states
    to LwIP callbacks*/
 struct tcp_echoserver_struct
 {
-  u8_t state;             /* current connection state */
-  struct tcp_pcb *pcb;    /* pointer on the current tcp_pcb */
-  struct pbuf *p;         /* pointer on the received/to be transmitted pbuf */
+  u8_t state;          /* current connection state */
+  struct tcp_pcb *pcb; /* pointer on the current tcp_pcb */
+  struct pbuf *p;      /* pointer on the received/to be transmitted pbuf */
 };
-
 
 static err_t tcp_echoserver_accept(void *arg, struct tcp_pcb *newpcb, err_t err);
 static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
@@ -91,23 +89,23 @@ void tcp_echoserver_init(void)
 {
   /* create new tcp pcb */
   tcp_echoserver_pcb = tcp_new();
-	
+
   if (tcp_echoserver_pcb != NULL)
   {
     err_t err;
-    
+
     /* bind echo_pcb to port 7 (ECHO protocol) */
-    err = tcp_bind(tcp_echoserver_pcb, IP_ADDR_ANY, g_tParam.LocalTCPPort);		/* 端口号为g_tParam.Ctrl_Port */
-    
+    err = tcp_bind(tcp_echoserver_pcb, IP_ADDR_ANY, g_tParam.LocalTCPPort); /* 端口号为g_tParam.Ctrl_Port */
+
     if (err == ERR_OK)
     {
       /* start tcp listening for echo_pcb */
       tcp_echoserver_pcb = tcp_listen(tcp_echoserver_pcb);
-      
+
       /* initialize LwIP tcp_accept callback function */
-      tcp_accept(tcp_echoserver_pcb, tcp_echoserver_accept);	/* 初始化接收回调函数 */
+      tcp_accept(tcp_echoserver_pcb, tcp_echoserver_accept); /* 初始化接收回调函数 */
     }
-    else 
+    else
     {
       /* deallocate the pcb */
       memp_free(MEMP_TCP_PCB, tcp_echoserver_pcb);
@@ -146,19 +144,19 @@ static err_t tcp_echoserver_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
     es->state = ES_ACCEPTED;
     es->pcb = newpcb;
     es->p = NULL;
-    
+
     /* pass newly allocated es structure as argument to newpcb */
     tcp_arg(newpcb, es);
-    
-    /* initialize lwip tcp_recv callback function for newpcb  */ 
-    tcp_recv(newpcb, tcp_echoserver_recv);		/* 初始化数据接收回调函数 */
-    
+
+    /* initialize lwip tcp_recv callback function for newpcb  */
+    tcp_recv(newpcb, tcp_echoserver_recv); /* 初始化数据接收回调函数 */
+
     /* initialize lwip tcp_err callback function for newpcb  */
-    tcp_err(newpcb, tcp_echoserver_error);		/* 初始化错误回调函数 */
-    
+    tcp_err(newpcb, tcp_echoserver_error); /* 初始化错误回调函数 */
+
     /* initialize lwip tcp_poll callback function for newpcb */
-    tcp_poll(newpcb, tcp_echoserver_poll, 1);	/* tcp_poll回调函数 */
-    
+    tcp_poll(newpcb, tcp_echoserver_poll, 1); /* tcp_poll回调函数 */
+
     ret_err = ERR_OK;
   }
   else
@@ -168,9 +166,8 @@ static err_t tcp_echoserver_accept(void *arg, struct tcp_pcb *newpcb, err_t err)
     /* return memory error */
     ret_err = ERR_MEM;
   }
-  return ret_err;  
+  return ret_err;
 }
-
 
 /**
   * @brief  This function is the implementation for tcp_recv LwIP callback
@@ -185,86 +182,86 @@ static err_t tcp_echoserver_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
   struct tcp_echoserver_struct *es;
   err_t ret_err;
 
-  LWIP_ASSERT("arg != NULL",arg != NULL);
-  
+  LWIP_ASSERT("arg != NULL", arg != NULL);
+
   es = (struct tcp_echoserver_struct *)arg;
-  
-//		DebugToggle1();
+
+  //		DebugToggle1();
   /* if we receive an empty tcp frame from client => close connection */
-  if (p == NULL)					/* 从客户端接收到空数据 */
+  if (p == NULL) /* 从客户端接收到空数据 */
   {
     /* remote host closed connection */
     es->state = ES_CLOSING;
-    if(es->p == NULL)
+    if (es->p == NULL)
     {
-       /* we're done sending, close connection */
-       tcp_echoserver_connection_close(tpcb, es);
+      /* we're done sending, close connection */
+      tcp_echoserver_connection_close(tpcb, es);
     }
     else
     {
-	#if 0							/* 既然还没完成，此部分代码也没什么用，所以去除该部分 */
+#if 0 /* 既然还没完成，此部分代码也没什么用，所以去除该部分 */
       /* we're not done yet */
       /* acknowledge received packet */
       tcp_sent(tpcb, tcp_echoserver_sent);		
       
       /* send remaining data*/
       tcp_echoserver_send(tpcb, es);
-	#endif
+#endif
     }
     ret_err = ERR_OK;
-  }   
+  }
   /* else : a non empty frame was received from client but for some reason err != ERR_OK */
-  else if(err != ERR_OK)			/* 从客户端接收到一个非空的数据,但是由于某种原因err!=ERR_OK */
+  else if (err != ERR_OK) /* 从客户端接收到一个非空的数据,但是由于某种原因err!=ERR_OK */
   {
     /* free received pbuf*/
     es->p = NULL;
     pbuf_free(p);
     ret_err = err;
   }
-  else if(es->state == ES_ACCEPTED)			/* 链接状态，第一次收到数据会进入此分支，之后会在es->state == ES_RECEIVED分支 */
+  else if (es->state == ES_ACCEPTED) /* 链接状态，第一次收到数据会进入此分支，之后会在es->state == ES_RECEIVED分支 */
   {
     /* first data chunk in p->payload */
     es->state = ES_RECEIVED;
-    
+
     /* store reference to incoming pbuf (chain) */
     es->p = p;
-    
+
     /* initialize LwIP tcp_sent callback function */
-    tcp_sent(tpcb, tcp_echoserver_sent);		/* 初始化Lwip协议栈tcp_sent的回调函数，此函数可以放在tcp_echoserver_accept中一起做 */
-    
+    tcp_sent(tpcb, tcp_echoserver_sent); /* 初始化Lwip协议栈tcp_sent的回调函数，此函数可以放在tcp_echoserver_accept中一起做 */
+
     /* send back the received data (echo) */
-    tcp_echoserver_send(tpcb, es);	/* ST官方例程接收到数据立刻发送出去，所以删除这部分代码 */
-    
+    tcp_echoserver_send(tpcb, es); /* ST官方例程接收到数据立刻发送出去，所以删除这部分代码 */
+
     ret_err = ERR_OK;
   }
   else if (es->state == ES_RECEIVED)
   {
     /* more data received from client and previous data has been already sent*/
-    if(es->p == NULL)
+    if (es->p == NULL)
     {
-//		DebugToggle2();
+      //		DebugToggle2();
       es->p = p;
-  
+
       /* send back received data */
-      tcp_echoserver_send(tpcb, es);	/* ST官方例程接收到数据立刻发送出去，所以删除这部分代码 */
+      tcp_echoserver_send(tpcb, es); /* ST官方例程接收到数据立刻发送出去，所以删除这部分代码 */
     }
     else
     {
       struct pbuf *ptr;
-		
+
       /* chain pbufs to the end of what we recv'ed previously  */
       ptr = es->p;
-      pbuf_chain(ptr,p);
+      pbuf_chain(ptr, p);
     }
     ret_err = ERR_OK;
   }
-  
+
   /* data received when connection already closed */
   else
   {
     /* Acknowledge data reception */
     tcp_recved(tpcb, p->tot_len);
-    
+
     /* free pbuf and do nothing */
     es->p = NULL;
     pbuf_free(p);
@@ -316,7 +313,7 @@ static err_t tcp_echoserver_poll(void *arg, struct tcp_pcb *tpcb)
     else
     {
       /* no remaining pbuf (chain)  */
-      if(es->state == ES_CLOSING)
+      if (es->state == ES_CLOSING)
       {
         /*  close tcp connection */
         tcp_echoserver_connection_close(tpcb, es);
@@ -346,8 +343,8 @@ static err_t tcp_echoserver_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
   LWIP_UNUSED_ARG(len);
 
   es = (struct tcp_echoserver_struct *)arg;
-  
-  if(es->p != NULL)
+
+  if (es->p != NULL)
   {
     /* still got pbufs to send */
     tcp_echoserver_send(tpcb, es);
@@ -355,12 +352,11 @@ static err_t tcp_echoserver_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
   else
   {
     /* if no more data to send and client closed connection*/
-    if(es->state == ES_CLOSING)
+    if (es->state == ES_CLOSING)
       tcp_echoserver_connection_close(tpcb, es);
   }
   return ERR_OK;
 }
-
 
 /**
   * @brief  This function is used to send data for tcp connection
@@ -374,92 +370,91 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
 {
   struct pbuf *ptr;
   err_t wr_err = ERR_OK;
-	
+
   while ((wr_err == ERR_OK) &&
-         (es->p != NULL) && 
+         (es->p != NULL) &&
          (es->p->len <= tcp_sndbuf(tpcb)))
   {
-    
+
     /* get pointer on pbuf from es structure */
     ptr = es->p;
-	  
-	#if 1		/* 默认数据包就在一个结构体中，没有用到链表解析 xd 2016-08-27 */
-	  {
-//		  uint8_t *p;
-		  bsp_LedToggle(1);		/* 信号指示灯翻转 */
-		
-//		  p = ptr->payload;
-		 #if 1
-			if (ptr->len > 6)
-			{
-				uint16_t i;
-				memcpy(g_tModS.TCP_Head, ptr->payload, 6);
-				g_tModS.TCP_Flag = 1;
-				MODS_Poll((uint8_t *)((uint8_t *)ptr->payload + 6), ptr->len - 6);
-				//MODBUS_Poll(ptr->payload, ptr->len);
-				for (i = 0; i < g_tModS.TxCount; i++)
-				{
-					g_tModS.TxBuf[g_tModS.TxCount - i - 1 + 6] = g_tModS.TxBuf[g_tModS.TxCount - i - 1];
-				}
-				memcpy(g_tModS.TxBuf, g_tModS.TCP_Head, 6);
-				g_tModS.TxCount -= 2;
-				g_tModS.TxBuf[4] = g_tModS.TxCount >> 8;
-				g_tModS.TxBuf[5] = g_tModS.TxCount;
-				wr_err = tcp_write(tpcb, g_tModS.TxBuf, g_tModS.TxCount + 6, 1); 
-			}
-		#else
-			MODBUS_Poll(ptr->payload, ptr->len);
-			wr_err = tcp_write(tpcb, g_tModS.TxBuf, g_tModS.TxCount, 1); 
-		#endif
-	  } 
-    #else		/* 此分支为解析链表数据，并发送接收的数据,st官方例程代码 */
-		/* enqueue data for transmission */
-		wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);	/* pbuf为数据结构体，ptr->payload为数据缓冲区 */
-	#endif
 
-	if (wr_err == ERR_OK)
-	{
-		u16_t plen;
+#if 1 /* 默认数据包就在一个结构体中，没有用到链表解析 xd 2016-08-27 */
+    {
+      //		  uint8_t *p;
+      bsp_LedToggle(1); /* 信号指示灯翻转 */
 
-		plen = ptr->len;
+      //		  p = ptr->payload;
+#if 1
+      if (ptr->len > 6)
+      {
+        uint16_t i;
+        memcpy(g_tModS.TCP_Head, ptr->payload, 6);
+        g_tModS.TCP_Flag = 1;
+        MODS_Poll((uint8_t *)((uint8_t *)ptr->payload + 6), ptr->len - 6);
+        //MODBUS_Poll(ptr->payload, ptr->len);
+        for (i = 0; i < g_tModS.TxCount; i++)
+        {
+          g_tModS.TxBuf[g_tModS.TxCount - i - 1 + 6] = g_tModS.TxBuf[g_tModS.TxCount - i - 1];
+        }
+        memcpy(g_tModS.TxBuf, g_tModS.TCP_Head, 6);
+        g_tModS.TxCount -= 2;
+        g_tModS.TxBuf[4] = g_tModS.TxCount >> 8;
+        g_tModS.TxBuf[5] = g_tModS.TxCount;
+        wr_err = tcp_write(tpcb, g_tModS.TxBuf, g_tModS.TxCount + 6, 1);
+      }
+#else
+      MODBUS_Poll(ptr->payload, ptr->len);
+      wr_err = tcp_write(tpcb, g_tModS.TxBuf, g_tModS.TxCount, 1);
+#endif
+    }
+#else /* 此分支为解析链表数据，并发送接收的数据,st官方例程代码 */
+    /* enqueue data for transmission */
+    wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1); /* pbuf为数据结构体，ptr->payload为数据缓冲区 */
+#endif
 
-		/* continue with next pbuf in chain (if any) */
-		es->p = ptr->next;							/* 指向下一个pbuf */
+    if (wr_err == ERR_OK)
+    {
+      u16_t plen;
 
-		if(es->p != NULL)
-		{
-		/* increment reference count for es->p */
-		pbuf_ref(es->p);							/* pbuf的ref加1，表示用到次数（Lwip协议栈源码） */
-		}
+      plen = ptr->len;
 
-		/* free pbuf: will free pbufs up to es->p (because es->p has a reference count > 0) */
-		pbuf_free(ptr);
+      /* continue with next pbuf in chain (if any) */
+      es->p = ptr->next; /* 指向下一个pbuf */
 
-		/* Update tcp window size to be advertized : should be called when received
+      if (es->p != NULL)
+      {
+        /* increment reference count for es->p */
+        pbuf_ref(es->p); /* pbuf的ref加1，表示用到次数（Lwip协议栈源码） */
+      }
+
+      /* free pbuf: will free pbufs up to es->p (because es->p has a reference count > 0) */
+      pbuf_free(ptr);
+
+      /* Update tcp window size to be advertized : should be called when received
 		data (with the amount plen) has been processed by the application layer */
-		tcp_recved(tpcb, plen);			/* 更新tcp窗口大小 */
-	}
-	else if(wr_err == ERR_MEM)
-	{
-		/* we are low on memory, try later / harder, defer to poll */
-		es->p = ptr;
-	}
-	 else
-   {
-	 /* other problem ?? */
-	   uint8_t a;
-	   a = a;
-	   
-   }
-   	/* 
+      tcp_recved(tpcb, plen); /* 更新tcp窗口大小 */
+    }
+    else if (wr_err == ERR_MEM)
+    {
+      /* we are low on memory, try later / harder, defer to poll */
+      es->p = ptr;
+    }
+    else
+    {
+      /* other problem ?? */
+      uint8_t a;
+      a = a;
+    }
+    /* 
 		上面用tcp_write函数将数据写入tpcb，但此时数据并没有发送出去。
 		而是在tcp_input函数调用tcp_output(tpcb)数据才发送出去。
 		如果要增加发送速度，可以在这里调用tcp_output(tpcb);
 	*/
   }
-  
-	/* 2016-09-13 by xd 立刻发送 */
-	tcp_output(tpcb);		        /* 将数据立刻发送出去 */
+
+  /* 2016-09-13 by xd 立刻发送 */
+  tcp_output(tpcb); /* 将数据立刻发送出去 */
 }
 
 /**
@@ -470,20 +465,20 @@ static void tcp_echoserver_send(struct tcp_pcb *tpcb, struct tcp_echoserver_stru
   */
 static void tcp_echoserver_connection_close(struct tcp_pcb *tpcb, struct tcp_echoserver_struct *es)
 {
-  
+
   /* remove all callbacks */
   tcp_arg(tpcb, NULL);
   tcp_sent(tpcb, NULL);
   tcp_recv(tpcb, NULL);
   tcp_err(tpcb, NULL);
   tcp_poll(tpcb, NULL, 0);
-  
+
   /* delete es structure */
   if (es != NULL)
   {
     mem_free(es);
-  }  
-  
+  }
+
   /* close tcp connection */
   tcp_close(tpcb);
 }

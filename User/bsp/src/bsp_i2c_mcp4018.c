@@ -29,7 +29,7 @@ static void MCP4018_SoftReset(void);
 */
 void bsp_InitMCP4018(void)
 {
-	MCP4018_SoftReset();
+  MCP4018_SoftReset();
 }
 
 /*
@@ -42,10 +42,10 @@ void bsp_InitMCP4018(void)
 */
 static void MCP4018_SoftReset(void)
 {
-	i2c_Start();
-	i2c_SendByte(0xFF);
-	i2c_Start();
-	i2c_Stop();
+  i2c_Start();
+  i2c_SendByte(0xFF);
+  i2c_Start();
+  i2c_Stop();
 }
 
 /*
@@ -58,15 +58,15 @@ static void MCP4018_SoftReset(void)
 */
 void MCP4018_WriteData(uint8_t _ucOpecode)
 {
-	i2c_Start(); /* 总线开始信号 */
+  i2c_Start(); /* 总线开始信号 */
 
-	i2c_SendByte(MCP4018_SLAVE_ADDRESS); /* 发送设备地址+写信号 */
-	i2c_WaitAck();
+  i2c_SendByte(MCP4018_SLAVE_ADDRESS); /* 发送设备地址+写信号 */
+  i2c_WaitAck();
 
-	i2c_SendByte(_ucOpecode); /* 1字节操作码 */
-	i2c_WaitAck();
+  i2c_SendByte(_ucOpecode); /* 1字节操作码 */
+  i2c_WaitAck();
 
-	i2c_Stop(); /* 总线停止信号 */
+  i2c_Stop(); /* 总线停止信号 */
 }
 
 /*
@@ -79,17 +79,17 @@ void MCP4018_WriteData(uint8_t _ucOpecode)
 */
 uint8_t MCP4018_ReadData(void)
 {
-	uint8_t ucData1;
+  uint8_t ucData1;
 
-	i2c_Start();														 /* 总线开始信号 */
-	i2c_SendByte(MCP4018_SLAVE_ADDRESS + 1); /* 发送设备地址+读信号 */
-	i2c_WaitAck();
+  i2c_Start();                             /* 总线开始信号 */
+  i2c_SendByte(MCP4018_SLAVE_ADDRESS + 1); /* 发送设备地址+读信号 */
+  i2c_WaitAck();
 
-	ucData1 = i2c_ReadByte(); /* 读出高字节数据 */
-	i2c_NAck();
-	i2c_Stop(); /* 总线停止信号 */
+  ucData1 = i2c_ReadByte(); /* 读出高字节数据 */
+  i2c_NAck();
+  i2c_Stop(); /* 总线停止信号 */
 
-	return ucData1;
+  return ucData1;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

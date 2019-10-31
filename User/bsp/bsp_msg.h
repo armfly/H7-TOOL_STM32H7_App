@@ -14,35 +14,35 @@
 #ifndef __BSP_MSG_H
 #define __BSP_MSG_H
 
-#define MSG_FIFO_SIZE    40	   		/* 消息个数 */
+#define MSG_FIFO_SIZE 40 /* 消息个数 */
 
-enum 
+enum
 {
 	MSG_NONE = 0,
-	
+
 	MSG_CAN1_RX,
 	MSG_CAN2_RX,
-	
-	MSG_RESET_CPU,			/* 复位CPU */
-	
-	MSG_SAVE_PARAM,			/* 保存参数消息 */
+
+	MSG_RESET_CPU, /* 复位CPU */
+
+	MSG_SAVE_PARAM, /* 保存参数消息 */
 };
 
 /* 按键FIFO用到变量 */
 typedef struct
 {
-	uint16_t MsgCode;		/* 消息代码 */
-	uint32_t MsgParam;		/* 消息的数据体, 也可以是指针（强制转化） */
-}MSG_T;
+	uint16_t MsgCode;	/* 消息代码 */
+	uint32_t MsgParam; /* 消息的数据体, 也可以是指针（强制转化） */
+} MSG_T;
 
 /* 按键FIFO用到变量 */
 typedef struct
 {
-	MSG_T Buf[MSG_FIFO_SIZE];	/* 消息缓冲区 */
-	uint8_t Read;					/* 缓冲区读指针1 */
-	uint8_t Write;					/* 缓冲区写指针 */
-	uint8_t Read2;					/* 缓冲区读指针2 */
-}MSG_FIFO_T;
+	MSG_T Buf[MSG_FIFO_SIZE]; /* 消息缓冲区 */
+	uint8_t Read;							/* 缓冲区读指针1 */
+	uint8_t Write;						/* 缓冲区写指针 */
+	uint8_t Read2;						/* 缓冲区读指针2 */
+} MSG_FIFO_T;
 
 /* 供外部调用的函数声明 */
 void bsp_InitMsg(void);

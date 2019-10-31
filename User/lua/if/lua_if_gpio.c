@@ -4,190 +4,189 @@
 #include "lua_if.h"
 #include "bsp.h"
 
-static int lua_SetTVCC(lua_State* L);
-static int lua_GpioCfg(lua_State* L);
-static int lua_GpioWrite(lua_State* L);
-static int lua_GpioRead(lua_State* L);
-static int lua_ReadFmcBus(lua_State* L);
+static int lua_SetTVCC(lua_State *L);
+static int lua_GpioCfg(lua_State *L);
+static int lua_GpioWrite(lua_State *L);
+static int lua_GpioRead(lua_State *L);
+static int lua_ReadFmcBus(lua_State *L);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_GpioCfg
-*	¹¦ÄÜËµÃ÷: ÅäÖÃGPIO¹¦ÄÜ
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_GpioCfg
+*	åŠŸèƒ½è¯´æ˜: é…ç½®GPIOåŠŸèƒ½
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lua_gpio_RegisterFun(void)
 {
-	//½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
-    lua_register(g_Lua, "gpio_cfg",  lua_GpioCfg);		/* gpio_cfg(0, 1) */
-	lua_register(g_Lua, "gpio_write", lua_GpioWrite);	/* gpio_write(0, 1) */
-	lua_register(g_Lua, "gpio_read", lua_GpioRead);		/* gpio_write(0, 1) */
-	lua_register(g_Lua, "read_bus", lua_ReadFmcBus);	/* read_bus() */
-	
-	lua_register(g_Lua, "set_tvcc", lua_SetTVCC);	/* */
-	
+  //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+  //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
+  lua_register(g_Lua, "gpio_cfg", lua_GpioCfg);     /* gpio_cfg(0, 1) */
+  lua_register(g_Lua, "gpio_write", lua_GpioWrite); /* gpio_write(0, 1) */
+  lua_register(g_Lua, "gpio_read", lua_GpioRead);   /* gpio_write(0, 1) */
+  lua_register(g_Lua, "read_bus", lua_ReadFmcBus);  /* read_bus() */
+
+  lua_register(g_Lua, "set_tvcc", lua_SetTVCC); /* */
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_GpioCfg
-*	¹¦ÄÜËµÃ÷: ÅäÖÃGPIO¹¦ÄÜ
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_GpioCfg
+*	åŠŸèƒ½è¯´æ˜: é…ç½®GPIOåŠŸèƒ½
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_GpioCfg(lua_State* L)
+static int lua_GpioCfg(lua_State *L)
 {
-	uint8_t _no;
-	uint8_t _dir;
+  uint8_t _no;
+  uint8_t _dir;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		_no = luaL_checknumber(L, 1);
-	}
-	else
-	{
-		return 1;
-	}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    _no = luaL_checknumber(L, 1);
+  }
+  else
+  {
+    return 1;
+  }
 
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{
-		_dir = luaL_checknumber(L, 2);
-	}
-	else
-	{
-		return 1;
-	}
-	
-	if (_dir == 0)
-	{
-		EIO_ConfigPort(_no, ES_GPIO_IN);
-	}
-	else if (_dir == 1)
-	{
-		EIO_ConfigPort(_no, ES_GPIO_OUT);
-	}	
-	else if (_dir == 2)
-	{
-		EIO_ConfigPort(_no, ES_FMC_OUT);
-	}
-	return 1;
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    _dir = luaL_checknumber(L, 2);
+  }
+  else
+  {
+    return 1;
+  }
+
+  if (_dir == 0)
+  {
+    EIO_ConfigPort(_no, ES_GPIO_IN);
+  }
+  else if (_dir == 1)
+  {
+    EIO_ConfigPort(_no, ES_GPIO_OUT);
+  }
+  else if (_dir == 2)
+  {
+    EIO_ConfigPort(_no, ES_FMC_OUT);
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_GpioWrite
-*	¹¦ÄÜËµÃ÷: ÉèÖÃGPIOÊä³öµçÆ½
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_GpioWrite
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®GPIOè¾“å‡ºç”µå¹³
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_GpioWrite(lua_State* L)
+static int lua_GpioWrite(lua_State *L)
 {
-	uint8_t _no;
-	uint8_t _value;
+  uint8_t _no;
+  uint8_t _value;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		_no = luaL_checknumber(L, 1);
-	}
-	else
-	{
-		return 1;
-	}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    _no = luaL_checknumber(L, 1);
+  }
+  else
+  {
+    return 1;
+  }
 
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{
-		_value = luaL_checknumber(L, 2);
-	}
-	else
-	{
-		return 1;
-	}
-	
-	if (_value == 0)
-	{
-		EIO_SetOutLevel(_no, 0);
-	}
-	else if (_value == 1)
-	{
-		EIO_SetOutLevel(_no, 1);
-	}	
-	return 1;
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    _value = luaL_checknumber(L, 2);
+  }
+  else
+  {
+    return 1;
+  }
+
+  if (_value == 0)
+  {
+    EIO_SetOutLevel(_no, 0);
+  }
+  else if (_value == 1)
+  {
+    EIO_SetOutLevel(_no, 1);
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_GpioRead
-*	¹¦ÄÜËµÃ÷: ¶ÁÈ¡GPIOÊä³öµçÆ½
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_GpioRead
+*	åŠŸèƒ½è¯´æ˜: è¯»å–GPIOè¾“å‡ºç”µå¹³
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_GpioRead(lua_State* L)
+static int lua_GpioRead(lua_State *L)
 {
-	uint8_t _no;
-	uint8_t _value;
+  uint8_t _no;
+  uint8_t _value;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		_no = luaL_checknumber(L, 1);
-	}
-	else
-	{
-		return 0;
-	}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    _no = luaL_checknumber(L, 1);
+  }
+  else
+  {
+    return 0;
+  }
 
-	if (EIO_GetInputLevel(_no) == 0)
-	{
-		lua_pushnumber(L, 0);	/* ·µ»ØÖµ */
-	}
-	else
-	{
-		lua_pushnumber(L, 1);	/* ·µ»ØÖµ */
-	}
-	return 1;
+  if (EIO_GetInputLevel(_no) == 0)
+  {
+    lua_pushnumber(L, 0); /* è¿”å›å€¼ */
+  }
+  else
+  {
+    lua_pushnumber(L, 1); /* è¿”å›å€¼ */
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_ReadFmcBus
-*	¹¦ÄÜËµÃ÷: Í¨¹ıFMC×ÜÏß¶ÁÈ¡¿ÚÏßµçÆ½
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: 16bitÊı¾İ
+*	å‡½ æ•° å: lua_ReadFmcBus
+*	åŠŸèƒ½è¯´æ˜: é€šè¿‡FMCæ€»çº¿è¯»å–å£çº¿ç”µå¹³
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: 16bitæ•°æ®
 *********************************************************************************************************
 */
-static int lua_ReadFmcBus(lua_State* L)
+static int lua_ReadFmcBus(lua_State *L)
 {
-	uint16_t in; 
-	
-	in = EIO_ReadFMC();
-	
-	lua_pushnumber(L, in);	/* ·µ»ØÖµ */
-	return 1;
+  uint16_t in;
+
+  in = EIO_ReadFMC();
+
+  lua_pushnumber(L, in); /* è¿”å›å€¼ */
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_SetTVCC
-*	¹¦ÄÜËµÃ÷: ÉèÖÃTVCCµçÑ¹
-*	ĞÎ    ²Î: ÊäÈëIOµçÑ¹. µ¥Î»·ü¡£Ö§³Ö¸¡µã
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_SetTVCC
+*	åŠŸèƒ½è¯´æ˜: è®¾ç½®TVCCç”µå‹
+*	å½¢    å‚: è¾“å…¥IOç”µå‹. å•ä½ä¼ã€‚æ”¯æŒæµ®ç‚¹
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_SetTVCC(lua_State* L)
+static int lua_SetTVCC(lua_State *L)
 {
-	float volt;
+  float volt;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		volt = luaL_checknumber(L, 1);
-		bsp_SetTVCC(volt * 1000);
-	}
-	return 1;
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    volt = luaL_checknumber(L, 1);
+    bsp_SetTVCC(volt * 1000);
+  }
+  return 1;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

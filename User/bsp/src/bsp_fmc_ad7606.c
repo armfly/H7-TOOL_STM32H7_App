@@ -18,10 +18,10 @@
 */
 
 /*
-	STM32-V7开发板 + AD7606模块， 控制采集的IO:
-	
-	PC6/TIM3_CH1/TIM8_CH1     ----> AD7606_CONVST  (和摄像头复用),  输出PWM方波，作为ADC启动信号
-	PE5/DCMI_D6/AD7606_BUSY   <---- AD7606_BUSY    , CPU在BUSY中断服务程序中读取采集结果
+  STM32-V7开发板 + AD7606模块， 控制采集的IO:
+  
+  PC6/TIM3_CH1/TIM8_CH1     ----> AD7606_CONVST  (和摄像头复用),  输出PWM方波，作为ADC启动信号
+  PE5/DCMI_D6/AD7606_BUSY   <---- AD7606_BUSY    , CPU在BUSY中断服务程序中读取采集结果
 */
 
 #include "bsp.h"
@@ -63,7 +63,7 @@
 /* AD7606 FSMC总线地址，只能读，无需写 */
 #define AD7606_RESULT() *(__IO uint16_t *)0x60003000
 
-AD7606_VAR_T g_tAD7606;		/* 定义1个全局变量，保存一些参数 */
+AD7606_VAR_T g_tAD7606;   /* 定义1个全局变量，保存一些参数 */
 AD7606_FIFO_T g_tAdcFifo; /* 定义FIFO结构体变量 */
 
 static void AD7606_CtrlLinesConfig(void);
@@ -79,15 +79,15 @@ static void AD7606_FSMCConfig(void);
 */
 void bsp_InitAD7606(void)
 {
-	AD7606_CtrlLinesConfig();
-	AD7606_FSMCConfig();
+  AD7606_CtrlLinesConfig();
+  AD7606_FSMCConfig();
 
-	AD7606_SetOS(AD_OS_NO);	/* 无过采样 */
-	AD7606_SetInputRange(0); /* 0表示输入量程为正负5V, 1表示正负10V */
+  AD7606_SetOS(AD_OS_NO);  /* 无过采样 */
+  AD7606_SetInputRange(0); /* 0表示输入量程为正负5V, 1表示正负10V */
 
-	AD7606_Reset();
+  AD7606_Reset();
 
-	CONVST_1(); /* 启动转换的GPIO平时设置为高 */
+  CONVST_1(); /* 启动转换的GPIO平时设置为高 */
 }
 
 /*
@@ -99,119 +99,119 @@ void bsp_InitAD7606(void)
 *********************************************************************************************************
 */
 /*
-	安富莱STM32-V7开发板接线方法：
-	PD0/FMC_D2
-	PD1/FMC_D3
-	PD4/FMC_NOE		---- 读控制信号，OE = Output Enable ， N 表示低有效
-	PD5/FMC_NWE		-XX- 写控制信号，AD7606 只有读，无写信号
-	PD8/FMC_D13
-	PD9/FMC_D14
-	PD10/FMC_D15
-	PD14/FMC_D0
-	PD15/FMC_D1
+  安富莱STM32-V7开发板接线方法：
+  PD0/FMC_D2
+  PD1/FMC_D3
+  PD4/FMC_NOE		---- 读控制信号，OE = Output Enable ， N 表示低有效
+  PD5/FMC_NWE		-XX- 写控制信号，AD7606 只有读，无写信号
+  PD8/FMC_D13
+  PD9/FMC_D14
+  PD10/FMC_D15
+  PD14/FMC_D0
+  PD15/FMC_D1
 
-	PE7/FMC_D4
-	PE8/FMC_D5
-	PE9/FMC_D6
-	PE10/FMC_D7
-	PE11/FMC_D8
-	PE12/FMC_D9
-	PE13/FMC_D10
-	PE14/FMC_D11
-	PE15/FMC_D12
-	
-	PG0/FMC_A10		--- 和主片选FMC_NE2一起译码
-	PG1/FMC_A11		--- 和主片选FMC_NE2一起译码
-	PG9/FMC_NE2		--- 主片选（TFT, OLED 和 AD7606）	
+  PE7/FMC_D4
+  PE8/FMC_D5
+  PE9/FMC_D6
+  PE10/FMC_D7
+  PE11/FMC_D8
+  PE12/FMC_D9
+  PE13/FMC_D10
+  PE14/FMC_D11
+  PE15/FMC_D12
+  
+  PG0/FMC_A10		--- 和主片选FMC_NE2一起译码
+  PG1/FMC_A11		--- 和主片选FMC_NE2一起译码
+  PG9/FMC_NE2		--- 主片选（TFT, OLED 和 AD7606）	
 */
 
 /* 
-	控制AD7606参数的其他IO分配在扩展的74HC574上
-	X13 - AD7606_OS0
-	X14 - AD7606_OS1
-	X15 - AD7606_OS2
-	X24 - AD7606_RESET
-	X25 - AD7606_RAGE	
-	
-	PE5 - AD7606_BUSY
+  控制AD7606参数的其他IO分配在扩展的74HC574上
+  X13 - AD7606_OS0
+  X14 - AD7606_OS1
+  X15 - AD7606_OS2
+  X24 - AD7606_RESET
+  X25 - AD7606_RAGE	
+  
+  PE5 - AD7606_BUSY
 */
 static void AD7606_CtrlLinesConfig(void)
 {
-	/* bsp_fm_io 已配置fmc。 此处不必重复配置 
-		bsp_InitExtIO();
-	*/
+  /* bsp_fm_io 已配置fmc。 此处不必重复配置 
+    bsp_InitExtIO();
+  */
 
-	/*
+  /*
 
-	PD0/FMC_D2
-	PD1/FMC_D3
-	PD4/FMC_NOE		---- 读控制信号，OE = Output Enable ， N 表示低有效
-	PD5/FMC_NWE		-XX- 写控制信号，AD7606 只有读，无写信号
-	PD8/FMC_D13
-	PD9/FMC_D14
-	PD10/FMC_D15
-	PD14/FMC_D0
-	PD15/FMC_D1
+  PD0/FMC_D2
+  PD1/FMC_D3
+  PD4/FMC_NOE		---- 读控制信号，OE = Output Enable ， N 表示低有效
+  PD5/FMC_NWE		-XX- 写控制信号，AD7606 只有读，无写信号
+  PD8/FMC_D13
+  PD9/FMC_D14
+  PD10/FMC_D15
+  PD14/FMC_D0
+  PD15/FMC_D1
 
-	PE7/FMC_D4
-	PE8/FMC_D5
-	PE9/FMC_D6
-	PE10/FMC_D7
-	PE11/FMC_D8
-	PE12/FMC_D9
-	PE13/FMC_D10
-	PE14/FMC_D11
-	PE15/FMC_D12
-	
-	PG0/FMC_A10		--- 和主片选FMC_NE2一起译码
-	PG1/FMC_A11		--- 和主片选FMC_NE2一起译码
-	PG9/FMC_NE2		--- 主片选（OLED, 74HC574, DM9000, AD7606）	
-	
+  PE7/FMC_D4
+  PE8/FMC_D5
+  PE9/FMC_D6
+  PE10/FMC_D7
+  PE11/FMC_D8
+  PE12/FMC_D9
+  PE13/FMC_D10
+  PE14/FMC_D11
+  PE15/FMC_D12
+  
+  PG0/FMC_A10		--- 和主片选FMC_NE2一起译码
+  PG1/FMC_A11		--- 和主片选FMC_NE2一起译码
+  PG9/FMC_NE2		--- 主片选（OLED, 74HC574, DM9000, AD7606）	
+  
 //	PF0/FMC_A0      ---- RS
-	*/
+  */
 
-	GPIO_InitTypeDef gpio_init_structure;
+  GPIO_InitTypeDef gpio_init_structure;
 
-	/* 使能 GPIO时钟 */
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-	__HAL_RCC_GPIOE_CLK_ENABLE();
-	__HAL_RCC_GPIOF_CLK_ENABLE();
-	__HAL_RCC_GPIOG_CLK_ENABLE();
-	__HAL_RCC_GPIOH_CLK_ENABLE();
-	__HAL_RCC_GPIOI_CLK_ENABLE();
+  /* 使能 GPIO时钟 */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOI_CLK_ENABLE();
 
-	/* 使能FMC时钟 */
-	__HAL_RCC_FMC_CLK_ENABLE();
+  /* 使能FMC时钟 */
+  __HAL_RCC_FMC_CLK_ENABLE();
 
-	/* 设置 GPIOD 相关的IO为复用推挽输出 */
-	gpio_init_structure.Mode = GPIO_MODE_AF_PP;
-	gpio_init_structure.Pull = GPIO_PULLUP;
-	gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	gpio_init_structure.Alternate = GPIO_AF12_FMC;
+  /* 设置 GPIOD 相关的IO为复用推挽输出 */
+  gpio_init_structure.Mode = GPIO_MODE_AF_PP;
+  gpio_init_structure.Pull = GPIO_PULLUP;
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  gpio_init_structure.Alternate = GPIO_AF12_FMC;
 
-	/* 配置GPIOD */
-	gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5 |
-														GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 |
-														GPIO_PIN_15;
-	HAL_GPIO_Init(GPIOD, &gpio_init_structure);
+  /* 配置GPIOD */
+  gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5 |
+                            GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 |
+                            GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOD, &gpio_init_structure);
 
-	/* 配置GPIOE */
-	gpio_init_structure.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 |
-														GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
-														GPIO_PIN_15;
-	HAL_GPIO_Init(GPIOE, &gpio_init_structure);
+  /* 配置GPIOE */
+  gpio_init_structure.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 |
+                            GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+                            GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOE, &gpio_init_structure);
 
-	/* 配置GPIOG */
-	gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_9;
-	HAL_GPIO_Init(GPIOG, &gpio_init_structure);
+  /* 配置GPIOG */
+  gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_9;
+  HAL_GPIO_Init(GPIOG, &gpio_init_structure);
 
-	/* 配置GPIOH */
-	gpio_init_structure.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
-	HAL_GPIO_Init(GPIOH, &gpio_init_structure);
+  /* 配置GPIOH */
+  gpio_init_structure.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOH, &gpio_init_structure);
 
-	/* 配置GPIOI */
-	gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10;
-	HAL_GPIO_Init(GPIOI, &gpio_init_structure);
+  /* 配置GPIOI */
+  gpio_init_structure.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10;
+  HAL_GPIO_Init(GPIOI, &gpio_init_structure);
 }
 
 /*
@@ -224,58 +224,58 @@ static void AD7606_CtrlLinesConfig(void)
 */
 static void AD7606_FSMCConfig(void)
 {
-	/* bsp_fm_io 已配置fmc。 此处不必重复配置 
-		bsp_InitExtIO();
-	*/
-	/*
-		AD7606规格书要求(3.3V时)：RD读信号低电平脉冲宽度最短21ns，高电平脉冲最短宽度15ns。
+  /* bsp_fm_io 已配置fmc。 此处不必重复配置 
+    bsp_InitExtIO();
+  */
+  /*
+    AD7606规格书要求(3.3V时)：RD读信号低电平脉冲宽度最短21ns，高电平脉冲最短宽度15ns。
 
-		按照如下配置 读数均正常。为了和同BANK的LCD配置相同，选择3-0-6-1-0-0
-		3-0-5-1-0-0  : RD高持续75ns， 低电平持续50ns.  1us以内可读取8路样本数据到内存。
-		1-0-1-1-0-0  : RD高75ns，低电平执行12ns左右，下降沿差不多也12ns.  数据读取正确。
-	*/
-	SRAM_HandleTypeDef hsram = {0};
-	FMC_NORSRAM_TimingTypeDef SRAM_Timing = {0};
+    按照如下配置 读数均正常。为了和同BANK的LCD配置相同，选择3-0-6-1-0-0
+    3-0-5-1-0-0  : RD高持续75ns， 低电平持续50ns.  1us以内可读取8路样本数据到内存。
+    1-0-1-1-0-0  : RD高75ns，低电平执行12ns左右，下降沿差不多也12ns.  数据读取正确。
+  */
+  SRAM_HandleTypeDef hsram = {0};
+  FMC_NORSRAM_TimingTypeDef SRAM_Timing = {0};
 
-	/*
-		AD7606规格书要求(3.3V时)：RD读信号低电平脉冲宽度最短21ns，高电平脉冲最短宽度15ns。
+  /*
+    AD7606规格书要求(3.3V时)：RD读信号低电平脉冲宽度最短21ns，高电平脉冲最短宽度15ns。
 
-		按照如下配置 读数均正常。为了和同BANK的LCD配置相同，选择3-0-6-1-0-0
-		3-0-5-1-0-0  : RD高持续75ns， 低电平持续50ns.  1us以内可读取8路样本数据到内存。
-		1-0-1-1-0-0  : RD高75ns，低电平执行12ns左右，下降沿差不多也12ns.  数据读取正确。
-	*/
-	hsram.Instance = FMC_NORSRAM_DEVICE;
-	hsram.Extended = FMC_NORSRAM_EXTENDED_DEVICE;
+    按照如下配置 读数均正常。为了和同BANK的LCD配置相同，选择3-0-6-1-0-0
+    3-0-5-1-0-0  : RD高持续75ns， 低电平持续50ns.  1us以内可读取8路样本数据到内存。
+    1-0-1-1-0-0  : RD高75ns，低电平执行12ns左右，下降沿差不多也12ns.  数据读取正确。
+  */
+  hsram.Instance = FMC_NORSRAM_DEVICE;
+  hsram.Extended = FMC_NORSRAM_EXTENDED_DEVICE;
 
-	/* SRAM 总线时序配置 */
-	SRAM_Timing.AddressSetupTime = 4;
-	SRAM_Timing.AddressHoldTime = 1;
-	SRAM_Timing.DataSetupTime = 5;
-	SRAM_Timing.BusTurnAroundDuration = 3;
-	SRAM_Timing.CLKDivision = 2;
-	SRAM_Timing.DataLatency = 2;
-	SRAM_Timing.AccessMode = FMC_ACCESS_MODE_A;
+  /* SRAM 总线时序配置 */
+  SRAM_Timing.AddressSetupTime = 4;
+  SRAM_Timing.AddressHoldTime = 1;
+  SRAM_Timing.DataSetupTime = 5;
+  SRAM_Timing.BusTurnAroundDuration = 3;
+  SRAM_Timing.CLKDivision = 2;
+  SRAM_Timing.DataLatency = 2;
+  SRAM_Timing.AccessMode = FMC_ACCESS_MODE_A;
 
-	hsram.Init.NSBank = FMC_NORSRAM_BANK1;
-	hsram.Init.DataAddressMux = FMC_DATA_ADDRESS_MUX_DISABLE;
-	hsram.Init.MemoryType = FMC_MEMORY_TYPE_SRAM;
-	hsram.Init.MemoryDataWidth = FMC_NORSRAM_MEM_BUS_WIDTH_32; /* 32位总线宽度 */
-	hsram.Init.BurstAccessMode = FMC_BURST_ACCESS_MODE_DISABLE;
-	hsram.Init.WaitSignalPolarity = FMC_WAIT_SIGNAL_POLARITY_LOW;
-	hsram.Init.WaitSignalActive = FMC_WAIT_TIMING_BEFORE_WS;
-	hsram.Init.WriteOperation = FMC_WRITE_OPERATION_ENABLE;
-	hsram.Init.WaitSignal = FMC_WAIT_SIGNAL_DISABLE;
-	hsram.Init.ExtendedMode = FMC_EXTENDED_MODE_DISABLE;
-	hsram.Init.AsynchronousWait = FMC_ASYNCHRONOUS_WAIT_DISABLE;
-	hsram.Init.WriteBurst = FMC_WRITE_BURST_DISABLE;
-	hsram.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
+  hsram.Init.NSBank = FMC_NORSRAM_BANK1;
+  hsram.Init.DataAddressMux = FMC_DATA_ADDRESS_MUX_DISABLE;
+  hsram.Init.MemoryType = FMC_MEMORY_TYPE_SRAM;
+  hsram.Init.MemoryDataWidth = FMC_NORSRAM_MEM_BUS_WIDTH_32; /* 32位总线宽度 */
+  hsram.Init.BurstAccessMode = FMC_BURST_ACCESS_MODE_DISABLE;
+  hsram.Init.WaitSignalPolarity = FMC_WAIT_SIGNAL_POLARITY_LOW;
+  hsram.Init.WaitSignalActive = FMC_WAIT_TIMING_BEFORE_WS;
+  hsram.Init.WriteOperation = FMC_WRITE_OPERATION_ENABLE;
+  hsram.Init.WaitSignal = FMC_WAIT_SIGNAL_DISABLE;
+  hsram.Init.ExtendedMode = FMC_EXTENDED_MODE_DISABLE;
+  hsram.Init.AsynchronousWait = FMC_ASYNCHRONOUS_WAIT_DISABLE;
+  hsram.Init.WriteBurst = FMC_WRITE_BURST_DISABLE;
+  hsram.Init.ContinuousClock = FMC_CONTINUOUS_CLOCK_SYNC_ONLY;
 
-	/* 初始化SRAM控制器 */
-	if (HAL_SRAM_Init(&hsram, &SRAM_Timing, &SRAM_Timing) != HAL_OK)
-	{
-		/* 初始化错误 */
-		Error_Handler(__FILE__, __LINE__);
-	}
+  /* 初始化SRAM控制器 */
+  if (HAL_SRAM_Init(&hsram, &SRAM_Timing, &SRAM_Timing) != HAL_OK)
+  {
+    /* 初始化错误 */
+    Error_Handler(__FILE__, __LINE__);
+  }
 }
 
 /*
@@ -297,53 +297,53 @@ static void AD7606_FSMCConfig(void)
 */
 void AD7606_SetOS(uint8_t _ucOS)
 {
-	g_tAD7606.ucOS = _ucOS;
-	switch (_ucOS)
-	{
-	case AD_OS_X2:
-		OS2_0();
-		OS1_0();
-		OS0_1();
-		break;
+  g_tAD7606.ucOS = _ucOS;
+  switch (_ucOS)
+  {
+  case AD_OS_X2:
+    OS2_0();
+    OS1_0();
+    OS0_1();
+    break;
 
-	case AD_OS_X4:
-		OS2_0();
-		OS1_1();
-		OS0_0();
-		break;
+  case AD_OS_X4:
+    OS2_0();
+    OS1_1();
+    OS0_0();
+    break;
 
-	case AD_OS_X8:
-		OS2_0();
-		OS1_1();
-		OS0_1();
-		break;
+  case AD_OS_X8:
+    OS2_0();
+    OS1_1();
+    OS0_1();
+    break;
 
-	case AD_OS_X16:
-		OS2_1();
-		OS1_0();
-		OS0_0();
-		break;
+  case AD_OS_X16:
+    OS2_1();
+    OS1_0();
+    OS0_0();
+    break;
 
-	case AD_OS_X32:
-		OS2_1();
-		OS1_0();
-		OS0_1();
-		break;
+  case AD_OS_X32:
+    OS2_1();
+    OS1_0();
+    OS0_1();
+    break;
 
-	case AD_OS_X64:
-		OS2_1();
-		OS1_1();
-		OS0_0();
-		break;
+  case AD_OS_X64:
+    OS2_1();
+    OS1_1();
+    OS0_0();
+    break;
 
-	case AD_OS_NO:
-	default:
-		g_tAD7606.ucOS = AD_OS_NO;
-		OS2_0();
-		OS1_0();
-		OS0_0();
-		break;
-	}
+  case AD_OS_NO:
+  default:
+    g_tAD7606.ucOS = AD_OS_NO;
+    OS2_0();
+    OS1_0();
+    OS0_0();
+    break;
+  }
 }
 
 /*
@@ -356,16 +356,16 @@ void AD7606_SetOS(uint8_t _ucOS)
 */
 void AD7606_SetInputRange(uint8_t _ucRange)
 {
-	if (_ucRange == 0)
-	{
-		g_tAD7606.ucRange = 0;
-		RANGE_0(); /* 设置为正负5V */
-	}
-	else
-	{
-		g_tAD7606.ucRange = 1;
-		RANGE_1(); /* 设置为正负10V */
-	}
+  if (_ucRange == 0)
+  {
+    g_tAD7606.ucRange = 0;
+    RANGE_0(); /* 设置为正负5V */
+  }
+  else
+  {
+    g_tAD7606.ucRange = 1;
+    RANGE_1(); /* 设置为正负10V */
+  }
 }
 
 /*
@@ -378,14 +378,14 @@ void AD7606_SetInputRange(uint8_t _ucRange)
 */
 void AD7606_Reset(void)
 {
-	RESET_0(); /* 退出复位状态 */
+  RESET_0(); /* 退出复位状态 */
 
-	RESET_1(); /* 进入复位状态 */
-	RESET_1(); /* 仅用于延迟。 RESET复位高电平脉冲宽度最小50ns。 */
-	RESET_1();
-	RESET_1();
+  RESET_1(); /* 进入复位状态 */
+  RESET_1(); /* 仅用于延迟。 RESET复位高电平脉冲宽度最小50ns。 */
+  RESET_1();
+  RESET_1();
 
-	RESET_0(); /* 退出复位状态 */
+  RESET_0(); /* 退出复位状态 */
 }
 
 /*
@@ -398,13 +398,13 @@ void AD7606_Reset(void)
 */
 void AD7606_StartConvst(void)
 {
-	/* page 7：  CONVST 高电平脉冲宽度和低电平脉冲宽度最短 25ns */
-	/* CONVST平时为高 */
-	CONVST_0();
-	CONVST_0();
-	CONVST_0();
+  /* page 7：  CONVST 高电平脉冲宽度和低电平脉冲宽度最短 25ns */
+  /* CONVST平时为高 */
+  CONVST_0();
+  CONVST_0();
+  CONVST_0();
 
-	CONVST_1();
+  CONVST_1();
 }
 
 /*
@@ -417,14 +417,14 @@ void AD7606_StartConvst(void)
 */
 void AD7606_ReadNowAdc(void)
 {
-	g_tAD7606.sNowAdc[0] = AD7606_RESULT(); /* 读第1路样本 */
-	g_tAD7606.sNowAdc[1] = AD7606_RESULT(); /* 读第2路样本 */
-	g_tAD7606.sNowAdc[2] = AD7606_RESULT(); /* 读第3路样本 */
-	g_tAD7606.sNowAdc[3] = AD7606_RESULT(); /* 读第4路样本 */
-	g_tAD7606.sNowAdc[4] = AD7606_RESULT(); /* 读第5路样本 */
-	g_tAD7606.sNowAdc[5] = AD7606_RESULT(); /* 读第6路样本 */
-	g_tAD7606.sNowAdc[6] = AD7606_RESULT(); /* 读第7路样本 */
-	g_tAD7606.sNowAdc[7] = AD7606_RESULT(); /* 读第8路样本 */
+  g_tAD7606.sNowAdc[0] = AD7606_RESULT(); /* 读第1路样本 */
+  g_tAD7606.sNowAdc[1] = AD7606_RESULT(); /* 读第2路样本 */
+  g_tAD7606.sNowAdc[2] = AD7606_RESULT(); /* 读第3路样本 */
+  g_tAD7606.sNowAdc[3] = AD7606_RESULT(); /* 读第4路样本 */
+  g_tAD7606.sNowAdc[4] = AD7606_RESULT(); /* 读第5路样本 */
+  g_tAD7606.sNowAdc[5] = AD7606_RESULT(); /* 读第6路样本 */
+  g_tAD7606.sNowAdc[6] = AD7606_RESULT(); /* 读第7路样本 */
+  g_tAD7606.sNowAdc[7] = AD7606_RESULT(); /* 读第8路样本 */
 }
 
 /*
@@ -445,11 +445,11 @@ void AD7606_ReadNowAdc(void)
 */
 uint8_t AD7606_HasNewData(void)
 {
-	if (g_tAdcFifo.usCount > 0)
-	{
-		return 1;
-	}
-	return 0;
+  if (g_tAdcFifo.usCount > 0)
+  {
+    return 1;
+  }
+  return 0;
 }
 
 /*
@@ -462,7 +462,7 @@ uint8_t AD7606_HasNewData(void)
 */
 uint8_t AD7606_FifoFull(void)
 {
-	return g_tAdcFifo.ucFull;
+  return g_tAdcFifo.ucFull;
 }
 
 /*
@@ -475,23 +475,23 @@ uint8_t AD7606_FifoFull(void)
 */
 uint8_t AD7606_ReadFifo(uint16_t *_usReadAdc)
 {
-	if (AD7606_HasNewData())
-	{
-		*_usReadAdc = g_tAdcFifo.sBuf[g_tAdcFifo.usRead];
-		if (++g_tAdcFifo.usRead >= ADC_FIFO_SIZE)
-		{
-			g_tAdcFifo.usRead = 0;
-		}
+  if (AD7606_HasNewData())
+  {
+    *_usReadAdc = g_tAdcFifo.sBuf[g_tAdcFifo.usRead];
+    if (++g_tAdcFifo.usRead >= ADC_FIFO_SIZE)
+    {
+      g_tAdcFifo.usRead = 0;
+    }
 
-		DISABLE_INT();
-		if (g_tAdcFifo.usCount > 0)
-		{
-			g_tAdcFifo.usCount--;
-		}
-		ENABLE_INT();
-		return 1;
-	}
-	return 0;
+    DISABLE_INT();
+    if (g_tAdcFifo.usCount > 0)
+    {
+      g_tAdcFifo.usCount--;
+    }
+    ENABLE_INT();
+    return 1;
+  }
+  return 0;
 }
 
 /*
@@ -504,17 +504,17 @@ uint8_t AD7606_ReadFifo(uint16_t *_usReadAdc)
 */
 void AD7606_StartRecord(uint32_t _ulFreq)
 {
-	AD7606_StopRecord();
+  AD7606_StopRecord();
 
-	AD7606_Reset();				/* 复位硬件 */
-	AD7606_StartConvst(); /* 启动采样，避免第1组数据全0的问题 */
+  AD7606_Reset();       /* 复位硬件 */
+  AD7606_StartConvst(); /* 启动采样，避免第1组数据全0的问题 */
 
-	g_tAdcFifo.usRead = 0; /* 必须在开启TIM2之前清0 */
-	g_tAdcFifo.usWrite = 0;
-	g_tAdcFifo.usCount = 0;
-	g_tAdcFifo.ucFull = 0;
+  g_tAdcFifo.usRead = 0; /* 必须在开启TIM2之前清0 */
+  g_tAdcFifo.usWrite = 0;
+  g_tAdcFifo.usCount = 0;
+  g_tAdcFifo.ucFull = 0;
 
-	AD7606_EnterAutoMode(_ulFreq);
+  AD7606_EnterAutoMode(_ulFreq);
 }
 
 /*
@@ -527,25 +527,25 @@ void AD7606_StartRecord(uint32_t _ulFreq)
 */
 void AD7606_EnterAutoMode(uint32_t _ulFreq)
 {
-	/* 配置PC6为TIM1_CH1功能，输出占空比50%的方波 */
-	bsp_SetTIMOutPWM(CONVST_GPIO, CONVST_PIN, CONVST_TIMX, CONVST_TIMCH, _ulFreq, 5000);
+  /* 配置PC6为TIM1_CH1功能，输出占空比50%的方波 */
+  bsp_SetTIMOutPWM(CONVST_GPIO, CONVST_PIN, CONVST_TIMX, CONVST_TIMCH, _ulFreq, 5000);
 
-	/* 配置PE5, BUSY 作为中断输入口，下降沿触发 */
-	{
-		GPIO_InitTypeDef GPIO_InitStructure;
+  /* 配置PE5, BUSY 作为中断输入口，下降沿触发 */
+  {
+    GPIO_InitTypeDef GPIO_InitStructure;
 
-		CONVST_RCC_GPIO_CLK_ENABLE(); /* 打开GPIO时钟 */
-		__HAL_RCC_SYSCFG_CLK_ENABLE();
+    CONVST_RCC_GPIO_CLK_ENABLE(); /* 打开GPIO时钟 */
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
 
-		GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING; /* 中断下降沿触发 */
-		GPIO_InitStructure.Pull = GPIO_NOPULL;
-		GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
-		GPIO_InitStructure.Pin = BUSY_PIN;
-		HAL_GPIO_Init(BUSY_GPIO, &GPIO_InitStructure);
+    GPIO_InitStructure.Mode = GPIO_MODE_IT_FALLING; /* 中断下降沿触发 */
+    GPIO_InitStructure.Pull = GPIO_NOPULL;
+    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStructure.Pin = BUSY_PIN;
+    HAL_GPIO_Init(BUSY_GPIO, &GPIO_InitStructure);
 
-		HAL_NVIC_SetPriority(BUSY_IRQn, 2, 0);
-		HAL_NVIC_EnableIRQ(BUSY_IRQn);
-	}
+    HAL_NVIC_SetPriority(BUSY_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(BUSY_IRQn);
+  }
 }
 
 /*
@@ -558,24 +558,24 @@ void AD7606_EnterAutoMode(uint32_t _ulFreq)
 */
 void AD7606_StopRecord(void)
 {
-	/* 配置PC6 输出低电平，关闭TIM */
-	bsp_SetTIMOutPWM(CONVST_GPIO, CONVST_PIN, CONVST_TIMX, CONVST_TIMCH, 1000, 10000);
-	CONVST_1(); /* 启动转换的GPIO平时设置为高 */
+  /* 配置PC6 输出低电平，关闭TIM */
+  bsp_SetTIMOutPWM(CONVST_GPIO, CONVST_PIN, CONVST_TIMX, CONVST_TIMCH, 1000, 10000);
+  CONVST_1(); /* 启动转换的GPIO平时设置为高 */
 
-	/* 配置 BUSY 作为中断输入口，下降沿触发 */
-	{
-		GPIO_InitTypeDef GPIO_InitStructure;
+  /* 配置 BUSY 作为中断输入口，下降沿触发 */
+  {
+    GPIO_InitTypeDef GPIO_InitStructure;
 
-		CONVST_RCC_GPIO_CLK_ENABLE(); /* 打开GPIO时钟 */
+    CONVST_RCC_GPIO_CLK_ENABLE(); /* 打开GPIO时钟 */
 
-		/* Configure PC.13 pin as input floating */
-		GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
-		GPIO_InitStructure.Pull = GPIO_NOPULL;
-		GPIO_InitStructure.Pin = CONVST_PIN;
-		HAL_GPIO_Init(CONVST_GPIO, &GPIO_InitStructure);
+    /* Configure PC.13 pin as input floating */
+    GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStructure.Pull = GPIO_NOPULL;
+    GPIO_InitStructure.Pin = CONVST_PIN;
+    HAL_GPIO_Init(CONVST_GPIO, &GPIO_InitStructure);
 
-		HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
-	}
+    HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+  }
 }
 
 /*
@@ -588,26 +588,26 @@ void AD7606_StopRecord(void)
 */
 void AD7606_ISR(void)
 {
-	uint8_t i;
+  uint8_t i;
 
-	AD7606_ReadNowAdc();
+  AD7606_ReadNowAdc();
 
-	for (i = 0; i < 8; i++)
-	{
-		g_tAdcFifo.sBuf[g_tAdcFifo.usWrite] = g_tAD7606.sNowAdc[i];
-		if (++g_tAdcFifo.usWrite >= ADC_FIFO_SIZE)
-		{
-			g_tAdcFifo.usWrite = 0;
-		}
-		if (g_tAdcFifo.usCount < ADC_FIFO_SIZE)
-		{
-			g_tAdcFifo.usCount++;
-		}
-		else
-		{
-			g_tAdcFifo.ucFull = 1; /* FIFO 满，主程序来不及处理数据 */
-		}
-	}
+  for (i = 0; i < 8; i++)
+  {
+    g_tAdcFifo.sBuf[g_tAdcFifo.usWrite] = g_tAD7606.sNowAdc[i];
+    if (++g_tAdcFifo.usWrite >= ADC_FIFO_SIZE)
+    {
+      g_tAdcFifo.usWrite = 0;
+    }
+    if (g_tAdcFifo.usCount < ADC_FIFO_SIZE)
+    {
+      g_tAdcFifo.usCount++;
+    }
+    else
+    {
+      g_tAdcFifo.ucFull = 1; /* FIFO 满，主程序来不及处理数据 */
+    }
+  }
 }
 
 /*
@@ -621,7 +621,7 @@ void AD7606_ISR(void)
 #ifndef EXTI9_5_ISR_MOVE_OUT /* bsp.h 中定义此行，表示本函数移到 stam32h7xx_it.c。 避免重复定义 */
 void BUSY_IRQHandler(void)
 {
-	HAL_GPIO_EXTI_IRQHandler(BUSY_PIN);
+  HAL_GPIO_EXTI_IRQHandler(BUSY_PIN);
 }
 
 /*
@@ -634,10 +634,10 @@ void BUSY_IRQHandler(void)
 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if (GPIO_Pin == BUSY_PIN)
-	{
-		AD7606_ISR();
-	}
+  if (GPIO_Pin == BUSY_PIN)
+  {
+    AD7606_ISR();
+  }
 }
 
 #endif

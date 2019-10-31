@@ -20,13 +20,13 @@
 
 typedef struct
 {
-	uint16_t Year;
-	uint8_t Mon;
-	uint8_t Day;
-	uint8_t Hour;
-	uint8_t Min;
-	uint8_t Sec;
-	uint8_t Week;
+  uint16_t Year;
+  uint8_t Mon;
+  uint8_t Day;
+  uint8_t Hour;
+  uint8_t Min;
+  uint8_t Sec;
+  uint8_t Week;
 } RTC_T;
 
 void bsp_InitRTC(void);

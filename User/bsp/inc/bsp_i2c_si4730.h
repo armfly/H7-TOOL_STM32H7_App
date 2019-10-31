@@ -22,23 +22,23 @@
 /* FM/RDS Receiver Command Summary */
 enum
 {
-	SI4730_CMD_POWER_UP = 0x01,				/*Power up device and mode selection. */
-	SI4730_CMD_GET_REV = 0x10,				/*Returns revision information on the device. */
-	SI4730_CMD_POWER_DOWN = 0x11,			/*Power down device. */
-	SI4730_CMD_SET_PROPERTY = 0x12,		/*Sets the value of a property. */
-	SI4730_CMD_GET_PROPERTY = 0x13,		/*Retrieves a property’s value. */
-	SI4730_CMD_GET_INT_STATUS = 0x14, /*Reads interrupt status bits. */
-	SI4730_CMD_PATCH_ARGS = 0x15,			/*Reserved command used for patch file downloads. */
-	SI4730_CMD_PATCH_DATA = 0x16,			/*Reserved command used for patch file downloads. */
-	SI4730_CMD_FM_TUNE_FREQ = 0x20,		/*Selects the FM tuning frequency. */
-	SI4730_CMD_FM_SEEK_START = 0x21,	/*Begins searching for a valid frequency. */
-	SI4730_CMD_FM_TUNE_STATUS = 0x22, /*Queries the status of previous FM_TUNE_FREQ or FM_SEEK_START command. */
-	SI4730_CMD_FM_RSQ_STATUS = 0x23,	/*Queries the status of the Received Signal Quality (RSQ) of the current channel. */
-	//SI4730_CMD_FM_RDS_STATUS 	= 0x24, /*Returns RDS information for current channel and reads an entry from RDS FIFO. */
-	SI4730_CMD_FM_AGC_STATUS = 0x27,	 /*Queries the current AGC settings */
-	SI4730_CMD_FM_AGC_OVERRIDE = 0x28, /*Override AGC setting by disabling and forcing it to a fixed value */
-	SI4730_CMD_GPIO_CTL = 0x80,				 /*Configures GPO1, 2, and 3 as output or Hi-Z. */
-	SI4730_CMD_GPIO_SET = 0x81,				 /*Sets GPO1, 2, and 3 output level (low or high). */
+  SI4730_CMD_POWER_UP = 0x01,       /*Power up device and mode selection. */
+  SI4730_CMD_GET_REV = 0x10,        /*Returns revision information on the device. */
+  SI4730_CMD_POWER_DOWN = 0x11,     /*Power down device. */
+  SI4730_CMD_SET_PROPERTY = 0x12,   /*Sets the value of a property. */
+  SI4730_CMD_GET_PROPERTY = 0x13,   /*Retrieves a property’s value. */
+  SI4730_CMD_GET_INT_STATUS = 0x14, /*Reads interrupt status bits. */
+  SI4730_CMD_PATCH_ARGS = 0x15,     /*Reserved command used for patch file downloads. */
+  SI4730_CMD_PATCH_DATA = 0x16,     /*Reserved command used for patch file downloads. */
+  SI4730_CMD_FM_TUNE_FREQ = 0x20,   /*Selects the FM tuning frequency. */
+  SI4730_CMD_FM_SEEK_START = 0x21,  /*Begins searching for a valid frequency. */
+  SI4730_CMD_FM_TUNE_STATUS = 0x22, /*Queries the status of previous FM_TUNE_FREQ or FM_SEEK_START command. */
+  SI4730_CMD_FM_RSQ_STATUS = 0x23,  /*Queries the status of the Received Signal Quality (RSQ) of the current channel. */
+  //SI4730_CMD_FM_RDS_STATUS 	= 0x24, /*Returns RDS information for current channel and reads an entry from RDS FIFO. */
+  SI4730_CMD_FM_AGC_STATUS = 0x27,   /*Queries the current AGC settings */
+  SI4730_CMD_FM_AGC_OVERRIDE = 0x28, /*Override AGC setting by disabling and forcing it to a fixed value */
+  SI4730_CMD_GPIO_CTL = 0x80,        /*Configures GPO1, 2, and 3 as output or Hi-Z. */
+  SI4730_CMD_GPIO_SET = 0x81,        /*Sets GPO1, 2, and 3 output level (low or high). */
 };
 
 uint8_t SI4730_SendCmd(uint8_t *_pCmdBuf, uint8_t _ucCmdLen);

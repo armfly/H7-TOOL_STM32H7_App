@@ -14,9 +14,9 @@
 
 typedef struct
 {
-	uint8_t Buf[5];
-	uint8_t Temp; /* Temperature 温度 摄氏度 */
-	uint8_t Hum;	/* Humidity 湿度 百分比 */
+  uint8_t Buf[5];
+  uint8_t Temp; /* Temperature 温度 摄氏度 */
+  uint8_t Hum;  /* Humidity 湿度 百分比 */
 } DHT11_T;
 
 void bsp_InitDHT11(void);

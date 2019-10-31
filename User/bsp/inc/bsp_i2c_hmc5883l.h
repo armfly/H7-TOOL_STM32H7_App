@@ -27,26 +27,26 @@
 
 typedef struct
 {
-	int16_t X;
-	int16_t Y;
-	int16_t Z;
+  int16_t X;
+  int16_t Y;
+  int16_t Z;
 
-	int16_t X_Min;
-	int16_t Y_Min;
-	int16_t Z_Min;
+  int16_t X_Min;
+  int16_t Y_Min;
+  int16_t Z_Min;
 
-	int16_t X_Max;
-	int16_t Y_Max;
-	int16_t Z_Max;
+  int16_t X_Max;
+  int16_t Y_Max;
+  int16_t Z_Max;
 
-	uint8_t Status;
+  uint8_t Status;
 
-	uint8_t CfgRegA;
-	uint8_t CfgRegB;
-	uint8_t CfgRegC;
-	uint8_t ModeReg;
+  uint8_t CfgRegA;
+  uint8_t CfgRegB;
+  uint8_t CfgRegC;
+  uint8_t ModeReg;
 
-	uint8_t IDReg[3 + 1];
+  uint8_t IDReg[3 + 1];
 } HMC5883L_T;
 
 extern HMC5883L_T g_tMag;

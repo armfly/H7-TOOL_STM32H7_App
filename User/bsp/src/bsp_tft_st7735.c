@@ -18,25 +18,25 @@
 #include "fonts.h"
 
 /*
-	H7-TOOL LCD口线分配
-	
-	PF3  --->  LCD_RS
-	PG2	 --->  LCD_CS
-	PC12 --->  LCD_SDA		SPI3_MOSI
-	PC10 --->  LCD_SCK		SPI3_SCK
-	
-	PH9	 --->  BACK_LIGHT	TIM12_CH2
-	
-	第2版增加reset
-	
-	PB6  --->  LCD_RESET
+  H7-TOOL LCD口线分配
+  
+  PF3  --->  LCD_RS
+  PG2	 --->  LCD_CS
+  PC12 --->  LCD_SDA		SPI3_MOSI
+  PC10 --->  LCD_SCK		SPI3_SCK
+  
+  PH9	 --->  BACK_LIGHT	TIM12_CH2
+  
+  第2版增加reset
+  
+  PB6  --->  LCD_RESET
 */
 
 #define ALL_LCD_GPIO_CLK_ENABLE() \
-	__HAL_RCC_GPIOC_CLK_ENABLE();   \
-	__HAL_RCC_GPIOF_CLK_ENABLE();   \
-	__HAL_RCC_GPIOG_CLK_ENABLE();   \
-	__HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();   \
+  __HAL_RCC_GPIOF_CLK_ENABLE();   \
+  __HAL_RCC_GPIOG_CLK_ENABLE();   \
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
 /* LCD_RS 寄存器选择 */
 #define LCD_RS_GPIO GPIOF
@@ -80,12 +80,12 @@ static void ST7735_initial(void);
 */
 void ST7735_InitHard(void)
 {
-	ST7735_ConfigGPIO(); /* 配置429 CPU内部LTDC */
+  ST7735_ConfigGPIO(); /* 配置429 CPU内部LTDC */
 
-	ST7735_initial();
+  ST7735_initial();
 
-	g_LcdHeight = 128; /* 显示屏分辨率-高度 */
-	g_LcdWidth = 128;	/* 显示屏分辨率-宽度 */
+  g_LcdHeight = 128; /* 显示屏分辨率-高度 */
+  g_LcdWidth = 128;  /* 显示屏分辨率-宽度 */
 }
 
 /*
@@ -98,196 +98,196 @@ void ST7735_InitHard(void)
 */
 static void ST7735_ConfigGPIO(void)
 {
-	/* 配置GPIO */
-	{
-		GPIO_InitTypeDef gpio_init;
+  /* 配置GPIO */
+  {
+    GPIO_InitTypeDef gpio_init;
 
-		/* 打开GPIO时钟 */
-		ALL_LCD_GPIO_CLK_ENABLE();
+    /* 打开GPIO时钟 */
+    ALL_LCD_GPIO_CLK_ENABLE();
 
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* 设置推挽输出 */
-		gpio_init.Pull = GPIO_NOPULL;						/* 上下拉电阻不使能 */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 设置推挽输出 */
+    gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+    gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-		gpio_init.Pin = LCD_RS_PIN;
-		HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
+    gpio_init.Pin = LCD_RS_PIN;
+    HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_CS_PIN;
-		HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
+    gpio_init.Pin = LCD_CS_PIN;
+    HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_SCK_PIN;
-		HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
+    gpio_init.Pin = LCD_SCK_PIN;
+    HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_SDA_PIN;
-		HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
+    gpio_init.Pin = LCD_SDA_PIN;
+    HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
 
-		gpio_init.Pin = LCD_RESET_PIN;
-		HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
-	}
+    gpio_init.Pin = LCD_RESET_PIN;
+    HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
+  }
 }
 
 /*写指令到 LCD 模块*/
 void transfer_command(int data1)
 {
-	char i;
+  char i;
 
-	LCD_CS_0();
-	LCD_RS_0();
-	for (i = 0; i < 8; i++)
-	{
-		LCD_SCK_0();
-		if (data1 & 0x80)
-			LCD_SDA_1();
-		else
-			LCD_SDA_0();
-		LCD_SCK_1();
-		data1 = data1 <<= 1;
-	}
+  LCD_CS_0();
+  LCD_RS_0();
+  for (i = 0; i < 8; i++)
+  {
+    LCD_SCK_0();
+    if (data1 & 0x80)
+      LCD_SDA_1();
+    else
+      LCD_SDA_0();
+    LCD_SCK_1();
+    data1 = data1 <<= 1;
+  }
 }
 
 /*写数据到 LCD 模块*/
 void transfer_data(int data1)
 {
-	char i;
+  char i;
 
-	LCD_CS_0();
-	LCD_RS_1();
-	for (i = 0; i < 8; i++)
-	{
-		LCD_SCK_0();
-		if (data1 & 0x80)
-			LCD_SDA_1();
-		else
-			LCD_SDA_0();
-		LCD_SCK_1();
-		data1 = data1 <<= 1;
-	}
+  LCD_CS_0();
+  LCD_RS_1();
+  for (i = 0; i < 8; i++)
+  {
+    LCD_SCK_0();
+    if (data1 & 0x80)
+      LCD_SDA_1();
+    else
+      LCD_SDA_0();
+    LCD_SCK_1();
+    data1 = data1 <<= 1;
+  }
 }
 
 // 连写2个字节（即 16 位）数据到LCD模块
 void transfer_data_16(uint16_t data2)
 {
-	transfer_data(data2 >> 8);
-	transfer_data(data2);
+  transfer_data(data2 >> 8);
+  transfer_data(data2);
 }
 
 //LCD 初始化
 static void ST7735_initial(void)
 {
-	bsp_DelayUS(50 * 1000);
-	LCD_RESET_0(); /* 低电平：复位 */
-	bsp_DelayUS(1000);
-	LCD_RESET_1(); /* 高电平：复位结束 */
-	bsp_DelayUS(10 * 1000);
+  bsp_DelayUS(50 * 1000);
+  LCD_RESET_0(); /* 低电平：复位 */
+  bsp_DelayUS(1000);
+  LCD_RESET_1(); /* 高电平：复位结束 */
+  bsp_DelayUS(10 * 1000);
 
-	//开始初始化：
-	transfer_command(0x11);
-	transfer_command(0xb1);
-	transfer_data(0x01);
-	transfer_data(0x2c);
-	transfer_data(0x2d);
-	transfer_command(0xb2);
-	transfer_data(0x01);
-	transfer_data(0x2c);
-	transfer_data(0x2d);
-	transfer_command(0xb3);
-	transfer_data(0x01);
-	transfer_data(0x2c);
-	transfer_data(0x2d);
+  //开始初始化：
+  transfer_command(0x11);
+  transfer_command(0xb1);
+  transfer_data(0x01);
+  transfer_data(0x2c);
+  transfer_data(0x2d);
+  transfer_command(0xb2);
+  transfer_data(0x01);
+  transfer_data(0x2c);
+  transfer_data(0x2d);
+  transfer_command(0xb3);
+  transfer_data(0x01);
+  transfer_data(0x2c);
+  transfer_data(0x2d);
 
-	transfer_data(0x01);
-	transfer_data(0x2d);
-	transfer_data(0x2d);
-	transfer_command(0xb4);
-	transfer_data(0x02);
-	transfer_command(0xb6);
-	transfer_data(0xb4);
-	transfer_data(0xf0);
-	transfer_command(0xc0);
-	transfer_data(0xa2);
-	transfer_data(0x02);
-	transfer_data(0x84);
-	transfer_command(0xc1);
-	transfer_data(0xc5);
-	transfer_command(0xc2);
-	transfer_data(0x0a);
-	transfer_data(0x00);
-	transfer_command(0xc3);
-	transfer_data(0x8a);
-	transfer_data(0x2a);
-	transfer_command(0xc4);
-	transfer_data(0x8a);
-	transfer_data(0xee);
-	transfer_command(0xc5);
-	transfer_data(0x0e);
-	transfer_command(0x36); //行扫描顺序，列扫描顺序，横放/竖放
-	transfer_data(0x08);
-	//MX = 1（行地址顺序：从左到右），MY = 1（列地址顺序：从上到下），MV = 0（竖放），ML = 0(纵向刷新：
-	//从上到下），RGB = 1（依次为 RGB），MH = 0（横向刷新顺序：从左到右）
-	//定义："normal"就是“0xc8”---正常竖放;
-	//定义："CW180"就是“0x08"---在正常竖放基础上转 180 度竖放;
-	//定义："CCW90”就是“0xa8"---在竖放基础上逆时针转 90 度横放;
-	//定义：“CW90”就是“0x68"---在竖放基础上顺转 90 度横放;
-	transfer_command(0xff);
-	transfer_data(0x40);
-	transfer_data(0x03);
-	transfer_data(0x1a);
+  transfer_data(0x01);
+  transfer_data(0x2d);
+  transfer_data(0x2d);
+  transfer_command(0xb4);
+  transfer_data(0x02);
+  transfer_command(0xb6);
+  transfer_data(0xb4);
+  transfer_data(0xf0);
+  transfer_command(0xc0);
+  transfer_data(0xa2);
+  transfer_data(0x02);
+  transfer_data(0x84);
+  transfer_command(0xc1);
+  transfer_data(0xc5);
+  transfer_command(0xc2);
+  transfer_data(0x0a);
+  transfer_data(0x00);
+  transfer_command(0xc3);
+  transfer_data(0x8a);
+  transfer_data(0x2a);
+  transfer_command(0xc4);
+  transfer_data(0x8a);
+  transfer_data(0xee);
+  transfer_command(0xc5);
+  transfer_data(0x0e);
+  transfer_command(0x36); //行扫描顺序，列扫描顺序，横放/竖放
+  transfer_data(0x08);
+  //MX = 1（行地址顺序：从左到右），MY = 1（列地址顺序：从上到下），MV = 0（竖放），ML = 0(纵向刷新：
+  //从上到下），RGB = 1（依次为 RGB），MH = 0（横向刷新顺序：从左到右）
+  //定义："normal"就是“0xc8”---正常竖放;
+  //定义："CW180"就是“0x08"---在正常竖放基础上转 180 度竖放;
+  //定义："CCW90”就是“0xa8"---在竖放基础上逆时针转 90 度横放;
+  //定义：“CW90”就是“0x68"---在竖放基础上顺转 90 度横放;
+  transfer_command(0xff);
+  transfer_data(0x40);
+  transfer_data(0x03);
+  transfer_data(0x1a);
 
-	transfer_command(0xfc);
-	transfer_data(0x11);
-	transfer_data(0x17);
-	transfer_command(0xf0);
-	transfer_data(0x01);
-	transfer_command(0x3a);
-	transfer_data(0x05);
-	transfer_command(0xf6);
-	transfer_data(0x00);
-	transfer_command(0xe0);
-	transfer_data(0x02);
-	transfer_data(0x1c);
-	transfer_data(0x07);
-	transfer_data(0x12);
-	transfer_data(0x37);
-	transfer_data(0x32);
-	transfer_data(0x29);
-	transfer_data(0x2d);
-	transfer_data(0x29);
-	transfer_data(0x25);
-	transfer_data(0x2b);
-	transfer_data(0x39);
-	transfer_data(0x00);
-	transfer_data(0x01);
-	transfer_data(0x03);
-	transfer_data(0x10);
-	transfer_command(0xe1);
-	transfer_data(0x0b);
-	transfer_data(0x14);
-	transfer_data(0x09);
-	transfer_data(0x26);
-	transfer_data(0x27);
-	transfer_data(0x22);
-	transfer_data(0x1c);
-	transfer_data(0x20);
-	transfer_data(0x1d);
-	transfer_data(0x1a);
-	transfer_data(0x25);
-	transfer_data(0x2d);
-	transfer_data(0x06);
-	transfer_data(0x06);
+  transfer_command(0xfc);
+  transfer_data(0x11);
+  transfer_data(0x17);
+  transfer_command(0xf0);
+  transfer_data(0x01);
+  transfer_command(0x3a);
+  transfer_data(0x05);
+  transfer_command(0xf6);
+  transfer_data(0x00);
+  transfer_command(0xe0);
+  transfer_data(0x02);
+  transfer_data(0x1c);
+  transfer_data(0x07);
+  transfer_data(0x12);
+  transfer_data(0x37);
+  transfer_data(0x32);
+  transfer_data(0x29);
+  transfer_data(0x2d);
+  transfer_data(0x29);
+  transfer_data(0x25);
+  transfer_data(0x2b);
+  transfer_data(0x39);
+  transfer_data(0x00);
+  transfer_data(0x01);
+  transfer_data(0x03);
+  transfer_data(0x10);
+  transfer_command(0xe1);
+  transfer_data(0x0b);
+  transfer_data(0x14);
+  transfer_data(0x09);
+  transfer_data(0x26);
+  transfer_data(0x27);
+  transfer_data(0x22);
+  transfer_data(0x1c);
+  transfer_data(0x20);
+  transfer_data(0x1d);
+  transfer_data(0x1a);
+  transfer_data(0x25);
+  transfer_data(0x2d);
+  transfer_data(0x06);
+  transfer_data(0x06);
 
-	transfer_data(0x02);
-	transfer_data(0x0f);
-	transfer_command(0x2a); //定义 X 地址的开始及结束位置
-	transfer_data(0x00);
-	transfer_data(0x00);
-	transfer_data(0x00);
-	transfer_data(0x7F);
-	transfer_command(0x2b); //定义 Y 地址的开始及结束位置
-	transfer_data(0x00);
-	transfer_data(0x00);
-	transfer_data(0x00);
-	transfer_data(0x7F);
-	transfer_command(0x29); //开显示
+  transfer_data(0x02);
+  transfer_data(0x0f);
+  transfer_command(0x2a); //定义 X 地址的开始及结束位置
+  transfer_data(0x00);
+  transfer_data(0x00);
+  transfer_data(0x00);
+  transfer_data(0x7F);
+  transfer_command(0x2b); //定义 Y 地址的开始及结束位置
+  transfer_data(0x00);
+  transfer_data(0x00);
+  transfer_data(0x00);
+  transfer_data(0x7F);
+  transfer_command(0x29); //开显示
 }
 
 //定义窗口坐标：开始坐标（XS,YS)以及窗口大小（x_total,y_total)
@@ -363,8 +363,8 @@ static void ST7735_initial(void)
 // 连写2个字节（即 16 位）数据到LCD模块
 void ST7735_WriteData16(uint16_t data2)
 {
-	transfer_data(data2 >> 8);
-	transfer_data(data2);
+  transfer_data(data2 >> 8);
+  transfer_data(data2);
 }
 
 /*
@@ -377,7 +377,7 @@ void ST7735_WriteData16(uint16_t data2)
 */
 void ST7735_GetChipDescribe(char *_str)
 {
-	strcpy(_str, "ST7735");
+  strcpy(_str, "ST7735");
 }
 
 /*
@@ -394,17 +394,17 @@ void ST7735_GetChipDescribe(char *_str)
 */
 void ST7735_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth)
 {
-	/* 设置 X 开始及结束的地址 */
-	transfer_command(0x2a);
-	transfer_data_16(_usX + 2);
-	transfer_data_16(_usX + 2 + _usWidth - 1);
+  /* 设置 X 开始及结束的地址 */
+  transfer_command(0x2a);
+  transfer_data_16(_usX + 2);
+  transfer_data_16(_usX + 2 + _usWidth - 1);
 
-	/* 设置 Y开始及结束的地址 */
-	transfer_command(0x2b);
-	transfer_data_16(_usY + 1);
-	transfer_data_16(_usY + 1 + _usHeight - 1);
+  /* 设置 Y开始及结束的地址 */
+  transfer_command(0x2b);
+  transfer_data_16(_usY + 1);
+  transfer_data_16(_usY + 1 + _usHeight - 1);
 
-	transfer_command(0x2c); /* 写数据开始 */
+  transfer_command(0x2c); /* 写数据开始 */
 }
 
 /*
@@ -417,7 +417,7 @@ void ST7735_SetDispWin(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 */
 void ST7735_QuitWinMode(void)
 {
-	ST7735_SetDispWin(0, 0, g_LcdHeight, g_LcdWidth);
+  ST7735_SetDispWin(0, 0, g_LcdHeight, g_LcdWidth);
 }
 
 /*
@@ -454,7 +454,7 @@ void ST7735_DispOff(void)
 */
 void ST7735_ClrScr(uint16_t _usColor)
 {
-	ST7735_FillRect(0, 0, g_LcdHeight, g_LcdWidth, _usColor);
+  ST7735_FillRect(0, 0, g_LcdHeight, g_LcdWidth, _usColor);
 }
 
 /*
@@ -469,8 +469,8 @@ void ST7735_ClrScr(uint16_t _usColor)
 */
 void ST7735_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 {
-	ST7735_SetDispWin(_usX, _usY, 1, 1);
-	transfer_data_16(_usColor);
+  ST7735_SetDispWin(_usX, _usY, 1, 1);
+  transfer_data_16(_usColor);
 }
 
 /*
@@ -485,7 +485,7 @@ void ST7735_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 */
 uint16_t ST7735_GetPixel(uint16_t _usX, uint16_t _usY)
 {
-	return CL_BLUE;
+  return CL_BLUE;
 }
 
 /*
@@ -501,86 +501,86 @@ uint16_t ST7735_GetPixel(uint16_t _usX, uint16_t _usY)
 */
 void ST7735_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _usY2, uint16_t _usColor)
 {
-	int32_t dx, dy;
-	int32_t tx, ty;
-	int32_t inc1, inc2;
-	int32_t d, iTag;
-	int32_t x, y;
+  int32_t dx, dy;
+  int32_t tx, ty;
+  int32_t inc1, inc2;
+  int32_t d, iTag;
+  int32_t x, y;
 
-	/* 采用 Bresenham 算法，在2点间画一条直线 */
+  /* 采用 Bresenham 算法，在2点间画一条直线 */
 
-	ST7735_PutPixel(_usX1, _usY1, _usColor);
+  ST7735_PutPixel(_usX1, _usY1, _usColor);
 
-	/* 如果两点重合，结束后面的动作。*/
-	if (_usX1 == _usX2 && _usY1 == _usY2)
-	{
-		return;
-	}
+  /* 如果两点重合，结束后面的动作。*/
+  if (_usX1 == _usX2 && _usY1 == _usY2)
+  {
+    return;
+  }
 
-	iTag = 0;
-	/* dx = abs ( _usX2 - _usX1 ); */
-	if (_usX2 >= _usX1)
-	{
-		dx = _usX2 - _usX1;
-	}
-	else
-	{
-		dx = _usX1 - _usX2;
-	}
+  iTag = 0;
+  /* dx = abs ( _usX2 - _usX1 ); */
+  if (_usX2 >= _usX1)
+  {
+    dx = _usX2 - _usX1;
+  }
+  else
+  {
+    dx = _usX1 - _usX2;
+  }
 
-	/* dy = abs ( _usY2 - _usY1 ); */
-	if (_usY2 >= _usY1)
-	{
-		dy = _usY2 - _usY1;
-	}
-	else
-	{
-		dy = _usY1 - _usY2;
-	}
+  /* dy = abs ( _usY2 - _usY1 ); */
+  if (_usY2 >= _usY1)
+  {
+    dy = _usY2 - _usY1;
+  }
+  else
+  {
+    dy = _usY1 - _usY2;
+  }
 
-	if (dx < dy) /*如果dy为计长方向，则交换纵横坐标。*/
-	{
-		uint16_t temp;
+  if (dx < dy) /*如果dy为计长方向，则交换纵横坐标。*/
+  {
+    uint16_t temp;
 
-		iTag = 1;
-		temp = _usX1;
-		_usX1 = _usY1;
-		_usY1 = temp;
-		temp = _usX2;
-		_usX2 = _usY2;
-		_usY2 = temp;
-		temp = dx;
-		dx = dy;
-		dy = temp;
-	}
-	tx = _usX2 > _usX1 ? 1 : -1; /* 确定是增1还是减1 */
-	ty = _usY2 > _usY1 ? 1 : -1;
-	x = _usX1;
-	y = _usY1;
-	inc1 = 2 * dy;
-	inc2 = 2 * (dy - dx);
-	d = inc1 - dx;
-	while (x != _usX2) /* 循环画点 */
-	{
-		if (d < 0)
-		{
-			d += inc1;
-		}
-		else
-		{
-			y += ty;
-			d += inc2;
-		}
-		if (iTag)
-		{
-			ST7735_PutPixel(y, x, _usColor);
-		}
-		else
-		{
-			ST7735_PutPixel(x, y, _usColor);
-		}
-		x += tx;
-	}
+    iTag = 1;
+    temp = _usX1;
+    _usX1 = _usY1;
+    _usY1 = temp;
+    temp = _usX2;
+    _usX2 = _usY2;
+    _usY2 = temp;
+    temp = dx;
+    dx = dy;
+    dy = temp;
+  }
+  tx = _usX2 > _usX1 ? 1 : -1; /* 确定是增1还是减1 */
+  ty = _usY2 > _usY1 ? 1 : -1;
+  x = _usX1;
+  y = _usY1;
+  inc1 = 2 * dy;
+  inc2 = 2 * (dy - dx);
+  d = inc1 - dx;
+  while (x != _usX2) /* 循环画点 */
+  {
+    if (d < 0)
+    {
+      d += inc1;
+    }
+    else
+    {
+      y += ty;
+      d += inc2;
+    }
+    if (iTag)
+    {
+      ST7735_PutPixel(y, x, _usColor);
+    }
+    else
+    {
+      ST7735_PutPixel(x, y, _usColor);
+    }
+    x += tx;
+  }
 }
 
 /*
@@ -597,14 +597,14 @@ void ST7735_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _u
 void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
-	ST7735_FillRect(_usX, _usY, 1, _usLen, _usColor);
+  ST7735_FillRect(_usX, _usY, 1, _usLen, _usColor);
 #else
-	uint16_t i;
+  uint16_t i;
 
-	for (i = 0; i < _usLen; i++)
-	{
-		ST7735_PutPixel(_usX + i, _usY, _usColor);
-	}
+  for (i = 0; i < _usLen; i++)
+  {
+    ST7735_PutPixel(_usX + i, _usY, _usColor);
+  }
 #endif
 }
 
@@ -622,14 +622,14 @@ void ST7735_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _u
 void ST7735_DrawVLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _usColor)
 {
 #if 0
-	ST7735_FillRect(_usX, _usY, _usLen, 1, _usColor);
+  ST7735_FillRect(_usX, _usY, _usLen, 1, _usColor);
 #else
-	uint16_t i;
+  uint16_t i;
 
-	for (i = 0; i < _usLen; i++)
-	{
-		ST7735_PutPixel(_usX, _usY + i, _usColor);
-	}
+  for (i = 0; i < _usLen; i++)
+  {
+    ST7735_PutPixel(_usX, _usY + i, _usColor);
+  }
 #endif
 }
 /*
@@ -644,12 +644,12 @@ void ST7735_DrawVLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _u
 */
 void ST7735_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usColor)
 {
-	uint16_t i;
+  uint16_t i;
 
-	for (i = 0; i < _usSize - 1; i++)
-	{
-		ST7735_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
-	}
+  for (i = 0; i < _usSize - 1; i++)
+  {
+    ST7735_DrawLine(x[i], y[i], x[i + 1], y[i + 1], _usColor);
+  }
 }
 
 /*
@@ -665,18 +665,18 @@ void ST7735_DrawPoints(uint16_t *x, uint16_t *y, uint16_t _usSize, uint16_t _usC
 */
 void ST7735_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
-	/*
-	 ---------------->---
-	|(_usX，_usY)        |
-	V                    V  _usHeight
-	|                    |
-	 ---------------->---
-		  _usWidth
-	*/
-	ST7735_DrawHLine(_usX, _usY, _usWidth, _usColor);
-	ST7735_DrawVLine(_usX + _usWidth - 1, _usY, _usHeight, _usColor);
-	ST7735_DrawHLine(_usX, _usY + _usHeight - 1, _usWidth, _usColor);
-	ST7735_DrawVLine(_usX, _usY, _usHeight, _usColor);
+  /*
+   ---------------->---
+  |(_usX，_usY)        |
+  V                    V  _usHeight
+  |                    |
+   ---------------->---
+      _usWidth
+  */
+  ST7735_DrawHLine(_usX, _usY, _usWidth, _usColor);
+  ST7735_DrawVLine(_usX + _usWidth - 1, _usY, _usHeight, _usColor);
+  ST7735_DrawHLine(_usX, _usY + _usHeight - 1, _usWidth, _usColor);
+  ST7735_DrawVLine(_usX, _usY, _usHeight, _usColor);
 }
 
 /*
@@ -693,14 +693,14 @@ void ST7735_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 */
 void ST7735_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
-	uint32_t i;
+  uint32_t i;
 
-	ST7735_SetDispWin(_usX, _usY, _usHeight, _usWidth);
+  ST7735_SetDispWin(_usX, _usY, _usHeight, _usWidth);
 
-	for (i = 0; i < _usHeight * _usWidth; i++)
-	{
-		transfer_data_16(_usColor);
-	}
+  for (i = 0; i < _usHeight * _usWidth; i++)
+  {
+    transfer_data_16(_usColor);
+  }
 }
 
 /*
@@ -715,36 +715,36 @@ void ST7735_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 */
 void ST7735_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_t _usColor)
 {
-	int32_t D;		 /* Decision Variable */
-	uint32_t CurX; /* 当前 X 值 */
-	uint32_t CurY; /* 当前 Y 值 */
+  int32_t D;     /* Decision Variable */
+  uint32_t CurX; /* 当前 X 值 */
+  uint32_t CurY; /* 当前 Y 值 */
 
-	D = 3 - (_usRadius << 1);
-	CurX = 0;
-	CurY = _usRadius;
+  D = 3 - (_usRadius << 1);
+  CurX = 0;
+  CurY = _usRadius;
 
-	while (CurX <= CurY)
-	{
-		ST7735_PutPixel(_usX + CurX, _usY + CurY, _usColor);
-		ST7735_PutPixel(_usX + CurX, _usY - CurY, _usColor);
-		ST7735_PutPixel(_usX - CurX, _usY + CurY, _usColor);
-		ST7735_PutPixel(_usX - CurX, _usY - CurY, _usColor);
-		ST7735_PutPixel(_usX + CurY, _usY + CurX, _usColor);
-		ST7735_PutPixel(_usX + CurY, _usY - CurX, _usColor);
-		ST7735_PutPixel(_usX - CurY, _usY + CurX, _usColor);
-		ST7735_PutPixel(_usX - CurY, _usY - CurX, _usColor);
+  while (CurX <= CurY)
+  {
+    ST7735_PutPixel(_usX + CurX, _usY + CurY, _usColor);
+    ST7735_PutPixel(_usX + CurX, _usY - CurY, _usColor);
+    ST7735_PutPixel(_usX - CurX, _usY + CurY, _usColor);
+    ST7735_PutPixel(_usX - CurX, _usY - CurY, _usColor);
+    ST7735_PutPixel(_usX + CurY, _usY + CurX, _usColor);
+    ST7735_PutPixel(_usX + CurY, _usY - CurX, _usColor);
+    ST7735_PutPixel(_usX - CurY, _usY + CurX, _usColor);
+    ST7735_PutPixel(_usX - CurY, _usY - CurX, _usColor);
 
-		if (D < 0)
-		{
-			D += (CurX << 2) + 6;
-		}
-		else
-		{
-			D += ((CurX - CurY) << 2) + 10;
-			CurY--;
-		}
-		CurX++;
-	}
+    if (D < 0)
+    {
+      D += (CurX << 2) + 6;
+    }
+    else
+    {
+      D += ((CurX - CurY) << 2) + 10;
+      CurY--;
+    }
+    CurX++;
+  }
 }
 
 /*
@@ -761,20 +761,20 @@ void ST7735_DrawCircle(uint16_t _usX, uint16_t _usY, uint16_t _usRadius, uint16_
 */
 void ST7735_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t *_ptr)
 {
-	uint16_t i, k, y;
-	const uint16_t *p;
+  uint16_t i, k, y;
+  const uint16_t *p;
 
-	p = _ptr;
-	y = _usY;
-	for (i = 0; i < _usHeight; i++)
-	{
-		for (k = 0; k < _usWidth; k++)
-		{
-			ST7735_PutPixel(_usX + k, y, *p++);
-		}
+  p = _ptr;
+  y = _usY;
+  for (i = 0; i < _usHeight; i++)
+  {
+    for (k = 0; k < _usWidth; k++)
+    {
+      ST7735_PutPixel(_usX + k, y, *p++);
+    }
 
-		y++;
-	}
+    y++;
+  }
 }
 
 /*
@@ -787,26 +787,26 @@ void ST7735_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _
 */
 void ST7735_SetDirection(uint8_t _dir)
 {
-	uint16_t temp;
+  uint16_t temp;
 
-	if (_dir == 0 || _dir == 1) /* 横屏， 横屏180度 */
-	{
-		if (g_LcdWidth < g_LcdHeight)
-		{
-			temp = g_LcdWidth;
-			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;
-		}
-	}
-	else if (_dir == 2 || _dir == 3) /* 竖屏, 竖屏180°*/
-	{
-		if (g_LcdWidth > g_LcdHeight)
-		{
-			temp = g_LcdWidth;
-			g_LcdWidth = g_LcdHeight;
-			g_LcdHeight = temp;
-		}
-	}
+  if (_dir == 0 || _dir == 1) /* 横屏， 横屏180度 */
+  {
+    if (g_LcdWidth < g_LcdHeight)
+    {
+      temp = g_LcdWidth;
+      g_LcdWidth = g_LcdHeight;
+      g_LcdHeight = temp;
+    }
+  }
+  else if (_dir == 2 || _dir == 3) /* 竖屏, 竖屏180°*/
+  {
+    if (g_LcdWidth > g_LcdHeight)
+    {
+      temp = g_LcdWidth;
+      g_LcdWidth = g_LcdHeight;
+      g_LcdHeight = temp;
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

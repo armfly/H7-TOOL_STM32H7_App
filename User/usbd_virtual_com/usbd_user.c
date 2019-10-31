@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : USB devie ĞéÄâ´®¿ÚÇı¶¯
-*	ÎÄ¼şÃû³Æ : usbd_user.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ·â×°ĞéÄâ´®¿Ú²Ù×÷º¯Êı£¬Ìá¹©¸øAPPÊ¹ÓÃ.
+*	æ¨¡å—åç§° : USB devie è™šæ‹Ÿä¸²å£é©±åŠ¨
+*	æ–‡ä»¶åç§° : usbd_user.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å°è£…è™šæ‹Ÿä¸²å£æ“ä½œå‡½æ•°ï¼Œæä¾›ç»™APPä½¿ç”¨.
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-12-11  armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-12-11  armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2018-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2018-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -23,47 +23,47 @@ extern PCD_HandleTypeDef hpcd;
 extern void SelectCDCUart(uint8_t _com);
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbd_OpenCDC
-*	¹¦ÄÜËµÃ÷: ´ò¿ªUSB
-*	ĞÎ    ²Î: _com : 1, 4
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbd_OpenCDC
+*	åŠŸèƒ½è¯´æ˜: æ‰“å¼€USB
+*	å½¢    å‚: _com : 1, 4
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbd_OpenCDC(uint8_t _com)
 {
-	SelectCDCUart(_com);		/* Ñ¡Ôñuart1»òuart4×÷ÎªĞéÄâ´®¿Ú */
-	
-	/* Init Device Library */
-	USBD_Init(&USBD_Device, &VCP_Desc, 0);
+  SelectCDCUart(_com); /* é€‰æ‹©uart1æˆ–uart4ä½œä¸ºè™šæ‹Ÿä¸²å£ */
 
-	/* Add Supported Class */
-	USBD_RegisterClass(&USBD_Device, USBD_CDC_CLASS);
+  /* Init Device Library */
+  USBD_Init(&USBD_Device, &VCP_Desc, 0);
 
-	/* Add CDC Interface Class */
-	USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
+  /* Add Supported Class */
+  USBD_RegisterClass(&USBD_Device, USBD_CDC_CLASS);
 
-	/* Start Device Process */
-	USBD_Start(&USBD_Device);
+  /* Add CDC Interface Class */
+  USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
+
+  /* Start Device Process */
+  USBD_Start(&USBD_Device);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbd_CloseCDC
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕUSB
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbd_CloseCDC
+*	åŠŸèƒ½è¯´æ˜: å…³é—­USB
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbd_CloseCDC(void)
 {
-	if (USBD_Device.dev_config == 0)
-	{
-		return;		
-	}
-	
-	USBD_Stop(&USBD_Device);
-	
-	USBD_DeInit(&USBD_Device);
+  if (USBD_Device.dev_config == 0)
+  {
+    return;
+  }
+
+  USBD_Stop(&USBD_Device);
+
+  USBD_DeInit(&USBD_Device);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

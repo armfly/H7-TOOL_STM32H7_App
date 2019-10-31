@@ -25,17 +25,17 @@
 ** false due to limited range of data type"; the +1 tricks the compiler,
 ** avoiding this warning but also this optimization.)
 */
-#define luaM_reallocv(L, b, on, n, e)                                         \
-   (((sizeof(n) >= sizeof(size_t) && cast(size_t, (n)) + 1 > MAX_SIZET / (e)) \
-         ? luaM_toobig(L)                                                     \
-         : cast_void(0)),                                                     \
-    luaM_realloc_(L, (b), (on) * (e), (n) * (e)))
+#define luaM_reallocv(L, b, on, n, e)                                        \
+  (((sizeof(n) >= sizeof(size_t) && cast(size_t, (n)) + 1 > MAX_SIZET / (e)) \
+        ? luaM_toobig(L)                                                     \
+        : cast_void(0)),                                                     \
+   luaM_realloc_(L, (b), (on) * (e), (n) * (e)))
 
 /*
 ** Arrays of chars do not need any test
 */
 #define luaM_reallocvchar(L, b, on, n) \
-   cast(char *, luaM_realloc_(L, (b), (on) * sizeof(char), (n) * sizeof(char)))
+  cast(char *, luaM_realloc_(L, (b), (on) * sizeof(char), (n) * sizeof(char)))
 
 #define luaM_freemem(L, b, s) luaM_realloc_(L, (b), (s), 0)
 #define luaM_free(L, b) luaM_realloc_(L, (b), sizeof(*(b)), 0)
@@ -44,16 +44,16 @@
 #define luaM_malloc(L, s) luaM_realloc_(L, NULL, 0, (s))
 #define luaM_new(L, t) cast(t *, luaM_malloc(L, sizeof(t)))
 #define luaM_newvector(L, n, t) \
-   cast(t *, luaM_reallocv(L, NULL, 0, n, sizeof(t)))
+  cast(t *, luaM_reallocv(L, NULL, 0, n, sizeof(t)))
 
 #define luaM_newobject(L, tag, s) luaM_realloc_(L, NULL, tag, (s))
 
 #define luaM_growvector(L, v, nelems, size, t, limit, e) \
-   if ((nelems) + 1 > (size))                            \
-   ((v) = cast(t *, luaM_growaux_(L, v, &(size), sizeof(t), limit, e)))
+  if ((nelems) + 1 > (size))                             \
+  ((v) = cast(t *, luaM_growaux_(L, v, &(size), sizeof(t), limit, e)))
 
 #define luaM_reallocvector(L, v, oldn, n, t) \
-   ((v) = cast(t *, luaM_reallocv(L, v, oldn, n, sizeof(t))))
+  ((v) = cast(t *, luaM_reallocv(L, v, oldn, n, sizeof(t))))
 
 LUAI_FUNC l_noret luaM_toobig(lua_State *L);
 

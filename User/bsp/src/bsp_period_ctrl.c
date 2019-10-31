@@ -34,13 +34,13 @@ void RunLedOff(void) { bsp_LedOff(1); }
 */
 void PERIOD_InitVar(void)
 {
-	g_tRunLed.ucEnalbe = 0;
-	g_tRunLed.OnFunc = RunLedOn;
-	g_tRunLed.OffFunc = RunLedOff;
+  g_tRunLed.ucEnalbe = 0;
+  g_tRunLed.OnFunc = RunLedOn;
+  g_tRunLed.OffFunc = RunLedOff;
 
-	//	g_tWiFiLed.ucEnalbe = 0;
-	//	g_tWiFiLed.OnFunc = bsp_WiFiLedOn;
-	//	g_tWiFiLed.OffFunc = bsp_WiFiLedOff;
+  //	g_tWiFiLed.ucEnalbe = 0;
+  //	g_tWiFiLed.OnFunc = bsp_WiFiLedOn;
+  //	g_tWiFiLed.OffFunc = bsp_WiFiLedOff;
 }
 
 /*
@@ -53,8 +53,8 @@ void PERIOD_InitVar(void)
 */
 void PERIOD_Scan(void)
 {
-	//	PERIOD_ScanDev(&g_tWiFiLed);
-	PERIOD_ScanDev(&g_tRunLed);
+  //	PERIOD_ScanDev(&g_tWiFiLed);
+  PERIOD_ScanDev(&g_tRunLed);
 }
 
 /*
@@ -69,20 +69,20 @@ void PERIOD_Scan(void)
 */
 void PERIOD_Start(PERIOD_CTRL_T *_ptPer, uint16_t _usOnTime, uint16_t _usOffTime, uint16_t _usCycle)
 {
-	if (_usOnTime == 0)
-	{
-		return;
-	}
+  if (_usOnTime == 0)
+  {
+    return;
+  }
 
-	_ptPer->usOnTime = (_usOnTime + 9) / 10;
-	_ptPer->usOffTime = (_usOffTime + 9) / 10;
-	_ptPer->usCycle = _usCycle;
-	_ptPer->usCount = 0;
-	_ptPer->usCycleCount = 0;
-	_ptPer->ucState = 0;
-	_ptPer->ucEnalbe = 1; /* 设置完全局参数后再使能发声标志 */
+  _ptPer->usOnTime = (_usOnTime + 9) / 10;
+  _ptPer->usOffTime = (_usOffTime + 9) / 10;
+  _ptPer->usCycle = _usCycle;
+  _ptPer->usCount = 0;
+  _ptPer->usCycleCount = 0;
+  _ptPer->ucState = 0;
+  _ptPer->ucEnalbe = 1; /* 设置完全局参数后再使能发声标志 */
 
-	_ptPer->OnFunc(); /* 执行ON时的函数 */
+  _ptPer->OnFunc(); /* 执行ON时的函数 */
 }
 
 /*
@@ -95,11 +95,11 @@ void PERIOD_Start(PERIOD_CTRL_T *_ptPer, uint16_t _usOnTime, uint16_t _usOffTime
 */
 void PERIOD_Stop(PERIOD_CTRL_T *_ptPer)
 {
-	_ptPer->ucEnalbe = 0;
+  _ptPer->ucEnalbe = 0;
 
-	/* 必须在清控制标志后再停止发声，避免停止后在中断中又开启 */
-	_ptPer->OffFunc(); /* 执行ON时的函数 */
-	;
+  /* 必须在清控制标志后再停止发声，避免停止后在中断中又开启 */
+  _ptPer->OffFunc(); /* 执行ON时的函数 */
+  ;
 }
 
 /*
@@ -112,53 +112,53 @@ void PERIOD_Stop(PERIOD_CTRL_T *_ptPer)
 */
 static void PERIOD_ScanDev(PERIOD_CTRL_T *_ptPer)
 {
-	if ((_ptPer->ucEnalbe == 0) || (_ptPer->usOffTime == 0))
-	{
-		return;
-	}
+  if ((_ptPer->ucEnalbe == 0) || (_ptPer->usOffTime == 0))
+  {
+    return;
+  }
 
-	if (_ptPer->ucState == 0)
-	{
-		if (_ptPer->usOffTime > 0) /* 间断 */
-		{
-			if (++_ptPer->usCount >= _ptPer->usOnTime)
-			{
-				_ptPer->OffFunc(); /* 关闭动作 */
-				_ptPer->usCount = 0;
-				_ptPer->ucState = 1;
-			}
-		}
-		else
-		{
-			; /* 不做任何处理，连续发声 */
-		}
-	}
-	else if (_ptPer->ucState == 1)
-	{
-		if (++_ptPer->usCount >= _ptPer->usOffTime)
-		{
-			/* 连续发声时，直到调用stop停止为止 */
-			if (_ptPer->usCycle > 0)
-			{
-				if (++_ptPer->usCycleCount >= _ptPer->usCycle)
-				{
-					/* 循环次数到，停止发声 */
-					_ptPer->ucEnalbe = 0;
-				}
+  if (_ptPer->ucState == 0)
+  {
+    if (_ptPer->usOffTime > 0) /* 间断 */
+    {
+      if (++_ptPer->usCount >= _ptPer->usOnTime)
+      {
+        _ptPer->OffFunc(); /* 关闭动作 */
+        _ptPer->usCount = 0;
+        _ptPer->ucState = 1;
+      }
+    }
+    else
+    {
+      ; /* 不做任何处理，连续发声 */
+    }
+  }
+  else if (_ptPer->ucState == 1)
+  {
+    if (++_ptPer->usCount >= _ptPer->usOffTime)
+    {
+      /* 连续发声时，直到调用stop停止为止 */
+      if (_ptPer->usCycle > 0)
+      {
+        if (++_ptPer->usCycleCount >= _ptPer->usCycle)
+        {
+          /* 循环次数到，停止发声 */
+          _ptPer->ucEnalbe = 0;
+        }
 
-				if (_ptPer->ucEnalbe == 0)
-				{
-					_ptPer->usOffTime = 0;
-					return;
-				}
-			}
+        if (_ptPer->ucEnalbe == 0)
+        {
+          _ptPer->usOffTime = 0;
+          return;
+        }
+      }
 
-			_ptPer->usCount = 0;
-			_ptPer->ucState = 0;
+      _ptPer->usCount = 0;
+      _ptPer->ucState = 0;
 
-			_ptPer->OnFunc(); /* 周期性执行On函数 */
-		}
-	}
+      _ptPer->OnFunc(); /* 周期性执行On函数 */
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -19,32 +19,32 @@
 #include "param.h"
 
 /*
-	H7-TOOL 使用PA4用作 DAC_OUT1
+  H7-TOOL 使用PA4用作 DAC_OUT1
 
-	DAC1使用了TIM6作为定时触发， DMA通道: DMA1_Stream5
+  DAC1使用了TIM6作为定时触发， DMA通道: DMA1_Stream5
 //	DAC2使用了TIM7作为定时触发， DMA通道: DMA2_Stream6	
-	
-	DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable 开启了DAC输出缓冲，增加驱动能力,
-	开了缓冲之后，靠近0V和参考电源时，失真厉害，最低50mV
-	不开缓冲波形较好，到0V目测不出明显失真。
-	
-	功能：
-	1、输出正弦波，幅度和频率可调节
-	2、输出方波，幅度偏移可调节，频率可调节，占空比可以调节
-	3、输出三角波，幅度可调节，频率可调节，上升沿占比可调节
-	4、基本的DAC输出直流电平的函数
-	
-	
-	硬件用PG3控制输出电压量程 0-10V、±10V
-	
-	硬件用 PE3/65130_SW 控制DAC电路的电源
+  
+  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable 开启了DAC输出缓冲，增加驱动能力,
+  开了缓冲之后，靠近0V和参考电源时，失真厉害，最低50mV
+  不开缓冲波形较好，到0V目测不出明显失真。
+  
+  功能：
+  1、输出正弦波，幅度和频率可调节
+  2、输出方波，幅度偏移可调节，频率可调节，占空比可以调节
+  3、输出三角波，幅度可调节，频率可调节，上升沿占比可调节
+  4、基本的DAC输出直流电平的函数
+  
+  
+  硬件用PG3控制输出电压量程 0-10V、±10V
+  
+  硬件用 PE3/65130_SW 控制DAC电路的电源
 */
 /* 控制DAC电路的电源 PE3/65130_SW */
 #define DAC_POWER_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
 #define DAC_POWER_GPIO GPIOE
 #define DAC_POWER_PIN GPIO_PIN_3
-#define DAC_POWER_ON() DAC_POWER_GPIO->BSRRL = DAC_POWER_PIN					 /* DAC POWER ON */
-#define DAC_POWER_OFF() DAC_POWER_GPIO->BSRRH = DAC_POWER_PIN					 /* DAC POWER OFF */
+#define DAC_POWER_ON() DAC_POWER_GPIO->BSRRL = DAC_POWER_PIN           /* DAC POWER ON */
+#define DAC_POWER_OFF() DAC_POWER_GPIO->BSRRH = DAC_POWER_PIN          /* DAC POWER OFF */
 #define DAC_POWER_IS_ON() ((DAC_POWER_GPIO->IDR & DAC_POWER_PIN) == 0) /* 如果已使能输出，返回ture */
 
 /* DAC 引脚定义 */
@@ -92,51 +92,51 @@ static void TIM6_Config(uint32_t _freq);
 */
 void bsp_InitDAC1(void)
 {
-	/* 电压输出量程控制GPIO配置 */
-	{
-		GPIO_InitTypeDef gpio_init;
+  /* 电压输出量程控制GPIO配置 */
+  {
+    GPIO_InitTypeDef gpio_init;
 
-		/* DAC power 控制 */
-		DAC_POWER_CLK_ENABLE();
-		DAC_POWER_OFF();
-		gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* 设置推挽输出 */
-		gpio_init.Pull = GPIO_NOPULL;						/* 上下拉电阻不使能 */
-		gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
-		gpio_init.Pin = DAC_POWER_PIN;
-		HAL_GPIO_Init(DAC_POWER_GPIO, &gpio_init);
-	}
+    /* DAC power 控制 */
+    DAC_POWER_CLK_ENABLE();
+    DAC_POWER_OFF();
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 设置推挽输出 */
+    gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+    gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+    gpio_init.Pin = DAC_POWER_PIN;
+    HAL_GPIO_Init(DAC_POWER_GPIO, &gpio_init);
+  }
 
-	/* 配置DAC, 无触发，不用DMA */
-	{
-		DacHandle.Instance = DACx;
+  /* 配置DAC, 无触发，不用DMA */
+  {
+    DacHandle.Instance = DACx;
 
-		HAL_DAC_DeInit(&DacHandle);
+    HAL_DAC_DeInit(&DacHandle);
 
-		/*##-1- Initialize the DAC peripheral ######################################*/
-		if (HAL_DAC_Init(&DacHandle) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
+    /*##-1- Initialize the DAC peripheral ######################################*/
+    if (HAL_DAC_Init(&DacHandle) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
 
-		/*##-1- DAC channel1 Configuration #########################################*/
-		sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
-		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-		//sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
+    /*##-1- DAC channel1 Configuration #########################################*/
+    sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+    sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+    //sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
 
-		if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
+    if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DAC_CHANNEL_1) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
 
-		/*##-2- Enable DAC selected channel and associated DMA #############################*/
-		if (HAL_DAC_Start(&DacHandle, DAC_CHANNEL_1) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
-	}
+    /*##-2- Enable DAC selected channel and associated DMA #############################*/
+    if (HAL_DAC_Start(&DacHandle, DAC_CHANNEL_1) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
+  }
 
-	g_tDacWave.Type = DAC_WAVE_NONE;
-	g_tDacWave.CycleSetting = 0;
+  g_tDacWave.Type = DAC_WAVE_NONE;
+  g_tDacWave.CycleSetting = 0;
 }
 
 /*
@@ -149,7 +149,7 @@ void bsp_InitDAC1(void)
 */
 void bsp_SetDAC1(uint16_t _dac)
 {
-	DAC1->DHR12R1 = _dac;
+  DAC1->DHR12R1 = _dac;
 }
 
 /*
@@ -162,7 +162,7 @@ void bsp_SetDAC1(uint16_t _dac)
 */
 void bsp_SetDAC2(uint16_t _dac)
 {
-	DAC1->DHR12R2 = _dac;
+  DAC1->DHR12R2 = _dac;
 }
 
 /*
@@ -175,20 +175,20 @@ void bsp_SetDAC2(uint16_t _dac)
 */
 void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
 {
-	GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct;
 
-	/*##-1- 使能时钟 #################################*/
-	/* 使能GPIO时钟 */
-	DACx_CHANNEL_GPIO_CLK_ENABLE();
-	/* 使能DAC外设时钟 */
-	DACx_CLK_ENABLE();
+  /*##-1- 使能时钟 #################################*/
+  /* 使能GPIO时钟 */
+  DACx_CHANNEL_GPIO_CLK_ENABLE();
+  /* 使能DAC外设时钟 */
+  DACx_CLK_ENABLE();
 
-	/*##-2- 配置GPIO ##########################################*/
-	/* DAC Channel1 GPIO 配置 */
-	GPIO_InitStruct.Pin = DACx_CHANNEL_PIN;
-	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	HAL_GPIO_Init(DACx_CHANNEL_GPIO_PORT, &GPIO_InitStruct);
+  /*##-2- 配置GPIO ##########################################*/
+  /* DAC Channel1 GPIO 配置 */
+  GPIO_InitStruct.Pin = DACx_CHANNEL_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(DACx_CHANNEL_GPIO_PORT, &GPIO_InitStruct);
 }
 
 /*
@@ -201,18 +201,18 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac)
 */
 void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac)
 {
-	/*##-1- 复位DAC外设 ##################################################*/
-	DACx_FORCE_RESET();
-	DACx_RELEASE_RESET();
+  /*##-1- 复位DAC外设 ##################################################*/
+  DACx_FORCE_RESET();
+  DACx_RELEASE_RESET();
 
-	/*##-2- 复位DAC对应GPIO ################################*/
-	HAL_GPIO_DeInit(DACx_CHANNEL_GPIO_PORT, DACx_CHANNEL_PIN);
+  /*##-2- 复位DAC对应GPIO ################################*/
+  HAL_GPIO_DeInit(DACx_CHANNEL_GPIO_PORT, DACx_CHANNEL_PIN);
 
-	/*##-3- 关闭DAC用的DMA Stream ############################################*/
-	HAL_DMA_DeInit(hdac->DMA_Handle1);
+  /*##-3- 关闭DAC用的DMA Stream ############################################*/
+  HAL_DMA_DeInit(hdac->DMA_Handle1);
 
-	/*##-4- 关闭DMA中断 ###########################################*/
-	HAL_NVIC_DisableIRQ(DACx_DMA_IRQn);
+  /*##-4- 关闭DMA中断 ###########################################*/
+  HAL_NVIC_DisableIRQ(DACx_DMA_IRQn);
 }
 
 /*
@@ -225,8 +225,8 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac)
 */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
-	/* TIM6 时钟使能 */
-	__HAL_RCC_TIM6_CLK_ENABLE();
+  /* TIM6 时钟使能 */
+  __HAL_RCC_TIM6_CLK_ENABLE();
 }
 
 /*
@@ -239,9 +239,9 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 */
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
 {
-	/*##-1- 复位外设 ##################################################*/
-	__HAL_RCC_TIM6_FORCE_RESET();
-	__HAL_RCC_TIM6_RELEASE_RESET();
+  /*##-1- 复位外设 ##################################################*/
+  __HAL_RCC_TIM6_FORCE_RESET();
+  __HAL_RCC_TIM6_RELEASE_RESET();
 }
 
 /*
@@ -254,41 +254,41 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
 */
 static void TIM6_Config(uint32_t _freq)
 {
-	static TIM_HandleTypeDef htim;
-	TIM_MasterConfigTypeDef sMasterConfig;
+  static TIM_HandleTypeDef htim;
+  TIM_MasterConfigTypeDef sMasterConfig;
 
-	/*##-1- Configure the TIM peripheral #######################################*/
-	/* Time base configuration */
-	htim.Instance = TIM6;
+  /*##-1- Configure the TIM peripheral #######################################*/
+  /* Time base configuration */
+  htim.Instance = TIM6;
 
-	if (_freq < 100)
-	{
-		htim.Init.Prescaler = 100;
-		htim.Init.Period = ((SystemCoreClock / 2) / htim.Init.Prescaler) / _freq - 1;
-		htim.Init.ClockDivision = 0;
-	}
-	else
-	{
-		htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
-		htim.Init.Prescaler = 0;
-		htim.Init.ClockDivision = 0;
-	}
+  if (_freq < 100)
+  {
+    htim.Init.Prescaler = 100;
+    htim.Init.Period = ((SystemCoreClock / 2) / htim.Init.Prescaler) / _freq - 1;
+    htim.Init.ClockDivision = 0;
+  }
+  else
+  {
+    htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
+    htim.Init.Prescaler = 0;
+    htim.Init.ClockDivision = 0;
+  }
 
-	htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
-	htim.Init.Prescaler = 0;
-	htim.Init.ClockDivision = 0;
-	htim.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim.Init.RepetitionCounter = 0;
-	HAL_TIM_Base_Init(&htim);
+  htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
+  htim.Init.Prescaler = 0;
+  htim.Init.ClockDivision = 0;
+  htim.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim.Init.RepetitionCounter = 0;
+  HAL_TIM_Base_Init(&htim);
 
-	/* TIM6 TRGO selection */
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  /* TIM6 TRGO selection */
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 
-	HAL_TIMEx_MasterConfigSynchronization(&htim, &sMasterConfig);
+  HAL_TIMEx_MasterConfigSynchronization(&htim, &sMasterConfig);
 
-	/*##-2- Enable TIM peripheral counter ######################################*/
-	HAL_TIM_Base_Start(&htim);
+  /*##-2- Enable TIM peripheral counter ######################################*/
+  HAL_TIM_Base_Start(&htim);
 }
 
 /*
@@ -303,64 +303,64 @@ static void TIM6_Config(uint32_t _freq)
 */
 void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
 {
-	DAC_POWER_ON(); /* 打开DAC供电电路 */
+  DAC_POWER_ON(); /* 打开DAC供电电路 */
 
-	TIM6_Config(_DacFreq); /* DAC转换频率最高1M */
+  TIM6_Config(_DacFreq); /* DAC转换频率最高1M */
 
-	/* 配置DAC, TIM6触发，DMA启用 */
-	{
-		DacHandle.Instance = DACx;
+  /* 配置DAC, TIM6触发，DMA启用 */
+  {
+    DacHandle.Instance = DACx;
 
-		HAL_DAC_DeInit(&DacHandle);
+    HAL_DAC_DeInit(&DacHandle);
 
-		/*##-1- Initialize the DAC peripheral ######################################*/
-		if (HAL_DAC_Init(&DacHandle) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
+    /*##-1- Initialize the DAC peripheral ######################################*/
+    if (HAL_DAC_Init(&DacHandle) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
 
-		/* 配置DMA */
-		{
-			static DMA_HandleTypeDef hdma_dac1;
+    /* 配置DMA */
+    {
+      static DMA_HandleTypeDef hdma_dac1;
 
-			/* 使能DMA1时钟 */
-			DMAx_CLK_ENABLE();
+      /* 使能DMA1时钟 */
+      DMAx_CLK_ENABLE();
 
-			/* 配置 DACx_DMA_STREAM  */
-			hdma_dac1.Instance = DACx_DMA_INSTANCE;
+      /* 配置 DACx_DMA_STREAM  */
+      hdma_dac1.Instance = DACx_DMA_INSTANCE;
 
-			hdma_dac1.Init.Request = DMA_REQUEST_DAC1;
+      hdma_dac1.Init.Request = DMA_REQUEST_DAC1;
 
-			hdma_dac1.Init.Direction = DMA_MEMORY_TO_PERIPH;
-			hdma_dac1.Init.PeriphInc = DMA_PINC_DISABLE;
-			hdma_dac1.Init.MemInc = DMA_MINC_ENABLE;
-			hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-			hdma_dac1.Init.MemDataAlignment = DMA_PDATAALIGN_HALFWORD;
-			hdma_dac1.Init.Mode = DMA_CIRCULAR;
-			hdma_dac1.Init.Priority = DMA_PRIORITY_HIGH;
+      hdma_dac1.Init.Direction = DMA_MEMORY_TO_PERIPH;
+      hdma_dac1.Init.PeriphInc = DMA_PINC_DISABLE;
+      hdma_dac1.Init.MemInc = DMA_MINC_ENABLE;
+      hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+      hdma_dac1.Init.MemDataAlignment = DMA_PDATAALIGN_HALFWORD;
+      hdma_dac1.Init.Mode = DMA_CIRCULAR;
+      hdma_dac1.Init.Priority = DMA_PRIORITY_HIGH;
 
-			HAL_DMA_Init(&hdma_dac1);
+      HAL_DMA_Init(&hdma_dac1);
 
-			/* 关联DMA句柄到DAC句柄下 */
-			__HAL_LINKDMA(&DacHandle, DMA_Handle1, hdma_dac1);
-		}
+      /* 关联DMA句柄到DAC句柄下 */
+      __HAL_LINKDMA(&DacHandle, DMA_Handle1, hdma_dac1);
+    }
 
-		/*##-1- DAC channel1 Configuration #########################################*/
-		sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
-		//		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;	//GND附近非线性失真厉害
-		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
+    /*##-1- DAC channel1 Configuration #########################################*/
+    sConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
+    //		sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;	//GND附近非线性失真厉害
+    sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;
 
-		if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DAC_CHANNEL_1) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
+    if (HAL_DAC_ConfigChannel(&DacHandle, &sConfig, DAC_CHANNEL_1) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
 
-		/*##-2- Enable DAC selected channel and associated DMA #############################*/
-		if (HAL_DAC_Start_DMA(&DacHandle, DAC_CHANNEL_1, (uint32_t *)_BufAddr, _Count, DAC_ALIGN_12B_R) != HAL_OK)
-		{
-			Error_Handler(__FILE__, __LINE__);
-		}
-	}
+    /*##-2- Enable DAC selected channel and associated DMA #############################*/
+    if (HAL_DAC_Start_DMA(&DacHandle, DAC_CHANNEL_1, (uint32_t *)_BufAddr, _Count, DAC_ALIGN_12B_R) != HAL_OK)
+    {
+      Error_Handler(__FILE__, __LINE__);
+    }
+  }
 }
 
 /*
@@ -374,19 +374,19 @@ void bsp_StartDAC1_DMA(uint32_t _BufAddr, uint32_t _Count, uint32_t _DacFreq)
 */
 void dac1_SetSinWave(uint16_t _bottom, uint16_t _top, uint32_t _freq)
 {
-	uint16_t i;
-	uint16_t mid; /* 中值 */
-	uint16_t att; /* 幅度 */
+  uint16_t i;
+  uint16_t mid; /* 中值 */
+  uint16_t att; /* 幅度 */
 
-	mid = (_bottom + _top) / 2; /* 0位的值 */
-	att = (_top - _bottom) / 2; /* 正弦波幅度，峰峰值除以2 */
+  mid = (_bottom + _top) / 2; /* 0位的值 */
+  att = (_top - _bottom) / 2; /* 正弦波幅度，峰峰值除以2 */
 
-	for (i = 0; i < WAVE_SAMPLE_SIZE; i++)
-	{
-		g_Wave1[i] = mid + (int32_t)(att * sin((i * 2 * 3.14159) / WAVE_SAMPLE_SIZE));
-	}
+  for (i = 0; i < WAVE_SAMPLE_SIZE; i++)
+  {
+    g_Wave1[i] = mid + (int32_t)(att * sin((i * 2 * 3.14159) / WAVE_SAMPLE_SIZE));
+  }
 
-	bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
+  bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
 }
 
 /*
@@ -402,18 +402,18 @@ void dac1_SetSinWave(uint16_t _bottom, uint16_t _top, uint32_t _freq)
 */
 void dac1_SetRectWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _duty)
 {
-	uint16_t i;
+  uint16_t i;
 
-	for (i = 0; i < (_duty * WAVE_SAMPLE_SIZE) / 100; i++)
-	{
-		g_Wave1[i] = _top;
-	}
-	for (; i < WAVE_SAMPLE_SIZE; i++)
-	{
-		g_Wave1[i] = _bottom;
-	}
+  for (i = 0; i < (_duty * WAVE_SAMPLE_SIZE) / 100; i++)
+  {
+    g_Wave1[i] = _top;
+  }
+  for (; i < WAVE_SAMPLE_SIZE; i++)
+  {
+    g_Wave1[i] = _bottom;
+  }
 
-	bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
+  bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
 }
 
 /*
@@ -429,34 +429,34 @@ void dac1_SetRectWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t 
 */
 void dac1_SetTriWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _duty)
 {
-	uint32_t i;
-	uint16_t dac;
-	uint16_t m;
+  uint32_t i;
+  uint16_t dac;
+  uint16_t m;
 
-	/* 构造三角波数组，128个样本，从 _bottom 到 _top */
-	m = (_duty * WAVE_SAMPLE_SIZE) / 100;
+  /* 构造三角波数组，128个样本，从 _bottom 到 _top */
+  m = (_duty * WAVE_SAMPLE_SIZE) / 100;
 
-	if (m == 0)
-	{
-		m = 1;
-	}
+  if (m == 0)
+  {
+    m = 1;
+  }
 
-	if (m > WAVE_SAMPLE_SIZE - 1)
-	{
-		m = WAVE_SAMPLE_SIZE - 1;
-	}
-	for (i = 0; i < m; i++)
-	{
-		dac = _bottom + ((_top - _bottom) * i) / m;
-		g_Wave1[i] = dac;
-	}
-	for (; i < WAVE_SAMPLE_SIZE; i++)
-	{
-		dac = _top - ((_top - _bottom) * (i - m)) / (WAVE_SAMPLE_SIZE - m);
-		g_Wave1[i] = dac;
-	}
+  if (m > WAVE_SAMPLE_SIZE - 1)
+  {
+    m = WAVE_SAMPLE_SIZE - 1;
+  }
+  for (i = 0; i < m; i++)
+  {
+    dac = _bottom + ((_top - _bottom) * i) / m;
+    g_Wave1[i] = dac;
+  }
+  for (; i < WAVE_SAMPLE_SIZE; i++)
+  {
+    dac = _top - ((_top - _bottom) * (i - m)) / (WAVE_SAMPLE_SIZE - m);
+    g_Wave1[i] = dac;
+  }
 
-	bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
+  bsp_StartDAC1_DMA((uint32_t)&g_Wave1, WAVE_SAMPLE_SIZE, _freq * WAVE_SAMPLE_SIZE);
 }
 
 /*
@@ -470,18 +470,18 @@ void dac1_SetTriWave(uint16_t _bottom, uint16_t _top, uint32_t _freq, uint16_t _
 */
 void dac1_StopWave(void)
 {
-	//	__HAL_RCC_DAC12_FORCE_RESET();
-	//	__HAL_RCC_DAC12_RELEASE_RESET();
-	//
-	//	HAL_DMA_DeInit(DacHandle.DMA_Handle1);
+  //	__HAL_RCC_DAC12_FORCE_RESET();
+  //	__HAL_RCC_DAC12_RELEASE_RESET();
+  //
+  //	HAL_DMA_DeInit(DacHandle.DMA_Handle1);
 
-	HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1); /* 函数内部会关闭DAC */
+  HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1); /* 函数内部会关闭DAC */
 
-	bsp_InitDAC1(); /* 重新启用DAC */
+  bsp_InitDAC1(); /* 重新启用DAC */
 
-	bsp_SetDAC1(32767);
+  bsp_SetDAC1(32767);
 
-	DAC_POWER_OFF();
+  DAC_POWER_OFF();
 }
 
 /*
@@ -494,14 +494,14 @@ void dac1_StopWave(void)
 */
 int16_t dac1_DacToVolt(uint16_t _dac)
 {
-	int32_t volt;
+  int32_t volt;
 
-	/* 正负10V量程 */
-	{
-		volt = CaculTwoPoint(g_tCalib.Dac10V.x1, g_tCalib.Dac10V.y1,
-												 g_tCalib.Dac10V.x2, g_tCalib.Dac10V.y2, _dac);
-	}
-	return volt;
+  /* 正负10V量程 */
+  {
+    volt = CaculTwoPoint(g_tCalib.Dac10V.x1, g_tCalib.Dac10V.y1,
+                         g_tCalib.Dac10V.x2, g_tCalib.Dac10V.y2, _dac);
+  }
+  return volt;
 }
 
 /*
@@ -514,42 +514,42 @@ int16_t dac1_DacToVolt(uint16_t _dac)
 */
 int16_t dac1_VoltToDac(int16_t _volt)
 {
-	int32_t dac;
-	int32_t x1, y1, x2, y2;
+  int32_t dac;
+  int32_t x1, y1, x2, y2;
 
-	if (_volt <= g_tCalib.Dac10V.y2)
-	{
-		x1 = g_tCalib.Dac10V.y1;
-		y1 = g_tCalib.Dac10V.x1;
-		x2 = g_tCalib.Dac10V.y2;
-		y2 = g_tCalib.Dac10V.x2;
-	}
-	else if (_volt <= g_tCalib.Dac10V.y3)
-	{
-		x1 = g_tCalib.Dac10V.y2;
-		y1 = g_tCalib.Dac10V.x2;
-		x2 = g_tCalib.Dac10V.y3;
-		y2 = g_tCalib.Dac10V.x3;
-	}
-	else
-	{
-		x1 = g_tCalib.Dac10V.y3;
-		y1 = g_tCalib.Dac10V.x3;
-		x2 = g_tCalib.Dac10V.y4;
-		y2 = g_tCalib.Dac10V.x4;
-	}
+  if (_volt <= g_tCalib.Dac10V.y2)
+  {
+    x1 = g_tCalib.Dac10V.y1;
+    y1 = g_tCalib.Dac10V.x1;
+    x2 = g_tCalib.Dac10V.y2;
+    y2 = g_tCalib.Dac10V.x2;
+  }
+  else if (_volt <= g_tCalib.Dac10V.y3)
+  {
+    x1 = g_tCalib.Dac10V.y2;
+    y1 = g_tCalib.Dac10V.x2;
+    x2 = g_tCalib.Dac10V.y3;
+    y2 = g_tCalib.Dac10V.x3;
+  }
+  else
+  {
+    x1 = g_tCalib.Dac10V.y3;
+    y1 = g_tCalib.Dac10V.x3;
+    x2 = g_tCalib.Dac10V.y4;
+    y2 = g_tCalib.Dac10V.x4;
+  }
 
-	/* 正负10V量程 */
-	dac = CaculTwoPoint(x1, y1, x2, y2, _volt);
-	if (dac < 0)
-	{
-		dac = 0;
-	}
-	else if (dac > 4095)
-	{
-		dac = 4095;
-	}
-	return dac;
+  /* 正负10V量程 */
+  dac = CaculTwoPoint(x1, y1, x2, y2, _volt);
+  if (dac < 0)
+  {
+    dac = 0;
+  }
+  else if (dac > 4095)
+  {
+    dac = 4095;
+  }
+  return dac;
 }
 
 /*
@@ -562,11 +562,11 @@ int16_t dac1_VoltToDac(int16_t _volt)
 */
 int16_t dac1_DacToCurr(uint16_t _dac)
 {
-	int32_t curr;
+  int32_t curr;
 
-	curr = CaculTwoPoint(g_tCalib.Dac20mA.x1, g_tCalib.Dac20mA.y1,
-											 g_tCalib.Dac20mA.x2, g_tCalib.Dac20mA.y2, _dac);
-	return curr;
+  curr = CaculTwoPoint(g_tCalib.Dac20mA.x1, g_tCalib.Dac20mA.y1,
+                       g_tCalib.Dac20mA.x2, g_tCalib.Dac20mA.y2, _dac);
+  return curr;
 }
 
 /*
@@ -579,42 +579,42 @@ int16_t dac1_DacToCurr(uint16_t _dac)
 */
 int16_t dac1_CurrToDac(int16_t _curr)
 {
-	int32_t dac;
-	int32_t x1, y1, x2, y2;
+  int32_t dac;
+  int32_t x1, y1, x2, y2;
 
-	if (_curr <= g_tCalib.Dac20mA.y2)
-	{
-		x1 = g_tCalib.Dac20mA.y1;
-		y1 = g_tCalib.Dac20mA.x1;
-		x2 = g_tCalib.Dac20mA.y2;
-		y2 = g_tCalib.Dac20mA.x2;
-	}
-	else if (_curr <= g_tCalib.Dac20mA.y3)
-	{
-		x1 = g_tCalib.Dac20mA.y2;
-		y1 = g_tCalib.Dac20mA.x2;
-		x2 = g_tCalib.Dac20mA.y3;
-		y2 = g_tCalib.Dac20mA.x3;
-	}
-	else
-	{
-		x1 = g_tCalib.Dac20mA.y3;
-		y1 = g_tCalib.Dac20mA.x3;
-		x2 = g_tCalib.Dac20mA.y4;
-		y2 = g_tCalib.Dac20mA.x4;
-	}
+  if (_curr <= g_tCalib.Dac20mA.y2)
+  {
+    x1 = g_tCalib.Dac20mA.y1;
+    y1 = g_tCalib.Dac20mA.x1;
+    x2 = g_tCalib.Dac20mA.y2;
+    y2 = g_tCalib.Dac20mA.x2;
+  }
+  else if (_curr <= g_tCalib.Dac20mA.y3)
+  {
+    x1 = g_tCalib.Dac20mA.y2;
+    y1 = g_tCalib.Dac20mA.x2;
+    x2 = g_tCalib.Dac20mA.y3;
+    y2 = g_tCalib.Dac20mA.x3;
+  }
+  else
+  {
+    x1 = g_tCalib.Dac20mA.y3;
+    y1 = g_tCalib.Dac20mA.x3;
+    x2 = g_tCalib.Dac20mA.y4;
+    y2 = g_tCalib.Dac20mA.x4;
+  }
 
-	/* 正负10V量程 */
-	dac = CaculTwoPoint(x1, y1, x2, y2, _curr);
-	if (dac < 0)
-	{
-		dac = 0;
-	}
-	else if (dac > 4095)
-	{
-		dac = 4095;
-	}
-	return dac;
+  /* 正负10V量程 */
+  dac = CaculTwoPoint(x1, y1, x2, y2, _curr);
+  if (dac < 0)
+  {
+    dac = 0;
+  }
+  else if (dac > 4095)
+  {
+    dac = 4095;
+  }
+  return dac;
 }
 
 /*
@@ -627,56 +627,56 @@ int16_t dac1_CurrToDac(int16_t _curr)
 */
 void dac1_StartDacWave(void)
 {
-	uint16_t bottom;
-	uint16_t top;
+  uint16_t bottom;
+  uint16_t top;
 
-	g_tDacWave.CycleCount = 0;
+  g_tDacWave.CycleCount = 0;
 
-	switch (g_tDacWave.Type)
-	{
-	case DAC_WAVE_NO:
-		dac1_StopWave();
-		DAC_POWER_ON(); /* 打开DAC供电电路 */
-		break;
+  switch (g_tDacWave.Type)
+  {
+  case DAC_WAVE_NO:
+    dac1_StopWave();
+    DAC_POWER_ON(); /* 打开DAC供电电路 */
+    break;
 
-	case DAC_WAVE_SIN:
-		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-		top = dac1_VoltToDac(g_tDacWave.VoltMax);
-		dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
-		break;
+  case DAC_WAVE_SIN:
+    bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+    top = dac1_VoltToDac(g_tDacWave.VoltMax);
+    dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
+    break;
 
-	case DAC_WAVE_SQUARE:
-		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-		top = dac1_VoltToDac(g_tDacWave.VoltMax);
-		dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
-		break;
+  case DAC_WAVE_SQUARE:
+    bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+    top = dac1_VoltToDac(g_tDacWave.VoltMax);
+    dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+    break;
 
-	case DAC_WAVE_TRI:
-		bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-		top = dac1_VoltToDac(g_tDacWave.VoltMax);
-		dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
-		break;
-	}
+  case DAC_WAVE_TRI:
+    bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+    top = dac1_VoltToDac(g_tDacWave.VoltMax);
+    dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+    break;
+  }
 }
 
 /* DMA传输完成时回调 */
 void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)
 {
-	if (hdac == &DacHandle)
-	{
-		if (g_tDacWave.CycleSetting == 0) /* 一直循环 */
-		{
-			;
-		}
-		else
-		{
-			++g_tDacWave.CycleCount;
-			if (g_tDacWave.CycleCount >= g_tDacWave.CycleSetting)
-			{
-				HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1);
-			}
-		}
-	}
+  if (hdac == &DacHandle)
+  {
+    if (g_tDacWave.CycleSetting == 0) /* 一直循环 */
+    {
+      ;
+    }
+    else
+    {
+      ++g_tDacWave.CycleCount;
+      if (g_tDacWave.CycleCount >= g_tDacWave.CycleSetting)
+      {
+        HAL_DAC_Stop_DMA(&DacHandle, DAC_CHANNEL_1);
+      }
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

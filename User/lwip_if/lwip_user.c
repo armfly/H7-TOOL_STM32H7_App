@@ -44,31 +44,31 @@ struct netif gnetif;
 
 static void Netif_Config(void)
 {
-	ip_addr_t ipaddr;
-	ip_addr_t netmask;
-	ip_addr_t gw;
+  ip_addr_t ipaddr;
+  ip_addr_t netmask;
+  ip_addr_t gw;
 
 #if LWIP_DHCP
-	ip_addr_set_zero_ip4(&ipaddr);
-	ip_addr_set_zero_ip4(&netmask);
-	ip_addr_set_zero_ip4(&gw);
+  ip_addr_set_zero_ip4(&ipaddr);
+  ip_addr_set_zero_ip4(&netmask);
+  ip_addr_set_zero_ip4(&gw);
 #else
-	/* IP address default setting */
-	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
-	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
-	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+  /* IP address default setting */
+  IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+  IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+  IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
 #endif
 
-	/* add the network interface */
-	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
+  /* add the network interface */
+  netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &ethernet_input);
 
-	/*  Registers the default network interface */
-	netif_set_default(&gnetif);
+  /*  Registers the default network interface */
+  netif_set_default(&gnetif);
 
-	ethernet_link_status_updated(&gnetif);
+  ethernet_link_status_updated(&gnetif);
 
 #if LWIP_NETIF_LINK_CALLBACK
-	netif_set_link_callback(&gnetif, ethernet_link_status_updated);
+  netif_set_link_callback(&gnetif, ethernet_link_status_updated);
 #endif
 }
 
@@ -83,21 +83,21 @@ static void Netif_Config(void)
 */
 void lwip_start(void)
 {
-	/* Initialize the LwIP stack */
-	lwip_init();
+  /* Initialize the LwIP stack */
+  lwip_init();
 
-	/* Configure the Network interface */
-	Netif_Config();
+  /* Configure the Network interface */
+  Netif_Config();
 
-	/* Http webserver Init */
-	http_server_init();
+  /* Http webserver Init */
+  http_server_init();
 
-	/* tcp server init */
-	tcp_echoserver_init();
+  /* tcp server init */
+  tcp_echoserver_init();
 
-	udp_server_init(); /* 开启UDP监听 */
+  udp_server_init(); /* 开启UDP监听 */
 
-	s_init_lwip_ok = 1;
+  s_init_lwip_ok = 1;
 }
 
 /*
@@ -110,24 +110,24 @@ void lwip_start(void)
 */
 void lwip_pro(void)
 {
-	if (s_init_lwip_ok == 0)
-	{
-		return;
-	}
+  if (s_init_lwip_ok == 0)
+  {
+    return;
+  }
 
-	/* Read a received packet from the Ethernet buffers and send it 
+  /* Read a received packet from the Ethernet buffers and send it 
        to the lwIP for handling */
-	ethernetif_input(&gnetif);
+  ethernetif_input(&gnetif);
 
-	/* Handle timeouts */
-	sys_check_timeouts();
+  /* Handle timeouts */
+  sys_check_timeouts();
 
 #if LWIP_NETIF_LINK_CALLBACK
-	Ethernet_Link_Periodic_Handle(&gnetif);
+  Ethernet_Link_Periodic_Handle(&gnetif);
 #endif
 
 #if LWIP_DHCP
-	DHCP_Periodic_Handle(&gnetif);
+  DHCP_Periodic_Handle(&gnetif);
 #endif
 }
 

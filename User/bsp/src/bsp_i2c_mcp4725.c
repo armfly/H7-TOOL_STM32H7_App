@@ -27,8 +27,8 @@
 */
 void bsp_InitMCP4725(void)
 {
-	MCP4725_SetVolt(0, 1250);
-	MCP4725_SetVolt(1, 1250);
+  MCP4725_SetVolt(0, 1250);
+  MCP4725_SetVolt(1, 1250);
 }
 
 /*
@@ -42,11 +42,11 @@ void bsp_InitMCP4725(void)
 */
 void MCP4725_SetVolt(uint8_t _ch, uint16_t _volt)
 {
-	uint16_t dac;
+  uint16_t dac;
 
-	dac = (_volt * 4095) / 5080;
+  dac = (_volt * 4095) / 5080;
 
-	MCP4725_WriteData(_ch, dac);
+  MCP4725_WriteData(_ch, dac);
 }
 
 /*
@@ -60,23 +60,23 @@ void MCP4725_SetVolt(uint8_t _ch, uint16_t _volt)
 */
 void MCP4725_WriteData(uint8_t _ch, uint16_t _usDac)
 {
-	if (_usDac > 4095)
-	{
-		_usDac = 4095;
-	}
+  if (_usDac > 4095)
+  {
+    _usDac = 4095;
+  }
 
-	i2c_Start(); /* 总线开始信号 */
+  i2c_Start(); /* 总线开始信号 */
 
-	i2c_SendByte(MCP4025_SLAVE_ADDRESS + _ch * 2); /* 发送设备地址+写信号 */
-	i2c_WaitAck();
+  i2c_SendByte(MCP4025_SLAVE_ADDRESS + _ch * 2); /* 发送设备地址+写信号 */
+  i2c_WaitAck();
 
-	i2c_SendByte(_usDac >> 8); /* 高4bit */
-	i2c_WaitAck();
+  i2c_SendByte(_usDac >> 8); /* 高4bit */
+  i2c_WaitAck();
 
-	i2c_SendByte(_usDac); /* 低8bit */
-	i2c_WaitAck();
+  i2c_SendByte(_usDac); /* 低8bit */
+  i2c_WaitAck();
 
-	i2c_Stop(); /* 总线停止信号 */
+  i2c_Stop(); /* 总线停止信号 */
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

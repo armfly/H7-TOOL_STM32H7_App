@@ -7,129 +7,127 @@
 #include "ff_gen_drv.h"
 #include "sd_diskio_dma.h"
 
+FATFS g_lua_fs;
+FIL g_lua_file1;
 
-FATFS   g_lua_fs;
-FIL 	g_lua_file1;
+char luaDiskPath[4]; /* ä¿å­˜FatFS ç£ç›˜è·¯å¾„ */
 
-char luaDiskPath[4]; /* ±£´æFatFS ´ÅÅÌÂ·¾¶ */
-
-static int lua_f_mount(lua_State* L);
-static int lua_f_dir(lua_State* L);
+static int lua_f_mount(lua_State *L);
+static int lua_f_dir(lua_State *L);
 void ViewDir(char *_path);
 
 void lua_fatfs_RegisterFun(void)
 {
-	//½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
-    lua_register(g_Lua, "f_init", lua_f_mount);	
-	lua_register(g_Lua, "f_dir", lua_f_dir);
+  //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+  //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
+  lua_register(g_Lua, "f_init", lua_f_mount);
+  lua_register(g_Lua, "f_dir", lua_f_dir);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_udp_SendBytes
-*	¹¦ÄÜËµÃ÷: ÏòUDP·¢ËÍÒ»°üÊı¾İ¡£UDPÄ¿±êIPÓÉ×îºóÒ»´Î½ÓÊÕµ½µÄUDP°üÖĞÌáÈ¡£¬Ò²¾ÍÊÇÖ»·¢¸ø×îºóÒ»´ÎÍ¨ĞÅµÄÖ÷»ú
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_udp_SendBytes
+*	åŠŸèƒ½è¯´æ˜: å‘UDPå‘é€ä¸€åŒ…æ•°æ®ã€‚UDPç›®æ ‡IPç”±æœ€åä¸€æ¬¡æ¥æ”¶åˆ°çš„UDPåŒ…ä¸­æå–ï¼Œä¹Ÿå°±æ˜¯åªå‘ç»™æœ€åä¸€æ¬¡é€šä¿¡çš„ä¸»æœº
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_f_mount(lua_State* L)
+static int lua_f_mount(lua_State *L)
 {
-	FATFS_LinkDriver(&SD_Driver, luaDiskPath);
-	
-	/* ¹ÒÔØÎÄ¼şÏµÍ³ */
-	if (f_mount(&g_lua_fs, luaDiskPath, 0) != FR_OK)
-	{
-		printf("f_mountÎÄ¼şÏµÍ³Ê§°Ü");
-	}
-	
-	return 1;
+  FATFS_LinkDriver(&SD_Driver, luaDiskPath);
+
+  /* æŒ‚è½½æ–‡ä»¶ç³»ç»Ÿ */
+  if (f_mount(&g_lua_fs, luaDiskPath, 0) != FR_OK)
+  {
+    printf("f_mountæ–‡ä»¶ç³»ç»Ÿå¤±è´¥");
+  }
+
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_f_dir
-*	¹¦ÄÜËµÃ÷: 
-*	ĞÎ    ²Î: 
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_f_dir
+*	åŠŸèƒ½è¯´æ˜: 
+*	å½¢    å‚: 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int lua_f_dir(lua_State* L)
+static int lua_f_dir(lua_State *L)
 {
-	const char *data;
-	uint32_t len;
-	
-	if (lua_type(L, 1) == LUA_TSTRING) 	/* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{		
-		data = luaL_checklstring(L, 1, &len); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstringµÄ³¤¶È */		
-	}
-	
-	ViewDir((char *)data);
-	
-	return 1;
+  const char *data;
+  uint32_t len;
+
+  if (lua_type(L, 1) == LUA_TSTRING) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    data = luaL_checklstring(L, 1, &len); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stringçš„é•¿åº¦ */
+  }
+
+  ViewDir((char *)data);
+
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: ViewDir
-*	¹¦ÄÜËµÃ÷: ÏÔÊ¾¸ùÄ¿Â¼ÏÂµÄÎÄ¼şÃû
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: ViewDir
+*	åŠŸèƒ½è¯´æ˜: æ˜¾ç¤ºæ ¹ç›®å½•ä¸‹çš„æ–‡ä»¶å
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void ViewDir(char *_path)
 {
-	/* ±¾º¯ÊıÊ¹ÓÃµÄ¾Ö²¿±äÁ¿Õ¼ÓÃ½Ï¶à£¬ÇëĞŞ¸ÄÆô¶¯ÎÄ¼ş£¬±£Ö¤¶ÑÕ»¿Õ¼ä¹»ÓÃ */
-	FRESULT result;
-	DIR DirInf;
-	FILINFO FileInf;
-	uint32_t cnt = 0;
+  /* æœ¬å‡½æ•°ä½¿ç”¨çš„å±€éƒ¨å˜é‡å ç”¨è¾ƒå¤šï¼Œè¯·ä¿®æ”¹å¯åŠ¨æ–‡ä»¶ï¼Œä¿è¯å †æ ˆç©ºé—´å¤Ÿç”¨ */
+  FRESULT result;
+  DIR DirInf;
+  FILINFO FileInf;
+  uint32_t cnt = 0;
 
-	/* ´ò¿ª¸ùÎÄ¼ş¼Ğ - ÓÃÍêºóĞèÒª f_closedir  */
-	result = f_opendir(&DirInf, _path); /* 1: ±íÊ¾ÅÌ·û */
-	if (result != FR_OK)
-	{
-		printf("´ò¿ª¸ùÄ¿Â¼Ê§°Ü (%d)\r\n", result);
-		return;
-	}
+  /* æ‰“å¼€æ ¹æ–‡ä»¶å¤¹ - ç”¨å®Œåéœ€è¦ f_closedir  */
+  result = f_opendir(&DirInf, _path); /* 1: è¡¨ç¤ºç›˜ç¬¦ */
+  if (result != FR_OK)
+  {
+    printf("æ‰“å¼€æ ¹ç›®å½•å¤±è´¥ (%d)\r\n", result);
+    return;
+  }
 
-	printf("\r\nµ±Ç°Ä¿Â¼£º%s\r\n", _path);
+  printf("\r\nå½“å‰ç›®å½•ï¼š%s\r\n", _path);
 
-	/* ¶ÁÈ¡µ±Ç°ÎÄ¼ş¼ĞÏÂµÄÎÄ¼şºÍÄ¿Â¼ */
-	printf("ÊôĞÔ        |  ÎÄ¼ş´óĞ¡ | ¶ÌÎÄ¼şÃû | ³¤ÎÄ¼şÃû\r\n");
-	for (cnt = 0; ;cnt++)
-	{
-		result = f_readdir(&DirInf,&FileInf); 		/* ¶ÁÈ¡Ä¿Â¼Ïî£¬Ë÷Òı»á×Ô¶¯ÏÂÒÆ */
-		if (result != FR_OK || FileInf.fname[0] == 0)
-		{
-			break;
-		}
+  /* è¯»å–å½“å‰æ–‡ä»¶å¤¹ä¸‹çš„æ–‡ä»¶å’Œç›®å½• */
+  printf("å±æ€§        |  æ–‡ä»¶å¤§å° | çŸ­æ–‡ä»¶å | é•¿æ–‡ä»¶å\r\n");
+  for (cnt = 0;; cnt++)
+  {
+    result = f_readdir(&DirInf, &FileInf); /* è¯»å–ç›®å½•é¡¹ï¼Œç´¢å¼•ä¼šè‡ªåŠ¨ä¸‹ç§» */
+    if (result != FR_OK || FileInf.fname[0] == 0)
+    {
+      break;
+    }
 
-		if (FileInf.fname[0] == '.')
-		{
-			continue;
-		}
+    if (FileInf.fname[0] == '.')
+    {
+      continue;
+    }
 
-		/* ÅĞ¶ÏÊÇÎÄ¼ş»¹ÊÇ×ÓÄ¿Â¼ */
-		if (FileInf.fattrib & AM_DIR)
-		{
-			printf("(0x%02d)Ä¿Â¼  ", FileInf.fattrib);
-		}
-		else
-		{
-			printf("(0x%02d)ÎÄ¼ş  ", FileInf.fattrib);
-		}
+    /* åˆ¤æ–­æ˜¯æ–‡ä»¶è¿˜æ˜¯å­ç›®å½• */
+    if (FileInf.fattrib & AM_DIR)
+    {
+      printf("(0x%02d)ç›®å½•  ", FileInf.fattrib);
+    }
+    else
+    {
+      printf("(0x%02d)æ–‡ä»¶  ", FileInf.fattrib);
+    }
 
-		/* ´òÓ¡ÎÄ¼ş´óĞ¡, ×î´ó4G */
-		printf(" %10d", FileInf.fsize);
+    /* æ‰“å°æ–‡ä»¶å¤§å°, æœ€å¤§4G */
+    printf(" %10d", FileInf.fsize);
 
-		printf("  %s |", FileInf.altname);	/* ¶ÌÎÄ¼şÃû */
+    printf("  %s |", FileInf.altname); /* çŸ­æ–‡ä»¶å */
 
-		printf("  %s\r\n", (char *)FileInf.fname);	/* ³¤ÎÄ¼şÃû */
-	}
-	
-	f_closedir(&DirInf);	/*¡¡¹Ø±Õ´ò¿ªµÄÄ¿Â¼ */
+    printf("  %s\r\n", (char *)FileInf.fname); /* é•¿æ–‡ä»¶å */
+  }
+
+  f_closedir(&DirInf); /*ã€€å…³é—­æ‰“å¼€çš„ç›®å½• */
 }
 
-
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

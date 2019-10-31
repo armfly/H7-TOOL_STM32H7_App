@@ -9,179 +9,179 @@
 #include "swd_host.h"
 #include "Systick_Handler.h"
 
-/* ÎªÁË±ÜÃâºÍDAPÇı¶¯ÖĞµÄº¯Êı»ìÏı£¬±¾Ä£¿éº¯ÊıÃûÇ°×ºÓÃ h7swd */
+/* ä¸ºäº†é¿å…å’ŒDAPé©±åŠ¨ä¸­çš„å‡½æ•°æ··æ·†ï¼Œæœ¬æ¨¡å—å‡½æ•°åå‰ç¼€ç”¨ h7swd */
 
-static int h7swd_Init(lua_State* L);
-static int h7swd_ReadID(lua_State* L);
-static int h7swd_WriteMemory(lua_State* L);
-static int h7swd_ReadMemory(lua_State* L);
+static int h7swd_Init(lua_State *L);
+static int h7swd_ReadID(lua_State *L);
+static int h7swd_WriteMemory(lua_State *L);
+static int h7swd_ReadMemory(lua_State *L);
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_swd_RegisterFun
-*	¹¦ÄÜËµÃ÷: ×¢²álua CÓïÑÔ½Ó¿Úº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_swd_RegisterFun
+*	åŠŸèƒ½è¯´æ˜: æ³¨å†Œlua Cè¯­è¨€æ¥å£å‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lua_swd_RegisterFun(void)
 {
-	//½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
-    lua_register(g_Lua, "swd_init", h7swd_Init);	
-	lua_register(g_Lua, "swd_getid", h7swd_ReadID);
-	lua_register(g_Lua, "swd_write", h7swd_WriteMemory);	
-	lua_register(g_Lua, "swd_read", h7swd_ReadMemory);
-}
-			
-/*
-*********************************************************************************************************
-*	º¯ Êı Ãû: h7swd_Init
-*	¹¦ÄÜËµÃ÷: ¶ÁĞ¾Æ¬ID
-*	ĞÎ    ²Î: vcc : CPU¹©µçµçÑ¹
-*	·µ »Ø Öµ: ÎŞ
-*********************************************************************************************************
-*/
-static int h7swd_Init(lua_State* L)
-{
-	float vcc;
-		
-	sysTickInit();	/* ÕâÊÇDAPÇı¶¯ÖĞµÄ³õÊ¼»¯º¯Êı,È«¾Ö±äÁ¿³õÊ¼»¯ */
-
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		vcc = luaL_checknumber(L, 1);	/* VCCµçÑ¹£¬¸¡µã£¬µ¥Î»V */
-	}
-	
-	bsp_SetTVCC(vcc * 1000);	/* ÉèÖÃ½Ó¿ÚµçÆ½3.3V */
-	bsp_DelayUS(100 * 100);		/* ÑÓ³Ù100ms */
-		
-	swd_init_debug();			/* ½øÈëswd debug×´Ì¬ */
-		
-	return 1;
+  //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+  //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
+  lua_register(g_Lua, "swd_init", h7swd_Init);
+  lua_register(g_Lua, "swd_getid", h7swd_ReadID);
+  lua_register(g_Lua, "swd_write", h7swd_WriteMemory);
+  lua_register(g_Lua, "swd_read", h7swd_ReadMemory);
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: h7swd_ReadID
-*	¹¦ÄÜËµÃ÷: ¶ÁĞ¾Æ¬ID
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: h7swd_Init
+*	åŠŸèƒ½è¯´æ˜: è¯»èŠ¯ç‰‡ID
+*	å½¢    å‚: vcc : CPUä¾›ç”µç”µå‹
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int h7swd_ReadID(lua_State* L)
+static int h7swd_Init(lua_State *L)
 {
-	uint32_t id;
+  float vcc;
 
-	if (swd_read_idcode(&id) == 0)
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-	}
-	else
-	{
-		lua_pushnumber(L, id);	/* ³É¹¦,·µ»ØID */
-	}	
-	return 1;
+  sysTickInit(); /* è¿™æ˜¯DAPé©±åŠ¨ä¸­çš„åˆå§‹åŒ–å‡½æ•°,å…¨å±€å˜é‡åˆå§‹åŒ– */
+
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    vcc = luaL_checknumber(L, 1); /* VCCç”µå‹ï¼Œæµ®ç‚¹ï¼Œå•ä½V */
+  }
+
+  bsp_SetTVCC(vcc * 1000); /* è®¾ç½®æ¥å£ç”µå¹³3.3V */
+  bsp_DelayUS(100 * 100);  /* å»¶è¿Ÿ100ms */
+
+  swd_init_debug(); /* è¿›å…¥swd debugçŠ¶æ€ */
+
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: h7swd_WriteMemory
-*	¹¦ÄÜËµÃ÷: Ğ´CPUÄÚ´æ£¨»ò¼Ä´æÆ÷£©
-*	ĞÎ    ²Î: addr : Ä¿±êµØÖ·
-*		  	  data : Êı¾İ»º³åÇø£¬º¬³¤¶È
-*	·µ »Ø Öµ: 0 Ê§°Ü   1 ³É¹¦
+*	å‡½ æ•° å: h7swd_ReadID
+*	åŠŸèƒ½è¯´æ˜: è¯»èŠ¯ç‰‡ID
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int h7swd_WriteMemory(lua_State* L)
+static int h7swd_ReadID(lua_State *L)
 {
-	uint32_t addr = 0;
-	const char *data;
-	size_t len = 0;
-	
-	sysTickInit();	/* ÕâÊÇDAPÇı¶¯ÖĞµÄ³õÊ¼»¯º¯Êı,È«¾Ö±äÁ¿³õÊ¼»¯ */
+  uint32_t id;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		addr = luaL_checknumber(L, 1);	/* Ä¿±êÄÚ´æµØÖ· */
-	}
-	else
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-		return 1;		
-	}
-
-	if (lua_type(L, 2) == LUA_TSTRING) 	/* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{		
-		data = luaL_checklstring(L, 2, &len); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstringµÄ³¤¶È */		
-	}
-	
-	if (len > 128 * 1024)
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-		return 1;
-	}
-	
-	if (swd_write_memory(addr, (uint8_t *)data, len) == 0)
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-	}
-	else
-	{
-		lua_pushnumber(L, 1);	/* ³É¹¦ */
-	}
-		
-	return 1;
+  if (swd_read_idcode(&id) == 0)
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+  }
+  else
+  {
+    lua_pushnumber(L, id); /* æˆåŠŸ,è¿”å›ID */
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: h7swd_ReadMemory
-*	¹¦ÄÜËµÃ÷: ¶ÁCPUÄÚ´æ£¨»ò¼Ä´æÆ÷£©
-*	ĞÎ    ²Î: addr : Ä¿±êµØÖ·
-*		  	  data : Êı¾İ»º³åÇø£¬º¬³¤¶È
-*	·µ »Ø Öµ: 0 Ê§°Ü   1 ³É¹¦
+*	å‡½ æ•° å: h7swd_WriteMemory
+*	åŠŸèƒ½è¯´æ˜: å†™CPUå†…å­˜ï¼ˆæˆ–å¯„å­˜å™¨ï¼‰
+*	å½¢    å‚: addr : ç›®æ ‡åœ°å€
+*		  	  data : æ•°æ®ç¼“å†²åŒºï¼Œå«é•¿åº¦
+*	è¿” å› å€¼: 0 å¤±è´¥   1 æˆåŠŸ
 *********************************************************************************************************
 */
-static int h7swd_ReadMemory(lua_State* L)
+static int h7swd_WriteMemory(lua_State *L)
 {
-	uint32_t addr;
-	uint32_t num;
+  uint32_t addr = 0;
+  const char *data;
+  size_t len = 0;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) 	/* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{		
-		addr = luaL_checknumber(L, 1); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstringµÄ³¤¶È */		
-	}
-	else
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-		return 1;
-	}
-	
-	if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-	{
-		num = luaL_checknumber(L, 2);
-		
-		memset(s_lua_read_buf, 0, num);		
-	}
-	
-	if (num > LUA_READ_LEN_MAX)
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-		return 1;
-	}
+  sysTickInit(); /* è¿™æ˜¯DAPé©±åŠ¨ä¸­çš„åˆå§‹åŒ–å‡½æ•°,å…¨å±€å˜é‡åˆå§‹åŒ– */
 
-	if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
-	{
-		lua_pushnumber(L, 0);	/* ³ö´í */
-	}
-	else
-	{
-		lua_pushnumber(L, 1);	/* ³É¹¦ */
-	}
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* ç›®æ ‡å†…å­˜åœ°å€ */
+  }
+  else
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+    return 1;
+  }
 
-	lua_pushlstring(L, (char *)s_lua_read_buf, num); 
-	return 1;
+  if (lua_type(L, 2) == LUA_TSTRING) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    data = luaL_checklstring(L, 2, &len); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stringçš„é•¿åº¦ */
+  }
+
+  if (len > 128 * 1024)
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+    return 1;
+  }
+
+  if (swd_write_memory(addr, (uint8_t *)data, len) == 0)
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+  }
+  else
+  {
+    lua_pushnumber(L, 1); /* æˆåŠŸ */
+  }
+
+  return 1;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/*
+*********************************************************************************************************
+*	å‡½ æ•° å: h7swd_ReadMemory
+*	åŠŸèƒ½è¯´æ˜: è¯»CPUå†…å­˜ï¼ˆæˆ–å¯„å­˜å™¨ï¼‰
+*	å½¢    å‚: addr : ç›®æ ‡åœ°å€
+*		  	  data : æ•°æ®ç¼“å†²åŒºï¼Œå«é•¿åº¦
+*	è¿” å› å€¼: 0 å¤±è´¥   1 æˆåŠŸ
+*********************************************************************************************************
+*/
+static int h7swd_ReadMemory(lua_State *L)
+{
+  uint32_t addr;
+  uint32_t num;
+
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    addr = luaL_checknumber(L, 1); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stringçš„é•¿åº¦ */
+  }
+  else
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+    return 1;
+  }
+
+  if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+  {
+    num = luaL_checknumber(L, 2);
+
+    memset(s_lua_read_buf, 0, num);
+  }
+
+  if (num > LUA_READ_LEN_MAX)
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+    return 1;
+  }
+
+  if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
+  {
+    lua_pushnumber(L, 0); /* å‡ºé”™ */
+  }
+  else
+  {
+    lua_pushnumber(L, 1); /* æˆåŠŸ */
+  }
+
+  lua_pushlstring(L, (char *)s_lua_read_buf, num);
+  return 1;
+}
+
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -27,9 +27,9 @@
 #define GPIO_PORT_BEEP GPIOG
 #define GPIO_PIN_BEEP GPIO_PIN_1
 
-#define BEEP_ENABLE() GPIO_PORT_BEEP->BSRRL = GPIO_PIN_BEEP	/* 使能蜂鸣器鸣叫 */
+#define BEEP_ENABLE() GPIO_PORT_BEEP->BSRRL = GPIO_PIN_BEEP  /* 使能蜂鸣器鸣叫 */
 #define BEEP_DISABLE() GPIO_PORT_BEEP->BSRRH = GPIO_PIN_BEEP /* 禁止蜂鸣器鸣叫 */
-#else																												 /* 无源蜂鸣器 */
+#else                                                        /* 无源蜂鸣器 */
 /* PA0 ---> TIM5_CH1 */
 
 /* 1500表示频率1.5KHz，5000表示50.00%的占空比 */
@@ -52,22 +52,22 @@ BEEP_T g_tBeep; /* 定义蜂鸣器全局结构体变量 */
 void BEEP_InitHard(void)
 {
 #ifdef BEEP_HAVE_POWER /* 有源蜂鸣器 */
-	GPIO_InitTypeDef gpio_init;
+  GPIO_InitTypeDef gpio_init;
 
-	/* 第1步：打开GPIO时钟 */
-	BEEP_GPIO_CLK_ENABLE();
+  /* 第1步：打开GPIO时钟 */
+  BEEP_GPIO_CLK_ENABLE();
 
-	BEEP_DISABLE();
+  BEEP_DISABLE();
 
-	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;		/* 设置开漏输出 */
-	gpio_init.Pull = GPIO_NOPULL;						/* 上下拉电阻不使能 */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+  gpio_init.Mode = GPIO_MODE_OUTPUT_PP;   /* 设置开漏输出 */
+  gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+  gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-	gpio_init.Pin = GPIO_PIN_BEEP;
-	HAL_GPIO_Init(GPIO_PORT_BEEP, &gpio_init);
+  gpio_init.Pin = GPIO_PIN_BEEP;
+  HAL_GPIO_Init(GPIO_PORT_BEEP, &gpio_init);
 #endif
 
-	g_tBeep.ucMute = 0; /* 关闭静音 */
+  g_tBeep.ucMute = 0; /* 关闭静音 */
 }
 
 /*
@@ -82,20 +82,20 @@ void BEEP_InitHard(void)
 */
 void BEEP_Start(uint16_t _usBeepTime, uint16_t _usStopTime, uint16_t _usCycle)
 {
-	if (_usBeepTime == 0 || g_tBeep.ucMute == 1)
-	{
-		return;
-	}
+  if (_usBeepTime == 0 || g_tBeep.ucMute == 1)
+  {
+    return;
+  }
 
-	g_tBeep.usBeepTime = _usBeepTime;
-	g_tBeep.usStopTime = _usStopTime;
-	g_tBeep.usCycle = _usCycle;
-	g_tBeep.usCount = 0;
-	g_tBeep.usCycleCount = 0;
-	g_tBeep.ucState = 0;
-	g_tBeep.ucEnalbe = 1; /* 设置完全局参数后再使能发声标志 */
+  g_tBeep.usBeepTime = _usBeepTime;
+  g_tBeep.usStopTime = _usStopTime;
+  g_tBeep.usCycle = _usCycle;
+  g_tBeep.usCount = 0;
+  g_tBeep.usCycleCount = 0;
+  g_tBeep.ucState = 0;
+  g_tBeep.ucEnalbe = 1; /* 设置完全局参数后再使能发声标志 */
 
-	BEEP_ENABLE(); /* 开始发声 */
+  BEEP_ENABLE(); /* 开始发声 */
 }
 
 /*
@@ -108,15 +108,15 @@ void BEEP_Start(uint16_t _usBeepTime, uint16_t _usStopTime, uint16_t _usCycle)
 */
 void BEEP_Stop(void)
 {
-	g_tBeep.ucEnalbe = 0;
+  g_tBeep.ucEnalbe = 0;
 
-	//	if ((g_tBeep.usStopTime == 0) || (g_tBeep.usCycle == 0))
-	//	{
-	//		BEEP_DISABLE();	/* 必须在清控制标志后再停止发声，避免停止后在中断中又开启 */
-	//	}
-	g_tBeep.usStopTime = 0;
-	g_tBeep.usCycle = 0;
-	BEEP_DISABLE();
+  //	if ((g_tBeep.usStopTime == 0) || (g_tBeep.usCycle == 0))
+  //	{
+  //		BEEP_DISABLE();	/* 必须在清控制标志后再停止发声，避免停止后在中断中又开启 */
+  //	}
+  g_tBeep.usStopTime = 0;
+  g_tBeep.usCycle = 0;
+  BEEP_DISABLE();
 }
 
 /*
@@ -129,9 +129,9 @@ void BEEP_Stop(void)
 */
 void BEEP_Pause(void)
 {
-	BEEP_Stop();
+  BEEP_Stop();
 
-	g_tBeep.ucMute = 1; /* 静音 */
+  g_tBeep.ucMute = 1; /* 静音 */
 }
 
 /*
@@ -144,9 +144,9 @@ void BEEP_Pause(void)
 */
 void BEEP_Resume(void)
 {
-	BEEP_Stop();
+  BEEP_Stop();
 
-	g_tBeep.ucMute = 0; /* 静音 */
+  g_tBeep.ucMute = 0; /* 静音 */
 }
 
 /*
@@ -159,7 +159,7 @@ void BEEP_Resume(void)
 */
 void BEEP_KeyTone(void)
 {
-	BEEP_Start(5, 1, 1); /* 鸣叫50ms，停10ms， 1次 */
+  BEEP_Start(5, 1, 1); /* 鸣叫50ms，停10ms， 1次 */
 }
 
 /*
@@ -172,53 +172,53 @@ void BEEP_KeyTone(void)
 */
 void BEEP_Pro(void)
 {
-	if ((g_tBeep.ucEnalbe == 0) || (g_tBeep.usStopTime == 0) || (g_tBeep.ucMute == 1))
-	{
-		return;
-	}
+  if ((g_tBeep.ucEnalbe == 0) || (g_tBeep.usStopTime == 0) || (g_tBeep.ucMute == 1))
+  {
+    return;
+  }
 
-	if (g_tBeep.ucState == 0)
-	{
-		if (g_tBeep.usStopTime > 0) /* 间断发声 */
-		{
-			if (++g_tBeep.usCount >= g_tBeep.usBeepTime)
-			{
-				BEEP_DISABLE(); /* 停止发声 */
-				g_tBeep.usCount = 0;
-				g_tBeep.ucState = 1;
-			}
-		}
-		else
-		{
-			; /* 不做任何处理，连续发声 */
-		}
-	}
-	else if (g_tBeep.ucState == 1)
-	{
-		if (++g_tBeep.usCount >= g_tBeep.usStopTime)
-		{
-			/* 连续发声时，直到调用stop停止为止 */
-			if (g_tBeep.usCycle > 0)
-			{
-				if (++g_tBeep.usCycleCount >= g_tBeep.usCycle)
-				{
-					/* 循环次数到，停止发声 */
-					g_tBeep.ucEnalbe = 0;
-				}
+  if (g_tBeep.ucState == 0)
+  {
+    if (g_tBeep.usStopTime > 0) /* 间断发声 */
+    {
+      if (++g_tBeep.usCount >= g_tBeep.usBeepTime)
+      {
+        BEEP_DISABLE(); /* 停止发声 */
+        g_tBeep.usCount = 0;
+        g_tBeep.ucState = 1;
+      }
+    }
+    else
+    {
+      ; /* 不做任何处理，连续发声 */
+    }
+  }
+  else if (g_tBeep.ucState == 1)
+  {
+    if (++g_tBeep.usCount >= g_tBeep.usStopTime)
+    {
+      /* 连续发声时，直到调用stop停止为止 */
+      if (g_tBeep.usCycle > 0)
+      {
+        if (++g_tBeep.usCycleCount >= g_tBeep.usCycle)
+        {
+          /* 循环次数到，停止发声 */
+          g_tBeep.ucEnalbe = 0;
+        }
 
-				if (g_tBeep.ucEnalbe == 0)
-				{
-					g_tBeep.usStopTime = 0;
-					return;
-				}
-			}
+        if (g_tBeep.ucEnalbe == 0)
+        {
+          g_tBeep.usStopTime = 0;
+          return;
+        }
+      }
 
-			g_tBeep.usCount = 0;
-			g_tBeep.ucState = 0;
+      g_tBeep.usCount = 0;
+      g_tBeep.ucState = 0;
 
-			BEEP_ENABLE(); /* 开始发声 */
-		}
-	}
+      BEEP_ENABLE(); /* 开始发声 */
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

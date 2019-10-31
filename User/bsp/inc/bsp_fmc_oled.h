@@ -19,10 +19,10 @@
 #else
 typedef struct
 {
-	uint16_t FontCode;	 /* 字体代码 0 表示16点阵 */
-	uint16_t FrontColor; /* 字体颜色 */
-	uint16_t BackColor;	/* 文字背景颜色，透明 */
-	uint16_t Space;			 /* 文字间距，单位 = 像素 */
+  uint16_t FontCode;   /* 字体代码 0 表示16点阵 */
+  uint16_t FrontColor; /* 字体颜色 */
+  uint16_t BackColor;  /* 文字背景颜色，透明 */
+  uint16_t Space;      /* 文字间距，单位 = 像素 */
 } FONT_T;
 #endif
 

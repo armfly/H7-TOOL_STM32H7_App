@@ -16,28 +16,28 @@
 */
 
 /*
-	应用说明：
-	在访问I2C设备前，请先调用 i2c_CheckDevice() 检测I2C设备是否正常，该函数会配置GPIO
+  应用说明：
+  在访问I2C设备前，请先调用 i2c_CheckDevice() 检测I2C设备是否正常，该函数会配置GPIO
 */
 
 #include "bsp.h"
 
 /*
-	i2c总线GPIO:
- 		PI7/I2C1_SCL
- 		PF15/I2C1_SDA
+  i2c总线GPIO:
+     PI7/I2C1_SCL
+     PF15/I2C1_SDA
 */
 
 /* 定义I2C总线连接的GPIO端口, 用户只需要修改下面4行代码即可任意改变SCL和SDA的引脚 */
-#define I2C_SCL_GPIO GPIOI		 /* 连接到SCL时钟线的GPIO */
+#define I2C_SCL_GPIO GPIOI     /* 连接到SCL时钟线的GPIO */
 #define I2C_SCL_PIN GPIO_PIN_7 /* 连接到SCL时钟线的GPIO */
 
-#define I2C_SDA_GPIO GPIOF			/* 连接到SDA数据线的GPIO */
+#define I2C_SDA_GPIO GPIOF      /* 连接到SDA数据线的GPIO */
 #define I2C_SDA_PIN GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
 
 #define ALL_I2C_GPIO_CLK_ENABLE() \
-	__HAL_RCC_GPIOI_CLK_ENABLE();   \
-	__HAL_RCC_GPIOF_CLK_ENABLE()
+  __HAL_RCC_GPIOI_CLK_ENABLE();   \
+  __HAL_RCC_GPIOF_CLK_ENABLE()
 
 /* 定义读写SCL和SDA的宏 */
 #define I2C_SCL_1() I2C_SCL_GPIO->BSRRL = I2C_SCL_PIN /* SCL = 1 */
@@ -59,23 +59,23 @@
 */
 void bsp_InitI2C(void)
 {
-	GPIO_InitTypeDef gpio_init;
+  GPIO_InitTypeDef gpio_init;
 
-	/* 第1步：打开GPIO时钟 */
-	ALL_I2C_GPIO_CLK_ENABLE();
+  /* 第1步：打开GPIO时钟 */
+  ALL_I2C_GPIO_CLK_ENABLE();
 
-	gpio_init.Mode = GPIO_MODE_OUTPUT_OD;		/* 设置开漏输出 */
-	gpio_init.Pull = GPIO_NOPULL;						/* 上下拉电阻不使能 */
-	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+  gpio_init.Mode = GPIO_MODE_OUTPUT_OD;   /* 设置开漏输出 */
+  gpio_init.Pull = GPIO_NOPULL;           /* 上下拉电阻不使能 */
+  gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-	gpio_init.Pin = I2C_SCL_PIN;
-	HAL_GPIO_Init(I2C_SCL_GPIO, &gpio_init);
+  gpio_init.Pin = I2C_SCL_PIN;
+  HAL_GPIO_Init(I2C_SCL_GPIO, &gpio_init);
 
-	gpio_init.Pin = I2C_SDA_PIN;
-	HAL_GPIO_Init(I2C_SDA_GPIO, &gpio_init);
+  gpio_init.Pin = I2C_SDA_PIN;
+  HAL_GPIO_Init(I2C_SDA_GPIO, &gpio_init);
 
-	/* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
-	i2c_Stop();
+  /* 给一个停止信号, 复位I2C总线上的所有设备到待机模式 */
+  i2c_Stop();
 }
 
 /*
@@ -88,18 +88,18 @@ void bsp_InitI2C(void)
 */
 static void i2c_Delay(void)
 {
-	/*　
-		CPU主频168MHz时，在内部Flash运行, MDK工程不优化。用台式示波器观测波形。
-		循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms, 读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
-		循环次数为10时，SCL频率 = 1.1MHz (读耗时: 138ms, 读速度: 118724B/s)
-		循环次数为30时，SCL频率 = 440KHz， SCL高电平时间1.0us，SCL低电平时间1.2us
+  /*　
+    CPU主频168MHz时，在内部Flash运行, MDK工程不优化。用台式示波器观测波形。
+    循环次数为5时，SCL频率 = 1.78MHz (读耗时: 92ms, 读写正常，但是用示波器探头碰上就读写失败。时序接近临界)
+    循环次数为10时，SCL频率 = 1.1MHz (读耗时: 138ms, 读速度: 118724B/s)
+    循环次数为30时，SCL频率 = 440KHz， SCL高电平时间1.0us，SCL低电平时间1.2us
 
-		上拉电阻选择2.2K欧时，SCL上升沿时间约0.5us，如果选4.7K欧，则上升沿约1us
+    上拉电阻选择2.2K欧时，SCL上升沿时间约0.5us，如果选4.7K欧，则上升沿约1us
 
-		实际应用选择400KHz左右的速率即可
-	*/
-	/* STM8S GPIO芯片，2us 4us 5us不成功, 6us成功，选7us留点余量 */
-	bsp_DelayUS(7);
+    实际应用选择400KHz左右的速率即可
+  */
+  /* STM8S GPIO芯片，2us 4us 5us不成功, 6us成功，选7us留点余量 */
+  bsp_DelayUS(7);
 }
 
 /*
@@ -112,15 +112,15 @@ static void i2c_Delay(void)
 */
 void i2c_Start(void)
 {
-	/* 当SCL高电平时，SDA出现一个下跳沿表示I2C总线启动信号 */
-	I2C_SDA_1();
-	I2C_SCL_1();
-	i2c_Delay();
-	I2C_SDA_0();
-	i2c_Delay();
+  /* 当SCL高电平时，SDA出现一个下跳沿表示I2C总线启动信号 */
+  I2C_SDA_1();
+  I2C_SCL_1();
+  i2c_Delay();
+  I2C_SDA_0();
+  i2c_Delay();
 
-	I2C_SCL_0();
-	i2c_Delay();
+  I2C_SCL_0();
+  i2c_Delay();
 }
 
 /*
@@ -133,12 +133,12 @@ void i2c_Start(void)
 */
 void i2c_Stop(void)
 {
-	/* 当SCL高电平时，SDA出现一个上跳沿表示I2C总线停止信号 */
-	I2C_SDA_0();
-	I2C_SCL_1();
-	i2c_Delay();
-	I2C_SDA_1();
-	i2c_Delay();
+  /* 当SCL高电平时，SDA出现一个上跳沿表示I2C总线停止信号 */
+  I2C_SDA_0();
+  I2C_SCL_1();
+  i2c_Delay();
+  I2C_SDA_1();
+  i2c_Delay();
 }
 
 /*
@@ -151,30 +151,30 @@ void i2c_Stop(void)
 */
 void i2c_SendByte(uint8_t _ucByte)
 {
-	uint8_t i;
+  uint8_t i;
 
-	/* 先发送字节的高位bit7 */
-	for (i = 0; i < 8; i++)
-	{
-		if (_ucByte & 0x80)
-		{
-			I2C_SDA_1();
-		}
-		else
-		{
-			I2C_SDA_0();
-		}
-		i2c_Delay();
-		I2C_SCL_1();
-		i2c_Delay();
-		I2C_SCL_0();
-		if (i == 7)
-		{
-			I2C_SDA_1(); // 释放总线
-		}
-		_ucByte <<= 1; /* 左移一个bit */
-									 //		i2c_Delay();
-	}
+  /* 先发送字节的高位bit7 */
+  for (i = 0; i < 8; i++)
+  {
+    if (_ucByte & 0x80)
+    {
+      I2C_SDA_1();
+    }
+    else
+    {
+      I2C_SDA_0();
+    }
+    i2c_Delay();
+    I2C_SCL_1();
+    i2c_Delay();
+    I2C_SCL_0();
+    if (i == 7)
+    {
+      I2C_SDA_1(); // 释放总线
+    }
+    _ucByte <<= 1; /* 左移一个bit */
+                   //		i2c_Delay();
+  }
 }
 
 /*
@@ -187,24 +187,24 @@ void i2c_SendByte(uint8_t _ucByte)
 */
 uint8_t i2c_ReadByte(void)
 {
-	uint8_t i;
-	uint8_t value;
+  uint8_t i;
+  uint8_t value;
 
-	/* 读到第1个bit为数据的bit7 */
-	value = 0;
-	for (i = 0; i < 8; i++)
-	{
-		value <<= 1;
-		I2C_SCL_1();
-		i2c_Delay();
-		if (I2C_SDA_READ())
-		{
-			value++;
-		}
-		I2C_SCL_0();
-		i2c_Delay();
-	}
-	return value;
+  /* 读到第1个bit为数据的bit7 */
+  value = 0;
+  for (i = 0; i < 8; i++)
+  {
+    value <<= 1;
+    I2C_SCL_1();
+    i2c_Delay();
+    if (I2C_SDA_READ())
+    {
+      value++;
+    }
+    I2C_SCL_0();
+    i2c_Delay();
+  }
+  return value;
 }
 
 /*
@@ -217,23 +217,23 @@ uint8_t i2c_ReadByte(void)
 */
 uint8_t i2c_WaitAck(void)
 {
-	uint8_t re;
+  uint8_t re;
 
-	I2C_SDA_1(); /* CPU释放SDA总线 */
-	i2c_Delay();
-	I2C_SCL_1(); /* CPU驱动SCL = 1, 此时器件会返回ACK应答 */
-	i2c_Delay();
-	if (I2C_SDA_READ()) /* CPU读取SDA口线状态 */
-	{
-		re = 1;
-	}
-	else
-	{
-		re = 0;
-	}
-	I2C_SCL_0();
-	i2c_Delay();
-	return re;
+  I2C_SDA_1(); /* CPU释放SDA总线 */
+  i2c_Delay();
+  I2C_SCL_1(); /* CPU驱动SCL = 1, 此时器件会返回ACK应答 */
+  i2c_Delay();
+  if (I2C_SDA_READ()) /* CPU读取SDA口线状态 */
+  {
+    re = 1;
+  }
+  else
+  {
+    re = 0;
+  }
+  I2C_SCL_0();
+  i2c_Delay();
+  return re;
 }
 
 /*
@@ -246,13 +246,13 @@ uint8_t i2c_WaitAck(void)
 */
 void i2c_Ack(void)
 {
-	I2C_SDA_0(); /* CPU驱动SDA = 0 */
-	i2c_Delay();
-	I2C_SCL_1(); /* CPU产生1个时钟 */
-	i2c_Delay();
-	I2C_SCL_0();
-	i2c_Delay();
-	I2C_SDA_1(); /* CPU释放SDA总线 */
+  I2C_SDA_0(); /* CPU驱动SDA = 0 */
+  i2c_Delay();
+  I2C_SCL_1(); /* CPU产生1个时钟 */
+  i2c_Delay();
+  I2C_SCL_0();
+  i2c_Delay();
+  I2C_SDA_1(); /* CPU释放SDA总线 */
 }
 
 /*
@@ -265,12 +265,12 @@ void i2c_Ack(void)
 */
 void i2c_NAck(void)
 {
-	I2C_SDA_1(); /* CPU驱动SDA = 1 */
-	i2c_Delay();
-	I2C_SCL_1(); /* CPU产生1个时钟 */
-	i2c_Delay();
-	I2C_SCL_0();
-	i2c_Delay();
+  I2C_SDA_1(); /* CPU驱动SDA = 1 */
+  i2c_Delay();
+  I2C_SCL_1(); /* CPU产生1个时钟 */
+  i2c_Delay();
+  I2C_SCL_0();
+  i2c_Delay();
 }
 
 /*
@@ -283,19 +283,19 @@ void i2c_NAck(void)
 */
 uint8_t i2c_CheckDevice(uint8_t _Address)
 {
-	uint8_t ucAck;
+  uint8_t ucAck;
 
-	if (I2C_SDA_READ() && I2C_SCL_READ())
-	{
-		i2c_Start(); /* 发送启动信号 */
+  if (I2C_SDA_READ() && I2C_SCL_READ())
+  {
+    i2c_Start(); /* 发送启动信号 */
 
-		/* 发送设备地址+读写控制bit（0 = w， 1 = r) bit7 先传 */
-		i2c_SendByte(_Address | I2C_WR);
-		ucAck = i2c_WaitAck(); /* 检测设备的ACK应答 */
+    /* 发送设备地址+读写控制bit（0 = w， 1 = r) bit7 先传 */
+    i2c_SendByte(_Address | I2C_WR);
+    ucAck = i2c_WaitAck(); /* 检测设备的ACK应答 */
 
-		i2c_Stop(); /* 发送停止信号 */
+    i2c_Stop(); /* 发送停止信号 */
 
-		return ucAck;
-	}
-	return 1; /* I2C总线异常 */
+    return ucAck;
+  }
+  return 1; /* I2C总线异常 */
 }

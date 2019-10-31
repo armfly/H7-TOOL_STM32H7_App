@@ -18,32 +18,32 @@
 
 typedef struct
 {
-	uint8_t Enable;
-	uint8_t TimerCount;
-	uint8_t i2c_addr;
+  uint8_t Enable;
+  uint8_t TimerCount;
+  uint8_t i2c_addr;
 
-	uint8_t TouchpointFlag;
-	uint8_t Touchkeystate;
+  uint8_t TouchpointFlag;
+  uint8_t Touchkeystate;
 
-	uint16_t X0;
-	uint16_t Y0;
-	uint16_t P0;
+  uint16_t X0;
+  uint16_t Y0;
+  uint16_t P0;
 
-	uint16_t X1;
-	uint16_t Y1;
-	uint16_t P1;
+  uint16_t X1;
+  uint16_t Y1;
+  uint16_t P1;
 
-	uint16_t X2;
-	uint16_t Y2;
-	uint16_t P2;
+  uint16_t X2;
+  uint16_t Y2;
+  uint16_t P2;
 
-	uint16_t X3;
-	uint16_t Y3;
-	uint16_t P3;
+  uint16_t X3;
+  uint16_t Y3;
+  uint16_t P3;
 
-	uint16_t X4;
-	uint16_t Y4;
-	uint16_t P4;
+  uint16_t X4;
+  uint16_t Y4;
+  uint16_t P4;
 } GT911_T;
 
 void GT911_InitHard(void);

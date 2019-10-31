@@ -45,50 +45,47 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-#ifndef  __LCD_LOG_CONF_H__
-#define  __LCD_LOG_CONF_H__
+#ifndef __LCD_LOG_CONF_H__
+#define __LCD_LOG_CONF_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32h743i_eval_lcd.h" 
+#include "stm32h743i_eval_lcd.h"
 #include <stdio.h>
-
 
 /** @addtogroup LCD_LOG
   * @{
   */
-  
+
 /** @defgroup LCD_LOG
   * @brief This file is the 
   * @{
-  */ 
-
+  */
 
 /** @defgroup LCD_LOG_CONF_Exported_Defines
   * @{
-  */ 
+  */
 
 /* Comment the line below to disable the scroll back and forward features */
-#define     LCD_SCROLL_ENABLED      1
-   
+#define LCD_SCROLL_ENABLED 1
 
 /* Define the Fonts  */
-#define     LCD_LOG_HEADER_FONT                   Font16
-#define     LCD_LOG_FOOTER_FONT                   Font12
-#define     LCD_LOG_TEXT_FONT                     Font12
+#define LCD_LOG_HEADER_FONT Font16
+#define LCD_LOG_FOOTER_FONT Font12
+#define LCD_LOG_TEXT_FONT Font12
 
 /* Define the LCD LOG Color  */
-#define     LCD_LOG_BACKGROUND_COLOR              LCD_COLOR_WHITE
-#define     LCD_LOG_TEXT_COLOR                    LCD_COLOR_DARKBLUE
+#define LCD_LOG_BACKGROUND_COLOR LCD_COLOR_WHITE
+#define LCD_LOG_TEXT_COLOR LCD_COLOR_DARKBLUE
 
-#define     LCD_LOG_SOLID_BACKGROUND_COLOR        LCD_COLOR_BLUE
-#define     LCD_LOG_SOLID_TEXT_COLOR              LCD_COLOR_WHITE
+#define LCD_LOG_SOLID_BACKGROUND_COLOR LCD_COLOR_BLUE
+#define LCD_LOG_SOLID_TEXT_COLOR LCD_COLOR_WHITE
 
 /* Define the cache depth */
-#define     CACHE_SIZE              100
-#define     YWINDOW_SIZE            14
+#define CACHE_SIZE 100
+#define YWINDOW_SIZE 14
 
 #if (YWINDOW_SIZE > 14)
-  #error "Wrong YWINDOW SIZE"
+#error "Wrong YWINDOW SIZE"
 #endif
 
 /* Redirect the printf to the LCD */
@@ -102,47 +99,44 @@
 
 /** @defgroup LCD_LOG_CONF_Exported_TypesDefinitions
   * @{
-  */ 
+  */
 
 /**
   * @}
-  */ 
-
+  */
 
 /** @defgroup LCD_LOG_Exported_Macros
   * @{
-  */ 
-
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup LCD_LOG_CONF_Exported_Variables
   * @{
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup LCD_LOG_CONF_Exported_FunctionsPrototype
   * @{
-  */ 
+  */
 
 /**
   * @}
-  */ 
-
+  */
 
 #endif //__LCD_LOG_CONF_H__
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -51,117 +51,113 @@
 #include "usbd_cdc.h"
 
 /* 
-	H7-TOOL –Èƒ‚¥Æø⁄£®RS232£¨ RS485£¨TTL-UART£© π”√µƒPA9 PA10 
-	PA9/USART1_TX/PE13/FMC_D10
-	PA10/USART1_RX/PE14/FMC_D11
+  H7-TOOL ËôöÊãü‰∏≤Âè£ÔºàRS232Ôºå RS485ÔºåTTL-UARTÔºâ‰ΩøÁî®ÁöÑPA9 PA10 
+  PA9/USART1_TX/PE13/FMC_D10
+  PA10/USART1_RX/PE14/FMC_D11
 
-	¡Ÿ ±µ˜ ‘ESP32 ±£¨ø…“‘Ω´∆‰”≥…‰µΩUART4ø⁄£¨Õ®π˝PC¥Æø⁄÷˙ ÷≤‚ ‘AT÷∏¡Ó°£
-	PH13/UART4_TX 
-	PH14/UART4_RX
+  ‰∏¥Êó∂Ë∞ÉËØïESP32Êó∂ÔºåÂèØ‰ª•Â∞ÜÂÖ∂Êò†Â∞ÑÂà∞UART4Âè£ÔºåÈÄöËøáPC‰∏≤Âè£Âä©ÊâãÊµãËØïATÊåá‰ª§„ÄÇ
+  PH13/UART4_TX 
+  PH14/UART4_RX
 */
 
-/* ∂®“ÂŒÔ¿Ì¥Æø⁄ Aø⁄£¨Bø⁄«–ªª */
-#if 1	/* H7-TOOL »± ° π”√’‚∏ˆUART */
-	#define A_USARTx                           USART1
-	#define A_USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE()
+/* ÂÆö‰πâÁâ©ÁêÜ‰∏≤Âè£ AÂè£ÔºåBÂè£ÂàáÊç¢ */
+#if 1 /* H7-TOOL Áº∫ÁúÅ‰ΩøÁî®Ëøô‰∏™UART */
+#define A_USARTx USART1
+#define A_USARTx_CLK_ENABLE() __HAL_RCC_USART1_CLK_ENABLE()
 
-	#define A_DMAx_CLK_ENABLE()                __HAL_RCC_DMA1_CLK_ENABLE()
+#define A_DMAx_CLK_ENABLE() __HAL_RCC_DMA1_CLK_ENABLE()
 
-	#define A_USARTx_FORCE_RESET()             __HAL_RCC_USART1_FORCE_RESET()
-	#define A_USARTx_RELEASE_RESET()           __HAL_RCC_USART1_RELEASE_RESET()
+#define A_USARTx_FORCE_RESET() __HAL_RCC_USART1_FORCE_RESET()
+#define A_USARTx_RELEASE_RESET() __HAL_RCC_USART1_RELEASE_RESET()
 
-	#define A_USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-	#define A_USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define A_USARTx_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
+#define A_USARTx_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
-	/* Definition for USARTx Pins */
-	#define A_USARTx_TX_PIN                    GPIO_PIN_9
-	#define A_USARTx_TX_GPIO_PORT              GPIOA
-	#define A_USARTx_TX_AF                     GPIO_AF7_USART1
+/* Definition for USARTx Pins */
+#define A_USARTx_TX_PIN GPIO_PIN_9
+#define A_USARTx_TX_GPIO_PORT GPIOA
+#define A_USARTx_TX_AF GPIO_AF7_USART1
 
-	#define A_USARTx_RX_PIN                    GPIO_PIN_10
-	#define A_USARTx_RX_GPIO_PORT              GPIOA
-	#define A_USARTx_RX_AF                     GPIO_AF7_USART1
+#define A_USARTx_RX_PIN GPIO_PIN_10
+#define A_USARTx_RX_GPIO_PORT GPIOA
+#define A_USARTx_RX_AF GPIO_AF7_USART1
 
+/* Definition for USARTx's NVIC: used for receiving data over Rx pin */
+#define A_USARTx_IRQn USART1_IRQn
+#define A_USARTx_IRQHandler USART1_IRQHandler
 
-	/* Definition for USARTx's NVIC: used for receiving data over Rx pin */
-	#define A_USARTx_IRQn                      USART1_IRQn
-	#define A_USARTx_IRQHandler                USART1_IRQHandler
+#define A_USARTx_TX_DMA_CHANNEL DMA_REQUEST_USART1_TX
+#define A_USARTx_RX_DMA_CHANNEL DMA_REQUEST_USART1_RX
 
-	#define A_USARTx_TX_DMA_CHANNEL             DMA_REQUEST_USART1_TX
-	#define A_USARTx_RX_DMA_CHANNEL             DMA_REQUEST_USART1_RX
+/* Definition for USARTx's DMA */
+#define A_USARTx_TX_DMA_STREAM DMA1_Stream7
+#define A_USARTx_RX_DMA_STREAM DMA1_Stream5
 
-
-	/* Definition for USARTx's DMA */
-	#define A_USARTx_TX_DMA_STREAM              DMA1_Stream7
-	#define A_USARTx_RX_DMA_STREAM              DMA1_Stream5
-
-	/* Definition for USARTx's NVIC */
-	#define A_USARTx_DMA_TX_IRQn                DMA1_Stream7_IRQn
-	#define A_USARTx_DMA_RX_IRQn                DMA1_Stream5_IRQn
-	#define A_USARTx_DMA_TX_IRQHandler          DMA1_Stream7_IRQHandler
-	#define A_USARTx_DMA_RX_IRQHandler          DMA1_Stream5_IRQHandler
+/* Definition for USARTx's NVIC */
+#define A_USARTx_DMA_TX_IRQn DMA1_Stream7_IRQn
+#define A_USARTx_DMA_RX_IRQn DMA1_Stream5_IRQn
+#define A_USARTx_DMA_TX_IRQHandler DMA1_Stream7_IRQHandler
+#define A_USARTx_DMA_RX_IRQHandler DMA1_Stream5_IRQHandler
 #endif
 
-#if 1	/* H7-TOOL …˝º∂ESP32ƒ£øÈπÃº˛ ± π”√’‚∏ˆUART */
-	#define B_USARTx                           UART4
-	#define B_USARTx_CLK_ENABLE()              __HAL_RCC_UART4_CLK_ENABLE()
+#if 1 /* H7-TOOL ÂçáÁ∫ßESP32Ê®°ÂùóÂõ∫‰ª∂Êó∂‰ΩøÁî®Ëøô‰∏™UART */
+#define B_USARTx UART4
+#define B_USARTx_CLK_ENABLE() __HAL_RCC_UART4_CLK_ENABLE()
 
-	#define B_DMAx_CLK_ENABLE()                __HAL_RCC_DMA1_CLK_ENABLE()
+#define B_DMAx_CLK_ENABLE() __HAL_RCC_DMA1_CLK_ENABLE()
 
-	#define B_USARTx_FORCE_RESET()             __HAL_RCC_UART4_FORCE_RESET()
-	#define B_USARTx_RELEASE_RESET()           __HAL_RCC_UART4_RELEASE_RESET()
+#define B_USARTx_FORCE_RESET() __HAL_RCC_UART4_FORCE_RESET()
+#define B_USARTx_RELEASE_RESET() __HAL_RCC_UART4_RELEASE_RESET()
 
-	#define B_USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOH_CLK_ENABLE()
-	#define B_USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOH_CLK_ENABLE()
+#define B_USARTx_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOH_CLK_ENABLE()
+#define B_USARTx_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOH_CLK_ENABLE()
 
-	/* Definition for USARTx Pins */
-	#define B_USARTx_TX_PIN                    GPIO_PIN_13
-	#define B_USARTx_TX_GPIO_PORT              GPIOH
-	#define B_USARTx_TX_AF                     GPIO_AF8_UART4
+/* Definition for USARTx Pins */
+#define B_USARTx_TX_PIN GPIO_PIN_13
+#define B_USARTx_TX_GPIO_PORT GPIOH
+#define B_USARTx_TX_AF GPIO_AF8_UART4
 
-	#define B_USARTx_RX_PIN                    GPIO_PIN_14
-	#define B_USARTx_RX_GPIO_PORT              GPIOH
-	#define B_USARTx_RX_AF                     GPIO_AF8_UART4
+#define B_USARTx_RX_PIN GPIO_PIN_14
+#define B_USARTx_RX_GPIO_PORT GPIOH
+#define B_USARTx_RX_AF GPIO_AF8_UART4
 
-	/* Definition for USARTx's NVIC: used for receiving data over Rx pin */
-	#define B_USARTx_IRQn                      UART4_IRQn
-	#define B_USARTx_IRQHandler                UART4_IRQHandler
+/* Definition for USARTx's NVIC: used for receiving data over Rx pin */
+#define B_USARTx_IRQn UART4_IRQn
+#define B_USARTx_IRQHandler UART4_IRQHandler
 
-	#define B_USARTx_TX_DMA_CHANNEL             DMA_REQUEST_UART4_TX
-	#define B_USARTx_RX_DMA_CHANNEL             DMA_REQUEST_UART4_RX
+#define B_USARTx_TX_DMA_CHANNEL DMA_REQUEST_UART4_TX
+#define B_USARTx_RX_DMA_CHANNEL DMA_REQUEST_UART4_RX
 
+/* Definition for USARTx's DMA */
+#define B_USARTx_TX_DMA_STREAM DMA1_Stream7
+#define B_USARTx_RX_DMA_STREAM DMA1_Stream5
 
-	/* Definition for USARTx's DMA */
-	#define B_USARTx_TX_DMA_STREAM              DMA1_Stream7
-	#define B_USARTx_RX_DMA_STREAM              DMA1_Stream5
-
-	/* Definition for USARTx's NVIC */
-	#define B_USARTx_DMA_TX_IRQn                DMA1_Stream7_IRQn
-	#define B_USARTx_DMA_RX_IRQn                DMA1_Stream5_IRQn
-	#define B_USARTx_DMA_TX_IRQHandler          DMA1_Stream7_IRQHandler
-	#define B_USARTx_DMA_RX_IRQHandler          DMA1_Stream5_IRQHandler
+/* Definition for USARTx's NVIC */
+#define B_USARTx_DMA_TX_IRQn DMA1_Stream7_IRQn
+#define B_USARTx_DMA_RX_IRQn DMA1_Stream5_IRQn
+#define B_USARTx_DMA_TX_IRQHandler DMA1_Stream7_IRQHandler
+#define B_USARTx_DMA_RX_IRQHandler DMA1_Stream5_IRQHandler
 #endif
 
-
-/* Definition for TIMx clock resources   . TIM3 ”√”⁄DSO æ≤®∆˜ADC¥•∑¢‘¥ */
-#define TIMx                             TIM15	
-#define TIMx_CLK_ENABLE                  __HAL_RCC_TIM15_CLK_ENABLE
-#define TIMx_FORCE_RESET()               __HAL_RCC_TIM15_FORCE_RESET()
-#define TIMx_RELEASE_RESET()             __HAL_RCC_TIM15_RELEASE_RESET()
+/* Definition for TIMx clock resources   . TIM3 Áî®‰∫éDSOÁ§∫Ê≥¢Âô®ADCËß¶ÂèëÊ∫ê */
+#define TIMx TIM15
+#define TIMx_CLK_ENABLE __HAL_RCC_TIM15_CLK_ENABLE
+#define TIMx_FORCE_RESET() __HAL_RCC_TIM15_FORCE_RESET()
+#define TIMx_RELEASE_RESET() __HAL_RCC_TIM15_RELEASE_RESET()
 
 /* Definition for TIMx's NVIC */
-#define TIMx_IRQn                        TIM15_IRQn
-#define TIMx_IRQHandler                  TIM15_IRQHandler
+#define TIMx_IRQn TIM15_IRQn
+#define TIMx_IRQHandler TIM15_IRQHandler
 
 /* Periodically, the state of the buffer "UserTxBuffer" is checked.
    The period depends on CDC_POLLING_INTERVAL */
-#define CDC_POLLING_INTERVAL             5 /* in ms. The max is 65ms and the min is 1ms */
+#define CDC_POLLING_INTERVAL 5 /* in ms. The max is 65ms and the min is 1ms */
 
-extern USBD_CDC_ItfTypeDef  USBD_CDC_fops;
+extern USBD_CDC_ItfTypeDef USBD_CDC_fops;
 
 extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
 extern uint8_t USBCom_SendBufNow(int _Port, uint8_t *_Buf, uint16_t _Len);
-	
+
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 #endif /* __USBD_CDC_IF_H */

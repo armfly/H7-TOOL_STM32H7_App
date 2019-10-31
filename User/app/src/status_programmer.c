@@ -26,52 +26,52 @@
 */
 void status_Programmer(void)
 {
-	uint8_t ucKeyCode; /* 按键代码 */
-	uint8_t fRefresh;
+  uint8_t ucKeyCode; /* 按键代码 */
+  uint8_t fRefresh;
 
-	DispHeader("烧录器");
+  DispHeader("烧录器");
 
-	fRefresh = 1;
-	while (g_MainStatus == MS_PROGRAMMER)
-	{
-		bsp_Idle();
+  fRefresh = 1;
+  while (g_MainStatus == MS_PROGRAMMER)
+  {
+    bsp_Idle();
 
-		if (fRefresh) /* 刷新整个界面 */
-		{
-			fRefresh = 0;
-		}
+    if (fRefresh) /* 刷新整个界面 */
+    {
+      fRefresh = 0;
+    }
 
-		ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-		if (ucKeyCode != KEY_NONE)
-		{
-			/* 有键按下 */
-			switch (ucKeyCode)
-			{
-			case KEY_DOWN_S: /* S键按下 */
-				break;
+    ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+    if (ucKeyCode != KEY_NONE)
+    {
+      /* 有键按下 */
+      switch (ucKeyCode)
+      {
+      case KEY_DOWN_S: /* S键按下 */
+        break;
 
-			case KEY_UP_S: /* S键释放 */
-				g_MainStatus = NextStatus(MS_PROGRAMMER);
-				break;
+      case KEY_UP_S: /* S键释放 */
+        g_MainStatus = NextStatus(MS_PROGRAMMER);
+        break;
 
-			case KEY_LONG_S: /* S键长按 */
-				break;
+      case KEY_LONG_S: /* S键长按 */
+        break;
 
-			case KEY_DOWN_C: /* C键按下 */
-				break;
+      case KEY_DOWN_C: /* C键按下 */
+        break;
 
-			case KEY_UP_C: /* C键释放 */
-				g_MainStatus = LastStatus(MS_PROGRAMMER);
-				break;
+      case KEY_UP_C: /* C键释放 */
+        g_MainStatus = LastStatus(MS_PROGRAMMER);
+        break;
 
-			case KEY_LONG_C: /* C键长按 */
-				break;
+      case KEY_LONG_C: /* C键长按 */
+        break;
 
-			default:
-				break;
-			}
-		}
-	}
+      default:
+        break;
+      }
+    }
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

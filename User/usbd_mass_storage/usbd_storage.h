@@ -42,7 +42,7 @@
   *
   ******************************************************************************
   */
-  
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USBD_STORAGE_H_
 #define __USBD_STORAGE_H_
@@ -54,8 +54,8 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-extern USBD_StorageTypeDef  USBD_DISK_fops;
+extern USBD_StorageTypeDef USBD_DISK_fops;
 
 #endif /* __USBD_STORAGE_H_ */
- 
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

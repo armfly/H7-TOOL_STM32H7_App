@@ -3,21 +3,21 @@
 #include "param.h"
 
 /* 
-	lua Ôö¼Óµ÷ÊÔ´úÂëµÄ·½·¨:
+  lua å¢åŠ è°ƒè¯•ä»£ç çš„æ–¹æ³•:
 
-lobject.cÎÄ¼ş:
-	const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
-	#if 1		
-	  printf("%s", msg);
-	#endif
+lobject.cæ–‡ä»¶:
+  const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
+  #if 1		
+    printf("%s", msg);
+  #endif
 
-ldebug.c ÎÄ¼ş luaG_runerror º¯Êı£¬Ôö¼Óprintf
+ldebug.c æ–‡ä»¶ luaG_runerror å‡½æ•°ï¼Œå¢åŠ printf
 
-lauxlib.c ÎÄ¼ş luaL_errorº¯Êı£¬Ôö¼Óprintf
+lauxlib.c æ–‡ä»¶ luaL_errorå‡½æ•°ï¼Œå¢åŠ printf
 
-ldo.c ÎÄ¼ş luaD_throw º¯Êı	printf("\r\nthrow errcode=%d\r\n", errcode);
+ldo.c æ–‡ä»¶ luaD_throw å‡½æ•°	printf("\r\nthrow errcode=%d\r\n", errcode);
 
-lua.h ¶¨Òå´íÎó´úÂë
+lua.h å®šä¹‰é”™è¯¯ä»£ç 
 #define LUA_ERRRUN	2
 #define LUA_ERRSYNTAX	3
 #define LUA_ERRMEM	4
@@ -27,8 +27,8 @@ lua.h ¶¨Òå´íÎó´úÂë
 */
 
 /*
-	luaconf.h ÎÄ¼ş¶Ô¸¡µãºÍÕûÊıµÄ´¦Àí¡£ È±Ê¡64Î»ÕûÊı£¬Ë«¾«¶È¸¡µã
-		default configuration for 64-bit Lua ('long long' and 'double')
+  luaconf.h æ–‡ä»¶å¯¹æµ®ç‚¹å’Œæ•´æ•°çš„å¤„ç†ã€‚ ç¼ºçœ64ä½æ•´æ•°ï¼ŒåŒç²¾åº¦æµ®ç‚¹
+    default configuration for 64-bit Lua ('long long' and 'double')
 */
 
 lua_State *g_Lua = 0;
@@ -42,61 +42,60 @@ uint32_t s_lua_func_read_idx;
 uint8_t s_lua_read_buf[LUA_READ_LEN_MAX];
 uint8_t s_lua_read_len;
 
-static int get_runtime(lua_State* L);
-static int check_runtime(lua_State* L);
+static int get_runtime(lua_State *L);
+static int check_runtime(lua_State *L);
 
 static void lua_RegisterFunc(void);
 
 void exit(int status)
 {
-	;
+  ;
 }
 
 int system(const char *cmd)
 {
-	return 0;
+  return 0;
 }
 
 /* time_t : date/time in unix secs past 1-Jan-70 */
 time_t time(time_t *_t)
 {
-	/* ÒÔÏÂ´úÂëÀ´×ÔÓÚ£º https://blog.csdn.net/qq_29350001/article/details/87637350 */
-	#define xMINUTE (60)		  /* 1·ÖµÄÃëÊı */
-	#define xHOUR   (60*xMINUTE)  /* 1Ğ¡Ê±µÄÃëÊı */
-	#define xDAY    (24*xHOUR   ) /* 1ÌìµÄÃëÊı */
-	#define xYEAR   (365*xDAY   ) /* 1ÄêµÄÃëÊı */
+/* ä»¥ä¸‹ä»£ç æ¥è‡ªäºï¼š https://blog.csdn.net/qq_29350001/article/details/87637350 */
+#define xMINUTE (60)         /* 1åˆ†çš„ç§’æ•° */
+#define xHOUR (60 * xMINUTE) /* 1å°æ—¶çš„ç§’æ•° */
+#define xDAY (24 * xHOUR)    /* 1å¤©çš„ç§’æ•° */
+#define xYEAR (365 * xDAY)   /* 1å¹´çš„ç§’æ•° */
 
-	/* ½«localtime£¨UTC+8±±¾©Ê±¼ä£©×ªÎªUNIX TIME£¬ÒÔ1970Äê1ÔÂ1ÈÕÎªÆğµã */
-	static unsigned int  month[12] =
-	{
-		/*01ÔÂ*/xDAY*(0),
-		/*02ÔÂ*/xDAY*(31),
-		/*03ÔÂ*/xDAY*(31+28),
-		/*04ÔÂ*/xDAY*(31+28+31),
-		/*05ÔÂ*/xDAY*(31+28+31+30),
-		/*06ÔÂ*/xDAY*(31+28+31+30+31),
-		/*07ÔÂ*/xDAY*(31+28+31+30+31+30),
-		/*08ÔÂ*/xDAY*(31+28+31+30+31+30+31),
-		/*09ÔÂ*/xDAY*(31+28+31+30+31+30+31+31),
-		/*10ÔÂ*/xDAY*(31+28+31+30+31+30+31+31+30),
-		/*11ÔÂ*/xDAY*(31+28+31+30+31+30+31+31+30+31),
-		/*12ÔÂ*/xDAY*(31+28+31+30+31+30+31+31+30+31+30)
-	};
-	unsigned int  seconds = 0;
-	unsigned int  year = 0;
-  
-	RTC_ReadClock();
-	year = g_tRTC.Year - 1970;						/* ²»¿¼ÂÇ2100ÄêÇ§Äê³æÎÊÌâ */
-	seconds = xYEAR * year + xDAY * ((year + 1) /4);  /* Ç°¼¸Äê¹ıÈ¥µÄÃëÊı */
-	seconds += month[g_tRTC.Mon - 1];      			/* ¼ÓÉÏ½ñÄê±¾ÔÂ¹ıÈ¥µÄÃëÊı */
-	if ((g_tRTC.Mon > 2) && (((year + 2) % 4) == 0))		/* 2008ÄêÎªÈòÄê */
-	seconds += xDAY;            					/* ÈòÄê¼Ó1ÌìÃëÊı */
-	seconds += xDAY * (g_tRTC.Day-1); 	/* ¼ÓÉÏ±¾Ìì¹ıÈ¥µÄÃëÊı */
-	seconds += xHOUR * g_tRTC.Hour;		/* ¼ÓÉÏ±¾Ğ¡Ê±¹ıÈ¥µÄÃëÊı */
-	seconds += xMINUTE * g_tRTC.Min;		/* ¼ÓÉÏ±¾·ÖÖÓ¹ıÈ¥µÄÃëÊı */
-	seconds += g_tRTC.Sec;				/* ¼ÓÉÏµ±Ç°ÃëÊı<br>¡¡seconds -= 8 * xHOUR; */
-	*_t = seconds;
-	return *_t;
+  /* å°†localtimeï¼ˆUTC+8åŒ—äº¬æ—¶é—´ï¼‰è½¬ä¸ºUNIX TIMEï¼Œä»¥1970å¹´1æœˆ1æ—¥ä¸ºèµ·ç‚¹ */
+  static unsigned int month[12] =
+      {
+          /*01æœˆ*/ xDAY * (0),
+          /*02æœˆ*/ xDAY * (31),
+          /*03æœˆ*/ xDAY * (31 + 28),
+          /*04æœˆ*/ xDAY * (31 + 28 + 31),
+          /*05æœˆ*/ xDAY * (31 + 28 + 31 + 30),
+          /*06æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31),
+          /*07æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30),
+          /*08æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30 + 31),
+          /*09æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31),
+          /*10æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30),
+          /*11æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31),
+          /*12æœˆ*/ xDAY * (31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30)};
+  unsigned int seconds = 0;
+  unsigned int year = 0;
+
+  RTC_ReadClock();
+  year = g_tRTC.Year - 1970;                        /* ä¸è€ƒè™‘2100å¹´åƒå¹´è™«é—®é¢˜ */
+  seconds = xYEAR * year + xDAY * ((year + 1) / 4); /* å‰å‡ å¹´è¿‡å»çš„ç§’æ•° */
+  seconds += month[g_tRTC.Mon - 1];                 /* åŠ ä¸Šä»Šå¹´æœ¬æœˆè¿‡å»çš„ç§’æ•° */
+  if ((g_tRTC.Mon > 2) && (((year + 2) % 4) == 0))  /* 2008å¹´ä¸ºé—°å¹´ */
+    seconds += xDAY;                                /* é—°å¹´åŠ 1å¤©ç§’æ•° */
+  seconds += xDAY * (g_tRTC.Day - 1);               /* åŠ ä¸Šæœ¬å¤©è¿‡å»çš„ç§’æ•° */
+  seconds += xHOUR * g_tRTC.Hour;                   /* åŠ ä¸Šæœ¬å°æ—¶è¿‡å»çš„ç§’æ•° */
+  seconds += xMINUTE * g_tRTC.Min;                  /* åŠ ä¸Šæœ¬åˆ†é’Ÿè¿‡å»çš„ç§’æ•° */
+  seconds += g_tRTC.Sec;                            /* åŠ ä¸Šå½“å‰ç§’æ•°<br>ã€€seconds -= 8 * xHOUR; */
+  *_t = seconds;
+  return *_t;
 }
 
 /*
@@ -114,7 +113,7 @@ print(\"sum =\", foo())
 print(\"and sum = 2^11 =\", 2 ^ 11)
 print(\"exp(200) =\", math.exp(200))
 */
-const char lua_test[] = { 
+const char lua_test[] = {
     "print(\"Hello,I am lua!\\n--this is newline printf\")\n"
     "function foo()\n"
     "  local i = 0\n"
@@ -127,400 +126,396 @@ const char lua_test[] = {
     "end\n"
     "print(\"sum =\", foo())\n"
     "print(\"and sum = 2^11 =\", 2 ^ 11)\n"
-    "print(\"exp(200) =\", math.exp(200))\n"
-};
+    "print(\"exp(200) =\", math.exp(200))\n"};
 
 void lua_Test(void)
 {
-	luaL_dostring(g_Lua, lua_test); /* ÔËĞĞLua½Å±¾ */
-	
-	luaL_dostring(g_Lua, "print(add_f(1.0, 9.09))\n print(sub_f(20.1,19.01))");
+  luaL_dostring(g_Lua, lua_test); /* è¿è¡ŒLuaè„šæœ¬ */
+
+  luaL_dostring(g_Lua, "print(add_f(1.0, 9.09))\n print(sub_f(20.1,19.01))");
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_Init
-*	¹¦ÄÜËµÃ÷: ³õÊ¼»¯luaĞéÄâ»ú
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_Init
+*	åŠŸèƒ½è¯´æ˜: åˆå§‹åŒ–luaè™šæ‹Ÿæœº
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lua_Init(void)
-{    
-    g_Lua = luaL_newstate(); 		/* ½¨Á¢LuaÔËĞĞ»·¾³ */
-    luaL_openlibs(g_Lua);
-    luaopen_base(g_Lua);
-	
-	lua_RegisterFunc();		/* ×¢²ácº¯Êı£¬¹©luaµ÷ÓÃ */
+{
+  g_Lua = luaL_newstate(); /* å»ºç«‹Luaè¿è¡Œç¯å¢ƒ */
+  luaL_openlibs(g_Lua);
+  luaopen_base(g_Lua);
+
+  lua_RegisterFunc(); /* æ³¨å†Œcå‡½æ•°ï¼Œä¾›luaè°ƒç”¨ */
 }
 
-/* ¹Ø±ÕÊÍ·ÅLua */
+/* å…³é—­é‡Šæ”¾Lua */
 void lua_DeInit(void)
-{	
-    lua_close(g_Lua);				/* ÊÍ·ÅÄÚ´æ */
-	g_Lua = 0;
+{
+  lua_close(g_Lua); /* é‡Šæ”¾å†…å­˜ */
+  g_Lua = 0;
 }
 
 void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_len)
 {
-	uint32_t i;
-	
-	for (i = 0; i < _len; i++)
-	{
-		if (_addr < LUA_PROG_LEN_MAX)
-		{
-			s_lua_prog_buf[_addr + i] = _buf[i];
-		}
-	}
-	
-	s_lua_prog_len = _total_len;
-	s_lua_prog_buf[s_lua_prog_len] = 0;
-	
-	if (g_Lua > 0)
-	{
-		lua_DeInit();
-	}
-	lua_Init();
-	
-	//luaL_dostring(g_Lua, s_lua_prog_buf);
+  uint32_t i;
+
+  for (i = 0; i < _len; i++)
+  {
+    if (_addr < LUA_PROG_LEN_MAX)
+    {
+      s_lua_prog_buf[_addr + i] = _buf[i];
+    }
+  }
+
+  s_lua_prog_len = _total_len;
+  s_lua_prog_buf[s_lua_prog_len] = 0;
+
+  if (g_Lua > 0)
+  {
+    lua_DeInit();
+  }
+  lua_Init();
+
+  //luaL_dostring(g_Lua, s_lua_prog_buf);
 }
 
 void lua_Poll(void)
 {
-	if (g_tVar.LuaRunOnce == 1)
-	{
-		g_tVar.LuaRunOnce = 0;
-		luaL_dostring(g_Lua, s_lua_prog_buf);
-	}
+  if (g_tVar.LuaRunOnce == 1)
+  {
+    g_tVar.LuaRunOnce = 0;
+    luaL_dostring(g_Lua, s_lua_prog_buf);
+  }
 }
 
 void lua_DoInit(void)
 {
-	luaL_dostring(g_Lua, "init()");
+  luaL_dostring(g_Lua, "init()");
 }
 
-// Í¨ĞÅĞ´ÎÄ¼ş
+// é€šä¿¡å†™æ–‡ä»¶
 uint8_t lua_66H_Write(uint32_t _addr, uint8_t *_buf, uint32_t _len)
 {
-    uint8_t re;
-	
-	lua_getglobal(g_Lua, "write");    // º¯ÊıÈëÕ» »ñÈ¡luaº¯Êıwrite
-	lua_pushinteger(g_Lua, _addr); 	
-	lua_pushlstring(g_Lua, (char *)_buf, _len); 
-	lua_pushinteger(g_Lua, _len); 
-	
-	lua_pcall(g_Lua, 3, 1, 0);
-	/*
-		lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
-		1
-		nargs ²ÎÊı¸öÊı
-		nresults ·µ»ØÖµ¸öÊı
-		errFunc ´íÎó´¦Àíº¯Êı£¬0±íÊ¾ÎŞ£¬±íÊ¾´íÎó´¦Àíº¯ÊıÔÚÕ»ÖĞµÄË÷Òı
-	*/
-	re = lua_tonumber(g_Lua, -1);
-	lua_pop(g_Lua, 1);
-	return re;
+  uint8_t re;
+
+  lua_getglobal(g_Lua, "write"); // å‡½æ•°å…¥æ ˆ è·å–luaå‡½æ•°write
+  lua_pushinteger(g_Lua, _addr);
+  lua_pushlstring(g_Lua, (char *)_buf, _len);
+  lua_pushinteger(g_Lua, _len);
+
+  lua_pcall(g_Lua, 3, 1, 0);
+  /*
+    lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
+    1
+    nargs å‚æ•°ä¸ªæ•°
+    nresults è¿”å›å€¼ä¸ªæ•°
+    errFunc é”™è¯¯å¤„ç†å‡½æ•°ï¼Œ0è¡¨ç¤ºæ— ï¼Œè¡¨ç¤ºé”™è¯¯å¤„ç†å‡½æ•°åœ¨æ ˆä¸­çš„ç´¢å¼•
+  */
+  re = lua_tonumber(g_Lua, -1);
+  lua_pop(g_Lua, 1);
+  return re;
 }
 
-// Í¨ĞÅ¶ÁÎÄ¼ş
+// é€šä¿¡è¯»æ–‡ä»¶
 uint8_t lua_67H_Read(uint32_t _addr, uint8_t *_buf, uint32_t _len)
 {
-    uint8_t re = 0;
-	uint32_t i;
-	
-	lua_getglobal(g_Lua, "read");    // º¯ÊıÈëÕ» »ñÈ¡luaº¯Êıwrite
-	lua_pushinteger(g_Lua, _addr); 	
-	lua_pushinteger(g_Lua, _len); 
-	
-	lua_pcall(g_Lua, 2, 1, 0);
-	/*
-		lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
-		1
-		nargs ²ÎÊı¸öÊı
-		nresults ·µ»ØÖµ¸öÊı
-		errFunc ´íÎó´¦Àíº¯Êı£¬0±íÊ¾ÎŞ£¬±íÊ¾´íÎó´¦Àíº¯ÊıÔÚÕ»ÖĞµÄË÷Òı
-	*/
-	
-	for (i = 0; i < _len; i++)
-	{
-		_buf[i] = s_lua_read_buf[i];
-	}
+  uint8_t re = 0;
+  uint32_t i;
 
-	return re;
+  lua_getglobal(g_Lua, "read"); // å‡½æ•°å…¥æ ˆ è·å–luaå‡½æ•°write
+  lua_pushinteger(g_Lua, _addr);
+  lua_pushinteger(g_Lua, _len);
+
+  lua_pcall(g_Lua, 2, 1, 0);
+  /*
+    lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
+    1
+    nargs å‚æ•°ä¸ªæ•°
+    nresults è¿”å›å€¼ä¸ªæ•°
+    errFunc é”™è¯¯å¤„ç†å‡½æ•°ï¼Œ0è¡¨ç¤ºæ— ï¼Œè¡¨ç¤ºé”™è¯¯å¤„ç†å‡½æ•°åœ¨æ ˆä¸­çš„ç´¢å¼•
+  */
+
+  for (i = 0; i < _len; i++)
+  {
+    _buf[i] = s_lua_read_buf[i];
+  }
+
+  return re;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: beep
-*	¹¦ÄÜËµÃ÷: ·äÃùº¯Êı luaµ÷ÓÃ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: beep
+*	åŠŸèƒ½è¯´æ˜: èœ‚é¸£å‡½æ•° luaè°ƒç”¨
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int beep(lua_State* L)
+static int beep(lua_State *L)
 {
-    //¼ì²éÕ»ÖĞµÄ²ÎÊıÊÇ·ñºÏ·¨£¬1±íÊ¾Luaµ÷ÓÃÊ±µÄµÚÒ»¸ö²ÎÊı(´Ó×óµ½ÓÒ)£¬ÒÀ´ËÀàÍÆ¡£
-    //Èç¹ûLua´úÂëÔÚµ÷ÓÃÊ±´«µİµÄ²ÎÊı²»Îªnumber£¬¸Ãº¯Êı½«±¨´í²¢ÖÕÖ¹³ÌĞòµÄÖ´ĞĞ¡£
-//    double op1 = luaL_checknumber(L, 1);
-//    double op2 = luaL_checknumber(L, 2);
-	
-	BEEP_KeyTone();
-	
-    //½«º¯ÊıµÄ½á¹ûÑ¹ÈëÕ»ÖĞ¡£Èç¹ûÓĞ¶à¸ö·µ»ØÖµ£¬¿ÉÒÔÔÚÕâÀï¶à´ÎÑ¹ÈëÕ»ÖĞ¡£
-    //lua_pushnumber(L, op1 + op2);
-	
-    //·µ»ØÖµÓÃÓÚÌáÊ¾¸ÃCº¯ÊıµÄ·µ»ØÖµÊıÁ¿£¬¼´Ñ¹ÈëÕ»ÖĞµÄ·µ»ØÖµÊıÁ¿¡£
-    return 0;
+  //æ£€æŸ¥æ ˆä¸­çš„å‚æ•°æ˜¯å¦åˆæ³•ï¼Œ1è¡¨ç¤ºLuaè°ƒç”¨æ—¶çš„ç¬¬ä¸€ä¸ªå‚æ•°(ä»å·¦åˆ°å³)ï¼Œä¾æ­¤ç±»æ¨ã€‚
+  //å¦‚æœLuaä»£ç åœ¨è°ƒç”¨æ—¶ä¼ é€’çš„å‚æ•°ä¸ä¸ºnumberï¼Œè¯¥å‡½æ•°å°†æŠ¥é”™å¹¶ç»ˆæ­¢ç¨‹åºçš„æ‰§è¡Œã€‚
+  //    double op1 = luaL_checknumber(L, 1);
+  //    double op2 = luaL_checknumber(L, 2);
+
+  BEEP_KeyTone();
+
+  //å°†å‡½æ•°çš„ç»“æœå‹å…¥æ ˆä¸­ã€‚å¦‚æœæœ‰å¤šä¸ªè¿”å›å€¼ï¼Œå¯ä»¥åœ¨è¿™é‡Œå¤šæ¬¡å‹å…¥æ ˆä¸­ã€‚
+  //lua_pushnumber(L, op1 + op2);
+
+  //è¿”å›å€¼ç”¨äºæç¤ºè¯¥Cå‡½æ•°çš„è¿”å›å€¼æ•°é‡ï¼Œå³å‹å…¥æ ˆä¸­çš„è¿”å›å€¼æ•°é‡ã€‚
+  return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: delayus
-*	¹¦ÄÜËµÃ÷: Î¢ÃëÑÓ³Ù luaº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: delayus
+*	åŠŸèƒ½è¯´æ˜: å¾®ç§’å»¶è¿Ÿ luaå‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int delayus(lua_State* L)
+static int delayus(lua_State *L)
 {
-    uint32_t n = luaL_checknumber(L,1);
+  uint32_t n = luaL_checknumber(L, 1);
 
-	bsp_DelayUS(n);
-    return 0;
+  bsp_DelayUS(n);
+  return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: delayms
-*	¹¦ÄÜËµÃ÷: ºÁÃëÑÓ³Ù luaº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: delayms
+*	åŠŸèƒ½è¯´æ˜: æ¯«ç§’å»¶è¿Ÿ luaå‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int delayms(lua_State* L)
+static int delayms(lua_State *L)
 {
-    uint32_t n = luaL_checknumber(L,1);
+  uint32_t n = luaL_checknumber(L, 1);
 
-	bsp_DelayMS(n);
-    return 0;
+  bsp_DelayMS(n);
+  return 0;
 }
-
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: printhex
-*	¹¦ÄÜËµÃ÷: ´òÓ¡hex¸ñÊ½.  printhex(100, 2);	printhex("123");	
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: printhex
+*	åŠŸèƒ½è¯´æ˜: æ‰“å°hexæ ¼å¼.  printhex(100, 2);	printhex("123");	
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
 extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
-static int printhex(lua_State* L)
+static int printhex(lua_State *L)
 {
-	if (lua_type(L, 1) == LUA_TSTRING) 	/* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{		
-		const char *data;
-		size_t len;
-		
-		data = luaL_checklstring(L, 1, &len); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstringµÄ³¤¶È */
-		#if PRINT_TO_UDP == 1
-			lua_udp_SendBuf((uint8_t *)data, len, LUA_UDP_PORT);
-		#else	
-			USBCom_SendBuf(1, (uint8_t *)data, len);
-		#endif		
-	}
+  if (lua_type(L, 1) == LUA_TSTRING) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    const char *data;
+    size_t len;
 
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		char buf[32];
-		uint32_t num;
-		uint32_t bytes;
-		
-		num = luaL_checknumber(L, 1);
-		if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
-		{
-			bytes = luaL_checknumber(L, 2);
-			if (bytes == 1)
-			{
-				sprintf(buf, "0x%02X\r\n", num);
-			}
-			else if (bytes == 2)
-			{
-				sprintf(buf, "0x%04X\r\n", num);
-			}
-			else if (bytes == 3)
-			{
-				sprintf(buf, "0x%06X\r\n", num);
-			}
-			else if (bytes == 4)
-			{
-				sprintf(buf, "0x%08X\r\n", num);
-			}
-			else
-			{
-				sprintf(buf, "0x%X\r\n", num);
-			}
-		}
-		else
-		{			
-			sprintf(buf, "%X\r\n", num);
-		}
+    data = luaL_checklstring(L, 1, &len); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stringçš„é•¿åº¦ */
+#if PRINT_TO_UDP == 1
+    lua_udp_SendBuf((uint8_t *)data, len, LUA_UDP_PORT);
+#else
+    USBCom_SendBuf(1, (uint8_t *)data, len);
+#endif
+  }
 
-		#if PRINT_TO_UDP == 1
-			lua_udp_SendBuf((uint8_t *)buf, strlen(buf), LUA_UDP_PORT);
-		#else	
-			USBCom_SendBuf(1, (uint8_t *)buf, strlen(buf));
-		#endif
-	}	
-	return 1;
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    char buf[32];
+    uint32_t num;
+    uint32_t bytes;
+
+    num = luaL_checknumber(L, 1);
+    if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
+    {
+      bytes = luaL_checknumber(L, 2);
+      if (bytes == 1)
+      {
+        sprintf(buf, "0x%02X\r\n", num);
+      }
+      else if (bytes == 2)
+      {
+        sprintf(buf, "0x%04X\r\n", num);
+      }
+      else if (bytes == 3)
+      {
+        sprintf(buf, "0x%06X\r\n", num);
+      }
+      else if (bytes == 4)
+      {
+        sprintf(buf, "0x%08X\r\n", num);
+      }
+      else
+      {
+        sprintf(buf, "0x%X\r\n", num);
+      }
+    }
+    else
+    {
+      sprintf(buf, "%X\r\n", num);
+    }
+
+#if PRINT_TO_UDP == 1
+    lua_udp_SendBuf((uint8_t *)buf, strlen(buf), LUA_UDP_PORT);
+#else
+    USBCom_SendBuf(1, (uint8_t *)buf, strlen(buf));
+#endif
+  }
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: write_clock
-*	¹¦ÄÜËµÃ÷: Ğ´Ê±ÖÓ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: write_clock
+*	åŠŸèƒ½è¯´æ˜: å†™æ—¶é’Ÿ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int write_clock(lua_State* L)
+static int write_clock(lua_State *L)
 {
-	uint16_t year;
-	uint8_t mon, day, hour, min, sec;
-	
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		year = luaL_checknumber(L, 1);
-	}
-	if (lua_type(L, 2) == LUA_TNUMBER)
-	{
-		mon = luaL_checknumber(L, 2);
-	}
-	if (lua_type(L, 3) == LUA_TNUMBER)
-	{
-		day = luaL_checknumber(L, 3);
-	}
-	if (lua_type(L, 4) == LUA_TNUMBER)
-	{
-		hour = luaL_checknumber(L, 4);
-	}
-	if (lua_type(L, 5) == LUA_TNUMBER)
-	{
-		min = luaL_checknumber(L, 5);
-	}
-	if (lua_type(L, 6) == LUA_TNUMBER)
-	{
-		sec = luaL_checknumber(L, 6);
-	}	
-	
-	RTC_WriteClock(year, mon, day, hour, min, sec);
-    return 0;
+  uint16_t year;
+  uint8_t mon, day, hour, min, sec;
+
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    year = luaL_checknumber(L, 1);
+  }
+  if (lua_type(L, 2) == LUA_TNUMBER)
+  {
+    mon = luaL_checknumber(L, 2);
+  }
+  if (lua_type(L, 3) == LUA_TNUMBER)
+  {
+    day = luaL_checknumber(L, 3);
+  }
+  if (lua_type(L, 4) == LUA_TNUMBER)
+  {
+    hour = luaL_checknumber(L, 4);
+  }
+  if (lua_type(L, 5) == LUA_TNUMBER)
+  {
+    min = luaL_checknumber(L, 5);
+  }
+  if (lua_type(L, 6) == LUA_TNUMBER)
+  {
+    sec = luaL_checknumber(L, 6);
+  }
+
+  RTC_WriteClock(year, mon, day, hour, min, sec);
+  return 0;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: read_clock
-*	¹¦ÄÜËµÃ÷: Ğ´Ê±ÖÓ
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: read_clock
+*	åŠŸèƒ½è¯´æ˜: å†™æ—¶é’Ÿ
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int read_clock(lua_State* L)
+static int read_clock(lua_State *L)
 {
-	static uint8_t rtc_buf[8];
-	
-	RTC_ReadClock();
+  static uint8_t rtc_buf[8];
 
-	rtc_buf[0] = g_tRTC.Year >> 8;
-	rtc_buf[1] = g_tRTC.Year;
-	rtc_buf[2] = g_tRTC.Mon;
-	rtc_buf[3] = g_tRTC.Day;
-	rtc_buf[4] = g_tRTC.Hour;
-	rtc_buf[5] = g_tRTC.Min;
-	rtc_buf[6] = g_tRTC.Sec;
-	rtc_buf[7] = g_tRTC.Week;
-	
-	lua_pushlstring(L, (const char *)rtc_buf, 8); 
-    return 1;
+  RTC_ReadClock();
+
+  rtc_buf[0] = g_tRTC.Year >> 8;
+  rtc_buf[1] = g_tRTC.Year;
+  rtc_buf[2] = g_tRTC.Mon;
+  rtc_buf[3] = g_tRTC.Day;
+  rtc_buf[4] = g_tRTC.Hour;
+  rtc_buf[5] = g_tRTC.Min;
+  rtc_buf[6] = g_tRTC.Sec;
+  rtc_buf[7] = g_tRTC.Week;
+
+  lua_pushlstring(L, (const char *)rtc_buf, 8);
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: get_runtime
-*	¹¦ÄÜËµÃ÷: »ñµÃCPUÔËĞĞÊ±¼ä¡£msµ¥Î»
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: get_runtime
+*	åŠŸèƒ½è¯´æ˜: è·å¾—CPUè¿è¡Œæ—¶é—´ã€‚mså•ä½
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int get_runtime(lua_State* L)
+static int get_runtime(lua_State *L)
 {
-	int32_t runtime;
-	
-	runtime = bsp_GetRunTime();
-	lua_pushnumber(L, runtime); 
-    return 1;
+  int32_t runtime;
+
+  runtime = bsp_GetRunTime();
+  lua_pushnumber(L, runtime);
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: check_runtime
-*	¹¦ÄÜËµÃ÷: ÅĞ¶ÏÊ±¼ä³¤¶È
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: check_runtime
+*	åŠŸèƒ½è¯´æ˜: åˆ¤æ–­æ—¶é—´é•¿åº¦
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
-static int check_runtime(lua_State* L)
+static int check_runtime(lua_State *L)
 {
-	int32_t lasttime;
-	uint8_t re;
-	
-	if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
-	{
-		lasttime = luaL_checknumber(L, 1);
-	}
+  int32_t lasttime;
+  uint8_t re;
 
-	re = bsp_CheckRunTime(lasttime);
-	
-	lua_pushnumber(L, 	re); 
-    return 1;
+  if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
+  {
+    lasttime = luaL_checknumber(L, 1);
+  }
+
+  re = bsp_CheckRunTime(lasttime);
+
+  lua_pushnumber(L, re);
+  return 1;
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: lua_RegisterFunc
-*	¹¦ÄÜËµÃ÷: ×¢²álua¿Éµ÷ÓÃµÄcº¯Êı
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: lua_RegisterFunc
+*	åŠŸèƒ½è¯´æ˜: æ³¨å†Œluaå¯è°ƒç”¨çš„cå‡½æ•°
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static void lua_RegisterFunc(void)
 {
-	//½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
-    lua_register(g_Lua, "beep", beep);
-    lua_register(g_Lua, "delayus", delayus);
-	lua_register(g_Lua, "delayms", delayms);
-	lua_register(g_Lua, "printhex", printhex);
-	lua_register(g_Lua, "write_clock", write_clock);
-	lua_register(g_Lua, "read_clock", read_clock);
-	lua_register(g_Lua, "get_runtime", get_runtime);
-	lua_register(g_Lua, "check_runtime", check_runtime);
-	
-	/* ×¢²á½Ó¿Úº¯Êı */
-	lua_gpio_RegisterFun();	
-	lua_i2c_RegisterFun();
-	lua_spi_RegisterFun();
-	lua_tim_RegisterFun();
-	lua_tcp_RegisterFun();
-	lua_qspi_RegisterFun();
-	lua_fatfs_RegisterFun();
-	lua_swd_RegisterFun();	
-	
-	lua_adc_RegisterFun();
-	lua_dac_RegisterFun();
-	lua_reg_RegisterFun();
-	lua_extio_RegisterFun();
+  //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+  //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
+  lua_register(g_Lua, "beep", beep);
+  lua_register(g_Lua, "delayus", delayus);
+  lua_register(g_Lua, "delayms", delayms);
+  lua_register(g_Lua, "printhex", printhex);
+  lua_register(g_Lua, "write_clock", write_clock);
+  lua_register(g_Lua, "read_clock", read_clock);
+  lua_register(g_Lua, "get_runtime", get_runtime);
+  lua_register(g_Lua, "check_runtime", check_runtime);
+
+  /* æ³¨å†Œæ¥å£å‡½æ•° */
+  lua_gpio_RegisterFun();
+  lua_i2c_RegisterFun();
+  lua_spi_RegisterFun();
+  lua_tim_RegisterFun();
+  lua_tcp_RegisterFun();
+  lua_qspi_RegisterFun();
+  lua_fatfs_RegisterFun();
+  lua_swd_RegisterFun();
+
+  lua_adc_RegisterFun();
+  lua_dac_RegisterFun();
+  lua_reg_RegisterFun();
+  lua_extio_RegisterFun();
 }
-
-

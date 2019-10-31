@@ -37,19 +37,19 @@
 /* 菜单结构 */
 typedef struct
 {
-	uint8_t **Text;		/* 菜单文本 */
-	uint8_t ViewLine; /* 可视行数 */
-	uint8_t Count;		/* 菜单项个数 */
-	uint8_t Offset;		/* 当前屏幕第1行对应的索引 */
-	uint8_t Cursor;		/* 选中行的索引 */
+  uint8_t **Text;   /* 菜单文本 */
+  uint8_t ViewLine; /* 可视行数 */
+  uint8_t Count;    /* 菜单项个数 */
+  uint8_t Offset;   /* 当前屏幕第1行对应的索引 */
+  uint8_t Cursor;   /* 选中行的索引 */
 
-	uint16_t Left;		/* X 坐标 */
-	uint16_t Top;			/* Y 坐标 */
-	uint16_t Height;	/* 高度 */
-	uint16_t Width;		/* 宽度 */
-	uint16_t LineCap; /* 行间距 */
+  uint16_t Left;    /* X 坐标 */
+  uint16_t Top;     /* Y 坐标 */
+  uint16_t Height;  /* 高度 */
+  uint16_t Width;   /* 宽度 */
+  uint16_t LineCap; /* 行间距 */
 
-	FONT_T Font; /* 字体 */
+  FONT_T Font; /* 字体 */
 } MENU_T;
 
 /* 菜单显示类 */

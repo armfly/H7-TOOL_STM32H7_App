@@ -19,18 +19,18 @@
 /* 定义串行Flash ID */
 enum
 {
-	SST25VF016B_ID = 0xBF2541,
-	MX25L1606E_ID = 0xC22015,
-	W25Q64BV_ID = 0xEF4017,
-	W25Q128_ID = 0xEF4018
+  SST25VF016B_ID = 0xBF2541,
+  MX25L1606E_ID = 0xC22015,
+  W25Q64BV_ID = 0xEF4017,
+  W25Q128_ID = 0xEF4018
 };
 
 typedef struct
 {
-	uint32_t ChipID;		/* 芯片ID */
-	char ChipName[16];	/* 芯片型号字符串，主要用于显示 */
-	uint32_t TotalSize; /* 总容量 */
-	uint16_t PageSize;	/* 页面大小 */
+  uint32_t ChipID;    /* 芯片ID */
+  char ChipName[16];  /* 芯片型号字符串，主要用于显示 */
+  uint32_t TotalSize; /* 总容量 */
+  uint16_t PageSize;  /* 页面大小 */
 } SFLASH_T;
 
 void bsp_InitSFlash(void);

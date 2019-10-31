@@ -15,24 +15,24 @@
 
 typedef enum
 {
-	DAC_WAVE_NO = 0,
-	DAC_WAVE_SIN,
-	DAC_WAVE_SQUARE,
-	DAC_WAVE_TRI
+  DAC_WAVE_NO = 0,
+  DAC_WAVE_SIN,
+  DAC_WAVE_SQUARE,
+  DAC_WAVE_TRI
 } DAC_WAVE_TYPE_E;
 
 /* 波形控制结构 */
 typedef struct
 {
-	uint8_t Type;
-	uint8_t VoltRange;
-	int16_t VoltMax;
-	int16_t VoltMin;
-	uint32_t Freq;
-	uint16_t Duty;
-	uint32_t CycleCount;
-	uint32_t CycleSetting;
-	uint8_t Run;
+  uint8_t Type;
+  uint8_t VoltRange;
+  int16_t VoltMax;
+  int16_t VoltMin;
+  uint32_t Freq;
+  uint16_t Duty;
+  uint32_t CycleCount;
+  uint32_t CycleSetting;
+  uint8_t Run;
 } DAC_WAVE_T;
 
 /* 这些函数是通用的设置，软件控制DAC数据 */

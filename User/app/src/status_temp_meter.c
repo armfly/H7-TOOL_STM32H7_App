@@ -28,61 +28,61 @@ static void DispTemp(void);
 */
 void status_TempMeter(void)
 {
-	uint8_t ucKeyCode; /* 按键代码 */
-	uint8_t fRefresh;
+  uint8_t ucKeyCode; /* 按键代码 */
+  uint8_t fRefresh;
 
-	DispHeader("温度测量");
+  DispHeader("温度测量");
 
-	fRefresh = 1;
-	bsp_StartAutoTimer(0, 200);
-	while (g_MainStatus == MS_TEMP_METER)
-	{
-		bsp_Idle();
+  fRefresh = 1;
+  bsp_StartAutoTimer(0, 200);
+  while (g_MainStatus == MS_TEMP_METER)
+  {
+    bsp_Idle();
 
-		if (fRefresh) /* 刷新整个界面 */
-		{
-			fRefresh = 0;
-			DispTemp();
-		}
+    if (fRefresh) /* 刷新整个界面 */
+    {
+      fRefresh = 0;
+      DispTemp();
+    }
 
-		if (bsp_CheckTimer(0))
-		{
-			fRefresh = 1;
-		}
+    if (bsp_CheckTimer(0))
+    {
+      fRefresh = 1;
+    }
 
-		ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-		if (ucKeyCode != KEY_NONE)
-		{
-			/* 有键按下 */
-			switch (ucKeyCode)
-			{
-			case KEY_DOWN_S: /* S键按下 */
-				break;
+    ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+    if (ucKeyCode != KEY_NONE)
+    {
+      /* 有键按下 */
+      switch (ucKeyCode)
+      {
+      case KEY_DOWN_S: /* S键按下 */
+        break;
 
-			case KEY_UP_S: /* S键释放 */
-				g_MainStatus = NextStatus(MS_TEMP_METER);
-				break;
+      case KEY_UP_S: /* S键释放 */
+        g_MainStatus = NextStatus(MS_TEMP_METER);
+        break;
 
-			case KEY_LONG_S: /* S键长按 */
-				break;
+      case KEY_LONG_S: /* S键长按 */
+        break;
 
-			case KEY_DOWN_C: /* C键按下 */
-				break;
+      case KEY_DOWN_C: /* C键按下 */
+        break;
 
-			case KEY_UP_C: /* C键释放 */
-				g_MainStatus = LastStatus(MS_TEMP_METER);
-				break;
+      case KEY_UP_C: /* C键释放 */
+        g_MainStatus = LastStatus(MS_TEMP_METER);
+        break;
 
-			case KEY_LONG_C: /* C键长按 */
-				break;
+      case KEY_LONG_C: /* C键长按 */
+        break;
 
-			default:
-				break;
-			}
-		}
-	}
+      default:
+        break;
+      }
+    }
+  }
 
-	bsp_StopTimer(0);
+  bsp_StopTimer(0);
 }
 
 /*
@@ -95,33 +95,33 @@ void status_TempMeter(void)
 */
 static void DispTemp(void)
 {
-	FONT_T tFont;
-	char buf[64];
+  FONT_T tFont;
+  char buf[64];
 
-	/* 设置字体参数 */
-	{
-		tFont.FontCode = FC_ST_24;				/* 字体代码 16点阵 */
-		tFont.FrontColor = CL_WHITE;			/* 字体颜色 */
-		tFont.BackColor = HEAD_BAR_COLOR; /* 文字背景颜色 */
-		tFont.Space = 0;									/* 文字间距，单位 = 像素 */
-	}
+  /* 设置字体参数 */
+  {
+    tFont.FontCode = FC_ST_24;        /* 字体代码 16点阵 */
+    tFont.FrontColor = CL_WHITE;      /* 字体颜色 */
+    tFont.BackColor = HEAD_BAR_COLOR; /* 文字背景颜色 */
+    tFont.Space = 0;                  /* 文字间距，单位 = 像素 */
+  }
 
-	if (g_tVar.NTCRes > 1000)
-	{
-		sprintf(buf, "电阻: ---- KΩ");
-		LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+  if (g_tVar.NTCRes > 1000)
+  {
+    sprintf(buf, "电阻: ---- KΩ");
+    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 
-		sprintf(buf, "温度: ---- ℃");
-		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
-	}
-	else
-	{
-		sprintf(buf, "电阻: %0.3fKΩ", g_tVar.NTCRes);
-		LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+    sprintf(buf, "温度: ---- ℃");
+    LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
+  }
+  else
+  {
+    sprintf(buf, "电阻: %0.3fKΩ", g_tVar.NTCRes);
+    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
 
-		sprintf(buf, "温度: %0.2f℃", g_tVar.NTCTemp);
-		LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
-	}
+    sprintf(buf, "温度: %0.2f℃", g_tVar.NTCTemp);
+    LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
+  }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

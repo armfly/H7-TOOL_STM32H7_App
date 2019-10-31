@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	Ä£¿éÃû³Æ : USB devie ĞéÄâ´ÅÅÌÇı¶¯
-*	ÎÄ¼şÃû³Æ : usbd_usr.c
-*	°æ    ±¾ : V1.0
-*	Ëµ    Ã÷ : ·â×°ĞéÄâUÅÌ²Ù×÷º¯Êı£¬Ìá¹©¸øAPPÊ¹ÓÃ.
+*	æ¨¡å—åç§° : USB devie è™šæ‹Ÿç£ç›˜é©±åŠ¨
+*	æ–‡ä»¶åç§° : usbd_usr.c
+*	ç‰ˆ    æœ¬ : V1.0
+*	è¯´    æ˜ : å°è£…è™šæ‹ŸUç›˜æ“ä½œå‡½æ•°ï¼Œæä¾›ç»™APPä½¿ç”¨.
 *
-*	ĞŞ¸Ä¼ÇÂ¼ :
-*		°æ±¾ºÅ  ÈÕÆÚ        ×÷Õß     ËµÃ÷
-*		V1.0    2018-09-05 armfly  ÕıÊ½·¢²¼
+*	ä¿®æ”¹è®°å½• :
+*		ç‰ˆæœ¬å·  æ—¥æœŸ        ä½œè€…     è¯´æ˜
+*		V1.0    2018-09-05 armfly  æ­£å¼å‘å¸ƒ
 *
-*	Copyright (C), 2015-2030, °²¸»À³µç×Ó www.armfly.com
+*	Copyright (C), 2015-2030, å®‰å¯Œè±ç”µå­ www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -27,44 +27,42 @@ PCD_HandleTypeDef hpcd;
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbd_OpenMassStorage
-*	¹¦ÄÜËµÃ÷: ´ò¿ªUSB
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbd_OpenMassStorage
+*	åŠŸèƒ½è¯´æ˜: æ‰“å¼€USB
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbd_OpenMassStorage(void)
 {
-	/* Init Device Library */
-	USBD_Init(&USBD_Device, &MSC_Desc, 0);
+  /* Init Device Library */
+  USBD_Init(&USBD_Device, &MSC_Desc, 0);
 
+  /* Add Supported Class */
+  USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
 
-	
-	/* Add Supported Class */
-	USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
+  /* Add Storage callbacks for MSC Class */
+  USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
 
-	/* Add Storage callbacks for MSC Class */
-	USBD_MSC_RegisterStorage(&USBD_Device, &USBD_DISK_fops);
+  /* Start Device Process */
+  USBD_Start(&USBD_Device);
 
-	/* Start Device Process */
-	USBD_Start(&USBD_Device);
-
-	HAL_PWREx_EnableUSBVoltageDetector();	
+  HAL_PWREx_EnableUSBVoltageDetector();
 }
 
 /*
 *********************************************************************************************************
-*	º¯ Êı Ãû: usbd_CloseMassStorage
-*	¹¦ÄÜËµÃ÷: ¹Ø±ÕUSB
-*	ĞÎ    ²Î: ÎŞ
-*	·µ »Ø Öµ: ÎŞ
+*	å‡½ æ•° å: usbd_CloseMassStorage
+*	åŠŸèƒ½è¯´æ˜: å…³é—­USB
+*	å½¢    å‚: æ— 
+*	è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void usbd_CloseMassStorage(void)
 {
-	USBD_Stop(&USBD_Device);
-	
-	USBD_DeInit(&USBD_Device);
+  USBD_Stop(&USBD_Device);
+
+  USBD_DeInit(&USBD_Device);
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/
