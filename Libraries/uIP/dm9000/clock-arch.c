@@ -45,9 +45,9 @@
 clock_time_t
 clock_time(void)
 {
-	return bsp_GetRunTime(); /* 1ms 单位 */
+    return bsp_GetRunTime(); /* 1ms 单位 */
 
-/*	下面是uIP的原始代码
+/*    下面是uIP的原始代码
   struct timeval tv;
   struct timezone tz;
 

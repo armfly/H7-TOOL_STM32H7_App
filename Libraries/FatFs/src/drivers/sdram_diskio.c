@@ -51,8 +51,8 @@
 #include "sdram_diskio.h"
 
 /* 定义SDRAM 虚拟磁盘的地址和空间。 4M字节 */
-#define SDRAM_DEVICE_ADDR		0x20000000
-#define SDRAM_DEVICE_SIZE		0x20000
+#define SDRAM_DEVICE_ADDR        0x20000000
+#define SDRAM_DEVICE_SIZE        0x20000
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -96,7 +96,7 @@ const Diskio_drvTypeDef  SDRAMDISK_Driver =
   */
 DSTATUS SDRAMDISK_initialize(BYTE lun)
 {
-	return RES_OK;
+    return RES_OK;
 }
 
 /**
@@ -191,7 +191,7 @@ DRESULT SDRAMDISK_ioctl(BYTE lun, BYTE cmd, void *buff)
   /* Get erase block size in unit of sector (DWORD) */
   case GET_BLOCK_SIZE :
     *(DWORD*)buff = 1;
-	res = RES_OK;
+    res = RES_OK;
     break;
 
   default:

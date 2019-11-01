@@ -1,16 +1,16 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : STM32内部RTC
-*	文件名称 : bsp_cpu_rtc.h
-*	版    本 : V1.0
-*	说    明 : 头文件
+*    模块名称 : STM32内部RTC
+*    文件名称 : bsp_cpu_rtc.h
+*    版    本 : V1.0
+*    说    明 : 头文件
 *
-*	修改记录 :
-*		版本号  日期       作者    说明
-*		v1.0    2015-08-08 armfly  首版
+*    修改记录 :
+*        版本号  日期       作者    说明
+*        v1.0    2015-08-08 armfly  首版
 *
-*	Copyright (C), 2015-2016, 安富莱电子 www.armfly.com
+*    Copyright (C), 2015-2016, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,13 +20,13 @@
 
 typedef struct
 {
-	uint16_t Year;
-	uint8_t Mon;
-	uint8_t Day;
-	uint8_t Hour;
-	uint8_t Min;
-	uint8_t Sec;
-	uint8_t Week;
+    uint16_t Year;
+    uint8_t Mon;
+    uint8_t Day;
+    uint8_t Hour;
+    uint8_t Min;
+    uint8_t Sec;
+    uint8_t Week;
 } RTC_T;
 
 void bsp_InitRTC(void);

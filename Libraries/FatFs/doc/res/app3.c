@@ -46,7 +46,7 @@ DWORD allocate_contiguous_clusters (    /* Returns the first sector in LBA (0:er
 
     /* File is not contiguous */
 #if _FS_READONLY
-    return 0;								/* Exit if in read-only cfg. */
+    return 0;                                /* Exit if in read-only cfg. */
 #else
     if (!(fp->flag & FA_WRITE)) return 0;   /* Exit if the file object is for read-only */
 

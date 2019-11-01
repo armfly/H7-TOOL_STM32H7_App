@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : 华为GPRS模块MG323驱动程序
-*	文件名称 : bsp_mg323.h
-*	版    本 : V1.0
-*	说    明 : 头文件
+*    模块名称 : 华为GPRS模块MG323驱动程序
+*    文件名称 : bsp_mg323.h
+*    版    本 : V1.0
+*    说    明 : 头文件
 *
-*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*    Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -40,15 +40,15 @@
 #define EAR_VOL_MAX 5
 #define EAR_VOL_DEFAULT 4
 
-/* AT+CREG? 命令应答中的网络状态定义 	当前网络注册状态  MG323_GetNetStatus() */
+/* AT+CREG? 命令应答中的网络状态定义     当前网络注册状态  MG323_GetNetStatus() */
 enum
 {
-	CREG_NO_REG = 0,		/* 0：没有注册，ME现在并没有在搜寻要注册的新的运营商 */
-	CREG_LOCAL_OK = 1,	/* 1：注册了本地网络 */
-	CREG_SEARCH = 2,		/* 2：没有注册，但MS正在搜寻要注册的新的运营商 */
-	CREG_REJECT = 3,		/* 3：注册被拒绝 */
-	CREG_UNKNOW = 4,		/* 4：未知原因 */
-	CREG_REMOTE_OK = 5, /* 5：注册了漫游网络 */
+    CREG_NO_REG = 0,        /* 0：没有注册，ME现在并没有在搜寻要注册的新的运营商 */
+    CREG_LOCAL_OK = 1,    /* 1：注册了本地网络 */
+    CREG_SEARCH = 2,        /* 2：没有注册，但MS正在搜寻要注册的新的运营商 */
+    CREG_REJECT = 3,        /* 3：注册被拒绝 */
+    CREG_UNKNOW = 4,        /* 4：未知原因 */
+    CREG_REMOTE_OK = 5, /* 5：注册了漫游网络 */
 };
 
 /* 通过 ATI 指令，可以查询模块的硬件信息 
@@ -63,10 +63,10 @@ OK
 */
 typedef struct
 {
-	char Manfacture[12];	 /* 厂商 */
-	char Model[12];				 /* 型号 */
-	char Revision[15 + 1]; /* 固件版本 */
-	char IMEI[15 + 1];		 /* IMEI 码 */
+    char Manfacture[12];     /* 厂商 */
+    char Model[12];                 /* 型号 */
+    char Revision[15 + 1]; /* 固件版本 */
+    char IMEI[15 + 1];         /* IMEI 码 */
 } MG_HARD_INFO_T;
 
 /* 供外部调用的函数声明 */

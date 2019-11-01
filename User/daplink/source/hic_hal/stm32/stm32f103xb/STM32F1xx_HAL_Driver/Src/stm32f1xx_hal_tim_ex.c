@@ -1434,7 +1434,7 @@ HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t 
        /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
 
 /** @defgroup TIMEx_Exported_Functions_Group5 Peripheral Control functions
- *  @brief   	Peripheral Control functions
+ *  @brief       Peripheral Control functions
  *
 @verbatim
   ==============================================================================

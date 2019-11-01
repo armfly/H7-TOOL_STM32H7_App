@@ -348,9 +348,9 @@ void UART_IRQHandler(void)
 
     if (intfl & MXC_F_UART_INTFL_TX_FIFO_AE) {
         /*
-        	Transfer data from write buffer to transmit FIFO if
-        	a) write buffer contains data and
-        	b) transmit FIFO is not full
+            Transfer data from write buffer to transmit FIFO if
+            a) write buffer contains data and
+            b) transmit FIFO is not full
         */
         while ((write_buffer.cnt_out != write_buffer.cnt_in) &&
                 (((CdcAcmUart->tx_fifo_ctrl & MXC_F_UART_TX_FIFO_CTRL_FIFO_ENTRY) >> MXC_F_UART_TX_FIFO_CTRL_FIFO_ENTRY_POS) < MXC_UART_FIFO_DEPTH)) {

@@ -108,8 +108,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define MDIOS_PORT_ADDRESS_SHIFT        ((uint32_t)8)
-#define	MDIOS_ALL_REG_FLAG	        ((uint32_t)0xFFFFFFFFU)
-#define	MDIOS_ALL_ERRORS_FLAG           ((uint32_t)(MDIOS_SR_PERF | MDIOS_SR_SERF | MDIOS_SR_TERF))
+#define    MDIOS_ALL_REG_FLAG            ((uint32_t)0xFFFFFFFFU)
+#define    MDIOS_ALL_ERRORS_FLAG           ((uint32_t)(MDIOS_SR_PERF | MDIOS_SR_SERF | MDIOS_SR_TERF))
 
 #define MDIOS_DIN_BASE_ADDR             (MDIOS_BASE + 0x100)
 #define MDIOS_DOUT_BASE_ADDR            (MDIOS_BASE + 0x180)
@@ -493,7 +493,7 @@ void HAL_MDIOS_IRQHandler(MDIOS_HandleTypeDef *hmdios)
   {
     /* Clear MDIOS WAKEUP Exti pending bit */
     __HAL_MDIOS_WAKEUP_EXTI_CLEAR_FLAG(MDIOS_WAKEUP_EXTI_LINE);
-		/* MDIOS WAKEUP interrupt user callback */
+        /* MDIOS WAKEUP interrupt user callback */
     HAL_MDIOS_WakeUpCallback(hmdios);
   }
 }

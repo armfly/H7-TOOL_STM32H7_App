@@ -589,8 +589,8 @@ static USBH_StatusTypeDef USBH_HandleControl (USBH_HandleTypeDef *phost)
   case CTRL_SETUP:
     /* send a SETUP packet */
     USBH_CtlSendSetup     (phost, 
-	                   (uint8_t *)phost->Control.setup.d8 , 
-	                   phost->Control.pipe_out); 
+                       (uint8_t *)phost->Control.setup.d8 , 
+                       phost->Control.pipe_out); 
     
     phost->Control.state = CTRL_SETUP_WAIT; 
     break; 

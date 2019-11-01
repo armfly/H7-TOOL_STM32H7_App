@@ -5,7 +5,7 @@
   * @version V2.4.2
   * @date    11-December-2015
   * @brief   USB Device Custom HID interface file.
-  *		     This template should be copied to the user folder, renamed and customized
+  *             This template should be copied to the user folder, renamed and customized
   *          following user needs.
   ******************************************************************************
   * @attention

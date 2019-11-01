@@ -57,7 +57,7 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
       ++lwip_stats.sys.mbox.used;
       if (lwip_stats.sys.mbox.max < lwip_stats.sys.mbox.used) {
          lwip_stats.sys.mbox.max = lwip_stats.sys.mbox.used;
-	  }
+      }
 #endif /* SYS_STATS */
  if (*mbox == NULL)
   return ERR_MEM;
@@ -73,18 +73,18 @@ err_t sys_mbox_new(sys_mbox_t *mbox, int size)
 */
 void sys_mbox_free(sys_mbox_t *mbox)
 {
-	if( osMessageWaiting(*mbox) )
-	{
-		/* Line for breakpoint.  Should never break here! */
-		portNOP();
+    if( osMessageWaiting(*mbox) )
+    {
+        /* Line for breakpoint.  Should never break here! */
+        portNOP();
 #if SYS_STATS
-	    lwip_stats.sys.mbox.err++;
+        lwip_stats.sys.mbox.err++;
 #endif /* SYS_STATS */
-			
-		// TODO notify the user of failure.
-	}
+            
+        // TODO notify the user of failure.
+    }
 
-	osMessageDelete(*mbox);
+    osMessageDelete(*mbox);
 
 #if SYS_STATS
      --lwip_stats.sys.mbox.used;
@@ -112,11 +112,11 @@ err_t result;
    else {
       // could not post, queue must be full
       result = ERR_MEM;
-			
+            
 #if SYS_STATS
       lwip_stats.sys.mbox.err++;
 #endif /* SYS_STATS */
-			
+            
    }
 
    return result;
@@ -208,28 +208,28 @@ err_t sys_sem_new(sys_sem_t *sem, u8_t count)
   osSemaphoreDef(SEM);
 
   *sem = osSemaphoreCreate (osSemaphore(SEM), 1);
-	
+    
   if(*sem == NULL)
   {
 #if SYS_STATS
       ++lwip_stats.sys.sem.err;
-#endif /* SYS_STATS */	
-		return ERR_MEM;
+#endif /* SYS_STATS */    
+        return ERR_MEM;
   }
-	
-  if(count == 0)	// Means it can't be taken
+    
+  if(count == 0)    // Means it can't be taken
   {
     osSemaphoreWait(*sem,0);
   }
 
 #if SYS_STATS
-	++lwip_stats.sys.sem.used;
- 	if (lwip_stats.sys.sem.max < lwip_stats.sys.sem.used) {
-		lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
-	}
+    ++lwip_stats.sys.sem.used;
+     if (lwip_stats.sys.sem.max < lwip_stats.sys.sem.used) {
+        lwip_stats.sys.sem.max = lwip_stats.sys.sem.used;
+    }
 #endif /* SYS_STATS */
-		
-	return ERR_OK;
+        
+    return ERR_OK;
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -328,7 +328,7 @@ err_t sys_mutex_new(sys_mutex_t *mutex) {
   {
 #if SYS_STATS
     ++lwip_stats.sys.mutex.err;
-#endif /* SYS_STATS */	
+#endif /* SYS_STATS */    
     return ERR_MEM;
   }
   
@@ -347,7 +347,7 @@ void sys_mutex_free(sys_mutex_t *mutex)
 #if SYS_STATS
       --lwip_stats.sys.mutex.used;
 #endif /* SYS_STATS */
-			
+            
   osMutexDelete(*mutex);
 }
 /*-----------------------------------------------------------------------------------*/

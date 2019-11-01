@@ -55,30 +55,30 @@
 */
 
 /*********************************************************************//**
- * @brief 		Configure pin function
- * @param[in]	port	Port number, should be: 0..15
- * @param[in]	pin	Pin number, should be: 0..31
- * @param[in]	mode	Pin mode, should be:
- * 					- MD_PUP	:Pull-up enabled
- * 					- MD_BUK	:Plain input
- * 					- MD_PLN	:Repeater mode
- * 					- MD_PDN	:Pull-down enabled
- * 					- MD_EHS        :Slew rate
- * 					- MD_EZI        :Input buffer enable
- * 					- MD_ZI         :Glitch filter enabled
- * 					- MD_EHD0       :High drive  8 mA
- * 					- MD_EHD1       :High drive 14 mA
- * 					- MD_EHD2       :High drive 20 mA
- * @param[in]	func 	Function mode, should be:
- * 					- FUNC0		:Function 0
- * 					- FUNC1		:Function 1
- * 					- FUNC2		:Function 2
- * 					- FUNC3		:Function 3
- * 					- FUNC4		:Function 4
- * 					- FUNC5		:Function 5
- * 					- FUNC6		:Function 6
- * 					- FUNC7		:Function 7
- * @return		None
+ * @brief         Configure pin function
+ * @param[in]    port    Port number, should be: 0..15
+ * @param[in]    pin    Pin number, should be: 0..31
+ * @param[in]    mode    Pin mode, should be:
+ *                     - MD_PUP    :Pull-up enabled
+ *                     - MD_BUK    :Plain input
+ *                     - MD_PLN    :Repeater mode
+ *                     - MD_PDN    :Pull-down enabled
+ *                     - MD_EHS        :Slew rate
+ *                     - MD_EZI        :Input buffer enable
+ *                     - MD_ZI         :Glitch filter enabled
+ *                     - MD_EHD0       :High drive  8 mA
+ *                     - MD_EHD1       :High drive 14 mA
+ *                     - MD_EHD2       :High drive 20 mA
+ * @param[in]    func     Function mode, should be:
+ *                     - FUNC0        :Function 0
+ *                     - FUNC1        :Function 1
+ *                     - FUNC2        :Function 2
+ *                     - FUNC3        :Function 3
+ *                     - FUNC4        :Function 4
+ *                     - FUNC5        :Function 5
+ *                     - FUNC6        :Function 6
+ *                     - FUNC7        :Function 7
+ * @return        None
  **********************************************************************/
 void scu_pinmux(uint8_t port, uint8_t pin, uint8_t mode, uint8_t func)
 {

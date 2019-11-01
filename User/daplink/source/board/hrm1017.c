@@ -25,6 +25,6 @@ const board_info_t g_board_info = {
     .infoVersion = 0x0,
     .board_id = "1017",
     .family_id = kNordic_Nrf51_FamilyID,
-    .daplink_drive_name = 		"MBED       ",
+    .daplink_drive_name =         "MBED       ",
     .target_cfg = &target_device,
 };

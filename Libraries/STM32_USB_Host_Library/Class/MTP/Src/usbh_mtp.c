@@ -141,7 +141,7 @@ USBH_ClassTypeDef  MTP_Class =
   * @retval USBH Status
   */
 static USBH_StatusTypeDef USBH_MTP_InterfaceInit (USBH_HandleTypeDef *phost)
-{	
+{    
   USBH_StatusTypeDef status = USBH_OK ;
   uint8_t interface, endpoint;
   
@@ -1030,7 +1030,7 @@ static void MTP_DecodeEvent (USBH_HandleTypeDef *phost)
   */
 USBH_StatusTypeDef USBH_MTP_GetDevicePropDesc (USBH_HandleTypeDef *phost,
                                                 uint16_t propcode, 
-			                        PTP_DevicePropDescTypdef* devicepropertydesc)
+                                    PTP_DevicePropDescTypdef* devicepropertydesc)
 
 {
   USBH_StatusTypeDef status = USBH_FAIL;

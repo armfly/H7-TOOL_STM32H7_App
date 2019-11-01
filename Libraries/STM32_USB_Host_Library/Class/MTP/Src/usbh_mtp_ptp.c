@@ -932,7 +932,7 @@ USBH_StatusTypeDef USBH_PTP_OpenSession (USBH_HandleTypeDef *phost, uint32_t ses
   */
 USBH_StatusTypeDef USBH_PTP_GetDevicePropDesc (USBH_HandleTypeDef *phost,
                                                 uint16_t propcode, 
-			PTP_DevicePropDescTypdef* devicepropertydesc)
+            PTP_DevicePropDescTypdef* devicepropertydesc)
 {
   USBH_StatusTypeDef   status = USBH_BUSY; 
   MTP_HandleTypeDef    *MTP_Handle =  (MTP_HandleTypeDef *)phost->pActiveClass->pData; 
@@ -973,10 +973,10 @@ USBH_StatusTypeDef USBH_PTP_GetDevicePropDesc (USBH_HandleTypeDef *phost,
     
     if(status == USBH_OK)
     {
-	devicepropertydesc->DevicePropertyCode = LE16(&data[PTP_dpd_DevicePropertyCode]);
-	devicepropertydesc->DataType = LE16(&data[PTP_dpd_DataType]);
-	devicepropertydesc->GetSet = *(uint8_t *)(&data[PTP_dpd_GetSet]);
-	devicepropertydesc->FormFlag =  PTP_DPFF_None;
+    devicepropertydesc->DevicePropertyCode = LE16(&data[PTP_dpd_DevicePropertyCode]);
+    devicepropertydesc->DataType = LE16(&data[PTP_dpd_DataType]);
+    devicepropertydesc->GetSet = *(uint8_t *)(&data[PTP_dpd_GetSet]);
+    devicepropertydesc->FormFlag =  PTP_DPFF_None;
     }
     break;
     

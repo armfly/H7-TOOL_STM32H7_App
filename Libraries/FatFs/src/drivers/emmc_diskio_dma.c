@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   SD DMA Disk I/O template driver. This file needs to be renamed and
              copied into the application project alongside the respective header
-	         file.
+             file.
   ******************************************************************************
   * @attention
   *
@@ -59,7 +59,7 @@
  * the value by default is as defined in the BSP platform driver otherwise 30 secs
  */
 
-#define SD_TIMEOUT 3 * 1000	//30 * 1000
+#define SD_TIMEOUT 3 * 1000    //30 * 1000
 
 #define SD_DEFAULT_BLOCK_SIZE 512
 
@@ -171,17 +171,17 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
   uint32_t alignedAddr;
 #endif
 
-#if 0	/* 非DMA模式 */
+#if 0    /* 非DMA模式 */
    if(BSP_MMC_ReadBlocks((uint32_t *) buff, (uint32_t) (sector), count, 1000) == MMC_OK)
    {
-	    res = RES_OK;
+        res = RES_OK;
    }
    else
    {
-	    res = RES_ERROR;
+        res = RES_ERROR;
    }
    return res;
-#else	/* DMA模式 */
+#else    /* DMA模式 */
   if(BSP_MMC_ReadBlocks_DMA((uint32_t*)buff,
                            (uint32_t) (sector),
                            count) == MMC_OK)
@@ -325,7 +325,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
   case GET_BLOCK_SIZE :
     BSP_MMC_GetCardInfo(&CardInfo);
     *(DWORD*)buff = CardInfo.LogBlockSize / SD_DEFAULT_BLOCK_SIZE;
-	res = RES_OK;
+    res = RES_OK;
     break;
 
   default:

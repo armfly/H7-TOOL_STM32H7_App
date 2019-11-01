@@ -1820,36 +1820,36 @@ BOOL USBD_EndPoint0_Setup_WinUSB_ReqToDevice(void)
 
 __weak \
 const U8 USBD_BinaryObjectStoreDescriptor[] = {
-	USB_BOS_DESC_SIZE,                      /* bLength */
-	USB_BINARY_OBJECT_STORE_DESCRIPTOR_TYPE,/* bDescriptorType */
-	WBVAL(USBD_BOS_WTOTALLENGTH),           /* wTotalLength */
-	USBD_NUM_DEV_CAPABILITIES,              /* bNumDeviceCaps */
+    USB_BOS_DESC_SIZE,                      /* bLength */
+    USB_BINARY_OBJECT_STORE_DESCRIPTOR_TYPE,/* bDescriptorType */
+    WBVAL(USBD_BOS_WTOTALLENGTH),           /* wTotalLength */
+    USBD_NUM_DEV_CAPABILITIES,              /* bNumDeviceCaps */
 #if (USBD_WEBUSB_ENABLE)
-	USBD_WEBUSB_DESC_LEN,                   /* bLength */
-	USB_DEVICE_CAPABILITY_DESCRIPTOR_TYPE,  /* bDescriptorType */
-	USB_DEVICE_CAPABILITY_PLATFORM,         /* bDevCapabilityType */
-	0x00,                                   /* bReserved */
-	0x38, 0xB6, 0x08, 0x34,                 /* PlatformCapabilityUUID */
-	0xA9, 0x09, 0xA0, 0x47,
-	0x8B, 0xFD, 0xA0, 0x76,
-	0x88, 0x15, 0xB6, 0x65,
-	WBVAL(0x0100), /* 1.00 */               /* bcdVersion */
-	USBD_WEBUSB_VENDOR_CODE,                /* bVendorCode */
-	0,                                      /* iLandingPage */
+    USBD_WEBUSB_DESC_LEN,                   /* bLength */
+    USB_DEVICE_CAPABILITY_DESCRIPTOR_TYPE,  /* bDescriptorType */
+    USB_DEVICE_CAPABILITY_PLATFORM,         /* bDevCapabilityType */
+    0x00,                                   /* bReserved */
+    0x38, 0xB6, 0x08, 0x34,                 /* PlatformCapabilityUUID */
+    0xA9, 0x09, 0xA0, 0x47,
+    0x8B, 0xFD, 0xA0, 0x76,
+    0x88, 0x15, 0xB6, 0x65,
+    WBVAL(0x0100), /* 1.00 */               /* bcdVersion */
+    USBD_WEBUSB_VENDOR_CODE,                /* bVendorCode */
+    0,                                      /* iLandingPage */
 #endif
 #if (USBD_WINUSB_ENABLE)
-	USBD_WINUSB_DESC_LEN,                   /* bLength */
-	USB_DEVICE_CAPABILITY_DESCRIPTOR_TYPE,  /* bDescriptorType */
-	USB_DEVICE_CAPABILITY_PLATFORM,         /* bDevCapabilityType */
-	0x00,                                   /* bReserved */
-	0xDF, 0x60, 0xDD, 0xD8,                 /* PlatformCapabilityUUID */
-	0x89, 0x45, 0xC7, 0x4C,
-	0x9C, 0xD2, 0x65, 0x9D,
-	0x9E, 0x64, 0x8A, 0x9F,
-	0x00, 0x00, 0x03, 0x06, /* >= Win 8.1 *//* dwWindowsVersion*/
-	WBVAL(USBD_WINUSB_DESC_SET_LEN),        /* wDescriptorSetTotalLength */
-	USBD_WINUSB_VENDOR_CODE,                /* bVendorCode */
-	0,                                      /* bAltEnumCode */
+    USBD_WINUSB_DESC_LEN,                   /* bLength */
+    USB_DEVICE_CAPABILITY_DESCRIPTOR_TYPE,  /* bDescriptorType */
+    USB_DEVICE_CAPABILITY_PLATFORM,         /* bDevCapabilityType */
+    0x00,                                   /* bReserved */
+    0xDF, 0x60, 0xDD, 0xD8,                 /* PlatformCapabilityUUID */
+    0x89, 0x45, 0xC7, 0x4C,
+    0x9C, 0xD2, 0x65, 0x9D,
+    0x9E, 0x64, 0x8A, 0x9F,
+    0x00, 0x00, 0x03, 0x06, /* >= Win 8.1 *//* dwWindowsVersion*/
+    WBVAL(USBD_WINUSB_DESC_SET_LEN),        /* wDescriptorSetTotalLength */
+    USBD_WINUSB_VENDOR_CODE,                /* bVendorCode */
+    0,                                      /* bAltEnumCode */
 #endif
 };
 

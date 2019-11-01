@@ -51,8 +51,8 @@ typedef enum {ERROR = 0, SUCCESS = !ERROR} Status;
  * Read/Write transfer type mode (Block or non-block)
  */
 typedef enum {
-    NONE_BLOCKING = 0,		/**< None Blocking type */
-    BLOCKING,				/**< Blocking type */
+    NONE_BLOCKING = 0,        /**< None Blocking type */
+    BLOCKING,                /**< Blocking type */
 } TRANSFER_BLOCK_Type;
 
 
@@ -68,7 +68,7 @@ typedef int32_t(*PFI)();
  */
 #undef _BIT
 /* Set bit macro */
-#define _BIT(n)	(1<<(n))
+#define _BIT(n)    (1<<(n))
 
 /* _SBF(f,v) sets the bit field starting at position "f" to value "v".
  * _SBF(f,v) is intended to be used in "OR" and "AND" expressions:
@@ -125,16 +125,16 @@ typedef uint8_t UNS_8;
 typedef int8_t INT_8;
 
 /** SMA type for 16 bit unsigned value */
-typedef	uint16_t UNS_16;
+typedef    uint16_t UNS_16;
 
 /** SMA type for 16 bit signed value */
-typedef	int16_t INT_16;
+typedef    int16_t INT_16;
 
 /** SMA type for 32 bit unsigned value */
-typedef	uint32_t UNS_32;
+typedef    uint32_t UNS_32;
 
 /** SMA type for 32 bit signed value */
-typedef	int32_t INT_32;
+typedef    int32_t INT_32;
 
 /** SMA type for 64 bit signed value */
 typedef int64_t INT_64;

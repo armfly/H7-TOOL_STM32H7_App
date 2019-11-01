@@ -175,7 +175,7 @@ HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
    hpcd->IN_ep[i].maxpacket =  0;
    hpcd->IN_ep[i].xfer_buff = 0;
    hpcd->IN_ep[i].xfer_len = 0;
-	 
+     
 
  }
  
@@ -204,7 +204,7 @@ HAL_StatusTypeDef HAL_PCD_Init(PCD_HandleTypeDef *hpcd)
    HAL_PCDEx_ActivateLPM(hpcd);
  }
  
-#if defined (USB_OTG_GCCFG_BCDEN)	
+#if defined (USB_OTG_GCCFG_BCDEN)    
  /* Activate Battery charging */
  if (hpcd->Init.battery_charging_enable ==1)
  {
@@ -594,8 +594,8 @@ void HAL_PCD_IRQHandler(PCD_HandleTypeDef *hpcd)
         
         /* Get hclk frequency value */
         hclk = HAL_RCC_GetHCLKFreq();
-		
-		    if((hclk >= 14200000)&&(hclk < 15000000))
+        
+            if((hclk >= 14200000)&&(hclk < 15000000))
         {
           /* hclk Clock Range between 14.2-15 MHz */
           hpcd->Instance->GUSBCFG |= (uint32_t)((0xF << 10) & USB_OTG_GUSBCFG_TRDT);

@@ -103,8 +103,8 @@
 /*
  * The basic PPP frame.
  */
-#define PPP_HDRLEN	4	/* octets for standard ppp header */
-#define PPP_FCSLEN	2	/* octets for FCS */
+#define PPP_HDRLEN    4    /* octets for standard ppp header */
+#define PPP_FCSLEN    2    /* octets for FCS */
 
 /*
  * Values for phase.

@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   USB Host Disk I/O template  driver (without internal DMA).This file
              has to be copied under the appliction porject alongside the
-	     repective header file.
+         repective header file.
   ******************************************************************************
   * @attention
   *

@@ -25,11 +25,11 @@
 // Default empty board info. 
 __attribute__((weak)) 
 const board_info_t g_board_info = {
-		.infoVersion = 0x1234,
-		.board_id = "0000",
-		.daplink_url_name =       "MBED    HTM",
-		.daplink_drive_name = 		"DAPLINK    ",
-		.daplink_target_url = "https://mbed.org/device/?code=@U?version=@V?target_id=@T",
+        .infoVersion = 0x1234,
+        .board_id = "0000",
+        .daplink_url_name =       "MBED    HTM",
+        .daplink_drive_name =         "DAPLINK    ",
+        .daplink_target_url = "https://mbed.org/device/?code=@U?version=@V?target_id=@T",
 };
 
 

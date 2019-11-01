@@ -701,8 +701,8 @@ typedef struct
                                         tmpreg = READ_BIT(RCC->AHB3ENR, RCC_AHB3ENR_JPGDECEN);\
                                         UNUSED(tmpreg); \
                                        } while(0)
-																			
-																			 
+                                                                            
+                                                                             
 #define __HAL_RCC_FMC_CLK_ENABLE()   do { \
                                         __IO uint32_t tmpreg; \
                                         SET_BIT(RCC->AHB3ENR, RCC_AHB3ENR_FMCEN);\

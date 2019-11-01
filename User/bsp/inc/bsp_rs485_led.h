@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : 安富莱LED-485-XXX系列数码管的驱动程序
-*	文件名称 : bsp_rs485_led.h
-*	版    本 : V1.0
-*	说    明 : 头文件
+*    模块名称 : 安富莱LED-485-XXX系列数码管的驱动程序
+*    文件名称 : bsp_rs485_led.h
+*    版    本 : V1.0
+*    说    明 : 头文件
 *
-*	Copyright (C), 2014-2015, 安富莱电子 www.armfly.com
+*    Copyright (C), 2014-2015, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -19,21 +19,21 @@
 
 typedef struct
 {
-	uint8_t RxBuf[MODH_RX_SIZE];
-	uint8_t RxCount;
-	uint8_t RxStatus;
-	uint8_t RxNewFlag;
+    uint8_t RxBuf[MODH_RX_SIZE];
+    uint8_t RxCount;
+    uint8_t RxStatus;
+    uint8_t RxNewFlag;
 
-	uint8_t AppRxBuf[MODH_RX_SIZE];
-	uint8_t AppRxCount;
+    uint8_t AppRxBuf[MODH_RX_SIZE];
+    uint8_t AppRxCount;
 
-	uint32_t Baud;
+    uint32_t Baud;
 
-	uint8_t RspCode;
+    uint8_t RspCode;
 
-	uint8_t TxBuf[MODH_TX_SIZE];
-	uint8_t TxLen;
-	uint8_t fAckOK; /* 应答OK标志 */
+    uint8_t TxBuf[MODH_TX_SIZE];
+    uint8_t TxLen;
+    uint8_t fAckOK; /* 应答OK标志 */
 } MODH_T;
 
 extern MODH_T g_tModH;

@@ -206,7 +206,7 @@ typedef struct {
 typedef struct {
     uint32_t               : 4;
     uint32_t mapping_req   : 1;
-	uint32_t scl_push_pull : 1;
+    uint32_t scl_push_pull : 1;
     uint32_t               : 26;
 } mxc_ioman_i2cm0_req_t;
 
@@ -219,7 +219,7 @@ typedef struct {
 typedef struct {
     uint32_t               : 4;
     uint32_t mapping_req   : 1;
-	uint32_t scl_push_pull : 1;
+    uint32_t scl_push_pull : 1;
     uint32_t               : 26;
 } mxc_ioman_i2cm1_req_t;
 

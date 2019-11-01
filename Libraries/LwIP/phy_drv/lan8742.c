@@ -368,7 +368,7 @@ int32_t LAN8742_GetLinkState(lan8742_Object_t *pObj)
     else
     {
       return LAN8742_STATUS_10MBITS_HALFDUPLEX;
-    }  		
+    }
   }
   else /* Auto Nego enabled */
   {
@@ -398,7 +398,7 @@ int32_t LAN8742_GetLinkState(lan8742_Object_t *pObj)
     else
     {
       return LAN8742_STATUS_10MBITS_HALFDUPLEX;
-    }				
+    }
   }
 }
 
@@ -441,7 +441,7 @@ int32_t LAN8742_SetLinkState(lan8742_Object_t *pObj, uint32_t LinkState)
     {
       /* Wrong link status parameter */
       status = LAN8742_STATUS_ERROR;
-    }	
+    }
   }
   else
   {
@@ -659,7 +659,7 @@ int32_t LAN8742_GetITStatus(lan8742_Object_t *pObj, uint32_t Interrupt)
   {
     status = LAN8742_STATUS_READ_ERROR;
   }
-	
+
   return status;
 }
 

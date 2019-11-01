@@ -238,14 +238,14 @@ __weak void SystemInit(void)
        !(MXC_PWRMAN->pwr_rst_ctrl & MXC_F_PWRMAN_PWR_RST_CTRL_POR)) {
         /* Clear GPIO WUD event and configuration registers, globally */
         MXC_PWRSEQ->reg1 |= (MXC_F_PWRSEQ_REG1_PWR_CLR_IO_EVENT_LATCH |
-			     MXC_F_PWRSEQ_REG1_PWR_CLR_IO_CFG_LATCH);
+                 MXC_F_PWRSEQ_REG1_PWR_CLR_IO_CFG_LATCH);
         MXC_PWRSEQ->reg1 &= ~(MXC_F_PWRSEQ_REG1_PWR_CLR_IO_EVENT_LATCH |
-			      MXC_F_PWRSEQ_REG1_PWR_CLR_IO_CFG_LATCH);
+                  MXC_F_PWRSEQ_REG1_PWR_CLR_IO_CFG_LATCH);
     } else {
-				/* Unfreeze the GPIO by clearing MBUS_GATE, when returning from LP0 */
-				MXC_PWRSEQ->reg1 &= ~(MXC_F_PWRSEQ_REG1_PWR_MBUS_GATE);
-				/* LP0 wake-up: Turn off special switch to eliminate ~50nA of leakage on VDD12 */
-				MXC_PWRSEQ->reg1 &= ~MXC_F_PWRSEQ_REG1_PWR_SRAM_NWELL_SW;
+                /* Unfreeze the GPIO by clearing MBUS_GATE, when returning from LP0 */
+                MXC_PWRSEQ->reg1 &= ~(MXC_F_PWRSEQ_REG1_PWR_MBUS_GATE);
+                /* LP0 wake-up: Turn off special switch to eliminate ~50nA of leakage on VDD12 */
+                MXC_PWRSEQ->reg1 &= ~MXC_F_PWRSEQ_REG1_PWR_SRAM_NWELL_SW;
     }
 
     /* Turn on retention regulator */

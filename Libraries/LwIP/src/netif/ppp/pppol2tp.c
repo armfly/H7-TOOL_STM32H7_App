@@ -769,27 +769,27 @@ static void pppol2tp_timeout(void *arg) {
       if (l2tp->peer_nr <= l2tp->our_ns -1) { /* the SCCCN was not acknowledged */
 #if defined(LWIP_DEBUG) && (LOG_DEBUG == LWIP_DBG_ON)
         if ((err = pppol2tp_send_scccn(l2tp, l2tp->our_ns -1)) != 0) {
-	  l2tp->icrq_retried--;
-	  PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send SCCCN, error=%d\n", err));
-	  sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);
-	  break;
-	}
+      l2tp->icrq_retried--;
+      PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send SCCCN, error=%d\n", err));
+      sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);
+      break;
+    }
 #else
         if (pppol2tp_send_scccn(l2tp, l2tp->our_ns -1) != 0) {
-	  l2tp->icrq_retried--;
-	  sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);
-	  break;
-	}
+      l2tp->icrq_retried--;
+      sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);
+      break;
+    }
 #endif
       }
 #if defined(LWIP_DEBUG) && (LOG_DEBUG == LWIP_DBG_ON)
       if ((err = pppol2tp_send_icrq(l2tp, l2tp->our_ns)) != 0) {
-	l2tp->icrq_retried--;
-	PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send ICRQ, error=%d\n", err));
+    l2tp->icrq_retried--;
+    PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send ICRQ, error=%d\n", err));
       }
 #else
       if (pppol2tp_send_icrq(l2tp, l2tp->our_ns) != 0) {
-	l2tp->icrq_retried--;
+    l2tp->icrq_retried--;
       }
 #endif
       sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);
@@ -804,12 +804,12 @@ static void pppol2tp_timeout(void *arg) {
       PPPDEBUG(LOG_DEBUG, ("pppol2tp: iccn_retried=%d\n", l2tp->iccn_retried));
 #if defined(LWIP_DEBUG) && (LOG_DEBUG == LWIP_DBG_ON)
       if ((err = pppol2tp_send_iccn(l2tp, l2tp->our_ns)) != 0) {
-	l2tp->iccn_retried--;
-	PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send ICCN, error=%d\n", err));
+    l2tp->iccn_retried--;
+    PPPDEBUG(LOG_DEBUG, ("pppol2tp: failed to send ICCN, error=%d\n", err));
       }
 #else
       if (pppol2tp_send_iccn(l2tp, l2tp->our_ns) != 0) {
-	l2tp->iccn_retried--;
+    l2tp->iccn_retried--;
       }
 #endif
       sys_timeout(PPPOL2TP_CONTROL_TIMEOUT, pppol2tp_timeout, l2tp);

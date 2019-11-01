@@ -1,12 +1,12 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : ESP32 串口WIFI模块驱动程序
-*	文件名称 : bsp_esp32_at.h
-*	版    本 : V1.3
-*	说    明 : 头文件
+*    模块名称 : ESP32 串口WIFI模块驱动程序
+*    文件名称 : bsp_esp32_at.h
+*    版    本 : V1.3
+*    说    明 : 头文件
 *
-*	Copyright (C), 2015-2020, 安富莱电子 www.armfly.com
+*    Copyright (C), 2015-2020, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -20,82 +20,82 @@
 /* 定义下面这句话, 将把收到的字符发送到调试串口1 */
 #define ESP32_TO_COM1_EN
 
-#define SSID_MAX_LEN 32			/* SSID最长32个字符，存储时需要32+1空间，末尾加0 */
+#define SSID_MAX_LEN 32            /* SSID最长32个字符，存储时需要32+1空间，末尾加0 */
 #define PASSWORD_MAX_LEN 64 /* WIFI 密码 最长64个字符，存储时需要32+1空间，末尾加0 */
 
 /* 设备结构体 */
 typedef struct
 {
-	char ssid[33];	 /* SSID是一个无线局域网络（WLAN）的名称。SSID是区分大小写的文本字符串，最大长度32个字符 */
-	uint8_t ecn;		 /* 加密方式 
-						0   OPEN
-						1   WEP
-						2   WPA_PSK
-						3   WPA2_PSK
-						4   WPA_WPA2_PSK
-					*/
-	int32_t rssi;		 /* 信号强度 */
-	uint8_t mac[20]; /* MAC地址字符串*/
-	uint8_t ch;			 /* 信道 */
+    char ssid[33];     /* SSID是一个无线局域网络（WLAN）的名称。SSID是区分大小写的文本字符串，最大长度32个字符 */
+    uint8_t ecn;         /* 加密方式 
+                        0   OPEN
+                        1   WEP
+                        2   WPA_PSK
+                        3   WPA2_PSK
+                        4   WPA_WPA2_PSK
+                    */
+    int32_t rssi;         /* 信号强度 */
+    uint8_t mac[20]; /* MAC地址字符串*/
+    uint8_t ch;             /* 信道 */
 } WIFI_AP_T;
 
 /* 加密方式 */
 enum
 {
-	ECN_OPEN = 0,
-	ECN_WEP = 1,
-	ECN_WPA_PSK = 2,
-	ECN_WPA2_PSK = 3,
-	ECN_WPA_WPA2_PSK = 4,
+    ECN_OPEN = 0,
+    ECN_WEP = 1,
+    ECN_WPA_PSK = 2,
+    ECN_WPA2_PSK = 3,
+    ECN_WPA_WPA2_PSK = 4,
 };
 
 /* ESP32_PT_WaitResonse 函数的返回值定义 */
 enum
 {
-	PT_NULL = 0, /* 空操作，需要继续等待 */
-	PT_TIMEOUT,	/* 执行超时 */
+    PT_NULL = 0, /* 空操作，需要继续等待 */
+    PT_TIMEOUT,    /* 执行超时 */
 
-	PT_OK,	/* 成功执行 */
-	PT_ERR, /* 执行失败 */
+    PT_OK,    /* 成功执行 */
+    PT_ERR, /* 执行失败 */
 };
 
 /* ESP32_QueryIPStatus 函数的返回值定义 */
 enum
 {
-	IPS_GET_IP = '2',		 /* 获得IP */
-	IPS_LINK_OK = '3',	 /* 建立连接 */
-	IPS_LINK_LOST = '4', /* 失去连接，模块可能看门狗复位 */
+    IPS_GET_IP = '2',         /* 获得IP */
+    IPS_LINK_OK = '3',     /* 建立连接 */
+    IPS_LINK_LOST = '4', /* 失去连接，模块可能看门狗复位 */
 
-	IPS_BUSY = '8',		/* 模块内部忙， zhg 自定义的状态，不是命令正确应答 */
-	IPS_TIMEOUT = '9' /* 命令应答超时， zhg 自定义的状态 */
+    IPS_BUSY = '8',        /* 模块内部忙， zhg 自定义的状态，不是命令正确应答 */
+    IPS_TIMEOUT = '9' /* 命令应答超时， zhg 自定义的状态 */
 };
 
 /* ESP32_RxData 函数的返回值定义 */
 enum
 {
-	ESP_RX_NONE = 0, /* 没有读到字节 */
-	ESP_RX_BYTE,		 /* 表示接收到字节（数据不全，未解码。 用于主程序判断超时） */
-	ESP_RX_IPD,			 /* +IPD数据包, TCP，UDP数据包  */
-	ESP_RX_OTHER		 /* 收到回车换行结束的应答字符串  */
+    ESP_RX_NONE = 0, /* 没有读到字节 */
+    ESP_RX_BYTE,         /* 表示接收到字节（数据不全，未解码。 用于主程序判断超时） */
+    ESP_RX_IPD,             /* +IPD数据包, TCP，UDP数据包  */
+    ESP_RX_OTHER         /* 收到回车换行结束的应答字符串  */
 };
 
 /* 用于非阻塞函数 */
 #define ACK_MAX_LEN 128
 typedef struct
 {
-	uint8_t RxBuf[ACK_MAX_LEN];
-	uint8_t Len1;
-	uint8_t Len2;
-	uint8_t Len3;
+    uint8_t RxBuf[ACK_MAX_LEN];
+    uint8_t Len1;
+    uint8_t Len2;
+    uint8_t Len3;
 
-	char *pStr1;
-	char *pStr2;
-	char *pStr3;
+    char *pStr1;
+    char *pStr2;
+    char *pStr3;
 
-	int32_t LastTime;
-	uint16_t Timeout;
+    int32_t LastTime;
+    uint16_t Timeout;
 
-	uint8_t RunFirst;
+    uint8_t RunFirst;
 } ESP32_PT_T;
 
 /* 供外部调用的函数声明 */

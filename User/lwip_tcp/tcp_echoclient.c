@@ -53,7 +53,7 @@ __IO uint32_t message_count=0;
 //u8_t   data[100] = "123456";
 
 struct tcp_pcb *echoclient_pcb;
-TCP_USER_T g_tClient;		/* TCP用户结构体 2016-09-09 by xd*/
+TCP_USER_T g_tClient;        /* TCP用户结构体 2016-09-09 by xd*/
 uint8_t g_fTcpState;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -76,15 +76,15 @@ void tcp_echoclient_connect(void)
   ip_addr_t DestIPaddr;
   
   /* create new tcp pcb */
-  echoclient_pcb = tcp_new();		/* 创建新的PCB */
+  echoclient_pcb = tcp_new();        /* 创建新的PCB */
   
   if (echoclient_pcb != NULL)
   {
-    //IP4_ADDR( &DestIPaddr, DEST_IP_ADDR0, DEST_IP_ADDR1, DEST_IP_ADDR2, DEST_IP_ADDR3 );	/* 设置目的IP地址 */
-	IP4_ADDR( &DestIPaddr, g_tParam.RemoteIPAddr[0], g_tParam.RemoteIPAddr[1], g_tParam.RemoteIPAddr[2], g_tParam.RemoteIPAddr[3]);	/* 设置目的IP地址 */
+    //IP4_ADDR( &DestIPaddr, DEST_IP_ADDR0, DEST_IP_ADDR1, DEST_IP_ADDR2, DEST_IP_ADDR3 );    /* 设置目的IP地址 */
+    IP4_ADDR( &DestIPaddr, g_tParam.RemoteIPAddr[0], g_tParam.RemoteIPAddr[1], g_tParam.RemoteIPAddr[2], g_tParam.RemoteIPAddr[3]);    /* 设置目的IP地址 */
     
     /* connect to destination address/port */
-    tcp_connect(echoclient_pcb, &DestIPaddr, g_tParam.RemoteTcpPort, tcp_echoclient_connected);		/* 连接到目的地址的指定端口上,连接成功后回调tcp_client_connected()函数 */
+    tcp_connect(echoclient_pcb, &DestIPaddr, g_tParam.RemoteTcpPort, tcp_echoclient_connected);        /* 连接到目的地址的指定端口上,连接成功后回调tcp_client_connected()函数 */
   }
   else
   {
@@ -99,10 +99,10 @@ void tcp_echoclient_connect(void)
 
 /*
 *********************************************************************************************************
-*	函 数 名: tcp_echoclient_connected
-*	功能说明: LwIP TCP连接建立后调用的回调函数
-*	形    参: 无
-*	返 回 值: 无
+*    函 数 名: tcp_echoclient_connected
+*    功能说明: LwIP TCP连接建立后调用的回调函数
+*    形    参: 无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /**
@@ -118,17 +118,17 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
   if (err == ERR_OK)   
   {
     /* allocate structure es to maintain tcp connection informations */
-    es = (struct echoclient *)mem_malloc(sizeof(struct echoclient));	/* 分配内存 */
+    es = (struct echoclient *)mem_malloc(sizeof(struct echoclient));    /* 分配内存 */
   
     if (es != NULL)
     {
-      es->state = ES_CONNECTED;		/* 状态为连接成功 */
-		
-		g_tClient.TcpState = 1;		/* 连接成功 */
-		
+      es->state = ES_CONNECTED;        /* 状态为连接成功 */
+        
+        g_tClient.TcpState = 1;        /* 连接成功 */
+        
       es->pcb = tpcb;
-	  es->p_tx = NULL;			/* 2016-09-05 xd 增加。连接时，清空数据缓冲区 */
-	  //sprintf((char*)data, "sending tcp client message %d", message_count);
+      es->p_tx = NULL;            /* 2016-09-05 xd 增加。连接时，清空数据缓冲区 */
+      //sprintf((char*)data, "sending tcp client message %d", message_count);
         
       /* allocate pbuf */
       //es->p_tx = pbuf_alloc(PBUF_TRANSPORT, strlen((char*)data) , PBUF_POOL);
@@ -139,19 +139,19 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
         //pbuf_take(es->p_tx, (char*)data, strlen((char*)data));
         
         /* pass newly allocated es structure as argument to tpcb */
-        tcp_arg(tpcb, es);						/* 使用es更新tpcb的callback arg */
+        tcp_arg(tpcb, es);                        /* 使用es更新tpcb的callback arg */
   
         /* initialize LwIP tcp_recv callback function */ 
-        tcp_recv(tpcb, tcp_echoclient_recv);	/* 初始化LwIP接收回调函数 */
+        tcp_recv(tpcb, tcp_echoclient_recv);    /* 初始化LwIP接收回调函数 */
   
         /* initialize LwIP tcp_sent callback function */
-        tcp_sent(tpcb, tcp_echoclient_sent);	/* 初始化LwIP发送回调函数 */
+        tcp_sent(tpcb, tcp_echoclient_sent);    /* 初始化LwIP发送回调函数 */
   
         /* initialize LwIP tcp_poll callback function */
-        tcp_poll(tpcb, tcp_echoclient_poll, 1);	/* 初始化LwIP的tcp_poll回调函数 */
+        tcp_poll(tpcb, tcp_echoclient_poll, 1);    /* 初始化LwIP的tcp_poll回调函数 */
     
         /* send data */
-        //tcp_echoclient_send(tpcb,es);		
+        //tcp_echoclient_send(tpcb,es);        
         
         return ERR_OK;
       }
@@ -159,19 +159,19 @@ static err_t tcp_echoclient_connected(void *arg, struct tcp_pcb *tpcb, err_t err
     else
     {
       /* close connection */
-      tcp_echoclient_connection_close(tpcb, es);	/* 关闭连接 */
+      tcp_echoclient_connection_close(tpcb, es);    /* 关闭连接 */
       
       /* return memory allocation error */
-      return ERR_MEM;  			/* 返回内存分配错误 */
+      return ERR_MEM;              /* 返回内存分配错误 */
     }
   }
   else
   {
     /* close connection */
-    tcp_echoclient_connection_close(tpcb, es);		/* 关闭连接 */
+    tcp_echoclient_connection_close(tpcb, es);        /* 关闭连接 */
   }
   
-  g_tClient.TcpState = 0;		/* 连接失败 */ 
+  g_tClient.TcpState = 0;        /* 连接失败 */ 
   return err;
 }
     
@@ -187,14 +187,14 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
   struct echoclient *es;
   err_t ret_err;
   struct pbuf *q;
-	uint32_t RxPos = 0;		/* 当前接收数据的位置 */
+    uint32_t RxPos = 0;        /* 当前接收数据的位置 */
 
   LWIP_ASSERT("arg != NULL",arg != NULL);
   
   es = (struct echoclient *)arg;
   
   /* if we receive an empty tcp frame from server => close connection */
-  if (p == NULL)			/* 如果从服务器接受到空的TCP包 -> 关闭连接 */
+  if (p == NULL)            /* 如果从服务器接受到空的TCP包 -> 关闭连接 */
   { 
     /* remote host closed connection */
     es->state = ES_CLOSING;
@@ -211,50 +211,50 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
     ret_err = ERR_OK;
   }   
   /* else : a non empty frame was received from echo server but for some reason err != ERR_OK */
-  else if(err != ERR_OK)		/* 否则：接收到非空的数据，但是由于某些原因，错误 */
+  else if(err != ERR_OK)        /* 否则：接收到非空的数据，但是由于某些原因，错误 */
   {
     /* free received pbuf*/
-    pbuf_free(p);		/* 释放接受pbuf */
+    pbuf_free(p);        /* 释放接受pbuf */
 
     ret_err = err;
   }
-  else if(es->state == ES_CONNECTED)	/* 连接状态，并且接受到正确的数据包 */
+  else if(es->state == ES_CONNECTED)    /* 连接状态，并且接受到正确的数据包 */
   {
     /* increment message count */
-    message_count++;		/* 接受到数据的数量 */
-	  
-	if (p != NULL)
-	{
-		memset(g_tClient.RxData, 0, TCP_Rx_SIZE);		/* 清空接收缓冲区 */
-		
-		for(q = p;q != NULL;q = q->next) 	/* 遍历整个pbuf链表 */
-		{
-			if (q->len > (TCP_Rx_SIZE - RxPos))		/* 判断数据长度，如果大于接收buf，则应答错误 */
-			{
-				break;		/* 数据长度过大，应答错误 */
-			}
-			else			/* 将数据存入buf */
-			{
-				memcpy(g_tClient.RxData + RxPos, q->payload, q->len);
-			}
-			RxPos += q->len;  		/* 接收到的数据长度 */
-		}
+    message_count++;        /* 接受到数据的数量 */
+      
+    if (p != NULL)
+    {
+        memset(g_tClient.RxData, 0, TCP_Rx_SIZE);        /* 清空接收缓冲区 */
+        
+        for(q = p;q != NULL;q = q->next)     /* 遍历整个pbuf链表 */
+        {
+            if (q->len > (TCP_Rx_SIZE - RxPos))        /* 判断数据长度，如果大于接收buf，则应答错误 */
+            {
+                break;        /* 数据长度过大，应答错误 */
+            }
+            else            /* 将数据存入buf */
+            {
+                memcpy(g_tClient.RxData + RxPos, q->payload, q->len);
+            }
+            RxPos += q->len;          /* 接收到的数据长度 */
+        }
 
-		//strcpy((char*)g_tClient.TxData, (char*)g_tClient.RxData);	
-		
-		g_tClient.TcpState = 2;		/* 接收到数据 */
-		
-		/* Acknowledge data reception */
-		tcp_recved(tpcb, p->tot_len);  	/* 获取接收数据，通知LwIP可以获取更多数据 */
+        //strcpy((char*)g_tClient.TxData, (char*)g_tClient.RxData);    
+        
+        g_tClient.TcpState = 2;        /* 接收到数据 */
+        
+        /* Acknowledge data reception */
+        tcp_recved(tpcb, p->tot_len);      /* 获取接收数据，通知LwIP可以获取更多数据 */
 
-		pbuf_free(p);		/* 数据已放入接收缓冲区,可以释放内存了 */
-		//tcp_echoclient_connection_close(tpcb, es);	/* 这里不需要断开连接吧 */
-		ret_err = ERR_OK;
-	}
+        pbuf_free(p);        /* 数据已放入接收缓冲区,可以释放内存了 */
+        //tcp_echoclient_connection_close(tpcb, es);    /* 这里不需要断开连接吧 */
+        ret_err = ERR_OK;
+    }
   }
 
   /* data received when connection already closed */
-  else	/* 当连接已经关闭，接受到数据 */
+  else    /* 当连接已经关闭，接受到数据 */
   {
     /* Acknowledge data reception */
     tcp_recved(tpcb, p->tot_len);
@@ -269,31 +269,31 @@ static err_t tcp_echoclient_recv(void *arg, struct tcp_pcb *tpcb, struct pbuf *p
 
 /*
 *********************************************************************************************************
-*	函 数 名: tcp_client_usersent
-*	功能说明: 用户发送数据，2016-09-08 by xd
-*	形    参: 无
-*	返 回 值: 无
+*    函 数 名: tcp_client_usersent
+*    功能说明: 用户发送数据，2016-09-08 by xd
+*    形    参: 无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 void tcp_client_usersent(struct tcp_pcb *_tpcb)
 {
-	struct echoclient *es = NULL;
-	es =_tpcb->callback_arg;
-	
-	if(es != NULL)  /* 连接处于空闲可以发数据 */
-	{
-		es->p_tx = pbuf_alloc(PBUF_TRANSPORT, g_tClient.TxCount , PBUF_POOL);		/* 分配内存，内存的大小就是数据长度ptr->len */
-		
-		 /* copy data to pbuf */
-        pbuf_take(es->p_tx, (char*)g_tClient.TxData, g_tClient.TxCount);		/* 将data[]中的数据复制到 es->p_tx */
-		
-		tcp_echoclient_send(_tpcb, es);
-		
-		if (es->p_tx)
-		{
-			pbuf_free(es->p_tx);	/* 释放内存 */
-		}
-	}
+    struct echoclient *es = NULL;
+    es =_tpcb->callback_arg;
+    
+    if(es != NULL)  /* 连接处于空闲可以发数据 */
+    {
+        es->p_tx = pbuf_alloc(PBUF_TRANSPORT, g_tClient.TxCount , PBUF_POOL);        /* 分配内存，内存的大小就是数据长度ptr->len */
+        
+         /* copy data to pbuf */
+        pbuf_take(es->p_tx, (char*)g_tClient.TxData, g_tClient.TxCount);        /* 将data[]中的数据复制到 es->p_tx */
+        
+        tcp_echoclient_send(_tpcb, es);
+        
+        if (es->p_tx)
+        {
+            pbuf_free(es->p_tx);    /* 释放内存 */
+        }
+    }
 }
 
 /**
@@ -315,7 +315,7 @@ static void tcp_echoclient_send(struct tcp_pcb *tpcb, struct echoclient * es)
     
     /* get pointer on pbuf from es structure */
     ptr = es->p_tx;
-	  
+      
     /* enqueue data for transmission */
     wr_err = tcp_write(tpcb, ptr->payload, ptr->len, 1);
     
@@ -343,8 +343,8 @@ static void tcp_echoclient_send(struct tcp_pcb *tpcb, struct echoclient * es)
      /* other problem ?? */
    }
    
-   	/* 2016-09-08 by xd 立刻发送 */
-	tcp_output(tpcb);		        /* 将数据立刻发送出去 */
+       /* 2016-09-08 by xd 立刻发送 */
+    tcp_output(tpcb);                /* 将数据立刻发送出去 */
    
   }
 }
@@ -416,10 +416,10 @@ static err_t tcp_echoclient_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 
 /*
 *********************************************************************************************************
-*	函 数 名: tcp_echoclient_connection_close
-*	功能说明: 关闭与服务器的连接
-*	形    参: 无
-*	返 回 值: 无
+*    函 数 名: tcp_echoclient_connection_close
+*    功能说明: 关闭与服务器的连接
+*    形    参: 无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /**
@@ -431,7 +431,7 @@ static err_t tcp_echoclient_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 void tcp_echoclient_connection_close(struct tcp_pcb *tpcb, struct echoclient * es )
 {
   /* remove callbacks */
-  tcp_recv(tpcb, NULL);		
+  tcp_recv(tpcb, NULL);        
   tcp_sent(tpcb, NULL);
   tcp_poll(tpcb, NULL,0);
 
@@ -444,8 +444,8 @@ void tcp_echoclient_connection_close(struct tcp_pcb *tpcb, struct echoclient * e
   tcp_close(tpcb);
   
 /* 以下4个函数 2016-09-19 by xd */
-  g_tClient.TcpState = 0;	/* 断开连接 */
-  tcp_abort(tpcb);			/* 终止tcp控制块 */
+  g_tClient.TcpState = 0;    /* 断开连接 */
+  tcp_abort(tpcb);            /* 终止tcp控制块 */
   tcp_arg(tpcb,NULL); 
   tcp_err(tpcb,NULL);
 }

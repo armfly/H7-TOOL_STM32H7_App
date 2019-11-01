@@ -1,23 +1,23 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : SD卡驱动模块
-*	文件名称 : bsp_sdio_sd.c
-*	版    本 : V1.0
-*	说    明 : SD卡底层驱动。根据stm32h743i_eval_sd.c文件修改。
+*    模块名称 : SD卡驱动模块
+*    文件名称 : bsp_sdio_sd.c
+*    版    本 : V1.0
+*    说    明 : SD卡底层驱动。根据stm32h743i_eval_sd.c文件修改。
 *
-*	修改记录 :
-*		版本号  日期        作者     说明
-*		V1.0    2018-09-08  armfly  正式发布
+*    修改记录 :
+*        版本号  日期        作者     说明
+*        V1.0    2018-09-08  armfly  正式发布
 *
-*	Copyright (C), 2018-2030, 安富莱电子 www.armfly.com
+*    Copyright (C), 2018-2030, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
 
 /*
-	1. 修改卡插入检测GPIO相关配置
-	2. void SDMMC1_IRQHandler(void) 这个中断服务程序放到本文件末尾
+    1. 修改卡插入检测GPIO相关配置
+    2. void SDMMC1_IRQHandler(void) 这个中断服务程序放到本文件末尾
 */
 
 /**
@@ -126,10 +126,10 @@
   */
 
 /* 卡插入引脚 : PG9 */
-//#define SD_DETECT_GPIO_CLK_ENABLE()	__HAL_RCC_GPIOB_CLK_ENABLE()
+//#define SD_DETECT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
 
-//#define SD_DETECT_GPIO_PORT	GPIOG
-//#define SD_DETECT_PIN		GPIO_PIN_9
+//#define SD_DETECT_GPIO_PORT    GPIOG
+//#define SD_DETECT_PIN        GPIO_PIN_9
 
 /* PG9 == 0 表示卡插入 */
 //#define SD_IS_INSERTED()  ((SD_DETECT_GPIO_PORT->IDR & SD_DETECT_PIN) == 0)
@@ -522,14 +522,14 @@ __weak void BSP_SD_ErrorCallback(void)
 __weak void BSP_SD_DriveTransciver_1_8V_Callback(FlagStatus status)
 {
 #if 0
-	  if(status == SET)
-	  {
-		BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_SET);
-	  }
-	  else
-	  {
-		BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_RESET);
-	  }
+      if(status == SET)
+      {
+        BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_SET);
+      }
+      else
+      {
+        BSP_IO_WritePin(IO_PIN_13, BSP_IO_PIN_RESET);
+      }
 #endif
 }
 
@@ -587,10 +587,10 @@ void HAL_SD_DriveTransciver_1_8V_Callback(FlagStatus status)
 
 /*
 *********************************************************************************************************
-*	函 数 名: SDIO_IRQHandler
-*	功能说明: SDIO中断
-*	形    参:  无
-*	返 回 值: 无
+*    函 数 名: SDIO_IRQHandler
+*    功能说明: SDIO中断
+*    形    参:  无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 void SDMMC1_IRQHandler(void)

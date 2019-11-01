@@ -29,7 +29,7 @@
 
 // Flags for board_info 
 enum { 
-	kEnablePageErase = 1,               /*!< Enable page programming and sector erase for drag and drop */
+    kEnablePageErase = 1,               /*!< Enable page programming and sector erase for drag and drop */
     kEnableUnderResetConnect = 1<<1,    /*!< Enable under reset connection when enabling debug mode */
 };
 
@@ -45,7 +45,7 @@ typedef struct __attribute__((__packed__)) board_info {
     vfs_filename_t daplink_url_name;    /*!< Customize the URL file name */
     vfs_filename_t daplink_drive_name;  /*!< Customize the MSD DAPLink drive name */
     char daplink_target_url[64];        /*!< Customize the target url in DETAILS.TXT */
-	
+    
     // some specific board initilization
     void (*prerun_board_config)(void);                      /*!< Specific board debug/ID related initialization */
     void (*swd_set_target_reset)(uint8_t asserted);         /*!< Boards can customize how to send reset to the target precedence over target family */

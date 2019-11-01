@@ -309,27 +309,27 @@ typedef struct
   PTP_RespContainerTypedef     resp_container;
 
   /* ptp transaction ID */
-  uint32_t	transaction_id;
+  uint32_t    transaction_id;
   
   /* ptp session ID */
-  uint32_t	session_id;
+  uint32_t    session_id;
   
   /* device flags */
-  uint32_t	flags;
+  uint32_t    flags;
 
   /****** PTP transfer control *******/
   
   /* Data pointer */
-  uint8_t	*data_ptr;
+  uint8_t    *data_ptr;
 
   /* Data length */
-  int32_t	data_length;
+  int32_t    data_length;
   
   /* Data length */
-  uint32_t	data_packet;
+  uint32_t    data_packet;
   
   /* Data length */
-  uint32_t	iteration;
+  uint32_t    iteration;
   
   /* Packet Index */
   uint32_t   data_packet_counter;
@@ -337,7 +337,7 @@ typedef struct
   /****** Object transfer control *******/
   
   /* object pointer */
-  uint8_t	*object_ptr;
+  uint8_t    *object_ptr;
 
 }
 PTP_HandleTypeDef;
@@ -820,8 +820,8 @@ typedef struct
   uint32_t    GroupCode;
   uint8_t     FormFlag;
   union {
-    PTP_PropDescEnumFormTypedef	Enum;
-    PTP_PropDescRangeFormTypedef	Range;
+    PTP_PropDescEnumFormTypedef    Enum;
+    PTP_PropDescRangeFormTypedef    Range;
   } FORM;
 }
 PTP_ObjectPropDescTypeDef;
@@ -904,7 +904,7 @@ PTP_DevicePropDescTypdef;
 #define PTP_DTC_AINT128                                   (PTP_DTC_ARRAY_MASK | PTP_DTC_INT128)
 #define PTP_DTC_AUINT128                                  (PTP_DTC_ARRAY_MASK | PTP_DTC_UINT128)
 
-#define PTP_DTC_STR		0xFFFF
+#define PTP_DTC_STR        0xFFFF
 
 /* PTP Event Codes */
 
@@ -1013,7 +1013,7 @@ USBH_StatusTypeDef USBH_PTP_SendObject (USBH_HandleTypeDef *phost,
 
 USBH_StatusTypeDef USBH_PTP_GetDevicePropDesc (USBH_HandleTypeDef *phost,
                                                 uint16_t propcode, 
-			                      PTP_DevicePropDescTypdef* devicepropertydesc);
+                                  PTP_DevicePropDescTypdef* devicepropertydesc);
 
 /**
   * @}

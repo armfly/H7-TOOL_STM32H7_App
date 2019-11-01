@@ -33,20 +33,20 @@
 #define CONNECT_INTS  (MXC_F_USB_DEV_INTEN_SETUP | MXC_F_USB_DEV_INTEN_EP_IN | MXC_F_USB_DEV_INTEN_EP_OUT | MXC_F_USB_DEV_INTEN_DMA_ERR)
 
 typedef struct {
-	volatile uint32_t buf0_desc;
-	volatile uint32_t buf0_address;
-	volatile uint32_t buf1_desc;
-	volatile uint32_t buf1_address;
+    volatile uint32_t buf0_desc;
+    volatile uint32_t buf0_address;
+    volatile uint32_t buf1_desc;
+    volatile uint32_t buf1_address;
 } ep_buffer_t;
 
 typedef struct {
-	ep_buffer_t out_buffer;
-	ep_buffer_t in_buffer;
+    ep_buffer_t out_buffer;
+    ep_buffer_t in_buffer;
 } ep0_buffer_t;
 
 typedef struct {
-	ep0_buffer_t ep0;
-	ep_buffer_t ep[MXC_USB_NUM_EP - 1];
+    ep0_buffer_t ep0;
+    ep_buffer_t ep[MXC_USB_NUM_EP - 1];
 } ep_buffer_descriptor_t;
 
 typedef struct {
@@ -149,17 +149,17 @@ static void reset_state(void)
  */
 void USBD_Init (void)
 {
-	uint32_t reg;
+    uint32_t reg;
 
-	/* Enable USB power domain */
-	MXC_PWRMAN->pwr_rst_ctrl |= MXC_F_PWRMAN_PWR_RST_CTRL_USB_POWERED;
+    /* Enable USB power domain */
+    MXC_PWRMAN->pwr_rst_ctrl |= MXC_F_PWRMAN_PWR_RST_CTRL_USB_POWERED;
   /* Setup the USB clocking, select  */
   MXC_CLKMAN->clk_ctrl |= MXC_F_CLKMAN_CLK_CTRL_USB_CLOCK_ENABLE;
-	/* Force USB clock gater */
-	reg = MXC_CLKMAN->clk_gate_ctrl0;
-	reg &= ~MXC_F_CLKMAN_CLK_GATE_CTRL0_USB_CLK_GATER;
-	reg |= (0x2 << MXC_F_CLKMAN_CLK_GATE_CTRL0_USB_CLK_GATER_POS);
-	MXC_CLKMAN->clk_gate_ctrl0 = reg;
+    /* Force USB clock gater */
+    reg = MXC_CLKMAN->clk_gate_ctrl0;
+    reg &= ~MXC_F_CLKMAN_CLK_GATE_CTRL0_USB_CLK_GATER;
+    reg |= (0x2 << MXC_F_CLKMAN_CLK_GATE_CTRL0_USB_CLK_GATER_POS);
+    MXC_CLKMAN->clk_gate_ctrl0 = reg;
 
   MXC_USB->cn = 0;
   MXC_USB->cn = MXC_F_USB_CN_USB_EN;

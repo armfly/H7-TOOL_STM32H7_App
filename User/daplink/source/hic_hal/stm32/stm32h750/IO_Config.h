@@ -26,21 +26,21 @@
 #include "compiler.h"
 #include "daplink.h"
 
-#define DAPLINK_HIC_ID	DAPLINK_HIC_ID_STM32F103XB
+#define DAPLINK_HIC_ID    DAPLINK_HIC_ID_STM32F103XB
 
 COMPILER_ASSERT(DAPLINK_HIC_ID == DAPLINK_HIC_ID_STM32F103XB);
 
 //USB control pin
 #if 0
-	#define USB_CONNECT_PORT_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
-	#define USB_CONNECT_PORT_DISABLE()   __HAL_RCC_GPIOA_CLK_DISABLE()
-	#define USB_CONNECT_PORT             GPIOA
-	#define USB_CONNECT_PIN              GPIO_PIN_15
-	#define USB_CONNECT_ON()             (USB_CONNECT_PORT->BSRR = USB_CONNECT_PIN)
-	#define USB_CONNECT_OFF()            (USB_CONNECT_PORT->BRR  = USB_CONNECT_PIN)
+    #define USB_CONNECT_PORT_ENABLE()    __HAL_RCC_GPIOA_CLK_ENABLE()
+    #define USB_CONNECT_PORT_DISABLE()   __HAL_RCC_GPIOA_CLK_DISABLE()
+    #define USB_CONNECT_PORT             GPIOA
+    #define USB_CONNECT_PIN              GPIO_PIN_15
+    #define USB_CONNECT_ON()             (USB_CONNECT_PORT->BSRR = USB_CONNECT_PIN)
+    #define USB_CONNECT_OFF()            (USB_CONNECT_PORT->BRR  = USB_CONNECT_PIN)
 #else
-	#define USB_CONNECT_ON() 
-	#define USB_CONNECT_OFF()   
+    #define USB_CONNECT_ON() 
+    #define USB_CONNECT_OFF()   
 #endif
 
 //Connected LED

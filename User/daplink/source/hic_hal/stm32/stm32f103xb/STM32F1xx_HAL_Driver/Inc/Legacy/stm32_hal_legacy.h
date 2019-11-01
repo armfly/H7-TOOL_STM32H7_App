@@ -2616,7 +2616,7 @@
 #define SdioClockSelection                 Sdmmc1ClockSelection
 #define RCC_PERIPHCLK_SDIO                 RCC_PERIPHCLK_SDMMC1
 #define __HAL_RCC_SDIO_CONFIG              __HAL_RCC_SDMMC1_CONFIG
-#define __HAL_RCC_GET_SDIO_SOURCE          __HAL_RCC_GET_SDMMC1_SOURCE	
+#define __HAL_RCC_GET_SDIO_SOURCE          __HAL_RCC_GET_SDMMC1_SOURCE    
 #endif
 
 #if defined(STM32F7)
@@ -2858,8 +2858,8 @@
 #define  __HAL_SD_SDMMC_CLEAR_FLAG  __HAL_SD_SDIO_CLEAR_FLAG  
 #define  __HAL_SD_SDMMC_GET_IT      __HAL_SD_SDIO_GET_IT      
 #define  __HAL_SD_SDMMC_CLEAR_IT    __HAL_SD_SDIO_CLEAR_IT    
-#define  SDMMC_STATIC_FLAGS         SDIO_STATIC_FLAGS	       
-#define  SDMMC_CMD0TIMEOUT          SDIO_CMD0TIMEOUT	       
+#define  SDMMC_STATIC_FLAGS         SDIO_STATIC_FLAGS           
+#define  SDMMC_CMD0TIMEOUT          SDIO_CMD0TIMEOUT           
 #define  SD_SDMMC_SEND_IF_COND      SD_SDIO_SEND_IF_COND
 /* alias CMSIS */
 #define  SDMMC1_IRQn                SDIO_IRQn
@@ -2884,9 +2884,9 @@
 #define  __HAL_SD_SDIO_CLEAR_FLAG   __HAL_SD_SDMMC_CLEAR_FLAG
 #define  __HAL_SD_SDIO_GET_IT       __HAL_SD_SDMMC_GET_IT
 #define  __HAL_SD_SDIO_CLEAR_IT     __HAL_SD_SDMMC_CLEAR_IT
-#define  SDIO_STATIC_FLAGS	        SDMMC_STATIC_FLAGS
-#define  SDIO_CMD0TIMEOUT	          SDMMC_CMD0TIMEOUT
-#define  SD_SDIO_SEND_IF_COND	      SD_SDMMC_SEND_IF_COND
+#define  SDIO_STATIC_FLAGS            SDMMC_STATIC_FLAGS
+#define  SDIO_CMD0TIMEOUT              SDMMC_CMD0TIMEOUT
+#define  SD_SDIO_SEND_IF_COND          SD_SDMMC_SEND_IF_COND
 /* alias CMSIS for compatibilities */
 #define  SDIO_IRQn                  SDMMC1_IRQn
 #define  SDIO_IRQHandler            SDMMC1_IRQHandler

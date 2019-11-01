@@ -36,7 +36,7 @@ __weak BOOL USBD_EndPoint0_Setup_WinUSB_ReqToDevice(void)
     U32 len;
 
     BOOL success = (__FALSE);
-    if (USBD_SetupPacket.bRequest == usbd_winusb_vendor_code) {			/* vendor code correct? */
+    if (USBD_SetupPacket.bRequest == usbd_winusb_vendor_code) {            /* vendor code correct? */
         switch (USBD_SetupPacket.wIndex) {
             case WINUSB_REQUEST_GET_DESCRIPTOR_SET:
                 pD = (U8 *)USBD_WinUSBDescriptorSetDescriptor;

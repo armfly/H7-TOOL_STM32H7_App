@@ -21,7 +21,7 @@
  * use without further testing or modification.
  **********************************************************************/
 
-#define	LPC_CPACR	        0xE000ED88
+#define    LPC_CPACR            0xE000ED88
 
 #define SCB_MVFR0           0xE000EF40
 #define SCB_MVFR0_RESET     0x10110021
@@ -34,7 +34,7 @@
 void fpuEnable(void)
 {
     /* from arm trm manual, howto enable the FPU :
-    	; CPACR is located at address 0xE000ED88
+        ; CPACR is located at address 0xE000ED88
         LDR.W R0, =0xE000ED88
         ; Read CPACR
         LDR R1, [R0]

@@ -1,17 +1,17 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : GPS定位模块驱动程序
-*	文件名称 : bsp_uart_gps.c
-*	版    本 : V1.1
-*	说    明 : 解码GPS协议 NMEA-0183协议, 安富莱原创
+*    模块名称 : GPS定位模块驱动程序
+*    文件名称 : bsp_uart_gps.c
+*    版    本 : V1.1
+*    说    明 : 解码GPS协议 NMEA-0183协议, 安富莱原创
 *
-*	修改记录 :
-*		版本号  日期        作者     说明
-*		V1.0    2013-02-01 armfly  正式发布
-*		V1.1    2014-02-04 armfly  增加全局标志表示 GPS模块串口正常
+*    修改记录 :
+*        版本号  日期        作者     说明
+*        V1.0    2013-02-01 armfly  正式发布
+*        V1.1    2014-02-04 armfly  增加全局标志表示 GPS模块串口正常
 *
-*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*    Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -30,144 +30,144 @@ GPS_T g_tGPS;
 
 /*
 *********************************************************************************************************
-*	函 数 名: bsp_InitGPS
-*	功能说明: 配置GPS串口
-*	形    参:  无
-*	返 回 值: 无
+*    函 数 名: bsp_InitGPS
+*    功能说明: 配置GPS串口
+*    形    参:  无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 void bsp_InitGPS(void)
 {
-	/*
-		GPS 模块使用 UART 串口发送定位数据至 STM32, 每秒钟发送一组数据
+    /*
+        GPS 模块使用 UART 串口发送定位数据至 STM32, 每秒钟发送一组数据
 
-		因此，只需要配置串口即可。 bsp_uart_fifo.c 中已经配置好串口，此处不必再配置
-	*/
+        因此，只需要配置串口即可。 bsp_uart_fifo.c 中已经配置好串口，此处不必再配置
+    */
 
-	g_tGPS.PositionOk = 0; /* 数据设置为无效 */
-	g_tGPS.TimeOk = 0;		 /* 数据设置为无效 */
+    g_tGPS.PositionOk = 0; /* 数据设置为无效 */
+    g_tGPS.TimeOk = 0;         /* 数据设置为无效 */
 
-	g_tGPS.UartOk = 0; /* 串口通信正常的标志, 如果以后收到了校验合格的命令串则设置为1 */
+    g_tGPS.UartOk = 0; /* 串口通信正常的标志, 如果以后收到了校验合格的命令串则设置为1 */
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gps_pro
-*	功能说明: 轮询GPS数据包。插入到主程序中执行即可。分析结果存放在全局变量 g_tGPS
-*	形    参:  无
-*	返 回 值: 无
+*    函 数 名: gps_pro
+*    功能说明: 轮询GPS数据包。插入到主程序中执行即可。分析结果存放在全局变量 g_tGPS
+*    形    参:  无
+*    返 回 值: 无
 *********************************************************************************************************
 */
 void gps_pro(void)
 {
-	uint8_t ucData;
-	static uint8_t ucGpsHead = 0;
-	static uint8_t ucaGpsBuf[512];
-	static uint16_t usGpsPos = 0;
+    uint8_t ucData;
+    static uint8_t ucGpsHead = 0;
+    static uint8_t ucaGpsBuf[512];
+    static uint16_t usGpsPos = 0;
 
-	/* 从 GPS模块串口读取1个字节 comGetChar() 函数由 bsp_uart_fifo.c 实现 */
-	while (1)
-	{
-		if (comGetChar(COM2, &ucData))
-		{
+    /* 从 GPS模块串口读取1个字节 comGetChar() 函数由 bsp_uart_fifo.c 实现 */
+    while (1)
+    {
+        if (comGetChar(COM2, &ucData))
+        {
 #ifdef DEBUG_GPS_TO_COM1
-			/* 将收到的GPS模块数据按原样 打印到COM1 口，便于跟踪调试 */
-			comSendChar(COM1, ucData);
+            /* 将收到的GPS模块数据按原样 打印到COM1 口，便于跟踪调试 */
+            comSendChar(COM1, ucData);
 #endif
 
-			if (ucGpsHead == 0)
-			{
-				if (ucData == '$')
-				{
-					ucGpsHead = 1;
-					usGpsPos = 0;
-				}
-			}
-			else
-			{
-				if (usGpsPos < sizeof(ucaGpsBuf))
-				{
-					ucaGpsBuf[usGpsPos++] = ucData;
+            if (ucGpsHead == 0)
+            {
+                if (ucData == '$')
+                {
+                    ucGpsHead = 1;
+                    usGpsPos = 0;
+                }
+            }
+            else
+            {
+                if (usGpsPos < sizeof(ucaGpsBuf))
+                {
+                    ucaGpsBuf[usGpsPos++] = ucData;
 
-					if ((ucData == '\r') || (ucData == '\n'))
-					{
-						Analyze0183(ucaGpsBuf, usGpsPos - 1);
-						ucGpsHead = 0;
+                    if ((ucData == '\r') || (ucData == '\n'))
+                    {
+                        Analyze0183(ucaGpsBuf, usGpsPos - 1);
+                        ucGpsHead = 0;
 
-						g_tGPS.UartOk = 1; /* 接收到正确的命令 */
-					}
-				}
-				else
-				{
-					ucGpsHead = 0;
-				}
-			}
+                        g_tGPS.UartOk = 1; /* 接收到正确的命令 */
+                    }
+                }
+                else
+                {
+                    ucGpsHead = 0;
+                }
+            }
 
-			continue; /* 可能还有数据，继续分析 */
-		}
+            continue; /* 可能还有数据，继续分析 */
+        }
 
-		break; /* 分析完毕，退出函数 */
-	}
+        break; /* 分析完毕，退出函数 */
+    }
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: CheckXor
-*	功能说明: 检查0183数据包的校验和是否正确
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: TRUE 或 FALSE.
+*    函 数 名: CheckXor
+*    功能说明: 检查0183数据包的校验和是否正确
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: TRUE 或 FALSE.
 *********************************************************************************************************
 */
 uint8_t CheckXor(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	uint8_t ucXorSum;
-	uint8_t ucaBuf[2];
-	uint16_t i;
+    uint8_t ucXorSum;
+    uint8_t ucaBuf[2];
+    uint16_t i;
 
-	if (_usLen < 3)
-	{
-		return FALSE;
-	}
+    if (_usLen < 3)
+    {
+        return FALSE;
+    }
 
-	/* 如果没有校验字节，也认为出错 */
-	if (_ucaBuf[_usLen - 3] != '*')
-	{
-		return FALSE;
-	}
+    /* 如果没有校验字节，也认为出错 */
+    if (_ucaBuf[_usLen - 3] != '*')
+    {
+        return FALSE;
+    }
 
-	/* 不允许出现非ASCII字符 */
-	for (i = 0; i < _usLen - 3; i++)
-	{
-		if ((_ucaBuf[i] & 0x80) || (_ucaBuf[i] == 0))
-		{
-			return FALSE;
-		}
-	}
+    /* 不允许出现非ASCII字符 */
+    for (i = 0; i < _usLen - 3; i++)
+    {
+        if ((_ucaBuf[i] & 0x80) || (_ucaBuf[i] == 0))
+        {
+            return FALSE;
+        }
+    }
 
-	ucXorSum = _ucaBuf[0];
-	for (i = 1; i < _usLen - 3; i++)
-	{
-		ucXorSum = ucXorSum ^ _ucaBuf[i];
-	}
+    ucXorSum = _ucaBuf[0];
+    for (i = 1; i < _usLen - 3; i++)
+    {
+        ucXorSum = ucXorSum ^ _ucaBuf[i];
+    }
 
-	HexToAscii(&ucXorSum, ucaBuf, 2);
+    HexToAscii(&ucXorSum, ucaBuf, 2);
 
-	if (memcmp(&_ucaBuf[_usLen - 2], ucaBuf, 2) == 0)
-	{
-		return TRUE;
-	}
+    if (memcmp(&_ucaBuf[_usLen - 2], ucaBuf, 2) == 0)
+    {
+        return TRUE;
+    }
 
-	return FALSE;
+    return FALSE;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPGGA
-*	功能说明: 分析0183数据包中的 GPGGA 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPGGA
+*    功能说明: 分析0183数据包中的 GPGGA 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -189,143 +189,143 @@ uint8_t CheckXor(uint8_t *_ucaBuf, uint16_t _usLen)
 */
 void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	char *p;
+    char *p;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1 UTC 时间，hhmmss.sss，时分秒格式 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Hour = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Min = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Sec = StrToIntFix(p, 2);
-	p += 2;
+    /* 字段1 UTC 时间，hhmmss.sss，时分秒格式 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Hour = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Min = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Sec = StrToIntFix(p, 2);
+    p += 2;
 
-	/* 字段2 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段2 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段3 纬度N（北纬）或S（南纬） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'S')
-	{
-		g_tGPS.NS = 'S';
-	}
-	else if (*p == 'N')
-	{
-		g_tGPS.NS = 'N';
-	}
-	else
-	{
-		return;
-	}
+    /* 字段3 纬度N（北纬）或S（南纬） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'S')
+    {
+        g_tGPS.NS = 'S';
+    }
+    else if (*p == 'N')
+    {
+        g_tGPS.NS = 'N';
+    }
+    else
+    {
+        return;
+    }
 
-	/* 字段4  经度dddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.JingDu_Du = StrToIntFix(p, 3);
-	p += 3;
-	g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段4  经度dddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.JingDu_Du = StrToIntFix(p, 3);
+    p += 3;
+    g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段5 经度E（东经）或W（西经） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'E')
-	{
-		g_tGPS.EW = 'E';
-	}
-	else if (*p == 'W')
-	{
-		g_tGPS.EW = 'W';
-	}
+    /* 字段5 经度E（东经）或W（西经） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'E')
+    {
+        g_tGPS.EW = 'E';
+    }
+    else if (*p == 'W')
+    {
+        g_tGPS.EW = 'W';
+    }
 
-	/* 字段6 GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if ((*p == '1') || (*p == '2'))
-	{
-		g_tGPS.PositionOk = 1;
-	}
-	else
-	{
-		g_tGPS.PositionOk = 0;
-	}
+    /* 字段6 GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if ((*p == '1') || (*p == '2'))
+    {
+        g_tGPS.PositionOk = 1;
+    }
+    else
+    {
+        g_tGPS.PositionOk = 0;
+    }
 
-	/* 字段7：正在使用的卫星数量（00 - 12）（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.ViewNumber = StrToInt(p);
-	p += 2;
+    /* 字段7：正在使用的卫星数量（00 - 12）（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.ViewNumber = StrToInt(p);
+    p += 2;
 
-	/* 字段8：HDOP水平精度因子（0.5 - 99.9） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.HDOP = StrToInt(p);
+    /* 字段8：HDOP水平精度因子（0.5 - 99.9） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.HDOP = StrToInt(p);
 
-	/* 字段9：海拔高度（-9999.9 - 99999.9） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Altitude = StrToInt(p);
+    /* 字段9：海拔高度（-9999.9 - 99999.9） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Altitude = StrToInt(p);
 
-	/* 后面的字段信息丢弃 */
+    /* 后面的字段信息丢弃 */
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPGSA
-*	功能说明: 分析0183数据包中的 GPGSA 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPGSA
+*    功能说明: 分析0183数据包中的 GPGSA 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -352,77 +352,77 @@ void gpsGPGGA(uint8_t *_ucaBuf, uint16_t _usLen)
 */
 void gpsGPGSA(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	char *p;
-	uint8_t i;
+    char *p;
+    uint8_t i;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1 定位模式，A=自动手动2D/3D，M=手动2D/3D */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.ModeAM = *p;
+    /* 字段1 定位模式，A=自动手动2D/3D，M=手动2D/3D */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.ModeAM = *p;
 
-	/* 字段2 定位类型，1=未定位，2=2D定位，3=3D定位 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Mode2D3D = *p;
+    /* 字段2 定位类型，1=未定位，2=2D定位，3=3D定位 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Mode2D3D = *p;
 
-	/* 字段3 - 字段14 第1-12信道正在使用的卫星PRN码编号 */
-	for (i = 0; i < 12; i++)
-	{
-		p = strchr(p, ',');
-		if (p == 0)
-		{
-			return;
-		}
-		p++;
-		g_tGPS.SateID[i] = StrToInt(p);
-	}
+    /* 字段3 - 字段14 第1-12信道正在使用的卫星PRN码编号 */
+    for (i = 0; i < 12; i++)
+    {
+        p = strchr(p, ',');
+        if (p == 0)
+        {
+            return;
+        }
+        p++;
+        g_tGPS.SateID[i] = StrToInt(p);
+    }
 
-	/* 字段15：PDOP综合位置精度因子（0.5 - 99.9） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.PDOP = StrToInt(p);
+    /* 字段15：PDOP综合位置精度因子（0.5 - 99.9） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.PDOP = StrToInt(p);
 
-	/* 字段16：HDOP水平精度因子（0.5 - 99.9） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.HDOP = StrToInt(p);
+    /* 字段16：HDOP水平精度因子（0.5 - 99.9） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.HDOP = StrToInt(p);
 
-	/* 字段17：VDOP垂直精度因子（0.5 - 99.9） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.VDOP = StrToInt(p);
+    /* 字段17：VDOP垂直精度因子（0.5 - 99.9） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.VDOP = StrToInt(p);
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPGSV
-*	功能说明: 分析0183数据包中的 GPGSV 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPGSV
+*    功能说明: 分析0183数据包中的 GPGSV 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -454,88 +454,88 @@ $GPGSV,2,2,07,09,23,313,42,04,19,159,41,15,12,041,42*41
 */
 void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	//	uint8_t s_total = 0;	/* 语句总数目 */
-	uint8_t s_no = 0; /* 语句序号 */
-	uint8_t i;
-	char *p;
+    //    uint8_t s_total = 0;    /* 语句总数目 */
+    uint8_t s_no = 0; /* 语句序号 */
+    uint8_t i;
+    char *p;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1：本次GSV语句的总数目（1 - 3） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	//	s_total = StrToInt(p);
+    /* 字段1：本次GSV语句的总数目（1 - 3） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    //    s_total = StrToInt(p);
 
-	/* 字段2：本条GSV语句是本次GSV语句的第几条（1 - 3） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	s_no = StrToInt(p);
+    /* 字段2：本条GSV语句是本次GSV语句的第几条（1 - 3） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    s_no = StrToInt(p);
 
-	/* 字段3：当前可见卫星总数（00 - 12）（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.ViewNumber = StrToInt(p);
+    /* 字段3：当前可见卫星总数（00 - 12）（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.ViewNumber = StrToInt(p);
 
-	for (i = 0; i < 4; i++)
-	{
-		/* 字段4：PRN 码（伪随机噪声码）（01 - 32）（前导位数不足则补0） */
-		p = strchr(p, ',');
-		if (p == 0)
-		{
-			return;
-		}
-		p++;
-		g_tGPS.SateID[(s_no - 1) * 4 + i] = StrToInt(p);
+    for (i = 0; i < 4; i++)
+    {
+        /* 字段4：PRN 码（伪随机噪声码）（01 - 32）（前导位数不足则补0） */
+        p = strchr(p, ',');
+        if (p == 0)
+        {
+            return;
+        }
+        p++;
+        g_tGPS.SateID[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* 字段5：卫星仰角（00 - 90）度（前导位数不足则补0）*/
-		p = strchr(p, ',');
-		if (p == 0)
-		{
-			return;
-		}
-		p++;
-		g_tGPS.Elevation[(s_no - 1) * 4 + i] = StrToInt(p);
+        /* 字段5：卫星仰角（00 - 90）度（前导位数不足则补0）*/
+        p = strchr(p, ',');
+        if (p == 0)
+        {
+            return;
+        }
+        p++;
+        g_tGPS.Elevation[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* 字段6：卫星方位角（00 - 359）度（前导位数不足则补0） */
-		p = strchr(p, ',');
-		if (p == 0)
-		{
-			return;
-		}
-		p++;
-		g_tGPS.Azimuth[(s_no - 1) * 4 + i] = StrToInt(p);
+        /* 字段6：卫星方位角（00 - 359）度（前导位数不足则补0） */
+        p = strchr(p, ',');
+        if (p == 0)
+        {
+            return;
+        }
+        p++;
+        g_tGPS.Azimuth[(s_no - 1) * 4 + i] = StrToInt(p);
 
-		/* 字段7：信噪比（00－99）dbHz */
-		p = strchr(p, ',');
-		if (p == 0)
-		{
-			return;
-		}
-		p++;
-		g_tGPS.SNR[(s_no - 1) * 4 + i] = StrToInt(p);
-	}
+        /* 字段7：信噪比（00－99）dbHz */
+        p = strchr(p, ',');
+        if (p == 0)
+        {
+            return;
+        }
+        p++;
+        g_tGPS.SNR[(s_no - 1) * 4 + i] = StrToInt(p);
+    }
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPRMC
-*	功能说明: 分析0183数据包中的 GPGSV 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPRMC
+*    功能说明: 分析0183数据包中的 GPGSV 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -556,146 +556,146 @@ void gpsGPGSV(uint8_t *_ucaBuf, uint16_t _usLen)
 */
 void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	char *p;
+    char *p;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1 UTC时间，hhmmss.sss格式 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Hour = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Min = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Sec = StrToIntFix(p, 2);
-	p += 3;
-	g_tGPS.mSec = StrToIntFix(p, 3);
+    /* 字段1 UTC时间，hhmmss.sss格式 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Hour = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Min = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Sec = StrToIntFix(p, 2);
+    p += 3;
+    g_tGPS.mSec = StrToIntFix(p, 3);
 
-	/* 字段2 状态，A=定位，V=未定位 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p != 'A')
-	{
-		/* 未定位则直接返回 */
-		g_tGPS.PositionOk = 0;
-		return;
-	}
-	g_tGPS.PositionOk = 1;
-	p += 1;
+    /* 字段2 状态，A=定位，V=未定位 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p != 'A')
+    {
+        /* 未定位则直接返回 */
+        g_tGPS.PositionOk = 0;
+        return;
+    }
+    g_tGPS.PositionOk = 1;
+    p += 1;
 
-	/* 字段3 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段3 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段4 纬度N（北纬）或S（南纬）*/
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'S')
-	{
-		g_tGPS.NS = 'S';
-	}
-	else if (*p == 'N')
-	{
-		g_tGPS.NS = 'N';
-	}
-	else
-	{
-		return;
-	}
+    /* 字段4 纬度N（北纬）或S（南纬）*/
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'S')
+    {
+        g_tGPS.NS = 'S';
+    }
+    else if (*p == 'N')
+    {
+        g_tGPS.NS = 'N';
+    }
+    else
+    {
+        return;
+    }
 
-	/* 字段5 经度dddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.JingDu_Du = StrToIntFix(p, 3);
-	p += 3;
-	g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段5 经度dddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.JingDu_Du = StrToIntFix(p, 3);
+    p += 3;
+    g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段6：经度E（东经）或W（西经） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'E')
-	{
-		g_tGPS.EW = 'E';
-	}
-	else if (*p == 'W')
-	{
-		g_tGPS.EW = 'W';
-	}
+    /* 字段6：经度E（东经）或W（西经） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'E')
+    {
+        g_tGPS.EW = 'E';
+    }
+    else if (*p == 'W')
+    {
+        g_tGPS.EW = 'W';
+    }
 
-	/* 字段7：速度，节，Knots  10.05,*/
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.SpeedKnots = StrToInt(p);
+    /* 字段7：速度，节，Knots  10.05,*/
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.SpeedKnots = StrToInt(p);
 
-	/* 字段8：方位角，度 ,324.27 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.TrackDegTrue = StrToInt(p);
+    /* 字段8：方位角，度 ,324.27 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.TrackDegTrue = StrToInt(p);
 
-	/* 字段9：UTC日期，DDMMYY格式  150706 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Day = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Month = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Year = StrToIntFix(p, 2);
-	p += 2;
+    /* 字段9：UTC日期，DDMMYY格式  150706 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Day = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Month = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Year = StrToIntFix(p, 2);
+    p += 2;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPVTG
-*	功能说明: 分析0183数据包中的 GPVTG 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPVTG
+*    功能说明: 分析0183数据包中的 GPVTG 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -713,81 +713,81 @@ void gpsGPRMC(uint8_t *_ucaBuf, uint16_t _usLen)
 */
 void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	char *p;
+    char *p;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1：运动角度，000 - 359，（前导位数不足则补0）*/
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.TrackDegTrue = StrToInt(p);
+    /* 字段1：运动角度，000 - 359，（前导位数不足则补0）*/
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.TrackDegTrue = StrToInt(p);
 
-	/* 字段2：T=真北参照系 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
+    /* 字段2：T=真北参照系 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
 
-	/* 字段3：运动角度，000 - 359，（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.TrackDegMag = StrToInt(p);
+    /* 字段3：运动角度，000 - 359，（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.TrackDegMag = StrToInt(p);
 
-	/* 字段4：M=磁北参照系 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
+    /* 字段4：M=磁北参照系 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
 
-	/* 字段5：地面速率（000.0~999.9节，前面的0也将被传输） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.SpeedKnots = StrToInt(p);
+    /* 字段5：地面速率（000.0~999.9节，前面的0也将被传输） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.SpeedKnots = StrToInt(p);
 
-	/* 字段6：N=节，Knots */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
+    /* 字段6：N=节，Knots */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
 
-	/* 字段7：地面速率（0000.0~1851.8公里/小时，前面的0也将被传输） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.SpeedKM = StrToInt(p);
+    /* 字段7：地面速率（0000.0~1851.8公里/小时，前面的0也将被传输） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.SpeedKM = StrToInt(p);
 
-	/* 字段8：K=公里/时，km/h	 */
+    /* 字段8：K=公里/时，km/h     */
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gpsGPGLL
-*	功能说明: 分析0183数据包中的 GPGLL 命令，结果存放到全局变量
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: gpsGPGLL
+*    功能说明: 分析0183数据包中的 GPGLL 命令，结果存放到全局变量
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 /*
@@ -803,452 +803,452 @@ void gpsGPVTG(uint8_t *_ucaBuf, uint16_t _usLen)
 */
 void gpsGPGLL(uint8_t *_ucaBuf, uint16_t _usLen)
 {
-	char *p;
+    char *p;
 
-	p = (char *)_ucaBuf;
-	p[_usLen] = 0;
+    p = (char *)_ucaBuf;
+    p[_usLen] = 0;
 
-	/* 字段1 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段1 纬度ddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.WeiDu_Du = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.WeiDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.WeiDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段2 纬度N（北纬）或S（南纬）*/
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'S')
-	{
-		g_tGPS.NS = 'S';
-	}
-	else if (*p == 'N')
-	{
-		g_tGPS.NS = 'N';
-	}
-	else
-	{
-		return;
-	}
+    /* 字段2 纬度N（北纬）或S（南纬）*/
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'S')
+    {
+        g_tGPS.NS = 'S';
+    }
+    else if (*p == 'N')
+    {
+        g_tGPS.NS = 'N';
+    }
+    else
+    {
+        return;
+    }
 
-	/* 字段3 经度dddmm.mmmm，度分格式（前导位数不足则补0） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.JingDu_Du = StrToIntFix(p, 3);
-	p += 3;
-	g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
-	p += 3;
-	g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
-	p += 4;
+    /* 字段3 经度dddmm.mmmm，度分格式（前导位数不足则补0） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.JingDu_Du = StrToIntFix(p, 3);
+    p += 3;
+    g_tGPS.JingDu_Fen = StrToIntFix(p, 2) * 10000;
+    p += 3;
+    g_tGPS.JingDu_Fen += StrToIntFix(p, 4);
+    p += 4;
 
-	/* 字段4：经度E（东经）或W（西经） */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p == 'E')
-	{
-		g_tGPS.EW = 'E';
-	}
-	else if (*p == 'W')
-	{
-		g_tGPS.EW = 'W';
-	}
+    /* 字段4：经度E（东经）或W（西经） */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p == 'E')
+    {
+        g_tGPS.EW = 'E';
+    }
+    else if (*p == 'W')
+    {
+        g_tGPS.EW = 'W';
+    }
 
-	/* 字段5 UTC时间，hhmmss.sss格式 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	g_tGPS.Hour = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Min = StrToIntFix(p, 2);
-	p += 2;
-	g_tGPS.Sec = StrToIntFix(p, 2);
-	p += 2;
+    /* 字段5 UTC时间，hhmmss.sss格式 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    g_tGPS.Hour = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Min = StrToIntFix(p, 2);
+    p += 2;
+    g_tGPS.Sec = StrToIntFix(p, 2);
+    p += 2;
 
-	/* 字段6 状态，A=定位，V=未定位 */
-	p = strchr(p, ',');
-	if (p == 0)
-	{
-		return;
-	}
-	p++;
-	if (*p != 'A')
-	{
-		/* 未定位则直接返回 */
-		return;
-	}
+    /* 字段6 状态，A=定位，V=未定位 */
+    p = strchr(p, ',');
+    if (p == 0)
+    {
+        return;
+    }
+    p++;
+    if (*p != 'A')
+    {
+        /* 未定位则直接返回 */
+        return;
+    }
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: Analyze0183
-*	功能说明: 分析0183数据包
-*	形    参:  _ucaBuf  收到的数据
-*			 _usLen    数据长度
-*	返 回 值: 无
+*    函 数 名: Analyze0183
+*    功能说明: 分析0183数据包
+*    形    参:  _ucaBuf  收到的数据
+*             _usLen    数据长度
+*    返 回 值: 无
 *********************************************************************************************************
 */
 void Analyze0183(uint8_t *_ucaBuf, uint16_t _usLen)
 {
 
-	if (CheckXor(_ucaBuf, _usLen) != TRUE)
-	{
-		return;
-	}
+    if (CheckXor(_ucaBuf, _usLen) != TRUE)
+    {
+        return;
+    }
 
-	if (memcmp(_ucaBuf, "GPGGA,", 6) == 0)
-	{
-		gpsGPGGA(_ucaBuf, _usLen);
-	}
-	else if (memcmp(_ucaBuf, "GPGSA,", 6) == 0)
-	{
-		gpsGPGSA(_ucaBuf, _usLen);
-	}
-	else if (memcmp(_ucaBuf, "GPGSV,", 6) == 0)
-	{
-		gpsGPGSV(_ucaBuf, _usLen);
-	}
-	else if (memcmp(_ucaBuf, "GPRMC,", 6) == 0)
-	{
-		gpsGPRMC(_ucaBuf, _usLen);
-	}
-	else if (memcmp(_ucaBuf, "GPVTG,", 6) == 0)
-	{
-		gpsGPVTG(_ucaBuf, _usLen);
-	}
-	else if (memcmp(_ucaBuf, "GPGLL,", 6) == 0)
-	{
-		gpsGPGLL(_ucaBuf, _usLen);
-	}
+    if (memcmp(_ucaBuf, "GPGGA,", 6) == 0)
+    {
+        gpsGPGGA(_ucaBuf, _usLen);
+    }
+    else if (memcmp(_ucaBuf, "GPGSA,", 6) == 0)
+    {
+        gpsGPGSA(_ucaBuf, _usLen);
+    }
+    else if (memcmp(_ucaBuf, "GPGSV,", 6) == 0)
+    {
+        gpsGPGSV(_ucaBuf, _usLen);
+    }
+    else if (memcmp(_ucaBuf, "GPRMC,", 6) == 0)
+    {
+        gpsGPRMC(_ucaBuf, _usLen);
+    }
+    else if (memcmp(_ucaBuf, "GPVTG,", 6) == 0)
+    {
+        gpsGPVTG(_ucaBuf, _usLen);
+    }
+    else if (memcmp(_ucaBuf, "GPGLL,", 6) == 0)
+    {
+        gpsGPGLL(_ucaBuf, _usLen);
+    }
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: StrToInt
-*	功能说明: 将ASCII码字符串转换成十进制
-*	形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
-*	返 回 值: 二进制整数值
+*    函 数 名: StrToInt
+*    功能说明: 将ASCII码字符串转换成十进制
+*    形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
+*    返 回 值: 二进制整数值
 *********************************************************************************************************
 */
 int32_t StrToInt(char *_pStr)
 {
-	uint8_t flag;
-	char *p;
-	uint32_t ulInt;
-	uint8_t i;
-	uint8_t ucTemp;
+    uint8_t flag;
+    char *p;
+    uint32_t ulInt;
+    uint8_t i;
+    uint8_t ucTemp;
 
-	p = _pStr;
-	if (*p == '-')
-	{
-		flag = 1; /* 负数 */
-		p++;
-	}
-	else
-	{
-		flag = 0;
-	}
+    p = _pStr;
+    if (*p == '-')
+    {
+        flag = 1; /* 负数 */
+        p++;
+    }
+    else
+    {
+        flag = 0;
+    }
 
-	ulInt = 0;
-	for (i = 0; i < 15; i++)
-	{
-		ucTemp = *p;
-		if (ucTemp == '.') /* 遇到小数点，自动跳过1个字节 */
-		{
-			p++;
-			ucTemp = *p;
-		}
-		if ((ucTemp >= '0') && (ucTemp <= '9'))
-		{
-			ulInt = ulInt * 10 + (ucTemp - '0');
-			p++;
-		}
-		else
-		{
-			break;
-		}
-	}
+    ulInt = 0;
+    for (i = 0; i < 15; i++)
+    {
+        ucTemp = *p;
+        if (ucTemp == '.') /* 遇到小数点，自动跳过1个字节 */
+        {
+            p++;
+            ucTemp = *p;
+        }
+        if ((ucTemp >= '0') && (ucTemp <= '9'))
+        {
+            ulInt = ulInt * 10 + (ucTemp - '0');
+            p++;
+        }
+        else
+        {
+            break;
+        }
+    }
 
-	if (flag == 1)
-	{
-		return -ulInt;
-	}
-	return ulInt;
+    if (flag == 1)
+    {
+        return -ulInt;
+    }
+    return ulInt;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: StrToIntFix
-*	功能说明: 将ASCII码字符串转换成十进制, 给定长度
-*	形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
-*			 _ucLen : 固定长度
-*	返 回 值: 二进制整数值
+*    函 数 名: StrToIntFix
+*    功能说明: 将ASCII码字符串转换成十进制, 给定长度
+*    形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
+*             _ucLen : 固定长度
+*    返 回 值: 二进制整数值
 *********************************************************************************************************
 */
 int32_t StrToIntFix(char *_pStr, uint8_t _ucLen)
 {
-	uint8_t flag;
-	char *p;
-	uint32_t ulInt;
-	uint8_t i;
-	uint8_t ucTemp;
+    uint8_t flag;
+    char *p;
+    uint32_t ulInt;
+    uint8_t i;
+    uint8_t ucTemp;
 
-	p = _pStr;
-	if (*p == '-')
-	{
-		flag = 1; /* 负数 */
-		p++;
-		_ucLen--;
-	}
-	else
-	{
-		flag = 0;
-	}
+    p = _pStr;
+    if (*p == '-')
+    {
+        flag = 1; /* 负数 */
+        p++;
+        _ucLen--;
+    }
+    else
+    {
+        flag = 0;
+    }
 
-	ulInt = 0;
-	for (i = 0; i < _ucLen; i++)
-	{
-		ucTemp = *p;
-		if (ucTemp == '.') /* 遇到小数点，自动跳过1个字节 */
-		{
-			p++;
-			ucTemp = *p;
-		}
-		if ((ucTemp >= '0') && (ucTemp <= '9'))
-		{
-			ulInt = ulInt * 10 + (ucTemp - '0');
-			p++;
-		}
-		else
-		{
-			break;
-		}
-	}
+    ulInt = 0;
+    for (i = 0; i < _ucLen; i++)
+    {
+        ucTemp = *p;
+        if (ucTemp == '.') /* 遇到小数点，自动跳过1个字节 */
+        {
+            p++;
+            ucTemp = *p;
+        }
+        if ((ucTemp >= '0') && (ucTemp <= '9'))
+        {
+            ulInt = ulInt * 10 + (ucTemp - '0');
+            p++;
+        }
+        else
+        {
+            break;
+        }
+    }
 
-	if (flag == 1)
-	{
-		return -ulInt;
-	}
-	return ulInt;
+    if (flag == 1)
+    {
+        return -ulInt;
+    }
+    return ulInt;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: HexToAscii
-*	功能说明: 将hex码0x1f转换成'1'和'f'. 结尾填0.
-*	形    参: ucpHex 输入缓冲区指针
-*		     _ucpAscII 输出缓冲区指针
-*		    _ucLenasc ASCII的字符长度.
-*	返 回 值: 二进制整数值
+*    函 数 名: HexToAscii
+*    功能说明: 将hex码0x1f转换成'1'和'f'. 结尾填0.
+*    形    参: ucpHex 输入缓冲区指针
+*             _ucpAscII 输出缓冲区指针
+*            _ucLenasc ASCII的字符长度.
+*    返 回 值: 二进制整数值
 *********************************************************************************************************
 */
 void HexToAscii(uint8_t *_ucpHex, uint8_t *_ucpAscII, uint8_t _ucLenasc)
 {
-	uint8_t i;
-	uint8_t ucTemp;
+    uint8_t i;
+    uint8_t ucTemp;
 
-	for (i = 0; i < _ucLenasc; i++)
-	{
-		ucTemp = *_ucpHex;
-		if ((i & 0x01) == 0x00)
-			ucTemp = ucTemp >> 4;
-		else
-		{
-			ucTemp = ucTemp & 0x0f;
-			_ucpHex++;
-		}
-		if (ucTemp < 0x0a)
-			ucTemp += 0x30;
-		else
-			ucTemp += 0x37;
-		_ucpAscII[i] = ucTemp;
-	}
-	//--------debug--------//
-	_ucpAscII[i] = '\0';
-	//--------end----------//
+    for (i = 0; i < _ucLenasc; i++)
+    {
+        ucTemp = *_ucpHex;
+        if ((i & 0x01) == 0x00)
+            ucTemp = ucTemp >> 4;
+        else
+        {
+            ucTemp = ucTemp & 0x0f;
+            _ucpHex++;
+        }
+        if (ucTemp < 0x0a)
+            ucTemp += 0x30;
+        else
+            ucTemp += 0x37;
+        _ucpAscII[i] = ucTemp;
+    }
+    //--------debug--------//
+    _ucpAscII[i] = '\0';
+    //--------end----------//
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gps_FenToDu
-*	功能说明: 将分转换为度的小数部分，保留6位小数。 将分换算为度。
-*	形    参: 无
-*	返 回 值: 返回度的小数部分（十进制）
+*    函 数 名: gps_FenToDu
+*    功能说明: 将分转换为度的小数部分，保留6位小数。 将分换算为度。
+*    形    参: 无
+*    返 回 值: 返回度的小数部分（十进制）
 *********************************************************************************************************
 */
 uint32_t gps_FenToDu(uint32_t _fen)
 {
-	uint32_t du;
+    uint32_t du;
 
-	/* g_tGPS.WeiDu_Fen;	纬度，分. 232475；  小数点后4位  表示 23.2475分 */
+    /* g_tGPS.WeiDu_Fen;    纬度，分. 232475；  小数点后4位  表示 23.2475分 */
 
-	du = (_fen * 100) / 60;
+    du = (_fen * 100) / 60;
 
-	return du;
+    return du;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: gps_FenToMiao
-*	功能说明: 将分的小数部分转化秒
-*	形    参: 无
-*	返 回 值: 秒 整数部分
+*    函 数 名: gps_FenToMiao
+*    功能说明: 将分的小数部分转化秒
+*    形    参: 无
+*    返 回 值: 秒 整数部分
 *********************************************************************************************************
 */
 uint16_t gps_FenToMiao(uint32_t _fen)
 {
-	uint32_t miao;
+    uint32_t miao;
 
-	/* g_tGPS.WeiDu_Fen;	纬度，分. 232475；  小数点后4位  表示 23.2475分 
-		其中小数部分 0.2475 * 60 = 14.85 四舍五入为 15秒	
-		
-		
-		2475 * 60 = 148500
-		148500 / 10000 = 14;
-		
-		if ((148500 % 10000) >= 5000)
-		{
-			miao = 14 + 1
-		}
-	*/
+    /* g_tGPS.WeiDu_Fen;    纬度，分. 232475；  小数点后4位  表示 23.2475分 
+        其中小数部分 0.2475 * 60 = 14.85 四舍五入为 15秒    
+        
+        
+        2475 * 60 = 148500
+        148500 / 10000 = 14;
+        
+        if ((148500 % 10000) >= 5000)
+        {
+            miao = 14 + 1
+        }
+    */
 
-	miao = ((_fen % 10000) * 60);
+    miao = ((_fen % 10000) * 60);
 
-	if ((miao % 10000) >= 5000)
-	{
-		miao = miao / 10000 + 1; /* 5入 */
-	}
-	else
-	{
-		miao = miao / 10000; /* 4舍 */
-	}
+    if ((miao % 10000) >= 5000)
+    {
+        miao = miao / 10000 + 1; /* 5入 */
+    }
+    else
+    {
+        miao = miao / 10000; /* 4舍 */
+    }
 
-	return miao;
+    return miao;
 }
 
 /*
 *********************************************************************************************************
-*	函 数 名: StrToIntFix
-*	功能说明: 将ASCII码字符串转换成十进制, 给定长度
-*	形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
-*			 _ucLen : 固定长度
-*	返 回 值: 二进制整数值
+*    函 数 名: StrToIntFix
+*    功能说明: 将ASCII码字符串转换成十进制, 给定长度
+*    形    参: _pStr :待转换的ASCII码串. 可以以逗号或0结束
+*             _ucLen : 固定长度
+*    返 回 值: 二进制整数值
 *********************************************************************************************************
 */
 void UTCDate(void)
 {
 #if 0
-	/* 处理UTC时差 */
-	{
-		uint8_t ucaDays[]={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    /* 处理UTC时差 */
+    {
+        uint8_t ucaDays[]={31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-		if (g_tParam.iUTCtime > 0)
-		{
-			g_tGPS.Hour += g_tParam.iUTCtime;
-			if (g_tGPS.Hour > 23)
-			{
-				g_tGPS.Hour = g_tGPS.Hour - 24;
-				g_tGPS.ucDay++;
+        if (g_tParam.iUTCtime > 0)
+        {
+            g_tGPS.Hour += g_tParam.iUTCtime;
+            if (g_tGPS.Hour > 23)
+            {
+                g_tGPS.Hour = g_tGPS.Hour - 24;
+                g_tGPS.ucDay++;
 
-				/* 闰年2月份为29天 */
-				if (IsLeapYear(g_tGPS.usYear))
-				{
-					ucaDays[1] = 29;
-				}
-				else
-				{
-					ucaDays[1] = 28;
-				}
+                /* 闰年2月份为29天 */
+                if (IsLeapYear(g_tGPS.usYear))
+                {
+                    ucaDays[1] = 29;
+                }
+                else
+                {
+                    ucaDays[1] = 28;
+                }
 
-				if (g_tGPS.ucDay > ucaDays[g_tGPS.ucMonth - 1])
-				{
-					g_tGPS.ucDay = 1;
+                if (g_tGPS.ucDay > ucaDays[g_tGPS.ucMonth - 1])
+                {
+                    g_tGPS.ucDay = 1;
 
-					g_tGPS.ucMonth++;
+                    g_tGPS.ucMonth++;
 
-					if (g_tGPS.ucMonth > 12)
-					{
-						g_tGPS.usYear++;
-					}
-				}
-			}
+                    if (g_tGPS.ucMonth > 12)
+                    {
+                        g_tGPS.usYear++;
+                    }
+                }
+            }
 
-		}
-		else if (g_tParam.iUTCtime < 0)
-		{
-			int iHour;
+        }
+        else if (g_tParam.iUTCtime < 0)
+        {
+            int iHour;
 
-			iHour = g_tGPS.Hour;
-			iHour += g_tParam.iUTCtime;
+            iHour = g_tGPS.Hour;
+            iHour += g_tParam.iUTCtime;
 
-			if (iHour < 0)
-			{
-				g_tGPS.Hour = 24 + iHour;
+            if (iHour < 0)
+            {
+                g_tGPS.Hour = 24 + iHour;
 
-				if (g_tGPS.ucDay == 1)
-				{
-					if (g_tGPS.ucMonth == 1)
-					{
-						g_tGPS.usYear--;
-						g_tGPS.ucMonth = 12;
-						g_tGPS.ucDay = 31;
-					}
-					else
-					{
-						if (g_tGPS.ucMonth == 3)
-						{
-							g_tGPS.ucMonth = 2;
+                if (g_tGPS.ucDay == 1)
+                {
+                    if (g_tGPS.ucMonth == 1)
+                    {
+                        g_tGPS.usYear--;
+                        g_tGPS.ucMonth = 12;
+                        g_tGPS.ucDay = 31;
+                    }
+                    else
+                    {
+                        if (g_tGPS.ucMonth == 3)
+                        {
+                            g_tGPS.ucMonth = 2;
 
-							/* 闰年2月份为29天 */
-							if (IsLeapYear(g_tGPS.usYear))
-							{
-								g_tGPS.ucDay = 29;
-							}
-							else
-							{
-								g_tGPS.ucDay = 28;
-							}
-						}
-						else
-						{
-							g_tGPS.ucMonth--;
+                            /* 闰年2月份为29天 */
+                            if (IsLeapYear(g_tGPS.usYear))
+                            {
+                                g_tGPS.ucDay = 29;
+                            }
+                            else
+                            {
+                                g_tGPS.ucDay = 28;
+                            }
+                        }
+                        else
+                        {
+                            g_tGPS.ucMonth--;
 
-							g_tGPS.ucDay = ucaDays[g_tGPS.ucMonth];
-						}
-					}
-				}
-				else
-				{
-					g_tGPS.ucDay--;
-				}
-			}
-			else
-			{
-				g_tGPS.Hour = iHour;
-			}
-		}
-	}
+                            g_tGPS.ucDay = ucaDays[g_tGPS.ucMonth];
+                        }
+                    }
+                }
+                else
+                {
+                    g_tGPS.ucDay--;
+                }
+            }
+            else
+            {
+                g_tGPS.Hour = iHour;
+            }
+        }
+    }
 #endif
 }
 

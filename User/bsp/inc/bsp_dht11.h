@@ -1,10 +1,10 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : DHT11 驱动模块(1-wire 数字温湿度传感器）
-*	文件名称 : bsp_dht11.h
+*    模块名称 : DHT11 驱动模块(1-wire 数字温湿度传感器）
+*    文件名称 : bsp_dht11.h
 *
-*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*    Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,9 +14,9 @@
 
 typedef struct
 {
-	uint8_t Buf[5];
-	uint8_t Temp; /* Temperature 温度 摄氏度 */
-	uint8_t Hum;	/* Humidity 湿度 百分比 */
+    uint8_t Buf[5];
+    uint8_t Temp; /* Temperature 温度 摄氏度 */
+    uint8_t Hum;    /* Humidity 湿度 百分比 */
 } DHT11_T;
 
 void bsp_InitDHT11(void);

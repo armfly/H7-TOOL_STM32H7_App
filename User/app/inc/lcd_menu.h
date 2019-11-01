@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : LCD液晶显示器 菜单组件
-*	文件名称 : lcd_menu.h
-*	版    本 : V1.0
-*	说    明 : 头文件
-*	修改记录 :
-*		版本号  日期       作者    说明
-*		v1.0    2015-04-25 armfly  ST固件库版本 V2.1.0
+*    模块名称 : LCD液晶显示器 菜单组件
+*    文件名称 : lcd_menu.h
+*    版    本 : V1.0
+*    说    明 : 头文件
+*    修改记录 :
+*        版本号  日期       作者    说明
+*        v1.0    2015-04-25 armfly  ST固件库版本 V2.1.0
 *
-*	Copyright (C), 2015-2016, 安富莱电子 www.armfly.com
+*    Copyright (C), 2015-2016, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -37,19 +37,19 @@
 /* 菜单结构 */
 typedef struct
 {
-	uint8_t **Text;		/* 菜单文本 */
-	uint8_t ViewLine; /* 可视行数 */
-	uint8_t Count;		/* 菜单项个数 */
-	uint8_t Offset;		/* 当前屏幕第1行对应的索引 */
-	uint8_t Cursor;		/* 选中行的索引 */
+    uint8_t **Text;        /* 菜单文本 */
+    uint8_t ViewLine; /* 可视行数 */
+    uint8_t Count;        /* 菜单项个数 */
+    uint8_t Offset;        /* 当前屏幕第1行对应的索引 */
+    uint8_t Cursor;        /* 选中行的索引 */
 
-	uint16_t Left;		/* X 坐标 */
-	uint16_t Top;			/* Y 坐标 */
-	uint16_t Height;	/* 高度 */
-	uint16_t Width;		/* 宽度 */
-	uint16_t LineCap; /* 行间距 */
+    uint16_t Left;        /* X 坐标 */
+    uint16_t Top;            /* Y 坐标 */
+    uint16_t Height;    /* 高度 */
+    uint16_t Width;        /* 宽度 */
+    uint16_t LineCap; /* 行间距 */
 
-	FONT_T Font; /* 字体 */
+    FONT_T Font; /* 字体 */
 } MENU_T;
 
 /* 菜单显示类 */

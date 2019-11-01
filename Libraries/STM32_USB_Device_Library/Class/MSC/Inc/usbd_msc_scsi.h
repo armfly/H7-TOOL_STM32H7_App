@@ -106,8 +106,8 @@
 #define MEDIUM_NOT_PRESENT                          0x3A
 #define MEDIUM_HAVE_CHANGED                         0x28
 #define WRITE_PROTECTED                             0x27 
-#define UNRECOVERED_READ_ERROR			    0x11
-#define WRITE_FAULT				    0x03 
+#define UNRECOVERED_READ_ERROR                0x11
+#define WRITE_FAULT                    0x03 
 
 #define READ_FORMAT_CAPACITY_DATA_LEN               0x0C
 #define READ_CAPACITY10_DATA_LEN                    0x08
@@ -141,7 +141,7 @@ typedef struct _SENSE_ITEM {
       char ASC;
       char ASCQ;
     }b;
-    unsigned int	ASC;
+    unsigned int    ASC;
     char *pData;
   } w;
 } USBD_SCSI_SenseTypeDef; 

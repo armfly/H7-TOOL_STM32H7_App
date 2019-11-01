@@ -37,7 +37,7 @@ __weak BOOL USBD_EndPoint0_Setup_WebUSB_ReqToDevice(void)
     U32 len, n;
 
     BOOL success = (__FALSE);
-    if (USBD_SetupPacket.bRequest == usbd_webusb_vendor_code) {			/* vendor code correct? */
+    if (USBD_SetupPacket.bRequest == usbd_webusb_vendor_code) {            /* vendor code correct? */
         switch (USBD_SetupPacket.wIndex) {
             case WEBUSB_REQUEST_GET_URL:
                 pD = (U8 *)USBD_WebUSBURLDescriptor;

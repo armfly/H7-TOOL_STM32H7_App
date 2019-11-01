@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   USB Host Disk I/O template driver (with internal DMA).
              This file needs to be copied under the application project
-	     alongside the respective header file
+         alongside the respective header file
   ******************************************************************************
   * @attention
   *

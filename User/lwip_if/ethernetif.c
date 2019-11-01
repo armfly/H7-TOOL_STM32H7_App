@@ -415,17 +415,17 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
   GPIO_InitTypeDef GPIO_InitStructure;
 
   /* Ethernett MSP init: RMII Mode 
-	  CPU                   H7-TOOL  STM32-V7  ST  
-	  RX_CLK  -------------->  PA1      PA1    PA1
-	  TXD0    -------------->  PG13     PG13   PB12   ---
-	  TXD1    -------------->  PG14     PB13   PB13 
-	  RXD0    -------------->  PC4      PC4    PC4
-	  RXD1    -------------->  PC5      PC5    PC5
-	  TX_EN   -------------->  PG11     PG11   PB11   ---
-	  RX_DV   -------------->  PA7      PA7    PA7
-	  
-	  MDC     -------------->  PC1      PC1    PC1
-	  MDIO    -------------->  PA2      PA2    PA2		
+      CPU                   H7-TOOL  STM32-V7  ST  
+      RX_CLK  -------------->  PA1      PA1    PA1
+      TXD0    -------------->  PG13     PG13   PB12   ---
+      TXD1    -------------->  PG14     PB13   PB13 
+      RXD0    -------------->  PC4      PC4    PC4
+      RXD1    -------------->  PC5      PC5    PC5
+      TX_EN   -------------->  PG11     PG11   PB11   ---
+      RX_DV   -------------->  PA7      PA7    PA7
+      
+      MDC     -------------->  PC1      PC1    PC1
+      MDIO    -------------->  PA2      PA2    PA2        
   */
 
   /* Enable GPIOs clocks */
@@ -436,7 +436,7 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
 
   /* Configure PA1, PA2 , PA7 */
   GPIO_InitStructure.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_7;
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM; // GPIO_SPEED_FREQ_MEDIUM;	// GPIO_SPEED_FREQ_LOW; // GPIO_SPEED_FREQ_HIGH;
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM; // GPIO_SPEED_FREQ_MEDIUM;    // GPIO_SPEED_FREQ_LOW; // GPIO_SPEED_FREQ_HIGH;
   GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStructure.Pull = GPIO_NOPULL;
   GPIO_InitStructure.Alternate = GPIO_AF11_ETH;

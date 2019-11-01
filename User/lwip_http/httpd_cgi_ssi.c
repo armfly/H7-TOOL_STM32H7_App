@@ -85,7 +85,7 @@ u16_t ADC_Handler(int iIndex, char *pcInsert, int iInsertLen)
     char Digit1=0, Digit2=0, Digit3=0, Digit4=0; 
     uint32_t ADCVal = 0;
     
-    ADCVal = 1234;	//BSP_POTENTIOMETER_GetLevel();
+    ADCVal = 1234;    //BSP_POTENTIOMETER_GetLevel();
     
     /* convert to Voltage,  step = 0.8 mV */
     ADCVal = (uint32_t)(ADCVal * 0.8);  

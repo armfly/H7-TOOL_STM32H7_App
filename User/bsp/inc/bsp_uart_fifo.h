@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : 串口中断+FIFO驱动模块
-*	文件名称 : bsp_uart_fifo.h
-*	说    明 : 头文件
+*    模块名称 : 串口中断+FIFO驱动模块
+*    文件名称 : bsp_uart_fifo.h
+*    说    明 : 头文件
 *
-*	Copyright (C), 2015-2020, 安富莱电子 www.armfly.com
+*    Copyright (C), 2015-2020, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -18,34 +18,34 @@
 #define LUA_UDP_PORT 777
 
 /*
-	H7-TOOL 串口分配：
-	【串口1】 RS485， RS232，TTL串口，3合一
-		PA9/USART1_TX
-		P10/USART1_RX
+    H7-TOOL 串口分配：
+    【串口1】 RS485， RS232，TTL串口，3合一
+        PA9/USART1_TX
+        P10/USART1_RX
 
-	【串口2】 --- 未用
-		PA2/USART2_TX/ETH_MDIO (用于以太网，不做串口发送用)
-		PA3/USART2_RX	;接GPS模块输出
+    【串口2】 --- 未用
+        PA2/USART2_TX/ETH_MDIO (用于以太网，不做串口发送用)
+        PA3/USART2_RX    ;接GPS模块输出
 
-	【串口3】 --- 未用
-		PB10/USART3_TX
-		PB11/USART3_RX
+    【串口3】 --- 未用
+        PB10/USART3_TX
+        PB11/USART3_RX
 
-	【串口4】 --- ESP-32模块用
-		PH13/UART4_TX
-		PH14/UART4_RX
-		
-	【串口5】 ---  未用
+    【串口4】 --- ESP-32模块用
+        PH13/UART4_TX
+        PH14/UART4_RX
+        
+    【串口5】 ---  未用
 
-	【串口6】---  未用
-		PC6/USART6_TX
-		PC7/USART6_RX
-		
-	【串口7】 ---  引出，和FMC_D0 D1复用
-		PA15/UART7_TX		（FMC_DO)
-		PA8/UART7_RX		（FMC_D1)
-	
-	【串口8】 ---  未用
+    【串口6】---  未用
+        PC6/USART6_TX
+        PC7/USART6_RX
+        
+    【串口7】 ---  引出，和FMC_D0 D1复用
+        PA15/UART7_TX        （FMC_DO)
+        PA8/UART7_RX        （FMC_D1)
+    
+    【串口8】 ---  未用
 */
 
 #define UART1_FIFO_EN 0 /* 禁止。在USB虚拟串口驱动中使用DMA操作 */
@@ -70,16 +70,16 @@
 /* 定义端口号 */
 typedef enum
 {
-	COM1 = 0, /* USART1 */
-	COM2 = 1, /* USART2 */
-	COM3 = 2, /* USART3 */
-	COM4 = 3, /* UART4 */
-	COM5 = 4, /* UART5 */
-	COM6 = 5, /* USART6 */
-	COM7 = 6, /* UART7 */
-	COM8 = 7, /* UART8 */
+    COM1 = 0, /* USART1 */
+    COM2 = 1, /* USART2 */
+    COM3 = 2, /* USART3 */
+    COM4 = 3, /* UART4 */
+    COM5 = 4, /* UART5 */
+    COM6 = 5, /* USART6 */
+    COM7 = 6, /* UART7 */
+    COM8 = 7, /* UART8 */
 
-	COM_USB = 8 /* UART8 */
+    COM_USB = 8 /* UART8 */
 } COM_PORT_E;
 
 /* 定义串口波特率和FIFO缓冲区大小，分为发送缓冲区和接收缓冲区, 支持全双工 */
@@ -140,23 +140,23 @@ typedef enum
 /* 串口设备结构体 */
 typedef struct
 {
-	USART_TypeDef *uart;		 /* STM32内部串口设备指针 */
-	uint8_t *pTxBuf;				 /* 发送缓冲区 */
-	uint8_t *pRxBuf;				 /* 接收缓冲区 */
-	uint16_t usTxBufSize;		 /* 发送缓冲区大小 */
-	uint16_t usRxBufSize;		 /* 接收缓冲区大小 */
-	__IO uint16_t usTxWrite; /* 发送缓冲区写指针 */
-	__IO uint16_t usTxRead;	/* 发送缓冲区读指针 */
-	__IO uint16_t usTxCount; /* 等待发送的数据个数 */
+    USART_TypeDef *uart;         /* STM32内部串口设备指针 */
+    uint8_t *pTxBuf;                 /* 发送缓冲区 */
+    uint8_t *pRxBuf;                 /* 接收缓冲区 */
+    uint16_t usTxBufSize;         /* 发送缓冲区大小 */
+    uint16_t usRxBufSize;         /* 接收缓冲区大小 */
+    __IO uint16_t usTxWrite; /* 发送缓冲区写指针 */
+    __IO uint16_t usTxRead;    /* 发送缓冲区读指针 */
+    __IO uint16_t usTxCount; /* 等待发送的数据个数 */
 
-	__IO uint16_t usRxWrite; /* 接收缓冲区写指针 */
-	__IO uint16_t usRxRead;	/* 接收缓冲区读指针 */
-	__IO uint16_t usRxCount; /* 还未读取的新数据个数 */
+    __IO uint16_t usRxWrite; /* 接收缓冲区写指针 */
+    __IO uint16_t usRxRead;    /* 接收缓冲区读指针 */
+    __IO uint16_t usRxCount; /* 还未读取的新数据个数 */
 
-	void (*SendBefor)(void);					/* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式） */
-	void (*SendOver)(void);						/* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式） */
-	void (*ReciveNew)(uint8_t _byte); /* 串口收到数据的回调函数指针 */
-	uint8_t Sending;									/* 正在发送中 */
+    void (*SendBefor)(void);                    /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式） */
+    void (*SendOver)(void);                        /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式） */
+    void (*ReciveNew)(uint8_t _byte); /* 串口收到数据的回调函数指针 */
+    uint8_t Sending;                                    /* 正在发送中 */
 } UART_T;
 
 void bsp_InitUart(void);

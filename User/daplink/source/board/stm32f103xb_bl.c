@@ -53,7 +53,7 @@ const board_info_t g_board_info = {
     .infoVersion = 0x0,
     .board_id = "0000",
     .daplink_url_name =       "HELP_FAQHTM",
-    .daplink_drive_name = 		"MAINTENANCE",
+    .daplink_drive_name =         "MAINTENANCE",
     .daplink_target_url = "https://mbed.com/daplink",
     .target_cfg = &target_device,
 };

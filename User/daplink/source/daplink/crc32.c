@@ -5,8 +5,8 @@
  * Description: Slow and fast implementations of the CRC standards.
  *
  * Notes:       The parameters for each supported CRC standard are
- *				defined in the header file crc.h.  The implementations
- *				here should stand up to further additions to that list.
+ *                defined in the header file crc.h.  The implementations
+ *                here should stand up to further additions to that list.
  *
  *
  * Copyright (c) 2000 by Michael Barr.  This software is placed into
@@ -22,18 +22,18 @@
 
 #include "crc.h"
 
-#define FALSE	0
-#define TRUE	!FALSE
+#define FALSE    0
+#define TRUE    !FALSE
 
 typedef unsigned long  crc;
 
-#define CRC_NAME			"CRC-32"
-#define POLYNOMIAL			0x04C11DB7
-#define INITIAL_REMAINDER	0xFFFFFFFF
-#define FINAL_XOR_VALUE		0xFFFFFFFF
-#define REFLECT_DATA		TRUE
-#define REFLECT_REMAINDER	TRUE
-#define CHECK_VALUE			0xCBF43926
+#define CRC_NAME            "CRC-32"
+#define POLYNOMIAL            0x04C11DB7
+#define INITIAL_REMAINDER    0xFFFFFFFF
+#define FINAL_XOR_VALUE        0xFFFFFFFF
+#define REFLECT_DATA        TRUE
+#define REFLECT_REMAINDER    TRUE
+#define CHECK_VALUE            0xCBF43926
 
 /*
  * Derive parameters from the standard-specific parameters in crc.h.
@@ -43,18 +43,18 @@ typedef unsigned long  crc;
 
 #if (REFLECT_DATA == TRUE)
 #undef  REFLECT_DATA
-#define REFLECT_DATA(X)			((unsigned char) reflect((X), 8))
+#define REFLECT_DATA(X)            ((unsigned char) reflect((X), 8))
 #else
 #undef  REFLECT_DATA
-#define REFLECT_DATA(X)			(X)
+#define REFLECT_DATA(X)            (X)
 #endif
 
 #if (REFLECT_REMAINDER == TRUE)
 #undef  REFLECT_REMAINDER
-#define REFLECT_REMAINDER(X)	((crc) reflect((X), WIDTH))
+#define REFLECT_REMAINDER(X)    ((crc) reflect((X), WIDTH))
 #else
 #undef  REFLECT_REMAINDER
-#define REFLECT_REMAINDER(X)	(X)
+#define REFLECT_REMAINDER(X)    (X)
 #endif
 
 
@@ -63,11 +63,11 @@ typedef unsigned long  crc;
  * Function:    reflect()
  *
  * Description: Reorder the bits of a binary sequence, by reflecting
- *				them about the middle position.
+ *                them about the middle position.
  *
- * Notes:		No checking is done that nBits <= 32.
+ * Notes:        No checking is done that nBits <= 32.
  *
- * Returns:		The reflection of the original data.
+ * Returns:        The reflection of the original data.
  *
  *********************************************************************/
 static unsigned long
@@ -91,7 +91,7 @@ reflect(unsigned long data, unsigned char nBits)
     }
 
     return (reflection);
-}	/* reflect() */
+}    /* reflect() */
 
 
 /*********************************************************************
@@ -102,7 +102,7 @@ reflect(unsigned long data, unsigned char nBits)
  *
  * Notes:
  *
- * Returns:		The CRC of the message.
+ * Returns:        The CRC of the message.
  *
  *********************************************************************/
 uint32_t
@@ -151,7 +151,7 @@ crc32(const void *data, int nBytes)
  *
  * Notes:
  *
- * Returns:		The CRC of the message.
+ * Returns:        The CRC of the message.
  *
  *********************************************************************/
 uint32_t

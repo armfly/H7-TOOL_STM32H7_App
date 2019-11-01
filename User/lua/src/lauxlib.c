@@ -34,8 +34,8 @@
 */
 
 
-#define LEVELS1	10	/* size of the first part of the stack */
-#define LEVELS2	11	/* size of the second part of the stack */
+#define LEVELS1    10    /* size of the first part of the stack */
+#define LEVELS2    11    /* size of the second part of the stack */
 
 
 
@@ -222,19 +222,19 @@ LUALIB_API void luaL_where (lua_State *L, int level) {
 */
 LUALIB_API int luaL_error (lua_State *L, const char *fmt, ...) {
 
-	const char *msg;
-	
+    const char *msg;
+    
   va_list argp;
   va_start(argp, fmt);
   luaL_where(L, 1);
-	
+    
   msg = lua_pushvfstring(L, fmt, argp);
 
-	printf("%s", msg);
-	
+    printf("%s", msg);
+    
   va_end(argp);
   lua_concat(L, 2);
-	
+    
   return lua_error(L);
 }
 
@@ -257,7 +257,7 @@ LUALIB_API int luaL_fileresult (lua_State *L, int stat, const char *fname) {
 }
 
 
-#if !defined(l_inspectstat)	/* { */
+#if !defined(l_inspectstat)    /* { */
 
 #if defined(LUA_USE_POSIX)
 
@@ -276,7 +276,7 @@ LUALIB_API int luaL_fileresult (lua_State *L, int stat, const char *fname) {
 
 #endif
 
-#endif				/* } */
+#endif                /* } */
 
 
 LUALIB_API int luaL_execresult (lua_State *L, int stat) {
@@ -504,7 +504,7 @@ static void *newbox (lua_State *L, size_t newsize) {
 ** check whether buffer is using a userdata on the stack as a temporary
 ** buffer
 */
-#define buffonstack(B)	((B)->b != (B)->initb)
+#define buffonstack(B)    ((B)->b != (B)->initb)
 
 
 /*
@@ -597,7 +597,7 @@ LUALIB_API char *luaL_buffinitsize (lua_State *L, luaL_Buffer *B, size_t sz) {
 */
 
 /* index of free-list header */
-#define freelist	0
+#define freelist    0
 
 
 LUALIB_API int luaL_ref (lua_State *L, int t) {
