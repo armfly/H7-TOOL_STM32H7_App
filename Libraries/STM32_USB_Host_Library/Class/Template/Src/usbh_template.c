@@ -117,7 +117,7 @@ USBH_ClassTypeDef  TEMPLATE_Class =
   * @retval USBH Status
   */
 static USBH_StatusTypeDef USBH_TEMPLATE_InterfaceInit (USBH_HandleTypeDef *phost)
-{	
+{    
 
   return USBH_OK;
 }

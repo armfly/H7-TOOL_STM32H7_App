@@ -252,10 +252,10 @@ int32_t uart_get_configuration(UART_Configuration *config)
 
     // get flow control
     if (flow_control_enabled) {
-    	config->FlowControl = UART_FLOW_CONTROL_RTS_CTS;
+        config->FlowControl = UART_FLOW_CONTROL_RTS_CTS;
     }
     else {
-    	config->FlowControl = UART_FLOW_CONTROL_NONE;
+        config->FlowControl = UART_FLOW_CONTROL_NONE;
     }
     return 1;
 }

@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   SD DMA Disk I/O template driver. This file needs to be renamed and
              copied into the application project alongside the respective header
-	         file.
+             file.
   ******************************************************************************
   * @attention
   *
@@ -314,7 +314,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
   case GET_BLOCK_SIZE :
     BSP_SD_GetCardInfo(&CardInfo);
     *(DWORD*)buff = CardInfo.LogBlockSize / SD_DEFAULT_BLOCK_SIZE;
-	res = RES_OK;
+    res = RES_OK;
     break;
 
   default:

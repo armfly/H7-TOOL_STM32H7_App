@@ -462,7 +462,7 @@ void SystemInit_ExtMemCtl(void)
   for (index = 0; index<1000; index++);
   
   /* PALL command */ 
-    FMC_Bank5_6->SDCMR = 0x0000000A; 	
+    FMC_Bank5_6->SDCMR = 0x0000000A;     
   timeout = 0xFFFF;
   while((tmpreg != 0) && (timeout-- > 0))
   {
@@ -613,7 +613,7 @@ void SystemInit_ExtMemCtl(void)
   for (index = 0; index<1000; index++);
   
   /* PALL command */ 
-    FMC_Bank5_6->SDCMR = 0x0000000A; 	
+    FMC_Bank5_6->SDCMR = 0x0000000A;     
   timeout = 0xFFFF;
   while((tmpreg != 0) && (timeout-- > 0))
   {

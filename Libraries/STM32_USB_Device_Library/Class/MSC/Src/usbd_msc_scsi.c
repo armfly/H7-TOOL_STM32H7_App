@@ -386,14 +386,14 @@ static int8_t SCSI_RequestSense (USBD_HandleTypeDef  *pdev, uint8_t lun, uint8_t
     hmsc->bot_data[i] = 0;
   }
   
-  hmsc->bot_data[0]	= 0x70;		
-  hmsc->bot_data[7]	= REQUEST_SENSE_DATA_LEN - 6;	
+  hmsc->bot_data[0]    = 0x70;        
+  hmsc->bot_data[7]    = REQUEST_SENSE_DATA_LEN - 6;    
   
   if((hmsc->scsi_sense_head != hmsc->scsi_sense_tail)) {
     
-    hmsc->bot_data[2]     = hmsc->scsi_sense[hmsc->scsi_sense_head].Skey;		
-    hmsc->bot_data[12]    = hmsc->scsi_sense[hmsc->scsi_sense_head].w.b.ASCQ;	
-    hmsc->bot_data[13]    = hmsc->scsi_sense[hmsc->scsi_sense_head].w.b.ASC;	
+    hmsc->bot_data[2]     = hmsc->scsi_sense[hmsc->scsi_sense_head].Skey;        
+    hmsc->bot_data[12]    = hmsc->scsi_sense[hmsc->scsi_sense_head].w.b.ASCQ;    
+    hmsc->bot_data[13]    = hmsc->scsi_sense[hmsc->scsi_sense_head].w.b.ASC;    
     hmsc->scsi_sense_head++;
     
     if (hmsc->scsi_sense_head == SENSE_LIST_DEEPTH)

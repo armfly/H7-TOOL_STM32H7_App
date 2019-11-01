@@ -66,7 +66,7 @@ static uint32_t  soft_reset = SYSRESETREQ;
 #if  1  // armfly debug
 void swd_set_target_reset(uint8_t asserted)
 {
-	(asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);
+    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);
 }
 
 uint32_t target_get_apsel()
@@ -76,7 +76,7 @@ uint32_t target_get_apsel()
 //    } else {
 //        return 0;
 //    }
-	return 0;
+    return 0;
 }
 #endif
 
@@ -827,8 +827,8 @@ uint8_t swd_init_debug(void)
             do_abort = 0;
         }
         swd_init();
-		
-#if 0	// armfly debug		
+        
+#if 0    // armfly debug        
         // call a target dependant function
         // this function can do several stuff before really
         // initing the debug
@@ -836,7 +836,7 @@ uint8_t swd_init_debug(void)
             g_target_family->target_before_init_debug();
         }
 #endif
-		
+        
         if (!JTAG2SWD()) {
             do_abort = 1;
             continue;
@@ -880,7 +880,7 @@ uint8_t swd_init_debug(void)
             continue;
         }
 
-#if 0	// armfly debug				
+#if 0    // armfly debug                
         // call a target dependant function:
         // some target can enter in a lock state
         // this function can unlock these targets
@@ -888,7 +888,7 @@ uint8_t swd_init_debug(void)
             g_target_family->target_unlock_sequence();
         }
 #endif
-		
+        
         if (!swd_write_dp(DP_SELECT, 0)) {
             do_abort = 1;
             continue;

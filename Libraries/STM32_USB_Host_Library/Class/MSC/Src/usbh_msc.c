@@ -147,7 +147,7 @@ USBH_ClassTypeDef  USBH_msc =
   * @retval USBH Status
   */
 static USBH_StatusTypeDef USBH_MSC_InterfaceInit (USBH_HandleTypeDef *phost)
-{	 
+{     
   uint8_t interface = 0; 
   USBH_StatusTypeDef status = USBH_FAIL ;
   MSC_HandleTypeDef *MSC_Handle;

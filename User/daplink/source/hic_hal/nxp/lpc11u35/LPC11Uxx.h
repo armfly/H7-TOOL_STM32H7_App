@@ -219,9 +219,9 @@ typedef struct {                            /*!< (@ 0x40008000) USART Structure 
 typedef struct {                            /*!< (@ 0x40014000) CT32B0 Structure        */
   __IO uint32_t IR;                         /*!< (@ 0x40014000) Interrupt Register      */
   __IO uint32_t TCR;                        /*!< (@ 0x40014004) Timer Control Register  */
-  __IO uint32_t TC;                         /*!< (@ 0x40014008) Timer Counter 		*/
-  __IO uint32_t PR;                         /*!< (@ 0x4001400C) Prescale Register  	*/
-  __IO uint32_t PC;                         /*!< (@ 0x40014010) Prescale Counter	 */
+  __IO uint32_t TC;                         /*!< (@ 0x40014008) Timer Counter         */
+  __IO uint32_t PR;                         /*!< (@ 0x4001400C) Prescale Register      */
+  __IO uint32_t PC;                         /*!< (@ 0x40014010) Prescale Counter     */
   __IO uint32_t MCR;                        /*!< (@ 0x40014014) Match Control Register */
   union {
   __IO uint32_t MR[4];                      /*!< (@ 0x40014018) Match Register */
@@ -236,10 +236,10 @@ typedef struct {                            /*!< (@ 0x40014000) CT32B0 Structure
   union{
   __I  uint32_t CR[4];                      /*!< (@ 0x4001402C) Capture Register  */
     struct{
-  __I  uint32_t CR0;			    /*!< (@ 0x4001802C) Capture Register. CR 0 */
-  __I  uint32_t CR1;			    /*!< (@ 0x40018030) Capture Register. CR 1 */
-  __I  uint32_t CR2;			    /*!< (@ 0x40018034) Capture Register. CR 2 */
-  __I  uint32_t CR3;			    /*!< (@ 0x40018038) Capture Register. CR 3 */
+  __I  uint32_t CR0;                /*!< (@ 0x4001802C) Capture Register. CR 0 */
+  __I  uint32_t CR1;                /*!< (@ 0x40018030) Capture Register. CR 1 */
+  __I  uint32_t CR2;                /*!< (@ 0x40018034) Capture Register. CR 2 */
+  __I  uint32_t CR3;                /*!< (@ 0x40018038) Capture Register. CR 3 */
   };
   };
 __IO uint32_t EMR;                        /*!< (@ 0x4001403C) External Match Register */
@@ -267,14 +267,14 @@ typedef struct {                            /*!< (@ 0x4001C000) ADC Structure   
   union{
   __I  uint32_t DR[8];                      /*!< (@ 0x4001C010) A/D Channel Data Register*/
     struct{
-  __IO uint32_t DR0;                      	/*!< (@ 0x40020010) A/D Channel Data Register 0*/
-  __IO uint32_t DR1;                      	/*!< (@ 0x40020014) A/D Channel Data Register 1*/
-  __IO uint32_t DR2;                      	/*!< (@ 0x40020018) A/D Channel Data Register 2*/
-  __IO uint32_t DR3;                      	/*!< (@ 0x4002001C) A/D Channel Data Register 3*/
-  __IO uint32_t DR4;                      	/*!< (@ 0x40020020) A/D Channel Data Register 4*/
-  __IO uint32_t DR5;                      	/*!< (@ 0x40020024) A/D Channel Data Register 5*/
-  __IO uint32_t DR6;                      	/*!< (@ 0x40020028) A/D Channel Data Register 6*/
-  __IO uint32_t DR7;                      	/*!< (@ 0x4002002C) A/D Channel Data Register 7*/
+  __IO uint32_t DR0;                          /*!< (@ 0x40020010) A/D Channel Data Register 0*/
+  __IO uint32_t DR1;                          /*!< (@ 0x40020014) A/D Channel Data Register 1*/
+  __IO uint32_t DR2;                          /*!< (@ 0x40020018) A/D Channel Data Register 2*/
+  __IO uint32_t DR3;                          /*!< (@ 0x4002001C) A/D Channel Data Register 3*/
+  __IO uint32_t DR4;                          /*!< (@ 0x40020020) A/D Channel Data Register 4*/
+  __IO uint32_t DR5;                          /*!< (@ 0x40020024) A/D Channel Data Register 5*/
+  __IO uint32_t DR6;                          /*!< (@ 0x40020028) A/D Channel Data Register 6*/
+  __IO uint32_t DR7;                          /*!< (@ 0x4002002C) A/D Channel Data Register 7*/
   };
   };
   __I  uint32_t STAT;                       /*!< (@ 0x4001C030) A/D Status Register.  */
@@ -295,10 +295,10 @@ typedef struct {                            /*!< (@ 0x40038000) PMU Structure   
   union{
   __IO uint32_t GPREG[4];                   /*!< (@ 0x40038004) General purpose register 0 */
   struct{
-  __IO uint32_t GPREG0;                   	/*!< (@ 0x40038004) General purpose register 0 */
-  __IO uint32_t GPREG1;                   	/*!< (@ 0x40038008) General purpose register 1 */
-  __IO uint32_t GPREG2;                   	/*!< (@ 0x4003800C) General purpose register 2 */
-  __IO uint32_t GPREG3;                   	/*!< (@ 0x40038010) General purpose register 3 */
+  __IO uint32_t GPREG0;                       /*!< (@ 0x40038004) General purpose register 0 */
+  __IO uint32_t GPREG1;                       /*!< (@ 0x40038008) General purpose register 1 */
+  __IO uint32_t GPREG2;                       /*!< (@ 0x4003800C) General purpose register 2 */
+  __IO uint32_t GPREG3;                       /*!< (@ 0x40038010) General purpose register 3 */
   };
   };
 } LPC_PMU_Type;
@@ -587,19 +587,19 @@ typedef struct {
     __IO uint32_t W[64];                       /*!< (@ 0x50001000) Word pin registers port 0/1 */
   };
        uint32_t RESERVED1[960];
-  __IO uint32_t DIR[2];			/* 0x2000 */
+  __IO uint32_t DIR[2];            /* 0x2000 */
        uint32_t RESERVED2[30];
-  __IO uint32_t MASK[2];		/* 0x2080 */
+  __IO uint32_t MASK[2];        /* 0x2080 */
        uint32_t RESERVED3[30];
-  __IO uint32_t PIN[2];			/* 0x2100 */
+  __IO uint32_t PIN[2];            /* 0x2100 */
        uint32_t RESERVED4[30];
-  __IO uint32_t MPIN[2];		/* 0x2180 */
+  __IO uint32_t MPIN[2];        /* 0x2180 */
        uint32_t RESERVED5[30];
-  __IO uint32_t SET[2];			/* 0x2200 */
+  __IO uint32_t SET[2];            /* 0x2200 */
        uint32_t RESERVED6[30];
-  __O  uint32_t CLR[2];			/* 0x2280 */
+  __O  uint32_t CLR[2];            /* 0x2280 */
        uint32_t RESERVED7[30];
-  __O  uint32_t NOT[2];			/* 0x2300 */
+  __O  uint32_t NOT[2];            /* 0x2300 */
 } LPC_GPIO_Type;
 
 

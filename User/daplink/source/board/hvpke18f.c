@@ -27,7 +27,7 @@ const board_info_t g_board_info = {
     .board_id = "0216",
     .family_id = kNXP_KinetisK_FamilyID,
     .daplink_url_name =       "PRODINFOHTM",
-    .daplink_drive_name = 	"HVP-KE18FD",
+    .daplink_drive_name =     "HVP-KE18FD",
     .daplink_target_url = "http://www.nxp.com/hvp-ke18f",
     .target_cfg = &target_device,
 };

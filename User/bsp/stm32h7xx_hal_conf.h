@@ -169,7 +169,7 @@
 #define  TICK_INT_PRIORITY            ((uint32_t)0x0F) /*!< tick interrupt priority */
 #define  USE_RTOS                     0
 /* #define  USE_SD_TRANSCEIVER           1U   */            /*!< use uSD Transceiver */
-#define  USE_SD_TRANSCEIVER     	1       /*!< use uSD Transceiver */
+#define  USE_SD_TRANSCEIVER         1       /*!< use uSD Transceiver */
 
 /* ########################### Ethernet Configuration ######################### */
 #define ETH_TX_DESC_CNT         4  /* number of Ethernet Tx DMA descriptors */

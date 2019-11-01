@@ -100,7 +100,7 @@ HAL_StatusTypeDef USB_CoreInit(USB_OTG_GlobalTypeDef *USBx, USB_OTG_CfgTypeDef c
   if (cfg.phy_itface == USB_OTG_ULPI_PHY)
   {
     
-    USBx->GCCFG &= ~(USB_OTG_GCCFG_PWRDWN);		
+    USBx->GCCFG &= ~(USB_OTG_GCCFG_PWRDWN);        
 
     /* Init The ULPI Interface */
     USBx->GUSBCFG &= ~(USB_OTG_GUSBCFG_TSDPS | USB_OTG_GUSBCFG_ULPIFSLS | USB_OTG_GUSBCFG_PHYSEL);
@@ -771,7 +771,7 @@ HAL_StatusTypeDef USB_WritePacket(USB_OTG_GlobalTypeDef *USBx, uint8_t *src, uin
     for (i = 0; i < count32b; i++)
     {
       USBx_DFIFO(ch_ep_num) = *((__packed uint32_t *)src);
-	  src += 4;
+      src += 4;
     }
   }
   return HAL_OK;
@@ -798,7 +798,7 @@ void *USB_ReadPacket(USB_OTG_GlobalTypeDef *USBx, uint8_t *dest, uint16_t len)
   for ( i = 0; i < count32b; i++)
   {
     *(__packed uint32_t *)dest = USBx_DFIFO(0);
-	dest += 4;
+    dest += 4;
     
   }
   return ((void *)dest);

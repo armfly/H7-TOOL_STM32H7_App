@@ -149,7 +149,7 @@ USBH_ClassTypeDef  CDC_Class =
   * @retval USBH Status
   */
 static USBH_StatusTypeDef USBH_CDC_InterfaceInit (USBH_HandleTypeDef *phost)
-{	
+{    
 
   USBH_StatusTypeDef status = USBH_FAIL ;
   uint8_t interface;

@@ -196,7 +196,7 @@ DRESULT SDRAMDISK_ioctl(BYTE lun, BYTE cmd, void *buff)
   /* Get erase block size in unit of sector (DWORD) */
   case GET_BLOCK_SIZE :
     *(DWORD*)buff = 1;
-	res = RES_OK;
+    res = RES_OK;
     break;
 
   default:

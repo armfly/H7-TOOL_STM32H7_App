@@ -27,7 +27,7 @@ const board_info_t g_board_info = {
     .board_id = "C005",
     .family_id = kNordic_Nrf51_FamilyID,
     .daplink_url_name =       "HELP    HTM",
-    .daplink_drive_name = 		"MTCONNEC04S",
+    .daplink_drive_name =         "MTCONNEC04S",
     .daplink_target_url = "https://blog.mtmtech.com.tw/mtconnect04s/",
     .target_cfg = &target_device,
 };

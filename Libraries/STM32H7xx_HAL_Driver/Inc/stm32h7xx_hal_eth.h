@@ -56,7 +56,7 @@
 #ifndef ETH_TX_DESC_CNT
  #define ETH_TX_DESC_CNT         4 
 #endif
-	 
+     
 #ifndef ETH_RX_DESC_CNT
  #define ETH_RX_DESC_CNT         4 
 #endif
@@ -95,7 +95,7 @@ typedef struct __ETH_BufferTypeDef
   
   uint32_t len;                   /*<! buffer length */
   
-  struct __ETH_BufferTypeDef *next; /*<! Pointer to the next buffer in the list */	
+  struct __ETH_BufferTypeDef *next; /*<! Pointer to the next buffer in the list */    
 }ETH_BufferTypeDef;
 /** 
   * 
@@ -242,7 +242,7 @@ typedef struct
   FunctionalState  CRCStripTypePacket;          /*!< Enables or disables the CRC stripping for Type packets.*/ 
 
   FunctionalState  AutomaticPadCRCStrip;        /*!< Enables or disables  the Automatic MAC Pad/CRC Stripping.*/ 
-																													 
+                                                                                                                     
   FunctionalState  Watchdog;                    /*!< Enables or disables the Watchdog timer on Rx path
                                                            When enabled, the MAC allows no more then 2048 bytes to be received.
                                                            When disabled, the MAC can receive up to 16384 bytes. */  
@@ -286,7 +286,7 @@ typedef struct
   FunctionalState  CRCCheckingRxPackets;        /*!< Enable or disables the CRC Checking for Received Packets. */   
 
   uint32_t         GiantPacketSizeLimit;        /*!< Specifies the packet size that the MAC will declare it as Giant, If it's size is 
-	                                                  greater than the value programmed in this field in units of bytes 
+                                                      greater than the value programmed in this field in units of bytes 
                                                           This parameter must be a number between Min_Data = 0x618 (1518 byte) and Max_Data = 0x3FFF (32 Kbyte)*/                                                          
  
   FunctionalState  ExtendedInterPacketGap;      /*!< Enable or disables the extended inter packet gap. */ 
@@ -295,7 +295,7 @@ typedef struct
                                                            This parameter can be a value from 0x0 to 0xFF */ 
   
   FunctionalState  ProgrammableWatchdog;        /*!< Enable or disables the Programmable Watchdog.*/
-	
+    
   uint32_t         WatchdogTimeout;             /*!< This field is used as watchdog timeout for a received packet
                                                         This parameter can be a value of @ref ETH_Watchdog_Timeout */                                                            
 
@@ -314,7 +314,7 @@ typedef struct
   
   FunctionalState  ReceiveFlowControl;          /*!< Enables or disables the MAC to decodes the received Pause packet  
                                                   and disables its transmitter for a specified (Pause) time */
-																													                                                        	 
+                                                                                                                                                                                 
   uint32_t         TransmitQueueMode;           /*!< Specifies the Transmit Queue operating mode.
                                                       This parameter can be a value of @ref ETH_Transmit_Mode */ 
 
@@ -351,10 +351,10 @@ typedef struct
    FunctionalState PBLx8Mode;               /*!< Enables or disables the PBL multiplication by eight. */
       
    uint32_t        TxDMABurstLength;        /*!< Indicates the maximum number of beats to be transferred in one Tx DMA transaction.
-                                                     This parameter can be a value of @ref ETH_Tx_DMA_Burst_Length */	
+                                                     This parameter can be a value of @ref ETH_Tx_DMA_Burst_Length */    
       
    FunctionalState SecondPacketOperate;     /*!< Enables or disables the Operate on second Packet mode, which allows the DMA to process a second
-                                                      Packet of Transmit data even before obtaining the status for the first one. */	
+                                                      Packet of Transmit data even before obtaining the status for the first one. */    
       
    uint32_t        RxDMABurstLength;        /*!< Indicates the maximum number of beats to be transferred in one Rx DMA transaction.
                                                     This parameter can be a value of @ref ETH_Rx_DMA_Burst_Length */
@@ -389,7 +389,7 @@ typedef struct
 {
    
   uint8_t                     *MACAddr;                  /*!< MAC Address of used Hardware: must be pointer on an array of 6 bytes */
-  	
+      
   ETH_MediaInterfaceTypeDef   MediaInterface;            /*!< Selects the MII interface or the RMII interface. */
 
   ETH_DMADescTypeDef          *TxDesc;                   /*!< Provides the address of the first DMA Tx descriptor in the list */
@@ -427,10 +427,10 @@ typedef struct
   ETH_TypeDef                *Instance;                 /*!< Register base address       */
   
   ETH_InitTypeDef            Init;                      /*!< Ethernet Init Configuration */
-	
+    
   ETH_TxDescListTypeDef      TxDescList;                /*!< Tx descriptor wrapper: holds all Tx descriptors list 
                                                             addresses and current descriptor index  */
-		
+        
   ETH_RxDescListTypeDef      RxDescList;                /*!< Rx descriptor wrapper: holds all Rx descriptors list 
                                                             addresses and current descriptor index  */ 
   
@@ -505,7 +505,7 @@ typedef struct{
   FunctionalState GlobalUnicast;    /*!< Enable or Disable Global unicast packet detection in power down mode */
   
   FunctionalState WakeUpForward;    /*!< Enable or Disable Forwarding Wake up packets */
-  	
+      
 }ETH_PowerDownConfigTypeDef;
 /** 
   * 
@@ -727,7 +727,7 @@ typedef struct{
   DMA Rx Normal Descriptor write back format
   ---------------------------------------------------------------------------------------------------------------------
   RDES0 |                 Inner VLAN Tag[31:16]                 |                 Outer VLAN Tag[15:0]                | 
-	---------------------------------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------------------------------------------------
   RDES1 |       OAM code, or MAC Control Opcode [31:16]         |               Extended Status                       |
   ---------------------------------------------------------------------------------------------------------------------
   RDES2 |      MAC Filter Status[31:16]        | VF(15) | Reserved [14:12] | ARP Status [11:10] | Header Length [9:0] |
@@ -818,7 +818,7 @@ typedef struct{
   DMA Rx context Descriptor
   ---------------------------------------------------------------------------------------------------------------------
   RDES0 |                                     Timestamp Low[31:0]                                                     | 
-	---------------------------------------------------------------------------------------------------------------------
+    ---------------------------------------------------------------------------------------------------------------------
   RDES1 |                                     Timestamp High[31:0]                                                    |
   ---------------------------------------------------------------------------------------------------------------------
   RDES2 |                                          Reserved                                                           |
@@ -1047,7 +1047,7 @@ typedef struct{
 /**
   * @}
   */
-	
+    
 /** @defgroup ETH_Tx_DMA_Burst_Length ETH Tx DMA Burst Length
   * @{
   */ 
@@ -1072,11 +1072,11 @@ typedef struct{
 #define ETH_RXDMABURSTLENGTH_32BEAT         ETH_DMACRCR_RPBL_32PBL                  
 /**
   * @}
-  */	
-	
+  */    
+    
 /** @defgroup ETH_DMA_Interrupts ETH DMA Interrupts
   * @{
-  */	
+  */    
 #define ETH_DMA_NORMAL_IT                 ETH_DMACIER_NIE 
 #define ETH_DMA_ABNORMAL_IT               ETH_DMACIER_AIE 
 #define ETH_DMA_CONTEXT_DESC_ERROR_IT     ETH_DMACIER_CDEE
@@ -1096,7 +1096,7 @@ typedef struct{
 
 /** @defgroup ETH_DMA_Status_Flags ETH DMA Status Flags
   * @{
-  */	
+  */    
 #define ETH_DMA_RX_NO_ERROR_FLAG                 ((uint32_t)0x00000000U)
 #define ETH_DMA_RX_DESC_READ_ERROR_FLAG          (ETH_DMACSR_REB_BIT_2 | ETH_DMACSR_REB_BIT_1 | ETH_DMACSR_REB_BIT_0)     
 #define ETH_DMA_RX_DESC_WRITE_ERROR_FLAG         (ETH_DMACSR_REB_BIT_2 | ETH_DMACSR_REB_BIT_1)       
@@ -1116,8 +1116,8 @@ typedef struct{
 #define ETH_DMA_TX_PROCESS_STOPPED_FLAG           ETH_DMACSR_TPS
 /**
   * @}
-  */	
-	
+  */    
+    
 /** @defgroup ETH_Transmit_Mode ETH Transmit Mode 
   * @{
   */ 
@@ -1145,7 +1145,7 @@ typedef struct{
 /**
   * @}
   */
-	
+    
 /** @defgroup ETH_Pause_Low_Threshold  ETH Pause Low Threshold
   * @{
   */ 
@@ -1158,7 +1158,7 @@ typedef struct{
 /**
   * @}
   */
-	
+    
 /** @defgroup ETH_Watchdog_Timeout ETH Watchdog Timeout
   * @{
   */ 
@@ -1213,7 +1213,7 @@ typedef struct{
 /**
   * @}
   */
-	
+    
 /** @defgroup ETH_Back_Off_Limit ETH Back Off Limit
   * @{
   */ 
@@ -1257,7 +1257,7 @@ typedef struct{
 /**
   * @}
   */
-	
+    
 /** @defgroup ETH_VLAN_Tag_Comparison ETH VLAN Tag Comparison
   * @{
   */ 
@@ -1280,7 +1280,7 @@ typedef struct{
  
 /** @defgroup ETH_MAC_Interrupts ETH MAC Interrupts
   * @{
-  */	
+  */    
 #define ETH_MAC_RX_STATUS_IT     ETH_MACIER_RXSTSIE 
 #define ETH_MAC_TX_STATUS_IT     ETH_MACIER_TXSTSIE 
 #define ETH_MAC_TIMESTAMP_IT     ETH_MACIER_TSIE
@@ -1293,7 +1293,7 @@ typedef struct{
 
 /** @defgroup ETH_MAC_Wake_Up_Event ETH MAC Wake Up Event
   * @{
-  */	
+  */    
 #define ETH_WAKEUP_PACKET_RECIEVED    ETH_MACPCSR_RWKPRCVD 
 #define ETH_MAGIC_PACKET_RECIEVED     ETH_MACPCSR_MGKPRCVD 
 /**
@@ -1309,7 +1309,7 @@ typedef struct{
 #define ETH_EXECESSIVE_DEFERRAL             ETH_MACRXTXSR_EXDEF
 #define ETH_LOSS_OF_CARRIER                 ETH_MACRXTXSR_LCARR
 #define ETH_NO_CARRIER                      ETH_MACRXTXSR_NCARR
-#define ETH_TRANSMIT_JABBR_TIMEOUT          ETH_MACRXTXSR_TJT  	
+#define ETH_TRANSMIT_JABBR_TIMEOUT          ETH_MACRXTXSR_TJT      
 /**
   * @}
   */

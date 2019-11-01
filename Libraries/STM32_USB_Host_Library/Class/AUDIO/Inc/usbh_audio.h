@@ -441,22 +441,22 @@ AUDIO_HandleTypeDef;
 #define AC_CLASS                        0x01
 
 /* A.2 Audio Interface Subclass Codes */
-#define USB_SUBCLASS_AUDIOCONTROL	0x01
-#define USB_SUBCLASS_AUDIOSTREAMING	0x02
-#define USB_SUBCLASS_MIDISTREAMING	0x03 
+#define USB_SUBCLASS_AUDIOCONTROL    0x01
+#define USB_SUBCLASS_AUDIOSTREAMING    0x02
+#define USB_SUBCLASS_MIDISTREAMING    0x03 
 
 #define USB_DESC_TYPE_CS_INTERFACE      0x24
 #define USB_DESC_TYPE_CS_ENDPOINT       0x25
 
 /* A.5 Audio Class-Specific AC Interface Descriptor Subtypes */
-#define UAC_HEADER			0x01
-#define UAC_INPUT_TERMINAL		0x02
-#define UAC_OUTPUT_TERMINAL		0x03
-#define UAC_MIXER_UNIT			0x04
-#define UAC_SELECTOR_UNIT		0x05
-#define UAC_FEATURE_UNIT		0x06
-#define UAC_PROCESSING_UNIT		0x07
-#define UAC_EXTENSION_UNIT		0x08
+#define UAC_HEADER            0x01
+#define UAC_INPUT_TERMINAL        0x02
+#define UAC_OUTPUT_TERMINAL        0x03
+#define UAC_MIXER_UNIT            0x04
+#define UAC_SELECTOR_UNIT        0x05
+#define UAC_FEATURE_UNIT        0x06
+#define UAC_PROCESSING_UNIT        0x07
+#define UAC_EXTENSION_UNIT        0x08
 
 /*Audio Class-Specific Endpoint Descriptor Subtypes*/
 #define  EP_CONTROL_UNDEFINED             0x00
@@ -482,48 +482,48 @@ AUDIO_HandleTypeDef;
 
 
 /* A.6 Audio Class-Specific AS Interface Descriptor Subtypes */
-#define UAC_AS_GENERAL			0x01
-#define UAC_FORMAT_TYPE			0x02
-#define UAC_FORMAT_SPECIFIC		0x03
+#define UAC_AS_GENERAL            0x01
+#define UAC_FORMAT_TYPE            0x02
+#define UAC_FORMAT_SPECIFIC        0x03
 
 /* A.8 Audio Class-Specific Endpoint Descriptor Subtypes */
-#define UAC_EP_GENERAL			0x01
+#define UAC_EP_GENERAL            0x01
 
 /* A.9 Audio Class-Specific Request Codes */
-#define UAC_SET_			0x00
-#define UAC_GET_			0x80
+#define UAC_SET_            0x00
+#define UAC_GET_            0x80
 
-#define UAC__CUR			0x1
-#define UAC__MIN			0x2
-#define UAC__MAX			0x3
-#define UAC__RES			0x4
-#define UAC__MEM			0x5
+#define UAC__CUR            0x1
+#define UAC__MIN            0x2
+#define UAC__MAX            0x3
+#define UAC__RES            0x4
+#define UAC__MEM            0x5
 
-#define UAC_SET_CUR			(UAC_SET_ | UAC__CUR)
-#define UAC_GET_CUR			(UAC_GET_ | UAC__CUR)
-#define UAC_SET_MIN			(UAC_SET_ | UAC__MIN)
-#define UAC_GET_MIN			(UAC_GET_ | UAC__MIN)
-#define UAC_SET_MAX			(UAC_SET_ | UAC__MAX)
-#define UAC_GET_MAX			(UAC_GET_ | UAC__MAX)
-#define UAC_SET_RES			(UAC_SET_ | UAC__RES)
-#define UAC_GET_RES			(UAC_GET_ | UAC__RES)
-#define UAC_SET_MEM			(UAC_SET_ | UAC__MEM)
-#define UAC_GET_MEM			(UAC_GET_ | UAC__MEM)
+#define UAC_SET_CUR            (UAC_SET_ | UAC__CUR)
+#define UAC_GET_CUR            (UAC_GET_ | UAC__CUR)
+#define UAC_SET_MIN            (UAC_SET_ | UAC__MIN)
+#define UAC_GET_MIN            (UAC_GET_ | UAC__MIN)
+#define UAC_SET_MAX            (UAC_SET_ | UAC__MAX)
+#define UAC_GET_MAX            (UAC_GET_ | UAC__MAX)
+#define UAC_SET_RES            (UAC_SET_ | UAC__RES)
+#define UAC_GET_RES            (UAC_GET_ | UAC__RES)
+#define UAC_SET_MEM            (UAC_SET_ | UAC__MEM)
+#define UAC_GET_MEM            (UAC_GET_ | UAC__MEM)
 
-#define UAC_GET_STAT			0xff
+#define UAC_GET_STAT            0xff
 
 /* MIDI - A.1 MS Class-Specific Interface Descriptor Subtypes */
-#define UAC_MS_HEADER			0x01
-#define UAC_MIDI_IN_JACK		0x02
-#define UAC_MIDI_OUT_JACK		0x03
+#define UAC_MS_HEADER            0x01
+#define UAC_MIDI_IN_JACK        0x02
+#define UAC_MIDI_OUT_JACK        0x03
 
 /* MIDI - A.1 MS Class-Specific Endpoint Descriptor Subtypes */
-#define UAC_MS_GENERAL			0x01
+#define UAC_MS_GENERAL            0x01
 
 /* Terminals - 2.1 USB Terminal Types */
-#define UAC_TERMINAL_UNDEFINED		0x100
-#define UAC_TERMINAL_STREAMING		0x101
-#define UAC_TERMINAL_VENDOR_SPEC	0x1FF
+#define UAC_TERMINAL_UNDEFINED        0x100
+#define UAC_TERMINAL_STREAMING        0x101
+#define UAC_TERMINAL_VENDOR_SPEC    0x1FF
     
 /**
   * @}

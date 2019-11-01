@@ -136,7 +136,7 @@ USBH_ClassTypeDef  HID_Class =
   * @retval USBH Status
   */
 static USBH_StatusTypeDef USBH_HID_InterfaceInit (USBH_HandleTypeDef *phost)
-{	
+{    
   uint8_t max_ep;
   uint8_t num = 0;
   uint8_t interface;
@@ -164,7 +164,7 @@ static USBH_StatusTypeDef USBH_HID_InterfaceInit (USBH_HandleTypeDef *phost)
       USBH_UsrLog ("KeyBoard device found!"); 
       HID_Handle->Init =  USBH_HID_KeybdInit;     
     }
-    else if(phost->device.CfgDesc.Itf_Desc[phost->device.current_interface].bInterfaceProtocol  == HID_MOUSE_BOOT_CODE)		  
+    else if(phost->device.CfgDesc.Itf_Desc[phost->device.current_interface].bInterfaceProtocol  == HID_MOUSE_BOOT_CODE)          
     {
       USBH_UsrLog ("Mouse device found!");         
       HID_Handle->Init =  USBH_HID_MouseInit;     
@@ -246,7 +246,7 @@ static USBH_StatusTypeDef USBH_HID_InterfaceInit (USBH_HandleTypeDef *phost)
   * @retval USBH Status
   */
 USBH_StatusTypeDef USBH_HID_InterfaceDeInit (USBH_HandleTypeDef *phost )
-{	
+{    
   HID_HandleTypeDef *HID_Handle =  (HID_HandleTypeDef *) phost->pActiveClass->pData; 
   
   if(HID_Handle->InPipe != 0x00)
@@ -663,7 +663,7 @@ HID_TypeTypeDef USBH_HID_GetDeviceType(USBH_HandleTypeDef *phost)
       type = HID_KEYBOARD;  
     }
     else if(phost->device.CfgDesc.Itf_Desc[phost->device.current_interface].bInterfaceProtocol \
-      == HID_MOUSE_BOOT_CODE)		  
+      == HID_MOUSE_BOOT_CODE)          
     {
       type=  HID_MOUSE;  
     }

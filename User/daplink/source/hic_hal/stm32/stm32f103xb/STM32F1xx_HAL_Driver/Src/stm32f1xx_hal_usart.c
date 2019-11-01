@@ -37,7 +37,7 @@
              (+++) Associate the initilalized DMA handle to the USART DMA Tx/Rx handle.
              (+++) Configure the priority and enable the NVIC for the transfer complete interrupt on the DMA Tx/Rx channel.
             (+++) Configure the USARTx interrupt priority and enable the NVIC USART IRQ handle
-			      (used for last byte sending completion detection in DMA non circular mode)
+                  (used for last byte sending completion detection in DMA non circular mode)
 
     (#) Program the Baud Rate, Word Length, Stop Bit, Parity, Hardware 
         flow control and Mode(Receiver/Transmitter) in the husart Init structure.

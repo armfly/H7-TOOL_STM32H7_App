@@ -612,7 +612,7 @@ breakbreak:;
       }
 #else
       pppoe_send_padr(sc);
-#endif 	/*defined(LWIP_DEBUG) && (DEBUG_LOG == LWIP_DEBUG_ON) */
+#endif     /*defined(LWIP_DEBUG) && (DEBUG_LOG == LWIP_DEBUG_ON) */
       sys_timeout(PPPOE_DISC_TIMEOUT * (1 + sc->sc_padr_retried), pppoe_timeout, sc);
       break;
     case PPPOE_CODE_PADS:

@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : AD7606数据采集模块
-*	文件名称 : bsp_ad7606.h
-*	版    本 : V1.0
+*    模块名称 : AD7606数据采集模块
+*    文件名称 : bsp_ad7606.h
+*    版    本 : V1.0
 *
-*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*    Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -16,13 +16,13 @@
 /* 过采样倍率 */
 typedef enum
 {
-	AD_OS_NO = 0,
-	AD_OS_X2 = 1,
-	AD_OS_X4 = 2,
-	AD_OS_X8 = 3,
-	AD_OS_X16 = 4,
-	AD_OS_X32 = 5,
-	AD_OS_X64 = 6
+    AD_OS_NO = 0,
+    AD_OS_X2 = 1,
+    AD_OS_X4 = 2,
+    AD_OS_X8 = 3,
+    AD_OS_X16 = 4,
+    AD_OS_X32 = 5,
+    AD_OS_X64 = 6
 } AD7606_OS_E;
 
 /* AD数据采集缓冲区 FIFO */
@@ -30,21 +30,21 @@ typedef enum
 
 typedef struct
 {
-	uint8_t ucOS;				/* 过采样倍率，0 - 6. 0表示无过采样 */
-	uint8_t ucRange;		/* 输入量程，0表示正负5V, 1表示正负10V */
-	int16_t sNowAdc[8]; /* 当前ADC值, 有符号数 */
+    uint8_t ucOS;                /* 过采样倍率，0 - 6. 0表示无过采样 */
+    uint8_t ucRange;        /* 输入量程，0表示正负5V, 1表示正负10V */
+    int16_t sNowAdc[8]; /* 当前ADC值, 有符号数 */
 } AD7606_VAR_T;
 
 typedef struct
 {
-	/* FIFO 结构 */
-	uint16_t usRead;	/* 读指针 */
-	uint16_t usWrite; /* 写指针 */
+    /* FIFO 结构 */
+    uint16_t usRead;    /* 读指针 */
+    uint16_t usWrite; /* 写指针 */
 
-	uint16_t usCount; /* 新数据个数 */
-	uint8_t ucFull;		/* FIFO满标志 */
+    uint16_t usCount; /* 新数据个数 */
+    uint8_t ucFull;        /* FIFO满标志 */
 
-	int16_t sBuf[ADC_FIFO_SIZE];
+    int16_t sBuf[ADC_FIFO_SIZE];
 } AD7606_FIFO_T;
 
 void bsp_InitAD7606(void);

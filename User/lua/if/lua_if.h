@@ -1,15 +1,15 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : lua接口模块
-*	文件名称 : lua_if.h
-*	版    本 : V1.0
-*	说    明 : 。
-*	修改记录 :
-*		版本号  日期       作者    说明
-*		v1.0    2015-04-25 armfly  ST固件库版本 V2.1.0
+*    模块名称 : lua接口模块
+*    文件名称 : lua_if.h
+*    版    本 : V1.0
+*    说    明 : 。
+*    修改记录 :
+*        版本号  日期       作者    说明
+*        v1.0    2015-04-25 armfly  ST固件库版本 V2.1.0
 *
-*	Copyright (C), 2014-2015, 安富莱电子 www.armfly.com
+*    Copyright (C), 2014-2015, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -35,9 +35,9 @@
 #include "lua_if_register.h"
 #include "lua_if_extio.h"
 
-#define LUA_PROG_LEN_MAX	(32 * 1024)
+#define LUA_PROG_LEN_MAX    (32 * 1024)
 
-#define LUA_READ_LEN_MAX	(2 * 1024)
+#define LUA_READ_LEN_MAX    (2 * 1024)
 
 void lua_Test(void);
 void lua_Init(void);

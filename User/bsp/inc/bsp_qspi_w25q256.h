@@ -1,10 +1,10 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : W25Q256 QSPI驱动模块
-*	文件名称 : bsp_qspi_w25q256.h
+*    模块名称 : W25Q256 QSPI驱动模块
+*    文件名称 : bsp_qspi_w25q256.h
 *
-*	Copyright (C),  2019-2030. 安富莱电子 www.armfly.com
+*    Copyright (C),  2019-2030. 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -14,26 +14,26 @@
 
 enum
 {
-	SST25VF016B_ID = 0xBF2541,
-	MX25L1606E_ID = 0xC22015,
-	W25Q64_ID = 0xEF4017,
-	W25Q128_ID = 0xEF4018,
-	W25Q256_ID = 0xEF4019
+    SST25VF016B_ID = 0xBF2541,
+    MX25L1606E_ID = 0xC22015,
+    W25Q64_ID = 0xEF4017,
+    W25Q128_ID = 0xEF4018,
+    W25Q256_ID = 0xEF4019
 };
 
 /* W25Q256JV基本信息 */
-#define QSPI_FLASH_SIZE 25									 /* Flash大小，2^25 = 32MB*/
-#define QSPI_SECTOR_SIZE (4 * 1024)					 /* 扇区大小，4KB */
-#define QSPI_PAGE_SIZE 256									 /* 页大小，256字节 */
+#define QSPI_FLASH_SIZE 25                                     /* Flash大小，2^25 = 32MB*/
+#define QSPI_SECTOR_SIZE (4 * 1024)                     /* 扇区大小，4KB */
+#define QSPI_PAGE_SIZE 256                                     /* 页大小，256字节 */
 #define QSPI_END_ADDR (1 << QSPI_FLASH_SIZE) /* 末尾地址 */
-#define QSPI_FLASH_SIZES 32 * 1024 * 1024		 /* Flash大小，2^25 = 32MB*/
+#define QSPI_FLASH_SIZES 32 * 1024 * 1024         /* Flash大小，2^25 = 32MB*/
 
 /* W25Q256JV相关命令 */
-#define WRITE_ENABLE_CMD 0x06											/* 写使能指令 */
-#define READ_ID_CMD2 0x9F													/* 读取ID命令 */
-#define READ_STATUS_REG_CMD 0x05									/* 读取状态命令 */
-#define SUBSECTOR_ERASE_4_BYTE_ADDR_CMD 0x21			/* 32bit地址扇区擦除指令, 4KB */
-#define QUAD_IN_FAST_PROG_4_BYTE_ADDR_CMD 0x34		/* 32bit地址的4线快速写入命令 */
+#define WRITE_ENABLE_CMD 0x06                                            /* 写使能指令 */
+#define READ_ID_CMD2 0x9F                                                    /* 读取ID命令 */
+#define READ_STATUS_REG_CMD 0x05                                    /* 读取状态命令 */
+#define SUBSECTOR_ERASE_4_BYTE_ADDR_CMD 0x21            /* 32bit地址扇区擦除指令, 4KB */
+#define QUAD_IN_FAST_PROG_4_BYTE_ADDR_CMD 0x34        /* 32bit地址的4线快速写入命令 */
 #define QUAD_INOUT_FAST_READ_4_BYTE_ADDR_CMD 0xEC /* 32bit地址的4线快速读取命令 */
 
 /* 备份下面的命令，待以后扩展API使用 */

@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   PPP Disk I/O driver generic driver template
              this driver is not functional and is intended to show
-	     how to implement a FatFs diskio driver.
+         how to implement a FatFs diskio driver.
   ******************************************************************************
   * @attention
   *
@@ -111,9 +111,9 @@ DSTATUS nand_initialize(BYTE lun)
   */
 DSTATUS nand_status(BYTE lun)
 {
-	DRESULT res = RES_OK;
+    DRESULT res = RES_OK;
 
-	return res;
+    return res;
 }
 
 /**
@@ -126,18 +126,18 @@ DSTATUS nand_status(BYTE lun)
   */
 DRESULT nand_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 {
-	DRESULT res = RES_OK;
+    DRESULT res = RES_OK;
 
-	if (NAND_OK == NAND_ReadMultiSectors(buff, sector, 512, count))
-	{
-		res = RES_OK;
-	}
-	else
-	{
-		res = RES_ERROR;
-	}
-	
-	return res;
+    if (NAND_OK == NAND_ReadMultiSectors(buff, sector, 512, count))
+    {
+        res = RES_OK;
+    }
+    else
+    {
+        res = RES_ERROR;
+    }
+    
+    return res;
 }
 
 /**
@@ -151,13 +151,13 @@ DRESULT nand_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
 #if _USE_WRITE == 1
 DRESULT nand_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 {
-	DRESULT res = RES_OK;
+    DRESULT res = RES_OK;
 
-	if (NAND_OK != NAND_WriteMultiSectors((uint8_t *)buff, sector, 512, count))  
-	{
-		res = RES_ERROR;
-	}
-	return res;
+    if (NAND_OK != NAND_WriteMultiSectors((uint8_t *)buff, sector, 512, count))  
+    {
+        res = RES_ERROR;
+    }
+    return res;
 }
 #endif /* _USE_WRITE == 1 */
 
@@ -171,39 +171,39 @@ DRESULT nand_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
 #if _USE_IOCTL == 1
 DRESULT nand_ioctl(BYTE lun, BYTE cmd, void *buff)
 {
-	DRESULT res = RES_ERROR;
+    DRESULT res = RES_ERROR;
 
-	switch (cmd)
-	{
-		/* Make sure that no pending write process */
-		case CTRL_SYNC :
-			res = RES_OK;
-			break;
+    switch (cmd)
+    {
+        /* Make sure that no pending write process */
+        case CTRL_SYNC :
+            res = RES_OK;
+            break;
 
-		/* Get number of sectors on the disk (DWORD) */
-		case GET_SECTOR_COUNT :
-			*(DWORD*)buff = NAND_FormatCapacity() / 512;	/* 必须为可用的扇区个数，不是芯片的理论容量 */
-			res = RES_OK;
-			break;
+        /* Get number of sectors on the disk (DWORD) */
+        case GET_SECTOR_COUNT :
+            *(DWORD*)buff = NAND_FormatCapacity() / 512;    /* 必须为可用的扇区个数，不是芯片的理论容量 */
+            res = RES_OK;
+            break;
 
-		/* Get R/W sector size (WORD) */
-		case GET_SECTOR_SIZE :
-			*(WORD*)buff = 512;
-			res = RES_OK;
-			break;
+        /* Get R/W sector size (WORD) */
+        case GET_SECTOR_SIZE :
+            *(WORD*)buff = 512;
+            res = RES_OK;
+            break;
 
-		/* Get erase block size in unit of sector (DWORD) */
-		case GET_BLOCK_SIZE :
-			*(DWORD*)buff = 512;
-			res = RES_OK;
-			break;
+        /* Get erase block size in unit of sector (DWORD) */
+        case GET_BLOCK_SIZE :
+            *(DWORD*)buff = 512;
+            res = RES_OK;
+            break;
 
-		default:
-			res = RES_PARERR;
-			break;
-	}
+        default:
+            res = RES_PARERR;
+            break;
+    }
 
-	return res;
+    return res;
 }
 #endif /* _USE_IOCTL == 1 */
 

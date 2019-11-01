@@ -54,7 +54,7 @@ void iap_reinvoke(void)
     LPC_SYSCON->SYSAHBCLKDIV = 1;
     /* Send Reinvoke ISP command to ISP entry point*/
     iap_op.cmd = 57;
-    init_msdstate();					 /* Initialize Storage state machine */
+    init_msdstate();                     /* Initialize Storage state machine */
     /* Set stack pointer to ROM value (reset default) This must be the last
      * piece of code executed before calling ISP, because most C expressions
      * and function returns will fail after the stack pointer is changed.

@@ -48,10 +48,10 @@
 /** @defgroup USB_INFO_Exported_Defines
   * @{
   */ 
-#define MODE_SENSE6_LEN			 8
-#define MODE_SENSE10_LEN		 8
-#define LENGTH_INQUIRY_PAGE00		 7
-#define LENGTH_FORMAT_CAPACITIES    	20
+#define MODE_SENSE6_LEN             8
+#define MODE_SENSE10_LEN         8
+#define LENGTH_INQUIRY_PAGE00         7
+#define LENGTH_FORMAT_CAPACITIES        20
 
 /**
   * @}

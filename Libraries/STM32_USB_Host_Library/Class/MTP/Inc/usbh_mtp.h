@@ -238,7 +238,7 @@ USBH_StatusTypeDef USBH_MTP_SendObject (USBH_HandleTypeDef *phost,
 
 USBH_StatusTypeDef USBH_MTP_GetDevicePropDesc (USBH_HandleTypeDef *phost,
                                                 uint16_t propcode, 
-			                        PTP_DevicePropDescTypdef* devicepropertydesc);
+                                    PTP_DevicePropDescTypdef* devicepropertydesc);
 
 void USBH_MTP_EventsCallback(USBH_HandleTypeDef *phost, uint32_t event, uint32_t param);
 /**

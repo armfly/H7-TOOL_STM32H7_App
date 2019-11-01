@@ -26,6 +26,6 @@ const board_info_t g_board_info = {
     .infoVersion = 0x0,
     .board_id = "1022",
     .family_id = kStub_HWReset_FamilyID,
-    .daplink_drive_name = 	"MBED       ",
+    .daplink_drive_name =     "MBED       ",
     .target_cfg = &target_device,
 };

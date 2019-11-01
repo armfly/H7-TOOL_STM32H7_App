@@ -189,7 +189,7 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
                         (uint32_t)(sector),
                         count, SD_TIMEOUT) == MSD_OK)
   {
-	/* wait until the Write operation is finished */
+    /* wait until the Write operation is finished */
     while(BSP_SD_GetCardState() != MSD_OK)
     {
     }
@@ -240,7 +240,7 @@ DRESULT SD_ioctl(BYTE lun, BYTE cmd, void *buff)
   case GET_BLOCK_SIZE :
     BSP_SD_GetCardInfo(&CardInfo);
     *(DWORD*)buff = CardInfo.LogBlockSize / SD_DEFAULT_BLOCK_SIZE;
-	res = RES_OK;
+    res = RES_OK;
     break;
 
   default:

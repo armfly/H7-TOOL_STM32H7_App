@@ -109,11 +109,11 @@ static uint8_t DAP_Info(uint8_t id, uint8_t *info) {
       length = (uint8_t)sizeof(DAP_SerNum);
 // --- begin DAPLink change ---
 #else
-	#if 0  // armfly debug
+    #if 0  // armfly debug
       data = info_get_unique_id();
-	#else
-	  data = "0123";
-	#endif
+    #else
+      data = "0123";
+    #endif
       length = (uint8_t)strlen(data) + 1;
       memcpy(info, data, length);
 // --- end DAPLink change ---
@@ -121,11 +121,11 @@ static uint8_t DAP_Info(uint8_t id, uint8_t *info) {
       break;
     case DAP_ID_FW_VER:
 // --- begin DAPLink change ---
-	#if 0  // armfly debug
+    #if 0  // armfly debug
       data = info_get_version();
-	#else
-		data = "A Ver";
-	#endif
+    #else
+        data = "A Ver";
+    #endif
       length = (uint8_t)strlen(data) + 1;
       memcpy(info, data, length);
 // Original:

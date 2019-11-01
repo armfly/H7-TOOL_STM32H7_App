@@ -23,7 +23,7 @@
 #include "uart.h"
 
 // Size must be 2^n
-#define BUFFER_SIZE	(4096)
+#define BUFFER_SIZE    (4096)
 
 #define UART_ERRORS (MXC_F_UART_INTFL_RX_FRAMING_ERR | \
                      MXC_F_UART_INTFL_RX_PARITY_ERR | \

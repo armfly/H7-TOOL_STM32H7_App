@@ -170,7 +170,7 @@ typedef enum
   OTG_FS_EP1_IN_IRQn          = 99,     /*!< USB OTG HS2 End Point 1 Out global interrupt                      */
   OTG_FS_WKUP_IRQn            = 100,    /*!< USB OTG HS2 End Point 1 In global interrupt                       */
   OTG_FS_IRQn                 = 101,    /*!< USB OTG HS2 Wakeup through EXTI interrupt                         */ 
-  DMAMUX1_OVR_IRQn	          = 102,    /*!<DMAMUX1 Overrun interrupt                                          */
+  DMAMUX1_OVR_IRQn              = 102,    /*!<DMAMUX1 Overrun interrupt                                          */
   HRTIM1_Master_IRQn          = 103,    /*!< HRTIM Master Timer global Interrupts                              */
   HRTIM1_TIMA_IRQn            = 104,    /*!< HRTIM Timer A global Interrupt                                    */
   HRTIM1_TIMB_IRQn            = 105,    /*!< HRTIM Timer B global Interrupt                                    */
@@ -1569,12 +1569,12 @@ typedef struct
 {
   __IO uint32_t SR;        /*!< Comparator status register,                    Address offset: 0x00 */
  __IO uint32_t ICFR;      /*!< Comparator interrupt clear flag register,       Address offset: 0x04 */
-	__IO uint32_t OR;        /*!< Comparator option register,                  Address offset: 0x08 */
+    __IO uint32_t OR;        /*!< Comparator option register,                  Address offset: 0x08 */
 } COMPOPT_TypeDef;
 
 typedef struct
 {  
-	__IO uint32_t CFGR;      /*!< Comparator configuration register  ,           Address offset: 0x00 */
+    __IO uint32_t CFGR;      /*!< Comparator configuration register  ,           Address offset: 0x00 */
 } COMP_TypeDef;
 
 typedef struct
@@ -1752,7 +1752,7 @@ typedef struct
   __IO uint32_t RDFR; 
   __IO uint32_t CRDFR;   
   __IO uint32_t SR;   
-  __IO uint32_t CLRFR;   	
+  __IO uint32_t CLRFR;       
   uint32_t RESERVED[57];
   __IO uint32_t DINR0;   
   __IO uint32_t DINR1;    
@@ -7017,7 +7017,7 @@ typedef struct
 #define ETH_MACWTR_WTO_14KB                           ((uint32_t)0x0000000C)   /* Maximum received packet length 14KB */
 #define ETH_MACWTR_WTO_15KB                           ((uint32_t)0x0000000D)   /* Maximum received packet length 15KB */
 #define ETH_MACWTR_WTO_16KB                           ((uint32_t)0x0000000E)   /* Maximum received packet length 16KB */
-	
+    
 /* Bit definition for Ethernet MAC Hash Table High Register */
 #define ETH_MACHTHR_HTH_Pos                           (0U)                     
 #define ETH_MACHTHR_HTH_Msk                           (0xFFFFFFFFU << ETH_MACHTHR_HTH_Pos) /*!< 0xFFFFFFFF */
@@ -17707,7 +17707,7 @@ typedef struct
 #define SPI_CR1_SSI_Pos             (12U)                                      
 #define SPI_CR1_SSI_Msk             (0x1U << SPI_CR1_SSI_Pos)                  /*!< 0x00001000 */
 #define SPI_CR1_SSI                 SPI_CR1_SSI_Msk                            /*!<Internal SS signal input level                 */
-#define SPI_CR1_CRC33_17            ((uint32_t)0x00002000)                     /*!<32-bit CRC polynomial configuration													  */
+#define SPI_CR1_CRC33_17            ((uint32_t)0x00002000)                     /*!<32-bit CRC polynomial configuration                                                      */
 #define SPI_CR1_RCRCINI_Pos         (14U)                                      
 #define SPI_CR1_RCRCINI_Msk         (0x1U << SPI_CR1_RCRCINI_Pos)              /*!< 0x00004000 */
 #define SPI_CR1_RCRCINI             SPI_CR1_RCRCINI_Msk                        /*!<CRC init pattern control for receiver            */
@@ -17851,37 +17851,37 @@ typedef struct
 /*******************  Bit definition for SPI_IER register  ********************/
 #define SPI_IER_RXPIE_Pos           (0U)                                       
 #define SPI_IER_RXPIE_Msk           (0x1U << SPI_IER_RXPIE_Pos)                /*!< 0x00000001 */
-#define SPI_IER_RXPIE               SPI_IER_RXPIE_Msk                          /*!<RXP Interrupt Enable						*/
+#define SPI_IER_RXPIE               SPI_IER_RXPIE_Msk                          /*!<RXP Interrupt Enable                        */
 #define SPI_IER_TXPIE_Pos           (1U)                                       
 #define SPI_IER_TXPIE_Msk           (0x1U << SPI_IER_TXPIE_Pos)                /*!< 0x00000002 */
-#define SPI_IER_TXPIE               SPI_IER_TXPIE_Msk                          /*!<TXP interrupt enable						*/
+#define SPI_IER_TXPIE               SPI_IER_TXPIE_Msk                          /*!<TXP interrupt enable                        */
 #define SPI_IER_DXPIE_Pos           (2U)                                       
 #define SPI_IER_DXPIE_Msk           (0x1U << SPI_IER_DXPIE_Pos)                /*!< 0x00000004 */
-#define SPI_IER_DXPIE               SPI_IER_DXPIE_Msk                          /*!<DXP interrupt enable 						*/
+#define SPI_IER_DXPIE               SPI_IER_DXPIE_Msk                          /*!<DXP interrupt enable                         */
 #define SPI_IER_EOTIE_Pos           (3U)                                       
 #define SPI_IER_EOTIE_Msk           (0x1U << SPI_IER_EOTIE_Pos)                /*!< 0x00000008 */
-#define SPI_IER_EOTIE               SPI_IER_EOTIE_Msk                          /*!<EOT/SUSP/TXC interrupt enable 	*/
+#define SPI_IER_EOTIE               SPI_IER_EOTIE_Msk                          /*!<EOT/SUSP/TXC interrupt enable     */
 #define SPI_IER_TXTFIE_Pos          (4U)                                       
 #define SPI_IER_TXTFIE_Msk          (0x1U << SPI_IER_TXTFIE_Pos)               /*!< 0x00000010 */
-#define SPI_IER_TXTFIE              SPI_IER_TXTFIE_Msk                         /*!<TXTF interrupt enable 					*/
+#define SPI_IER_TXTFIE              SPI_IER_TXTFIE_Msk                         /*!<TXTF interrupt enable                     */
 #define SPI_IER_UDRIE_Pos           (5U)                                       
 #define SPI_IER_UDRIE_Msk           (0x1U << SPI_IER_UDRIE_Pos)                /*!< 0x00000020 */
-#define SPI_IER_UDRIE               SPI_IER_UDRIE_Msk                          /*!<UDR interrupt enable 						*/
+#define SPI_IER_UDRIE               SPI_IER_UDRIE_Msk                          /*!<UDR interrupt enable                         */
 #define SPI_IER_OVRIE_Pos           (6U)                                       
 #define SPI_IER_OVRIE_Msk           (0x1U << SPI_IER_OVRIE_Pos)                /*!< 0x00000040 */
-#define SPI_IER_OVRIE               SPI_IER_OVRIE_Msk                          /*!<OVR interrupt enable 						*/
+#define SPI_IER_OVRIE               SPI_IER_OVRIE_Msk                          /*!<OVR interrupt enable                         */
 #define SPI_IER_CRCIE_Pos           (7U)                                       
 #define SPI_IER_CRCIE_Msk           (0x1U << SPI_IER_CRCIE_Pos)                /*!< 0x00000080 */
-#define SPI_IER_CRCIE               SPI_IER_CRCIE_Msk                          /*!<CRC interrupt enable 						*/
+#define SPI_IER_CRCIE               SPI_IER_CRCIE_Msk                          /*!<CRC interrupt enable                         */
 #define SPI_IER_TIFREIE_Pos         (8U)                                       
 #define SPI_IER_TIFREIE_Msk         (0x1U << SPI_IER_TIFREIE_Pos)              /*!< 0x00000100 */
 #define SPI_IER_TIFREIE             SPI_IER_TIFREIE_Msk                        /*!<TI Frame Error interrupt enable */
 #define SPI_IER_MODFIE_Pos          (9U)                                       
 #define SPI_IER_MODFIE_Msk          (0x1U << SPI_IER_MODFIE_Pos)               /*!< 0x00000200 */
-#define SPI_IER_MODFIE              SPI_IER_MODFIE_Msk                         /*!<MODF interrupt enable 					*/
+#define SPI_IER_MODFIE              SPI_IER_MODFIE_Msk                         /*!<MODF interrupt enable                     */
 #define SPI_IER_TSERIE_Pos          (10U)                                      
 #define SPI_IER_TSERIE_Msk          (0x1U << SPI_IER_TSERIE_Pos)               /*!< 0x00000400 */
-#define SPI_IER_TSERIE              SPI_IER_TSERIE_Msk                         /*!<TSER interrupt enable 					*/
+#define SPI_IER_TSERIE              SPI_IER_TSERIE_Msk                         /*!<TSER interrupt enable                     */
 
 /*******************  Bit definition for SPI_SR register  ********************/
 #define SPI_SR_RXP_Pos              (0U)                                       
@@ -17889,7 +17889,7 @@ typedef struct
 #define SPI_SR_RXP                  SPI_SR_RXP_Msk                             /*!<Rx-Packet available            */
 #define SPI_SR_TXP_Pos              (1U)                                       
 #define SPI_SR_TXP_Msk              (0x1U << SPI_SR_TXP_Pos)                   /*!< 0x00000002 */
-#define SPI_SR_TXP                  SPI_SR_TXP_Msk                             /*!<Tx-Packet space available      	*/
+#define SPI_SR_TXP                  SPI_SR_TXP_Msk                             /*!<Tx-Packet space available          */
 #define SPI_SR_DXP_Pos              (2U)                                       
 #define SPI_SR_DXP_Msk              (0x1U << SPI_SR_DXP_Pos)                   /*!< 0x00000004 */
 #define SPI_SR_DXP                  SPI_SR_DXP_Msk                             /*!<Duplex Packet available         */
@@ -17901,7 +17901,7 @@ typedef struct
 #define SPI_SR_TXTF                 SPI_SR_TXTF_Msk                            /*!<Transmission Transfer Filled    */
 #define SPI_SR_UDR_Pos              (5U)                                       
 #define SPI_SR_UDR_Msk              (0x1U << SPI_SR_UDR_Pos)                   /*!< 0x00000020 */
-#define SPI_SR_UDR                  SPI_SR_UDR_Msk                             /*!<UDR at Slave transmission 			*/
+#define SPI_SR_UDR                  SPI_SR_UDR_Msk                             /*!<UDR at Slave transmission             */
 #define SPI_SR_OVR_Pos              (6U)                                       
 #define SPI_SR_OVR_Msk              (0x1U << SPI_SR_OVR_Pos)                   /*!< 0x00000040 */
 #define SPI_SR_OVR                  SPI_SR_OVR_Msk                             /*!<Rx-Packet available            */
@@ -18636,7 +18636,7 @@ typedef struct
 #define SYSCFG_UR3_BOOT_ADD1_Msk        (0xFFFFU << SYSCFG_UR3_BOOT_ADD1_Pos)  /*!< 0x0000FFFF */
 #define SYSCFG_UR3_BOOT_ADD1            SYSCFG_UR3_BOOT_ADD1_Msk               /*!< Core Boot Address 1 */
 
-	/******************  Bit definition for SYSCFG_UR4 register  *******************/
+    /******************  Bit definition for SYSCFG_UR4 register  *******************/
 
 #define SYSCFG_UR4_MEPAD_BANK1_Pos      (16U)                                  
 #define SYSCFG_UR4_MEPAD_BANK1_Msk      (0x1U << SYSCFG_UR4_MEPAD_BANK1_Pos)   /*!< 0x00010000 */
@@ -25058,7 +25058,7 @@ typedef struct
                                          ((INSTANCE) == TIM14)  || \
                                          ((INSTANCE) == TIM15)  || \
                                          ((INSTANCE) == TIM16)  || \
-                                         ((INSTANCE) == TIM17))	
+                                         ((INSTANCE) == TIM17))    
 /************ TIM Instances : at least 2 capture/compare channels *************/
 #define IS_TIM_CC2_INSTANCE(INSTANCE)   (((INSTANCE) == TIM1)   || \
                                          ((INSTANCE) == TIM2)   || \

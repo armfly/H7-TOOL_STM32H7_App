@@ -23,13 +23,13 @@
 
 osStatus_t osKernelInitialize(void)
 {
-	sysTickInit();
+    sysTickInit();
     return osOK;
 }
 
 osThreadId_t osThreadNew(osThreadFunc_t func, void *argument, const osThreadAttr_t *attr)
 {
-	sysTickRegMainFunc(func);
+    sysTickRegMainFunc(func);
     return (osThreadId_t)1;
 }
 

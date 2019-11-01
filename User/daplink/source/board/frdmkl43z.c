@@ -27,7 +27,7 @@ const board_info_t g_board_info = {
     .board_id = "0262",
     .family_id = kNXP_KinetisL_FamilyID,
     .daplink_url_name =       "PRODINFOHTM",
-    .daplink_drive_name = 	"FRDM-KL43ZD",
+    .daplink_drive_name =     "FRDM-KL43ZD",
     .daplink_target_url = "http://www.nxp.com/frdm-kl43z",
     .target_cfg = &target_device,
 };

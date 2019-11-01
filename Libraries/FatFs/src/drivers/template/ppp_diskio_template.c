@@ -6,7 +6,7 @@
   * @date    10-November-2017
   * @brief   PPP Disk I/O driver generic driver template
              this driver is not functional and is intended to show
-	     how to implement a FatFs diskio driver.
+         how to implement a FatFs diskio driver.
   ******************************************************************************
   * @attention
   *

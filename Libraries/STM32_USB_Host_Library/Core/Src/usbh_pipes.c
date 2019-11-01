@@ -143,7 +143,7 @@ uint8_t USBH_AllocPipe  (USBH_HandleTypeDef *phost, uint8_t ep_addr)
 
   if (pipe != 0xFFFF)
   {
-	phost->Pipes[pipe] = 0x8000 | ep_addr;
+    phost->Pipes[pipe] = 0x8000 | ep_addr;
   }
   return pipe;
 }
@@ -159,7 +159,7 @@ USBH_StatusTypeDef USBH_FreePipe  (USBH_HandleTypeDef *phost, uint8_t idx)
 {
    if(idx < 11)
    {
-	 phost->Pipes[idx] &= 0x7FFF;
+     phost->Pipes[idx] &= 0x7FFF;
    }
    return USBH_OK;
 }
@@ -176,10 +176,10 @@ static uint16_t USBH_GetFreePipe (USBH_HandleTypeDef *phost)
   
   for (idx = 0 ; idx < 11 ; idx++)
   {
-	if ((phost->Pipes[idx] & 0x8000) == 0)
-	{
-	   return idx;
-	} 
+    if ((phost->Pipes[idx] & 0x8000) == 0)
+    {
+       return idx;
+    } 
   }
   return 0xFFFF;
 }

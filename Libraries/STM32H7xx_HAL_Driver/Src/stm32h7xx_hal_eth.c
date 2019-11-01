@@ -157,14 +157,14 @@
   */
 /* Helper macros for TX descriptor handling */
 #define INCR_TX_DESC_INDEX(inx, offset) do {\
-	(inx) += (offset);\
+    (inx) += (offset);\
           if ((inx) >= ETH_TX_DESC_CNT){\
             (inx) = ((inx) - ETH_TX_DESC_CNT);}\
-} while (0)	
+} while (0)    
 
 /* Helper macros for RX descriptor handling */
 #define INCR_RX_DESC_INDEX(inx, offset) do {\
-	(inx) += (offset);\
+    (inx) += (offset);\
           if ((inx) >= ETH_RX_DESC_CNT){\
             (inx) = ((inx) - ETH_RX_DESC_CNT);}\
 } while (0)
@@ -285,11 +285,11 @@ HAL_StatusTypeDef HAL_ETH_Init(ETH_HandleTypeDef *heth)
   /*------------------ MAC LPI 1US Tic Counter Configuration --------------------*/
   WRITE_REG(heth->Instance->MAC1USTCR, ((HAL_RCC_GetHCLKFreq() / ETH_MAC_US_TICK) - 1));
   
-  /*------------------ MAC, MTL and DMA default Configuration ----------------*/	
+  /*------------------ MAC, MTL and DMA default Configuration ----------------*/    
   ETH_MACDMAConfig(heth);
   
   /* SET DSL to 64 bit */
-  MODIFY_REG(heth->Instance->DMACCR, ETH_DMACCR_DSL, ETH_DMACCR_DSL_64BIT);	
+  MODIFY_REG(heth->Instance->DMACCR, ETH_DMACCR_DSL, ETH_DMACCR_DSL_64BIT);    
   
   /* Set Receive Buffers Length (must be a multiple of 4) */
   if ((heth->Init.RxBuffLen % 4) != 0)
@@ -1647,7 +1647,7 @@ HAL_StatusTypeDef HAL_ETH_SetDMAConfig(ETH_HandleTypeDef *heth,  ETH_DMAConfigTy
   }
   
   if(heth->RxState == HAL_ETH_STATE_READY)
-  {	
+  {    
     ETH_SetDMAConfig(heth, dmaconf);
     
     return HAL_OK;
@@ -1667,17 +1667,17 @@ HAL_StatusTypeDef HAL_ETH_SetDMAConfig(ETH_HandleTypeDef *heth,  ETH_DMAConfigTy
 void HAL_ETH_SetMDIOClockRange(ETH_HandleTypeDef *heth)
 {
   uint32_t tmpreg, hclk;
-	
+    
   /* Get the ETHERNET MACMDIOAR value */
   tmpreg = (heth->Instance)->MACMDIOAR;
   
-	/* Clear CSR Clock Range bits */
+    /* Clear CSR Clock Range bits */
   tmpreg &= ~ETH_MACMDIOAR_CR;  
-	
-	/* Get hclk frequency value */
+    
+    /* Get hclk frequency value */
   hclk = HAL_RCC_GetHCLKFreq();
-	
-	/* Set CR bits depending on hclk value */
+    
+    /* Set CR bits depending on hclk value */
   if((hclk >= 20000000)&&(hclk < 35000000))
   {
     /* CSR Clock Range between 20-35 MHz */
@@ -1703,9 +1703,9 @@ void HAL_ETH_SetMDIOClockRange(ETH_HandleTypeDef *heth)
     /* CSR Clock Range between 150-200 MHz */ 
     tmpreg |= (uint32_t)ETH_MACMDIOAR_CR_DIV102;    
   }
-	
+    
   /* Configure the CSR Clock Range */
-  (heth->Instance)->MACMDIOAR = (uint32_t)tmpreg;		
+  (heth->Instance)->MACMDIOAR = (uint32_t)tmpreg;        
 }
 
 /**
@@ -1850,7 +1850,7 @@ void HAL_ETH_SetRxVLANIdentifier(ETH_HandleTypeDef *heth, uint32_t ComparisonBit
   {
     MODIFY_REG(heth->Instance->MACVTR, ETH_MACVTR_VL_VID , VLANIdentifier);
     SET_BIT(heth->Instance->MACVTR, ETH_MACVTR_ETV);
-  }	
+  }    
 }
 
 /**
@@ -2249,7 +2249,7 @@ static void ETH_MAC_MDIO_ClkConfig(ETH_HandleTypeDef *heth)
   }
   
   /* Configure the CSR Clock Range */
-  (heth->Instance)->MACMDIOAR = (uint32_t)tmpreg;		
+  (heth->Instance)->MACMDIOAR = (uint32_t)tmpreg;        
 }
 
 /**
@@ -2444,7 +2444,7 @@ static uint32_t ETH_Prepare_Tx_Descriptors(ETH_HandleTypeDef *heth, ETH_TxPacket
   {
     WRITE_REG(dmatxdesc->DESC1, 0x0);
     /* Set buffer 2 Length */
-    MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_B2L, 0x0);		
+    MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_B2L, 0x0);        
   }
   
   if(READ_BIT(pTxConfig->Attributes, ETH_TX_PACKETS_FEATURES_TSO))
@@ -2452,7 +2452,7 @@ static uint32_t ETH_Prepare_Tx_Descriptors(ETH_HandleTypeDef *heth, ETH_TxPacket
     /* Set TCP Header length */
     MODIFY_REG(dmatxdesc->DESC3, ETH_DMATXNDESCRF_THL, (pTxConfig->TCPHeaderLen << 19));
     /* Set TCP payload length */
-    MODIFY_REG(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TPL, pTxConfig->PayloadLen);	
+    MODIFY_REG(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TPL, pTxConfig->PayloadLen);    
     /* Set TCP Segmentation Enabled bit */
     SET_BIT(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TSE);
   }
@@ -2474,7 +2474,7 @@ static uint32_t ETH_Prepare_Tx_Descriptors(ETH_HandleTypeDef *heth, ETH_TxPacket
   if(READ_BIT(pTxConfig->Attributes, ETH_TX_PACKETS_FEATURES_VLANTAG))
   {
     /* Set Vlan Tag control */
-    MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_VTIR, pTxConfig->VlanCtrl);		
+    MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_VTIR, pTxConfig->VlanCtrl);        
   }
   
   /* Mark it as First Descriptor */
@@ -2541,13 +2541,13 @@ static uint32_t ETH_Prepare_Tx_Descriptors(ETH_HandleTypeDef *heth, ETH_TxPacket
     {
       WRITE_REG(dmatxdesc->DESC1, 0x0);
       /* Set buffer 2 Length */
-      MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_B2L, 0x0);		
+      MODIFY_REG(dmatxdesc->DESC2, ETH_DMATXNDESCRF_B2L, 0x0);        
     }
     
     if(READ_BIT(pTxConfig->Attributes, ETH_TX_PACKETS_FEATURES_TSO))
     {
       /* Set TCP payload length */
-      MODIFY_REG(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TPL, pTxConfig->PayloadLen);	
+      MODIFY_REG(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TPL, pTxConfig->PayloadLen);    
       /* Set TCP Segmentation Enabled bit */
       SET_BIT(dmatxdesc->DESC3, ETH_DMATXNDESCRF_TSE);
     }

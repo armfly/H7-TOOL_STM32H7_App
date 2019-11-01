@@ -1,11 +1,11 @@
 /*
 *********************************************************************************************************
 *
-*	模块名称 : cpu内部falsh操作模块
-*	文件名称 : bsp_cpu_flash.h
-*	版    本 : V1.0
+*    模块名称 : cpu内部falsh操作模块
+*    文件名称 : bsp_cpu_flash.h
+*    版    本 : V1.0
 *
-*	Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
+*    Copyright (C), 2013-2014, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
@@ -13,8 +13,8 @@
 #ifndef _BSP_CPU_FLASH_H_
 #define _BSP_CPU_FLASH_H_
 
-//#define FLASH_BASE_ADDR	0x08000000			/* Flash基地址 */
-//#define	FLASH_SIZE		(1*1024*1024)		/* Flash 容量 */
+//#define FLASH_BASE_ADDR    0x08000000            /* Flash基地址 */
+//#define    FLASH_SIZE        (1*1024*1024)        /* Flash 容量 */
 
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_SECTOR_0 ((uint32_t)0x08000000)  /* Base @ of Sector 0, 16 Kbytes */

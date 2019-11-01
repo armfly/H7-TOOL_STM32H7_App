@@ -50,70 +50,70 @@
 #include "bsp_fmc_sdram.h"
 #include "bsp_fmc_nand_flash.h"
 
-//#define printf_ok			printf
+//#define printf_ok            printf
 #define printf_ok(...)
 
-#define printf_err			printf
+#define printf_err            printf
 //#define printf_err(...)
 
-#define STORAGE_LUN_NBR                  2		// 3
+#define STORAGE_LUN_NBR                  2        // 3
 //#define STORAGE_BLK_NBR                  0x10000
 //#define STORAGE_BLK_SIZ                  0x200
 
-//#define LUN_SDRAM	1
-#define LUN_SD		0
-//#define LUN_NAND	2
+//#define LUN_SDRAM    1
+#define LUN_SD        0
+//#define LUN_NAND    2
 
 
 /* 定义SDRAM 虚拟磁盘的地址和空间。 4M字节 */
-#define SDRAM_DISK_ADDR		SDRAM_APP_BUF
-#define SDRAM_DISK_SIZE		(4 * 1024 * 1024)
+#define SDRAM_DISK_ADDR        SDRAM_APP_BUF
+#define SDRAM_DISK_SIZE        (4 * 1024 * 1024)
 
 /* Private macro ------------------------------------------------------------- */
 /* Private variables --------------------------------------------------------- */
 /* USB Mass storage Standard Inquiry Data */
 int8_t STORAGE_Inquirydata[] = {  /* 36 */
-	/* LUN 0 */
-	0x00,
-	0x80,
-	0x02,
-	0x02,
-	(STANDARD_INQUIRY_DATA_LEN - 5),
-	0x00,
-	0x00,
-	0x00,
-	'S', 'T', 'M', ' ', ' ', ' ', ' ', ' ', /* Manufacturer: 8 bytes */
-	'P', 'r', 'o', 'd', 'u', 'c', 't', ' ', /* Product : 16 Bytes */
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'0', '.', '0', '1',           /* Version : 4 Bytes */
-	
-	/* LUN 1 NAND Flash */
-	0x00,
-	0x80,
-	0x02,
-	0x02,
-	(STANDARD_INQUIRY_DATA_LEN - 5),
-	0x00,
-	0x00,
-	0x00,
-	'A', 'R', 'M', 'F', 'L', 'Y', ' ', ' ', /* Manufacturer : 8 bytes */
-	'N', 'A', 'N', 'D', ' ', 'F', 'l', 'a', /* Product      : 16 Bytes */
-	' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-	'1', '.', '0' ,'0',                     /* Version      : 4 Bytes */	
+    /* LUN 0 */
+    0x00,
+    0x80,
+    0x02,
+    0x02,
+    (STANDARD_INQUIRY_DATA_LEN - 5),
+    0x00,
+    0x00,
+    0x00,
+    'S', 'T', 'M', ' ', ' ', ' ', ' ', ' ', /* Manufacturer: 8 bytes */
+    'P', 'r', 'o', 'd', 'u', 'c', 't', ' ', /* Product : 16 Bytes */
+    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+    '0', '.', '0', '1',           /* Version : 4 Bytes */
+    
+    /* LUN 1 NAND Flash */
+    0x00,
+    0x80,
+    0x02,
+    0x02,
+    (STANDARD_INQUIRY_DATA_LEN - 5),
+    0x00,
+    0x00,
+    0x00,
+    'A', 'R', 'M', 'F', 'L', 'Y', ' ', ' ', /* Manufacturer : 8 bytes */
+    'N', 'A', 'N', 'D', ' ', 'F', 'l', 'a', /* Product      : 16 Bytes */
+    ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
+    '1', '.', '0' ,'0',                     /* Version      : 4 Bytes */    
 
-	/* LUN 2 SDRAM */
-	0x00,
-	0x80,
-	0x02,
-	0x02,
-	(STANDARD_INQUIRY_DATA_LEN - 5),
-	0x00,
-	0x00,
-	0x00,
-	'A', 'R', 'M', 'F', 'L', 'Y', ' ', ' ', /* Manufacturer : 8 bytes */
-	'S', 'D', 'R', 'A', 'M', ' ', ' ', ' ', /* Product      : 16 Bytes */
-	's', 'h', ' ', ' ', ' ', ' ', ' ', ' ',
-	'1', '.', '0' ,'0',                     /* Version      : 4 Bytes */	
+    /* LUN 2 SDRAM */
+    0x00,
+    0x80,
+    0x02,
+    0x02,
+    (STANDARD_INQUIRY_DATA_LEN - 5),
+    0x00,
+    0x00,
+    0x00,
+    'A', 'R', 'M', 'F', 'L', 'Y', ' ', ' ', /* Manufacturer : 8 bytes */
+    'S', 'D', 'R', 'A', 'M', ' ', ' ', ' ', /* Product      : 16 Bytes */
+    's', 'h', ' ', ' ', ' ', ' ', ' ', ' ',
+    '1', '.', '0' ,'0',                     /* Version      : 4 Bytes */    
 };
 
 /* Private function prototypes ----------------------------------------------- */
@@ -148,19 +148,19 @@ USBD_StorageTypeDef USBD_DISK_fops = {
   */
 int8_t STORAGE_Init(uint8_t lun)
 {
-	int8_t ret = -1;
-	
-	switch (lun)
-	{
-		case LUN_SD:	
-			BSP_MMC_Init();
-			ret = 0;
-			break;
-		
-//		case LUN_SDRAM:
-//			break;
-	}
-	return ret;	
+    int8_t ret = -1;
+    
+    switch (lun)
+    {
+        case LUN_SD:    
+            BSP_MMC_Init();
+            ret = 0;
+            break;
+        
+//        case LUN_SDRAM:
+//            break;
+    }
+    return ret;    
 }
 
 /**
@@ -173,29 +173,29 @@ int8_t STORAGE_Init(uint8_t lun)
 int8_t STORAGE_GetCapacity(uint8_t lun, uint32_t * block_num,
                            uint16_t * block_size)
 {
-	int8_t ret = -1;
-	
-	switch (lun)
-	{
-		case LUN_SD:	
-			{
-				HAL_MMC_CardInfoTypeDef info;				
+    int8_t ret = -1;
+    
+    switch (lun)
+    {
+        case LUN_SD:    
+            {
+                HAL_MMC_CardInfoTypeDef info;                
 
-				BSP_MMC_GetCardInfo(&info);
+                BSP_MMC_GetCardInfo(&info);
 
-				*block_num = info.LogBlockNbr - 1;
-				*block_size = info.LogBlockSize;
-				ret = 0;
-			}
-			break;
-			
-//		case LUN_SDRAM:
-//			*block_num =  SDRAM_DISK_SIZE / 512 - 1;
-//			*block_size = 512;
-//			ret = 0;			
-//			break;
-	}	
-	return ret; 
+                *block_num = info.LogBlockNbr - 1;
+                *block_size = info.LogBlockSize;
+                ret = 0;
+            }
+            break;
+            
+//        case LUN_SDRAM:
+//            *block_num =  SDRAM_DISK_SIZE / 512 - 1;
+//            *block_size = 512;
+//            ret = 0;            
+//            break;
+    }    
+    return ret; 
 }
 
 /**
@@ -205,24 +205,24 @@ int8_t STORAGE_GetCapacity(uint8_t lun, uint32_t * block_num,
   */
 int8_t STORAGE_IsReady(uint8_t lun)
 {
-	int8_t ret = -1;
-	switch (lun)
-	{
-		case LUN_SD:	
-			{
-				if (BSP_MMC_GetCardState() == MMC_TRANSFER_OK)
-				{
-					ret = 0;
-				}
+    int8_t ret = -1;
+    switch (lun)
+    {
+        case LUN_SD:    
+            {
+                if (BSP_MMC_GetCardState() == MMC_TRANSFER_OK)
+                {
+                    ret = 0;
+                }
 
-			}
-			break;
-		
-//		case LUN_SDRAM:
-//			ret = 0;
-//			break;
-	}
-	return ret;
+            }
+            break;
+        
+//        case LUN_SDRAM:
+//            ret = 0;
+//            break;
+    }
+    return ret;
 }
 
 /**
@@ -245,47 +245,47 @@ int8_t STORAGE_IsWriteProtected(uint8_t lun)
 int8_t STORAGE_Read(uint8_t lun, uint8_t * buf, uint32_t blk_addr,
                     uint16_t blk_len)
 {
-	int8_t ret = -1;
-	switch (lun)
-	{
-		case LUN_SD:	
-			{
-				//if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
-				{
-					BSP_MMC_ReadBlocks((uint32_t *) buf, blk_addr, blk_len, 1000);
+    int8_t ret = -1;
+    switch (lun)
+    {
+        case LUN_SD:    
+            {
+                //if (BSP_SD_IsDetected() != SD_NOT_PRESENT)
+                {
+                    BSP_MMC_ReadBlocks((uint32_t *) buf, blk_addr, blk_len, 1000);
 
-					/* Wait until SD card is ready to use for new operation */
-					while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK)
-					{
-					}
+                    /* Wait until SD card is ready to use for new operation */
+                    while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK)
+                    {
+                    }
 
-					ret = 0;
-				}
-			}
-			break;
-			
-//		case LUN_SDRAM:
-//			{
-//				uint32_t i;
-//				uint32_t *p_sdram;
-//				uint32_t *p_buf;
-//				
-//				if (blk_len * 512 > SDRAM_DISK_SIZE)
-//				{
-//					break;	/* 异常 */
-//				}
-//				
-//				p_buf = (uint32_t *)buf;
-//				p_sdram = (uint32_t *)(SDRAM_DISK_ADDR + blk_addr * 512);
-//				for (i = 0; i < blk_len * 512 / 4; i++)
-//				{
-//					*p_buf++ = *p_sdram++;
-//				}
-//			}
-//			ret = 0;
-//			break;
-	}
-	return ret;
+                    ret = 0;
+                }
+            }
+            break;
+            
+//        case LUN_SDRAM:
+//            {
+//                uint32_t i;
+//                uint32_t *p_sdram;
+//                uint32_t *p_buf;
+//                
+//                if (blk_len * 512 > SDRAM_DISK_SIZE)
+//                {
+//                    break;    /* 异常 */
+//                }
+//                
+//                p_buf = (uint32_t *)buf;
+//                p_sdram = (uint32_t *)(SDRAM_DISK_ADDR + blk_addr * 512);
+//                for (i = 0; i < blk_len * 512 / 4; i++)
+//                {
+//                    *p_buf++ = *p_sdram++;
+//                }
+//            }
+//            ret = 0;
+//            break;
+    }
+    return ret;
 }
 
 /**
@@ -298,49 +298,49 @@ int8_t STORAGE_Read(uint8_t lun, uint8_t * buf, uint32_t blk_addr,
 int8_t STORAGE_Write(uint8_t lun, uint8_t * buf, uint32_t blk_addr,
                      uint16_t blk_len)
 {
-	int8_t ret = -1;
-	switch (lun)
-	{
-		case LUN_SD:	
-			{
-				//if (BSP_MMC_IsDetected() != SD_NOT_PRESENT)
-				{
-					BSP_MMC_WriteBlocks((uint32_t *) buf, blk_addr, blk_len, 1000);
+    int8_t ret = -1;
+    switch (lun)
+    {
+        case LUN_SD:    
+            {
+                //if (BSP_MMC_IsDetected() != SD_NOT_PRESENT)
+                {
+                    BSP_MMC_WriteBlocks((uint32_t *) buf, blk_addr, blk_len, 1000);
 
-					/* Wait until SD card is ready to use for new operation */
-					while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK)
-					{
-					}
+                    /* Wait until SD card is ready to use for new operation */
+                    while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK)
+                    {
+                    }
 
-					ret = 0;
-				}
-			}
-			break;
-			
-//		case LUN_SDRAM:
-//			{
-//				uint32_t i;
-//				uint32_t *p_sdram;
-//				uint32_t *p_buf;
-//				
-//				if (blk_len * 512 > SDRAM_DISK_SIZE)
-//				{
-//					break;	/* 异常 */
-//				}
-//				
-//				printf_ok("sdram_Write ok: BlockNo=%d, Count=%d", blk_addr, blk_len);				
-//				
-//				p_buf = (uint32_t *)buf;
-//				p_sdram = (uint32_t *)(SDRAM_DISK_ADDR + blk_addr * 512);
-//				for (i = 0; i < blk_len * 512 / 4; i++)
-//				{
-//					*p_sdram++ = *p_buf++;
-//				}
-//			}
-//			ret = 0;
-//			break;
-	}
-	return ret;
+                    ret = 0;
+                }
+            }
+            break;
+            
+//        case LUN_SDRAM:
+//            {
+//                uint32_t i;
+//                uint32_t *p_sdram;
+//                uint32_t *p_buf;
+//                
+//                if (blk_len * 512 > SDRAM_DISK_SIZE)
+//                {
+//                    break;    /* 异常 */
+//                }
+//                
+//                printf_ok("sdram_Write ok: BlockNo=%d, Count=%d", blk_addr, blk_len);                
+//                
+//                p_buf = (uint32_t *)buf;
+//                p_sdram = (uint32_t *)(SDRAM_DISK_ADDR + blk_addr * 512);
+//                for (i = 0; i < blk_len * 512 / 4; i++)
+//                {
+//                    *p_sdram++ = *p_buf++;
+//                }
+//            }
+//            ret = 0;
+//            break;
+    }
+    return ret;
 }
 
 /**

@@ -41,52 +41,52 @@
 
 /* Local Variable */
 const int16_t CGU_Entity_ControlReg_Offset[CGU_ENTITY_NUM] = {
-    -1,		//CGU_CLKSRC_32KHZ_OSC,
-    -1,		//CGU_CLKSRC_IRC,
-    -1,		//CGU_CLKSRC_ENET_RX_CLK,
-    -1,		//CGU_CLKSRC_ENET_TX_CLK,
-    -1,		//CGU_CLKSRC_GP_CLKIN,
-    -1,		//CGU_CLKSRC_TCK,
-    0x18,	//CGU_CLKSRC_XTAL_OSC,
-    0x20,	//CGU_CLKSRC_PLL0,
-    0x30,	//CGU_CLKSRC_PLL0_AUDIO **REV A**
-    0x44,	//CGU_CLKSRC_PLL1,
-    -1,		//CGU_CLKSRC_RESERVE,
-    -1,		//CGU_CLKSRC_RESERVE,
-    0x48,	//CGU_CLKSRC_IDIVA,,
-    0x4C,	//CGU_CLKSRC_IDIVB,
-    0x50,	//CGU_CLKSRC_IDIVC,
-    0x54,	//CGU_CLKSRC_IDIVD,
-    0x58,	//CGU_CLKSRC_IDIVE,
+    -1,        //CGU_CLKSRC_32KHZ_OSC,
+    -1,        //CGU_CLKSRC_IRC,
+    -1,        //CGU_CLKSRC_ENET_RX_CLK,
+    -1,        //CGU_CLKSRC_ENET_TX_CLK,
+    -1,        //CGU_CLKSRC_GP_CLKIN,
+    -1,        //CGU_CLKSRC_TCK,
+    0x18,    //CGU_CLKSRC_XTAL_OSC,
+    0x20,    //CGU_CLKSRC_PLL0,
+    0x30,    //CGU_CLKSRC_PLL0_AUDIO **REV A**
+    0x44,    //CGU_CLKSRC_PLL1,
+    -1,        //CGU_CLKSRC_RESERVE,
+    -1,        //CGU_CLKSRC_RESERVE,
+    0x48,    //CGU_CLKSRC_IDIVA,,
+    0x4C,    //CGU_CLKSRC_IDIVB,
+    0x50,    //CGU_CLKSRC_IDIVC,
+    0x54,    //CGU_CLKSRC_IDIVD,
+    0x58,    //CGU_CLKSRC_IDIVE,
 
-    0x5C,	//CGU_BASE_SAFE,
-    0x60,	//CGU_BASE_USB0,
-    0x64,	//CGU_BASE_PERIPH,	// used for SPGPIO, peripheral control
-    0x68,	//CGU_BASE_USB1,
-    0x6C,	//CGU_BASE_M4,
-    0x70,	//CGU_BASE_SPIFI,
-    -1,		//CGU_BASE_RESERVE,
-    0x78,	//CGU_BASE_PHY_RX,
-    0x7C,	//CGU_BASE_PHY_TX,
-    0x80,	//CGU_BASE_APB1,
-    0x84,	//CGU_BASE_APB3,
-    0x88,	//CGU_BASE_LCD,
-    0X8C,	//CGU_BASE_ENET_CSR, **REV A**
-    0x90,	//CGU_BASE_SDIO,
-    0x94,	//CGU_BASE_SSP0,
-    0x98,	//CGU_BASE_SSP1,
-    0x9C,	//CGU_BASE_UART0,
-    0xA0,	//CGU_BASE_UART1,
-    0xA4,	//CGU_BASE_UART2,
-    0xA8,	//CGU_BASE_UART3,
-    0xAC,	//CGU_BASE_CLKOUT
+    0x5C,    //CGU_BASE_SAFE,
+    0x60,    //CGU_BASE_USB0,
+    0x64,    //CGU_BASE_PERIPH,    // used for SPGPIO, peripheral control
+    0x68,    //CGU_BASE_USB1,
+    0x6C,    //CGU_BASE_M4,
+    0x70,    //CGU_BASE_SPIFI,
+    -1,        //CGU_BASE_RESERVE,
+    0x78,    //CGU_BASE_PHY_RX,
+    0x7C,    //CGU_BASE_PHY_TX,
+    0x80,    //CGU_BASE_APB1,
+    0x84,    //CGU_BASE_APB3,
+    0x88,    //CGU_BASE_LCD,
+    0X8C,    //CGU_BASE_ENET_CSR, **REV A**
+    0x90,    //CGU_BASE_SDIO,
+    0x94,    //CGU_BASE_SSP0,
+    0x98,    //CGU_BASE_SSP1,
+    0x9C,    //CGU_BASE_UART0,
+    0xA0,    //CGU_BASE_UART1,
+    0xA4,    //CGU_BASE_UART2,
+    0xA8,    //CGU_BASE_UART3,
+    0xAC,    //CGU_BASE_CLKOUT
     -1,
     -1,
     -1,
     -1,
-    0xC0,	//CGU_BASE_APLL
-    0xC4,	//CGU_BASE_OUT0
-    0xC8	//CGU_BASE_OUT1
+    0xC0,    //CGU_BASE_APLL
+    0xC4,    //CGU_BASE_OUT0
+    0xC8    //CGU_BASE_OUT1
 };
 
 const uint8_t CGU_ConnectAlloc_Tbl[CGU_CLKSRC_NUM][CGU_ENTITY_NUM] = {
@@ -113,53 +113,53 @@ const uint8_t CGU_ConnectAlloc_Tbl[CGU_CLKSRC_NUM][CGU_ENTITY_NUM] = {
 };
 
 const CGU_PERIPHERAL_S CGU_PERIPHERAL_Info[CGU_PERIPHERAL_NUM] = {
-    /*	Register Clock			|	Peripheral Clock
-    |	BASE	|	BRANCH	|	BASE	|	BRANCH		*/
-    {CGU_BASE_APB3,	0x1118, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_ADC0,
-    {CGU_BASE_APB3,	0x1120, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_ADC1,
-    {CGU_BASE_M4,	0x1460, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_AES,
-    ////	CGU_PERIPHERAL_ALARMTIMER_CGU_RGU_RTC_WIC,
-    {CGU_BASE_APB1,	0x1200, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_APB1_BUS,
-    {CGU_BASE_APB3,	0x1100, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_APB3_BUS,
-    {CGU_BASE_APB3,	0x1128, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_CAN0,
-    {CGU_BASE_M4,	0x1538, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_CREG,
-    {CGU_BASE_APB3,	0x1110, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_DAC,
-    {CGU_BASE_M4,	0x1440, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_DMA,
-    {CGU_BASE_M4,	0x1430, CGU_BASE_M4,		0x1478, 0},//CGU_PERIPHERAL_EMC,
-    {CGU_BASE_M4,	0x1420, CGU_BASE_PHY_RX,	0x0000, CGU_PERIPHERAL_ETHERNET_TX},//CGU_PERIPHERAL_ETHERNET,
-    {CGU_ENTITY_NONE, 0x0000, CGU_BASE_PHY_TX,	0x0000, 0}, //CGU_PERIPHERAL_ETHERNET_TX
-    {CGU_BASE_M4,	0x1410, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_GPIO,
-    {CGU_BASE_APB1,	0x1210, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_I2C0,
-    {CGU_BASE_APB3,	0x1108, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_I2C1,
-    {CGU_BASE_APB1,	0x1218, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_I2S,
-    {CGU_BASE_M4,	0x1418, CGU_BASE_LCD,	0x0000, 0},//CGU_PERIPHERAL_LCD,
-    {CGU_BASE_M4,	0x1448, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_M3CORE,
-    {CGU_BASE_M4,	0x1400, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_M3_BUS,
-    {CGU_BASE_APB1,	0x1208, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_MOTOCON,
-    {CGU_BASE_M4,	0x1630, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_QEI,
-    {CGU_BASE_M4,	0x1600, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_RITIMER,
-    {CGU_BASE_M4,	0x1468, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_SCT,
-    {CGU_BASE_M4,	0x1530, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_SCU,
-    {CGU_BASE_M4,	0x1438, CGU_BASE_SDIO,	0x2800, 0},//CGU_PERIPHERAL_SDIO,
-    {CGU_BASE_M4,	0x1408, CGU_BASE_SPIFI,	0x1300, 0},//CGU_PERIPHERAL_SPIFI,
-    {CGU_BASE_M4,	0x1518, CGU_BASE_SSP0,	0x2700, 0},//CGU_PERIPHERAL_SSP0,
-    {CGU_BASE_M4,	0x1628, CGU_BASE_SSP1,	0x2600, 0},//CGU_PERIPHERAL_SSP1,
-    {CGU_BASE_M4,	0x1520, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_TIMER0,
-    {CGU_BASE_M4,	0x1528, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_TIMER1,
-    {CGU_BASE_M4,	0x1618, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_TIMER2,
-    {CGU_BASE_M4,	0x1620, CGU_ENTITY_NONE,	0x0000, 0},//CGU_PERIPHERAL_TIMER3,
-    {CGU_BASE_M4,	0x1508, CGU_BASE_UART0,	0x2500, 0},//CGU_PERIPHERAL_UART0,
-    {CGU_BASE_M4,	0x1510, CGU_BASE_UART1,	0x2400, 0},//CGU_PERIPHERAL_UART1,
-    {CGU_BASE_M4,	0x1608, CGU_BASE_UART2,	0x2300, 0},//CGU_PERIPHERAL_UART2,
-    {CGU_BASE_M4,	0x1610, CGU_BASE_UART3,	0x2200, 0},//CGU_PERIPHERAL_UART3,
-    {CGU_BASE_M4,	0x1428, CGU_BASE_USB0,	0x1800, 0},//CGU_PERIPHERAL_USB0,
-    {CGU_BASE_M4,	0x1470, CGU_BASE_USB1,	0x1900, 0},//CGU_PERIPHERAL_USB1,
-    {CGU_BASE_M4,	0x1500, CGU_BASE_SAFE,	0x0000, 0},//CGU_PERIPHERAL_WWDT,
+    /*    Register Clock            |    Peripheral Clock
+    |    BASE    |    BRANCH    |    BASE    |    BRANCH        */
+    {CGU_BASE_APB3,    0x1118, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_ADC0,
+    {CGU_BASE_APB3,    0x1120, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_ADC1,
+    {CGU_BASE_M4,    0x1460, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_AES,
+    ////    CGU_PERIPHERAL_ALARMTIMER_CGU_RGU_RTC_WIC,
+    {CGU_BASE_APB1,    0x1200, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_APB1_BUS,
+    {CGU_BASE_APB3,    0x1100, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_APB3_BUS,
+    {CGU_BASE_APB3,    0x1128, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_CAN0,
+    {CGU_BASE_M4,    0x1538, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_CREG,
+    {CGU_BASE_APB3,    0x1110, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_DAC,
+    {CGU_BASE_M4,    0x1440, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_DMA,
+    {CGU_BASE_M4,    0x1430, CGU_BASE_M4,        0x1478, 0},//CGU_PERIPHERAL_EMC,
+    {CGU_BASE_M4,    0x1420, CGU_BASE_PHY_RX,    0x0000, CGU_PERIPHERAL_ETHERNET_TX},//CGU_PERIPHERAL_ETHERNET,
+    {CGU_ENTITY_NONE, 0x0000, CGU_BASE_PHY_TX,    0x0000, 0}, //CGU_PERIPHERAL_ETHERNET_TX
+    {CGU_BASE_M4,    0x1410, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_GPIO,
+    {CGU_BASE_APB1,    0x1210, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_I2C0,
+    {CGU_BASE_APB3,    0x1108, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_I2C1,
+    {CGU_BASE_APB1,    0x1218, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_I2S,
+    {CGU_BASE_M4,    0x1418, CGU_BASE_LCD,    0x0000, 0},//CGU_PERIPHERAL_LCD,
+    {CGU_BASE_M4,    0x1448, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_M3CORE,
+    {CGU_BASE_M4,    0x1400, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_M3_BUS,
+    {CGU_BASE_APB1,    0x1208, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_MOTOCON,
+    {CGU_BASE_M4,    0x1630, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_QEI,
+    {CGU_BASE_M4,    0x1600, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_RITIMER,
+    {CGU_BASE_M4,    0x1468, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_SCT,
+    {CGU_BASE_M4,    0x1530, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_SCU,
+    {CGU_BASE_M4,    0x1438, CGU_BASE_SDIO,    0x2800, 0},//CGU_PERIPHERAL_SDIO,
+    {CGU_BASE_M4,    0x1408, CGU_BASE_SPIFI,    0x1300, 0},//CGU_PERIPHERAL_SPIFI,
+    {CGU_BASE_M4,    0x1518, CGU_BASE_SSP0,    0x2700, 0},//CGU_PERIPHERAL_SSP0,
+    {CGU_BASE_M4,    0x1628, CGU_BASE_SSP1,    0x2600, 0},//CGU_PERIPHERAL_SSP1,
+    {CGU_BASE_M4,    0x1520, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_TIMER0,
+    {CGU_BASE_M4,    0x1528, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_TIMER1,
+    {CGU_BASE_M4,    0x1618, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_TIMER2,
+    {CGU_BASE_M4,    0x1620, CGU_ENTITY_NONE,    0x0000, 0},//CGU_PERIPHERAL_TIMER3,
+    {CGU_BASE_M4,    0x1508, CGU_BASE_UART0,    0x2500, 0},//CGU_PERIPHERAL_UART0,
+    {CGU_BASE_M4,    0x1510, CGU_BASE_UART1,    0x2400, 0},//CGU_PERIPHERAL_UART1,
+    {CGU_BASE_M4,    0x1608, CGU_BASE_UART2,    0x2300, 0},//CGU_PERIPHERAL_UART2,
+    {CGU_BASE_M4,    0x1610, CGU_BASE_UART3,    0x2200, 0},//CGU_PERIPHERAL_UART3,
+    {CGU_BASE_M4,    0x1428, CGU_BASE_USB0,    0x1800, 0},//CGU_PERIPHERAL_USB0,
+    {CGU_BASE_M4,    0x1470, CGU_BASE_USB1,    0x1900, 0},//CGU_PERIPHERAL_USB1,
+    {CGU_BASE_M4,    0x1500, CGU_BASE_SAFE,    0x0000, 0},//CGU_PERIPHERAL_WWDT,
 };
 
 uint32_t CGU_ClockSourceFrequency[CGU_CLKSRC_NUM] = {0, 12000000, 0, 0, 0, 0, 0, 480000000, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-#define CGU_CGU_ADDR	((uint32_t)LPC_CGU)
+#define CGU_CGU_ADDR    ((uint32_t)LPC_CGU)
 #define CGU_REG_BASE_CTRL(x) (*(uint32_t*)(CGU_CGU_ADDR+CGU_Entity_ControlReg_Offset[CGU_PERIPHERAL_Info[x].RegBaseEntity]))
 #define CGU_REG_BRANCH_CTRL(x) (*(uint32_t*)(CGU_CGU_ADDR+CGU_PERIPHERAL_Info[x].RegBranchOffset))
 #define CGU_REG_BRANCH_STATUS(x) (*(volatile uint32_t*)(CGU_CGU_ADDR+CGU_PERIPHERAL_Info[x].RegBranchOffset+4))
@@ -230,13 +230,13 @@ static void cgu_findMN(uint32_t wantedFreq, uint32_t *pMsel, uint32_t *pNsel)
 }
 
 /*********************************************************************//**
- * @brief		Initialize default clock for LPC4300 Eval board
- * @param[in]	None
- * @return 		Initialize status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- Other: error
+ * @brief        Initialize default clock for LPC4300 Eval board
+ * @param[in]    None
+ * @return         Initialize status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - Other: error
  **********************************************************************/
-uint32_t	CGU_Init(uint32_t wantedFreq)
+uint32_t    CGU_Init(uint32_t wantedFreq)
 {
     uint32_t msel = 0;
     uint32_t nsel = 0;
@@ -279,52 +279,52 @@ uint32_t	CGU_Init(uint32_t wantedFreq)
 }
 
 /*********************************************************************//**
- * @brief		Configure power for individual peripheral
- * @param[in]	PPType	peripheral type, should be:
- * 					- CGU_PERIPHERAL_ADC0		:ADC0
- * 					- CGU_PERIPHERAL_ADC1		:ADC1
- * 					- CGU_PERIPHERAL_AES		:AES
- * 					- CGU_PERIPHERAL_APB1_BUS	:APB1 bus
- * 					- CGU_PERIPHERAL_APB3_BUS	:APB3 bus
- * 					- CGU_PERIPHERAL_CAN		:CAN
- * 					- CGU_PERIPHERAL_CREG		:CREG
- * 					- CGU_PERIPHERAL_DAC		:DAC
- * 					- CGU_PERIPHERAL_DMA		:DMA
- * 					- CGU_PERIPHERAL_EMC		:EMC
- * 					- CGU_PERIPHERAL_ETHERNET	:ETHERNET
- * 					- CGU_PERIPHERAL_GPIO		:GPIO
- * 					- CGU_PERIPHERAL_I2C0		:I2C0
- * 					- CGU_PERIPHERAL_I2C1		:I2C1
- * 					- CGU_PERIPHERAL_I2S		:I2S
- * 					- CGU_PERIPHERAL_LCD		:LCD
- * 					- CGU_PERIPHERAL_M3CORE		:M3 core
- * 					- CGU_PERIPHERAL_M3_BUS		:M3 bus
- * 					- CGU_PERIPHERAL_MOTOCON	:Motor control
- * 					- CGU_PERIPHERAL_QEI		:QEI
- * 					- CGU_PERIPHERAL_RITIMER	:RIT timer
- * 					- CGU_PERIPHERAL_SCT		:SCT
- * 					- CGU_PERIPHERAL_SCU		:SCU
- * 					- CGU_PERIPHERAL_SDIO		:SDIO
- * 					- CGU_PERIPHERAL_SPIFI		:SPIFI
- * 					- CGU_PERIPHERAL_SSP0		:SSP0
- * 					- CGU_PERIPHERAL_SSP1		:SSP1
- * 					- CGU_PERIPHERAL_TIMER0		:TIMER0
- * 					- CGU_PERIPHERAL_TIMER1		:TIMER1
- * 					- CGU_PERIPHERAL_TIMER2		:TIMER2
- * 					- CGU_PERIPHERAL_TIMER3		:TIMER3
- * 					- CGU_PERIPHERAL_UART0		:UART0
- * 					- CGU_PERIPHERAL_UART1		:UART1
- * 					- CGU_PERIPHERAL_UART2		:UART2
- * 					- CGU_PERIPHERAL_UART3		:UART3
- * 					- CGU_PERIPHERAL_USB0		:USB0
- * 					- CGU_PERIPHERAL_USB1		:USB1
- * 					- CGU_PERIPHERAL_WWDT		:WWDT
- * @param[in]	en status, should be:
- * 					- ENABLE: Enable power
- * 					- DISABLE: Disable power
- * @return 		Configure status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- Other: error
+ * @brief        Configure power for individual peripheral
+ * @param[in]    PPType    peripheral type, should be:
+ *                     - CGU_PERIPHERAL_ADC0        :ADC0
+ *                     - CGU_PERIPHERAL_ADC1        :ADC1
+ *                     - CGU_PERIPHERAL_AES        :AES
+ *                     - CGU_PERIPHERAL_APB1_BUS    :APB1 bus
+ *                     - CGU_PERIPHERAL_APB3_BUS    :APB3 bus
+ *                     - CGU_PERIPHERAL_CAN        :CAN
+ *                     - CGU_PERIPHERAL_CREG        :CREG
+ *                     - CGU_PERIPHERAL_DAC        :DAC
+ *                     - CGU_PERIPHERAL_DMA        :DMA
+ *                     - CGU_PERIPHERAL_EMC        :EMC
+ *                     - CGU_PERIPHERAL_ETHERNET    :ETHERNET
+ *                     - CGU_PERIPHERAL_GPIO        :GPIO
+ *                     - CGU_PERIPHERAL_I2C0        :I2C0
+ *                     - CGU_PERIPHERAL_I2C1        :I2C1
+ *                     - CGU_PERIPHERAL_I2S        :I2S
+ *                     - CGU_PERIPHERAL_LCD        :LCD
+ *                     - CGU_PERIPHERAL_M3CORE        :M3 core
+ *                     - CGU_PERIPHERAL_M3_BUS        :M3 bus
+ *                     - CGU_PERIPHERAL_MOTOCON    :Motor control
+ *                     - CGU_PERIPHERAL_QEI        :QEI
+ *                     - CGU_PERIPHERAL_RITIMER    :RIT timer
+ *                     - CGU_PERIPHERAL_SCT        :SCT
+ *                     - CGU_PERIPHERAL_SCU        :SCU
+ *                     - CGU_PERIPHERAL_SDIO        :SDIO
+ *                     - CGU_PERIPHERAL_SPIFI        :SPIFI
+ *                     - CGU_PERIPHERAL_SSP0        :SSP0
+ *                     - CGU_PERIPHERAL_SSP1        :SSP1
+ *                     - CGU_PERIPHERAL_TIMER0        :TIMER0
+ *                     - CGU_PERIPHERAL_TIMER1        :TIMER1
+ *                     - CGU_PERIPHERAL_TIMER2        :TIMER2
+ *                     - CGU_PERIPHERAL_TIMER3        :TIMER3
+ *                     - CGU_PERIPHERAL_UART0        :UART0
+ *                     - CGU_PERIPHERAL_UART1        :UART1
+ *                     - CGU_PERIPHERAL_UART2        :UART2
+ *                     - CGU_PERIPHERAL_UART3        :UART3
+ *                     - CGU_PERIPHERAL_USB0        :USB0
+ *                     - CGU_PERIPHERAL_USB1        :USB1
+ *                     - CGU_PERIPHERAL_WWDT        :WWDT
+ * @param[in]    en status, should be:
+ *                     - ENABLE: Enable power
+ *                     - DISABLE: Disable power
+ * @return         Configure status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - Other: error
  **********************************************************************/
 uint32_t CGU_ConfigPWR(CGU_PERIPHERAL_T PPType,  FunctionalState en)
 {
@@ -402,47 +402,47 @@ uint32_t CGU_ConfigPWR(CGU_PERIPHERAL_T PPType,  FunctionalState en)
 
 
 /*********************************************************************//**
- * @brief		Get peripheral clock frequency
- * @param[in]	Clock	Peripheral type, should be:
- * 					- CGU_PERIPHERAL_ADC0		:ADC0
- * 					- CGU_PERIPHERAL_ADC1		:ADC1
- * 					- CGU_PERIPHERAL_AES		:AES
- * 					- CGU_PERIPHERAL_APB1_BUS	:APB1 bus
- * 					- CGU_PERIPHERAL_APB3_BUS	:APB3 bus
- * 					- CGU_PERIPHERAL_CAN		:CAN
- * 					- CGU_PERIPHERAL_CREG		:CREG
- * 					- CGU_PERIPHERAL_DAC		:DAC
- * 					- CGU_PERIPHERAL_DMA		:DMA
- * 					- CGU_PERIPHERAL_EMC		:EMC
- * 					- CGU_PERIPHERAL_ETHERNET	:ETHERNET
- * 					- CGU_PERIPHERAL_GPIO		:GPIO
- * 					- CGU_PERIPHERAL_I2C0		:I2C0
- * 					- CGU_PERIPHERAL_I2C1		:I2C1
- * 					- CGU_PERIPHERAL_I2S		:I2S
- * 					- CGU_PERIPHERAL_LCD		:LCD
- * 					- CGU_PERIPHERAL_M3CORE		:M3 core
- * 					- CGU_PERIPHERAL_M3_BUS		:M3 bus
- * 					- CGU_PERIPHERAL_MOTOCON	:Motor control
- * 					- CGU_PERIPHERAL_QEI		:QEI
- * 					- CGU_PERIPHERAL_RITIMER	:RIT timer
- * 					- CGU_PERIPHERAL_SCT		:SCT
- * 					- CGU_PERIPHERAL_SCU		:SCU
- * 					- CGU_PERIPHERAL_SDIO		:SDIO
- * 					- CGU_PERIPHERAL_SPIFI		:SPIFI
- * 					- CGU_PERIPHERAL_SSP0		:SSP0
- * 					- CGU_PERIPHERAL_SSP1		:SSP1
- * 					- CGU_PERIPHERAL_TIMER0		:TIMER0
- * 					- CGU_PERIPHERAL_TIMER1		:TIMER1
- * 					- CGU_PERIPHERAL_TIMER2		:TIMER2
- * 					- CGU_PERIPHERAL_TIMER3		:TIMER3
- * 					- CGU_PERIPHERAL_UART0		:UART0
- * 					- CGU_PERIPHERAL_UART1		:UART1
- * 					- CGU_PERIPHERAL_UART2		:UART2
- * 					- CGU_PERIPHERAL_UART3		:UART3
- * 					- CGU_PERIPHERAL_USB0		:USB0
- * 					- CGU_PERIPHERAL_USB1		:USB1
- * 					- CGU_PERIPHERAL_WWDT		:WWDT
- * @return 		Return frequently value
+ * @brief        Get peripheral clock frequency
+ * @param[in]    Clock    Peripheral type, should be:
+ *                     - CGU_PERIPHERAL_ADC0        :ADC0
+ *                     - CGU_PERIPHERAL_ADC1        :ADC1
+ *                     - CGU_PERIPHERAL_AES        :AES
+ *                     - CGU_PERIPHERAL_APB1_BUS    :APB1 bus
+ *                     - CGU_PERIPHERAL_APB3_BUS    :APB3 bus
+ *                     - CGU_PERIPHERAL_CAN        :CAN
+ *                     - CGU_PERIPHERAL_CREG        :CREG
+ *                     - CGU_PERIPHERAL_DAC        :DAC
+ *                     - CGU_PERIPHERAL_DMA        :DMA
+ *                     - CGU_PERIPHERAL_EMC        :EMC
+ *                     - CGU_PERIPHERAL_ETHERNET    :ETHERNET
+ *                     - CGU_PERIPHERAL_GPIO        :GPIO
+ *                     - CGU_PERIPHERAL_I2C0        :I2C0
+ *                     - CGU_PERIPHERAL_I2C1        :I2C1
+ *                     - CGU_PERIPHERAL_I2S        :I2S
+ *                     - CGU_PERIPHERAL_LCD        :LCD
+ *                     - CGU_PERIPHERAL_M3CORE        :M3 core
+ *                     - CGU_PERIPHERAL_M3_BUS        :M3 bus
+ *                     - CGU_PERIPHERAL_MOTOCON    :Motor control
+ *                     - CGU_PERIPHERAL_QEI        :QEI
+ *                     - CGU_PERIPHERAL_RITIMER    :RIT timer
+ *                     - CGU_PERIPHERAL_SCT        :SCT
+ *                     - CGU_PERIPHERAL_SCU        :SCU
+ *                     - CGU_PERIPHERAL_SDIO        :SDIO
+ *                     - CGU_PERIPHERAL_SPIFI        :SPIFI
+ *                     - CGU_PERIPHERAL_SSP0        :SSP0
+ *                     - CGU_PERIPHERAL_SSP1        :SSP1
+ *                     - CGU_PERIPHERAL_TIMER0        :TIMER0
+ *                     - CGU_PERIPHERAL_TIMER1        :TIMER1
+ *                     - CGU_PERIPHERAL_TIMER2        :TIMER2
+ *                     - CGU_PERIPHERAL_TIMER3        :TIMER3
+ *                     - CGU_PERIPHERAL_UART0        :UART0
+ *                     - CGU_PERIPHERAL_UART1        :UART1
+ *                     - CGU_PERIPHERAL_UART2        :UART2
+ *                     - CGU_PERIPHERAL_UART3        :UART3
+ *                     - CGU_PERIPHERAL_USB0        :USB0
+ *                     - CGU_PERIPHERAL_USB1        :USB1
+ *                     - CGU_PERIPHERAL_WWDT        :WWDT
+ * @return         Return frequently value
  **********************************************************************/
 uint32_t CGU_GetPCLKFrequency(CGU_PERIPHERAL_T Clock)
 {
@@ -467,7 +467,7 @@ uint32_t CGU_GetPCLKFrequency(CGU_PERIPHERAL_T Clock)
         }
 
     } else {
-        if (CGU_REG_BASE_CTRL(Clock) & 1)	{
+        if (CGU_REG_BASE_CTRL(Clock) & 1)    {
             return 0;
         }
 
@@ -484,9 +484,9 @@ uint32_t CGU_GetPCLKFrequency(CGU_PERIPHERAL_T Clock)
 
 
 /*********************************************************************//**
- * @brief		Update clock
- * @param[in]	None
- * @return 		None
+ * @brief        Update clock
+ * @param[in]    None
+ * @return         None
  **********************************************************************/
 void CGU_UpdateClock(void)
 {
@@ -532,13 +532,13 @@ void CGU_UpdateClock(void)
 }
 
 /*********************************************************************//**
- * @brief		Set XTAL oscillator value
- * @param[in]	ClockFrequency	XTAL Frequency value
- * @return 		Setting status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- CGU_ERROR_FREQ_OUTOF_RANGE: XTAL value set is out of range
+ * @brief        Set XTAL oscillator value
+ * @param[in]    ClockFrequency    XTAL Frequency value
+ * @return         Setting status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - CGU_ERROR_FREQ_OUTOF_RANGE: XTAL value set is out of range
  **********************************************************************/
-uint32_t	CGU_SetXTALOSC(uint32_t ClockFrequency)
+uint32_t    CGU_SetXTALOSC(uint32_t ClockFrequency)
 {
     if (ClockFrequency < 15000000) {
         LPC_CGU->XTAL_OSC_CTRL &= ~(1 << 2);
@@ -556,20 +556,20 @@ uint32_t	CGU_SetXTALOSC(uint32_t ClockFrequency)
 
 
 /*********************************************************************//**
- * @brief		Set clock divider
- * @param[in]	SelectDivider	Clock source, should be:
- * 					- CGU_CLKSRC_IDIVA	:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB	:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC	:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD	:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE	:Integer divider register E
- * @param[in]	divisor	Divisor value, should be: 0..255
- * @return 		Setting status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- CGU_ERROR_INVALID_ENTITY: Invalid entity
+ * @brief        Set clock divider
+ * @param[in]    SelectDivider    Clock source, should be:
+ *                     - CGU_CLKSRC_IDIVA    :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB    :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC    :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD    :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE    :Integer divider register E
+ * @param[in]    divisor    Divisor value, should be: 0..255
+ * @return         Setting status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - CGU_ERROR_INVALID_ENTITY: Invalid entity
  **********************************************************************/
 /* divisor number must >=1*/
-uint32_t	CGU_SetDIV(CGU_ENTITY_T SelectDivider, uint32_t divisor)
+uint32_t    CGU_SetDIV(CGU_ENTITY_T SelectDivider, uint32_t divisor)
 {
     int32_t RegOffset;
     uint32_t tempReg;
@@ -592,47 +592,47 @@ uint32_t	CGU_SetDIV(CGU_ENTITY_T SelectDivider, uint32_t divisor)
 }
 
 /*********************************************************************//**
- * @brief		Enable clock entity
- * @param[in]	ClockEntity	Clock entity, should be:
- * 					- CGU_CLKSRC_32KHZ_OSC		:32Khz oscillator
- * 					- CGU_CLKSRC_IRC			:IRC clock
- * 					- CGU_CLKSRC_ENET_RX_CLK	:Ethernet receive clock
- * 					- CGU_CLKSRC_ENET_TX_CLK	:Ethernet transmit clock
- * 					- CGU_CLKSRC_GP_CLKIN		:General purpose input clock
- * 					- CGU_CLKSRC_XTAL_OSC		:Crystal oscillator
- * 					- CGU_CLKSRC_PLL0			:PLL0 clock
- * 					- CGU_CLKSRC_PLL1			:PLL1 clock
- * 					- CGU_CLKSRC_IDIVA			:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB			:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC			:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD			:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE			:Integer divider register E
- * 					- CGU_BASE_SAFE				:Base safe clock (always on)for WDT
- * 					- CGU_BASE_USB0				:Base clock for USB0
- * 					- CGU_BASE_PERIPH			:Base clock for Peripheral bus
- * 					- CGU_BASE_USB1				:Base clock for USB1
- * 					- CGU_BASE_M4				:System base clock for ARM Cortex-M3 core
- * 												 and APB peripheral blocks #0 and #2
- * 					- CGU_BASE_SPIFI			:Base clock for SPIFI
- * 					- CGU_BASE_PHY_RX			:Base clock for Ethernet PHY Rx
- * 					- CGU_BASE_PHY_TX			:Base clock for Ethernet PHY Tx
- * 					- CGU_BASE_APB1				:Base clock for APB peripheral block #1
- * 					- CGU_BASE_APB3				:Base clock for APB peripheral block #3
- * 					- CGU_BASE_LCD				:Base clock for LCD
- * 					- CGU_BASE_SDIO				:Base clock for SDIO card reader
- * 					- CGU_BASE_SSP0				:Base clock for SSP0
- * 					- CGU_BASE_SSP1				:Base clock for SSP1
- * 					- CGU_BASE_UART0			:Base clock for UART0
- * 					- CGU_BASE_UART1			:Base clock for UART1
- * 					- CGU_BASE_UART2			:Base clock for UART2
- * 					- CGU_BASE_UART3			:Base clock for UART3
- * 					- CGU_BASE_CLKOUT			:Base clock for CLKOUT pin
- * @param[in]	en status, should be:
- * 					- ENABLE: Enable power
- * 					- DISABLE: Disable power
- * @return 		Setting status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- CGU_ERROR_INVALID_ENTITY: Invalid entity
+ * @brief        Enable clock entity
+ * @param[in]    ClockEntity    Clock entity, should be:
+ *                     - CGU_CLKSRC_32KHZ_OSC        :32Khz oscillator
+ *                     - CGU_CLKSRC_IRC            :IRC clock
+ *                     - CGU_CLKSRC_ENET_RX_CLK    :Ethernet receive clock
+ *                     - CGU_CLKSRC_ENET_TX_CLK    :Ethernet transmit clock
+ *                     - CGU_CLKSRC_GP_CLKIN        :General purpose input clock
+ *                     - CGU_CLKSRC_XTAL_OSC        :Crystal oscillator
+ *                     - CGU_CLKSRC_PLL0            :PLL0 clock
+ *                     - CGU_CLKSRC_PLL1            :PLL1 clock
+ *                     - CGU_CLKSRC_IDIVA            :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB            :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC            :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD            :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE            :Integer divider register E
+ *                     - CGU_BASE_SAFE                :Base safe clock (always on)for WDT
+ *                     - CGU_BASE_USB0                :Base clock for USB0
+ *                     - CGU_BASE_PERIPH            :Base clock for Peripheral bus
+ *                     - CGU_BASE_USB1                :Base clock for USB1
+ *                     - CGU_BASE_M4                :System base clock for ARM Cortex-M3 core
+ *                                                  and APB peripheral blocks #0 and #2
+ *                     - CGU_BASE_SPIFI            :Base clock for SPIFI
+ *                     - CGU_BASE_PHY_RX            :Base clock for Ethernet PHY Rx
+ *                     - CGU_BASE_PHY_TX            :Base clock for Ethernet PHY Tx
+ *                     - CGU_BASE_APB1                :Base clock for APB peripheral block #1
+ *                     - CGU_BASE_APB3                :Base clock for APB peripheral block #3
+ *                     - CGU_BASE_LCD                :Base clock for LCD
+ *                     - CGU_BASE_SDIO                :Base clock for SDIO card reader
+ *                     - CGU_BASE_SSP0                :Base clock for SSP0
+ *                     - CGU_BASE_SSP1                :Base clock for SSP1
+ *                     - CGU_BASE_UART0            :Base clock for UART0
+ *                     - CGU_BASE_UART1            :Base clock for UART1
+ *                     - CGU_BASE_UART2            :Base clock for UART2
+ *                     - CGU_BASE_UART3            :Base clock for UART3
+ *                     - CGU_BASE_CLKOUT            :Base clock for CLKOUT pin
+ * @param[in]    en status, should be:
+ *                     - ENABLE: Enable power
+ *                     - DISABLE: Disable power
+ * @return         Setting status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - CGU_ERROR_INVALID_ENTITY: Invalid entity
  **********************************************************************/
 uint32_t CGU_EnableEntity(CGU_ENTITY_T ClockEntity, uint32_t en)
 {
@@ -706,53 +706,53 @@ uint32_t CGU_EnableEntity(CGU_ENTITY_T ClockEntity, uint32_t en)
 }
 
 /*********************************************************************//**
- * @brief		Connect entity clock source
- * @param[in]	ClockSource	Clock source, should be:
- * 					- CGU_CLKSRC_32KHZ_OSC		:32Khz oscillator
- * 					- CGU_CLKSRC_IRC			:IRC clock
- * 					- CGU_CLKSRC_ENET_RX_CLK	:Ethernet receive clock
- * 					- CGU_CLKSRC_ENET_TX_CLK	:Ethernet transmit clock
- * 					- CGU_CLKSRC_GP_CLKIN		:General purpose input clock
- * 					- CGU_CLKSRC_XTAL_OSC		:Crystal oscillator
- * 					- CGU_CLKSRC_PLL0			:PLL0 clock
- * 					- CGU_CLKSRC_PLL1			:PLL1 clock
- * 					- CGU_CLKSRC_IDIVA			:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB			:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC			:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD			:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE			:Integer divider register E
- * @param[in]	ClockEntity	Clock entity, should be:
- * 					- CGU_CLKSRC_PLL0			:PLL0 clock
- * 					- CGU_CLKSRC_PLL1			:PLL1 clock
- * 					- CGU_CLKSRC_IDIVA			:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB			:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC			:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD			:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE			:Integer divider register E
- * 					- CGU_BASE_SAFE				:Base safe clock (always on)for WDT
- * 					- CGU_BASE_USB0				:Base clock for USB0
- * 					- CGU_BASE_USB1				:Base clock for USB1
- * 					- CGU_BASE_M4				:System base clock for ARM Cortex-M3 core
- * 												 and APB peripheral blocks #0 and #2
- * 					- CGU_BASE_SPIFI			:Base clock for SPIFI
- * 					- CGU_BASE_PHY_RX			:Base clock for Ethernet PHY Rx
- * 					- CGU_BASE_PHY_TX			:Base clock for Ethernet PHY Tx
- * 					- CGU_BASE_APB1				:Base clock for APB peripheral block #1
- * 					- CGU_BASE_APB3				:Base clock for APB peripheral block #3
- * 					- CGU_BASE_LCD				:Base clock for LCD
- * 					- CGU_BASE_SDIO				:Base clock for SDIO card reader
- * 					- CGU_BASE_SSP0				:Base clock for SSP0
- * 					- CGU_BASE_SSP1				:Base clock for SSP1
- * 					- CGU_BASE_UART0			:Base clock for UART0
- * 					- CGU_BASE_UART1			:Base clock for UART1
- * 					- CGU_BASE_UART2			:Base clock for UART2
- * 					- CGU_BASE_UART3			:Base clock for UART3
- * 					- CGU_BASE_CLKOUT			:Base clock for CLKOUT pin
- * @return 		Setting status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- CGU_ERROR_CONNECT_TOGETHER: Error when 2 clock source connect together
- * 					- CGU_ERROR_INVALID_CLOCK_SOURCE: Invalid clock source error
- * 					- CGU_ERROR_INVALID_ENTITY: Invalid entity error
+ * @brief        Connect entity clock source
+ * @param[in]    ClockSource    Clock source, should be:
+ *                     - CGU_CLKSRC_32KHZ_OSC        :32Khz oscillator
+ *                     - CGU_CLKSRC_IRC            :IRC clock
+ *                     - CGU_CLKSRC_ENET_RX_CLK    :Ethernet receive clock
+ *                     - CGU_CLKSRC_ENET_TX_CLK    :Ethernet transmit clock
+ *                     - CGU_CLKSRC_GP_CLKIN        :General purpose input clock
+ *                     - CGU_CLKSRC_XTAL_OSC        :Crystal oscillator
+ *                     - CGU_CLKSRC_PLL0            :PLL0 clock
+ *                     - CGU_CLKSRC_PLL1            :PLL1 clock
+ *                     - CGU_CLKSRC_IDIVA            :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB            :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC            :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD            :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE            :Integer divider register E
+ * @param[in]    ClockEntity    Clock entity, should be:
+ *                     - CGU_CLKSRC_PLL0            :PLL0 clock
+ *                     - CGU_CLKSRC_PLL1            :PLL1 clock
+ *                     - CGU_CLKSRC_IDIVA            :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB            :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC            :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD            :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE            :Integer divider register E
+ *                     - CGU_BASE_SAFE                :Base safe clock (always on)for WDT
+ *                     - CGU_BASE_USB0                :Base clock for USB0
+ *                     - CGU_BASE_USB1                :Base clock for USB1
+ *                     - CGU_BASE_M4                :System base clock for ARM Cortex-M3 core
+ *                                                  and APB peripheral blocks #0 and #2
+ *                     - CGU_BASE_SPIFI            :Base clock for SPIFI
+ *                     - CGU_BASE_PHY_RX            :Base clock for Ethernet PHY Rx
+ *                     - CGU_BASE_PHY_TX            :Base clock for Ethernet PHY Tx
+ *                     - CGU_BASE_APB1                :Base clock for APB peripheral block #1
+ *                     - CGU_BASE_APB3                :Base clock for APB peripheral block #3
+ *                     - CGU_BASE_LCD                :Base clock for LCD
+ *                     - CGU_BASE_SDIO                :Base clock for SDIO card reader
+ *                     - CGU_BASE_SSP0                :Base clock for SSP0
+ *                     - CGU_BASE_SSP1                :Base clock for SSP1
+ *                     - CGU_BASE_UART0            :Base clock for UART0
+ *                     - CGU_BASE_UART1            :Base clock for UART1
+ *                     - CGU_BASE_UART2            :Base clock for UART2
+ *                     - CGU_BASE_UART3            :Base clock for UART3
+ *                     - CGU_BASE_CLKOUT            :Base clock for CLKOUT pin
+ * @return         Setting status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - CGU_ERROR_CONNECT_TOGETHER: Error when 2 clock source connect together
+ *                     - CGU_ERROR_INVALID_CLOCK_SOURCE: Invalid clock source error
+ *                     - CGU_ERROR_INVALID_ENTITY: Invalid entity error
  **********************************************************************/
 /* Connect one entity into clock source */
 uint32_t CGU_EntityConnect(CGU_ENTITY_T ClockSource, CGU_ENTITY_T ClockEntity)
@@ -801,17 +801,17 @@ uint32_t CGU_EntityConnect(CGU_ENTITY_T ClockSource, CGU_ENTITY_T ClockEntity)
 
 
 /*********************************************************************//**
- * @brief		Get current USB PLL clock from XTAL
- * @param[in]	None
- * @return 		Returned clock value
+ * @brief        Get current USB PLL clock from XTAL
+ * @param[in]    None
+ * @return         Returned clock value
  **********************************************************************/
 uint32_t CGU_SetPLL0(void)
 {
     // Setup PLL550 to generate 480MHz from 12 MHz crystal
-    LPC_CGU->PLL0USB_CTRL |= 1; 	// Power down PLL
-    //	P			N
+    LPC_CGU->PLL0USB_CTRL |= 1;     // Power down PLL
+    //    P            N
     LPC_CGU->PLL0USB_NP_DIV = (98 << 0) | (514 << 12);
-    //	SELP	SELI	SELR	MDEC
+    //    SELP    SELI    SELR    MDEC
     LPC_CGU->PLL0USB_MDIV = (0xB << 17) | (0x10 << 22) | (0 << 28) | (0x7FFA << 0);
     LPC_CGU->PLL0USB_CTRL = (CGU_CLKSRC_XTAL_OSC << 24) | (0x3 << 2) | (1 << 4);
     return CGU_ERROR_SUCCESS;
@@ -820,9 +820,9 @@ uint32_t CGU_SetPLL0(void)
 
 
 /*********************************************************************//**
- * @brief		Get current Audio PLL clock from XTAL
- * @param[in]	None
- * @return 		Returned clock value
+ * @brief        Get current Audio PLL clock from XTAL
+ * @param[in]    None
+ * @return         Returned clock value
  **********************************************************************/
 uint32_t CGU_SetPLL0audio(void)
 {
@@ -835,11 +835,11 @@ uint32_t CGU_SetPLL0audio(void)
                               | _BIT(0); /* power down */
     /* PLL should be set to 512fs rate 512 * 48000 =  24576000 Hz */
     /* set mdec register */
-#if 1   	// results from gcc program
+#if 1       // results from gcc program
     LPC_CGU->PLL0AUDIO_MDIV = 0x23e34d3;
     LPC_CGU->PLL0AUDIO_NP_DIV = 0x3f00e;
     LPC_CGU->PLL0AUDIO_CTRL = (6 << 24)   /* source = XTAL OSC 12 MHz */
-                              | (6 << 12)		 // fractional divider off and bypassed
+                              | (6 << 12)         // fractional divider off and bypassed
                               | _BIT(4);   /* CLKEN */
 #else
     LPC_CGU->PLL0AUDIO_MDIV = (0 << 28)  /* SELR */
@@ -864,13 +864,13 @@ uint32_t CGU_SetPLL0audio(void)
 
 
 /*********************************************************************//**
- * @brief		Setting PLL1
- * @param[in]	mult	Multiple value
- * @return 		Setting status, could be:
- * 					- CGU_ERROR_SUCCESS: successful
- * 					- CGU_ERROR_INVALID_PARAM: Invalid parameter error
+ * @brief        Setting PLL1
+ * @param[in]    mult    Multiple value
+ * @return         Setting status, could be:
+ *                     - CGU_ERROR_SUCCESS: successful
+ *                     - CGU_ERROR_INVALID_PARAM: Invalid parameter error
  **********************************************************************/
-uint32_t	CGU_SetPLL1(uint32_t mult)
+uint32_t    CGU_SetPLL1(uint32_t mult)
 {
     uint32_t msel = 0, nsel = 0, psel = 0, pval = 1;
     uint32_t freq;
@@ -890,12 +890,12 @@ uint32_t	CGU_SetPLL1(uint32_t mult)
             pval *= 2;
         }
 
-//		if(2*(pval)*freq > 320000000) {
-//			//THIS IS OUT OF RANGE!!!
-//			//HOW DO WE ASSERT IN SAMPLE CODE?
-//			//__breakpoint(0);
-//			return CGU_ERROR_INVALID_PARAM;
-//		}
+//        if(2*(pval)*freq > 320000000) {
+//            //THIS IS OUT OF RANGE!!!
+//            //HOW DO WE ASSERT IN SAMPLE CODE?
+//            //__breakpoint(0);
+//            return CGU_ERROR_INVALID_PARAM;
+//        }
         LPC_CGU->PLL1_CTRL |= (msel << 16) | (nsel << 12) | (psel << 8) | CGU_PLL1_FBSEL_MASK;
 
     } else if (freq < 320000000) {
@@ -910,25 +910,25 @@ uint32_t	CGU_SetPLL1(uint32_t mult)
 
 
 /*********************************************************************//**
- * @brief		Get current base status
- * @param[in]	Base	Base type, should be:
- * 					- CGU_BASE_USB0				:Base clock for USB0
- * 					- CGU_BASE_USB1				:Base clock for USB1
- * 					- CGU_BASE_M4				:System base clock for ARM Cortex-M3 core
- * 												 and APB peripheral blocks #0 and #2
- * 					- CGU_BASE_SPIFI			:Base clock for SPIFI
- * 					- CGU_BASE_APB1				:Base clock for APB peripheral block #1
- * 					- CGU_BASE_APB3				:Base clock for APB peripheral block #3
- * 					- CGU_BASE_SDIO				:Base clock for SDIO card reader
- * 					- CGU_BASE_SSP0				:Base clock for SSP0
- * 					- CGU_BASE_SSP1				:Base clock for SSP1
- * 					- CGU_BASE_UART0			:Base clock for UART0
- * 					- CGU_BASE_UART1			:Base clock for UART1
- * 					- CGU_BASE_UART2			:Base clock for UART2
- * 					- CGU_BASE_UART3			:Base clock for UART3
- * @return 		Always return 0
+ * @brief        Get current base status
+ * @param[in]    Base    Base type, should be:
+ *                     - CGU_BASE_USB0                :Base clock for USB0
+ *                     - CGU_BASE_USB1                :Base clock for USB1
+ *                     - CGU_BASE_M4                :System base clock for ARM Cortex-M3 core
+ *                                                  and APB peripheral blocks #0 and #2
+ *                     - CGU_BASE_SPIFI            :Base clock for SPIFI
+ *                     - CGU_BASE_APB1                :Base clock for APB peripheral block #1
+ *                     - CGU_BASE_APB3                :Base clock for APB peripheral block #3
+ *                     - CGU_BASE_SDIO                :Base clock for SDIO card reader
+ *                     - CGU_BASE_SSP0                :Base clock for SSP0
+ *                     - CGU_BASE_SSP1                :Base clock for SSP1
+ *                     - CGU_BASE_UART0            :Base clock for UART0
+ *                     - CGU_BASE_UART1            :Base clock for UART1
+ *                     - CGU_BASE_UART2            :Base clock for UART2
+ *                     - CGU_BASE_UART3            :Base clock for UART3
+ * @return         Always return 0
  **********************************************************************/
-uint32_t	CGU_GetBaseStatus(CGU_ENTITY_T Base)
+uint32_t    CGU_GetBaseStatus(CGU_ENTITY_T Base)
 {
     switch (Base) {
         /*CCU1*/
@@ -985,46 +985,46 @@ uint32_t	CGU_GetBaseStatus(CGU_ENTITY_T Base)
 
 
 /*********************************************************************//**
- * @brief		Compare one source clock to IRC clock
- * @param[in]	Clock	Clock entity that will be compared to IRC, should be:
- * 					- CGU_CLKSRC_32KHZ_OSC		:32Khz crystal oscillator
- * 					- CGU_CLKSRC_ENET_RX_CLK	:Ethernet receive clock
- * 					- CGU_CLKSRC_ENET_TX_CLK	:Ethernet transmit clock
- * 					- CGU_CLKSRC_GP_CLKIN		:General purpose input clock
- * 					- CGU_CLKSRC_XTAL_OSC		:Crystal oscillator
- * 					- CGU_CLKSRC_PLL0			:PLL0 clock
- * 					- CGU_CLKSRC_PLL1			:PLL1 clock
- * 					- CGU_CLKSRC_IDIVA			:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB			:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC			:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD			:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE			:Integer divider register E
- * 					- CGU_BASE_SAFE				:Base safe clock (always on)for WDT
- * 					- CGU_BASE_USB0				:Base clock for USB0
- * 					- CGU_BASE_USB1				:Base clock for USB1
- * 					- CGU_BASE_M4				:System base clock for ARM Cortex-M3 core
- * 												 and APB peripheral blocks #0 and #2
- * 					- CGU_BASE_SPIFI			:Base clock for SPIFI
- * 					- CGU_BASE_PHY_RX			:Base clock for Ethernet PHY Rx
- * 					- CGU_BASE_PHY_TX			:Base clock for Ethernet PHY Tx
- * 					- CGU_BASE_APB1				:Base clock for APB peripheral block #1
- * 					- CGU_BASE_APB3				:Base clock for APB peripheral block #3
- * 					- CGU_BASE_LCD				:Base clock for LCD
- * 					- CGU_BASE_SDIO				:Base clock for SDIO card reader
- * 					- CGU_BASE_SSP0				:Base clock for SSP0
- * 					- CGU_BASE_SSP1				:Base clock for SSP1
- * 					- CGU_BASE_UART0			:Base clock for UART0
- * 					- CGU_BASE_UART1			:Base clock for UART1
- * 					- CGU_BASE_UART2			:Base clock for UART2
- * 					- CGU_BASE_UART3			:Base clock for UART3
- * 					- CGU_BASE_CLKOUT			:Base clock for CLKOUT pin
- * @param[in]	m	Multiple value pointer
- * @param[in]	d	Divider value pointer
- * @return 		Compare status, could be:
- * 					- (-1): fail
- * 					- 0: successful
- * @note		Formula used to compare:
- * 				FClock = F_IRC* m / d
+ * @brief        Compare one source clock to IRC clock
+ * @param[in]    Clock    Clock entity that will be compared to IRC, should be:
+ *                     - CGU_CLKSRC_32KHZ_OSC        :32Khz crystal oscillator
+ *                     - CGU_CLKSRC_ENET_RX_CLK    :Ethernet receive clock
+ *                     - CGU_CLKSRC_ENET_TX_CLK    :Ethernet transmit clock
+ *                     - CGU_CLKSRC_GP_CLKIN        :General purpose input clock
+ *                     - CGU_CLKSRC_XTAL_OSC        :Crystal oscillator
+ *                     - CGU_CLKSRC_PLL0            :PLL0 clock
+ *                     - CGU_CLKSRC_PLL1            :PLL1 clock
+ *                     - CGU_CLKSRC_IDIVA            :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB            :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC            :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD            :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE            :Integer divider register E
+ *                     - CGU_BASE_SAFE                :Base safe clock (always on)for WDT
+ *                     - CGU_BASE_USB0                :Base clock for USB0
+ *                     - CGU_BASE_USB1                :Base clock for USB1
+ *                     - CGU_BASE_M4                :System base clock for ARM Cortex-M3 core
+ *                                                  and APB peripheral blocks #0 and #2
+ *                     - CGU_BASE_SPIFI            :Base clock for SPIFI
+ *                     - CGU_BASE_PHY_RX            :Base clock for Ethernet PHY Rx
+ *                     - CGU_BASE_PHY_TX            :Base clock for Ethernet PHY Tx
+ *                     - CGU_BASE_APB1                :Base clock for APB peripheral block #1
+ *                     - CGU_BASE_APB3                :Base clock for APB peripheral block #3
+ *                     - CGU_BASE_LCD                :Base clock for LCD
+ *                     - CGU_BASE_SDIO                :Base clock for SDIO card reader
+ *                     - CGU_BASE_SSP0                :Base clock for SSP0
+ *                     - CGU_BASE_SSP1                :Base clock for SSP1
+ *                     - CGU_BASE_UART0            :Base clock for UART0
+ *                     - CGU_BASE_UART1            :Base clock for UART1
+ *                     - CGU_BASE_UART2            :Base clock for UART2
+ *                     - CGU_BASE_UART3            :Base clock for UART3
+ *                     - CGU_BASE_CLKOUT            :Base clock for CLKOUT pin
+ * @param[in]    m    Multiple value pointer
+ * @param[in]    d    Divider value pointer
+ * @return         Compare status, could be:
+ *                     - (-1): fail
+ *                     - 0: successful
+ * @note        Formula used to compare:
+ *                 FClock = F_IRC* m / d
  **********************************************************************/
 int CGU_FrequencyMonitor(CGU_ENTITY_T Clock, uint32_t *m, uint32_t *d)
 {
@@ -1069,48 +1069,48 @@ int CGU_FrequencyMonitor(CGU_ENTITY_T Clock, uint32_t *m, uint32_t *d)
 }
 
 /*********************************************************************//**
- * @brief		Compare one source clock to another source clock
- * @param[in]	Clock	Clock entity that will be compared to second source, should be:
- * 					- CGU_CLKSRC_32KHZ_OSC		:32Khz crystal oscillator
- * 					- CGU_CLKSRC_ENET_RX_CLK	:Ethernet receive clock
- * 					- CGU_CLKSRC_ENET_TX_CLK	:Ethernet transmit clock
- * 					- CGU_CLKSRC_GP_CLKIN		:General purpose input clock
- * 					- CGU_CLKSRC_XTAL_OSC		:Crystal oscillator
- * 					- CGU_CLKSRC_PLL0			:PLL0 clock
- * 					- CGU_CLKSRC_PLL1			:PLL1 clock
- * 					- CGU_CLKSRC_IDIVA			:Integer divider register A
- * 					- CGU_CLKSRC_IDIVB			:Integer divider register B
- * 					- CGU_CLKSRC_IDIVC			:Integer divider register C
- * 					- CGU_CLKSRC_IDIVD			:Integer divider register D
- * 					- CGU_CLKSRC_IDIVE			:Integer divider register E
- * 					- CGU_BASE_SAFE				:Base safe clock (always on)for WDT
- * 					- CGU_BASE_USB0				:Base clock for USB0
- * 					- CGU_BASE_USB1				:Base clock for USB1
- * 					- CGU_BASE_M4				:System base clock for ARM Cortex-M3 core
- * 												 and APB peripheral blocks #0 and #2
- * 					- CGU_BASE_SPIFI			:Base clock for SPIFI
- * 					- CGU_BASE_PHY_RX			:Base clock for Ethernet PHY Rx
- * 					- CGU_BASE_PHY_TX			:Base clock for Ethernet PHY Tx
- * 					- CGU_BASE_APB1				:Base clock for APB peripheral block #1
- * 					- CGU_BASE_APB3				:Base clock for APB peripheral block #3
- * 					- CGU_BASE_LCD				:Base clock for LCD
- * 					- CGU_BASE_SDIO				:Base clock for SDIO card reader
- * 					- CGU_BASE_SSP0				:Base clock for SSP0
- * 					- CGU_BASE_SSP1				:Base clock for SSP1
- * 					- CGU_BASE_UART0			:Base clock for UART0
- * 					- CGU_BASE_UART1			:Base clock for UART1
- * 					- CGU_BASE_UART2			:Base clock for UART2
- * 					- CGU_BASE_UART3			:Base clock for UART3
- * 					- CGU_BASE_CLKOUT			:Base clock for CLKOUT pin
- * @param[in]	CompareToClock	Clock source that to be compared to first source, should be different
- * 				to first source.
- * @param[in]	m	Multiple value pointer
- * @param[in]	d	Divider value pointer
- * @return 		Compare status, could be:
- * 					- (-1): fail
- * 					- 0: successful
- * @note		Formula used to compare:
- * 				FClock = m*FCompareToClock/d
+ * @brief        Compare one source clock to another source clock
+ * @param[in]    Clock    Clock entity that will be compared to second source, should be:
+ *                     - CGU_CLKSRC_32KHZ_OSC        :32Khz crystal oscillator
+ *                     - CGU_CLKSRC_ENET_RX_CLK    :Ethernet receive clock
+ *                     - CGU_CLKSRC_ENET_TX_CLK    :Ethernet transmit clock
+ *                     - CGU_CLKSRC_GP_CLKIN        :General purpose input clock
+ *                     - CGU_CLKSRC_XTAL_OSC        :Crystal oscillator
+ *                     - CGU_CLKSRC_PLL0            :PLL0 clock
+ *                     - CGU_CLKSRC_PLL1            :PLL1 clock
+ *                     - CGU_CLKSRC_IDIVA            :Integer divider register A
+ *                     - CGU_CLKSRC_IDIVB            :Integer divider register B
+ *                     - CGU_CLKSRC_IDIVC            :Integer divider register C
+ *                     - CGU_CLKSRC_IDIVD            :Integer divider register D
+ *                     - CGU_CLKSRC_IDIVE            :Integer divider register E
+ *                     - CGU_BASE_SAFE                :Base safe clock (always on)for WDT
+ *                     - CGU_BASE_USB0                :Base clock for USB0
+ *                     - CGU_BASE_USB1                :Base clock for USB1
+ *                     - CGU_BASE_M4                :System base clock for ARM Cortex-M3 core
+ *                                                  and APB peripheral blocks #0 and #2
+ *                     - CGU_BASE_SPIFI            :Base clock for SPIFI
+ *                     - CGU_BASE_PHY_RX            :Base clock for Ethernet PHY Rx
+ *                     - CGU_BASE_PHY_TX            :Base clock for Ethernet PHY Tx
+ *                     - CGU_BASE_APB1                :Base clock for APB peripheral block #1
+ *                     - CGU_BASE_APB3                :Base clock for APB peripheral block #3
+ *                     - CGU_BASE_LCD                :Base clock for LCD
+ *                     - CGU_BASE_SDIO                :Base clock for SDIO card reader
+ *                     - CGU_BASE_SSP0                :Base clock for SSP0
+ *                     - CGU_BASE_SSP1                :Base clock for SSP1
+ *                     - CGU_BASE_UART0            :Base clock for UART0
+ *                     - CGU_BASE_UART1            :Base clock for UART1
+ *                     - CGU_BASE_UART2            :Base clock for UART2
+ *                     - CGU_BASE_UART3            :Base clock for UART3
+ *                     - CGU_BASE_CLKOUT            :Base clock for CLKOUT pin
+ * @param[in]    CompareToClock    Clock source that to be compared to first source, should be different
+ *                 to first source.
+ * @param[in]    m    Multiple value pointer
+ * @param[in]    d    Divider value pointer
+ * @return         Compare status, could be:
+ *                     - (-1): fail
+ *                     - 0: successful
+ * @note        Formula used to compare:
+ *                 FClock = m*FCompareToClock/d
  **********************************************************************/
 uint32_t CGU_RealFrequencyCompare(CGU_ENTITY_T Clock, CGU_ENTITY_T CompareToClock, uint32_t *m, uint32_t *d)
 {

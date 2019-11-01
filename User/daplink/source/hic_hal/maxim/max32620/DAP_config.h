@@ -14,7 +14,7 @@ Provides definitions about:
 */
 
 #include <stdio.h>
-#include "max32620.h"	// Debug Unit Cortex-M Processor Header File
+#include "max32620.h"    // Debug Unit Cortex-M Processor Header File
 #include "clkman_regs.h"
 #include "gpio_regs.h"
 #include "IO_Config.h"

@@ -42,11 +42,11 @@
 #else
 //#error "CMSIS core headers needed"
 
-	#include "stm32h7xx_hal.h"
+    #include "stm32h7xx_hal.h"
 #endif
-#define OS_CLOCK	400000000
+#define OS_CLOCK    400000000
 
-#define OS_TICK		400000
+#define OS_TICK        400000
 
 ////SysTick Timer Configuration
 //#ifndef OS_CLOCK

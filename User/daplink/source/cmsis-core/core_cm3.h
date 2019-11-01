@@ -100,7 +100,7 @@
   #define __INLINE         inline                                     /*!< inline keyword for TASKING Compiler   */
   #define __STATIC_INLINE  static inline
 
-#elif defined ( __CSMC__ )	/* Cosmic */
+#elif defined ( __CSMC__ )    /* Cosmic */
   #define __packed
   #define __ASM            _asm                                      /*!< asm keyword for COSMIC Compiler      */
   #define __INLINE         inline                                    /*use -pc99 on compile line !< inline keyword for COSMIC Compiler   */
@@ -137,8 +137,8 @@
     #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
   #endif
 
-#elif defined ( __CSMC__ )		/* Cosmic */
-  #if ( __CSMC__ & 0x400)		// FPU present for parser
+#elif defined ( __CSMC__ )        /* Cosmic */
+  #if ( __CSMC__ & 0x400)        // FPU present for parser
     #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
   #endif
 #endif

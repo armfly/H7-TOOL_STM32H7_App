@@ -143,8 +143,8 @@ static __inline void pin_out_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
 
 //#define GPIO_OTYPER_OT_0                 ((uint32_t)0x00000001)    
 //#define GPIO_OUTPUT_TYPE      ((uint32_t)0x00000010)
-	
-	  uint32_t temp;
+    
+      uint32_t temp;
 
       /*--------------------- GPIO Mode Configuration ------------------------*/
 
@@ -156,7 +156,7 @@ static __inline void pin_out_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
       temp = GPIOx->MODER;
       temp &= ~(0x3U << (pin_bit * 2));
       temp |= ((0x00000001U & 0x00000003) << (pin_bit * 2));
-      GPIOx->MODER = temp;		
+      GPIOx->MODER = temp;        
 
       /* In case of Output or Alternate function mode selection */
 //      if((GPIO_Init->Mode == GPIO_MODE_OUTPUT_PP) || (GPIO_Init->Mode == GPIO_MODE_AF_PP) ||
@@ -175,12 +175,12 @@ static __inline void pin_out_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
 //        temp &= ~(GPIO_OTYPER_OT_0 << pin_bit) ;
 //        temp |= (((GPIO_Init->Mode & GPIO_OUTPUT_TYPE) >> 4) << pin_bit);
 //        GPIOx->OTYPER = temp;
-		
-		/* 优化 */
+        
+        /* 优化 */
         temp = GPIOx->OTYPER;
         temp &= ~(0x00000001 << pin_bit) ;
         //temp |= (((0x00000001U & 0x00000010) >> 4) << pin_bit);
-        GPIOx->OTYPER = temp;		
+        GPIOx->OTYPER = temp;        
 //      }
 
       /* Activate the Pull-up or Pull down resistor for the current IO */
@@ -247,8 +247,8 @@ static __inline void pin_in_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
 
 //#define GPIO_OTYPER_OT_0                 ((uint32_t)0x00000001)    
 //#define GPIO_OUTPUT_TYPE      ((uint32_t)0x00000010)
-	
-	  uint32_t temp;
+    
+      uint32_t temp;
 
       /*--------------------- GPIO Mode Configuration ------------------------*/
 
@@ -260,7 +260,7 @@ static __inline void pin_in_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
       temp = GPIOx->MODER;
       temp &= ~(0x3U << (pin_bit * 2));
       //temp |= ((0x00000000U & 0x00000003) << (pin_bit * 2));
-      GPIOx->MODER = temp;		
+      GPIOx->MODER = temp;        
 
       /* In case of Output or Alternate function mode selection */
 //      if((GPIO_Init->Mode == GPIO_MODE_OUTPUT_PP) || (GPIO_Init->Mode == GPIO_MODE_AF_PP) ||
@@ -279,12 +279,12 @@ static __inline void pin_in_init(GPIO_TypeDef* GPIOx, uint8_t pin_bit)
 //        temp &= ~(GPIO_OTYPER_OT_0 << pin_bit) ;
 //        temp |= (((GPIO_Init->Mode & GPIO_OUTPUT_TYPE) >> 4) << pin_bit);
 //        GPIOx->OTYPER = temp;
-		
-		/* 优化 */
+        
+        /* 优化 */
 //        temp = GPIOx->OTYPER;
 //        temp &= ~(0x00000001 << pin_bit) ;
 //        //temp |= (((0x00000000U & 0x00000010) >> 4) << pin_bit);
-//        GPIOx->OTYPER = temp;		
+//        GPIOx->OTYPER = temp;        
 //      }
 
       /* Activate the Pull-up or Pull down resistor for the current IO */
@@ -354,10 +354,10 @@ static __inline void PORT_SWD_SETUP(void)
 {
     // Set SWCLK HIGH
     SWCLK_TCK_PIN_PORT->BSRRL = SWCLK_TCK_PIN;
-	
+    
     // Set SWDIO HIGH
     SWDIO_OUT_PIN_PORT->BSRRL = SWDIO_OUT_PIN;
-	
+    
     // Set RESET HIGH
     //pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);//TODO - fix reset logic
     nRESET_PIN_PORT->BSRRL = nRESET_PIN;
@@ -451,9 +451,9 @@ called prior \ref PIN_SWDIO_OUT function calls.
 */
 static __forceinline void PIN_SWDIO_OUT_ENABLE(void)
 {
-	GPIOG->BSRRL = GPIO_PIN_9;	/* PG9 = 1 是输出 */	
+    GPIOG->BSRRL = GPIO_PIN_9;    /* PG9 = 1 是输出    */    
     pin_out_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
-	
+    
     SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
 }
 
@@ -464,9 +464,9 @@ called prior \ref PIN_SWDIO_IN function calls.
 //static __forceinline void PIN_SWDIO_OUT_DISABLE(void)
 static  void PIN_SWDIO_OUT_DISABLE(void)
 {
-	GPIOG->BSRRH = GPIO_PIN_9;	/* PG9 = 0 是输入 */	
+    GPIOG->BSRRH = GPIO_PIN_9;    /* PG9 = 0 是输入       */    
     pin_in_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
-	
+    
     SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
 }
 
@@ -610,7 +610,7 @@ static __inline void DAP_SETUP(void)
 //    __HAL_RCC_GPIOB_CLK_ENABLE();
 //    __HAL_RCC_GPIOC_CLK_ENABLE();
 //    __HAL_RCC_GPIOD_CLK_ENABLE();
-//	
+//    
 //    /* Configure I/O pin SWCLK */
 //    pin_out_init(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN_Bit);
 //    SWCLK_TCK_PIN_PORT->BSRR = SWCLK_TCK_PIN;
@@ -625,13 +625,13 @@ static __inline void DAP_SETUP(void)
 
 //    pin_out_init(CONNECTED_LED_PORT, CONNECTED_LED_PIN_Bit);
 //    CONNECTED_LED_PORT->BSRR = CONNECTED_LED_PIN;
-	EIO_D4_Config(ES_GPIO_OUT);		/* RESET - 输出 */
-	EIO_D6_Config(ES_GPIO_OUT);		/* SWCLK - 输出 */
-	EIO_D8_Config(ES_GPIO_OUT);		/* SWDIO - 输出 */
-	
-	EIO_D2_Config(ES_GPIO_OUT);		/* 测试引脚 - 输出 */
-	
-	bsp_InitSPI2_Fast();
+    EIO_D4_Config(ES_GPIO_OUT);        /* RESET - 输出 */
+    EIO_D6_Config(ES_GPIO_OUT);        /* SWCLK - 输出 */
+    EIO_D8_Config(ES_GPIO_OUT);        /* SWDIO - 输出 */
+    
+    EIO_D2_Config(ES_GPIO_OUT);        /* 测试引脚 - 输出 */
+    
+    bsp_InitSPI2_Fast();
 }
 
 /** Reset Target Device with custom specific I/O pin or command sequence.

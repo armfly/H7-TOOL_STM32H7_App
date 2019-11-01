@@ -1102,7 +1102,7 @@ HAL_StatusTypeDef HAL_RTC_SetAlarm_IT(RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef 
   }
 
     /* RTC Alarm Interrupt Configuration: EXTI configuration */
-     __HAL_RTC_ALARM_EXTI_ENABLE_IT();	 
+     __HAL_RTC_ALARM_EXTI_ENABLE_IT();     
  
   __HAL_RTC_ALARM_EXTI_ENABLE_RISING_EDGE();
   /*  Enable the write protection for RTC registers */
