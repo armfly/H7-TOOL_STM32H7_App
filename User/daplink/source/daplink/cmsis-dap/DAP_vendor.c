@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  * Copyright (c) 2013-2016 ARM Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
@@ -62,7 +62,7 @@ uint32_t DAP_ProcessVendorCommand(const uint8_t *request, uint8_t *response) {
   uint32_t num = (1U << 16) | 1U;
 
   *response++ = *request;        // copy Command ID
-#if 0 // armfly ÁÙÊ±ÆÁ±Î
+#if 0 // armfly ä¸´æ—¶å±è”½
   switch (*request++) {          // first byte in request is Command ID
     case ID_DAP_Vendor0: {
         const char *id_str = info_get_unique_id();

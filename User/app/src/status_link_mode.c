@@ -15,6 +15,7 @@
 */
 #include "bsp.h"
 #include "main.h"
+#include "usbd_user.h"
 
 /*
 *********************************************************************************************************
@@ -78,11 +79,11 @@ void status_LinkMode(void)
 
                 tFont.FrontColor = CL_BLACK; /* 黑字 */
                 y = 10 * line_cap;
-                sprintf(buf, "长按S进入系统设置", &tFont);
+                sprintf(buf, "长按S进入系统设置");
 
                 LCD_DispStr(x, y, buf, &tFont);
                 y = 11 * line_cap;
-                sprintf(buf, "长按C切换方向", &tFont);
+                sprintf(buf, "长按C切换方向");
                 LCD_DispStr(x, y, buf, &tFont);
             }
         }
@@ -96,7 +97,7 @@ void status_LinkMode(void)
             case KEY_DOWN_S: /* S键按下 */
                 break;
 
-            case KEY_UP_S: /* S键释放 */
+            case KEY_UP_S:   /* S键释放 */
                 g_MainStatus = NextStatus(MS_LINK_MODE);
                 break;
 
@@ -136,8 +137,11 @@ void status_LinkMode(void)
         }
     }
 
-    usbd_CloseCDC();
-    usbd_OpenCDC(1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
+	if (g_MainStatus != MS_SYSTEM_SET)
+    {
+        usbd_CloseCDC();
+        usbd_OpenCDC(1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
+    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -3,19 +3,20 @@
 *
 *    模块名称 : H7-TOOL App主程序
 *    文件名称 : main.c
-*    版    本 : V1.0
+*    版    本 : V1.1
 *    说    明 : 
 *
 *    修改记录 :
 *        版本号  日期        作者     说明
 *        V1.0    2019-10-01 armfly  正式发布
+*        V1.1    2019-11-02 armfly  整理格式。增加功能。
 *
 *    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
 */
 
-#include "bsp.h" /* printf函数定向输出到串口，所以必须包含这个文件 */
+#include "bsp.h"
 #include "main.h"
 
 #include "status_link_mode.h"
@@ -41,24 +42,24 @@
 
 static void DispLogo(void);
 
-uint16_t g_MainStatus;
+uint16_t g_MainStatus;  /* 主状态字 */
 
 /* 主状态切换顺序 */
 static const uint16_t StatusOrder[] =
-        {
-                MS_LINK_MODE,             /* 联机状态 */
-                MS_VOLTAGE_METER,    /* 电压表 */
-                MS_RESISTOR_METER, /* 电阻表 */
-                MS_CURRENT_METER,    /* 高侧电流表 */
-                MS_TEMP_METER,         /* 温度表 */
-                MS_PROGRAMMER,         /* 脱机下载器 */
+{
+    MS_LINK_MODE,        /* 联机状态 */
+    MS_VOLTAGE_METER,    /* 电压表 */
+    MS_RESISTOR_METER,   /* 电阻表 */
+    MS_CURRENT_METER,    /* 高侧电流表 */
+    MS_TEMP_METER,       /* 温度表 */
+    MS_PROGRAMMER,       /* 脱机下载器 */
 };
 
 /*
 *********************************************************************************************************
 *    函 数 名: main
 *    功能说明: c程序入口
-*    形    参：无
+*    形    参: 无
 *    返 回 值: 错误代码(无需处理)
 *********************************************************************************************************
 */
@@ -101,39 +102,39 @@ int main(void)
     {
         switch (g_MainStatus)
         {
-        case MS_LINK_MODE: /* 联机状态 */
+        case MS_LINK_MODE:      /* 联机状态 */
             status_LinkMode();
             break;
 
-        case MS_SYSTEM_SET: /* 系统设置 */
+        case MS_SYSTEM_SET:     /* 系统设置 */
             status_SystemSetMain();
             break;
 
-        case MS_HARD_INFO: /* 硬件信息 */
+        case MS_HARD_INFO:      /* 硬件信息 */
             status_HardInfo();
             break;
 
-        case MS_ESP32_TEST: /* ESP32模块固件升级 */
+        case MS_ESP32_TEST:     /* ESP32模块固件升级 */
             status_ESP32Test();
             break;
 
-        case MS_USB_UART1: /* USB虚拟串口，映射到硬件UART1， RS485 RS232 */
+        case MS_USB_UART1:      /* USB虚拟串口，映射到硬件UART1， RS485 RS232 */
             status_UsbUart1();
             break;
 
-        case MS_PROGRAMMER: /* 脱机下载器 */
+        case MS_PROGRAMMER:     /* 脱机下载器 */
             status_Programmer();
             break;
 
-        case MS_VOLTAGE_METER: /* 电压表 */
+        case MS_VOLTAGE_METER:  /* 电压表 */
             status_VoltageMeter();
             break;
 
-        case MS_CURRENT_METER: /* 高侧电流表 */
+        case MS_CURRENT_METER:  /* 高侧电流表 */
             status_CurrentMeter();
             break;
 
-        case MS_TEMP_METER: /* 温度表 */
+        case MS_TEMP_METER:     /* 温度表 */
             status_TempMeter();
             break;
 
@@ -251,7 +252,8 @@ static void DispLogo(void)
         uint16_t y = 3;
         uint16_t line_cap = 20;
 
-        LCD_DispStr(x, y, "H7-TOOL多功能开发工具", &tFont);
+        //LCD_DispStr(x, y, "H7-TOOL多功能开发工具", &tFont);
+        LCD_DispStr(x, y, "H7-TOOL", &tFont);
         y += line_cap;
 
         sprintf(buf, "App Ver:%d.%02X",
@@ -284,10 +286,10 @@ void DispHeader(char *_str)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_24;                /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;            /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR; /* 文字背景颜色 */
-        tFont.Space = 0;                                    /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
+        tFont.FrontColor = CL_WHITE;        /* 字体颜色 */
+        tFont.BackColor = HEAD_BAR_COLOR;   /* 文字背景颜色 */
+        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
     }
 
     LCD_DispStrEx(0, 0, _str, &tFont, 240, ALIGN_CENTER);
@@ -312,10 +314,10 @@ void DSO_StartMode2(void)
     WriteRegValue_06H(0x0203, 0);    /* CH2通道增益0档，不放大 */
     WriteRegValue_06H(0x0204, 0);    /* CH1通道直流偏值，未用 */
     WriteRegValue_06H(0x0205, 0);    /* CH2通道直流偏值，未用 */
-    WriteRegValue_06H(0x0206, 12); /* 采样频率1M */
+    WriteRegValue_06H(0x0206, 12);   /* 采样频率1M */
     WriteRegValue_06H(0x0207, 0);    /* 采样深度1K */
     WriteRegValue_06H(0x0208, 0);    /* 触发电平 */
-    WriteRegValue_06H(0x0209, 50); /* 触发位置 */
+    WriteRegValue_06H(0x0209, 50);   /* 触发位置 */
     WriteRegValue_06H(0x020A, 0);    /* 触发模式 0=自动 */
     WriteRegValue_06H(0x020B, 0);    /* 触发通道CH1 */
     WriteRegValue_06H(0x020C, 0);    /* 触发边沿 */

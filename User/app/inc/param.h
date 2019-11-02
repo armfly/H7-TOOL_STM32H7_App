@@ -143,10 +143,10 @@ typedef struct
     float HighSideCurr;
     float USBPowerVolt;
     float ExtPowerVolt;
-    float TVCCVolt; /* TVCC实测电压 */
-    float TVCCCurr; /* TVCC实测电压 */
-    float NTCRes;        /* NTC电阻 */
-    float NTCTemp;    /* NTC温度 */
+    float TVCCVolt;             /* TVCC实测电压 */
+    float TVCCCurr;             /* TVCC实测电压 */
+    float NTCRes;               /* NTC电阻 */
+    float NTCTemp;              /* NTC温度 */
 
     float ADC_CH1Volt;
     float ADC_CH2Volt;
@@ -154,24 +154,27 @@ typedef struct
     float ADC_HighSideCurr;
     float ADC_USBPowerVolt;
     float ADC_ExtPowerVolt;
-    float ADC_TVCCVolt; /* TVCC实测电压 */
-    float ADC_TVCCCurr; /* TVCC实测电压 */
-    float ADC_NTCRes;        /* NTC电阻 */
+    float ADC_TVCCVolt;         /* TVCC实测电压 */
+    float ADC_TVCCCurr;         /* TVCC实测电压 */
+    float ADC_NTCRes;           /* NTC电阻 */
+    
+    float BatteryCapacity;      /* 电池容量累计 */
+    uint8_t StartBatCap;        /* 开始累计容量 */
 
-    uint16_t OutTVCCDac; /* 输出TVCC dac值 */
-    uint16_t OutTVCCmV;    /* 输出TVCC mV值 */
+    uint16_t OutTVCCDac;        /* 输出TVCC dac值 */
+    uint16_t OutTVCCmV;         /* 输出TVCC mV值 */
 
-    uint16_t OutVoltDAC; /* 输出电压 dac值 */
-    int16_t OutVoltmV;     /* 输出电压 mV值 有符号数 支持负电压*/
+    uint16_t OutVoltDAC;        /* 输出电压 dac值 */
+    int16_t OutVoltmV;          /* 输出电压 mV值 有符号数 支持负电压*/
 
-    uint16_t OutCurrDAC; /* 输出电流 dac值 */
-    uint16_t OutCurruA;    /* 输出电流 uA值 */
+    uint16_t OutCurrDAC;        /* 输出电流 dac值 */
+    uint16_t OutCurruA;         /* 输出电流 uA值 */
 
     uint8_t LuaRunOnce;
 
     uint8_t CalibEnable;
 
-    uint8_t GpioMode[16]; /* 保存GPIO模式参数，输入，输出或特殊功能 */
+    uint8_t GpioMode[16];       /* 保存GPIO模式参数、输入、输出或特殊功能 */
 
 } VAR_T;
 

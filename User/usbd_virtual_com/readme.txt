@@ -52,7 +52,7 @@ This is a typical application on how to use the STM32H743xx USB OTG Device perip
 behaves as a USB-to-RS232 bridge following the Virtual COM Port (VCP) implementation.
  - On one side, the STM32 exchanges data with a PC host through USB interface in Device mode.
  - On the other side, the STM32 exchanges data with other devices (same host, other host,
-   other devices…) through the UART interface (RS232).
+   other devicesï¿½ through the UART interface (RS232).
 
 At the beginning of the main program the HAL_Init() function is called to reset 
 all the peripherals, initialize the Flash interface and the systick.
@@ -148,20 +148,17 @@ compiler preprocessor (already done in the preconfigured projects provided with 
       - "USE_USB_FS" when using USB Full Speed (FS) Core 
       
 @Note If the  application is using the DTCM/ITCM memories (@0x20000000/ 0x0000000: not cacheable and only accessible
-      by the Cortex M7 and the  MDMA), no need for cache maintenance when the Cortex M7 and the MDMA access these RAMs.
-      If the application needs to use DMA(or other masters) based access or requires more RAM, then  the user has to:
-              - Use a non TCM SRAM. (example : D1 AXI-SRAM @ 0x24000000)
-              - Add a cache maintenance mechanism to ensure the cache coherence between CPU and other masters(DMAs,DMA2D,LTDC,MDMA).
-              - The addresses and the size of cacheable buffers (shared between CPU and other masters)
-                must be	properly defined to be aligned to L1-CACHE line size (32 bytes). 
- 
-@Note It is recommended to enable the cache and maintain its coherence, but depending on the use case
-      It is also possible to configure the MPU as "Write through", to guarantee the write access coherence.
-              In that case, the MPU must be configured as Cacheable/Bufferable/Not Shareable.
-              Even though the user must manage the cache coherence for read accesses.
-              Please refer to the AN4838 “Managing memory protection unit (MPU) in STM32 MCUs”
-              Please refer to the AN4839 “Level 1 cache on STM32F7 Series”
-
+      by the Cortex M7 and the ç‡¤DMA), no need for cache maintenance when the Cortex M7 and the MDMA access these RAMs.
+ç‰‹ç‰‹ï¿½If the application needs to use DMA(or other masters) based access or requires more RAM, then çˆhe user has to:
+ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ï¿½ï¿½- Use a non TCM SRAM. (example : D1 AXI-SRAM @ 0x24000000)
+ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ï¿½ï¿½- Add a cache maintenance mechanism to ensure the cache coherence between CPU and other masters(DMAs,DMA2D,LTDC,MDMA).
+ç‰‹ç‰‹ç‰‹ï¿½      - The addresses and the size of cacheable buffers (shared between CPU and other masters)
+                must be	properlyç‡¿efined to be aligned to L1-CACHE line size (32 bytes). 
+ï¿½@Note It is recommended to enable the cache and maintain its coherence, but depending on the use case
+ç‰‹ç‰‹ï¿½It is also possible to configure the MPU as "Write through", to guarantee the write access coherence.
+ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ï¿½ï¿½In that case, the MPU must be configured as Cacheable/Bufferable/Not Shareable.
+ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ï¿½ï¿½Even though the user must manage the cache coherence for read accesses.
+ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹Please refer to the AN4838 æ—anaging memory protection unit (MPU) in STM32 MCUsï¿½ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹ç‰‹Please refer to the AN4839 æ•evel 1 cache on STM32F7 Seriesï¿½
 @par Directory contents 
 
   - USB_Device/CDC_Standalone/Src/main.c                  Main program

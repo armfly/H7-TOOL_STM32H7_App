@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file    DAP.h
  * @brief   Access to ARM DAP using CMSIS-DAP protocol
  *

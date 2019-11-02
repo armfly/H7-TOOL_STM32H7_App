@@ -2366,14 +2366,10 @@ float bsp_AdcToCH1Volt(float _adc)
 {
     float volt;
 
-    volt =     CaculTwoPointFloat(
+    volt =  CaculTwoPointFloat(
             g_tCalib.CH1[g_tDSO.Gain1].x1, g_tCalib.CH1[g_tDSO.Gain1].y1, 
             g_tCalib.CH1[g_tDSO.Gain1].x2, g_tCalib.CH1[g_tDSO.Gain1].y2, 
-            _adc);
-//    if (volt > (float)-0.020 && volt < (float)0.020)    /* 0值.正负20mV以内自动归零 */
-//    {
-//        volt = 0;
-//    }        
+            _adc);        
     return volt;
 }
 
@@ -2389,14 +2385,10 @@ float bsp_AdcToCH2Volt(float _adc)
 {
     float volt;
 
-    volt =     CaculTwoPointFloat(
+    volt =  CaculTwoPointFloat(
             g_tCalib.CH2[g_tDSO.Gain2].x1, g_tCalib.CH2[g_tDSO.Gain2].y1, 
             g_tCalib.CH2[g_tDSO.Gain2].x2, g_tCalib.CH2[g_tDSO.Gain2].y2, 
-            _adc);
-//    if (volt > (float)-0.020 && volt < (float)0.020)    /* 0值.正负20mV以内自动归零 */
-//    {
-//        volt = 0;
-//    }        
+            _adc);       
     return volt;
 }
 

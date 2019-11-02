@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * @file    SW_DP.c
  * @brief   SWD driver
  *
@@ -31,22 +31,22 @@
 #include "DAP_config.h"
 #include "DAP.h"
 
-#define SPI_MODE_ENABLE        1                            /* 1 ±íÊ¾SPIÄ£Ê½£¬ 0±íÊ¾GPIOÄ£Ê½ */
+#define SPI_MODE_ENABLE        1                            /* 1 è¡¨ç¤ºSPIæ¨¡å¼ï¼Œ 0è¡¨ç¤ºGPIOæ¨¡å¼ */
 
 /* 
-    SPI_BAUDRATEPRESCALER_4 = 50MHz SCKÊ±ÖÓ£¬²»ÄÜ¹¤×÷¡£
-    SPI_BAUDRATEPRESCALER_8 = 25MHz SCKÊ±ÖÓ£¬ÎÈ¶¨¶ÁÐ´¡£ Ð´²¢¶Á2048×Ö½Ú£¬ºÄÊ±5ms£¬µÈÐ§´«ÊäËÙ¶È 800KB/s
+    SPI_BAUDRATEPRESCALER_4 = 50MHz SCKæ—¶é’Ÿï¼Œä¸èƒ½å·¥ä½œã€‚
+    SPI_BAUDRATEPRESCALER_8 = 25MHz SCKæ—¶é’Ÿï¼Œç¨³å®šè¯»å†™ã€‚ å†™å¹¶è¯»2048å­—èŠ‚ï¼Œè€—æ—¶5msï¼Œç­‰æ•ˆä¼ è¾“é€Ÿåº¦ 800KB/s
     
     SPI_BAUDRATEPRESCALER_16 = 12.5MHz
     SPI_BAUDRATEPRESCALER_32 = 6.25MHz
     SPI_BAUDRATEPRESCALER_64 = 3.125MHz
     SPI_BAUDRATEPRESCALER_128 = 1.5625MHz
     
-    Êµ²âST-LINKÏÂÔØ640K³ÌÐò£¬²Á³ýÐèÒª9Ãë£¨ÕâÊÇCPUµÄFLASH²Á³ýÊ±¼ä½ÏÂýµ¼ÖÂ£©£¬±à³ÌºÍÐ£ÑéÐèÒª13Ãë¡£
-    °´H7-TOOLµÄ800KB/SµÄËÙ¶È£¬SWDÊ±Ðò´«Êä¿ÉÒÔÔÚ1ÃëÄÚÍê³É£¬Ê£ÏÂµÄÊ±¼äÖ÷Òª¿¿USBÍ¨ÐÅºÍCPUÔËËãÀ´Ìá¸ßÐ§ÂÊ¡£
-    Òò´ËÔÚSWDµ×²ãÊ±ÐòÉÏÓÅ»¯ÒÑ¾­Ã»ÓÐ¶à´óµÄ±ØÒªÁË£¬Ò²Ðí¿ÉÒÔÌá¸ßµ½1MB/S¡£µ«ÊÇ¶ÔÕûÌåÐ§ÂÊÃ»ÓÐ¶à´ó¸ÄÉÆ¡£
+    å®žæµ‹ST-LINKä¸‹è½½640Kç¨‹åºï¼Œæ“¦é™¤éœ€è¦9ç§’ï¼ˆè¿™æ˜¯CPUçš„FLASHæ“¦é™¤æ—¶é—´è¾ƒæ…¢å¯¼è‡´ï¼‰ï¼Œç¼–ç¨‹å’Œæ ¡éªŒéœ€è¦13ç§’ã€‚
+    æŒ‰H7-TOOLçš„800KB/Sçš„é€Ÿåº¦ï¼ŒSWDæ—¶åºä¼ è¾“å¯ä»¥åœ¨1ç§’å†…å®Œæˆï¼Œå‰©ä¸‹çš„æ—¶é—´ä¸»è¦é USBé€šä¿¡å’ŒCPUè¿ç®—æ¥æé«˜æ•ˆçŽ‡ã€‚
+    å› æ­¤åœ¨SWDåº•å±‚æ—¶åºä¸Šä¼˜åŒ–å·²ç»æ²¡æœ‰å¤šå¤§çš„å¿…è¦äº†ï¼Œä¹Ÿè®¸å¯ä»¥æé«˜åˆ°1MB/Sã€‚ä½†æ˜¯å¯¹æ•´ä½“æ•ˆçŽ‡æ²¡æœ‰å¤šå¤§æ”¹å–„ã€‚
 */
-#define SPI_MODE_BAUD        SPI_BAUDRATEPRESCALER_8        /* SPI_BAUDRATEPRESCALER_4 ²»ÎÈ¶¨ */
+#define SPI_MODE_BAUD        SPI_BAUDRATEPRESCALER_8        /* SPI_BAUDRATEPRESCALER_4 ä¸ç¨³å®š */
 
 
 #define PIN_SWCLK_SET PIN_SWCLK_TCK_SET
@@ -236,7 +236,7 @@ uint8_t  SWD_Transfer(uint32_t request, uint32_t *data)
     }
 }
 
-/********************************* armfly ÓÅ»¯Ê±ÐòËÙ¶È ***************************/
+/********************************* armfly ä¼˜åŒ–æ—¶åºé€Ÿåº¦ ***************************/
 // SWD Transfer I/O
 //   request: A[3:2] RnW APnDP
 //   data:    DATA[31:0]
@@ -425,7 +425,7 @@ void SWD_DIO_OutDisable(void)
 {
 #if SPI_MODE_ENABLE == 1    
     SPI2->CR1 = SPI_CR1_SSI;    
-    GPIOG->BSRRH = GPIO_PIN_9;    /* PG9 = 0 ÊÇÊäÈë        /        
+    GPIOG->BSRRH = GPIO_PIN_9;    /* PG9 = 0 æ˜¯è¾“å…¥        */        
 #else
     PIN_SWDIO_OUT_DISABLE(); 
 #endif
@@ -434,7 +434,7 @@ void SWD_DIO_OutDisable(void)
 void SWD_DIO_OutEnable(void)
 {
 #if SPI_MODE_ENABLE == 1
-    GPIOG->BSRRL = GPIO_PIN_9;    /* PG9 = 1 ÊÇÊä³ö       */    
+    GPIOG->BSRRL = GPIO_PIN_9;    /* PG9 = 1 æ˜¯è¾“å‡º       */    
     SPI2->CR1 = SPI_CR1_SSI | SPI_CR1_HDDIR;
 #else
     PIN_SWDIO_OUT_ENABLE(); 
@@ -472,7 +472,7 @@ void SWJ_Sequence (uint32_t count, const uint8_t *data) {
         
         if (rem)
         {
-            val = *(uint32_t *)data;        /* ¿ÉÄÜ¶à·ÃÎÊÄÚ´æ */
+            val = *(uint32_t *)data;        /* å¯èƒ½å¤šè®¿é—®å†…å­˜ */
             SWD_SendBits(rem, val);
         }
     }
@@ -558,7 +558,7 @@ uint8_t SWD_TransferFastH7(uint32_t request, uint32_t *data)
 //    if (ack == DAP_TRANSFER_OK) 
     {         /* OK response */                      
         /* Data transfer */                                                        
-        if (request & DAP_TRANSFER_RnW)     /* ¶ÁÖ¸Áî - 32 + 1 bit */
+        if (request & DAP_TRANSFER_RnW)     /* è¯»æŒ‡ä»¤ - 32 + 1 bit */
         {                       
             ack = SWD_ReadBits(3 + DAP_Data.swd_conf.turnaround);
             ack >>= DAP_Data.swd_conf.turnaround;            
@@ -625,7 +625,7 @@ uint8_t SWD_TransferFastH7(uint32_t request, uint32_t *data)
                 return ((uint8_t)ack);                              
             }
         } 
-        else  // Ð´Ö¸Áî
+        else  // å†™æŒ‡ä»¤
         {                 
             ack = SWD_ReadBits(3 + DAP_Data.swd_conf.turnaround + 1);
             ack >>= DAP_Data.swd_conf.turnaround;    
@@ -669,7 +669,7 @@ uint8_t SWD_TransferFastH7(uint32_t request, uint32_t *data)
                 SWD_SendBits(16, val);
                 SWD_SendBits(16 + 1 + DAP_Data.transfer.idle_cycles, (val >> 16) + (parity << 16));
                 
-                //PIN_SWDIO_OUT(1U);     ºÃÏñ²»ÊÇ±ØÐëµÄ¡£
+                //PIN_SWDIO_OUT(1U);     å¥½åƒä¸æ˜¯å¿…é¡»çš„ã€‚
 
                 return ((uint8_t)ack);                  
             }            
@@ -679,7 +679,7 @@ uint8_t SWD_TransferFastH7(uint32_t request, uint32_t *data)
 
     if ((ack == DAP_TRANSFER_WAIT) || (ack == DAP_TRANSFER_FAULT)) 
     {             
-        if (request & DAP_TRANSFER_RnW)     /* ¶ÁÒì³£ */
+        if (request & DAP_TRANSFER_RnW)     /* è¯»å¼‚å¸¸ */
         {
             /* WAIT or FAULT response */                                               
 //            if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) 
@@ -710,7 +710,7 @@ uint8_t SWD_TransferFastH7(uint32_t request, uint32_t *data)
             PIN_SWDIO_OUT(1U);                                                         
             return ((uint8_t)ack);   
         }            
-        else    /* Ð´Òì³£ - Ç°Ãæ¶à·¢ÁË1¸öclk */
+        else    /* å†™å¼‚å¸¸ - å‰é¢å¤šå‘äº†1ä¸ªclk */
         {
             /* WAIT or FAULT response */                                               
 //            if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) 
@@ -804,7 +804,7 @@ uint8_t SWD_TransferFastH7_ok(uint32_t request, uint32_t *data)
     if (ack == DAP_TRANSFER_OK) 
     {         /* OK response */                      
         /* Data transfer */                                                        
-        if (request & DAP_TRANSFER_RnW)     /* ¶ÁÖ¸Áî - 32 + 1 bit */
+        if (request & DAP_TRANSFER_RnW)     /* è¯»æŒ‡ä»¤ - 32 + 1 bit */
         {                                          
             /* Read data */                                                          
             val = 0U;                                                                

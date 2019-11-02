@@ -794,7 +794,6 @@ void FloatToBEBuf(float _f, uint8_t *_pBuf)
 {
     float f;
     uint8_t *p;
-    uint8_t buf[4];
 
     f = _f;
     p = (uint8_t *)&f;

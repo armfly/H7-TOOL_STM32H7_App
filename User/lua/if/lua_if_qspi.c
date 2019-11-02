@@ -11,8 +11,8 @@ static int qspi_erase4k(lua_State* L);
 
 void lua_qspi_RegisterFun(void)
 {
-    //½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
+    //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+    //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
     lua_register(g_Lua, "qspi_readid", qspi_readid);    
     lua_register(g_Lua, "qspi_read", qspi_read);    
     lua_register(g_Lua, "qspi_write", qspi_write);
@@ -21,10 +21,10 @@ void lua_qspi_RegisterFun(void)
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: qspi_readid
-*    ¹¦ÄÜËµÃ÷: ¶ÁĞ¾Æ¬ID
-*    ĞÎ    ²Î: 
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: qspi_readid
+*    åŠŸèƒ½è¯´æ˜: è¯»èŠ¯ç‰‡ID
+*    å½¢    å‚: 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int qspi_readid(lua_State* L)
@@ -32,7 +32,7 @@ static int qspi_readid(lua_State* L)
     uint32_t id;
     
     id = QSPI_ReadID();
-    lua_pushnumber(L, id);    /* ·µ»ØÖµ */
+    lua_pushnumber(L, id);    /* è¿”å›å€¼ */
         
     return 1;
 }
@@ -40,17 +40,17 @@ static int qspi_readid(lua_State* L)
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: qspi_erase4k
-*    ¹¦ÄÜËµÃ÷: ²Á³ıÒ»¸öÉÈÇø£¬4KB
-*    ĞÎ    ²Î: 
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: qspi_erase4k
+*    åŠŸèƒ½è¯´æ˜: æ“¦é™¤ä¸€ä¸ªæ‰‡åŒºï¼Œ4KB
+*    å½¢    å‚: 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int qspi_erase4k(lua_State* L)
 {
     uint32_t addr;
 
-    if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
+    if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
     {
         addr = luaL_checknumber(L, 1);
         
@@ -59,17 +59,17 @@ static int qspi_erase4k(lua_State* L)
     }
 
     QSPI_EraseSector(addr);
-    lua_pushnumber(L, 1);    /* ³É¹¦ */
+    lua_pushnumber(L, 1);    /* æˆåŠŸ */
 
     return 1;
 }
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: qspi_write
-*    ¹¦ÄÜËµÃ÷: Ğ´Ò»°üÊı¾İ£¬Ğ¡ÓÚ256×Ö½Ú
-*    ĞÎ    ²Î: 
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: qspi_write
+*    åŠŸèƒ½è¯´æ˜: å†™ä¸€åŒ…æ•°æ®ï¼Œå°äº256å­—èŠ‚
+*    å½¢    å‚: 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int qspi_write(lua_State* L)
@@ -78,39 +78,39 @@ static int qspi_write(lua_State* L)
     const char *data;
     uint32_t addr;
 
-    if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
+    if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
     {
         addr = luaL_checknumber(L, 1);
     }
     
-    if (lua_type(L, 2) == LUA_TSTRING)     /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
+    if (lua_type(L, 2) == LUA_TSTRING)     /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {        
-        data = luaL_checklstring(L, 2, &len); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstri        µÄ³¤¶È */        
+        data = luaL_checklstring(L, 2, &len); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stri        çš„é•¿åº¦ */        
     }
     
     if (len > QSPI_PAGE_SIZE)
     {
-        lua_pushnumber(L, 0);    /* ³ö´í */
+        lua_pushnumber(L, 0);    /* å‡ºé”™ */
         return 1;
     }
     
     if (QSPI_WriteBuffer((uint8_t *)data, addr, len) == 0)
     {
-        lua_pushnumber(L, 0);    /* ³ö´í */
+        lua_pushnumber(L, 0);    /* å‡ºé”™ */
     }
     else
     {
-        lua_pushnumber(L, 1);    /* ³É¹¦ */
+        lua_pushnumber(L, 1);    /* æˆåŠŸ */
     }
     return 1;
 }
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: qspi_read
-*    ¹¦ÄÜËµÃ÷: ¶ÁÒ»°üÊı¾İ£¬¿É´óÓÚ256×Ö½Ú
-*    ĞÎ    ²Î: 
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: qspi_read
+*    åŠŸèƒ½è¯´æ˜: è¯»ä¸€åŒ…æ•°æ®ï¼Œå¯å¤§äº256å­—èŠ‚
+*    å½¢    å‚: 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int qspi_read(lua_State* L)
@@ -118,12 +118,12 @@ static int qspi_read(lua_State* L)
     uint32_t addr;
     uint32_t num;
 
-    if (lua_type(L, 1) == LUA_TNUMBER)     /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
+    if (lua_type(L, 1) == LUA_TNUMBER)     /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {        
-        addr = luaL_checknumber(L, 1); /* 1ÊÇ²ÎÊıµÄÎ»ÖÃ£¬ lenÊÇstri              µÄ³¤¶È */        
+        addr = luaL_checknumber(L, 1); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stri              çš„é•¿åº¦ */        
     }
     
-    if (lua_type(L, 2) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ2¸ö²ÎÊı */
+    if (lua_type(L, 2) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬2ä¸ªå‚æ•° */
     {
         num = luaL_checknumber(L, 2);
         
@@ -142,4 +142,4 @@ static int qspi_read(lua_State* L)
     return 1;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

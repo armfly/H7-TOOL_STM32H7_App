@@ -171,7 +171,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
   uint32_t alignedAddr;
 #endif
 
-#if 0    /* 非DMA模式 */
+#if 0    /* 闈濪MA妯″紡 */
    if(BSP_MMC_ReadBlocks((uint32_t *) buff, (uint32_t) (sector), count, 1000) == MMC_OK)
    {
         res = RES_OK;
@@ -181,7 +181,7 @@ DRESULT SD_read(BYTE lun, BYTE *buff, DWORD sector, UINT count)
         res = RES_ERROR;
    }
    return res;
-#else    /* DMA模式 */
+#else    /* DMA妯″紡 */
   if(BSP_MMC_ReadBlocks_DMA((uint32_t*)buff,
                            (uint32_t) (sector),
                            count) == MMC_OK)

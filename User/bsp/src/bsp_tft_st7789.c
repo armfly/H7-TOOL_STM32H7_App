@@ -287,8 +287,6 @@ static void ST7789_SendByteQuick(uint8_t data)
 /*写数据到 LCD 模块*/
 void Lcd_WriteData(uint8_t data1)
 {
-    char i;
-
     LCD_RS_1();
     LCD_CS_0();
     ST7789_SendByteQuick(data1);

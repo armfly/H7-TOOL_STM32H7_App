@@ -421,7 +421,9 @@ void bsp_RunPer1ms(void)
 *********************************************************************************************************
 */
 extern void lwip_pro(void);
-extern void lua_Poll();
+extern void lua_Poll(void);
+extern void wifi_task(void);
+extern void EXIO_ScanTask(void);
 void bsp_Idle(void)
 {
     /* --- 喂狗 */

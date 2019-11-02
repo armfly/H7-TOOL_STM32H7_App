@@ -5,33 +5,33 @@
 #include "bsp.h"
 #include "param.h"
 
-/* ÎªÁË±ÜÃâºÍDAPÇı¶¯ÖĞµÄº¯Êı»ìÏı£¬±¾Ä£¿éº¯ÊıÃûÇ°×ºÓÃ h7swd */
+/* ä¸ºäº†é¿å…å’ŒDAPé©±åŠ¨ä¸­çš„å‡½æ•°æ··æ·†ï¼Œæœ¬æ¨¡å—å‡½æ•°åå‰ç¼€ç”¨ h7swd */
 
 static int lua_ReadAdc(lua_State* L);
 static int lua_ReadAnalog(lua_State* L);
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: lua_adc_RegisterFun
-*    ¹¦ÄÜËµÃ÷: ×¢²álua CÓïÑÔ½Ó¿Úº¯Êı
-*    ĞÎ    ²Î: ÎŞ
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: lua_adc_RegisterFun
+*    åŠŸèƒ½è¯´æ˜: æ³¨å†Œlua Cè¯­è¨€æ¥å£å‡½æ•°
+*    å½¢    å‚: æ— 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 void lua_adc_RegisterFun(void)
 {
-    //½«Ö¸¶¨µÄº¯Êı×¢²áÎªLuaµÄÈ«¾Öº¯Êı±äÁ¿£¬ÆäÖĞµÚÒ»¸ö×Ö·û´®²ÎÊıÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊıÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊıÃû£¬µÚ¶ş¸ö²ÎÊıÎªÊµ¼ÊCº¯ÊıµÄÖ¸Õë¡£
+    //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+    //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®é™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
     lua_register(g_Lua, "read_adc", lua_ReadAdc);    
     lua_register(g_Lua, "read_analog", lua_ReadAnalog);
 }
             
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: lua_ReadAdc
-*    ¹¦ÄÜËµÃ÷: ¶ÁADCÖµ
-*    ĞÎ    ²Î: Í¨µÀºÅ 0-8
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: lua_ReadAdc
+*    åŠŸèƒ½è¯´æ˜: è¯»ADCå€¼
+*    å½¢    å‚: é€šé“å· 0-8
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int lua_ReadAdc(lua_State* L)
@@ -39,33 +39,33 @@ static int lua_ReadAdc(lua_State* L)
     uint8_t ch;
     float re;
 
-    if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
+    if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {
-        ch = luaL_checknumber(L, 1);    /* Ä£ÄâÍ¨µÀ */
+        ch = luaL_checknumber(L, 1);    /* æ¨¡æ‹Ÿé€šé“ */
     }
 
-    if (ch == AN_CH1)                      re = g_tVar.ADC_CH1Volt;        /* CH1µçÑ¹ */
-    else if (ch == AN_CH2)                 re = g_tVar.ADC_CH2Volt;        /* CH2µçÑ¹ */
+    if (ch == AN_CH1)                      re = g_tVar.ADC_CH1Volt;        /* CH1ç”µå‹ */
+    else if (ch == AN_CH2)                 re = g_tVar.ADC_CH2Volt;        /* CH2ç”µå‹ */
     else if (ch == AN_HIGH_SIDE_VOLT)     re = g_tVar.ADC_HighSideVolt;
     else if (ch == AN_HIGH_SIDE_CURR)     re = g_tVar.ADC_HighSideCurr;
-    else if (ch == AN_TVCC_VOLT)         re = g_tVar.ADC_TVCCVolt;        /* TVCCÊµ²âµçÑ¹ */
-    else if (ch == AN_TVCC_CURR)         re = g_tVar.ADC_TVCCCurr;        /* TVCCÊµ²âµçÑ¹ */
-    else if (ch == AN_NTC_RES)             re = g_tVar.ADC_NTCRes;            /* NTCµç×è */
+    else if (ch == AN_TVCC_VOLT)         re = g_tVar.ADC_TVCCVolt;        /* TVCCå®æµ‹ç”µå‹ */
+    else if (ch == AN_TVCC_CURR)         re = g_tVar.ADC_TVCCCurr;        /* TVCCå®æµ‹ç”µå‹ */
+    else if (ch == AN_NTC_RES)             re = g_tVar.ADC_NTCRes;            /* NTCç”µé˜» */
     else if (ch == AN_12V_VOLT)         re = g_tVar.ADC_ExtPowerVolt;
     else if (ch == AN_USB_VOLT)         re = g_tVar.ADC_USBPowerVolt;    
     else re = 0;
     
-    lua_pushnumber(L, re);    /* ³É¹¦,·µ»ØÊı¾İ */
+    lua_pushnumber(L, re);    /* æˆåŠŸ,è¿”å›æ•°æ® */
     
     return 1;
 }
 
 /*
 *********************************************************************************************************
-*    º¯ Êı Ãû: lua_ReadAdc
-*    ¹¦ÄÜËµÃ÷: ¶ÁĞ£×¼ºóµÄÄ£ÄâÁ¿
-*    ĞÎ    ²Î: ÎŞ
-*    ·µ »Ø Öµ: ÎŞ
+*    å‡½ æ•° å: lua_ReadAdc
+*    åŠŸèƒ½è¯´æ˜: è¯»æ ¡å‡†åçš„æ¨¡æ‹Ÿé‡
+*    å½¢    å‚: æ— 
+*    è¿” å› å€¼: æ— 
 *********************************************************************************************************
 */
 static int lua_ReadAnalog(lua_State* L)
@@ -73,25 +73,25 @@ static int lua_ReadAnalog(lua_State* L)
     uint8_t ch;
     float re;
 
-    if (lua_type(L, 1) == LUA_TNUMBER) /* ÅĞ¶ÏµÚ1¸ö²ÎÊı */
+    if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {
-        ch = luaL_checknumber(L, 1);    /* Ä£ÄâÍ¨µÀ */
+        ch = luaL_checknumber(L, 1);    /* æ¨¡æ‹Ÿé€šé“ */
     }
 
-    if (ch == AN_CH1)                      re = g_tVar.CH1Volt;        /* CH1µçÑ¹ */
-    else if (ch == AN_CH2)                 re = g_tVar.CH2Volt;        /* CH2µçÑ¹ */
+    if (ch == AN_CH1)                      re = g_tVar.CH1Volt;        /* CH1ç”µå‹ */
+    else if (ch == AN_CH2)                 re = g_tVar.CH2Volt;        /* CH2ç”µå‹ */
     else if (ch == AN_HIGH_SIDE_VOLT)     re = g_tVar.HighSideVolt;
     else if (ch == AN_HIGH_SIDE_CURR)     re = g_tVar.HighSideCurr;
-    else if (ch == AN_TVCC_VOLT)         re = g_tVar.TVCCVolt;        /* TVCCÊµ²âµçÑ¹ */
-    else if (ch == AN_TVCC_CURR)         re = g_tVar.TVCCCurr;        /* TVCCÊµ²âµçÑ¹ */
-    else if (ch == AN_NTC_RES)             re = g_tVar.NTCRes;            /* NTCµç×è */
+    else if (ch == AN_TVCC_VOLT)         re = g_tVar.TVCCVolt;        /* TVCCå®æµ‹ç”µå‹ */
+    else if (ch == AN_TVCC_CURR)         re = g_tVar.TVCCCurr;        /* TVCCå®æµ‹ç”µå‹ */
+    else if (ch == AN_NTC_RES)             re = g_tVar.NTCRes;            /* NTCç”µé˜» */
     else if (ch == AN_12V_VOLT)         re = g_tVar.ExtPowerVolt;
     else if (ch == AN_USB_VOLT)         re = g_tVar.USBPowerVolt;    
     else re = 0;
     
-    lua_pushnumber(L, re);    /* ³É¹¦,·µ»ØÊı¾İ */
+    lua_pushnumber(L, re);    /* æˆåŠŸ,è¿”å›æ•°æ® */
     
     return 1;
 }
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯Œè±ç”µå­ www.armfly.com (END OF FILE) *********************************/

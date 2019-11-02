@@ -11,8 +11,8 @@ static int lua_I2C_ReciveBytes(lua_State* L);
 
 void lua_i2c_RegisterFun(void)
 {
-    //½«Ö¸¶¨µÄº¯Êý×¢²áÎªLuaµÄÈ«¾Öº¯Êý±äÁ¿£¬ÆäÖÐµÚÒ»¸ö×Ö·û´®²ÎÊýÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊýÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊýÃû£¬µÚ¶þ¸ö²ÎÊýÎªÊµ¼ÊCº¯ÊýµÄÖ¸Õë¡£
+    //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+    //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®žé™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
     lua_register(g_Lua, "i2c_start", lua_I2C_Start);
     lua_register(g_Lua, "i2c_stop", lua_I2C_Stop);
     lua_register(g_Lua, "i2c_send", lua_I2C_SendBytes);
@@ -32,8 +32,8 @@ static int lua_I2C_Stop(lua_State* L)
 }
 
 /*
-    ÐÎÊ½1: i2c_send(buf);
-    ÐÎÊ½2: i2c_send(3    );    
+    å½¢å¼1: i2c_send(buf);
+    å½¢å¼2: i2c_send(3    );    
 */
 static int lua_I2C_SendBytes(lua_State* L)
 {
@@ -43,12 +43,12 @@ static int lua_I2C_SendBytes(lua_State* L)
     uint8_t buf[1];
     int re;
 
-    if (lua_type(L, 1) == LUA_TSTRING)     /* ÅÐ¶ÏµÚ1¸ö²ÎÊý */
+    if (lua_type(L, 1) == LUA_TSTRING)     /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {        
-        data = luaL_checklstring(L, 1, &len); /* 1ÊÇ²ÎÊýµÄÎ»ÖÃ£¬ lenÊÇstri              µÄ³¤¶È */        
+        data = luaL_checklstring(L, 1, &len); /* 1æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ lenæ˜¯stri              çš„é•¿åº¦ */        
     }
     
-    if (lua_type(L, 1) == LUA_TNUMBER) /* ÅÐ¶ÏµÚ1¸ö²ÎÊý */
+    if (lua_type(L, 1) == LUA_TNUMBER) /* åˆ¤æ–­ç¬¬1ä¸ªå‚æ•° */
     {
         len = 1;
         buf[0] = luaL_checknumber(L, 1);
@@ -67,15 +67,15 @@ static int lua_I2C_SendBytes(lua_State* L)
             break;
         }        
     }
-    lua_pushnumber(L, re);    /* ·µ»ØÖµ */
+    lua_pushnumber(L, re);    /* è¿”å›žå€¼ */
     return 1;
 }
 
 /*
-Lua¸øC++´«bufferÊ±£¬Ê¹ÓÃstring¾ÍÐÐ£¬ÔÙC++µÄ£¬tolua++ÖÐÊ¹ÓÃÏÂÃæ´úÂë¶ÁÈ¡buffer
+Luaç»™C++ä¼ bufferæ—¶ï¼Œä½¿ç”¨stringå°±è¡Œï¼Œå†C++çš„ï¼Œtolua++ä¸­ä½¿ç”¨ä¸‹é¢ä»£ç è¯»å–buffer
         size_t ld;
-        const char *data = luaL_checklstring(tolua_S, 2, &ld); // 2ÊÇ²ÎÊýµÄÎ»ÖÃ£¬ ldÊÇbufferµÄ³¤¶È
-C++¸øLua´«bufferÊ±£¬ÔÚC++´úÂëÖÐÊ¹ÓÃÏÂÃæ´úÂë´«Èëbuffer
+        const char *data = luaL_checklstring(tolua_S, 2, &ld); // 2æ˜¯å‚æ•°çš„ä½ç½®ï¼Œ ldæ˜¯bufferçš„é•¿åº¦
+C++ç»™Luaä¼ bufferæ—¶ï¼Œåœ¨C++ä»£ç ä¸­ä½¿ç”¨ä¸‹é¢ä»£ç ä¼ å…¥buffer
             LuaStack *stack = LuaEngine::getInstance()->getLuaStack();
             stack->
 
@@ -89,26 +89,26 @@ static int lua_I2C_ReciveBytes(lua_State* L)
     len = luaL_checknumber(L, 1);
     if (len == 0 || len > LUA_READ_LEN_MAX)
     {
-        lua_pushnumber(L, 0);    /* ·µ»ØÖµ */
+        lua_pushnumber(L, 0);    /* è¿”å›žå€¼ */
         return 0;
     }
 
     for (i = 0; i < len; i++)
     {
-        s_lua_read_buf[i] = i2c_ReadByte();    /* ¶Á1¸ö×Ö½Ú */
+        s_lua_read_buf[i] = i2c_ReadByte();    /* è¯»1ä¸ªå­—èŠ‚ */
 
-        /* Ã¿¶ÁÍê1¸ö×Ö½Úºó£¬ÐèÒª·¢ËÍAck£¬ ×îºóÒ»¸ö×Ö½Ú²»ÐèÒªAck£¬·¢Nack */
+        /* æ¯è¯»å®Œ1ä¸ªå­—èŠ‚åŽï¼Œéœ€è¦å‘é€Ackï¼Œ æœ€åŽä¸€ä¸ªå­—èŠ‚ä¸éœ€è¦Ackï¼Œå‘Nack */
         if (i != len - 1)
         {
-            i2c_Ack();    /* ÖÐ¼ä×Ö½Ú¶ÁÍêºó£¬CPU²úÉúACKÐÅºÅ(Çý¶¯SDA = 0) */
+            i2c_Ack();    /* ä¸­é—´å­—èŠ‚è¯»å®ŒåŽï¼ŒCPUäº§ç”ŸACKä¿¡å·(é©±åŠ¨SDA = 0) */
         }
         else
         {
-            i2c_NAck();    /* ×îºó1¸ö×Ö½Ú¶ÁÍêºó£¬CPU²úÉúNACKÐÅºÅ(Çý¶¯SDA = 1) */
+            i2c_NAck();    /* æœ€åŽ1ä¸ªå­—èŠ‚è¯»å®ŒåŽï¼ŒCPUäº§ç”ŸNACKä¿¡å·(é©±åŠ¨SDA = 1) */
         }
     }
     
-    //lua_pushnumber(L, 1);    /* ·µ»ØÖµ */
+    //lua_pushnumber(L, 1);    /* è¿”å›žå€¼ */
 //    strcpy(s_lua_read_buf, "s_lua_read_buf");
     lua_pushlstring(L, (char *)s_lua_read_buf, len); 
     return 1;

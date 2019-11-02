@@ -51,17 +51,17 @@
 #include "usbd_cdc.h"
 
 /* 
-    H7-TOOL ���⴮�ڣ�RS232�� RS485��TTL-UART��ʹ�õ�PA9 PA10 
+    H7-TOOL 虚拟串口（RS232， RS485，TTL-UART）使用的PA9 PA10 
     PA9/USART1_TX/PE13/FMC_D10
     PA10/USART1_RX/PE14/FMC_D11
 
-    ��ʱ����ESP32ʱ�����Խ���ӳ�䵽UART4�ڣ�ͨ��PC�������ֲ���ATָ�
+    临时调试ESP32时，可以将其映射到UART4口，通过PC串口助手测试AT指令。
     PH13/UART4_TX 
     PH14/UART4_RX
 */
 
-/* ������������ A�ڣ�B���л� */
-#if 1    /* H7-TOOL ȱʡʹ�����UART */
+/* 定义物理串口 A口，B口切换 */
+#if 1    /* H7-TOOL 缺省使用这个UART */
     #define A_USARTx                           USART1
     #define A_USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE()
 
@@ -102,7 +102,7 @@
     #define A_USARTx_DMA_RX_IRQHandler          DMA1_Stream5_IRQHandler
 #endif
 
-#if 1    /* H7-TOOL ����ESP32ģ��̼�ʱʹ�����UART */
+#if 1    /* H7-TOOL 升级ESP32模块固件时使用这个UART */
     #define B_USARTx                           UART4
     #define B_USARTx_CLK_ENABLE()              __HAL_RCC_UART4_CLK_ENABLE()
 
@@ -143,7 +143,7 @@
 #endif
 
 
-/* Definition for TIMx clock resources   . TIM3 ����DSOʾ����ADC����Դ */
+/* Definition for TIMx clock resources   . TIM3 用于DSO示波器ADC触发源 */
 #define TIMx                             TIM15    
 #define TIMx_CLK_ENABLE                  __HAL_RCC_TIM15_CLK_ENABLE
 #define TIMx_FORCE_RESET()               __HAL_RCC_TIM15_FORCE_RESET()

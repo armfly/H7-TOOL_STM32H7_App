@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file    debug_cm.h
  * @brief   Access to ARM DAP (Cortex-M) using CMSIS-DAP protocol
  *
