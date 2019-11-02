@@ -54,7 +54,7 @@ extern SPI_HandleTypeDef hspi2;
 void SWD_SendBitsOK(uint8_t _bits, uint32_t _data)
 {
 #if 1
-    static uint8_t s_first = 1;
+    //static uint8_t s_first = 1;
 
     //    if (s_first == 0)
     //    {

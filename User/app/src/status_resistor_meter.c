@@ -31,7 +31,7 @@ void status_ResistorMeter(void)
     uint8_t ucKeyCode; /* 按键代码 */
     uint8_t fRefresh;
 
-    DispHeader("电阻测量");
+    DispHeader("电阻、二极管测量");
 
     fRefresh = 1;
     bsp_StartAutoTimer(0, 300);
@@ -92,7 +92,7 @@ void status_ResistorMeter(void)
         }
     }
     bsp_StopTimer(0);
-    BEEP_Stop();
+    //BEEP_Stop();      打开会导致切换的按键音消失
 }
 
 /*
@@ -107,6 +107,8 @@ static void DispResistor(void)
 {
     FONT_T tFont;
     char buf[64];
+    float volt;
+    float curr;
 
     /* 设置字体参数 */
     {
@@ -116,7 +118,7 @@ static void DispResistor(void)
         tFont.Space = 0;                                    /* 文字间距，单位 = 像素 */
     }
 
-    if (g_tVar.NTCRes < 1.0)
+    if (g_tVar.NTCRes < 1.0f)
     {
         sprintf(buf, "电阻: %0.1fΩ", g_tVar.NTCRes * 1000);
     }
@@ -128,8 +130,27 @@ static void DispResistor(void)
     {
         sprintf(buf, "电阻: > 1MΩ");
     }
-
     LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+    
+    /* 大致计算，不是很精确 */
+    volt = 2.5f * g_tVar.NTCRes / (g_tVar.NTCRes + 5.1f);
+    curr = volt / g_tVar.NTCRes;
+    if (volt > 2.4f)
+    {
+        sprintf(buf, "   压降: > 2.4V");
+        LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT); 
+
+        sprintf(buf, "   电流: %0.3fmA", curr);
+        LCD_DispStrEx(10, 50 + 50 + 24, buf, &tFont, 220, ALIGN_LEFT);
+    }
+    else
+    {
+        sprintf(buf, "   压降: %0.3fV", volt);
+        LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT);
+        
+        sprintf(buf, "   电流: %0.3fmA", curr);
+        LCD_DispStrEx(10, 50 + 50 + 24, buf, &tFont, 220, ALIGN_LEFT);       
+    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

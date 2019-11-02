@@ -189,7 +189,7 @@ static void UartVarInit(void);
 static void InitHardUart(void);
 static void UartSend(UART_T *_pUart, uint8_t *_ucaBuf, uint16_t _usLen);
 static uint8_t UartGetChar(UART_T *_pUart, uint8_t *_pByte);
-static void UartIRQ(UART_T *_pUart);
+//static void UartIRQ(UART_T *_pUart);
 
 void RS485_InitTXE(void);
 
@@ -848,7 +848,7 @@ void bsp_SetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint32_t Parit
 */
 static void InitHardUart(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct;
+ //   GPIO_InitTypeDef GPIO_InitStruct;
     RCC_PeriphCLKInitTypeDef RCC_PeriphClkInit;
     UART_HandleTypeDef UartHandle;
 
@@ -1287,7 +1287,7 @@ void comPutRxFifo(COM_PORT_E _ucPort, uint8_t *_buf, uint16_t _len)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-static void UartIRQ(UART_T *_pUart)
+void UartIRQ(UART_T *_pUart)
 {
     uint32_t isrflags = READ_REG(_pUart->uart->ISR);
     uint32_t cr1its = READ_REG(_pUart->uart->CR1);
@@ -1530,6 +1530,7 @@ int fgetc(FILE *f)
 
     //    return (int)USART_ReceiveData(USART1);
     //#endif
+    return 0;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

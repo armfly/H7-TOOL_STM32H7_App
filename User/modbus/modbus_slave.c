@@ -19,6 +19,8 @@
 #include "modbus_register.h"
 #include "modbus_iap.h"
 #include "lua_if.h"
+#include "usbd_cdc_interface.h"
+
 
 static void MODS_AnalyzeApp(void);
 
@@ -34,9 +36,9 @@ static void MODS_10H(void);
 static void MODS_0FH(void);
 static void MODS_64H(void);
 static void MODS_65H(void);
-static void MODS_66H(void);
-static void MODS_67H(void);
-static void MODS_68H(void);
+//static void MODS_66H(void);
+//static void MODS_67H(void);
+//static void MODS_68H(void);
 
 static void MODS_60H(void); /* PC发这个指令读取波形数据 */
 
@@ -1191,7 +1193,7 @@ err_ret:
 *    返 回 值: 无
 *********************************************************************************************************
 */
-static void MODS_66H(void)
+void MODS_66H(void)
 {
     /*
         66H - write file
@@ -1253,7 +1255,7 @@ err_ret:
 *    返 回 值: 无
 *********************************************************************************************************
 */
-static void MODS_67H(void)
+void MODS_67H(void)
 {
     /*
         67H -  read file
@@ -1429,7 +1431,7 @@ err_ret:
 *    返 回 值: 无
 *********************************************************************************************************
 */
-static void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
+void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
 {
     /*
         从机应答: （然后开始多包连续应答)

@@ -7,10 +7,10 @@
 
 void lua_tcp_RegisterFun(void)
 {
-    //½«Ö¸¶¨µÄº¯Êý×¢²áÎªLuaµÄÈ«¾Öº¯Êý±äÁ¿£¬ÆäÖÐµÚÒ»¸ö×Ö·û´®²ÎÊýÎªLua´úÂë
-    //ÔÚµ÷ÓÃCº¯ÊýÊ±Ê¹ÓÃµÄÈ«¾Öº¯ÊýÃû£¬µÚ¶þ¸ö²ÎÊýÎªÊµ¼ÊCº¯ÊýµÄÖ¸Õë¡£
+    //å°†æŒ‡å®šçš„å‡½æ•°æ³¨å†Œä¸ºLuaçš„å…¨å±€å‡½æ•°å˜é‡ï¼Œå…¶ä¸­ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å‚æ•°ä¸ºLuaä»£ç 
+    //åœ¨è°ƒç”¨Cå‡½æ•°æ—¶ä½¿ç”¨çš„å…¨å±€å‡½æ•°åï¼Œç¬¬äºŒä¸ªå‚æ•°ä¸ºå®žé™…Cå‡½æ•°çš„æŒ‡é’ˆã€‚
     //lua_register(g_Lua, "udp_print", lua_udp_print);    
 }
 
 
-/***************************** °²¸»À³µç×Ó www.armfly.com (END OF FILE) *********************************/
+/***************************** å®‰å¯ŒèŽ±ç”µå­ www.armfly.com (END OF FILE) *********************************/

@@ -65,7 +65,7 @@
 //#define LUN_NAND    2
 
 
-/* ∂®“ÂSDRAM –Èƒ‚¥≈≈Ãµƒµÿ÷∑∫Õø’º‰°£ 4M◊÷Ω⁄ */
+/* ÂÆö‰πâSDRAM ËôöÊãüÁ£ÅÁõòÁöÑÂú∞ÂùÄÂíåÁ©∫Èó¥„ÄÇ 4MÂ≠óËäÇ */
 #define SDRAM_DISK_ADDR        SDRAM_APP_BUF
 #define SDRAM_DISK_SIZE        (4 * 1024 * 1024)
 
@@ -272,7 +272,7 @@ int8_t STORAGE_Read(uint8_t lun, uint8_t * buf, uint32_t blk_addr,
 //                
 //                if (blk_len * 512 > SDRAM_DISK_SIZE)
 //                {
-//                    break;    /* “Ï≥£ */
+//                    break;    /* ÂºÇÂ∏∏ */
 //                }
 //                
 //                p_buf = (uint32_t *)buf;
@@ -325,7 +325,7 @@ int8_t STORAGE_Write(uint8_t lun, uint8_t * buf, uint32_t blk_addr,
 //                
 //                if (blk_len * 512 > SDRAM_DISK_SIZE)
 //                {
-//                    break;    /* “Ï≥£ */
+//                    break;    /* ÂºÇÂ∏∏ */
 //                }
 //                
 //                printf_ok("sdram_Write ok: BlockNo=%d, Count=%d", blk_addr, blk_len);                

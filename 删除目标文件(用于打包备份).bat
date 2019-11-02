@@ -4,7 +4,8 @@ rd /Q /S project\MDK-ARM(uV5)\DebugConfig
 del /Q project\MDK-ARM(uV5)\*.bak
 del /Q project\MDK-ARM(uV5)\*.dep
 del /Q project\MDK-ARM(uV5)\JLink*
-del /Q project\MDK-ARM(uV5)\project.uvgui.*
+del /Q project\MDK-ARM(uV5)\project.uvguix.*
+del /Q project\MDK-ARM(uV5)\*.scvd
 
 rd /Q /S project\MDK5-DAPLink\Objects
 rd /Q /S project\MDK5-DAPLink\Listings
