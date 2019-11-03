@@ -26,108 +26,108 @@
 #include "bsp.h"
 
 /* 串口1的GPIO  PA9, PA10   RS323 DB9接口 */
-#define USART1_CLK_ENABLE() __HAL_RCC_USART1_CLK_ENABLE()
+#define USART1_CLK_ENABLE()             __HAL_RCC_USART1_CLK_ENABLE()
 
-#define USART1_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USART1_TX_GPIO_PORT GPIOA
-#define USART1_TX_PIN GPIO_PIN_9
-#define USART1_TX_AF GPIO_AF7_USART1
+#define USART1_TX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USART1_TX_GPIO_PORT             GPIOA
+#define USART1_TX_PIN                   GPIO_PIN_9
+#define USART1_TX_AF                    GPIO_AF7_USART1
 
-#define USART1_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USART1_RX_GPIO_PORT GPIOA
-#define USART1_RX_PIN GPIO_PIN_10
-#define USART1_RX_AF GPIO_AF7_USART1
+#define USART1_RX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USART1_RX_GPIO_PORT             GPIOA   
+#define USART1_RX_PIN                   GPIO_PIN_10
+#define USART1_RX_AF                    GPIO_AF7_USART1
 
 /* 串口2的GPIO --- PA2 PA3  GPS (只用RX。 TX被以太网占用） */
-#define USART2_CLK_ENABLE() __HAL_RCC_USART2_CLK_ENABLE()
+#define USART2_CLK_ENABLE()             __HAL_RCC_USART2_CLK_ENABLE()
 
-#define USART2_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USART2_TX_GPIO_PORT GPIOA
-#define USART2_TX_PIN GPIO_PIN_2
-#define USART2_TX_AF GPIO_AF7_USART2
+#define USART2_TX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USART2_TX_GPIO_PORT             GPIOA
+#define USART2_TX_PIN                   GPIO_PIN_2
+#define USART2_TX_AF                    GPIO_AF7_USART2
 
-#define USART2_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USART2_RX_GPIO_PORT GPIOA
-#define USART2_RX_PIN GPIO_PIN_3
-#define USART2_RX_AF GPIO_AF7_USART2
+#define USART2_RX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USART2_RX_GPIO_PORT             GPIOA
+#define USART2_RX_PIN                   GPIO_PIN_3
+#define USART2_RX_AF                    GPIO_AF7_USART2
 
 /* 串口3的GPIO --- PB10 PB11  RS485 */
-#define USART3_CLK_ENABLE() __HAL_RCC_USART3_CLK_ENABLE()
+#define USART3_CLK_ENABLE()             __HAL_RCC_USART3_CLK_ENABLE()
 
-#define USART3_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define USART3_TX_GPIO_PORT GPIOB
-#define USART3_TX_PIN GPIO_PIN_10
-#define USART3_TX_AF GPIO_AF7_USART3
+#define USART3_TX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE()
+#define USART3_TX_GPIO_PORT             GPIOB
+#define USART3_TX_PIN                   GPIO_PIN_10
+#define USART3_TX_AF                    GPIO_AF7_USART3
 
-#define USART3_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define USART3_RX_GPIO_PORT GPIOB
-#define USART3_RX_PIN GPIO_PIN_11
-#define USART3_RX_AF GPIO_AF7_USART3
+#define USART3_RX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOB_CLK_ENABLE()
+#define USART3_RX_GPIO_PORT             GPIOB
+#define USART3_RX_PIN                   GPIO_PIN_11
+#define USART3_RX_AF                    GPIO_AF7_USART3
 
 /* 串口4的GPIO --- PH13 PH14 */
-#define UART4_CLK_ENABLE() __HAL_RCC_UART4_CLK_ENABLE()
+#define UART4_CLK_ENABLE()              __HAL_RCC_UART4_CLK_ENABLE()
 
-#define UART4_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define UART4_TX_GPIO_PORT GPIOH
-#define UART4_TX_PIN GPIO_PIN_13
-#define UART4_TX_AF GPIO_AF8_UART4
+#define UART4_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOC_CLK_ENABLE()
+#define UART4_TX_GPIO_PORT              GPIOH
+#define UART4_TX_PIN                    GPIO_PIN_13
+#define UART4_TX_AF                     GPIO_AF8_UART4
 
-#define UART4_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define UART4_RX_GPIO_PORT GPIOH
-#define UART4_RX_PIN GPIO_PIN_14
-#define UART4_RX_AF GPIO_AF8_UART4
+#define UART4_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOC_CLK_ENABLE()
+#define UART4_RX_GPIO_PORT              GPIOH
+#define UART4_RX_PIN                    GPIO_PIN_14
+#define UART4_RX_AF                     GPIO_AF8_UART4
 
 /* 串口5的GPIO --- PC12/UART5_TX PD2/UART5_RX (被SD卡占用） */
-#define UART5_CLK_ENABLE() __HAL_RCC_UART5_CLK_ENABLE()
+#define UART5_CLK_ENABLE()              __HAL_RCC_UART5_CLK_ENABLE()
 
-#define UART5_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define UART5_TX_GPIO_PORT GPIOC
-#define UART5_TX_PIN GPIO_PIN_12
-#define UART5_TX_AF GPIO_AF8_UART5
+#define UART5_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOC_CLK_ENABLE()
+#define UART5_TX_GPIO_PORT              GPIOC
+#define UART5_TX_PIN                    GPIO_PIN_12
+#define UART5_TX_AF                     GPIO_AF8_UART5
 
-#define UART5_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
-#define UART5_RX_GPIO_PORT GPIOD
-#define UART5_RX_PIN GPIO_PIN_2
-#define UART5_RX_AF GPIO_AF8_UART5
+#define UART5_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOD_CLK_ENABLE()
+#define UART5_RX_GPIO_PORT              GPIOD
+#define UART5_RX_PIN                    GPIO_PIN_2
+#define UART5_RX_AF                     GPIO_AF8_UART5
 
 /* 串口6的GPIO --- PG14 PC7  GPRS */
-#define USART6_CLK_ENABLE() __HAL_RCC_USART6_CLK_ENABLE()
+#define USART6_CLK_ENABLE()             __HAL_RCC_USART6_CLK_ENABLE()
 
-#define USART6_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOG_CLK_ENABLE()
-#define USART6_TX_GPIO_PORT GPIOG
-#define USART6_TX_PIN GPIO_PIN_14
-#define USART6_TX_AF GPIO_AF7_USART6
+#define USART6_TX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOG_CLK_ENABLE()
+#define USART6_TX_GPIO_PORT             GPIOG
+#define USART6_TX_PIN                   GPIO_PIN_14
+#define USART6_TX_AF                    GPIO_AF7_USART6
 
-#define USART6_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
-#define USART6_RX_GPIO_PORT GPIOC
-#define USART6_RX_PIN GPIO_PIN_7
-#define USART6_RX_AF GPIO_AF7_USART6
+#define USART6_RX_GPIO_CLK_ENABLE()     __HAL_RCC_GPIOC_CLK_ENABLE()
+#define USART6_RX_GPIO_PORT             GPIOC
+#define USART6_RX_PIN                   GPIO_PIN_7
+#define USART6_RX_AF                    GPIO_AF7_USART6
 
 /* 串口7的GPIO --- PA15 PA8 */
-#define UART7_CLK_ENABLE() __HAL_RCC_UART7_CLK_ENABLE()
+#define UART7_CLK_ENABLE()              __HAL_RCC_UART7_CLK_ENABLE()
 
-#define UART7_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define UART7_TX_GPIO_PORT GPIOA
-#define UART7_TX_PIN GPIO_PIN_15
-#define UART7_TX_AF GPIO_AF11_UART7
+#define UART7_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define UART7_TX_GPIO_PORT              GPIOA
+#define UART7_TX_PIN                    GPIO_PIN_15
+#define UART7_TX_AF                     GPIO_AF11_UART7
 
-#define UART7_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define UART7_RX_GPIO_PORT GPIOA
-#define UART7_RX_PIN GPIO_PIN_8
-#define UART7_RX_AF GPIO_AF11_UART7
+#define UART7_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define UART7_RX_GPIO_PORT              GPIOA
+#define UART7_RX_PIN                    GPIO_PIN_8
+#define UART7_RX_AF                     GPIO_AF11_UART7
 
 /* 串口8的GPIO --- PB4/UART7_TX, PB3/UART7_RX   (被SPI3 占用) */
-#define UART8_CLK_ENABLE() __HAL_RCC_UART8_CLK_ENABLE()
+#define UART8_CLK_ENABLE()              __HAL_RCC_UART8_CLK_ENABLE()
 
-#define UART8_TX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOJ_CLK_ENABLE()
-#define UART8_TX_GPIO_PORT GPIOJ
-#define UART8_TX_PIN GPIO_PIN_8
-#define UART8_TX_AF GPIO_AF8_UART8
+#define UART8_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOJ_CLK_ENABLE()
+#define UART8_TX_GPIO_PORT              GPIOJ
+#define UART8_TX_PIN                    GPIO_PIN_8
+#define UART8_TX_AF                     GPIO_AF8_UART8
 
-#define UART8_RX_GPIO_CLK_ENABLE() __HAL_RCC_GPIOJ_CLK_ENABLE()
-#define UART8_RX_GPIO_PORT GPIOJ
-#define UART8_RX_PIN GPIO_PIN_9
-#define UART8_RX_AF GPIO_AF8_UART8
+#define UART8_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOJ_CLK_ENABLE()
+#define UART8_RX_GPIO_PORT              GPIOJ
+#define UART8_RX_PIN                    GPIO_PIN_9
+#define UART8_RX_AF                     GPIO_AF8_UART8
 
 /* 定义每个串口结构体变量 */
 #if UART1_FIFO_EN == 1
@@ -803,7 +803,7 @@ static void UartVarInit(void)
 */
 void bsp_SetUartParam(USART_TypeDef *Instance, uint32_t BaudRate, uint32_t Parity, uint32_t Mode)
 {
-    UART_HandleTypeDef UartHandle;
+    UART_HandleTypeDef UartHandle = {0};
 
     /* 第2步： 配置串口硬件参数 */
     /*##-1- Configure the UART peripheral ######################################*/

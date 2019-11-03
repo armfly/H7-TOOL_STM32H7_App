@@ -41,11 +41,11 @@
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);
 
-#define GPIO_DIR_SET_OUT(gpio, pin) gpio->BSRRL = pin /* DIR = 1 输出 */
+#define GPIO_DIR_SET_OUT(gpio, pin) gpio->BSRRL = pin   /* DIR = 1 输出 */
 #define GPIO_DIR_SET_IN(gpio, pin) gpio->BSRRH = pin    /* DIR = 0 输入 */
 
-#define GPIO_SET_HIGH(gpio, pin) gpio->BSRRL = pin /* pin = 1 */
-#define GPIO_SET_LOW(gpio, pin) gpio->BSRRH = pin    /* pin = 0 */
+#define GPIO_SET_HIGH(gpio, pin) gpio->BSRRL = pin      /* pin = 1 */
+#define GPIO_SET_LOW(gpio, pin) gpio->BSRRH = pin       /* pin = 0 */
 
 #define GPIO_IN_IS_HIGH(gpio, pin) (gpio->IDR & pin)
 #define GPIO_OUT_IS_HIGH(gpio, pin) (gpio->ODR & pin)
