@@ -26,6 +26,7 @@
 #include "status_temp_meter.h"
 #include "status_programmer.h"
 #include "status_system_set.h"
+#include "status_tvcc_power.h"
 
 #include "wifi_if.h"
 #include "ff.h"
@@ -52,6 +53,7 @@ static const uint16_t StatusOrder[] =
     MS_RESISTOR_METER,   /* 电阻表 */
     MS_CURRENT_METER,    /* 高侧电流表 */
     MS_TEMP_METER,       /* 温度表 */
+    MS_TVCC_POWER,       /* 微型数控电源 */   
     MS_PROGRAMMER,       /* 脱机下载器 */
 };
 
@@ -142,6 +144,10 @@ int main(void)
             status_ResistorMeter();
             break;
 
+        case MS_TVCC_POWER:     /* 微型电源 */
+            status_TVCCPower();
+            break;        
+        
         default:
             g_MainStatus = MS_LINK_MODE;
             break;

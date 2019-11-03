@@ -452,6 +452,11 @@
               <FileType>5</FileType>
               <FilePath>..\..\User\app\inc\main.h</FilePath>
             </File>
+            <File>
+              <FileName>status_tvcc_power.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_tvcc_power.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

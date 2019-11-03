@@ -6,8 +6,6 @@
 #include "lua_if.h"
 #include "bsp.h"
 
-static int lua_udp_print(lua_State* L);
-
 void lua_tim_RegisterFun(void)
 {
     //将指定的函数注册为Lua的全局函数变量，其中第一个字符串参数为Lua代码
