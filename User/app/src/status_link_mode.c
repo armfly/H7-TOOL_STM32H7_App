@@ -142,6 +142,8 @@ void status_LinkMode(void)
         usbd_CloseCDC();
         usbd_OpenCDC(1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
     }
+    
+    DSO_StartMode2();   /* 示波器启动模式2-低速多通道扫描 */
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

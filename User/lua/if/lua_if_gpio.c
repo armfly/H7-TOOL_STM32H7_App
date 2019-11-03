@@ -130,7 +130,6 @@ static int lua_GpioWrite(lua_State* L)
 static int lua_GpioRead(lua_State* L)
 {
     uint8_t _no;
-    uint8_t _value;
 
     if (lua_type(L, 1) == LUA_TNUMBER) /* 判断第1个参数 */
     {

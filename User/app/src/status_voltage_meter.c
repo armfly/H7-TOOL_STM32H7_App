@@ -34,8 +34,6 @@ void status_VoltageMeter(void)
 
     DispHeader("电压表");
 
-    DSO_StartMode2(); /* 示波器启动模式2-低速多通道扫描 */
-
     fRefresh = 1;
 
     bsp_StartAutoTimer(0, 300);
