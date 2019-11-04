@@ -98,6 +98,9 @@
 static void ST7789_ConfigGPIO(void);
 static void ST7789_initial(void);
 static void ST7789_SendByteQuick(uint8_t data);
+static void ST7789_SPI_Init(void);
+//添加硬件SPI接口
+SPI_HandleTypeDef hspi5;
 
 /*
 *********************************************************************************************************
@@ -110,7 +113,7 @@ static void ST7789_SendByteQuick(uint8_t data);
 void ST7789_InitHard(void)
 {
     ST7789_ConfigGPIO(); /* 配置429 CPU内部LTDC */
-
+	ST7789_SPI_Init();
     ST7789_initial();
 
     g_LcdHeight = 240; /* 显示屏分辨率-高度 */
@@ -127,161 +130,86 @@ void ST7789_InitHard(void)
 */
 static void ST7789_ConfigGPIO(void)
 {
-    /* 配置GPIO */
-    {
-        GPIO_InitTypeDef gpio_init;
+	GPIO_InitTypeDef gpio_init;
 
-        /* 打开GPIO时钟 */
-        ALL_LCD_GPIO_CLK_ENABLE();
+	/* 打开GPIO时钟 */
+	ALL_LCD_GPIO_CLK_ENABLE();
+	//HAL_GPIO_
+	LCD_CS_1(); 
+	gpio_init.Mode  =  GPIO_MODE_OUTPUT_PP;        /* 设置推挽输出 */
+	gpio_init.Pull  = GPIO_NOPULL;                        /* 上下拉电阻不使能 */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
 
-        LCD_CS_1();
-        LCD_SCK_1();
+	gpio_init.Pin = LCD_RS_PIN;
+	HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
 
-        gpio_init.Mode = GPIO_MODE_OUTPUT_PP;        /* 设置推挽输出 */
-        gpio_init.Pull = GPIO_NOPULL;                        /* 上下拉电阻不使能 */
-        gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+	gpio_init.Pin = LCD_CS_PIN;
+	HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
 
-        gpio_init.Pin = LCD_RS_PIN;
-        HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);
-
-        gpio_init.Pin = LCD_CS_PIN;
-        HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
-
-        gpio_init.Pin = LCD_SCK_PIN;
-        HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
-
-        gpio_init.Pin = LCD_SDA_PIN;
-        HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
-
-        gpio_init.Pin = LCD_RESET_PIN;
-        HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
-    }
+	gpio_init.Pin = LCD_RESET_PIN;
+	HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init); 
+	//硬件SPI接口使用的引脚
+	gpio_init.Pin = LCD_SCK_PIN|LCD_SDA_PIN;
+	gpio_init.Mode = GPIO_MODE_AF_PP;
+	gpio_init.Pull = GPIO_NOPULL;
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;//注意此处的速度,之前设置为低速导致2分频有故障,需要设置为高速
+	gpio_init.Alternate = GPIO_AF5_SPI5;
+	HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init); 
 }
+/*
+*********************************************************************************************************
+*    函 数 名: ST7789_SPI_Init
+*    功能说明: 初始化硬件SPI接口,使用的SPI5
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static void ST7789_SPI_Init(void)
+{
+	__HAL_RCC_SPI5_CLK_ENABLE();
+	hspi5.Instance = SPI5;
+	HAL_SPI_DeInit(&hspi5);
+	hspi5.Init.Mode = SPI_MODE_MASTER;
+	hspi5.Init.Direction = SPI_DIRECTION_2LINES;
+	hspi5.Init.DataSize = SPI_DATASIZE_8BIT;
+	hspi5.Init.CLKPolarity = SPI_POLARITY_LOW;
+	hspi5.Init.CLKPhase = SPI_PHASE_1EDGE;
+	hspi5.Init.NSS = SPI_NSS_SOFT;
+	hspi5.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+	hspi5.Init.FirstBit = SPI_FIRSTBIT_MSB;
+	hspi5.Init.TIMode = SPI_TIMODE_DISABLE;
+	hspi5.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+	hspi5.Init.CRCPolynomial = 0x0;
+	hspi5.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+	hspi5.Init.NSSPolarity = SPI_NSS_POLARITY_LOW;
+	hspi5.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+	hspi5.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+	hspi5.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+	hspi5.Init.MasterSSIdleness = SPI_MASTER_SS_IDLENESS_00CYCLE;
+	hspi5.Init.MasterInterDataIdleness = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+	hspi5.Init.MasterReceiverAutoSusp = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+	hspi5.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+	hspi5.Init.IOSwap =SPI_IO_SWAP_ENABLE;//交换MISO和MOSI引脚,需要注意
+	if (HAL_SPI_Init(&hspi5) != HAL_OK)
+	{
 
+	}
+	
+}
 /*写指令到 LCD 模块*/
 void Lcd_WriteIndex(uint8_t data1)
 {
 
     LCD_RS_0();
     LCD_CS_0();
-
     ST7789_SendByteQuick(data1);
-
     LCD_CS_1();
 }
 
 /* 优化代码，快速操作 */
 static void ST7789_SendByteQuick(uint8_t data)
 {
-    uint8_t bit;
-
-    if (data & 0x80)
-    {
-        LCD_SDA_1();
-    }
-    else
-    {
-        LCD_SDA_0();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit6 */
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit5 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit4 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit3 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit2 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit1 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
-
-    /* bit0 */
-    data <<= 1;
-    bit = (data & 0xC0);
-    if (bit == 0x80)
-    {
-        LCD_SDA_0();
-    }
-    else if (bit == 0x40)
-    {
-        LCD_SDA_1();
-    }
-    LCD_SCK_0();
-    LCD_SCK_1();
+		HAL_SPI_Transmit(&hspi5,&data,1,15);
 }
 
 /*写数据到 LCD 模块*/
@@ -388,9 +316,9 @@ static void ST7789_initial(void)
 
     Lcd_WriteIndex(0x21);
 
-    Lcd_WriteIndex(0x11);
+	Lcd_WriteIndex(0x11);
 
-    Lcd_WriteIndex(0x29);
+	Lcd_WriteIndex(0x29);
 }
 
 /*
@@ -658,7 +586,6 @@ void ST7789_DrawHLine(uint16_t _usX, uint16_t _usY, uint16_t _usLen, uint16_t _u
     ST7789_FillRect(_usX, _usY, 1, _usLen, _usColor);
 #else
     uint16_t i;
-
     for (i = 0; i < _usLen; i++)
     {
         ST7789_PutPixel(_usX + i, _usY, _usColor);
