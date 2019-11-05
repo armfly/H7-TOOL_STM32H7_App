@@ -69,3 +69,7 @@ dkms.conf
 **/**/[Dd]ebug/*
 **/**/[Ff]lash/*
 **/**/[Ss]ettings/*
+
+# 忽略Vnote 生成的 交换文件
+*.[Vv][Ss][Ww][Pp]
+
