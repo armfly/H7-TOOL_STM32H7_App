@@ -1,4 +1,4 @@
-<div style = "text-align: center; margin: auto; width: 100%;">
+<div align="center" class="has-mb-6">
 
 ![logo][logo]
 
@@ -23,21 +23,21 @@
 ### :gift: 功能特性 / Features
 
 1. 双通道虚拟示波器
-1. 8通道逻辑分析仪
-1. USB-RS485转换器
-1. USB-RS232转换器
-1. USB-TTL串口转换器
-1. USB-CAN转换器
-1. 联机烧录器（内置CMSIS DAP下载器）
-1. 脱机烧录器
-1. I2C控制器
-1. SPI控制器
-1. GPIO输入输出
-1. 模拟信号发生器
-1. PWM发生器
-1. 脉冲计数器（编码器输入）
-1. 频率计
-1. 负载电流波形测试仪（测量电压、电流，计算功率）
+2. 8通道逻辑分析仪
+3. USB-RS485转换器
+4. USB-RS232转换器
+5. USB-TTL串口转换器
+6. USB-CAN转换器
+7. 联机烧录器（内置CMSIS DAP下载器）
+8. 脱机烧录器
+9. I2C控制器
+10. SPI控制器
+11. GPIO输入输出
+12. 模拟信号发生器
+13. PWM发生器
+14. 脉冲计数器（编码器输入）
+15. 频率计
+16. 负载电流波形测试仪（测量电压、电流，计算功率）
 
 ### :construction: 任务列表 / TODO
 <!-- 以下为示例 -->
