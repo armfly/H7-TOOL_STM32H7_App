@@ -6,11 +6,11 @@
 
 [淘宝链接][淘宝链接] |
 [开发文档][开发文档] |
-[下载源码][下载源码]
-
-</div>
+[论坛][论坛]
 
 ![H7-TOOL_IMG][H7-TOOL_IMG]
+
+</div>
 
 ### :book: 简介 / Overview
 
@@ -67,7 +67,7 @@ This project is licensed under the `MIT License` - see the [LICENSE][许可证] 
 <!-- Markdown 超链接管理 -->
 [淘宝链接]: https://item.taobao.com/item.htm?id=602704490583 "跳转到 H7-TOOL 购买链接"
 [开发文档]: /Doc "查看开发文档"
-[下载源码]: ./archive/master.zip "点击下载源码"
+[论坛]: http://www.armbbs.cn
 [更新日志]: ./CHANGELOG "点击查看更新日志"
 [许可证]: ./LICENSE
 
