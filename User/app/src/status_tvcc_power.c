@@ -77,32 +77,43 @@ void status_TVCCPower(void)
                 }
                 else
                 {
-                    if (NowVolt < 5000)
+                    if(ucIgnoreKey == 0)
                     {
-                        NowVolt += 100;
-                        DispTVccSetting(NowVolt);
-                    }
-                    else
-                    {
-                        BEEP_Start(5, 5, 3);    /* 叫50ms，停50ms，循环3次 */
+                        if (NowVolt < 5000)
+                        {
+                            NowVolt += 100;
+                            DispTVccSetting(NowVolt);
+                        }
+                        else
+                        {
+                            BEEP_Start(5, 5, 3);    /* 叫50ms，停50ms，循环3次 */
+                        }
                     }
                 }
+                ucIgnoreKey = 0;
                 break;
 
             case KEY_LONG_S:    /* S键长按 */
-                ucAdjustMode = 1;
-                BEEP_KeyTone();
+                if(ucAdjustMode == 0)
+                {
+                    ucAdjustMode = 1;
+                    BEEP_KeyTone();
+                }
+                ucIgnoreKey = 1;    /* 需要丢弃即将到来的S键弹起事件 */
                 break;
 
             case KEY_DOWN_C:    /* C键按下 */
                 break;
 
             case KEY_UP_C:      /* C键释放 */
-                if (ucAdjustMode == 0 && ucIgnoreKey == 0)
-                {                
-                    g_MainStatus = LastStatus(MS_TVCC_POWER);
+                if (ucAdjustMode == 0)
+                {      
+                    if(ucIgnoreKey == 0)
+                    {
+                        g_MainStatus = LastStatus(MS_TVCC_POWER);
+                    }         
                 }
-                else
+                else 
                 {
                     if (NowVolt > 1200)
                     {
@@ -118,9 +129,12 @@ void status_TVCCPower(void)
                 break;
 
             case KEY_LONG_C:    /* C键长按 */
-                ucAdjustMode = 0;
+                if(ucAdjustMode == 1)
+                {
+                    ucAdjustMode = 0;
+                    BEEP_KeyTone();
+                }
                 ucIgnoreKey = 1;    /* 需要丢弃即将到来的C键弹起事件 */
-                BEEP_KeyTone();
                 break;
 
             default:
