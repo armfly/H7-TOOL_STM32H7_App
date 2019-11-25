@@ -14,6 +14,7 @@ void status_SystemSetMain(void);
 void status_ESP32Test(void);
 void status_UsbUart1(void);
 void status_HardInfo(void);
+void status_ModifyParam(void);
 
 #endif
 

@@ -437,6 +437,8 @@ void bsp_Idle(void)
     lua_Poll(); /* 编程接口 */
 
     EXIO_ScanTask(); /* 扩展IO任务，使能前天下内部10ms执行一次 */
+    
+    //tusb_task();    /* USB协议栈轮询任务 */
 }
 
 /*

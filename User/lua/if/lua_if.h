@@ -34,10 +34,14 @@
 #include "lua_if_dac.h"
 #include "lua_if_register.h"
 #include "lua_if_extio.h"
+#include "lua_if_uart.h"
 
 #define LUA_PROG_LEN_MAX    (32 * 1024)
 
 #define LUA_READ_LEN_MAX    (2 * 1024)
+
+//#define LUA_ERR_PRINT(...)
+#define LUA_ERR_PARAM_PRINT     printf
 
 void lua_Test(void);
 void lua_Init(void);

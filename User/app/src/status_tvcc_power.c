@@ -97,7 +97,7 @@ void status_TVCCPower(void)
                 if(ucAdjustMode == 0)
                 {
                     ucAdjustMode = 1;
-                    BEEP_KeyTone();
+                    PlayKeyTone();
                 }
                 ucIgnoreKey = 1;    /* 需要丢弃即将到来的S键弹起事件 */
                 break;
@@ -132,7 +132,7 @@ void status_TVCCPower(void)
                 if(ucAdjustMode == 1)
                 {
                     ucAdjustMode = 0;
-                    BEEP_KeyTone();
+                    PlayKeyTone();
                 }
                 ucIgnoreKey = 1;    /* 需要丢弃即将到来的C键弹起事件 */
                 break;
@@ -157,13 +157,12 @@ void status_TVCCPower(void)
 */
 static void DispHelpTVCCPower(void)
 {
-    FONT_T tFont; /* 定义字体结构体变量 */
+    FONT_T tFont;   /* 定义字体结构体变量 */
 
-    tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-    tFont.FrontColor = CL_YELLOW;       /* 字体颜色 */
-    tFont.BackColor = FORM_BACK_COLOR;  /* 文字背景颜色 */
-    tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    tFont.FrontColor = CL_BLACK;        /* 黑字 */
+    tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
+    tFont.FrontColor = HELP_TEXT_COLOR;     /* 字体颜色 */
+    tFont.BackColor = HELP_BACK_COLOR;      /* 文字背景颜色 */
+    tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
 
     LCD_DispStr(5, 240 - 40, "TVCC输出1.2-5.0V, 限流400mA", &tFont);
     LCD_DispStr(5, 240 - 20, "长按S进入调节状态", &tFont);
@@ -184,20 +183,20 @@ static void DispTVccVoltCurr(void)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;        /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR;   /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_24;              /* 字体代码 */
+        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
+        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
+        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
     }
 
-    sprintf(buf, "电压: %8.3fV", g_tVar.TVCCVolt );
-    LCD_DispStrEx(10, 50 + 32 * 0, buf, &tFont, 220, ALIGN_CENTER);
+    sprintf(buf, " 电压: %8.3fV", g_tVar.TVCCVolt );
+    LCD_DispStrEx(10, 50 + 32 * 0, buf, &tFont, 220, ALIGN_LEFT);
 
-    sprintf(buf, "电流: %8.2fmA", g_tVar.TVCCCurr);
-    LCD_DispStrEx(10, 50 + 32 * 1, buf, &tFont, 220, ALIGN_CENTER);
+    sprintf(buf, " 电流: %8.2fmA", g_tVar.TVCCCurr);
+    LCD_DispStrEx(10, 50 + 32 * 1, buf, &tFont, 220, ALIGN_LEFT);
 
-    sprintf(buf, "功率: %8.3fW", g_tVar.TVCCVolt * g_tVar.TVCCCurr / 1000);
-    LCD_DispStrEx(10, 50 + 32 * 2, buf, &tFont, 220, ALIGN_CENTER);   
+    sprintf(buf, " 功率: %8.3fW", g_tVar.TVCCVolt * g_tVar.TVCCCurr / 1000);
+    LCD_DispStrEx(10, 50 + 32 * 2, buf, &tFont, 220, ALIGN_LEFT);   
 }
 
 /*
@@ -216,8 +215,8 @@ static void DispTVccSetting(uint16_t _volt)
     /* 设置字体参数 */
     {
         tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_YELLOW;       /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR;   /* 文字背景颜色 */
+        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
+        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
         tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
     }
 

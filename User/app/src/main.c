@@ -27,6 +27,7 @@
 #include "status_programmer.h"
 #include "status_system_set.h"
 #include "status_tvcc_power.h"
+#include "status_pulse_meter.h"
 
 #include "wifi_if.h"
 #include "ff.h"
@@ -39,9 +40,12 @@
 #include "target_reset.h"
 #include "target_config.h"
 #include "swd_host.h"
-#include "usbd_user.h"
+
+//#include "usbd_user.h"
+#include "usb_if.h"
 
 static void DispLogo(void);
+uint16_t GetStatusIndex(uint16_t _NowStatus);
 
 uint16_t g_MainStatus;  /* 主状态字 */
 
@@ -55,6 +59,7 @@ static const uint16_t StatusOrder[] =
     MS_TEMP_METER,       /* 温度表 */
     MS_TVCC_POWER,       /* 微型数控电源 */   
     MS_PROGRAMMER,       /* 脱机下载器 */
+    MS_PULSE_METER,      /* 脉冲计 */
 };
 
 /*
@@ -73,7 +78,7 @@ int main(void)
     PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LED一直闪烁, 非阻塞 */
 
     DispLogo();
-
+    
     bsp_InitESP32();
 
     DSO_InitHard();
@@ -95,7 +100,9 @@ int main(void)
     }
 
     PERIOD_Stop(&g_tRunLed); /* 停止LED闪烁 */
-
+    
+    usbd_Init();    /* 初始化USB协议栈 */
+    
     //wifi_state = WIFI_INIT;
 
     /* 主程序采用状态机实现程序功能切换 */
@@ -124,6 +131,10 @@ int main(void)
             status_UsbUart1();
             break;
 
+        case MS_MODIFY_PARAM:   /* 修改参数 */
+            status_ModifyParam();
+            break;          
+
         case MS_PROGRAMMER:     /* 脱机下载器 */
             status_Programmer();
             break;
@@ -148,12 +159,20 @@ int main(void)
             status_TVCCPower();
             break;        
         
+        case MS_PULSE_METER:    /* 脉冲计 */
+            status_PulseMeter();
+            break;  
+        
+        
+        
+        
         default:
             g_MainStatus = MS_LINK_MODE;
             break;
         }
     }
 }
+
 
 /*
 *********************************************************************************************************
@@ -185,9 +204,7 @@ uint16_t NextStatus(uint16_t _NowStatus)
         next = 0;
     }
 
-#if SWITCH_BEEP_ENABLE == 1
-    BEEP_KeyTone();
-#endif
+    PlayKeyTone();
     return StatusOrder[next];
 }
 
@@ -224,10 +241,36 @@ uint16_t LastStatus(uint16_t _NowStatus)
     {
         next = count - 1;
     }
-#if SWITCH_BEEP_ENABLE == 1
-    BEEP_KeyTone();
-#endif
+    PlayKeyTone();
     return StatusOrder[next];
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetStatusIndex
+*    功能说明: 根据状态字获取菜单序号
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+uint16_t GetStatusIndex(uint16_t _NowStatus)
+{
+    uint16_t idx;
+    uint16_t i;
+    uint16_t count;
+
+    count = sizeof(StatusOrder) / 2;
+
+    for (i = 0; i < count; i++)
+    {
+        if (_NowStatus == StatusOrder[i])
+        {
+            idx = i;
+            break;
+        }
+    }
+
+    return idx;
 }
 
 /*
@@ -242,10 +285,10 @@ static void DispLogo(void)
 {
     FONT_T tFont; /* 定义字体结构体变量 */
 
-    tFont.FontCode = FC_ST_16;                 /* 字体代码 16点阵 */
-    tFont.FrontColor = CL_YELLOW;             /* 字体颜色 */
-    tFont.BackColor = FORM_BACK_COLOR; /* 文字背景颜色 */
-    tFont.Space = 0;                                     /* 文字间距，单位 = 像素 */
+    tFont.FontCode = FC_ST_16;                  /* 字体代码 16点阵 */
+    tFont.FrontColor = RGB(200, 200, 200);      /* 字体颜色 */
+    tFont.BackColor = FORM_BACK_COLOR;          /* 文字背景颜色 */
+    tFont.Space = 0;                            /* 文字间距，单位 = 像素 */
 
     ST7789_SetDirection(g_tParam.DispDir);
 
@@ -289,16 +332,28 @@ static void DispLogo(void)
 void DispHeader(char *_str)
 {
     FONT_T tFont;
+    char buf[48];
+    uint16_t idx = 0;
 
     /* 设置字体参数 */
     {
         tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;        /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR;   /* 文字背景颜色 */
+        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
+        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
         tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
     }
-
-    LCD_DispStrEx(0, 0, _str, &tFont, 240, ALIGN_CENTER);
+    
+    idx  = GetStatusIndex(g_MainStatus);
+    sprintf(buf, "%d.%s", idx, _str);
+    
+    if (g_MainStatus == MS_SYSTEM_SET)
+    {
+        LCD_DispStrEx(0, 0, _str, &tFont, 240, ALIGN_CENTER);
+    }
+    else
+    {
+        LCD_DispStrEx(0, 0, buf, &tFont, 240, ALIGN_CENTER);
+    }
 
     LCD_Fill_Rect(0, 24, 240 - 24, 240, FORM_BACK_COLOR); /* 清屏  */
 }
@@ -329,6 +384,22 @@ void DSO_StartMode2(void)
     WriteRegValue_06H(0x020C, 0);    /* 触发边沿 */
     WriteRegValue_06H(0x020D, 2);    /* 通道使能 */
     WriteRegValue_06H(0x020E, 1);    /* 开始采集 */
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PlayKeyTone
+*    功能说明: 播放按键音。通过参数可以关闭
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void PlayKeyTone(void)
+{
+    if (g_tParam.KeyToneEnable != 0)
+    {
+        BEEP_KeyTone();
+    }
 }
 
 /*

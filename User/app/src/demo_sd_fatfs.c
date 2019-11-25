@@ -125,7 +125,7 @@ void DemoFatFS(void)
             bsp_LedToggle(2);
         }
 
-        if (comGetChar(COM_USB, &cmd)) /* 从串口读入一个字符(非阻塞方式) */
+        if (comGetChar(COM_USB1, &cmd)) /* 从串口读入一个字符(非阻塞方式) */
         {
             printf("\r\n");
             switch (cmd)

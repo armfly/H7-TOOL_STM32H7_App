@@ -86,61 +86,64 @@ void SaveParam(void)
 */
 void InitBaseParam(void)
 {
-    g_tParam.UpgradeFlag = 0;        /*升级标记,0x55AAA55A表示需要更新APP，0xFFFF表示更新完毕*/
-    g_tParam.ParamVer = PARAM_VER;            /* 参数区版本控制（可用于程序升级时，决定是否对参数区进行升级） */
+    g_tParam.UpgradeFlag = 0;           /*升级标记,0x55AAA55A表示需要更新APP，0xFFFF表示更新完毕*/
+    g_tParam.ParamVer = PARAM_VER;      /* 参数区版本控制（可用于程序升级时，决定是否对参数区进行升级） */
     
-    g_tParam.DispDir = 3;            /* 显示方向 */
+    g_tParam.DispDir = 3;               /* 显示方向 */
     
     g_tParam.Addr485 = 1;
     
-    g_tParam.LocalIPAddr[0] = 192;        /* 本机IP地址 */
+    g_tParam.LocalIPAddr[0] = 192;      /* 本机IP地址 */
     g_tParam.LocalIPAddr[1] = 168;
     g_tParam.LocalIPAddr[2] = 1;
     g_tParam.LocalIPAddr[3] = 211;
     
-    g_tParam.NetMask[0] = 255;            /* 子网掩码 */
+    g_tParam.NetMask[0] = 255;          /* 子网掩码 */
     g_tParam.NetMask[1] = 255;
     g_tParam.NetMask[2] = 255;
     g_tParam.NetMask[3] = 0;
     
-    g_tParam.Gateway[0] = 192;            /* 网关 */
+    g_tParam.Gateway[0] = 192;          /* 网关 */
     g_tParam.Gateway[1] = 168;
     g_tParam.Gateway[2] = 1;
     g_tParam.Gateway[3] = 1;
     
-    g_tParam.LocalTCPPort = 30010;        /* 本机TCP端口和UDP端口号，相同 */    
+    g_tParam.LocalTCPPort = 30010;      /* 本机TCP端口和UDP端口号，相同 */    
 
-    g_tParam.RemoteIPAddr[0] = 192;    /* 远端(前置）IP地址 */
+    g_tParam.RemoteIPAddr[0] = 192;     /* 远端(前置）IP地址 */
     g_tParam.RemoteIPAddr[1] = 168;
     g_tParam.RemoteIPAddr[2] = 1;
     g_tParam.RemoteIPAddr[3] = 213;
     
-    g_tParam.RemoteTcpPort = 30000;        /* 远端（前置）TCP端口 */
+    g_tParam.RemoteTcpPort = 30000;     /* 远端（前置）TCP端口 */
 
-    g_tParam.WorkMode = 0;        /* 工作模式 保留 */
+    g_tParam.WorkMode = 0;              /* 工作模式 保留 */
 
-    g_tParam.APSelfEn = 0;            /* 0作为客户端，1作为AP */
+    g_tParam.APSelfEn = 0;              /* 0作为客户端，1作为AP */
     memset(g_tParam.AP_SSID, 0, 32 + 1);    /* AP名字 */
     memset(g_tParam.AP_PASS, 0, 16 + 1);    /* AP密码 */
-    g_tParam.WiFiIPAddr[0] = 192;        /* 静态IP地址  */
+    g_tParam.WiFiIPAddr[0] = 192;       /* 静态IP地址  */
     g_tParam.WiFiIPAddr[1] = 168;
     g_tParam.WiFiIPAddr[2] = 1;    
     g_tParam.WiFiIPAddr[3] = 105;
     
-    g_tParam.WiFiNetMask[0] = 255;        /* 子网掩码 255.255.255.0 */    
+    g_tParam.WiFiNetMask[0] = 255;      /* 子网掩码 255.255.255.0 */    
     g_tParam.WiFiNetMask[1] = 255;
     g_tParam.WiFiNetMask[2] = 255;
     g_tParam.WiFiNetMask[3] = 0;    
     
-    g_tParam.WiFiGateway[0] = 192;        /* 网关 192.168.1.1 */    
+    g_tParam.WiFiGateway[0] = 192;      /* 网关 192.168.1.1 */    
     g_tParam.WiFiGateway[1] = 168;
     g_tParam.WiFiGateway[2] = 1;
     g_tParam.WiFiGateway[3] = 1;
     
     g_tParam.DHCPEn = 0;                /* DHCP使能  */
     
-    g_tParam.TestWord = 0;        /*　测试单元，用于检测eepromg功能 */
-    g_tParam.NtcType = 0;        /* NTC热敏电阻类型 0 = 10K_B3950，1 = 100K_B3950 */
+    g_tParam.TestWord = 0;              /*　测试单元，用于检测eepromg功能 */
+    g_tParam.NtcType = 0;               /* NTC热敏电阻类型 0 = 10K_B3950，1 = 100K_B3950 */
+    
+    g_tParam.KeyToneEnable = 1;         /* 按键音控制 */
+    g_tParam.UIStyle = 0;
     
     SaveParam();
 }

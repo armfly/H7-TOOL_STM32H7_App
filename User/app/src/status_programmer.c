@@ -51,7 +51,7 @@ void status_Programmer(void)
                 break;
 
             case KEY_UP_S: /* S键释放 */
-                g_MainStatus = NextStatus(MS_PROGRAMMER);
+                g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_S: /* S键长按 */
@@ -61,7 +61,7 @@ void status_Programmer(void)
                 break;
 
             case KEY_UP_C: /* C键释放 */
-                g_MainStatus = LastStatus(MS_PROGRAMMER);
+                g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_C: /* C键长按 */

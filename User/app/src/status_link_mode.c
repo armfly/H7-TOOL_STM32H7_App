@@ -34,7 +34,7 @@ void status_LinkMode(void)
     DispHeader("联机模式");
 
     usbd_CloseCDC();
-    usbd_OpenCDC(8); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
+    usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
 
     fRefresh = 1;
     while (g_MainStatus == MS_LINK_MODE)
@@ -52,10 +52,10 @@ void status_LinkMode(void)
                 char buf[64];
                 uint8_t line_cap = 20;
 
-                tFont.FontCode = FC_ST_16;                 /* 字体代码 16点阵 */
-                tFont.FrontColor = CL_YELLOW;             /* 字体颜色 */
-                tFont.BackColor = FORM_BACK_COLOR; /* 文字背景颜色 */
-                tFont.Space = 0;                                     /* 文字间距，单位 = 像素 */
+                tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
+                tFont.FrontColor = INFO_TEXT_COLOR;     /* 字体颜色 */
+                tFont.BackColor = INFO_BACK_COLOR;      /* 文字背景颜色 */
+                tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
 
                 x = 5;
                 y = 2 * line_cap;
@@ -77,7 +77,7 @@ void status_LinkMode(void)
                 sprintf(buf, "UDP端口号: %d", g_tParam.LocalTCPPort);
                 LCD_DispStr(x, y, buf, &tFont);
 
-                tFont.FrontColor = CL_BLACK; /* 黑字 */
+                tFont.FrontColor = HELP_TEXT_COLOR;
                 y = 10 * line_cap;
                 sprintf(buf, "长按S进入系统设置");
 
@@ -98,11 +98,11 @@ void status_LinkMode(void)
                 break;
 
             case KEY_UP_S:   /* S键释放 */
-                g_MainStatus = NextStatus(MS_LINK_MODE);
+                g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_S: /* S键长按 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 g_MainStatus = MS_SYSTEM_SET;
                 break;
 
@@ -115,11 +115,11 @@ void status_LinkMode(void)
                     fIgnoreKey = 0;
                     break;
                 }
-                g_MainStatus = LastStatus(MS_LINK_MODE);
+                g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_C: /* C键 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 if (++g_tParam.DispDir > 3)
                 {
                     g_tParam.DispDir = 0;
@@ -140,7 +140,7 @@ void status_LinkMode(void)
 	if (g_MainStatus != MS_SYSTEM_SET)
     {
         usbd_CloseCDC();
-        usbd_OpenCDC(1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
+        usbd_OpenCDC(COM1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
     }
     
     DSO_StartMode2();   /* 示波器启动模式2-低速多通道扫描 */

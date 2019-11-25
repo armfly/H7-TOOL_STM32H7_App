@@ -60,7 +60,7 @@ void status_TempMeter(void)
                 break;
 
             case KEY_UP_S: /* S键释放 */
-                g_MainStatus = NextStatus(MS_TEMP_METER);
+                g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_S: /* S键长按 */
@@ -70,7 +70,7 @@ void status_TempMeter(void)
                 break;
 
             case KEY_UP_C: /* C键释放 */
-                g_MainStatus = LastStatus(MS_TEMP_METER);
+                g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_C: /* C键长按 */
@@ -100,27 +100,27 @@ static void DispTemp(void)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_24;                /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;            /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR; /* 文字背景颜色 */
-        tFont.Space = 0;                                    /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_24;              /* 字体代码 */
+        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
+        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
+        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
     }
 
     if (g_tVar.NTCRes > 1000)
     {
-        sprintf(buf, "电阻: ---- KΩ");
-        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+        sprintf(buf, " 电阻: ---- KΩ");
+        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
 
-        sprintf(buf, "温度: ---- ℃");
-        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
+        sprintf(buf, " 温度: ---- ℃");
+        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_LEFT);
     }
     else
     {
-        sprintf(buf, "电阻: %0.3fKΩ", g_tVar.NTCRes);
-        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+        sprintf(buf, " 电阻: %0.3fKΩ", g_tVar.NTCRes);
+        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
 
-        sprintf(buf, "温度: %0.2f℃", g_tVar.NTCTemp);
-        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_CENTER);
+        sprintf(buf,  "温度: %0.2f℃", g_tVar.NTCTemp);
+        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_LEFT);
     }
 }
 
