@@ -1482,7 +1482,7 @@ void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
 
     MODS_SendWithCRC();
 
-    USBCom_SendBufNow(0, g_tModS.TxBuf, g_tModS.TxCount);
+//    USBCom_SendBufNow(0, g_tModS.TxBuf, g_tModS.TxCount);
 }
 
 #if 0

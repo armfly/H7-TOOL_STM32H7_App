@@ -516,11 +516,11 @@ static void lua_RegisterFunc(void)
     lua_qspi_RegisterFun();
     lua_fatfs_RegisterFun();
     lua_swd_RegisterFun();    
-    
     lua_adc_RegisterFun();
     lua_dac_RegisterFun();
     lua_reg_RegisterFun();
     lua_extio_RegisterFun();
+    lua_uart_RegisterFun();
 }
 
 

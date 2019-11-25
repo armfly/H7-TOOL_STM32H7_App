@@ -17,22 +17,22 @@
 #ifndef _LCD_MENU_H
 #define _LCD_MENU_H
 
-#define CL_MENU_TEXT1 CL_WHITE
-#define CL_MENU_BACK1 MAIN_BACK_COLOR
+//#define CL_MENU_TEXT1   CL_WHITE
+//#define CL_MENU_BACK1   MAIN_BACK_COLOR
 
-/* 光标选中 */
-#define CL_MENU_TEXT2 CL_BLACK
-#define CL_MENU_BACK2 CL_YELLOW
+///* 光标选中 */
+//#define CL_MENU_TEXT2   CL_BLACK
+//#define CL_MENU_BACK2   CL_YELLOW
 
-/* 菜单选中，保留另外一个颜色 */
-#define CL_MENU_TEXT3 CL_BLACK
-#define CL_MENU_BACK3 RGB(142, 209, 158)
+///* 菜单选中，保留另外一个颜色 */
+//#define CL_MENU_TEXT3   CL_BLACK
+//#define CL_MENU_BACK3   RGB(142, 209, 158)
 
-#define MENU_LEFT (0 + 5)
-#define MENU_TOP (0 + 5)
-#define MENU_WIDTH (240 - 10)
-#define MENU_HEIGHT (240 - 50)
-#define MENU_CAP 26
+#define MENU_LEFT       (0 + 5)
+#define MENU_TOP        (0 + 5)
+#define MENU_WIDTH      (240 - 10)
+#define MENU_HEIGHT     (240 - 50)
+#define MENU_CAP        26
 
 /* 菜单结构 */
 typedef struct

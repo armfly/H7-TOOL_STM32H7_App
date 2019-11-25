@@ -19,12 +19,12 @@
 #include "status_system_set.h"
 #include "lcd_menu.h"
 #include "wifi_if.h"
-#include "usbd_user.h"
+#include "usb_if.h"
 
 const uint8_t *g_Menu1_Text[] =
         {
                 " 1 硬件信息",
-                " 2 USB转串口模式",
+                " 2 参数设置",
                 " 3 ESP32固件升级",
 
                 /* 结束符号, 用于菜单函数自动识别菜单项个数 */
@@ -96,7 +96,7 @@ void status_SystemSetMain(void)
                 break;
 
             case KEY_LONG_S: /* S键 上 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 s_enter_sub_menu = 1;
 
                 if (g_tMenu1.Cursor == 0)
@@ -105,7 +105,7 @@ void status_SystemSetMain(void)
                 }
                 else if (g_tMenu1.Cursor == 1)
                 {
-                    g_MainStatus = MS_USB_UART1;
+                    g_MainStatus = MS_MODIFY_PARAM;
                 }
                 else if (g_tMenu1.Cursor == 2)
                 {
@@ -123,7 +123,7 @@ void status_SystemSetMain(void)
                 break;
 
             case KEY_LONG_C: /* C键长按 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 s_enter_sub_menu = 0;
                 g_MainStatus = MS_LINK_MODE;
                 break;
@@ -154,19 +154,22 @@ void status_HardInfo(void)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_16;                 /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;             /* 字体颜色 */
-        tFont.BackColor = FORM_BACK_COLOR; /* 文字背景颜色 */
-        tFont.Space = 0;                                     /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
+        tFont.FrontColor = CL_WHITE;            /* 字体颜色 */
+        tFont.BackColor = FORM_BACK_COLOR;      /* 文字背景颜色 */
+        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
     }
 
     LCD_ClrScr(FORM_BACK_COLOR); /* 清屏，背景蓝色 */
 
     x = 5;
     y = 3;
-    LCD_DispStr(x, y, "H7-TOOL硬件信息", &tFont); /* 在(8,3)坐标处显示一串汉字 */
+    tFont.BackColor = CL_BLUE;                      /* 文字背景颜色 */
+    LCD_DispStr(x, y, "H7-TOOL硬件信息", &tFont);   /* 在(8,3)坐标处显示一串汉字 */
     y += usLineCap;
 
+    tFont.BackColor = FORM_BACK_COLOR;      /* 文字背景颜色 */
+    
     /* 检测CPU ID */
     {
         uint32_t id[3];
@@ -321,6 +324,19 @@ void status_HardInfo(void)
 
         //ESP32_GetMac(&mac);
     }
+    
+    /* 固件版本 */
+    {
+        tFont.FrontColor = CL_YELLOW;       /* 字体颜色 */
+        
+        sprintf(buf, "Boot Ver : %d.%02X", BOOT_VERSION >> 8, BOOT_VERSION & 0xFF);
+        LCD_DispStr(x, y, buf, &tFont);   
+
+        y += usLineCap;
+        
+        sprintf(buf, "App Ver : %d.%02X", APP_VERSION >> 8, APP_VERSION & 0xFF);
+        LCD_DispStr(x, y, buf, &tFont);
+    }
 
     bsp_StartAutoTimer(0, 1000);
     while (g_MainStatus == MS_HARD_INFO)
@@ -332,10 +348,10 @@ void status_HardInfo(void)
         {
             uint16_t x, y;
 
-            tFont.FontCode = FC_ST_16;     /* 字体代码 16点阵 */
-            tFont.FrontColor = CL_WHITE; /* 字体颜色 */
-            tFont.BackColor = CL_BLUE;     /* 文字背景颜色 */
-            tFont.Space = 0;                         /* 文字间距，单位 = 像素 */
+            tFont.FontCode = FC_ST_16;      /* 字体代码 16点阵 */
+            tFont.FrontColor = CL_WHITE;    /* 字体颜色 */
+            tFont.BackColor = CL_BLUE;      /* 文字背景颜色 */
+            tFont.Space = 0;                /* 文字间距，单位 = 像素 */
 
             RTC_ReadClock(); /* 读时钟，结果在 g_tRTC */
 
@@ -357,7 +373,7 @@ void status_HardInfo(void)
                 break;
 
             case KEY_LONG_C: /* C键长按 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 g_MainStatus = MS_SYSTEM_SET;
                 break;
 
@@ -367,123 +383,6 @@ void status_HardInfo(void)
         }
     }
 }
-
-/*
-*********************************************************************************************************
-*    函 数 名: status_DacTest
-*    功能说明: 测试DAC输出波形. 废弃。参数过多，需要联机使用DAC
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-#if 0
-void status_DacTest(void)
-{
-    uint8_t ucKeyCode;        /* 按键代码 */
-    uint8_t fRefresh;
-    FONT_T tFont;        /* 定义字体结构体变量 */
-    uint8_t ucFirstKey = 1;
-    uint8_t ucWaveIdx = 0;
-    int16_t volt_min = -10000;
-    int16_t volt_max = 10000;
-    uint32_t freq = 1000;
-    uint16_t duty = 50;
-
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_16;    /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_BLACK;    /* 字体颜色 */
-        tFont.BackColor = FORM_BACK_COLOR;    /* 文字背景颜色 */
-        tFont.Space = 0;                /* 文字间距，单位 = 像素 */
-
-        LCD_ClrScr(FORM_BACK_COLOR);      /* 清屏，背景蓝色 */
-
-        LCD_DispStr(5, 3, "DAC输出正弦波", &tFont);
-    }
-    
-    fRefresh = 1;
-    while (g_MainStatus == MS_DAC_TEST)
-    {
-        bsp_Idle();
-
-        if (fRefresh == 1)    /* 刷新整个界面 */
-        {
-            fRefresh = 0;
-            
-            g_tDacWave.VoltRange = 1;
-            g_tDacWave.CycleSetting = 0;            
-            g_tDacWave.VoltMin = volt_min;
-            g_tDacWave.VoltMax = volt_max;
-            g_tDacWave.Freq = freq;
-            g_tDacWave.Duty = duty;
-            
-            if (ucWaveIdx == 0)
-            {
-                LCD_DispStr(5, 3, "DAC输出正弦波", &tFont);
-                
-                g_tDacWave.Type = DAC_WAVE_SIN;                    
-                dac1_StartDacWave();
-            }
-            else if (ucWaveIdx == 1)
-            {
-                LCD_DispStr(5, 3, "DAC输出方波", &tFont);
-                g_tDacWave.Type = DAC_WAVE_SQUARE;            
-                dac1_StartDacWave();                
-            }
-            else if (ucWaveIdx == 2)
-            {
-                LCD_DispStr(5, 3, "DAC输出三角波", &tFont);
-                g_tDacWave.Type = DAC_WAVE_TRI;
-                dac1_StartDacWave();                
-            }
-        }
-
-        ucKeyCode = bsp_GetKey();    /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
-        {    
-            /* 有键按下 */
-            switch (ucKeyCode)
-            {
-                case  KEY_UP_S:        /* S键 上 */
-                    if (ucFirstKey == 1)
-                    {
-                        ucFirstKey = 0;    /* 丢弃第1个按键弹起事件 */
-                        break;
-                    }                    
-                    BEEP_KeyTone();
-                    if (++ucWaveIdx > 2)
-                    {
-                        ucWaveIdx = 0;
-                    }
-                    fRefresh = 1;                    
-                    break;
-
-                case  KEY_LONG_S:        /* S键 上 */
-                    break;                
-
-                case  KEY_UP_C:            /* C键 下 */
-                    if (ucFirstKey == 1)
-                    {
-                        ucFirstKey = 0;    /* 丢弃第1个按键弹起事件 */
-                        break;
-                    }
-                    break;
-
-                case  KEY_LONG_C:        /* C键长按 */
-                    BEEP_KeyTone();    
-                    g_MainStatus = MS_SYSTEM_SET;
-                    break;                    
-                
-                default:
-                    break;
-            }
-        }
-    }
-    
-    /* 停止DAC波形 */
-    dac1_StopWave();
-}
-#endif
 
 /*
 *********************************************************************************************************
@@ -511,7 +410,7 @@ void status_UsbUart1(void)
     }
 
     usbd_CloseCDC();
-    usbd_OpenCDC(1); /* 映射到串口1 */
+    usbd_OpenCDC(COM1); /* 映射到串口1 */
 
     while (g_MainStatus == MS_USB_UART1)
     {
@@ -533,7 +432,7 @@ void status_UsbUart1(void)
                 break;
 
             case KEY_LONG_C: /* C键长按 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 g_MainStatus = MS_SYSTEM_SET;
                 break;
 
@@ -544,7 +443,189 @@ void status_UsbUart1(void)
     }
 
     usbd_CloseCDC();
-    usbd_OpenCDC(8); /* 映射到串口8. 和PC软件联机 */
+    usbd_OpenCDC(COM_USB_PC); /* 映射到串口8. 和PC软件联机 */
+}
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: status_ModifyParam
+*    功能说明: 修改常用参数
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+#define PARAM_NUM       2
+void status_ModifyParam(void)
+{
+    uint8_t ucKeyCode; /* 按键代码 */
+    FONT_T tFont;             /* 定义字体结构体变量 */
+    uint8_t fRefresh = 1;
+    uint8_t fSaveParam = 0;
+    uint8_t cursor = 0;
+    char buf[48];
+    uint8_t ucIgnoreKey = 1;    
+
+    /* 设置字体参数 */
+    {
+        tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
+        tFont.FrontColor = CL_WHITE;        /* 字体颜色 */
+        tFont.BackColor = FORM_BACK_COLOR;  /* 文字背景颜色 */
+        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+
+        LCD_ClrScr(FORM_BACK_COLOR);        /* 清屏，背景蓝色 */
+
+        LCD_DispStr(5, 3, "设置参数", &tFont);
+    }
+
+    {
+        FONT_T tFont1;   /* 定义字体结构体变量 */
+
+        tFont1.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
+        tFont1.FrontColor = HELP_TEXT_COLOR;     /* 字体颜色 */
+        tFont1.BackColor = HELP_BACK_COLOR;      /* 文字背景颜色 */
+        tFont1.Space = 0;                        /* 文字间距，单位 = 像素 */
+
+        LCD_DispStr(5, 240 - 40, "长按S键选择参数", &tFont1);
+        LCD_DispStr(5, 240 - 20, "短按S、C键修改参数值", &tFont1);
+    }    
+    
+    while (g_MainStatus == MS_MODIFY_PARAM)
+    {
+        bsp_Idle();
+
+        if (fRefresh == 1)
+        {
+            uint16_t x = 10;
+            uint16_t y = 30;
+            
+            fRefresh = 0;
+            
+            /* 第1个参数 */
+            {
+                if (cursor == 0)
+                {
+                    tFont.BackColor = CL_RED;
+                }
+                else 
+                {
+                    tFont.BackColor = FORM_BACK_COLOR;
+                }
+                if (g_tParam.KeyToneEnable == 0)
+                {               
+                    LCD_DispStr(x, y, "按键音 : 关闭", &tFont);
+                }
+                else
+                {
+                    LCD_DispStr(x, y, "按键音 : 打开", &tFont);
+                }
+            }
+
+            y += 20;
+            
+            /* 第2个参数 - 界面风格  */
+            {
+                if (cursor == 1)
+                {
+                    tFont.BackColor = CL_RED;
+                }
+                else 
+                {
+                    tFont.BackColor = FORM_BACK_COLOR;
+                }
+                sprintf(buf, "界面风格 : %3d", g_tParam.UIStyle);
+                LCD_DispStr(x, y, buf, &tFont);
+            }          
+                      
+        }
+        
+        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        if (ucKeyCode != KEY_NONE)
+        {
+            /* 有键按下 */
+            switch (ucKeyCode)
+            {
+            case KEY_UP_S:      /* S键 弹起 */
+                if (ucIgnoreKey == 1)
+                {
+                    ucIgnoreKey = 0;
+                    break;
+                }
+                
+                if (cursor == 0)
+                {
+                    if (g_tParam.KeyToneEnable == 0)
+                    {
+                        g_tParam.KeyToneEnable = 1;
+                    }
+                    else
+                    {
+                        g_tParam.KeyToneEnable = 0;
+                    }     
+                }
+                else if (cursor == 1)
+                {
+                    g_tParam.UIStyle++;
+                    if (g_tParam.UIStyle >= UI_STYLE_NUM)
+                    {
+                        g_tParam.UIStyle = 0;
+                    }  
+                }                
+                fRefresh = 1;
+                fSaveParam = 1;
+                break;
+
+            case KEY_UP_C:      /* C键 下 */
+                if (cursor == 0)
+                {                
+                    if (g_tParam.KeyToneEnable == 0)
+                    {
+                        g_tParam.KeyToneEnable = 1;
+                    }
+                    else
+                    {
+                        g_tParam.KeyToneEnable = 0;
+                    }
+                }
+                else if (cursor == 1)
+                {
+                    if (g_tParam.UIStyle > 0)
+                    {
+                        g_tParam.UIStyle--;
+                    }     
+                    else
+                    {
+                        g_tParam.UIStyle = UI_STYLE_NUM;
+                    }
+                }                 
+                fRefresh = 1;
+                fSaveParam = 1;
+                break;
+
+            case KEY_LONG_S:        /* S键长按 - 选择参数 */
+                if (++cursor >= PARAM_NUM)
+                {
+                    cursor = 0;
+                }
+                ucIgnoreKey = 1;
+                fRefresh = 1;
+                break;
+
+            case KEY_LONG_C:        /* C键长按 - 返回 */
+                PlayKeyTone();
+                g_MainStatus = MS_SYSTEM_SET;
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+    
+    if (fSaveParam == 1)
+    {
+        SaveParam();    /* 保存参数 */
+    }
 }
 
 /*
@@ -576,7 +657,7 @@ void status_ESP32Test(void)
     }
 
     usbd_CloseCDC();
-    usbd_OpenCDC(4);
+    usbd_OpenCDC(COM4);
 
     //bsp_InitESP32();
 
@@ -596,7 +677,7 @@ void status_ESP32Test(void)
 
             if (isp_flag == 0)
             {
-                LCD_DispStr(5, 60, "当前模式: AT", &tFont);
+                LCD_DispStr(5, 60, "当前模式:  AT", &tFont);
             }
             else
             {
@@ -616,7 +697,7 @@ void status_ESP32Test(void)
                     ucFirstKey = 0; /* 丢弃第1个按键弹起事件 */
                     break;
                 }
-                BEEP_KeyTone();
+                PlayKeyTone();
 
                 if (isp_flag == 0)
                 {
@@ -647,7 +728,7 @@ void status_ESP32Test(void)
                 break;
 
             case KEY_LONG_C: /* C键长按 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 g_MainStatus = MS_SYSTEM_SET;
                 break;
 
@@ -657,211 +738,7 @@ void status_ESP32Test(void)
         }
     }
     usbd_CloseCDC();
-    usbd_OpenCDC(8); /* 启用USB虚拟串口 */
+    usbd_OpenCDC(COM_USB_PC); /* 启用USB虚拟串口 */
 }
-
-#if 0    
-        bsp_InitExtIO();        /* 输出端口初始化 */
-
-        EIO_ConfigPort(EIO_D0, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D1, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D2, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D3, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D4, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D5, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D6, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D7, ES_FMC_OUT);
-        EIO_ConfigPort(EIO_D8, ES_FMC_NOE);
-        EIO_ConfigPort(EIO_D9, ES_FMC_NWE);
-
-        
-        
-        //bsp_InitTimDMA1();
-        
-        {
-            __IO uint16_t *p = (uint16_t *)0x60000000;
-            while (1)
-            {
-                *p = 0xFF;
-                *p = 0x00;
-            }
-        }
-
-        DISABLE_INT();
-        while (1)
-        {
-            __IO uint16_t *pPort = (uint16_t *)0x60000000;
-            uint16_t *pMem = (uint16_t *)0x20000000;    // 0x38000000;0x30040000
-            uint32_t i;
-            
-            for (i = 0; i < 16 * 1024 / 2; i++)     //    18.18M
-            {
-                *pMem++ = *pPort;
-            }        
-        
-            // 18.18M, 一样的没变化
-//            do
-//            {
-//                *pMem++ = *pPort;
-//            }while((uint32_t)pMem < 0x20000000 + 128 * 1024);
-                
-        }
-//#else
-//        EIO_ConfigPort(EIO_D0, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D1, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D2, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D3, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D4, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D5, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D6, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D7, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D8, ES_GPIO_OUT);
-//        EIO_ConfigPort(EIO_D9, ES_GPIO_OUT);
-//#endif
-
-#if 0
-    /* LwIP 初始化 */
-    {
-        /* 如果不插网线，此函数执行时间过长 */
-        /* 网络参数存在在全局变量 g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
-        lwip_start();
-        
-        while (1)
-        {
-            lwip_pro();
-        }
-    }
-#endif        
-//        usbd_OpenCDC();        /* 启用USB虚拟串口 */
-
-//        bsp_DelayMS(1000);
-
-//        /* 测试ESP32 */
-//        bsp_InitESP32();
-//        //comClearRxFifo(COM_ESP32);    /* 等待发送缓冲区为空，应答结束*/    
-//        ESP32_PowerOn();
-        
-        bsp_SetDAC1(0);
-        bsp_SetTVCC(47);
-        bsp_StartAutoTimer(0, 200);
-        
-        DSO_InitHard();
-        DSO_SetDC(1,1);
-        DSO_SetDC(2,1);
-        DSO_SetGain(1, 3);
-        DSO_SetGain(2, 3);    
-            
-        lwip_start();
-        
-        while(1)
-        {
-            bsp_Idle();
-            
-            if (bsp_CheckTimer(0))
-            {
-                bsp_LedToggle(1);
-                
-                DSO_StartADC(200000);
-                
-                if (level == 0)
-                {
-                    level = 1;
-                    //EIO_SetOutLevel(EIO_D0, 1);
-                    EIO_SetOutLevel(EIO_D1, 1);
-                    EIO_SetOutLevel(EIO_D2, 1);
-                    EIO_SetOutLevel(EIO_D3, 1);
-                    EIO_SetOutLevel(EIO_D4, 1);
-                    EIO_SetOutLevel(EIO_D5, 1);
-                    EIO_SetOutLevel(EIO_D6, 1);
-                    EIO_SetOutLevel(EIO_D7, 1);
-                    EIO_SetOutLevel(EIO_D8, 1);
-                    EIO_SetOutLevel(EIO_D9, 1);
-                }
-                else
-                {
-                    level = 0;
-                    //EIO_SetOutLevel(EIO_D0, 0);
-                    EIO_SetOutLevel(EIO_D1, 0);
-                    EIO_SetOutLevel(EIO_D2, 0);
-                    EIO_SetOutLevel(EIO_D3, 0);
-                    EIO_SetOutLevel(EIO_D4, 0);
-                    EIO_SetOutLevel(EIO_D5, 0);
-                    EIO_SetOutLevel(EIO_D6, 0);
-                    EIO_SetOutLevel(EIO_D7, 0);
-                    EIO_SetOutLevel(EIO_D8, 0);
-                    EIO_SetOutLevel(EIO_D9, 0);
-                }
-            }
-            
-            ucKeyCode = bsp_GetKey();    /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-            if (ucKeyCode != KEY_NONE)
-            {
-                /* 有键按下 */
-                switch (ucKeyCode)
-                {
-                    case KEY_DOWN_S:        /* S键 */
-                        BEEP_KeyTone();
-                    
-//                        ESP32_EnterISP();
-                    
-                        LCD_ClrScr(CL_BLUE);
-                        if (++idx > 4)
-                            idx = 0;
-                         
-                        LCD_DrawIcon32(&s_tMainIcons[idx], &tIconFont, 0);
-
-                        if (++tvcc > 127)
-                        {
-                            tvcc = 0;
-                        }        
-                        bsp_SetTVCC(tvcc);
-                        
-                        {
-                            char buf[32];
-                            
-                            sprintf(buf, "%3d", tvcc);
-                            LCD_DispStr(0, 110, buf, &tIconFont);
-                        }
-                        
-                        if (++gain > 3)
-                        {
-                            gain = 0;
-                        }
-                        DSO_SetGain(0, gain);
-                        DSO_SetGain(1, gain);                        
-                        break;
-
-                    case KEY_DOWN_C:        /* C键 */            
-                        BEEP_KeyTone();
-//                    ESP32_ExitISP();
-                        if (bsp_GetVoltOutRange() == 0)
-                        {
-                            bsp_SetVoltOutRange(1);
-                        }
-                        else
-                        {
-                            bsp_SetVoltOutRange(0);
-                        }
-                        if (tvcc > 0)
-                        {
-                            tvcc--;
-                        }
-                        bsp_SetTVCC(tvcc);
-                        {
-                            char buf[32];
-                            
-                            sprintf(buf, "%3d", tvcc);
-                            LCD_DispStr(0, 110, buf, &tIconFont);
-                        }                        
-                        break;
-                    
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-
-#endif
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

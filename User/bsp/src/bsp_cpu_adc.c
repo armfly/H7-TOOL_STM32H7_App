@@ -36,48 +36,48 @@
     H7-TOOL 示波器电路，AC/DC耦合、增益控制GPIO
 */    
 /* CH1 增益控制 */
-#define G1A_PIN                0
-#define G1A_0()                HC595_WriteGPIO(G1A_PIN, 0)
-#define G1A_1()                HC595_WriteGPIO(G1A_PIN, 1)
+#define G1A_PIN                 0
+#define G1A_0()                 HC595_WriteGPIO(G1A_PIN, 0)
+#define G1A_1()                 HC595_WriteGPIO(G1A_PIN, 1)
 
-#define G1B_PIN                1
-#define G1B_0()                HC595_WriteGPIO(G1B_PIN, 0)
-#define G1B_1()                HC595_WriteGPIO(G1B_PIN, 1)
+#define G1B_PIN                 1
+#define G1B_0()                 HC595_WriteGPIO(G1B_PIN, 0)
+#define G1B_1()                 HC595_WriteGPIO(G1B_PIN, 1)
 
-#define G1C_PIN                2
-#define G1C_0()                HC595_WriteGPIO(G1C_PIN, 0)
-#define G1C_1()                HC595_WriteGPIO(G1C_PIN, 1)
+#define G1C_PIN                 2
+#define G1C_0()                 HC595_WriteGPIO(G1C_PIN, 0)
+#define G1C_1()                 HC595_WriteGPIO(G1C_PIN, 1)
 
 /* CH2 增益控制 */
-#define G2A_PIN                4
-#define G2A_0()                HC595_WriteGPIO(G2A_PIN, 0)
-#define G2A_1()                HC595_WriteGPIO(G2A_PIN, 1)
+#define G2A_PIN                 4
+#define G2A_0()                 HC595_WriteGPIO(G2A_PIN, 0)
+#define G2A_1()                 HC595_WriteGPIO(G2A_PIN, 1)
 
-#define G2B_PIN                5
-#define G2B_0()                HC595_WriteGPIO(G2B_PIN, 0)
-#define G2B_1()                HC595_WriteGPIO(G2B_PIN, 1)
+#define G2B_PIN                 5
+#define G2B_0()                 HC595_WriteGPIO(G2B_PIN, 0)
+#define G2B_1()                 HC595_WriteGPIO(G2B_PIN, 1)
 
-#define G2C_PIN                6
-#define G2C_0()                HC595_WriteGPIO(G2C_PIN, 0)
-#define G2C_1()                HC595_WriteGPIO(G2C_PIN, 1)
+#define G2C_PIN                 6
+#define G2C_0()                 HC595_WriteGPIO(G2C_PIN, 0)
+#define G2C_1()                 HC595_WriteGPIO(G2C_PIN, 1)
 
 /* CH1 交流/直流耦合 */
-#define AC1_PIN                3
-#define AC1_0()                HC595_WriteGPIO(AC1_PIN, 0)
-#define AC1_1()                HC595_WriteGPIO(AC1_PIN, 1)
+#define AC1_PIN                 3
+#define AC1_0()                 HC595_WriteGPIO(AC1_PIN, 0)
+#define AC1_1()                 HC595_WriteGPIO(AC1_PIN, 1)
 
 /* CH2 交流/直流耦合 */
-#define AC2_PIN                7
-#define AC2_0()                HC595_WriteGPIO(AC2_PIN, 0)
-#define AC2_1()                HC595_WriteGPIO(AC2_PIN, 1)
+#define AC2_PIN                 7
+#define AC2_0()                 HC595_WriteGPIO(AC2_PIN, 0)
+#define AC2_1()                 HC595_WriteGPIO(AC2_PIN, 1)
 
 
 /* 高端电流 增益控制 */
-#define GC_CLK_ENABLE()        __HAL_RCC_GPIOG_CLK_ENABLE()
-#define GC_GPIO                GPIOG
-#define GC_PIN                GPIO_PIN_2
-#define GC_0()                GC_GPIO->BSRRH = GC_PIN
-#define GC_1()                GC_GPIO->BSRRL = GC_PIN
+#define GC_CLK_ENABLE()         __HAL_RCC_GPIOG_CLK_ENABLE()
+#define GC_GPIO                 GPIOG
+#define GC_PIN                  GPIO_PIN_2
+#define GC_0()                  GC_GPIO->BSRRH = GC_PIN
+#define GC_1()                  GC_GPIO->BSRRL = GC_PIN
 
 
 /* 示波器模式，电压模式和电流模式使用不同的ADC通道 */
@@ -90,28 +90,28 @@
 
 /*-------------ADC CH1通道GPIO, ADC通道，DMA定义 -------------*/
 #if 1
-    #define ADCH1                            ADC1
-    #define ADCH1_CLK_ENABLE()               __HAL_RCC_ADC12_CLK_ENABLE()
-    #define ADCH1_FORCE_RESET()              __HAL_RCC_ADC12_FORCE_RESET()
-    #define ADCH1_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
-    #define ADCH1_CHANNEL                    ADC_CHANNEL_2        /* 用PF11 */
+    #define ADCH1                           ADC1
+    #define ADCH1_CLK_ENABLE()              __HAL_RCC_ADC12_CLK_ENABLE()
+    #define ADCH1_FORCE_RESET()             __HAL_RCC_ADC12_FORCE_RESET()
+    #define ADCH1_RELEASE_RESET()           __HAL_RCC_ADC12_RELEASE_RESET()
+    #define ADCH1_CHANNEL                   ADC_CHANNEL_2        /* 用PF11 */
     
     /* 差分正端 PF11/ADC1_INP2 + PF13/ADC2_INP2 + PF9/ADC3_INP2 */
-    #define ADCH1_P_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
-    #define ADCH1_P_GPIO_PORT          GPIOF
+    #define ADCH1_P_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOF_CLK_ENABLE()
+    #define ADCH1_P_GPIO_PORT               GPIOF
     //#define ADCH1_P_PIN                GPIO_PIN_11 | GPIO_PIN_9 | GPIO_PIN_13
-    #define ADCH1_P_PIN                GPIO_PIN_11
+    #define ADCH1_P_PIN                     GPIO_PIN_11
 
     /* 差分负端 PF12/ADC1_INN2 + PF10/ADC3_INN2 + PF14/ADC2_INN2 */
-    #define ADCH1_N_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOF_CLK_ENABLE()
-    #define ADCH1_N_GPIO_PORT          GPIOF
-    #define ADCH1_N_PIN                GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_14
+    #define ADCH1_N_GPIO_CLK_ENABLE()       __HAL_RCC_GPIOF_CLK_ENABLE()
+    #define ADCH1_N_GPIO_PORT               GPIOF
+    #define ADCH1_N_PIN                     GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_14
 
-    #define CH1_DMA_CLK_ENABLE()           __HAL_RCC_DMA1_CLK_ENABLE()
-    #define CH1_DMA_Stream                     DMA1_Stream1
-    #define CH1_DMA_Stream_IRQn                 DMA1_Stream1_IRQn
-    #define CH1_DMA_Stream_IRQHandle         DMA1_Stream1_IRQHandler
-    #define CH1_DMA_REQUEST_ADC                 DMA_REQUEST_ADC1
+    #define CH1_DMA_CLK_ENABLE()            __HAL_RCC_DMA1_CLK_ENABLE()
+    #define CH1_DMA_Stream                  DMA1_Stream1
+    #define CH1_DMA_Stream_IRQn             DMA1_Stream1_IRQn
+    #define CH1_DMA_Stream_IRQHandle        DMA1_Stream1_IRQHandler
+    #define CH1_DMA_REQUEST_ADC             DMA_REQUEST_ADC1
 #else
     #define ADCH1                            ADC3
     #define ADCH1_CLK_ENABLE()               __HAL_RCC_ADC3_CLK_ENABLE()
@@ -138,24 +138,24 @@
 
 /*------------- ADC CH2通道GPIO, ADC通道，DMA定义 -------------*/
 #if 1
-    #define ADCH2                            ADC3
-    #define ADCH2_CLK_ENABLE()               __HAL_RCC_ADC3_CLK_ENABLE()
-    #define ADCH2_FORCE_RESET()              __HAL_RCC_ADC3_FORCE_RESET()
-    #define ADCH2_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
-    #define ADCH2_CHANNEL                    ADC_CHANNEL_1
+    #define ADCH2                               ADC3
+    #define ADCH2_CLK_ENABLE()                  __HAL_RCC_ADC3_CLK_ENABLE()
+    #define ADCH2_FORCE_RESET()                 __HAL_RCC_ADC3_FORCE_RESET()
+    #define ADCH2_RELEASE_RESET()               __HAL_RCC_ADC3_RELEASE_RESET()
+    #define ADCH2_CHANNEL                       ADC_CHANNEL_1
     /* 差分正端 PC3_C/ADC3_INP1 */
-    #define ADCH2_P_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOC_CLK_ENABLE()
-    #define ADCH2_P_PIN                        GPIO_PIN_3
-    #define ADCH2_P_GPIO_PORT                  GPIOC
+    #define ADCH2_P_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()
+    #define ADCH2_P_PIN                         GPIO_PIN_3
+    #define ADCH2_P_GPIO_PORT                   GPIOC
     /* 差分负端 PC2_C/ADC3_INN1 */
-    #define ADCH2_N_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOC_CLK_ENABLE()
-    #define ADCH2_N_PIN                        GPIO_PIN_2
-    #define ADCH2_N_GPIO_PORT                  GPIOC
+    #define ADCH2_N_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()
+    #define ADCH2_N_PIN                         GPIO_PIN_2
+    #define ADCH2_N_GPIO_PORT                   GPIOC
 
-    #define CH2_DMA_CLK_ENABLE()           __HAL_RCC_DMA2_CLK_ENABLE()
-    #define CH2_DMA_Stream                     DMA2_Stream1
+    #define CH2_DMA_CLK_ENABLE()                __HAL_RCC_DMA2_CLK_ENABLE()
+    #define CH2_DMA_Stream                      DMA2_Stream1
     #define CH2_DMA_Stream_IRQn                 DMA2_Stream1_IRQn
-    #define CH2_DMA_Stream_IRQHandle         DMA2_Stream1_IRQHandler
+    #define CH2_DMA_Stream_IRQHandle            DMA2_Stream1_IRQHandler
     #define CH2_DMA_REQUEST_ADC                 DMA_REQUEST_ADC3
 #else
     #define ADCH2                            ADC3
@@ -197,19 +197,19 @@
 #define CT_ADCH1_RELEASE_RESET()            __HAL_RCC_ADC12_RELEASE_RESET()
 #define CT_ADCH1_CHANNEL                    ADC_CHANNEL_3
 /* 差分正端 PA6/ADC12_INP3 */
-#define CT_ADCH1_P_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
-#define CT_ADCH1_P_GPIO_PORT          GPIOA
-#define CT_ADCH1_P_PIN                GPIO_PIN_6
+#define CT_ADCH1_P_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
+#define CT_ADCH1_P_GPIO_PORT                GPIOA
+#define CT_ADCH1_P_PIN                      GPIO_PIN_6
 /* 差分负端没有 */
-#define CT_ADCH1_N_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
-#define CT_ADCH1_N_GPIO_PORT          GPIOA
-#define CT_ADCH1_N_PIN                GPIO_PIN_6
+#define CT_ADCH1_N_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
+#define CT_ADCH1_N_GPIO_PORT                GPIOA
+#define CT_ADCH1_N_PIN                      GPIO_PIN_6
 
-#define CT_CH1_DMA_CLK_ENABLE()           __HAL_RCC_DMA1_CLK_ENABLE()
-#define CT_CH1_DMA_Stream                     DMA1_Stream1
-#define CT_CH1_DMA_Stream_IRQn                 DMA1_Stream1_IRQn
+#define CT_CH1_DMA_CLK_ENABLE()             __HAL_RCC_DMA1_CLK_ENABLE()
+#define CT_CH1_DMA_Stream                   DMA1_Stream1
+#define CT_CH1_DMA_Stream_IRQn              DMA1_Stream1_IRQn
 #define CT_CH1_DMA_Stream_IRQHandle         DMA1_Stream1_IRQHandler
-#define CT_CH1_DMA_REQUEST_ADC                 DMA_REQUEST_ADC1
+#define CT_CH1_DMA_REQUEST_ADC              DMA_REQUEST_ADC1
 
 /* ADC CH2通道GPIO, ADC通道，DMA定义 */
 #define CT_ADCH2                            ADC3
@@ -218,19 +218,20 @@
 #define CT_ADCH2_RELEASE_RESET()            __HAL_RCC_ADC3_RELEASE_RESET()
 #define CT_ADCH2_CHANNEL                    ADC_CHANNEL_7
 /* 差分正端 PF8/ADC3_INP7 */
-#define CT_ADCH2_P_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOF_CLK_ENABLE()
-#define CT_ADCH2_P_PIN                        GPIO_PIN_8
-#define CT_ADCH2_P_GPIO_PORT                  GPIOF
+#define CT_ADCH2_P_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOF_CLK_ENABLE()
+#define CT_ADCH2_P_PIN                      GPIO_PIN_8
+#define CT_ADCH2_P_GPIO_PORT                GPIOF
 /* 差分负端没有，PF8/ADC3_INP7 */
-#define CT_ADCH2_N_GPIO_CLK_ENABLE()          __HAL_RCC_GPIOF_CLK_ENABLE()
-#define CT_ADCH2_N_PIN                        GPIO_PIN_8
-#define CT_ADCH2_N_GPIO_PORT                  GPIOF
+#define CT_ADCH2_N_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOF_CLK_ENABLE()
+#define CT_ADCH2_N_PIN                      GPIO_PIN_8
+#define CT_ADCH2_N_GPIO_PORT                GPIOF
 
-#define CT_CH2_DMA_CLK_ENABLE()           __HAL_RCC_DMA2_CLK_ENABLE()
-#define CT_CH2_DMA_Stream                     DMA2_Stream1
-#define CT_CH2_DMA_Stream_IRQn                 DMA2_Stream1_IRQn
-#define CT_CH2_DMA_Stream_IRQHandle          DMA2_Stream1_IRQHandler
-#define CT_CH2_DMA_REQUEST_ADC                 DMA_REQUEST_ADC3
+#define CT_CH2_DMA_CLK_ENABLE()             __HAL_RCC_DMA2_CLK_ENABLE()
+#define CT_CH2_DMA_Stream                   DMA2_Stream1
+#define CT_CH2_DMA_Stream_IRQn              DMA2_Stream1_IRQn
+#define CT_CH2_DMA_Stream_IRQHandle         DMA2_Stream1_IRQHandler
+#define CT_CH2_DMA_REQUEST_ADC              DMA_REQUEST_ADC3
+
 /********************************** 高端电流模式的GPIO定义（结束） *******************************/
 
 /* Private macro -------------------------------------------------------------*/

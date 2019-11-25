@@ -62,6 +62,9 @@
 #define MSC_EPIN_ADDR                0x81 
 #define MSC_EPOUT_ADDR               0x01 
 
+/* MSC Class Config */
+#define MSC_MEDIA_PACKET                      512
+
 /**
   * @}
   */ 

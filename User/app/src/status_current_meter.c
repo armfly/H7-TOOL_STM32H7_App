@@ -81,7 +81,7 @@ void status_CurrentMeter(void)
             case KEY_UP_S:      /* S键释放 */
                 if (g_tVar.StartBatCap == 0)
                 {
-                    g_MainStatus = NextStatus(MS_CURRENT_METER);
+                    g_MainStatus = NextStatus(g_MainStatus);
                 }
                 
                 break;
@@ -89,7 +89,7 @@ void status_CurrentMeter(void)
             case KEY_LONG_S:    /* S键长按 */
                 g_tVar.StartBatCap = 1;
                 g_tVar.BatteryCapacity = 0;
-                BEEP_KeyTone();
+                PlayKeyTone();
                 break;
 
             case KEY_DOWN_C:    /* C键按下 */
@@ -98,7 +98,7 @@ void status_CurrentMeter(void)
             case KEY_UP_C:      /* C键释放 */
                 if (g_tVar.StartBatCap == 0 && ucIgnoreKey == 0)
                 {                
-                    g_MainStatus = LastStatus(MS_CURRENT_METER);
+                    g_MainStatus = LastStatus(g_MainStatus);
                 }
                 ucIgnoreKey = 0;
                 break;
@@ -106,7 +106,7 @@ void status_CurrentMeter(void)
             case KEY_LONG_C:    /* C键长按 */
                 g_tVar.StartBatCap = 0;
                 ucIgnoreKey = 1;    /* 需要丢弃即将到来的C键弹起事件 */
-                BEEP_KeyTone();
+                PlayKeyTone();
                 break;
 
             default:
@@ -148,13 +148,12 @@ static void AutoCurrentRange(void)
 */
 static void DispHelpCurrentMeter(void)
 {
-    FONT_T tFont; /* 定义字体结构体变量 */
+    FONT_T tFont;   /* 定义字体结构体变量 */
 
-    tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-    tFont.FrontColor = CL_YELLOW;       /* 字体颜色 */
-    tFont.BackColor = FORM_BACK_COLOR;  /* 文字背景颜色 */
-    tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    tFont.FrontColor = CL_BLACK;        /* 黑字 */
+    tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
+    tFont.FrontColor = HELP_TEXT_COLOR;     /* 字体颜色 */
+    tFont.BackColor = HELP_BACK_COLOR;      /* 文字背景颜色 */
+    tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
 
     LCD_DispStr(5, 240 - 40, "长按S开始测量电池放电容量", &tFont);
     LCD_DispStr(5, 240 - 20, "长按C停止测量", &tFont);
@@ -175,23 +174,23 @@ static void DispCurrentVolt(void)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;        /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR;   /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_24;              /* 字体代码 */
+        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
+        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
+        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
     }
 
-    sprintf(buf, "电压: %8.3fV", g_tVar.HighSideVolt);
-    LCD_DispStrEx(10, 50 + 32 * 0, buf, &tFont, 220, ALIGN_CENTER);
+    sprintf(buf, " 电压: %8.3fV", g_tVar.HighSideVolt);
+    LCD_DispStrEx(10, 50 + 32 * 0, buf, &tFont, 220, ALIGN_LEFT);
 
-    sprintf(buf, "电流: %8.1fmA", g_tVar.HighSideCurr);
-    LCD_DispStrEx(10, 50 + 32 * 1, buf, &tFont, 220, ALIGN_CENTER);
+    sprintf(buf, " 电流: %8.1fmA", g_tVar.HighSideCurr);
+    LCD_DispStrEx(10, 50 + 32 * 1, buf, &tFont, 220, ALIGN_LEFT);
 
-    sprintf(buf, "功率: %8.3fW", g_tVar.HighSideVolt * g_tVar.HighSideCurr / 1000);
-    LCD_DispStrEx(10, 50 + 32 * 2, buf, &tFont, 220, ALIGN_CENTER); 
+    sprintf(buf, " 功率: %8.3fW", g_tVar.HighSideVolt * g_tVar.HighSideCurr / 1000);
+    LCD_DispStrEx(10, 50 + 32 * 2, buf, &tFont, 220, ALIGN_LEFT); 
 
-    sprintf(buf, "容量: %8.3fmAh", g_tVar.BatteryCapacity);
-    LCD_DispStrEx(10, 50 + 32 * 3, buf, &tFont, 220, ALIGN_CENTER);     
+    sprintf(buf, " 容量: %8.3fmAh", g_tVar.BatteryCapacity);
+    LCD_DispStrEx(10, 50 + 32 * 3, buf, &tFont, 220, ALIGN_LEFT);     
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

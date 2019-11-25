@@ -70,7 +70,7 @@ void status_ResistorMeter(void)
                 break;
 
             case KEY_UP_S: /* S键释放 */
-                g_MainStatus = NextStatus(MS_RESISTOR_METER);
+                g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_S: /* S键长按 */
@@ -80,7 +80,7 @@ void status_ResistorMeter(void)
                 break;
 
             case KEY_UP_C: /* C键释放 */
-                g_MainStatus = LastStatus(MS_RESISTOR_METER);
+                g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_C: /* C键长按 */
@@ -112,44 +112,44 @@ static void DispResistor(void)
 
     /* 设置字体参数 */
     {
-        tFont.FontCode = FC_ST_24;                /* 字体代码 16点阵 */
-        tFont.FrontColor = CL_WHITE;            /* 字体颜色 */
-        tFont.BackColor = HEAD_BAR_COLOR; /* 文字背景颜色 */
-        tFont.Space = 0;                                    /* 文字间距，单位 = 像素 */
+        tFont.FontCode = FC_ST_24;              /* 字体代码 */
+        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
+        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
+        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
     }
 
     if (g_tVar.NTCRes < 1.0f)
     {
-        sprintf(buf, "电阻: %0.1fΩ", g_tVar.NTCRes * 1000);
+        sprintf(buf, "  电阻: %0.1fΩ", g_tVar.NTCRes * 1000);
     }
     else if (g_tVar.NTCRes < 1000)
     {
-        sprintf(buf, "电阻: %0.3fKΩ", g_tVar.NTCRes);
+        sprintf(buf, "  电阻: %0.3fKΩ", g_tVar.NTCRes);
     }
     else
     {
-        sprintf(buf, "电阻: > 1MΩ");
+        sprintf(buf, "  电阻: > 1MΩ");
     }
-    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_CENTER);
+    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
     
     /* 大致计算，不是很精确 */
     volt = 2.5f * g_tVar.NTCRes / (g_tVar.NTCRes + 5.1f);
     curr = volt / g_tVar.NTCRes;
     if (volt > 2.4f)
     {
-        sprintf(buf, "   压降: > 2.4V");
+        sprintf(buf, "  压降: > 2.4V");
         LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT); 
 
-        sprintf(buf, "   电流: %0.3fmA", curr);
-        LCD_DispStrEx(10, 50 + 50 + 24, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "  电流: %0.3fmA", curr);
+        LCD_DispStrEx(10, 50 + 50 + 30, buf, &tFont, 220, ALIGN_LEFT);
     }
     else
     {
-        sprintf(buf, "   压降: %0.3fV", volt);
+        sprintf(buf, "  压降: %0.3fV", volt);
         LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT);
         
-        sprintf(buf, "   电流: %0.3fmA", curr);
-        LCD_DispStrEx(10, 50 + 50 + 24, buf, &tFont, 220, ALIGN_LEFT);       
+        sprintf(buf, "  电流: %0.3fmA", curr);
+        LCD_DispStrEx(10, 50 + 50 + 30, buf, &tFont, 220, ALIGN_LEFT);       
     }
 }
 

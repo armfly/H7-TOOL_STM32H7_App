@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "lua.h"
 
@@ -660,7 +661,7 @@ l_noret luaG_runerror (lua_State *L, const char *fmt, ...) {
   if (isLua(ci))  /* if Lua function, add source:line information */
     luaG_addinfo(L, msg, ci_func(ci)->p->source, currentline(ci));
   
-  printf("%s", msg);
+  //printf("%s", msg);
   
   luaG_errormsg(L);
 }
