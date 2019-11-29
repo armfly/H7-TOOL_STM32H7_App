@@ -44,15 +44,15 @@ void status_CurrentMeter(void)
     bsp_StartAutoTimer(1, 1000);
     while (g_MainStatus == MS_CURRENT_METER)
     {
-        bsp_Idle();
-
-        if (fRefresh) /* 刷新整个界面 */
+        if (fRefresh)       /* 刷新整个界面 */
         {
             fRefresh = 0;
 
             DispCurrentVolt();
             AutoCurrentRange();
         }
+
+        bsp_Idle();
 
         if (bsp_CheckTimer(0))
         {

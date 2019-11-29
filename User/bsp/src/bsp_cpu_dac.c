@@ -40,35 +40,35 @@
     硬件用 PE3/65130_SW 控制DAC电路的电源
 */
 /* 控制DAC电路的电源 PE3/65130_SW */
-#define DAC_POWER_CLK_ENABLE() __HAL_RCC_GPIOE_CLK_ENABLE()
-#define DAC_POWER_GPIO GPIOE
-#define DAC_POWER_PIN GPIO_PIN_3
-#define DAC_POWER_ON() DAC_POWER_GPIO->BSRRL = DAC_POWER_PIN                     /* DAC POWER ON */
-#define DAC_POWER_OFF() DAC_POWER_GPIO->BSRRH = DAC_POWER_PIN                     /* DAC POWER OFF */
-#define DAC_POWER_IS_ON() ((DAC_POWER_GPIO->IDR & DAC_POWER_PIN) == 0) /* 如果已使能输出，返回ture */
+#define DAC_POWER_CLK_ENABLE()      __HAL_RCC_GPIOE_CLK_ENABLE()
+#define DAC_POWER_GPIO              GPIOE
+#define DAC_POWER_PIN               GPIO_PIN_3
+#define DAC_POWER_ON()              BSP_SET_GPIO_1(DAC_POWER_GPIO, DAC_POWER_PIN)   /* DAC POWER ON */
+#define DAC_POWER_OFF()             BSP_SET_GPIO_0(DAC_POWER_GPIO, DAC_POWER_PIN)   /* DAC POWER OFF */
+#define DAC_POWER_IS_ON()           ((DAC_POWER_GPIO->IDR & DAC_POWER_PIN) == 0)    /* 如果已使能输出，返回ture */
 
 /* DAC 引脚定义 */
 #define DACx DAC1
-#define DACx_CHANNEL_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
-#define DMAx_CLK_ENABLE() __HAL_RCC_DMA1_CLK_ENABLE()
+#define DACx_CHANNEL_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOA_CLK_ENABLE()
+#define DMAx_CLK_ENABLE()               __HAL_RCC_DMA1_CLK_ENABLE()
 
-#define DACx_CLK_ENABLE() __HAL_RCC_DAC12_CLK_ENABLE()
-#define DACx_FORCE_RESET() __HAL_RCC_DAC12_FORCE_RESET()
-#define DACx_RELEASE_RESET() __HAL_RCC_DAC12_RELEASE_RESET()
+#define DACx_CLK_ENABLE()               __HAL_RCC_DAC12_CLK_ENABLE()
+#define DACx_FORCE_RESET()              __HAL_RCC_DAC12_FORCE_RESET()
+#define DACx_RELEASE_RESET()            __HAL_RCC_DAC12_RELEASE_RESET()
 
 /* Definition for DACx Channel Pin */
-#define DACx_CHANNEL_PIN GPIO_PIN_4
-#define DACx_CHANNEL_GPIO_PORT GPIOA
+#define DACx_CHANNEL_PIN                GPIO_PIN_4
+#define DACx_CHANNEL_GPIO_PORT          GPIOA
 
 /* Definition for DACx's DMA_STREAM */
-#define DACx_CHANNEL DAC_CHANNEL_1
+#define DACx_CHANNEL                    DAC_CHANNEL_1
 
 /* Definition for DACx's DMA_STREAM */
-#define DACx_DMA_INSTANCE DMA1_Stream5
+#define DACx_DMA_INSTANCE               DMA1_Stream5
 
 /* Definition for DACx's NVIC */
-#define DACx_DMA_IRQn DMA1_Stream5_IRQn
-#define DACx_DMA_IRQHandler DMA1_Stream5_IRQHandler
+#define DACx_DMA_IRQn                   DMA1_Stream5_IRQn
+#define DACx_DMA_IRQHandler             DMA1_Stream5_IRQHandler
 
 /* DMA波形缓冲区 */
 #define WAVE_SAMPLE_SIZE 128

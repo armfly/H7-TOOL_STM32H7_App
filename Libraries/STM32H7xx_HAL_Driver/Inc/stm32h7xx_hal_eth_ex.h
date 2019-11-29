@@ -6,29 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */ 
@@ -62,25 +46,25 @@
   */
 typedef struct{
   FunctionalState InnerVLANTagInStatus;      /*!< Enables or disables Inner VLAN Tag in Rx Status  */
-    
+	
   uint32_t StripInnerVLANTag;                /*!< Sets the Inner VLAN Tag Stripping on Receive 
                                                   This parameter can be a value of @ref ETHEx_Rx_Inner_VLAN_Tag_Stripping */
-    
+	
   FunctionalState InnerVLANTag;              /*!< Enables or disables Inner VLAN Tag */
 
   FunctionalState DoubleVLANProcessing;      /*!< Enable or Disable double VLAN processing */
-    
+	
   FunctionalState VLANTagHashTableMatch;     /*!< Enable or Disable VLAN Tag Hash Table Match */
-    
+	
   FunctionalState VLANTagInStatus;           /*!< Enable or Disable VLAN Tag in Rx status */
-    
+	
   uint32_t StripVLANTag;                     /*!< Set the VLAN Tag Stripping on Receive 
                                                   This parameter can be a value of @ref ETHEx_Rx_VLAN_Tag_Stripping */
-    
+	
   uint32_t VLANTypeCheck;                    /*!< Enable or Disable VLAN Type Check
                                                   This parameter can be a value of @ref ETHEx_VLAN_Type_Check */
-                                                                                 
-  FunctionalState VLANTagInverceMatch;       /*!< Enable or disable VLAN Tag Inverse Match */                                                                             
+																				 
+  FunctionalState VLANTagInverceMatch;       /*!< Enable or disable VLAN Tag Inverse Match */																			 
 }ETH_RxVLANConfigTypeDef;
 /** 
   * 
@@ -93,7 +77,7 @@ typedef struct{
   FunctionalState SourceTxDesc;   /*!< Enable or Disable VLAN tag source from DMA tx descriptors */
   
   FunctionalState SVLANType;      /*!< Enable or Disable insertion of SVLAN type */
-    
+	
   uint32_t VLANTagControl;        /*!< Sets the VLAN tag control in tx packets
                                       This parameter can be a value of @ref ETHEx_VLAN_Tag_Control */
 }ETH_TxVLANConfigTypeDef;
@@ -150,7 +134,7 @@ typedef struct{
                                         This parameter must be a value from 0x0 to 0xFFFF */
   
   uint32_t DestinationPort;        /*!< Sets the L4 filter destination port 
-                                        This parameter must be a value from 0x0 to 0xFFFF */    
+                                        This parameter must be a value from 0x0 to 0xFFFF */	
 }ETH_L4FilterConfigTypeDef;
 /** 
   * 
@@ -167,7 +151,7 @@ typedef struct{
     
 /** @defgroup ETHEx_LPI_Event ETHEx LPI Event
   * @{
-  */    
+  */	
 #define ETH_TX_LPI_ENTRY    ETH_MACLCSR_TLPIEN 
 #define ETH_TX_LPI_EXIT     ETH_MACLCSR_TLPIEX 
 #define ETH_RX_LPI_ENTRY    ETH_MACLCSR_RLPIEN
@@ -212,7 +196,7 @@ typedef struct{
 /**
   * @}
   */
-    
+	
 /** @defgroup ETHEx_L3_Destination_Match ETHEx L3 Destination Match
   * @{
   */
@@ -222,7 +206,7 @@ typedef struct{
 /**
   * @}
   */
-    
+	
 /** @defgroup ETHEx_L4_Protocol ETHEx L4 Protocol
   * @{
   */
@@ -231,7 +215,7 @@ typedef struct{
 /**
   * @}
   */
-    
+	
 /** @defgroup ETHEx_L4_Source_Match ETHEx L4 Source Match
   * @{
   */
@@ -241,7 +225,7 @@ typedef struct{
 /**
   * @}
   */
-    
+	
 /** @defgroup ETHEx_L4_Destination_Match ETHEx L4 Destination Match
   * @{
   */
@@ -293,7 +277,7 @@ typedef struct{
 #define ETH_VLANTAGCONTROL_REPLACE    (ETH_MACVIR_VLP | ETH_MACVIR_VLC_VLANTAGREPLACE)
 /**
   * @}
-  */    
+  */	
  
 /** @defgroup ETHEx_Tx_VLAN_Tag ETHEx Tx VLAN Tag
   * @{

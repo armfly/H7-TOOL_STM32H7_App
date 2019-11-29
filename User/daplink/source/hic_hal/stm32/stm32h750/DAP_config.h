@@ -353,14 +353,14 @@ Configures the DAP Hardware I/O pins for Serial Wire Debug (SWD) mode:
 static __inline void PORT_SWD_SETUP(void)
 {
     // Set SWCLK HIGH
-    SWCLK_TCK_PIN_PORT->BSRRL = SWCLK_TCK_PIN;
+    BSP_SET_GPIO_1(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);
     
     // Set SWDIO HIGH
-    SWDIO_OUT_PIN_PORT->BSRRL = SWDIO_OUT_PIN;
+    BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
     
     // Set RESET HIGH
     //pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);//TODO - fix reset logic
-    nRESET_PIN_PORT->BSRRL = nRESET_PIN;
+    BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -389,7 +389,7 @@ Set the SWCLK/TCK DAP hardware I/O pin to high level.
 */
 static __forceinline void PIN_SWCLK_TCK_SET(void)
 {
-    SWCLK_TCK_PIN_PORT->BSRRL = SWCLK_TCK_PIN;
+    BSP_SET_GPIO_1(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);
 }
 
 /** SWCLK/TCK I/O pin: Set Output to Low.
@@ -397,7 +397,7 @@ Set the SWCLK/TCK DAP hardware I/O pin to low level.
 */
 static __forceinline void PIN_SWCLK_TCK_CLR(void)
 {
-    SWCLK_TCK_PIN_PORT->BSRRH = SWCLK_TCK_PIN;
+    BSP_SET_GPIO_0(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);
 }
 
 // SWDIO/TMS Pin I/O --------------------------------------
@@ -415,7 +415,7 @@ Set the SWDIO/TMS DAP hardware I/O pin to high level.
 */
 static __forceinline void PIN_SWDIO_TMS_SET(void)
 {
-    SWDIO_OUT_PIN_PORT->BSRRL = SWDIO_OUT_PIN;
+    BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
 }
 
 /** SWDIO/TMS I/O pin: Set Output to Low.
@@ -423,7 +423,7 @@ Set the SWDIO/TMS DAP hardware I/O pin to low level.
 */
 static __forceinline void PIN_SWDIO_TMS_CLR(void)
 {
-    SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
+    BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
 }
 
 /** SWDIO I/O pin: Get Input (used in SWD mode only).
@@ -440,9 +440,9 @@ static __forceinline uint32_t PIN_SWDIO_IN(void)
 static __forceinline void PIN_SWDIO_OUT(uint32_t bit)
 {
     if (bit & 1)
-        SWDIO_OUT_PIN_PORT->BSRRL = SWDIO_OUT_PIN;
+        BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
     else
-        SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
+        BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
 }
 
 /** SWDIO I/O pin: Switch to Output mode (used in SWD mode only).
@@ -451,10 +451,10 @@ called prior \ref PIN_SWDIO_OUT function calls.
 */
 static __forceinline void PIN_SWDIO_OUT_ENABLE(void)
 {
-    GPIOG->BSRRL = GPIO_PIN_9;    /* PG9 = 1 ÊÇÊä³ö    */    
+    BSP_SET_GPIO_1(GPIOG, GPIO_PIN_9);    /* PG9 = 1 åˆ‡æ¢ä¸ºè¾“å‡ºæ–¹å‘ */    
     pin_out_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
     
-    SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
+    BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
 }
 
 /** SWDIO I/O pin: Switch to Input mode (used in SWD mode only).
@@ -464,10 +464,10 @@ called prior \ref PIN_SWDIO_IN function calls.
 //static __forceinline void PIN_SWDIO_OUT_DISABLE(void)
 static  void PIN_SWDIO_OUT_DISABLE(void)
 {
-    GPIOG->BSRRH = GPIO_PIN_9;    /* PG9 = 0 ÊÇÊäÈë       */    
+    BSP_SET_GPIO_0(GPIOG, GPIO_PIN_9);    /* PG9 = 0 åˆ‡æ¢ä¸ºè¾“å…¥æ–¹å‘  */    
     pin_in_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
     
-    SWDIO_OUT_PIN_PORT->BSRRH = SWDIO_OUT_PIN;
+    BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
 }
 
 
@@ -541,9 +541,9 @@ static __forceinline uint32_t PIN_nRESET_IN(void)
 static __forceinline void     PIN_nRESET_OUT(uint32_t bit)
 {
     if (bit & 1)
-        nRESET_PIN_PORT->BSRRL = nRESET_PIN;
+        BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
     else
-        nRESET_PIN_PORT->BSRRH = nRESET_PIN;
+        BSP_SET_GPIO_0(nRESET_PIN_PORT, nRESET_PIN);
 }
 
 //**************************************************************************************************
@@ -567,9 +567,9 @@ It is recommended to provide the following LEDs for status indication:
 static __inline void LED_CONNECTED_OUT(uint32_t bit)
 {
     if (bit & 1)
-        CONNECTED_LED_PORT->BSRRL = CONNECTED_LED_PIN; // LED on
+        BSP_SET_GPIO_1(CONNECTED_LED_PORT, CONNECTED_LED_PIN);  // LED on
     else
-        CONNECTED_LED_PORT->BSRRH = CONNECTED_LED_PIN;// LED off
+        BSP_SET_GPIO_0(CONNECTED_LED_PORT, CONNECTED_LED_PIN);  // LED off
 }
 
 /** Debug Unit: Set status Target Running LED.

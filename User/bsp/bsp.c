@@ -428,17 +428,15 @@ void bsp_Idle(void)
 {
     /* --- 喂狗 */
 
-    /* --- 让CPU进入休眠，由Systick定时中断唤醒或者其他中断唤醒 */
-
-    lwip_pro(); /* 以太网协议栈轮询 */
+    lwip_pro();             /* 以太网协议栈轮询 */
 
     wifi_task();
 
-    lua_Poll(); /* 编程接口 */
-
-    EXIO_ScanTask(); /* 扩展IO任务，使能前天下内部10ms执行一次 */
+    lua_Poll(); 
     
-    //tusb_task();    /* USB协议栈轮询任务 */
+    EXIO_ScanTask();        /* 扩展IO任务 */
+    
+    ST7789_DrawScreen();    /* 硬件SPI+DMA+刷屏 */
 }
 
 /*
@@ -453,108 +451,6 @@ void bsp_Idle(void)
 void HAL_Delay(uint32_t Delay)
 {
     bsp_DelayUS(Delay * 1000);
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: TestGpio_USB3300
-*    功能说明: 翻转USB3300相关的GPIO，用来做硬件DEBUG
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void TestGpio_USB3300(void)
-{
-    GPIO_InitTypeDef GPIO_InitStruct;
-
-    /* Configure USB FS GPIOs */
-    __GPIOA_CLK_ENABLE();
-    __GPIOB_CLK_ENABLE();
-    __GPIOC_CLK_ENABLE();
-    __GPIOH_CLK_ENABLE();
-    __GPIOI_CLK_ENABLE();
-
-    /* CLK */
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    /* D0 */
-    GPIO_InitStruct.Pin = GPIO_PIN_3;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    /* D1 D2 D3 D4 D5 D6 D7 */
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_5 |
-                                                GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /* STP */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    /* NXT */
-    GPIO_InitStruct.Pin = GPIO_PIN_4;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
-
-    /* DIR */
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Alternate = 0;
-    HAL_GPIO_Init(GPIOI, &GPIO_InitStruct);
-
-    while (1)
-    {
-        GPIOA->BSRRH = GPIO_PIN_5;
-        GPIOA->BSRRH = GPIO_PIN_3;
-
-        GPIOB->BSRRH = GPIO_PIN_0;
-        GPIOB->BSRRH = GPIO_PIN_1;
-        GPIOB->BSRRH = GPIO_PIN_5;
-        GPIOB->BSRRH = GPIO_PIN_10;
-        GPIOB->BSRRH = GPIO_PIN_11;
-        GPIOB->BSRRH = GPIO_PIN_12;
-        GPIOB->BSRRH = GPIO_PIN_13;
-
-        GPIOC->BSRRH = GPIO_PIN_0;
-        GPIOH->BSRRH = GPIO_PIN_4;
-        GPIOI->BSRRH = GPIO_PIN_11;
-
-        bsp_DelayMS(100);
-
-        GPIOA->BSRRL = GPIO_PIN_5;
-        GPIOA->BSRRL = GPIO_PIN_3;
-
-        GPIOB->BSRRL = GPIO_PIN_0;
-        GPIOB->BSRRL = GPIO_PIN_1;
-        GPIOB->BSRRL = GPIO_PIN_5;
-        GPIOB->BSRRL = GPIO_PIN_10;
-        GPIOB->BSRRL = GPIO_PIN_11;
-        GPIOB->BSRRL = GPIO_PIN_12;
-        GPIOB->BSRRL = GPIO_PIN_13;
-
-        GPIOC->BSRRL = GPIO_PIN_0;
-        GPIOH->BSRRL = GPIO_PIN_4;
-        GPIOI->BSRRL = GPIO_PIN_11;
-
-        bsp_DelayMS(100);
-    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

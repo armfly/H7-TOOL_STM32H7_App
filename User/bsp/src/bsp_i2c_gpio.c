@@ -29,22 +29,22 @@
 */
 
 /* 定义I2C总线连接的GPIO端口, 用户只需要修改下面4行代码即可任意改变SCL和SDA的引脚 */
-#define I2C_SCL_GPIO GPIOI         /* 连接到SCL时钟线的GPIO */
-#define I2C_SCL_PIN GPIO_PIN_7 /* 连接到SCL时钟线的GPIO */
+#define I2C_SCL_GPIO GPIOI          /* 连接到SCL时钟线的GPIO */
+#define I2C_SCL_PIN GPIO_PIN_7      /* 连接到SCL时钟线的GPIO */
 
-#define I2C_SDA_GPIO GPIOF            /* 连接到SDA数据线的GPIO */
-#define I2C_SDA_PIN GPIO_PIN_15 /* 连接到SDA数据线的GPIO */
+#define I2C_SDA_GPIO GPIOF          /* 连接到SDA数据线的GPIO */
+#define I2C_SDA_PIN GPIO_PIN_15     /* 连接到SDA数据线的GPIO */
 
 #define ALL_I2C_GPIO_CLK_ENABLE() \
     __HAL_RCC_GPIOI_CLK_ENABLE();   \
     __HAL_RCC_GPIOF_CLK_ENABLE()
 
 /* 定义读写SCL和SDA的宏 */
-#define I2C_SCL_1() I2C_SCL_GPIO->BSRRL = I2C_SCL_PIN /* SCL = 1 */
-#define I2C_SCL_0() I2C_SCL_GPIO->BSRRH = I2C_SCL_PIN /* SCL = 0 */
+#define I2C_SCL_1() BSP_SET_GPIO_1(I2C_SCL_GPIO, I2C_SCL_PIN)   /* SCL = 1 */
+#define I2C_SCL_0() BSP_SET_GPIO_0(I2C_SCL_GPIO, I2C_SCL_PIN)   /* SCL = 0 */
 
-#define I2C_SDA_1() I2C_SDA_GPIO->BSRRL = I2C_SDA_PIN /* SDA = 1 */
-#define I2C_SDA_0() I2C_SDA_GPIO->BSRRH = I2C_SDA_PIN /* SDA = 0 */
+#define I2C_SDA_1() BSP_SET_GPIO_1(I2C_SDA_GPIO, I2C_SDA_PIN)   /* SDA = 1 */
+#define I2C_SDA_0() BSP_SET_GPIO_0(I2C_SDA_GPIO, I2C_SDA_PIN)   /* SDA = 0 */
 
 #define I2C_SDA_READ() ((I2C_SDA_GPIO->IDR & I2C_SDA_PIN) != 0) /* 读SDA口线状态 */
 #define I2C_SCL_READ() ((I2C_SCL_GPIO->IDR & I2C_SCL_PIN) != 0) /* 读SCL口线状态 */

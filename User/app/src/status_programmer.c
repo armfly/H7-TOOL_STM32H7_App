@@ -34,13 +34,13 @@ void status_Programmer(void)
     fRefresh = 1;
     while (g_MainStatus == MS_PROGRAMMER)
     {
-        bsp_Idle();
-
         if (fRefresh) /* 刷新整个界面 */
         {
             fRefresh = 0;
         }
 
+        bsp_Idle();
+        
         ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {

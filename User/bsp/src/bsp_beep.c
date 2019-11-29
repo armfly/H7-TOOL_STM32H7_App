@@ -18,17 +18,17 @@
 
 #include "bsp.h"
 
-#define BEEP_HAVE_POWER /* 定义此行表示有源蜂鸣器，直接通过GPIO驱动, 无需PWM */
+#define BEEP_HAVE_POWER     /* 定义此行表示有源蜂鸣器，直接通过GPIO驱动, 无需PWM */
 
-#ifdef BEEP_HAVE_POWER /* 有源蜂鸣器 */
+#ifdef BEEP_HAVE_POWER      /* 有源蜂鸣器 */
 
 /* PG1 */
-#define BEEP_GPIO_CLK_ENABLE() __HAL_RCC_GPIOG_CLK_ENABLE()
-#define GPIO_PORT_BEEP GPIOG
-#define GPIO_PIN_BEEP GPIO_PIN_1
+#define BEEP_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOG_CLK_ENABLE()
+#define GPIO_PORT_BEEP              GPIOG
+#define GPIO_PIN_BEEP               GPIO_PIN_1
 
-#define BEEP_ENABLE() GPIO_PORT_BEEP->BSRRL = GPIO_PIN_BEEP    /* 使能蜂鸣器鸣叫 */
-#define BEEP_DISABLE() GPIO_PORT_BEEP->BSRRH = GPIO_PIN_BEEP /* 禁止蜂鸣器鸣叫 */
+#define BEEP_ENABLE()               BSP_SET_GPIO_1(GPIO_PORT_BEEP, GPIO_PIN_BEEP)   /* 使能蜂鸣器鸣叫 */
+#define BEEP_DISABLE()              BSP_SET_GPIO_0(GPIO_PORT_BEEP, GPIO_PIN_BEEP)   /* 禁止蜂鸣器鸣叫 */
 #else                                                                                                                 /* 无源蜂鸣器 */
 /* PA0 ---> TIM5_CH1 */
 

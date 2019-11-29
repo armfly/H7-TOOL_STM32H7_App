@@ -133,16 +133,16 @@ MTDO   GPIO0   GPIO2   Mode  Description
     __HAL_RCC_GPIOG_CLK_ENABLE()
 
 /* 硬件掉电控制引脚 -- 接 3.3V 开始工作  */
-#define GPIO_CH_PD GPIOF
-#define PIN_CH_PD GPIO_PIN_6
-#define ESP_CH_PD_0() GPIO_CH_PD->BSRRH = PIN_CH_PD
-#define ESP_CH_PD_1() GPIO_CH_PD->BSRRL = PIN_CH_PD
+#define GPIO_CH_PD          GPIOF
+#define PIN_CH_PD           GPIO_PIN_6
+#define ESP_CH_PD_0()       BSP_SET_GPIO_0(GPIO_CH_PD, PIN_CH_PD)
+#define ESP_CH_PD_1()       BSP_SET_GPIO_1(GPIO_CH_PD, PIN_CH_PD)
 
 /* 1表示进入固件升级模式 0表示正常AT指令模式 */
-#define GPIO_GPIO0 GPIOG
-#define PIN_GPIO0 GPIO_PIN_4
-#define ESP_GPIO0_0() GPIO_GPIO0->BSRRH = PIN_GPIO0 /* 固件升级模式 */
-#define ESP_GPIO0_1() GPIO_GPIO0->BSRRL = PIN_GPIO0 /* 正常运行模式 */
+#define GPIO_GPIO0          GPIOG
+#define PIN_GPIO0           GPIO_PIN_4
+#define ESP_GPIO0_0()       BSP_SET_GPIO_0(GPIO_GPIO0, PIN_GPIO0)   /* 固件升级模式 */
+#define ESP_GPIO0_1()       BSP_SET_GPIO_1(GPIO_GPIO0, PIN_GPIO0)   /* 正常运行模式 */
 
 uint8_t g_EspBuf[2048]; /* 用于解码 */
 

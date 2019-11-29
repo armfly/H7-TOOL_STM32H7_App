@@ -46,8 +46,6 @@ void status_TVCCPower(void)
     bsp_StartAutoTimer(0, 300);     
     while (g_MainStatus == MS_TVCC_POWER)
     {
-        bsp_Idle();
-
         if (fRefresh) /* 刷新整个界面 */
         {
             fRefresh = 0;
@@ -56,6 +54,8 @@ void status_TVCCPower(void)
             DispTVccVoltCurr();
         }
 
+        bsp_Idle();
+        
         if (bsp_CheckTimer(0))
         {
             fRefresh = 1;

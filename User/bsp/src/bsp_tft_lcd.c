@@ -387,6 +387,7 @@ void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uin
             }
         }
     }
+
 }
 
 /*
@@ -1687,7 +1688,7 @@ void LCD_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _us
 */
 void LCD_Fill_Rect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
-    LCDX_FillRect(_usX, _usY, _usHeight, _usWidth, _usColor);
+    LCDX_FillRect(_usX, _usY, _usHeight, _usWidth, _usColor);  
 }
 
 /*
