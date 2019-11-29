@@ -83,7 +83,6 @@
 #include "bsp_i2c_mcp4725.h"
 #include "bsp_power_tvcc.h"
 
-#include "bsp_tft_st7735.h"
 #include "bsp_tft_st7789.h"
 #include "bsp_tft_lcd.h"
 
