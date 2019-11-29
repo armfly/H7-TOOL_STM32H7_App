@@ -127,12 +127,12 @@ static uint8_t s_DispRefresh = 0;
 */
 void ST7789_InitHard(void)
 {
-    ST7789_ConfigGPIO(); /* 配置429 CPU内部LTDC */
+    ST7789_ConfigGPIO();    
 
     ST7789_initial();
 
-    g_LcdHeight = 240; /* 显示屏分辨率-高度 */
-    g_LcdWidth = 240;    /* 显示屏分辨率-宽度 */
+    g_LcdHeight = 240;      /* 显示屏分辨率-高度 */
+    g_LcdWidth = 240;       /* 显示屏分辨率-宽度 */
     
     s_pDispBuf = (uint16_t *)(0x30000000);
 }
@@ -306,9 +306,6 @@ void ST7789_DrawScreen(void)
         return;
     }
     
-    EIO_ConfigPort(EIO_D0, ES_GPIO_OUT);
-    EIO_SetOutLevel(EIO_D0, 1);
-    
     s_DispRefresh = 0;
     
     ST7789_SetDispWin(0, 0, 240, 240);
@@ -324,8 +321,6 @@ void ST7789_DrawScreen(void)
 	while (wTransferState == 0){}
 		
     LCD_CS_1();
-        
-    EIO_SetOutLevel(EIO_D0, 0);
 }
 
 /*写指令到 LCD 模块*/
