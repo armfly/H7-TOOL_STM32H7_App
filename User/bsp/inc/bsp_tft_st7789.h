@@ -34,4 +34,6 @@ void ST7789_SetDirection(uint8_t _dir);
 void ST7789_GetChipDescribe(char *_str);
 void ST7789_WriteData16(uint16_t data2);
 
+void ST7789_DrawScreen(void);
+
 #endif

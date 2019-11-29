@@ -76,15 +76,15 @@
 #define GC_CLK_ENABLE()         __HAL_RCC_GPIOG_CLK_ENABLE()
 #define GC_GPIO                 GPIOG
 #define GC_PIN                  GPIO_PIN_2
-#define GC_0()                  GC_GPIO->BSRRH = GC_PIN
-#define GC_1()                  GC_GPIO->BSRRL = GC_PIN
+#define GC_0()                  BSP_SET_GPIO_0(GC_GPIO, GC_PIN)
+#define GC_1()                  BSP_SET_GPIO_1(GC_GPIO, GC_PIN)
 
 
 /* 示波器模式，电压模式和电流模式使用不同的ADC通道 */
 
 #define    ENABLE_DIFFERENTIAL_ENDED        0    /* 0表示配置为单端，1表示配置为差分 */
 
-#define    H7_ADC_SAMPLETIME_1CYCLE_5    ADC_SAMPLETIME_1CYCLE_5
+#define    H7_ADC_SAMPLETIME_1CYCLE_5       ADC_SAMPLETIME_1CYCLE_5
 
 /********************************** 电压模式的GPIO定义 ***********************************/
 
@@ -820,7 +820,6 @@ void bsp_StartAdcCH1(void)
         AdcHandle1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle1.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
         AdcHandle1.Init.OversamplingMode         = DISABLE;                         /* No oversampling */
-        AdcHandle1.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
         AdcHandle1.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;         /* Left shift of final results */
         /* Initialize ADC peripheral according to the passed parameters */
         if (HAL_ADC_Init(&AdcHandle1) != HAL_OK)
@@ -828,6 +827,7 @@ void bsp_StartAdcCH1(void)
             Error_Handler(__FILE__, __LINE__);
         }
 
+        ADC_ConfigureBoostMode(&AdcHandle1);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
 
         /* ### - 2 - Start calibration ############################################ */
     #if ENABLE_DIFFERENTIAL_ENDED == 0    /* 单端模式 */    
@@ -896,14 +896,14 @@ void bsp_StartAdcCH1(void)
         AdcHandle1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle1.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
         AdcHandle1.Init.OversamplingMode         = DISABLE;                         /* No oversampling */
-        AdcHandle1.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
         /* Initialize ADC peripheral according to the passed parameters */
         if (HAL_ADC_Init(&AdcHandle1) != HAL_OK)
         {
             Error_Handler(__FILE__, __LINE__);
         }
 
-
+        ADC_ConfigureBoostMode(&AdcHandle1);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
+        
         /* ### - 2 - Start calibration ############################################ */
         if (HAL_ADCEx_Calibration_Start(&AdcHandle1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
         {
@@ -971,8 +971,6 @@ void bsp_StartAdcCH1(void)
         AdcHandle1.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_RISING;   /* Parameter discarded because software trigger chosen */
         AdcHandle1.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle1.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
-        AdcHandle1.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
-
         AdcHandle1.Init.OversamplingMode         = ENABLE;                         
         AdcHandle1.Init.Oversampling.Ratio                 = 1023;    /* 1024-oversampling */       
         AdcHandle1.Init.Oversampling.RightBitShift         = ADC_RIGHTBITSHIFT_10;         /* 6-bit right shift of the oversampled summation */    
@@ -985,6 +983,7 @@ void bsp_StartAdcCH1(void)
             Error_Handler(__FILE__, __LINE__);
         }
 
+        ADC_ConfigureBoostMode(&AdcHandle1);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */        
 
         /* ### - 2 - Start calibration ############################################ */
         if (HAL_ADCEx_Calibration_Start(&AdcHandle1, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
@@ -1058,7 +1057,6 @@ void bsp_StartAdcCH2(void)
         AdcHandle2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle2.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
         AdcHandle2.Init.OversamplingMode         = DISABLE;                         /* No oversampling */
-        AdcHandle2.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
         AdcHandle1.Init.LeftBitShift             = ADC_LEFTBITSHIFT_NONE;         /* Left shift of final results */
         /* Initialize ADC peripheral according to the passed parameters */
         if (HAL_ADC_Init(&AdcHandle2) != HAL_OK)
@@ -1066,7 +1064,8 @@ void bsp_StartAdcCH2(void)
             Error_Handler(__FILE__, __LINE__);
         }
 
-
+        ADC_ConfigureBoostMode(&AdcHandle2);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
+        
         /* ### - 2 - Start calibration ############################################ */
     #if ENABLE_DIFFERENTIAL_ENDED == 0    /* 单端模式 */            
         if (HAL_ADCEx_Calibration_Start(&AdcHandle2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
@@ -1131,14 +1130,14 @@ void bsp_StartAdcCH2(void)
         AdcHandle2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle2.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
         AdcHandle2.Init.OversamplingMode         = DISABLE;                         /* No oversampling */
-        AdcHandle2.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
         /* Initialize ADC peripheral according to the passed parameters */
         if (HAL_ADC_Init(&AdcHandle2) != HAL_OK)
         {
             Error_Handler(__FILE__, __LINE__);
         }
 
-
+        ADC_ConfigureBoostMode(&AdcHandle2);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
+        
         /* ### - 2 - Start calibration ############################################ */
         if (HAL_ADCEx_Calibration_Start(&AdcHandle2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
         {
@@ -1206,8 +1205,6 @@ void bsp_StartAdcCH2(void)
         AdcHandle2.Init.ExternalTrigConvEdge     = ADC_EXTERNALTRIGCONVEDGE_RISING;   /* Parameter discarded because software trigger chosen */
         AdcHandle2.Init.ConversionDataManagement = ADC_CONVERSIONDATA_DMA_CIRCULAR; /* ADC DMA circular requested */
         AdcHandle2.Init.Overrun                  = ADC_OVR_DATA_OVERWRITTEN;        /* DR register is overwritten with the last conversion result in case of overrun */
-        AdcHandle2.Init.BoostMode                = ENABLE;                          /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
-
         AdcHandle2.Init.OversamplingMode         = ENABLE;                         
         AdcHandle2.Init.Oversampling.Ratio                 = 1023;    /* 1024-oversampling */       
         AdcHandle2.Init.Oversampling.RightBitShift         = ADC_RIGHTBITSHIFT_10;         /* 6-bit right shift of the oversampled summation */    
@@ -1220,7 +1217,8 @@ void bsp_StartAdcCH2(void)
             Error_Handler(__FILE__, __LINE__);
         }
 
-
+        ADC_ConfigureBoostMode(&AdcHandle2);     /* Enable Boost mode as ADC clock frequency is bigger than 20 MHz */
+        
         /* ### - 2 - Start calibration ############################################ */
         if (HAL_ADCEx_Calibration_Start(&AdcHandle2, ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
         {

@@ -37,14 +37,14 @@ void status_ResistorMeter(void)
     bsp_StartAutoTimer(0, 300);
     while (g_MainStatus == MS_RESISTOR_METER)
     {
-        bsp_Idle();
-
         if (fRefresh) /* 刷新整个界面 */
         {
             fRefresh = 0;
             DispResistor();
         }
 
+        bsp_Idle();
+        
         /* 短路蜂鸣 20欧 */
         if (g_tVar.NTCRes < (float)0.02)
         {

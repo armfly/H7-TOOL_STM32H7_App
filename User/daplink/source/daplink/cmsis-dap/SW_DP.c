@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file    SW_DP.c
  * @brief   SWD driver
  *
@@ -425,7 +425,7 @@ void SWD_DIO_OutDisable(void)
 {
 #if SPI_MODE_ENABLE == 1    
     SPI2->CR1 = SPI_CR1_SSI;    
-    GPIOG->BSRRH = GPIO_PIN_9;    /* PG9 = 0 是输入        */        
+    BSP_SET_GPIO_0(GPIOG, GPIO_PIN_9);    /* PG9 = 0 是输入        */        
 #else
     PIN_SWDIO_OUT_DISABLE(); 
 #endif
@@ -434,7 +434,7 @@ void SWD_DIO_OutDisable(void)
 void SWD_DIO_OutEnable(void)
 {
 #if SPI_MODE_ENABLE == 1
-    GPIOG->BSRRL = GPIO_PIN_9;    /* PG9 = 1 是输出       */    
+    BSP_SET_GPIO_1(GPIOG, GPIO_PIN_9);    /* PG9 = 1 是输出       */    
     SPI2->CR1 = SPI_CR1_SSI | SPI_CR1_HDDIR;
 #else
     PIN_SWDIO_OUT_ENABLE(); 

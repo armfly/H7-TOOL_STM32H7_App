@@ -37,14 +37,14 @@ void status_TempMeter(void)
     bsp_StartAutoTimer(0, 200);
     while (g_MainStatus == MS_TEMP_METER)
     {
-        bsp_Idle();
-
         if (fRefresh) /* 刷新整个界面 */
         {
             fRefresh = 0;
             DispTemp();
         }
-
+        
+        bsp_Idle();
+        
         if (bsp_CheckTimer(0))
         {
             fRefresh = 1;

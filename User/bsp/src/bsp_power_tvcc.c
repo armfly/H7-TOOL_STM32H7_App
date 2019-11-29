@@ -21,13 +21,13 @@
 /* PC13控制LDO输出 */
 #define ALL_TVCC_GPIO_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
 
-#define TVCC_EN_GPIO GPIOC
-#define TVCC_EN_PIN GPIO_PIN_13
+#define TVCC_EN_GPIO    GPIOC
+#define TVCC_EN_PIN     GPIO_PIN_13
 
-#define TVCC_OFF() TVCC_EN_GPIO->BSRRH = TVCC_EN_PIN
-#define TVCC_ON() TVCC_EN_GPIO->BSRRL = TVCC_EN_PIN
+#define TVCC_OFF()      BSP_SET_GPIO_0(TVCC_EN_GPIO, TVCC_EN_PIN)
+#define TVCC_ON()       BSP_SET_GPIO_1(TVCC_EN_GPIO, TVCC_EN_PIN)
 
-#define TVCC_IS_ON() ((TVCC_EN_GPIO->IDR & TVCC_EN_PIN) != 0) /* 如果已使能输出，返回ture */
+#define TVCC_IS_ON()    ((TVCC_EN_GPIO->IDR & TVCC_EN_PIN) != 0) /* 如果已使能输出，返回ture */
 
 /* MCP4018数字电位器控制LDO输出电压值 (128档）
     VOUT = 1.25 * (1 + R1 / R2);

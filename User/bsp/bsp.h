@@ -19,22 +19,20 @@
 #define _BSP_H
 
 /* 定义 BSP 版本号 */
-#define __STM32H7_BSP_VERSION "1.1"
-
-/* CPU空闲时执行的函数 */
-//#define CPU_IDLE()        bsp_Idle()
+#define __STM32H7_BSP_VERSION "1.2"
 
 /* 开关全局中断的宏 */
-#define ENABLE_INT() __set_PRIMASK(0)    /* 使能全局中断 */
-#define DISABLE_INT() __set_PRIMASK(1) /* 禁止全局中断 */
+#define ENABLE_INT()    __set_PRIMASK(0)    /* 使能全局中断 */
+#define DISABLE_INT()   __set_PRIMASK(1)  /* 禁止全局中断 */
 
 /* 这个宏仅用于调试阶段排错 */
 #define BSP_Printf printf
 //#define BSP_Printf(...)
 
-#define EXTI9_5_ISR_MOVE_OUT /* bsp.h 中定义此行，表示本函数移到 stam32f4xx_it.c。 避免重复定义 */
+#define ERROR_HANDLER()     Error_Handler(__FILE__, __LINE__)
 
-#define ERROR_HANDLER() Error_Handler(__FILE__, __LINE__)
+#define BSP_SET_GPIO_1(gpio, pin)   gpio->BSRR = pin
+#define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)pin << 16U
 
 /* 默认是关闭状态 */
 #define Enable_EventRecorder 0
@@ -104,9 +102,9 @@
 #include "bsp_ntc.h"
 #include "bsp_ext_io.h"
 
-#define HARD_MODEL 0x0750
-#define BOOT_VERSION *(uint16_t *)(0x08000000 + 28)
-#define APP_VERSION *(uint16_t *)(0x08020000 + 28)
+#define HARD_MODEL              0x0750
+#define BOOT_VERSION            *(uint16_t *)(0x08000000 + 28)
+#define APP_VERSION             *(uint16_t *)(0x08020000 + 28)
 
 /* 提供给其他C文件调用的函数 */
 void bsp_Init(void);

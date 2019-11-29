@@ -281,14 +281,14 @@ void bsp_SetTIMOutPWM(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, TIM_TypeDef* TIMx,
     {       
         //bsp_RCC_TIM_Disable(TIMx);        /* 关闭TIM时钟, 可能影响其他通道 */     
         bsp_ConfigGpioOut(GPIOx, GPIO_Pin); /* 配置GPIO为推挽输出 */           
-        GPIOx->BSRRH = GPIO_Pin;        /* PWM = 0 */       
+        BSP_SET_GPIO_0(GPIOx, GPIO_Pin);        /* PWM = 0 */       
         return;
     }
     else if (_ulDutyCycle == 10000)
     {
         //bsp_RCC_TIM_Disable(TIMx);        /* 关闭TIM时钟, 可能影响其他通道 */
         bsp_ConfigGpioOut(GPIOx, GPIO_Pin); /* 配置GPIO为推挽输出 */       
-        GPIOx->BSRRL = GPIO_Pin;        /* PWM = 1*/    
+        BSP_SET_GPIO_1(GPIOx, GPIO_Pin);        /* PWM = 1*/    
         return;
     }
     

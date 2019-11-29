@@ -68,7 +68,7 @@ __Vectors       DCD     __initial_sp                      ; Top of Stack
                 DCD     MemManage_Handler                 ; MPU Fault Handler
                 DCD     BusFault_Handler                  ; Bus Fault Handler
                 DCD     UsageFault_Handler                ; Usage Fault Handler
-                DCD     0x00000104                        ; Reserved H7-TOOL APP 固件版本
+                DCD     0x00000105                        ; Reserved H7-TOOL APP 固件版本
                 DCD     0                                 ; Reserved
                 DCD     0                                 ; Reserved
                 DCD     0                                 ; Reserved

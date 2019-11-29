@@ -568,19 +568,19 @@ void comSetBaud(COM_PORT_E _ucPort, uint32_t _BaudRate)
     
     if (pUart->huart.Init.BaudRate < 300)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV64;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV64;
     }    
     else if (pUart->huart.Init.BaudRate < 1200)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV8;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV8;
     }
     else if (pUart->huart.Init.BaudRate < 2400)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV2;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV2;
     }
     else
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV1;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
     }
         
     HAL_UART_Init(&pUart->huart);
@@ -995,23 +995,21 @@ void bsp_InitUartParam(COM_PORT_E _ucPort, uint32_t BaudRate, uint32_t Parity, u
     pUart->huart.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;  
     if (BaudRate < 300)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV64;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV64;
     }    
     else if (BaudRate < 1200)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV8;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV8;
     }
     else if (BaudRate < 2400)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV2;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV2;
     }
     else
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV1;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
     }
-    pUart->huart.Init.FIFOMode = UART_FIFOMODE_DISABLE;
-    pUart->huart.Init.TXFIFOThreshold = UART_TXFIFO_THRESHOLD_1_8;
-    pUart->huart.Init.RXFIFOThreshold = UART_RXFIFO_THRESHOLD_1_8;    
+    pUart->huart.FifoMode = UART_FIFOMODE_DISABLE;
     pUart->huart.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
         
     if (HAL_UART_Init(&pUart->huart) != HAL_OK)
@@ -1057,19 +1055,19 @@ void bsp_SetUartParam(COM_PORT_E _ucPort, uint32_t BaudRate, uint32_t Parity, ui
    
     if (BaudRate < 300)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV64;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV64;
     }    
     else if (BaudRate < 1200)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV8;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV8;
     }
     else if (BaudRate < 2400)
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV2;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV2;
     }
     else
     {
-        pUart->huart.Init.Prescaler = UART_PRESCALER_DIV1;
+        pUart->huart.Init.ClockPrescaler = UART_PRESCALER_DIV1;
     }
    
     if (HAL_UART_Init(&pUart->huart) != HAL_OK)
@@ -1515,7 +1513,7 @@ void UartIRQ(UART_T *_pUart)
     uint32_t cr3its = READ_REG(_pUart->huart.Instance->CR3);
 
     /* 处理接收中断  */
-    if ((isrflags & USART_ISR_RXNE) != RESET)
+    if ((isrflags & USART_ISR_RXNE_RXFNE) != RESET)
     {
         /* 从串口接收数据寄存器读取数据存放到接收FIFO */
         uint8_t ch;
@@ -1543,7 +1541,7 @@ void UartIRQ(UART_T *_pUart)
     }
 
     /* 处理发送缓冲区空中断 */
-    if (((isrflags & USART_ISR_TXE) != RESET) && (cr1its & USART_CR1_TXEIE) != RESET)
+    if (((isrflags & USART_ISR_TXE_TXFNF) != RESET) && (cr1its & USART_CR1_TXEIE) != RESET)
     {
         //if (_pUart->usTxRead == _pUart->usTxWrite)
         if (_pUart->usTxCount == 0)

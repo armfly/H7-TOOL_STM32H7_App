@@ -2,6 +2,34 @@
 3. qspi_read(), lua连续读取存在问题. 2019-07-07
 
 ----------------------------------------------------------------------------
+2019-11-29 V1.05 - 功能未增加，但是改动比较大，封一个版本。
+1.HAL固件库、USB库升级到最新版（来自于en.stm32cubeh7 （V1.5.0））
+ -所有的GPIO寄存器操作更改为如下宏（因为新固件库取消了 BSRRH、BSRRL寄存器）
+   #define BSP_SET_GPIO_1(gpio, pin)   gpio->BSRR = pin
+   #define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)pin << 16U
+   
+2.显示屏驱动采用SPI+DMA驱动。整屏刷新18ms。（驱动由硬汉提供）
+ - 修bsp_tft_st7789.c文件
+ - bsp_Idle()函数执行  ST7789_DrawScreen();    /* 硬件SPI+DMA+刷屏 */
+ - 使用0x30000000开始的240*240*2字节内存做显存
+
+3.为了适应后台刷屏机制。所有的 while循环中bsp_Idle() 位置放到显示刷新后面
+    while (g_MainStatus == MS_CURRENT_METER)
+    {
+        if (fRefresh)       /* 刷新整个界面 */
+        {
+            fRefresh = 0;
+
+            DispCurrentVolt();
+            AutoCurrentRange();
+        }
+
+        bsp_Idle();        /* 必须在fRefresh语句后边, 否则刚进入界面会有闪烁感 */
+        
+        ...
+    }
+    
+----------------------------------------------------------------------------
 2019-11-25 V1.04
 1.新增脉冲计数和频率计功能。status_pulse_meter.c
 2.lua增加串口MODBUS接口函数

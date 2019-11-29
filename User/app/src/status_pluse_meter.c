@@ -41,8 +41,6 @@ void status_PulseMeter(void)
     bsp_StartAutoTimer(0, 1000);
     while (g_MainStatus == MS_PULSE_METER)
     {
-        bsp_Idle();
-
         if (fRefresh) /* 刷新整个界面 */
         {
             fRefresh = 0;
@@ -51,6 +49,8 @@ void status_PulseMeter(void)
             DispPulse();
         }
 
+        bsp_Idle();
+        
         if (bsp_CheckTimer(0))
         {
             fRefresh = 1;

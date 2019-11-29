@@ -3,12 +3,13 @@
 *
 *    模块名称 : ST7789 TFT SPI接口驱动程序
 *    文件名称 : bsp_tft_st7789.c
-*    版    本 : V1.0
+*    版    本 : V1.2
 *    说    明 : SPI接口，显示驱动IC为ST7789，分辨率为240*240,1.3寸ISP
 *    修改记录 :
-*        版本号  日期       作者    说明
+*        版本号  日期       作者        说明
 *        V1.0    2018-12-06 armfly 
-*        V1.1    2019-03-25 armfly 软件SPI，优化执行速度
+*        V1.1    2019-03-25 armfly      软件SPI，优化执行速度
+*        V1.2    2019-11-29 baiyongbin  硬件SPI+DMA提高刷屏速度
 *
 *    Copyright (C), 2018-2030, 安富莱电子 www.armfly.com
 *
@@ -23,36 +24,46 @@
     H7-TOOL LCD口线分配
     ----- 第6版 -----
     PG15  --->  LCD_RS
-    PE1     --->  LCD_CS
-    PH6 --->  LCD_SCK        SPI3_SCK    
-    PH7 --->  LCD_SDA        SPI3_MOSI
-    PH9     --->  BACK_LIGHT    TIM12_CH2
+    PE1   --->  LCD_CS
+    PH6   --->  LCD_SCK        SPI3_SCK    
+    PH7   --->  LCD_SDA        SPI3_MOSI
+    PH9   --->  BACK_LIGHT    TIM12_CH2
     
-    PB6  --->  LCD_RESET
-    PH15 --->  电源控制
+    PB6   --->  LCD_RESET
+    PH15  --->  电源控制
     
     ----- 第4、5版 -----
     PF3  --->  LCD_RS
-    PE1     --->  LCD_CS
+    PE1  --->  LCD_CS
     PG10 --->  LCD_SCK        SPI3_SCK    
     PG15 --->  LCD_SDA        SPI3_MOSI
-    PH9     --->  BACK_LIGHT    TIM12_CH2
+    PH9  --->  BACK_LIGHT    TIM12_CH2
     
     PB6  --->  LCD_RESET
     PH15 --->  电源控制
     
     --------------- 旧版 -------
     PF3  --->  LCD_RS
-    PG2     --->  LCD_CS
+    PG2  --->  LCD_CS
     PC12 --->  LCD_SDA        SPI3_MOSI
     PC10 --->  LCD_SCK        SPI3_SCK
     
-    PH9     --->  BACK_LIGHT    TIM12_CH2
+    PH9  --->  BACK_LIGHT    TIM12_CH2
     
     第2版增加reset
     
     PB6  --->  LCD_RESET
 */
+
+#define SPI5_SCK_CLK_ENABLE()   __HAL_RCC_GPIOH_CLK_ENABLE()
+#define SPI5_SCK_GPIO           GPIOH
+#define SPI5_SCK_PIN            GPIO_PIN_6
+#define SPI5_SCK_AF             GPIO_AF5_SPI5
+
+#define SPI5_MOSI_CLK_ENABLE()  __HAL_RCC_GPIOH_CLK_ENABLE()
+#define SPI5_MOSI_GPIO          GPIOH
+#define SPI5_MOSI_PIN           GPIO_PIN_7
+#define SPI5_MOSI_AF            GPIO_AF5_SPI5
 
 #define ALL_LCD_GPIO_CLK_ENABLE() \
     __HAL_RCC_GPIOB_CLK_ENABLE();   \
@@ -61,43 +72,50 @@
     __HAL_RCC_GPIOH_CLK_ENABLE();
 
 /* LCD_RS 寄存器选择 */
-#define LCD_RS_GPIO GPIOG
-#define LCD_RS_PIN GPIO_PIN_15
-#define LCD_RS_0() LCD_RS_GPIO->BSRRH = LCD_RS_PIN
-#define LCD_RS_1() LCD_RS_GPIO->BSRRL = LCD_RS_PIN
+#define LCD_RS_GPIO     GPIOG
+#define LCD_RS_PIN      GPIO_PIN_15
+#define LCD_RS_0()      BSP_SET_GPIO_0(LCD_RS_GPIO, LCD_RS_PIN)
+#define LCD_RS_1()      BSP_SET_GPIO_1(LCD_RS_GPIO, LCD_RS_PIN)
 
 /* LCD_CS SPI片选*/
-#define LCD_CS_GPIO GPIOE
-#define LCD_CS_PIN GPIO_PIN_1
-#define LCD_CS_0() LCD_CS_GPIO->BSRRH = LCD_CS_PIN
-#define LCD_CS_1() LCD_CS_GPIO->BSRRL = LCD_CS_PIN
+#define LCD_CS_GPIO     GPIOE
+#define LCD_CS_PIN      GPIO_PIN_1
+#define LCD_CS_0()      BSP_SET_GPIO_0(LCD_CS_GPIO, LCD_CS_PIN)
+#define LCD_CS_1()      BSP_SET_GPIO_1(LCD_CS_GPIO, LCD_CS_PIN)
 
 /* SPI 接口 */
-#define LCD_SCK_GPIO GPIOH
-#define LCD_SCK_PIN GPIO_PIN_6
-#define LCD_SCK_0() LCD_SCK_GPIO->BSRRH = LCD_SCK_PIN
-#define LCD_SCK_1() LCD_SCK_GPIO->BSRRL = LCD_SCK_PIN
+#define LCD_SCK_GPIO    GPIOH
+#define LCD_SCK_PIN     GPIO_PIN_6
+#define LCD_SCK_0()     BSP_SET_GPIO_0(LCD_SCK_GPIO, LCD_SCK_PIN)
+#define LCD_SCK_1()     BSP_SET_GPIO_1(LCD_SCK_GPIO, LCD_SCK_PIN)
 
-#define LCD_SDA_GPIO GPIOH
-#define LCD_SDA_PIN GPIO_PIN_7
-#define LCD_SDA_0() LCD_SDA_GPIO->BSRRH = LCD_SDA_PIN
-#define LCD_SDA_1() LCD_SDA_GPIO->BSRRL = LCD_SDA_PIN
+#define LCD_SDA_GPIO    GPIOH
+#define LCD_SDA_PIN     GPIO_PIN_7
+#define LCD_SDA_0()     BSP_SET_GPIO_0(LCD_SDA_GPIO, LCD_SDA_PIN)
+#define LCD_SDA_1()     BSP_SET_GPIO_1(LCD_SDA_GPIO, LCD_SDA_PIN)
 
 /* LCD_RESET 复位 */
-#define LCD_RESET_GPIO GPIOB
-#define LCD_RESET_PIN GPIO_PIN_6
-#define LCD_RESET_0() LCD_RESET_GPIO->BSRRH = LCD_RESET_PIN
-#define LCD_RESET_1() LCD_RESET_GPIO->BSRRL = LCD_RESET_PIN
+#define LCD_RESET_GPIO  GPIOB
+#define LCD_RESET_PIN   GPIO_PIN_6
+#define LCD_RESET_0()   BSP_SET_GPIO_0(LCD_RESET_GPIO, LCD_RESET_PIN)
+#define LCD_RESET_1()   BSP_SET_GPIO_1(LCD_RESET_GPIO, LCD_RESET_PIN)
 
 /* LCD_PWR_EN 电源控制 */
 #define LCD_PWR_EN_GPIO GPIOH
-#define LCD_PWR_EN_PIN GPIO_PIN_15
-#define LCD_PWR_EN_0() LCD_PWR_EN_GPIO->BSRRH = LCD_PWR_EN_PIN
-#define LCD_PWR_EN_1() LCD_PWR_EN_GPIO->BSRRL = LCD_PWR_EN_PIN
+#define LCD_PWR_EN_PIN  GPIO_PIN_15
+#define LCD_PWR_EN_0()  BSP_SET_GPIO_0(LCD_PWR_EN_GPIO, LCD_PWR_EN_PIN)
+#define LCD_PWR_EN_1()  BSP_SET_GPIO_1(LCD_PWR_EN_GPIO, LCD_PWR_EN_PIN)
 
 static void ST7789_ConfigGPIO(void);
 static void ST7789_initial(void);
 static void ST7789_SendByteQuick(uint8_t data);
+
+SPI_HandleTypeDef hspi5 = {0};
+DMA_HandleTypeDef hdma_tx = {0};
+__IO uint32_t wTransferState = 0;
+
+static uint16_t *s_pDispBuf;
+static uint8_t s_DispRefresh = 0;
 
 /*
 *********************************************************************************************************
@@ -115,6 +133,119 @@ void ST7789_InitHard(void)
 
     g_LcdHeight = 240; /* 显示屏分辨率-高度 */
     g_LcdWidth = 240;    /* 显示屏分辨率-宽度 */
+    
+    s_pDispBuf = (uint16_t *)(0x30000000);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_InitSPI5ParamFast
+*    功能说明: 硬件SPI配置
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_InitSPI5ParamFast(void)
+{
+	hspi5.Instance = SPI5;
+	hspi5.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+	hspi5.Init.Direction = SPI_DIRECTION_2LINES;
+	hspi5.Init.CLKPhase = SPI_PHASE_1EDGE;
+	hspi5.Init.CLKPolarity = SPI_POLARITY_HIGH;
+	hspi5.Init.DataSize = SPI_DATASIZE_16BIT;
+	hspi5.Init.FirstBit = SPI_FIRSTBIT_MSB;
+	hspi5.Init.TIMode = SPI_TIMODE_DISABLE;
+	hspi5.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+	hspi5.Init.CRCPolynomial = 7;
+	hspi5.Init.CRCLength = SPI_CRC_LENGTH_8BIT;
+	hspi5.Init.NSS = SPI_NSS_SOFT;
+	hspi5.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
+	hspi5.Init.MasterKeepIOState = SPI_MASTER_KEEP_IO_STATE_ENABLE; /* Recommanded setting to avoid glitches */
+	hspi5.Init.Mode = SPI_MODE_MASTER;
+	hspi5.Init.IOSwap = SPI_IO_SWAP_ENABLE;
+	hspi5.Init.FifoThreshold = SPI_FIFO_THRESHOLD_01DATA;
+
+	HAL_SPI_Init(&hspi5);
+
+	/* Enable DMA clock */
+	__HAL_RCC_DMA2_CLK_ENABLE();
+
+	/* Configure the DMA handler for Transmission process */
+	hdma_tx.Instance                 = DMA2_Stream3;
+	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+	hdma_tx.Init.MemBurst            = DMA_MBURST_SINGLE;
+	hdma_tx.Init.PeriphBurst         = DMA_PBURST_SINGLE;
+	hdma_tx.Init.Request             = DMA_REQUEST_SPI5_TX;
+	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
+	hdma_tx.Init.Mode                = DMA_NORMAL;
+	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+
+	HAL_DMA_Init(&hdma_tx);
+
+	/* Associate the initialized DMA handle to the the SPI handle */
+	__HAL_LINKDMA(&hspi5, hdmatx, hdma_tx);
+	
+	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 1);
+	HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+
+	HAL_NVIC_SetPriority(SPI5_IRQn, 1, 0);
+	HAL_NVIC_EnableIRQ(SPI5_IRQn);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_InitSPI5_Fast
+*    功能说明: 配置SPI总线。
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_InitSPI5_Fast(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct;
+
+    /* 配置GPIO时钟 */
+    SPI5_SCK_CLK_ENABLE();
+
+    SPI5_MOSI_CLK_ENABLE();
+
+    /* 使能SPI时钟 */
+    __HAL_RCC_SPI5_CLK_ENABLE();
+
+    /* 配置GPIO为SPI功能 */
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP; /* 上拉 */
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = SPI5_SCK_AF;
+
+    GPIO_InitStruct.Pin = SPI5_SCK_PIN;
+    HAL_GPIO_Init(SPI5_SCK_GPIO, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = SPI5_MOSI_PIN;
+    GPIO_InitStruct.Alternate = SPI5_MOSI_AF;
+    HAL_GPIO_Init(SPI5_MOSI_GPIO, &GPIO_InitStruct);
+
+	bsp_InitSPI5ParamFast();
+}
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+	wTransferState = 1;
+}
+
+void DMA2_Stream3_IRQHandler(void)
+{
+	HAL_DMA_IRQHandler(hspi5.hdmatx);
+}
+
+void SPI5_IRQHandler(void)
+{
+	HAL_SPI_IRQHandler(&hspi5);
 }
 
 /*
@@ -147,15 +278,54 @@ static void ST7789_ConfigGPIO(void)
         gpio_init.Pin = LCD_CS_PIN;
         HAL_GPIO_Init(LCD_CS_GPIO, &gpio_init);
 
-        gpio_init.Pin = LCD_SCK_PIN;
-        HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
+//        gpio_init.Pin = LCD_SCK_PIN;
+//        HAL_GPIO_Init(LCD_SCK_GPIO, &gpio_init);
 
-        gpio_init.Pin = LCD_SDA_PIN;
-        HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
+//        gpio_init.Pin = LCD_SDA_PIN;
+//        HAL_GPIO_Init(LCD_SDA_GPIO, &gpio_init);
 
         gpio_init.Pin = LCD_RESET_PIN;
         HAL_GPIO_Init(LCD_RESET_GPIO, &gpio_init);
     }
+	
+	bsp_InitSPI5_Fast();
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: ST7789_DrawScreen
+*    功能说明: 整屏刷新。 插入bsp_Idle()函数执行
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void ST7789_DrawScreen(void)
+{
+    if (s_DispRefresh == 0)
+    {
+        return;
+    }
+    
+    EIO_ConfigPort(EIO_D0, ES_GPIO_OUT);
+    EIO_SetOutLevel(EIO_D0, 1);
+    
+    s_DispRefresh = 0;
+    
+    ST7789_SetDispWin(0, 0, 240, 240);
+
+	bsp_InitSPI5ParamFast();
+    LCD_RS_1();
+    LCD_CS_0();
+	
+	wTransferState = 0; 
+	SCB_CleanInvalidateDCache();
+	
+	HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);
+	while (wTransferState == 0){}
+		
+    LCD_CS_1();
+        
+    EIO_SetOutLevel(EIO_D0, 0);
 }
 
 /*写指令到 LCD 模块*/
@@ -173,6 +343,23 @@ void Lcd_WriteIndex(uint8_t data1)
 /* 优化代码，快速操作 */
 static void ST7789_SendByteQuick(uint8_t data)
 {
+#if 1   /* 硬件模式 */
+	SPI5->CFG1 = SPI_BAUDRATEPRESCALER_8 | 7;
+    SPI5->CR1 = SPI_CR1_SSI;
+    SPI5->CR2 = 1;
+    SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI;
+    SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+
+    while ((SPI5->SR & SPI_FLAG_TXE) == 0);
+
+    *((__IO uint8_t *)&SPI5->TXDR) = data;
+	
+    while ((SPI5->SR & SPI_SR_TXC) == 0);
+	
+    SPI5->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
+	
+	SPI5->CR1 &= ~(SPI_CR1_SPE);
+#else   /* 软件模式 */
     uint8_t bit;
 
     if (data & 0x80)
@@ -282,6 +469,7 @@ static void ST7789_SendByteQuick(uint8_t data)
     }
     LCD_SCK_0();
     LCD_SCK_1();
+#endif
 }
 
 /*写数据到 LCD 模块*/
@@ -527,8 +715,14 @@ void ST7789_ClrScr(uint16_t _usColor)
 */
 void ST7789_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 {
-    ST7789_SetDispWin(_usX, _usY, 1, 1);
-    Lcd_WriteData_16(_usColor);
+    #if 1    
+        s_pDispBuf[_usY * 240 + _usX] = _usColor;
+    #else
+        ST7789_SetDispWin(_usX, _usY, 1, 1);
+        Lcd_WriteData_16(_usColor);    
+    #endif
+    
+    s_DispRefresh = 1;
 }
 
 /*
@@ -543,7 +737,11 @@ void ST7789_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 */
 uint16_t ST7789_GetPixel(uint16_t _usX, uint16_t _usY)
 {
-    return CL_BLUE;
+    #if 1    
+        return s_pDispBuf[_usY * 240 + _usX];
+    #else    
+        return CL_BLUE;
+    #endif
 }
 
 /*
@@ -740,7 +938,7 @@ void ST7789_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 /*
 *********************************************************************************************************
 *    函 数 名: ST7789_FillRect
-*    功能说明: 用一个颜色值填充一个矩形。使用STM32F429内部DMA2D硬件绘制。
+*    功能说明: 用一个颜色值填充一个矩形。
 *    形    参:
 *            _usX,_usY: 矩形左上角的坐标
 *            _usHeight : 矩形的高度
@@ -751,18 +949,66 @@ void ST7789_DrawRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 */
 void ST7789_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {
+#if 1
+    uint16_t i, j;
+    
+    for (i = 0; i < _usWidth; i++)
+    {
+        for (j = 0; j < _usHeight; j++)
+        {
+            ST7789_PutPixel(_usX + i, _usY + j, _usColor);
+        }
+    }
+#else    
     uint32_t i;
-
+	uint32_t Color;
+	uint32_t blkcnt;
+	
+	Color = (uint32_t)(_usColor<<16) + _usColor;
+	blkcnt = (_usHeight * _usWidth)>>1;
+	
     ST7789_SetDispWin(_usX, _usY, _usHeight, _usWidth);
 
     LCD_RS_1();
     LCD_CS_0();
-    for (i = 0; i < _usHeight * _usWidth; i++)
-    {
-        ST7789_SendByteQuick(_usColor >> 8);
-        ST7789_SendByteQuick(_usColor);
+	
+	SPI5->CFG1 = SPI_BAUDRATEPRESCALER_2 | 31;
+    for (i = 0; i < blkcnt; i++)
+    {     
+		SPI5->CR1 = SPI_CR1_SSI; 
+		SPI5->CR2 = 2;
+		SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI;
+		SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+		
+		while ((SPI5->SR & SPI_FLAG_TXE) == 0);
+
+		*((__IO uint32_t *)&SPI5->TXDR) = Color;
+
+		while ((SPI5->SR & SPI_SR_TXC) == 0);
+		SPI5->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
+
+		SPI5->CR1 &= ~(SPI_CR1_SPE);
     }
+	
+	if((_usWidth % 2) == 1)
+	{
+		SPI5->CFG1 = SPI_BAUDRATEPRESCALER_2 | 15;
+		SPI5->CR1 = SPI_CR1_SSI;
+		SPI5->CR2 = 1;
+		SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI;
+		SPI5->CR1 = SPI_CR1_SPE | SPI_CR1_SSI | SPI_CR1_CSTART;
+
+		while ((SPI5->SR & SPI_FLAG_TXE) == 0);
+
+		*((__IO uint16_t *)&SPI5->TXDR) = _usColor;
+
+		while ((SPI5->SR & SPI_SR_TXC) == 0);
+		SPI5->IFCR = SPI_IFCR_EOTC | SPI_IFCR_TXTFC;
+
+		SPI5->CR1 &= ~(SPI_CR1_SPE);
+	}
     LCD_CS_1();
+#endif    
 }
 
 /*
@@ -927,6 +1173,8 @@ void ST7789_SetDirection(uint8_t _dir)
             Lcd_WriteData((1 << 5) | (1 << 6) | (0 << 7));
         }
     }
+    
+    s_DispRefresh = 1;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
