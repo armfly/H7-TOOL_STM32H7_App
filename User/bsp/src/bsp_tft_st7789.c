@@ -135,6 +135,8 @@ void ST7789_InitHard(void)
     g_LcdWidth = 240;       /* 显示屏分辨率-宽度 */
     
     s_pDispBuf = (uint16_t *)(0x30000000);
+    
+    ;
 }
 
 /*
@@ -493,13 +495,13 @@ static void ST7789_initial(void)
 {
     LCD_PWR_EN_1();
 
-    bsp_DelayUS(10 * 1000); /* 等待电源稳定 */
-    LCD_RESET_0();                    /* 低电平：复位， 只需要大于10us */
+    bsp_DelayUS(10 * 1000);         /* 等待电源稳定 */
+    LCD_RESET_0();                  /* 低电平：复位， 只需要大于10us */
     bsp_DelayUS(20);                /* 延迟 20us */
-    LCD_RESET_1();                    /* 高电平：复位结束 */
-    bsp_DelayUS(10 * 1000); /* 复位之后，要求等待至少5ms, 此处等待10ms */
+    LCD_RESET_1();                  /* 高电平：复位结束 */
+    bsp_DelayUS(10 * 1000);         /* 复位之后，要求等待至少5ms, 此处等待10ms */
 
-    Lcd_WriteIndex(0x36); /* 扫描方向 */
+    Lcd_WriteIndex(0x36);           /* 扫描方向 */
     Lcd_WriteData(0x00);
 
     Lcd_WriteIndex(0x3A);
@@ -695,7 +697,15 @@ void ST7789_DispOff(void)
 */
 void ST7789_ClrScr(uint16_t _usColor)
 {
-    ST7789_FillRect(0, 0, g_LcdHeight, g_LcdWidth, _usColor);
+    uint16_t i;
+    uint32_t *p = (uint32_t *)s_pDispBuf;
+    uint32_t color;
+    
+    color = ((uint32_t)_usColor << 16) + _usColor;
+    for (i = 0; i < 240 * 240 / 2; i++)
+    {
+        *p++ = color;
+    }
 }
 
 /*
@@ -789,7 +799,7 @@ void ST7789_DrawLine(uint16_t _usX1, uint16_t _usY1, uint16_t _usX2, uint16_t _u
         dy = _usY1 - _usY2;
     }
 
-    if (dx < dy) /*如果dy为计长方向，则交换纵横坐标。*/
+    if (dx < dy)        /*如果dy为计长方向，则交换纵横坐标。*/
     {
         uint16_t temp;
 
@@ -1168,8 +1178,6 @@ void ST7789_SetDirection(uint8_t _dir)
             Lcd_WriteData((1 << 5) | (1 << 6) | (0 << 7));
         }
     }
-    
-    s_DispRefresh = 1;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

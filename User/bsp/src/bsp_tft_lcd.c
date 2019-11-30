@@ -114,7 +114,7 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
 */
 void LCD_InitHard(void)
 {
-    LCD_HardReset(); /* 硬件复位 （STM32-V5, V6 无需），针对其他GPIO控制LCD复位的产品 */
+    LCD_HardReset();        /* 硬件复位  */
 
     LCDX_InitHard();
 

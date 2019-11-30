@@ -292,7 +292,7 @@ static void DispLogo(void)
 
     ST7789_SetDirection(g_tParam.DispDir);
 
-    LCD_ClrScr(FORM_BACK_COLOR); /* 清屏，背景蓝色 */
+    LCD_ClrScr(FORM_BACK_COLOR);    /* 清屏，背景蓝色 */
 
     /* 显示APP固件版本。版本号放在中断向量表 */
     {
@@ -318,7 +318,11 @@ static void DispLogo(void)
         LCD_DispStr(x, y, "正在配置网络...", &tFont);
     }
 
-    LCD_SetBackLight(BRIGHT_DEFAULT); /* 打开背光，设置为缺省亮度 */
+    ST7789_DrawScreen();        /* 立即刷屏一次 */
+    
+    bsp_DelayMS(50);            /* 刷屏后延迟50ms再开背光, 避免花屏闪一下问题 */
+    
+    LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 */    
 }
 
 /*
