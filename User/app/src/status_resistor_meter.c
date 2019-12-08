@@ -30,8 +30,11 @@ void status_ResistorMeter(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */
     uint8_t fRefresh;
+    uint8_t fSound = 0;
 
     DispHeader("电阻、二极管测量");
+    DispHelpBar("电阻小于20欧姆时蜂鸣",
+                "");      
 
     fRefresh = 1;
     bsp_StartAutoTimer(0, 300);
@@ -49,10 +52,16 @@ void status_ResistorMeter(void)
         if (g_tVar.NTCRes < (float)0.02)
         {
             BEEP_Start(10, 10, 0);
+            fSound = 1;
         }
         else
         {
-            BEEP_Stop();
+            if (fSound == 1)
+            {
+                fSound = 0;
+                
+                BEEP_Stop();
+            }
         }
 
         if (bsp_CheckTimer(0))
@@ -73,7 +82,7 @@ void status_ResistorMeter(void)
                 g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_S: /* S键长按 */
+            case KEY_LONG_DOWN_S: /* S键长按 */
                 break;
 
             case KEY_DOWN_C: /* C键按下 */
@@ -83,7 +92,7 @@ void status_ResistorMeter(void)
                 g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_C: /* C键长按 */
+            case KEY_LONG_DOWN_C: /* C键长按 */
                 break;
 
             default:
@@ -92,7 +101,11 @@ void status_ResistorMeter(void)
         }
     }
     bsp_StopTimer(0);
-    //BEEP_Stop();      打开会导致切换的按键音消失
+
+    if (fSound == 1)
+    {
+        BEEP_Stop();
+    }    
 }
 
 /*
@@ -105,51 +118,42 @@ void status_ResistorMeter(void)
 */
 static void DispResistor(void)
 {
-    FONT_T tFont;
-    char buf[64];
+    char buf[32];
     float volt;
     float curr;
 
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;              /* 字体代码 */
-        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
-        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
-        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-    }
-
     if (g_tVar.NTCRes < 1.0f)
     {
-        sprintf(buf, "  电阻: %0.1fΩ", g_tVar.NTCRes * 1000);
+        sprintf(buf, "  %0.1f", g_tVar.NTCRes * 1000);
     }
     else if (g_tVar.NTCRes < 1000)
     {
-        sprintf(buf, "  电阻: %0.3fKΩ", g_tVar.NTCRes);
+        sprintf(buf, "  %0.3fK", g_tVar.NTCRes);
     }
     else
     {
-        sprintf(buf, "  电阻: > 1MΩ");
+        sprintf(buf, "  > 1M");
     }
-    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
-    
+    DispMeasBar(0, "电 阻:", buf, "Ω");
+  
     /* 大致计算，不是很精确 */
     volt = 2.5f * g_tVar.NTCRes / (g_tVar.NTCRes + 5.1f);
     curr = volt / g_tVar.NTCRes;
     if (volt > 2.4f)
     {
-        sprintf(buf, "  压降: > 2.4V");
-        LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT); 
+        sprintf(buf, "  > 2.4");
+        DispMeasBar(1, "压 降:", buf, "V");
 
-        sprintf(buf, "  电流: %0.3fmA", curr);
-        LCD_DispStrEx(10, 50 + 50 + 30, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "  %0.3f", curr);
+        DispMeasBar(2, "电 流:", buf, "mA");
     }
     else
     {
-        sprintf(buf, "  压降: %0.3fV", volt);
-        LCD_DispStrEx(10, 50 + 50, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "  %0.3f", volt);
+        DispMeasBar(1, "压 降:", buf, "V");
         
-        sprintf(buf, "  电流: %0.3fmA", curr);
-        LCD_DispStrEx(10, 50 + 50 + 30, buf, &tFont, 220, ALIGN_LEFT);       
+        sprintf(buf, "  %0.3f", curr);
+        DispMeasBar(2, "电 流:", buf, "mA");     
     }
 }
 

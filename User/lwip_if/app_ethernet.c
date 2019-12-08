@@ -45,7 +45,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "lwip/opt.h"
-#include "main.h"
+//#include "main.h"
 #if LWIP_DHCP
 #include "lwip/dhcp.h"
 #endif

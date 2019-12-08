@@ -144,6 +144,7 @@ void InitBaseParam(void)
     
     g_tParam.KeyToneEnable = 1;         /* 按键音控制 */
     g_tParam.UIStyle = 0;
+    g_tParam.LcdSleepTime = 0;          /* 0: 1分钟  1: 5分钟  2 : 15分钟  3: 1小时  4：关闭 */
     
     SaveParam();
 }
@@ -311,5 +312,31 @@ void InitCalibParam(void)
     
     SaveCalibParam();
 }
-        
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetSleepTimeMinute
+*    功能说明: LCD屏保超时。
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+ /* 0: 1分钟  1: 5分钟  2 : 15分钟  3: 1小时  4：关闭 */
+const uint16_t TabelSleeptIime[] = {
+    1,
+    5,
+    15,
+    60,
+    0
+};
+uint16_t GetSleepTimeMinute(void)
+{    
+    if (g_tParam.LcdSleepTime > 4)
+    {        
+        g_tParam.LcdSleepTime  = 0;
+    }
+    
+    return TabelSleeptIime[g_tParam.LcdSleepTime];
+}
+
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

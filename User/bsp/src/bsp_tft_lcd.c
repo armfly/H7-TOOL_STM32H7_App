@@ -265,7 +265,7 @@ uint16_t LCD_GetWidth(void)
 */
 void LCD_DispOn(void)
 {
-    ;
+    ST7789_DispOn();
 }
 
 /*
@@ -278,7 +278,7 @@ void LCD_DispOn(void)
 */
 void LCD_DispOff(void)
 {
-    ;
+    ST7789_DispOff();
 }
 
 /*
@@ -308,7 +308,7 @@ void LCD_ClrScr(uint16_t _usColor)
 */
 void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont)
 {
-    LCD_DispStrEx0(_usX, _usY, _ptr, _tFont, 0, 0);
+    LCD_DispStrEx(_usX, _usY, _ptr, _tFont, 0, 0);
 }
 
 /*
@@ -377,6 +377,15 @@ void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uin
 
             i += 8;
         }
+        else if (ch == '\n') /* 定位偏移，后面8个字符表示 X1, Y2 00 99 */
+        {
+            LCD_DispStrEx0(x, y, str_buf, _tFont, _Width, _Align);
+            len = 0;
+            
+            x = _usX + (_ptr[i + 1] - '0') * 10 + (_ptr[i + 2] - '0');
+            y = _usY + (_ptr[i + 3] - '0') * 10 + (_ptr[i + 4] - '0');            
+            i += 4;
+        }        
         else
         {
             if (len < sizeof(str_buf) - 1)
@@ -2896,9 +2905,10 @@ void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern uint8_t s_DispRefresh;
 void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
                                              uint16_t _usRadius, uint16_t _usColor)
-{
+{		
     if (_usHeight < 2 * _usRadius)
     {
         _usHeight = 2 * _usRadius;
@@ -2908,18 +2918,18 @@ void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
     {
         _usWidth = 2 * _usRadius;
     }
-
+		
     LCD_FillQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
-
-    LCD_Fill_Rect(_usX + _usRadius + 1, _usY, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
-
+	
+	LCD_Fill_Rect(_usX + _usRadius, _usY, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
+	
     LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
-
-    LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
+	
+	LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
 
     LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
-
-    LCD_Fill_Rect(_usX + _usRadius + 1, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius - 2, _usColor);
+	
+	LCD_Fill_Rect(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
 
     LCD_FillQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
 }

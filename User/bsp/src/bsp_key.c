@@ -3,11 +3,11 @@
 *
 *    模块名称 : 独立按键驱动模块 (外部输入IO)
 *    文件名称 : bsp_key.c
-*    版    本 : V1.3
+*    版    本 : V2.0
 *    说    明 : 扫描独立按键，具有软件滤波机制，具有按键FIFO。可以检测如下事件：
 *                (1) 按键按下
 *                (2) 按键弹起
-*                (3) 长按键
+*                (3) 长按键按下， 长按键弹起
 *                (4) 长按时自动连发
 *
 *    修改记录 :
@@ -17,6 +17,8 @@
 *                                   增加 K1 K2 组合键 和 K2 K3 组合键，用于系统控制
 *        V1.2    2016-01-25 armfly  针对P02工控板更改. 调整gpio定义方式，更加简洁
 *        V1.3    2018-11-26 armfly  s_tBtn结构赋初值0
+*        V2.0    2019-12-07 armfly  增加长按弹起事件和自动连发事件，增加双击事件。
+*                                   增加按键超时熄屏功能。
 *
 *    Copyright (C), 2016-2020, 安富莱电子 www.armfly.com
 *
@@ -25,8 +27,19 @@
 
 #include "bsp.h"
 
-#define HARD_KEY_NUM 2                             /* 实体按键个数 */
-#define KEY_COUNT (HARD_KEY_NUM + 0) /* 2个独立建 + 0个组合按键 */
+/*
+    一次双击动作触发如下事件
+    按下    
+    弹起 -- 丢弃
+    按下
+    双击弹起
+    弹起
+    
+
+*/
+
+#define HARD_KEY_NUM            2                       /* 实体按键个数 */
+#define KEY_COUNT               (HARD_KEY_NUM + 0)      /* 2个独立建 + 0个组合按键 */
 
 /* 使能GPIO时钟 */
 #define ALL_KEY_GPIO_CLK_ENABLE() \
@@ -59,7 +72,11 @@ static void bsp_InitKeyVar(void);
 static void bsp_InitKeyHard(void);
 static void bsp_DetectKey(uint8_t i);
 
-#define KEY_PIN_ACTIVE(id)
+
+
+/* 用于按键超时进入屏保 */
+static int32_t s_KeyTimeOutCount = 0;
+static uint8_t s_LcdOn = 1;
 
 /*
 *********************************************************************************************************
@@ -134,14 +151,14 @@ static uint8_t IsKeyDownFunc(uint8_t _id)
 *********************************************************************************************************
 *    函 数 名: bsp_InitKey
 *    功能说明: 初始化按键. 该函数被 bsp_Init() 调用。
-*    形    参:  无
+*    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
 */
 void bsp_InitKey(void)
 {
-    bsp_InitKeyVar();    /* 初始化按键变量 */
-    bsp_InitKeyHard(); /* 初始化按键硬件 */
+    bsp_InitKeyVar();   /* 初始化按键变量 */
+    bsp_InitKeyHard();  /* 初始化按键硬件 */
 }
 
 /*
@@ -161,9 +178,9 @@ static void bsp_InitKeyHard(void)
     ALL_KEY_GPIO_CLK_ENABLE();
 
     /* 第2步：配置所有的按键GPIO为浮动输入模式(实际上CPU复位后就是输入状态) */
-    gpio_init.Mode = GPIO_MODE_INPUT;                         /* 设置输入 */
-    gpio_init.Pull = GPIO_NOPULL;                                 /* 上下拉电阻不使能 */
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; /* GPIO速度等级 */
+    gpio_init.Mode = GPIO_MODE_INPUT;               /* 设置输入 */
+    gpio_init.Pull = GPIO_NOPULL;                   /* 上下拉电阻不使能 */
+    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;    /* GPIO速度等级 */
 
     for (i = 0; i < HARD_KEY_NUM; i++)
     {
@@ -180,6 +197,7 @@ static void bsp_InitKeyHard(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern uint16_t GetSleepTimeMinute(void);
 static void bsp_InitKeyVar(void)
 {
     uint8_t i;
@@ -193,17 +211,22 @@ static void bsp_InitKeyVar(void)
     for (i = 0; i < KEY_COUNT; i++)
     {
         s_tBtn[i].LongTime = KEY_LONG_TIME;         /* 长按时间 0 表示不检测长按键事件 */
-        s_tBtn[i].Count = KEY_FILTER_TIME / 2; /* 计数器设置为滤波时间的一半 */
-        s_tBtn[i].State = 0;                                     /* 按键缺省状态，0为未按下 */
-        s_tBtn[i].RepeatSpeed = 0;                         /* 按键连发的速度，0表示不支持连发 */
-        s_tBtn[i].RepeatCount = 0;                         /* 连发计数器 */
+        s_tBtn[i].Count = KEY_FILTER_TIME / 2;      /* 计数器设置为滤波时间的一半 */
+        s_tBtn[i].State = 0;                        /* 按键缺省状态，0为未按下 */
+        s_tBtn[i].RepeatSpeed = 0;                  /* 按键连发的速度，0表示不支持连发 */
+        s_tBtn[i].RepeatCount = 0;                  /* 连发计数器 */
+        s_tBtn[i].DelayCount = 0;
+        s_tBtn[i].ClickCount = 0;  
+        s_tBtn[i].LastTime = 0;
     }
 
     /* 如果需要单独更改某个按键的参数，可以在此单独重新赋值 */
 
     /* 摇杆上下左右，支持长按1秒后，自动连发 */
-    bsp_SetKeyParam(KID_S, 100, 6);
-    bsp_SetKeyParam(KID_C, 100, 6);
+    bsp_SetKeyParam(KID_S, KEY_LONG_TIME, 0);
+    bsp_SetKeyParam(KID_C, KEY_LONG_TIME, 0);
+    
+    s_KeyTimeOutCount = GetSleepTimeMinute() * 60 * 100u;  /* 10ms单位 */
 }
 
 /*
@@ -216,12 +239,29 @@ static void bsp_InitKeyVar(void)
 */
 void bsp_PutKey(uint8_t _KeyCode)
 {
+    /* 屏幕熄灭阶段，丢弃唤醒键 */
+    if (s_LcdOn == 0)
+    {        
+        uint8_t key;
+        
+        key = ((_KeyCode - 1) % KEY_MSG_STEP) + 1;
+        if (key == KEY_1_UP || key == KEY_1_LONG_UP)
+        {
+            s_LcdOn = 1;
+        }        
+        LCD_DispOn();     
+        LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 */            
+        return;
+    }
+    
     s_tKey.Buf[s_tKey.Write] = _KeyCode;
 
     if (++s_tKey.Write >= KEY_FIFO_SIZE)
     {
         s_tKey.Write = 0;
     }
+            
+    s_KeyTimeOutCount = GetSleepTimeMinute() * 60 * 100u;  /* 10ms单位 */
 }
 
 /*
@@ -285,7 +325,7 @@ uint8_t bsp_GetKey2(void)
 *    函 数 名: bsp_GetKeyState
 *    功能说明: 读取按键的状态
 *    形    参:  _ucKeyID : 按键ID，从0开始
-*    返 回 值: 1 表示按下， 0 表示未按下
+*    返 回 值: 0 表示未按下 1 表示按下， 2 表示长按持续状态
 *********************************************************************************************************
 */
 uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID)
@@ -353,18 +393,20 @@ static void bsp_DetectKey(uint8_t i)
                 pBtn->State = 1;
 
                 /* 发送按钮按下的消息 */
-                bsp_PutKey((uint8_t)(3 * i + 1));
+                bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_DOWN));
             }
 
             if (pBtn->LongTime > 0)
             {
                 if (pBtn->LongCount < pBtn->LongTime)
                 {
-                    /* 发送按钮持续按下的消息 */
+                    /* 发送长按消息 */
                     if (++pBtn->LongCount == pBtn->LongTime)
                     {
+                        pBtn->State = 2;
+                        
                         /* 键值放入按键FIFO */
-                        bsp_PutKey((uint8_t)(3 * i + 3));
+                        bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_LONG_DOWN));                        
                     }
                 }
                 else
@@ -374,8 +416,9 @@ static void bsp_DetectKey(uint8_t i)
                         if (++pBtn->RepeatCount >= pBtn->RepeatSpeed)
                         {
                             pBtn->RepeatCount = 0;
-                            /* 常按键后，每隔10ms发送1个按键 */
-                            bsp_PutKey((uint8_t)(3 * i + 1));
+                            /* 常按键后，每隔10ms发送1个按键弹起事件 */
+                            //bsp_PutKey((uint8_t)(4 * i + 1));  这是发按键按下事件
+                            bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_AUTO_UP));
                         }
                     }
                 }
@@ -394,76 +437,50 @@ static void bsp_DetectKey(uint8_t i)
         }
         else
         {
-            if (pBtn->State == 1)
+            if (pBtn->State != 0)
             {
-                pBtn->State = 0;
-
-                /* 发送按钮弹起的消息 */
-                bsp_PutKey((uint8_t)(3 * i + 2));
-            }
-        }
-
-        pBtn->LongCount = 0;
-        pBtn->RepeatCount = 0;
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: bsp_DetectFastIO
-*    功能说明: 检测高速的输入IO. 1ms刷新一次
-*    形    参: IO的id， 从0开始编码
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-static void bsp_DetectFastIO(uint8_t i)
-{
-    KEY_T *pBtn;
-
-    pBtn = &s_tBtn[i];
-    if (IsKeyDownFunc(i))
-    {
-        if (pBtn->State == 0)
-        {
-            pBtn->State = 1;
-
-            /* 发送按钮按下的消息 */
-            bsp_PutKey((uint8_t)(3 * i + 1));
-        }
-
-        if (pBtn->LongTime > 0)
-        {
-            if (pBtn->LongCount < pBtn->LongTime)
-            {
-                /* 发送按钮持续按下的消息 */
-                if (++pBtn->LongCount == pBtn->LongTime)
+                /* 2019-12-05 H7-TOOL增加，第4个事件, 长按后的弹起 */
+                if (pBtn->LongTime == 0)
                 {
-                    /* 键值放入按键FIFO */
-                    bsp_PutKey((uint8_t)(3 * i + 3));
+                    /* 发送短按弹起的消息 */
+                    bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));
                 }
-            }
-            else
-            {
-                if (pBtn->RepeatSpeed > 0)
+                else
                 {
-                    if (++pBtn->RepeatCount >= pBtn->RepeatSpeed)
+                    if (pBtn->State == 2)
                     {
-                        pBtn->RepeatCount = 0;
-                        /* 常按键后，每隔10ms发送1个按键 */
-                        bsp_PutKey((uint8_t)(3 * i + 1));
+                        /* 发送长按弹起的消息 */
+                        bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_LONG_UP));
+                        s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */
+                    }
+                    else
+                    {                       
+                        /* 发送短按弹起的消息 */
+                        //if (bsp_CheckRunTime(s_tBtn[i].LastTime) < 500)
+                        if (pBtn->DelayCount > 0)
+                        {                            
+                            if (pBtn->ClickCount == 1)
+                            {
+                                bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_DB_UP));  /* 双击事件 */
+                                pBtn->ClickCount = 0;
+                            }
+                            else
+                            {
+                                bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));     /* 单击事件 */
+                                pBtn->ClickCount = 0;
+                            }
+                            pBtn->DelayCount = 80; 
+                        }
+                        else                       
+                        {
+                            pBtn->ClickCount++;                        
+                            pBtn->DelayCount = KEY_DB_CLICK_TIME;  
+                        }
+                        s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */          
                     }
                 }
+                pBtn->State = 0;                
             }
-        }
-    }
-    else
-    {
-        if (pBtn->State == 1)
-        {
-            pBtn->State = 0;
-
-            /* 发送按钮弹起的消息 */
-            bsp_PutKey((uint8_t)(3 * i + 2));
         }
 
         pBtn->LongCount = 0;
@@ -474,7 +491,7 @@ static void bsp_DetectFastIO(uint8_t i)
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_KeyScan10ms
-*    功能说明: 扫描所有按键。非阻塞，被systick中断周期性的调用，10ms一次
+*    功能说明: 扫描所有按键。非阻塞，**被systick中断周期性的调用，10ms一次
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -484,26 +501,32 @@ void bsp_KeyScan10ms(void)
     uint8_t i;
 
     for (i = 0; i < KEY_COUNT; i++)
-    {
-        bsp_DetectKey(i);
+    {   
+        /* 超时判断 */
+        if (s_tBtn[i].DelayCount > 0)
+        {
+            if (--s_tBtn[i].DelayCount == 0)
+            {
+                if (s_tBtn[i].ClickCount == 1)
+                {
+                    bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));   /* 单击弹起 */
+                }              
+                s_tBtn[i].ClickCount = 0;
+            }
+        }
+
+        /* 检测按键 */
+        bsp_DetectKey(i);        
     }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: bsp_KeyScan1ms
-*    功能说明: 扫描所有按键。非阻塞，被systick中断周期性的调用，1ms一次.
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void bsp_KeyScan1ms(void)
-{
-    uint8_t i;
-
-    for (i = 0; i < KEY_COUNT; i++)
+    
+    if (s_KeyTimeOutCount > 0)
     {
-        bsp_DetectFastIO(i);
+        if (--s_KeyTimeOutCount == 0)
+        {
+            LCD_SetBackLight(0);   /* 关闭背光 */                
+            LCD_DispOff();
+            s_LcdOn = 0;    /* 屏幕关闭 */
+        }
     }
 }
 
