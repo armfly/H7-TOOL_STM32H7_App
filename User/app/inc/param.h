@@ -98,6 +98,7 @@ typedef struct
     /* V2.04追加 */
     uint8_t KeyToneEnable;
     uint8_t UIStyle;            /* UI风格 */
+    uint16_t LcdSleepTime;      /* 屏保时间 */
     
 } PARAM_T;
 
@@ -193,6 +194,8 @@ void InitCalibParam(void);
 void InitBaseParam(void);
 void WriteParamUint16(uint16_t _addr, uint16_t _value);
 void SaveCalibParam(void);
+
+uint16_t GetSleepTimeMinute(void);
 
 #endif
 

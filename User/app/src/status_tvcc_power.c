@@ -17,7 +17,6 @@
 #include "main.h"
 
 static void DispTVccVoltCurr(void);
-static void DispHelpTVCCPower(void);
 static void DispTVccSetting(uint16_t _volt);
 
 /*
@@ -30,14 +29,14 @@ static void DispTVccSetting(uint16_t _volt);
 */
 void status_TVCCPower(void)
 {
-    uint8_t ucKeyCode; /* 按键代码 */
+    uint8_t ucKeyCode;      /* 按键代码 */
     uint8_t fRefresh;
-    uint8_t ucIgnoreKey = 0;
     uint8_t ucAdjustMode = 0;
     uint16_t NowVolt;       /* 当前设置电压 mV */
 
     DispHeader("微型数控电源");
-    DispHelpTVCCPower();
+    DispHelpBar("TVCC输出1.2-5.0V,限流400mA",
+                "长按S进入调节状态");  
     
     fRefresh = 1;
     
@@ -77,29 +76,24 @@ void status_TVCCPower(void)
                 }
                 else
                 {
-                    if(ucIgnoreKey == 0)
+                    if (NowVolt < 5000)
                     {
-                        if (NowVolt < 5000)
-                        {
-                            NowVolt += 100;
-                            DispTVccSetting(NowVolt);
-                        }
-                        else
-                        {
-                            BEEP_Start(5, 5, 3);    /* 叫50ms，停50ms，循环3次 */
-                        }
+                        NowVolt += 100;
+                        DispTVccSetting(NowVolt);
+                    }
+                    else
+                    {
+                        BEEP_Start(5, 5, 3);    /* 叫50ms，停50ms，循环3次 */
                     }
                 }
-                ucIgnoreKey = 0;
                 break;
 
-            case KEY_LONG_S:    /* S键长按 */
+            case KEY_LONG_DOWN_S:    /* S键长按 */
                 if(ucAdjustMode == 0)
                 {
                     ucAdjustMode = 1;
                     PlayKeyTone();
                 }
-                ucIgnoreKey = 1;    /* 需要丢弃即将到来的S键弹起事件 */
                 break;
 
             case KEY_DOWN_C:    /* C键按下 */
@@ -108,10 +102,7 @@ void status_TVCCPower(void)
             case KEY_UP_C:      /* C键释放 */
                 if (ucAdjustMode == 0)
                 {      
-                    if(ucIgnoreKey == 0)
-                    {
-                        g_MainStatus = LastStatus(MS_TVCC_POWER);
-                    }         
+                    g_MainStatus = LastStatus(MS_TVCC_POWER);       
                 }
                 else 
                 {
@@ -125,16 +116,14 @@ void status_TVCCPower(void)
                         BEEP_Start(5,5,3);      /* 叫50ms，停50ms，循环3次 */
                     }                    
                 }                
-                ucIgnoreKey = 0;
                 break;
 
-            case KEY_LONG_C:    /* C键长按 */
+            case KEY_LONG_DOWN_C:    /* C键长按 */
                 if(ucAdjustMode == 1)
                 {
                     ucAdjustMode = 0;
                     PlayKeyTone();
                 }
-                ucIgnoreKey = 1;    /* 需要丢弃即将到来的C键弹起事件 */
                 break;
 
             default:
@@ -145,27 +134,6 @@ void status_TVCCPower(void)
     bsp_StopTimer(0);    
     
     bsp_SetTVCC(3300);      /* 退出时还原为3.3V */
-}
-
-/*
-*********************************************************************************************************
-*   函 数 名: DispHelpTVCCPower
-*   功能说明: 显示操作提示
-*   形    参: 无
-*   返 回 值: 无
-*********************************************************************************************************
-*/
-static void DispHelpTVCCPower(void)
-{
-    FONT_T tFont;   /* 定义字体结构体变量 */
-
-    tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
-    tFont.FrontColor = HELP_TEXT_COLOR;     /* 字体颜色 */
-    tFont.BackColor = HELP_BACK_COLOR;      /* 文字背景颜色 */
-    tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-
-    LCD_DispStr(5, 240 - 40, "TVCC输出1.2-5.0V, 限流400mA", &tFont);
-    LCD_DispStr(5, 240 - 20, "长按S进入调节状态", &tFont);
 }
         
 /*
@@ -178,25 +146,16 @@ static void DispHelpTVCCPower(void)
 */
 static void DispTVccVoltCurr(void)
 {
-    FONT_T tFont;
-    char buf[64];
+    char buf[32];
 
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;              /* 字体代码 */
-        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
-        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
-        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-    }
+    sprintf(buf, "%8.3f", g_tVar.TVCCVolt );
+    DispMeasBar(0, "电 压:", buf, "V");
 
-    sprintf(buf, " 电压: %8.3fV", g_tVar.TVCCVolt );
-    LCD_DispStrEx(10, 50 + 32 * 0, buf, &tFont, 220, ALIGN_LEFT);
+    sprintf(buf, "%7.2f", g_tVar.TVCCCurr);
+    DispMeasBar(1, "电 流:", buf, "mA");
 
-    sprintf(buf, " 电流: %8.2fmA", g_tVar.TVCCCurr);
-    LCD_DispStrEx(10, 50 + 32 * 1, buf, &tFont, 220, ALIGN_LEFT);
-
-    sprintf(buf, " 功率: %8.3fW", g_tVar.TVCCVolt * g_tVar.TVCCCurr / 1000);
-    LCD_DispStrEx(10, 50 + 32 * 2, buf, &tFont, 220, ALIGN_LEFT);   
+    sprintf(buf, "%8.3f", g_tVar.TVCCVolt * g_tVar.TVCCCurr / 1000);
+    DispMeasBar(2, "功 率:", buf, "W");   
 }
 
 /*
@@ -209,19 +168,10 @@ static void DispTVccVoltCurr(void)
 */
 static void DispTVccSetting(uint16_t _volt)
 {
-    FONT_T tFont;
     char buf[64];
 
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
-        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-
-    sprintf(buf, "设置电压: %d.%dV", _volt / 1000, (_volt % 1000) / 100);
-    LCD_DispStrEx(10, 70 + 32 * 3, buf, &tFont, 220, ALIGN_CENTER);      
+    sprintf(buf, "   %d.%dV", _volt / 1000, (_volt % 1000) / 100);
+    DispMeasBarEx(3, "设 置:", buf, "", CL_YELLOW); 
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

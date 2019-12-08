@@ -673,6 +673,7 @@ void ST7789_QuitWinMode(void)
 */
 void ST7789_DispOn(void)
 {
+    Lcd_WriteIndex(0x11);
 }
 
 /*
@@ -685,6 +686,7 @@ void ST7789_DispOn(void)
 */
 void ST7789_DispOff(void)
 {
+    Lcd_WriteIndex(0x10);
 }
 
 /*
@@ -1084,6 +1086,28 @@ void ST7789_DrawBMP(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _
         for (k = 0; k < _usWidth; k++)
         {
             ST7789_PutPixel(_usX + k, y, *p++);
+        }
+
+        y++;
+    }
+}
+
+/* 形参为 uint8 */
+void ST7789_DrawBMP8(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint8_t *_ptr)
+{
+    uint16_t i, k, y;
+    const uint8_t *p;
+    uint16_t pixel;
+
+    p = _ptr;
+    y = _usY;
+    for (i = 0; i < _usHeight; i++)
+    {
+        for (k = 0; k < _usWidth; k++)
+        {
+            pixel = (p[0] << 8) + p[1];
+            p += 2;
+            ST7789_PutPixel(_usX + k, y, pixel);
         }
 
         y++;

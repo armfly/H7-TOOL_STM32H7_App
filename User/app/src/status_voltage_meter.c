@@ -33,13 +33,15 @@ void status_VoltageMeter(void)
     uint8_t fRefresh;
 
     DispHeader("电压表");
+    DispHelpBar("输入电压范围: ±13.8V",
+                "");      
 
     fRefresh = 1;
 
     bsp_StartAutoTimer(0, 300);
     while (g_MainStatus == MS_VOLTAGE_METER)
     {
-        if (fRefresh) /* 刷新整个界面 */
+        if (fRefresh)       /* 刷新整个界面 */
         {
             fRefresh = 0;
 
@@ -54,30 +56,30 @@ void status_VoltageMeter(void)
             fRefresh = 1;
         }
 
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        ucKeyCode = bsp_GetKey();   /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S: /* S键按下 */
+            case KEY_DOWN_S:    /* S键按下 */
                 break;
 
-            case KEY_UP_S: /* S键释放 */
+            case KEY_UP_S:      /* S键释放 */
                 g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_S: /* S键长按 */
+            case KEY_LONG_DOWN_S:    /* S键长按 */
                 break;
 
-            case KEY_DOWN_C: /* C键按下 */
+            case KEY_DOWN_C:    /* C键按下 */
                 break;
 
-            case KEY_UP_C: /* C键释放 */
+            case KEY_UP_C:      /* C键释放 */
                 g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_C: /* C键长按 */
+            case KEY_LONG_DOWN_C:    /* C键长按 */
                 break;
 
             default:
@@ -130,22 +132,13 @@ static void AutoVoltRange(void)
 */
 static void DispCH1CH2(void)
 {
-    FONT_T tFont;
-    char buf[64];
+    char buf[32];
+    
+    sprintf(buf, "%8.3f", g_tVar.CH1Volt);
+    DispMeasBar(0, "CH1 DC:", buf, "V");
 
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;              /* 字体代码 */
-        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
-        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
-        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-    }
-
-    sprintf(buf, "  CH1: %8.3fV", g_tVar.CH1Volt);
-    LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
-
-    sprintf(buf, "  CH2: %8.3fV", g_tVar.CH2Volt);
-    LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_LEFT);
+    sprintf(buf, "%8.3f", g_tVar.CH2Volt);
+    DispMeasBar(1, "CH2 DC:", buf, "V");
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

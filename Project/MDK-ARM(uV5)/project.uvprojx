@@ -493,11 +493,6 @@
               <FilePath>..\..\User\bsp\src\bsp_led.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\src\bsp_key.c</FilePath>
-            </File>
-            <File>
               <FileName>bsp_tim_pwm.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_tim_pwm.c</FilePath>
@@ -516,6 +511,11 @@
               <FileName>bsp_tft_lcd.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_tft_lcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_key.c</FilePath>
             </File>
             <File>
               <FileName>bsp_beep.c</FileName>

@@ -32,6 +32,8 @@ void status_TempMeter(void)
     uint8_t fRefresh;
 
     DispHeader("温度测量");
+    DispHelpBar("温度传感器类型",
+                "NTC 10K B3950");     
 
     fRefresh = 1;
     bsp_StartAutoTimer(0, 200);
@@ -63,7 +65,7 @@ void status_TempMeter(void)
                 g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_S: /* S键长按 */
+            case KEY_LONG_DOWN_S: /* S键长按 */
                 break;
 
             case KEY_DOWN_C: /* C键按下 */
@@ -73,7 +75,7 @@ void status_TempMeter(void)
                 g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_C: /* C键长按 */
+            case KEY_LONG_DOWN_C: /* C键长按 */
                 break;
 
             default:
@@ -95,32 +97,23 @@ void status_TempMeter(void)
 */
 static void DispTemp(void)
 {
-    FONT_T tFont;
     char buf[64];
-
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;              /* 字体代码 */
-        tFont.FrontColor = VALUE_TEXT_COLOR;    /* 字体颜色 */
-        tFont.BackColor = VALUE_BACK_COLOR;     /* 文字背景颜色 */
-        tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-    }
 
     if (g_tVar.NTCRes > 1000)
     {
-        sprintf(buf, " 电阻: ---- KΩ");
-        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "   ----");
+        DispMeasBar(0, "电 阻:", buf, "KΩ");
 
-        sprintf(buf, " 温度: ---- ℃");
-        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "   ----");
+        DispMeasBar(1, "温 度:", buf, "℃");
     }
     else
     {
-        sprintf(buf, " 电阻: %0.3fKΩ", g_tVar.NTCRes);
-        LCD_DispStrEx(10, 50, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf, "%0.3f", g_tVar.NTCRes);
+        DispMeasBar(0, "电 阻:", buf, "KΩ");
 
-        sprintf(buf,  "温度: %0.2f℃", g_tVar.NTCTemp);
-        LCD_DispStrEx(10, 100, buf, &tFont, 220, ALIGN_LEFT);
+        sprintf(buf,  "%0.2f", g_tVar.NTCTemp);
+        DispMeasBar(1, "温 度:", buf, "℃");
     }
 }
 
