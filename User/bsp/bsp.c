@@ -40,7 +40,6 @@ void bsp_Init(void)
 
     /* 使能L1 Cache */
     CPU_CACHE_Enable();
-    SCB_EnableDCache();
 
     /* 
        STM32H7xx HAL 库初始化，此时系统用的还是H7自带的64MHz，HSI时钟:
@@ -328,18 +327,18 @@ static void MPU_Config(void)
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
     /* 配置总线扩展IO空间的属性为Write through */
-    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-    MPU_InitStruct.BaseAddress = 0x60000000;
-    MPU_InitStruct.Size = ARM_MPU_REGION_SIZE_64KB; // ARM_MPU_REGION_SIZE_16KB;
-    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
-    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE; /* 不能用MPU_ACCESS_CACHEABLE;会出现2次CS、WE信号 */
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
-    MPU_InitStruct.Number = MPU_REGION_NUMBER3;
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-    MPU_InitStruct.SubRegionDisable = 0x00;
-    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
-    HAL_MPU_ConfigRegion(&MPU_InitStruct);
+//    MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+//    MPU_InitStruct.BaseAddress = 0x60000000;
+//    MPU_InitStruct.Size = ARM_MPU_REGION_SIZE_64KB; // ARM_MPU_REGION_SIZE_16KB;
+//    MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+//    MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+//    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE; /* 不能用MPU_ACCESS_CACHEABLE;会出现2次CS、WE信号 */
+//    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+//    MPU_InitStruct.Number = MPU_REGION_NUMBER3;
+//    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+//    MPU_InitStruct.SubRegionDisable = 0x00;
+//    MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+//    HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
     /*使能 MPU */
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
@@ -424,6 +423,7 @@ extern void lwip_pro(void);
 extern void lua_Poll(void);
 extern void wifi_task(void);
 extern void EXIO_ScanTask(void);
+extern void LCD_Task(void);
 void bsp_Idle(void)
 {
     /* --- 喂狗 */
@@ -436,7 +436,7 @@ void bsp_Idle(void)
     
     EXIO_ScanTask();        /* 扩展IO任务 */
     
-    ST7789_DrawScreen();    /* 硬件SPI+DMA+刷屏 */
+    LCD_Task();    			/* 显示屏任务，硬件SPI+DMA+刷屏 */
 }
 
 /*

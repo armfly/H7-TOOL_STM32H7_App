@@ -1702,35 +1702,23 @@ void UART8_IRQHandler(void)
 */
 extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
 extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
+extern MEMO_T g_LuaMemo;
 int fputc(int ch, FILE *f)
 {
-#if 1 /* 将需要printf的字符通过串口中断FIFO发送出去，printf函数会立即返回 */
-    //comSendChar(COM1, ch);
     uint8_t buf[1];
 
     buf[0] = ch;
+    
 #if PRINT_TO_UDP == 1
     lua_udp_SendBuf(buf, 1, LUA_UDP_PORT);
+    
+    LCD_MemoAddChar(&g_LuaMemo, ch);
 #else
     USBCom_SendBuf(1, buf, 1);
 #endif
-
-    //        uint8_t buf[1];
-    //    buf[0]=ch;
-    //    HAL_UART_Transmit(&huart1,buf,1,1000);
-
+	
+    //comSendChar(COM1, ch);
     return ch;
-#else /* 采用阻塞方式发送每个字符,等待数据发送完毕 */
-    /* 写一个字节到USART1 */
-    USART_SendData(USART1, (uint8_t)ch);
-
-    /* 等待发送结束 */
-    while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET)
-    {
-    }
-
-    return ch;
-#endif
 }
 
 /*
@@ -1743,7 +1731,6 @@ int fputc(int ch, FILE *f)
 */
 int fgetc(FILE *f)
 {
-
     //#if 1    /* 从串口接收FIFO中取1个数据, 只有取到数据才返回 */
     //    uint8_t ucData;
 

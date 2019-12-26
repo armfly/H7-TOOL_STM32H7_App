@@ -26,9 +26,9 @@
 #define WRITE_REG_MAX_NUM   16      /* 写保持寄存器最大个数 */
 #define READ_REG_MAX_NUM    16      /* 读保持寄存器最大个数 */
 
-#define WRITE_DO_MAX_NUM   32       /* 写DO寄存器最大个数 */
-#define READ_DO_MAX_NUM    32       /* 写DO寄存器最大个数 */
-#define READ_DI_MAX_NUM    32       /* 读DI寄存器最大个数 */
+#define WRITE_DO_MAX_NUM    32      /* 写DO寄存器最大个数 */
+#define READ_DO_MAX_NUM     32      /* 写DO寄存器最大个数 */
+#define READ_DI_MAX_NUM     32      /* 读DI寄存器最大个数 */
 
 /*
     用法:
@@ -50,8 +50,10 @@ static int lua_uart_WriteReg16(lua_State* L);
 static int lua_uart_WriteReg32(lua_State* L);
 static int lua_uart_WriteRegFloat(lua_State* L);
 
-static int lua_uart_ReadReg16(lua_State* L);
-static int lua_uart_ReadReg32(lua_State* L);
+static int lua_uart_ReadRegU16(lua_State* L);
+static int lua_uart_ReadRegU32(lua_State* L);
+static int lua_uart_ReadRegS16(lua_State* L);
+static int lua_uart_ReadRegS32(lua_State* L);
 static int lua_uart_ReadRegFloat(lua_State* L); 
 
 static int lua_uart_WriteDO(lua_State* L);
@@ -78,8 +80,10 @@ void lua_uart_RegisterFun(void)
     lua_register(g_Lua, "modbus_write_u32", lua_uart_WriteReg32);
     lua_register(g_Lua, "modbus_write_float", lua_uart_WriteRegFloat);
 
-    lua_register(g_Lua, "modbus_read_u16", lua_uart_ReadReg16);    
-    lua_register(g_Lua, "modbus_read_u32", lua_uart_ReadReg32);
+    lua_register(g_Lua, "modbus_read_u16", lua_uart_ReadRegU16);    
+    lua_register(g_Lua, "modbus_read_u32", lua_uart_ReadRegU32);
+    lua_register(g_Lua, "modbus_read_s16", lua_uart_ReadRegS16);    
+    lua_register(g_Lua, "modbus_read_s32", lua_uart_ReadRegS32);    
     lua_register(g_Lua, "modbus_read_float", lua_uart_ReadRegFloat);      
 
     lua_register(g_Lua, "modbus_write_do", lua_uart_WriteDO);
@@ -511,14 +515,14 @@ static int lua_uart_WriteReg16(lua_State* L)
 
 /*
 *********************************************************************************************************
-*    函 数 名: lua_ReadReg16
+*    函 数 名: lua_uart_ReadRegU16
 *    功能说明: 读寄存器 16bit
 *    形    参: port, timeout, addr485, regaddr, regnum
 *    返 回 值: 寄存器值
 *********************************************************************************************************
 */
 #define STR_R_U16   "\r\nmodbus_read_u16(port, timeout, addr485, regaddr, regnum)\r\n--parameter error : "
-static int lua_uart_ReadReg16(lua_State* L)
+static int lua_uart_ReadRegU16(lua_State* L)
 {
     uint8_t port;
     uint16_t addr485;
@@ -624,6 +628,124 @@ static int lua_uart_ReadReg16(lua_State* L)
     }    
     lua_pushnumber(L, errcode); 
     LUA_ERR_PARAM_PRINT("\r\nmodbus_read_u16() regaddr = %04X errcode = %d\r\n", regaddr, errcode);    
+    return 1;   /* 返回 错误代码 */
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: lua_uart_ReadRegS16
+*    功能说明: 读寄存器 16bit
+*    形    参: port, timeout, addr485, regaddr, regnum
+*    返 回 值: 寄存器值
+*********************************************************************************************************
+*/
+#define STR_R_S16   "\r\nmodbus_read_s16(port, timeout, addr485, regaddr, regnum)\r\n--parameter error : "
+static int lua_uart_ReadRegS16(lua_State* L)
+{
+    uint8_t port;
+    uint16_t addr485;
+    uint16_t regaddr;
+    uint16_t num;
+    uint16_t timeout;
+    uint8_t txbuf[32];
+    uint8_t rxbuf[READ_REG_MAX_NUM * 2 + 5];
+    uint8_t pos = 0;
+    uint8_t rxlen;
+    uint16_t crc;
+    uint8_t errcode;
+    int16_t value;
+
+    if (lua_type(L, 1) == LUA_TNUMBER)                  /* 第1个参数: COM端口号 */
+    {
+        port = luaL_checknumber(L, 1);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"port\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 2) == LUA_TNUMBER)                  /* 第2个参数 : 超时 */
+    {
+        timeout = (uint16_t)luaL_checknumber(L, 2);
+    }  
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"timeout\r\n");
+        return 0;
+    }
+    
+    if (lua_type(L, 3) == LUA_TNUMBER)                  /* 第3个参数 : 485地址 */
+    {
+        addr485 = luaL_checknumber(L, 3);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"addr485\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 4) == LUA_TNUMBER)                  /* 第4个参数 寄存器地址 */
+    {
+        regaddr = luaL_checknumber(L, 4);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"regaddr\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 5) == LUA_TNUMBER)                  /* 第5个参数 : 寄存器个数*/
+    {
+        num = (uint16_t)luaL_checknumber(L, 5);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"regnum\r\n");
+        return 0;
+    }    
+    
+    txbuf[pos++] = addr485;
+    txbuf[pos++] = 0x03;
+    txbuf[pos++] = regaddr >> 8;
+    txbuf[pos++] = regaddr;
+    txbuf[pos++] = num >> 8;
+    txbuf[pos++] = num;
+    crc = CRC16_Modbus(txbuf, pos);
+    txbuf[pos++] = crc >> 8;
+    txbuf[pos++] = crc;
+    
+    if (num > READ_REG_MAX_NUM)
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S16"regnum > %d\r\n", READ_REG_MAX_NUM);
+        return 0;
+    }
+    
+    /* 发送命令 */
+    comSendBuf((COM_PORT_E)port, txbuf, pos);
+    
+    errcode = ERR_TIMEOUT;
+    rxlen = uart_ReadModbusAck(port, rxbuf, sizeof(rxbuf), timeout);
+    if (rxbuf[1] == 0x03 && rxlen == 2 * num + 5)
+    {        
+        uint8_t i;
+        
+        lua_pushnumber(L, RSP_OK);      /* 成功返回0 */
+            
+        for (i = 0; i < num; i++)
+        {
+            value = (int16_t)BEBufToUint16(&rxbuf[3 + 2 * i]);            
+            lua_pushnumber(L, value);
+        }
+        return num + 1;
+    }
+    if (rxlen == 5 && (rxbuf[1] & 0x80))    /* 错误应答 */
+    {
+        /* 01 86 02 C1 C2 */
+        errcode = rxbuf[2];
+    }    
+    lua_pushnumber(L, errcode); 
+    LUA_ERR_PARAM_PRINT("\r\nmodbus_read_s16() regaddr = %04X errcode = %d\r\n", regaddr, errcode);    
     return 1;   /* 返回 错误代码 */
 }
 
@@ -758,14 +880,14 @@ static int lua_uart_WriteReg32(lua_State* L)
 
 /*
 *********************************************************************************************************
-*    函 数 名: lua_ReadReg32
-*    功能说明: 读寄存器 32bit 有符号
+*    函 数 名: lua_uart_ReadRegU32
+*    功能说明: 读寄存器 32bit 无符号
 *    形    参: port, timeout, addr485, regaddr, regnum
 *    返 回 值: 寄存器值
 *********************************************************************************************************
 */
 #define STR_R_U32   "\r\nmodbus_read_u32(port, timeout, addr485, regaddr, regnum)\r\n--parameter error : "
-static int lua_uart_ReadReg32(lua_State* L)
+static int lua_uart_ReadRegU32(lua_State* L)
 {
     uint8_t port;
     uint16_t addr485;
@@ -873,6 +995,126 @@ static int lua_uart_ReadReg32(lua_State* L)
     }    
     lua_pushnumber(L, errcode); 
     LUA_ERR_PARAM_PRINT("\r\nmodbus_read_u32() regaddr = %04X errcode = %d\r\n", regaddr, errcode);       
+    return 1;   /* 返回 错误代码 */
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: lua_uart_ReadRegS32
+*    功能说明: 读寄存器 32bit 有符号
+*    形    参: port, timeout, addr485, regaddr, regnum
+*    返 回 值: 寄存器值
+*********************************************************************************************************
+*/
+#define STR_R_S32   "\r\nmodbus_read_s32(port, timeout, addr485, regaddr, regnum)\r\n--parameter error : "
+static int lua_uart_ReadRegS32(lua_State* L)
+{
+    uint8_t port;
+    uint16_t addr485;
+    uint16_t regaddr;
+    uint16_t num;
+    uint16_t timeout;
+    uint8_t txbuf[32];
+    uint8_t rxbuf[READ_REG_MAX_NUM * 2 + 5];
+    uint8_t pos = 0;
+    uint8_t rxlen;
+    uint16_t crc;
+    uint8_t errcode;
+    int32_t value32;
+
+    if (lua_type(L, 1) == LUA_TNUMBER)                  /* 第1个参数: COM端口号 */
+    {
+        port = luaL_checknumber(L, 1);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"port\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 2) == LUA_TNUMBER)                  /* 第2个参数 : 超时 */
+    {
+        timeout = (uint16_t)luaL_checknumber(L, 2);
+    }  
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"timeout\r\n");
+        return 0;
+    }
+    
+    if (lua_type(L, 3) == LUA_TNUMBER)                  /* 第3个参数 : 485地址 */
+    {
+        addr485 = luaL_checknumber(L, 3);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"addr485\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 4) == LUA_TNUMBER)                  /* 第4个参数 寄存器地址 */
+    {
+        regaddr = luaL_checknumber(L, 4);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"regaddr\r\n");
+        return 0;
+    }    
+
+    if (lua_type(L, 5) == LUA_TNUMBER)                  /* 第5个参数 : 寄存器个数*/
+    {
+        num = (uint16_t)luaL_checknumber(L, 5);
+    }
+    else
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"regnum\r\n");
+        return 0;
+    }    
+    
+    if (num > READ_REG_MAX_NUM / 2)
+    {
+        LUA_ERR_PARAM_PRINT(STR_R_S32"regnum > %d\r\n", READ_REG_MAX_NUM / 2);
+        return 0;
+    }
+    
+    num = num * 2;
+    
+    txbuf[pos++] = addr485;
+    txbuf[pos++] = 0x03;
+    txbuf[pos++] = regaddr >> 8;
+    txbuf[pos++] = regaddr;
+    txbuf[pos++] = num >> 8;
+    txbuf[pos++] = num;
+    crc = CRC16_Modbus(txbuf, pos);
+    txbuf[pos++] = crc >> 8;
+    txbuf[pos++] = crc;
+    
+    /* 发送命令 */
+    comSendBuf((COM_PORT_E)port, txbuf, pos);
+    
+    errcode = ERR_TIMEOUT;
+    rxlen = uart_ReadModbusAck(port, rxbuf, sizeof(rxbuf), timeout);
+    if (rxbuf[1] == 0x03 && rxlen == 2 * num + 5)
+    {        
+        uint8_t i;
+        
+        lua_pushnumber(L, RSP_OK);      /* 成功返回0 */
+            
+        for (i = 0; i < num; i++)
+        {
+            value32 = (int32_t)BEBufToUint32(&rxbuf[3 + 4 * i]);            
+            lua_pushnumber(L, value32);
+        }
+        return num + 1;
+    }
+    if (rxlen == 5 && (rxbuf[1] & 0x80))    /* 错误应答 */
+    {
+        /* 01 86 02 C1 C2 */
+        errcode = rxbuf[2];    
+    }    
+    lua_pushnumber(L, errcode); 
+    LUA_ERR_PARAM_PRINT("\r\nmodbus_read_s32() regaddr = %04X errcode = %d\r\n", regaddr, errcode);       
     return 1;   /* 返回 错误代码 */
 }
 

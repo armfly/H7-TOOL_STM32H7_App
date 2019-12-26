@@ -80,7 +80,7 @@ void status_CurrentMeter(void)
             case KEY_UP_S:      /* S键释放 */
                 if (g_tVar.StartBatCap == 0)
                 {
-                    g_MainStatus = NextStatus(g_MainStatus);
+                    g_MainStatus = LastStatus(g_MainStatus);
                 }
                 
                 break;
@@ -97,7 +97,7 @@ void status_CurrentMeter(void)
             case KEY_UP_C:      /* C键释放 */
                 if (g_tVar.StartBatCap == 0)
                 {                
-                    g_MainStatus = LastStatus(g_MainStatus);
+                    g_MainStatus = NextStatus(g_MainStatus);
                 }
                 break;
 

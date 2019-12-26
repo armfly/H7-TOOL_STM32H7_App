@@ -33,10 +33,10 @@
     弹起 -- 丢弃
     按下
     双击弹起
-    弹起
-    
-
+    弹起   
 */
+
+#define DOUBLE_CLICK_ENABLE     0   /* 1表示启用双击检测， 会影响单击体验变慢 */
 
 #define HARD_KEY_NUM            2                       /* 实体按键个数 */
 #define KEY_COUNT               (HARD_KEY_NUM + 0)      /* 2个独立建 + 0个组合按键 */
@@ -71,8 +71,6 @@ static KEY_FIFO_T s_tKey; /* 按键FIFO变量,结构体 */
 static void bsp_InitKeyVar(void);
 static void bsp_InitKeyHard(void);
 static void bsp_DetectKey(uint8_t i);
-
-
 
 /* 用于按键超时进入屏保 */
 static int32_t s_KeyTimeOutCount = 0;
@@ -247,10 +245,10 @@ void bsp_PutKey(uint8_t _KeyCode)
         key = ((_KeyCode - 1) % KEY_MSG_STEP) + 1;
         if (key == KEY_1_UP || key == KEY_1_LONG_UP)
         {
-            s_LcdOn = 1;
-        }        
-        LCD_DispOn();     
-        LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 */            
+            s_LcdOn = 1;            
+            g_LcdSleepReq = 2;    /* 控制LCD唤醒, 在bsp_Idle执行. 不可以在此调用 LCD_DispOff() */
+            LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 */                
+        }                
         return;
     }
     
@@ -451,32 +449,39 @@ static void bsp_DetectKey(uint8_t i)
                     {
                         /* 发送长按弹起的消息 */
                         bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_LONG_UP));
-                        s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */
+                        
+                        #if DOUBLE_CLICK_ENABLE == 1
+                            s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */
+                        #endif
                     }
                     else
                     {                       
+                        #if DOUBLE_CLICK_ENABLE == 1
                         /* 发送短按弹起的消息 */
-                        //if (bsp_CheckRunTime(s_tBtn[i].LastTime) < 500)
-                        if (pBtn->DelayCount > 0)
-                        {                            
-                            if (pBtn->ClickCount == 1)
-                            {
-                                bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_DB_UP));  /* 双击事件 */
-                                pBtn->ClickCount = 0;
+                            //if (bsp_CheckRunTime(s_tBtn[i].LastTime) < 500)
+                            if (pBtn->DelayCount > 0)
+                            {                            
+                                if (pBtn->ClickCount == 1)
+                                {
+                                    bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_DB_UP));  /* 双击事件 */
+                                    pBtn->ClickCount = 0;
+                                }
+                                else
+                                {
+                                    bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));     /* 单击弹起事件 */
+                                    pBtn->ClickCount = 0;
+                                }
+                                pBtn->DelayCount = 80; 
                             }
-                            else
+                            else                       
                             {
-                                bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));     /* 单击事件 */
-                                pBtn->ClickCount = 0;
+                                pBtn->ClickCount++;                        
+                                pBtn->DelayCount = KEY_DB_CLICK_TIME;  
                             }
-                            pBtn->DelayCount = 80; 
-                        }
-                        else                       
-                        {
-                            pBtn->ClickCount++;                        
-                            pBtn->DelayCount = KEY_DB_CLICK_TIME;  
-                        }
-                        s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */          
+                            s_tBtn[i].LastTime = bsp_GetRunTime();  /* 记录按键弹起时刻 */   
+                        #else
+                            bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));     /* 单击弹起事件 */
+                        #endif
                     }
                 }
                 pBtn->State = 0;                
@@ -491,7 +496,7 @@ static void bsp_DetectKey(uint8_t i)
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_KeyScan10ms
-*    功能说明: 扫描所有按键。非阻塞，**被systick中断周期性的调用，10ms一次
+*    功能说明: 扫描所有按键。非阻塞，被systick中断周期性的调用，10ms一次
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -502,19 +507,21 @@ void bsp_KeyScan10ms(void)
 
     for (i = 0; i < KEY_COUNT; i++)
     {   
-        /* 超时判断 */
-        if (s_tBtn[i].DelayCount > 0)
-        {
-            if (--s_tBtn[i].DelayCount == 0)
+        #if DOUBLE_CLICK_ENABLE == 1
+            /* 超时判断 */
+            if (s_tBtn[i].DelayCount > 0)
             {
-                if (s_tBtn[i].ClickCount == 1)
+                if (--s_tBtn[i].DelayCount == 0)
                 {
-                    bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));   /* 单击弹起 */
-                }              
-                s_tBtn[i].ClickCount = 0;
+                    if (s_tBtn[i].ClickCount == 1)
+                    {
+                        bsp_PutKey((uint8_t)(KEY_MSG_STEP * i + KEY_1_UP));   /* 单击弹起 */
+                    }              
+                    s_tBtn[i].ClickCount = 0;
+                }
             }
-        }
-
+        #endif
+            
         /* 检测按键 */
         bsp_DetectKey(i);        
     }
@@ -523,9 +530,9 @@ void bsp_KeyScan10ms(void)
     {
         if (--s_KeyTimeOutCount == 0)
         {
-            LCD_SetBackLight(0);   /* 关闭背光 */                
-            LCD_DispOff();
-            s_LcdOn = 0;    /* 屏幕关闭 */
+            LCD_SetBackLight(0);        /* 关闭背光 */                
+            g_LcdSleepReq = 1;          /* 控制LCD休眠, 在bsp_Idle执行. 不可以在此调用 LCD_DispOff() */
+            s_LcdOn = 0;                /* 屏幕关闭 */
         }
     }
 }

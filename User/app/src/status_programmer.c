@@ -19,10 +19,6 @@
 #define GROUP_NUM      20      /* 最大分组个数 */
 #define FILE_NUM       50      /* 每个分组下面最大文件个数 */
 
-/*
-    界面规划:
-*/
-
 /* 三个按钮 */
 #define BTN1_X     (240 - BTN1_W - 5)
 #define BTN1_Y     80
@@ -108,68 +104,6 @@ static void ProgStatusTvcc(void);
 
 static void DispGroupList(uint16_t _usIndex);
 static void DispFileList(uint16_t _usIndex);
-
-BUTTON_T btn1, btn2, btn3;
-
-/*
-*********************************************************************************************************
-*    函 数 名: status_ProgInit
-*    功能说明: 脱机编程器预览界面 
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void status_ProgInit(void)
-{
-    uint8_t ucKeyCode; /* 按键代码 */
-    uint8_t fRefresh;
-
-    DispHeader("烧录器");
-    DispHelpBar("长按S键开始烧录",
-                "");      
-    fRefresh = 1;
-    while (g_MainStatus == MS_PROG_INIT)
-    {
-        if (fRefresh) /* 刷新整个界面 */
-        {
-            fRefresh = 0;
-        }
-
-        bsp_Idle();
-        
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
-        {
-            /* 有键按下 */
-            switch (ucKeyCode)
-            {
-            case KEY_DOWN_S:    /* S键按下 */
-                break;
-
-            case KEY_UP_S:      /* S键释放 */
-                g_MainStatus = NextStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_S:    /* S键长按 */
-                g_MainStatus = MS_PROG_WORK;
-                break;
-
-            case KEY_DOWN_C:    /* C键按下 */
-                break;
-
-            case KEY_UP_C:      /* C键释放 */
-                g_MainStatus = LastStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_C:    /* C键长按 */
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
-}
 
 /*
 *********************************************************************************************************
@@ -456,6 +390,7 @@ static void ProgStatusMain(void)
     FONT_T tFont16;
     FONT_T tFont24;
 	static uint8_t cursor = 0;
+    BUTTON_T btn1, btn2, btn3;    
 
     /* 设置字体参数 */
     {
@@ -580,7 +515,7 @@ static void ProgStatusMain(void)
                 break;
             
             case KEY_LONG_DOWN_C:    /* C键长按 */
-                g_MainStatus = MS_PROG_INIT;
+                g_MainStatus = MS_EXTEND_INIT;
                 s_ProgStatus = PS_EXIT;
                 break;
 

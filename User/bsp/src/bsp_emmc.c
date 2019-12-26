@@ -116,7 +116,7 @@ uint8_t BSP_MMC_Init(void)
   /* if CLKDIV = 0 then SDMMC Clock frequency = SDMMC Kernel Clock
      else SDMMC Clock frequency = SDMMC Kernel Clock / [2 * CLKDIV].
   */
-  uSdHandle.Init.ClockDiv = 2;
+  uSdHandle.Init.ClockDiv = 3;		/* 2019-12-13 2 -> 3 */
   uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
@@ -266,6 +266,19 @@ uint8_t BSP_MMC_Erase(uint32_t StartAddr, uint32_t EndAddr)
   */
 __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
 {
+	
+	   /**SDMMC1 GPIO Configuration    
+    PC10     ------> SDMMC1_D2
+    PC11     ------> SDMMC1_D3
+    PC12     ------> SDMMC1_CK
+    PB9     ------> SDMMC1_D5
+    PB8     ------> SDMMC1_D4
+    PD2     ------> SDMMC1_CMD
+    PC8     ------> SDMMC1_D0
+    PC9     ------> SDMMC1_D1
+    PC7     ------> SDMMC1_D7
+    PC6     ------> SDMMC1_D6 
+    */
   /* __weak function can be modified by the application */
 
   GPIO_InitTypeDef gpio_init_structure;
@@ -280,8 +293,8 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
 
   /* Common GPIO configuration */
   gpio_init_structure.Mode = GPIO_MODE_AF_PP;
-  gpio_init_structure.Pull = GPIO_PULLUP;
-  gpio_init_structure.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  gpio_init_structure.Pull = GPIO_PULLUP; 
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;	/* 改为GPIO_SPEED_FREQ_HIGH    以前GPIO_SPEED_FREQ_VERY_HIGH*/
   gpio_init_structure.Alternate = GPIO_AF12_SDIO1;
 
   /* SDMMC GPIO CLKIN PB8, D0 PC8, D1 PC9, D2 PC10, D3 PC11, CK PC12, CMD PD2 */
@@ -297,7 +310,7 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   HAL_GPIO_Init(GPIOB, &gpio_init_structure);
 
   /* NVIC configuration for SDIO interrupts */
-  HAL_NVIC_SetPriority(SDMMC1_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
 }
 

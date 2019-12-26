@@ -45,9 +45,11 @@
 *                (2) h文件中使能按键提示音 #define BUTTON_BEEP()    BEEP_KeyTone();
 *        V4.8   2019-03-23
 *                (1) 新增 LCD_DispStrEx0
-*        V5.0   2019-10-27 H7-TOOL产品 增加UTF-8编码字符串支持。USE_UTF8 == 1启用。
-*                    - LCD_DispStrEx0() 函数更新。
+*        V5.0   2019-10-27 H7-TOOL产品 增加UTF-8编码字符串支持。USE_UTF8 == 1启用。  
+*                    - LCD_DispStrEx0() 函数更新。 增加形参 _UTF8
 *                    - LCD_GetStrWidth() 函数更新。
+*                    - 显示字符串函数限制超出宽度 LCD_DispStrEx0()
+*                    - \t字符串中的\t划线指令更换为\v指令. 避免和Lua print的\t冲突
 *
 *    Copyright (C), 2015-2030, 安富莱电子 www.armfly.com
 *
@@ -66,15 +68,19 @@
 #define USE_RA8875
 
 /* 下面3个变量，主要用于使程序同时支持不同的屏 */
-uint16_t g_LcdHeight = 128; /* 显示屏分辨率-高度 */
-uint16_t g_LcdWidth = 128;    /* 显示屏分辨率-宽度 */
-uint8_t s_ucBright;                    /* 背光亮度参数 */
-uint8_t g_LcdDirection = 0; /* 显示方向.0，1，2，3 */
+uint16_t g_LcdHeight = 128;         /* 显示屏分辨率-高度 */
+uint16_t g_LcdWidth = 128;          /* 显示屏分辨率-宽度 */
+uint8_t s_ucBright;                 /* 背光亮度参数 */
+uint8_t g_LcdDirection = 0;         /* 显示方向.0，1，2，3 */
+
+uint8_t g_LcdSleepReq = 0;          /* LCD休眠请求，用于SPI硬件互斥 */
+
+uint8_t g_Encode = ENCODE_UTF8;     /* 缺省编码方式 */
 
 static void LCD_HardReset(void);
 static void LCD_SetPwmBackLight(uint8_t _bright);
 static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-                                                     uint8_t _Align);
+                    uint8_t _Align);
 
 #if 1
 #define LCDX_InitHard ST7789_InitHard
@@ -125,6 +131,48 @@ void LCD_InitHard(void)
 
     LCD_SetBackLight(BRIGHT_DEFAULT);     /* 打开背光，设置为缺省亮度 */
 #endif
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_SetEncode
+*    功能说明: 设置文字编码方式
+*    形    参: _code:  ENCODE_UTF8, ENCODE_GBK
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_SetEncode(uint8_t _code)
+{
+    g_Encode = _code;   // g_Encode == ENCODE_UTF8
+}
+
+uint8_t LCD_GetEncode(void)
+{
+    return g_Encode;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_Task
+*    功能说明: 管理LCD刷屏和休眠的任务
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_Task(void)
+{
+    if (g_LcdSleepReq == 1)        /* 进入休眠。按键中断服务程序中会设置1 */
+    {
+        g_LcdSleepReq = 0;
+        LCD_DispOff();              /* 该函数会操作SPI，不可以在中断服务程序中执行 */
+    }
+    else if (g_LcdSleepReq == 2)    /* 退出休眠。按键中断服务程序中会设置2 */
+    {
+        g_LcdSleepReq = 0;
+        LCD_DispOn();              /* 该函数会操作SPI，不可以在中断服务程序中执行 */
+    }
+    
+    ST7789_DrawScreen();        /* 硬件SPI+DMA+刷屏 */
 }
 
 /*
@@ -308,12 +356,12 @@ void LCD_ClrScr(uint16_t _usColor)
 */
 void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont)
 {
-    LCD_DispStrEx(_usX, _usY, _ptr, _tFont, 0, 0);
+    LCD_DispStrEx(_usX, _usY, _ptr,  _tFont, 0, 0);
 }
 
 /*
 *********************************************************************************************************
-*    函 数 名: LCD_DispStrEx
+*    函 数 名: LCD_DispStrEx, LCD_DispStrEx_GBK
 *    功能说明: 在LCD指定坐标（左上角）显示一个字符串。 增强型函数。支持左\中\右对齐，支持定长清屏。 支持换行
 *    形    参:
 *        _usX : X坐标
@@ -329,7 +377,7 @@ void LCD_DispStr(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont)
 *********************************************************************************************************
 */
 void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-                                     uint8_t _Align)
+                        uint8_t _Align)
 {
     uint16_t i = 0;
     char str_buf[128] = {0};
@@ -365,7 +413,7 @@ void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uin
             y += cap;
             i += 2;
         }
-        else if (ch == '\t') /* 划线指令，后面8个字符表示 X1, Y2, X2,  Y2 00 99 02 02 */
+        else if (ch == '\v') /* 2019-12-25 由t改为v 划线指令，后面8个字符表示 X1, Y2, X2,  Y2 00 99 02 02 */
         {
             uint16_t x1, x2, y1, y2;
 
@@ -390,8 +438,23 @@ void LCD_DispStrEx(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uin
         {
             if (len < sizeof(str_buf) - 1)
             {
-                str_buf[len++] = ch;
-
+                if (ch == '\t')     /* 支持tab，8字符定位 */
+                {
+                    uint8_t m;
+                    
+                    for (m = 0; m < 8; m++)
+                    {
+                        if ((len % 8) == 0)
+                        {
+                            break;
+                        }
+                        str_buf[len++] = ' ';
+                    }
+                }
+                else
+                {
+                    str_buf[len++] = ch;
+                }
                 str_buf[len] = 0;
             }
         }
@@ -491,7 +554,7 @@ uint16_t LCD_GetFontHeight(FONT_T *_tFont)
 
 /*
 *********************************************************************************************************
-*    函 数 名: LCD_GetStrWidth
+*    函 数 名: LCD_GetStrWidth, LCD_GetStrWidth_GBK
 *    功能说明: 计算字符串宽度(像素单位)
 *    形    参:
 *        _ptr  : 字符串指针
@@ -638,7 +701,8 @@ uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
         }
         else /* 汉字 */
         {
-            #if USE_UTF8 == 1
+            if (g_Encode == ENCODE_UTF8)     /* UTF-8 */
+            {
                 /* 解读 UTF-8 编码非常简单。
                     如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
                     UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
@@ -684,13 +748,15 @@ uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
                         }                            
                     }
                 }
-            #else            
+            }
+            else     /* GBK */       
+            {
                 code2 = *++p;
                 if (code2 == 0)
                 {
                     break;
                 }
-            #endif
+            }
             font_width = LCD_GetFontWidth(_tFont);
         }
         width += (font_width + _tFont->Space);
@@ -1033,6 +1099,128 @@ static void _LCD_ReadAsciiDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
 
 /*
 *********************************************************************************************************
+*    函 数 名: _LCD_ReadHZDotQSPI
+*    功能说明: 读取1个汉字的点阵数据， 在QSPI Flash字库中读取
+*    形    参:
+*        _code1, _cod2 : 汉字内码. GB2312编码
+*        _fontcode ：字体代码
+*        _pBuf : 存放读出的字符点阵数据
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static void _LCD_ReadHZDotQSPI(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, uint8_t *_pBuf)
+{
+    uint32_t offset = 0;
+    uint8_t font_bytes = 0;
+
+    switch (_fontcode)
+    {
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 24;
+            offset = HZK12_ADDR;
+            break;
+
+        case FC_ST_16:
+            font_bytes = 32;
+            offset = HZK16_ADDR;
+            break;
+
+        case FC_ST_24:
+            font_bytes = 72;
+            offset = HZK24_ADDR;
+            break;
+
+        case FC_ST_32:
+            font_bytes = 128;
+            offset = HZK32_ADDR;
+            break;
+
+        default:
+            return;
+    }
+
+    /* 此处需要根据字库文件存放位置进行修改 
+        GB2312范围： 0xA1A1 - 0xFEFE
+        其中汉字范围 : 0xB0A1 - 0xF7FE
+    
+        GBK 范围： 0x8140 - 0xFEFE 
+    
+        安富莱自定义汉字编码错开GBK和GB2312编码空间： 0x8000 - 0x813F （319个）        
+    */
+    if (_code1 >= 0xA1 && _code1 <= 0xA9 && _code2 >= 0xA1)
+    {
+        offset += ((_code1 - 0xA1) * 94 + (_code2 - 0xA1)) * font_bytes;
+    }
+    else if (_code1 >= 0xB0 && _code1 <= 0xF7 && _code2 >= 0xA1)
+    {
+        offset += ((_code1 - 0xB0) * 94 + (_code2 - 0xA1) + 846) * font_bytes;
+    }
+    else /* 2018-03-13 增加自定义汉字编码，用于实现特殊图标符号 */
+    {
+        uint16_t code16;
+        uint8_t *pDot;
+        uint32_t address;
+        uint16_t m;
+
+        code16 = _code1 * 256 + _code2;
+        if (code16 >= 0x8000 && code16 <= 0x813F) /* 自定义汉字点阵，固定使用CPU片内部小字库 */
+        {
+            pDot = 0; /* 仅仅用于避免告警 */
+            switch (_fontcode)
+            {
+            case FC_ST_12: /* 12点阵 */
+                font_bytes = 24;
+                pDot = (uint8_t *)g_Hz12;
+                break;
+
+            case FC_ST_16:
+                font_bytes = 32;
+                pDot = (uint8_t *)g_Hz16;
+                break;
+
+            case FC_ST_24:
+                font_bytes = 72;
+                pDot = (uint8_t *)g_Hz24;
+                break;
+
+            case FC_ST_32:
+                font_bytes = 128;
+                pDot = (uint8_t *)g_Hz32;
+                break;
+
+            default:
+                break;
+            }
+
+            m = 0;
+            while (1)
+            {
+                address = m * (font_bytes + 2);
+                m++;
+                if ((_code1 == pDot[address + 0]) && (_code2 == pDot[address + 1]))
+                {
+                    address += 2;
+                    memcpy(_pBuf, &pDot[address], font_bytes);
+                    break;
+                }
+                else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
+                {
+                    /* 字库搜索完毕，未找到，则填充全FF */
+                    memset(_pBuf, 0xFF, font_bytes);
+                    break;
+                }
+            }
+            return;
+        }
+    }
+
+    /* 将CPU内部Flash中的ascii字符点阵复制到buf */
+    //memcpy(_pBuf, (char *)offset, font_bytes); 内存映射模式未调通，数据错乱
+    QSPI_ReadBuffer(_pBuf, offset, font_bytes);
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: _LCD_ReadHZDot
 *    功能说明: 读取1个汉字的点阵数据
 *    形    参:
@@ -1090,8 +1278,12 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
         }
         else if ((pDot[address + 0] == 0xFF) && (pDot[address + 1] == 0xFF))
         {
-            /* 字库搜索完毕，未找到，则填充全FF */
-            memset(_pBuf, 0xFF, font_bytes);
+            #if 1    /* 2019-12-24，H7-TOOL，未找到则去QSPI字库寻找 */
+                _LCD_ReadHZDotQSPI(_code1, _code2, _fontcode, _pBuf);
+            #else            
+                /* 字库搜索完毕，未找到，则填充全FF */
+                memset(_pBuf, 0xFF, font_bytes);    
+            #endif
             break;
         }
     }
@@ -1256,14 +1448,15 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
 *    返 回 值: 无
 *********************************************************************************************************
 */
+ALIGN_32BYTES(uint8_t g_DotBuf[96 * 40 / 8]); /* 最大支持96x40点阵字符 */
+
+
 static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tFont, uint16_t _Width,
-                                                     uint8_t _Align)
+                    uint8_t _Align)
 {
     uint32_t i;
     uint8_t code1;
     uint8_t code2;
-    //uint8_t buf[32 * 32 / 8];    /* 最大支持32点阵汉字 */
-    uint8_t buf[96 * 40 / 8]; /* 最大支持96x40点阵字符 */
     uint8_t width;
     uint16_t m;
     uint8_t font_width = 0;
@@ -1280,7 +1473,18 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
     uint8_t line_bytes;
     uint8_t asc_bytes = 0;
     uint8_t hz_bytes = 0;
+    
+    uint16_t xMax;
 
+    if (_Width > 0)
+    {
+        xMax = _usX + _Width - 1;
+    }
+    else
+    {
+        xMax = 1920;
+    }
+    
     switch (_tFont->FontCode)
     {
     case FC_ST_12: /* 12点阵 */
@@ -1375,7 +1579,7 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
                 {
                     RA8875_flag = 0;
                     /* 将ascii字符点阵复制到buf */
-                    _LCD_ReadAsciiDot(code1, _tFont->FontCode, buf); /* 读取ASCII字符点阵 */
+                    _LCD_ReadAsciiDot(code1, _tFont->FontCode, g_DotBuf); /* 读取ASCII字符点阵 */
 
                     //对秒进行特殊处理,避免宽度过大
                     if (_tFont->FontCode == FC_ST_62X40 || _tFont->FontCode == FC_ST_96X40)
@@ -1443,7 +1647,7 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
                                 }
                             }
                         }
-                        _LCD_ReadSmallDot(code1, _tFont->FontCode, buf);
+                        _LCD_ReadSmallDot(code1, _tFont->FontCode, g_DotBuf);                                            
 
                         width = font_width;
 
@@ -1469,7 +1673,8 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
             {
                 RA8875_flag = 0;
                 
-                #if USE_UTF8 == 1
+                if (g_Encode == ENCODE_UTF8)     /* UTF-8 */
+                {
                     /* 解读 UTF-8 编码非常简单。
                         如果一个字节的第一位是0，则这个字节单独就是一个字符；如果第一位是1，则连续有多少个1，就表示当前字符占用多少个字节。
                         UNICODE 最后一个二进制位开始，依次从后向前填入格式中的x，多出的位补0
@@ -1529,16 +1734,21 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
                         code1 = gb >> 8;
                         code2 = gb;
                     }
-                #else
+                }
+                else    /* GBK */
+                {
                     code2 = *++_ptr;                
                     if (code2 == 0)
                     {
                         break;
                     }
-                #endif
+                }
                 
                 /* 读1个汉字的点阵 */
-                _LCD_ReadHZDot(code1, code2, _tFont->FontCode, buf);
+                _LCD_ReadHZDot(code1, code2, _tFont->FontCode, g_DotBuf);
+                    
+                SCB_InvalidateDCache_by_Addr((uint32_t *)g_DotBuf,  sizeof(g_DotBuf));
+                    
                 width = font_width;
                 line_bytes = hz_bytes;
             }
@@ -1552,27 +1762,32 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
                     x = _usX;
                     for (i = 0; i < width; i++) /* 字符宽度 */
                     {
-                        if ((buf[m * line_bytes + i / 8] & (0x80 >> (i % 8))) != 0x00)
-                        {
-                            LCD_PutPixel(x, y, _tFont->FrontColor); /* 设置像素颜色为文字色 */
-                        }
-                        else
-                        {
-                            if (_tFont->BackColor != CL_MASK) /* 透明色 */
+                        if (x < xMax)
+                        {                        
+                            if ((g_DotBuf[m * line_bytes + i / 8] & (0x80 >> (i % 8))) != 0x00)
                             {
-                                LCD_PutPixel(x, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+                                LCD_PutPixel(x, y, _tFont->FrontColor); /* 设置像素颜色为文字色 */
+                            }
+                            else
+                            {
+                                if (_tFont->BackColor != CL_MASK) /* 透明色 */
+                                {
+                                    LCD_PutPixel(x, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+                                }
                             }
                         }
-
                         x++;
                     }
 
                     for (i = 0; i < _tFont->Space; i++) /* 字符宽度 */
                     {
-                        if (_tFont->BackColor != CL_MASK) /* 透明色 */
-                        {
-                            /* 如果文字底色按_tFont->usBackColor，并且字间距大于点阵的宽度，那么需要在文字之间填充(暂时未实现) */
-                            LCD_PutPixel(x + i, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+                        if (x < xMax)
+                        {                        
+                            if (_tFont->BackColor != CL_MASK) /* 透明色 */
+                            {
+                                /* 如果文字底色按_tFont->usBackColor，并且字间距大于点阵的宽度，那么需要在文字之间填充(暂时未实现) */
+                                LCD_PutPixel(x + i, y, _tFont->BackColor); /* 设置像素颜色为文字背景色 */
+                            }
                         }
                     }
                     y++;
@@ -2908,7 +3123,7 @@ void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 extern uint8_t s_DispRefresh;
 void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
                                              uint16_t _usRadius, uint16_t _usColor)
-{		
+{        
     if (_usHeight < 2 * _usRadius)
     {
         _usHeight = 2 * _usRadius;
@@ -2918,20 +3133,231 @@ void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
     {
         _usWidth = 2 * _usRadius;
     }
-		
+        
     LCD_FillQuterCircle(_usX + _usRadius, _usY + _usRadius, _usRadius, _usColor, 0); /* 左上角的弧 */
-	
-	LCD_Fill_Rect(_usX + _usRadius, _usY, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
-	
+    
+    LCD_Fill_Rect(_usX + _usRadius, _usY, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
+    
     LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usRadius, _usRadius, _usColor, 1); /* 右上角的弧 */
-	
-	LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
+    
+    LCD_Fill_Rect(_usX, _usY + _usRadius, _usHeight - 2 * _usRadius, _usWidth, _usColor);
 
     LCD_FillQuterCircle(_usX + _usWidth - _usRadius - 1, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 2); /* 右下角的弧 */
-	
-	LCD_Fill_Rect(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
+    
+    LCD_Fill_Rect(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius + 1, _usWidth - 2 * _usRadius, _usColor);
 
     LCD_FillQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
 }
 
+
+/*
+*********************************************************************************************************
+*    函 数 名: __MemoAddStr
+*    功能说明: 添加1行文本0结束. 0x0D 0A结束
+*    形    参:  _pMemo : 文本框对象
+*               _str : 字符串
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_MemoAddStr(MEMO_T *_pMemo, char *_str)
+{
+    uint32_t i = 0;
+    uint32_t InputLen;
+    uint32_t len;
+    uint32_t fond = 0;
+    
+    InputLen = strlen(_str);
+    
+    /* 如果超过容器长度, 则清除以前的数据，清除前面的30% */
+    len = 0;
+    if (_pMemo->Len + len >= _pMemo->MaxLen)
+    {
+        for (i = _pMemo->MaxLen / 3; i < _pMemo->MaxLen; i++)
+        {
+            if (fond == 0)
+            {
+                if (_pMemo->Text[i] == 0x0A)
+                {
+                    fond = 1;
+                }
+            }
+            else
+            {
+                _pMemo->Text[len++] = _pMemo->Text[i];
+                if (_pMemo->Text[i] == 0)
+                {
+                    break;
+                }
+            }
+        }
+        _pMemo->Len = len;        
+    }
+    
+    /* 追加新字符串填入 */
+    for (i = 0; i < InputLen; i++)
+    {
+        _pMemo->Text[_pMemo->Len++] = _str[i];
+    }
+    _pMemo->Text[_pMemo->Len] = 0;
+    
+    _pMemo->Refresh = 1;    /* 内容变化，需要刷新显示 */
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_MemoAddChar
+*    功能说明: 添加1个字符，补0
+*    形    参:  _pMemo : 文本框对象
+*               _ch : 字符
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_MemoAddChar(MEMO_T *_pMemo, char _ch)
+{
+    char buf[2];
+    
+    buf[0] = _ch;
+    buf[1] = 0;
+    LCD_MemoAddStr(_pMemo, buf);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_MemoClear
+*    功能说明: 清除文本
+*    形    参:  _pMemo : 文本框对象
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_MemoClear(MEMO_T *_pMemo)
+{
+    _pMemo->Len = 0;
+    _pMemo->Text[0] = 0;
+    LCD_Fill_Rect(_pMemo->Left + 1, _pMemo->Top + 1, _pMemo->Height - 2, _pMemo->Width - 2, EDIT_BACK_COLOR);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_InitMemo
+*    功能说明: 初始化多行文本框
+*    形    参: _pMemo 对象
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_InitMemo(MEMO_T *_pMemo)
+{
+    _pMemo->id = 0;
+    _pMemo->Len = 0;
+    _pMemo->Text[0] = 0; 
+    _pMemo->Refresh = 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_DrawMemo
+*    功能说明: 在LCD上绘制一个多行文本框
+*    形    参:
+*            _usX, _usY : 图片的坐标
+*            _usHeight  : 图片高度
+*            _usWidth   : 图片宽度
+*            _ptr       : 图片点阵指针
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+#define LINE_CAP    2       /* 文字行间距 */
+void LCD_DrawMemo(MEMO_T *_pMemo)
+{
+    uint16_t x, y;
+    uint16_t TextLineNum;
+    uint16_t line;
+    uint16_t CanDispLineNum;    /* 可以显示的行数 */
+    uint16_t BeginLine;
+    uint32_t i,k;
+    uint8_t FontHeight;
+    char *pSave;
+    char *p;
+    char buf[128];  /* 每行最大128字符 */
+    
+    _pMemo->Refresh = 0;
+    
+    /* 绘制边框，填充窗口 */
+    LCD_DrawRect(_pMemo->Left, _pMemo->Top, _pMemo->Height, _pMemo->Width, EDIT_BORDER_COLOR);
+    LCD_Fill_Rect(_pMemo->Left + 1, _pMemo->Top + 1, _pMemo->Height - 2, _pMemo->Width - 2, EDIT_BACK_COLOR);
+    
+    /* 解析文本，计算行数 */
+    p = _pMemo->Text;
+    TextLineNum = 0;
+    for (i = 0; i < _pMemo->MaxLen; i++)
+    {
+         if (p[i] == 0)
+         {
+             break;
+         }
+         if (p[i] == 0x0D || p[i] == 0x0A)
+         {
+             TextLineNum++;
+             if (p[i + 1] == 0x0A)
+             {
+                i++;
+             }
+         }
+    }
+    _pMemo->LineCount = TextLineNum;
+    
+    /* 计算可以显示的行数 */
+    FontHeight = LCD_GetFontHeight(_pMemo->Font);
+    CanDispLineNum = (_pMemo->Height - 2) / (FontHeight + LINE_CAP);
+    
+    /* 计算第1行位置 */
+    if (TextLineNum <= CanDispLineNum)
+    {
+        BeginLine = 0;
+    }
+    else
+    {
+        BeginLine = TextLineNum - CanDispLineNum;
+    }
+    
+    x = _pMemo->Left + 2;
+    y = _pMemo->Top + 2;
+    line = 0;
+    p = _pMemo->Text;
+    pSave = p;
+    for (i = 0; i < _pMemo->MaxLen; i++)
+    {
+         if (p[i] == 0)
+         {
+             break;
+         }
+         if (p[i] == 0x0D || p[i] == 0x0A)
+         {
+            if (line++ >= BeginLine)
+            {                              
+                for (k = 0; k < sizeof(buf); k++)
+                {
+                    if (pSave[k] == 0x0D || pSave[k] == 0x0A)
+                    {
+                        buf[k] = 0;
+                        break;
+                    }
+                    else
+                    {
+                        buf[k] = pSave[k];
+                    }
+                }
+                LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                
+                y += FontHeight + LINE_CAP;
+            }
+
+            if (p[i + 1] == 0x0A)
+            {
+                i++;
+            }
+
+            pSave = &p[i + 1];     /* 下一行起始位置 */
+         }
+    }    
+}
+    
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

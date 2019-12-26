@@ -1,21 +1,11 @@
 #include "lua_if.h"
 #include "bsp.h"
 #include "param.h"
+#include "file_lib.h"
+#include "main.h"
+
 
 /* 
-    lua 增加调试代码的方法:
-
-lobject.c文件:
-    const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
-    #if 1        
-      printf("%s", msg);
-    #endif
-
-ldebug.c 文件 luaG_runerror 函数，增加printf
-
-lauxlib.c 文件 luaL_error函数，增加printf
-
-ldo.c 文件 luaD_throw 函        printf("\r\nthrow errcode=%d\r\n", errcode);
 
 lua.h 定义错误代码
 #define LUA_ERRRUN    2
@@ -23,7 +13,6 @@ lua.h 定义错误代码
 #define LUA_ERRMEM    4
 #define LUA_ERRGCMM    5
 #define LUA_ERRERR    6
-
 */
 
 /*
@@ -33,7 +22,7 @@ lua.h 定义错误代码
 
 lua_State *g_Lua = 0;
 
-char s_lua_prog_buf[LUA_PROG_LEN_MAX];
+char s_lua_prog_buf[LUA_PROG_LEN_MAX + 1];
 uint32_t s_lua_prog_len;
 uint32_t s_lua_func_init_idx;
 uint32_t s_lua_func_write_idx;
@@ -42,11 +31,17 @@ uint32_t s_lua_func_read_idx;
 uint8_t s_lua_read_buf[LUA_READ_LEN_MAX];
 uint8_t s_lua_read_len;
 
+static uint8_t s_lua_quit = 0;
+
+
 static int get_runtime(lua_State* L);
 static int check_runtime(lua_State* L);
 
 static void lua_RegisterFunc(void);
 
+static void LuaYeildHook(lua_State *_L, lua_Debug *ar);
+
+/* lua源码调用该函数，会告警 */
 void exit(int status)
 {
     ;
@@ -100,44 +95,6 @@ time_t time(time_t *_t)
 }
 
 /*
-print(\"Hello,I am lua!\\n--this is newline printf\")
-function foo()
-  local i = 0
-  local sum = 1
-    while i <= 10 do
-         sum = sum * 2
-         i = i + 1
-    end
-return sum
- end
-print(\"sum =\", foo())
-print(\"and sum = 2^11 =\", 2 ^ 11)
-print(\"exp(200) =\", math.exp(200))
-*/
-const char lua_test[] = { 
-    "print(\"Hello,I am lua!\\n--this is newline printf\")\n"
-    "function foo()\n"
-    "  local i = 0\n"
-    "  local sum = 1\n"
-    "  while i <= 10 do\n"
-    "    sum = sum * 2\n"
-    "    i = i + 1\n"
-    "  end\n"
-    "return sum\n"
-    "end\n"
-    "print(\"sum =\", foo())\n"
-    "print(\"and sum = 2^11 =\", 2 ^ 11)\n"
-    "print(\"exp(200) =\", math.exp(200))\n"
-};
-
-void lua_Test(void)
-{
-    luaL_dostring(g_Lua, lua_test); /* 运行Lua脚本 */
-    
-    luaL_dostring(g_Lua, "print(add_f(1.0, 9.09))\n print(sub_f(20.1,19.01))");
-}
-
-/*
 *********************************************************************************************************
 *    函 数 名: lua_Init
 *    功能说明: 初始化lua虚拟机
@@ -152,15 +109,129 @@ void lua_Init(void)
     luaopen_base(g_Lua);
     
     lua_RegisterFunc();        /* 注册c函数，供lua调用 */
+
+	//错误处理函数
+	lua_sethook(g_Lua, LuaYeildHook, LUA_MASKLINE, 0);    
 }
 
 /* 关闭释放Lua */
 void lua_DeInit(void)
 {    
-    lua_close(g_Lua);                /* 释放内存 */
-    g_Lua = 0;
+    if (g_Lua > 0)
+    {
+        lua_close(g_Lua);                /* 释放内存 */
+        g_Lua = 0;
+    }
 }
 
+// 每行执行的钩子函数，用于终止lua程序
+extern MEMO_T g_LuaMemo;
+void LuaYeildHook(lua_State *_L, lua_Debug *ar)
+{
+	if (s_lua_quit == 1)
+	{
+		s_lua_quit = 0;
+
+		lua_yield(_L, 0);
+	}
+    
+    if (g_MainStatus == MS_LUA_EXEC_FILE)
+    {
+        uint8_t ucKeyCode;
+        
+        /* 显示Lua程序print的字符串. 内容在bsp_uart_fif文件 fputc 函数填充的 */
+        if (g_LuaMemo.Refresh == 1)     
+        {
+            LCD_SetEncode(ENCODE_GBK);
+            LCD_DrawMemo(&g_LuaMemo);            
+            LCD_SetEncode(ENCODE_UTF8);
+        }
+
+        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        if (ucKeyCode != KEY_NONE)
+        {
+            /* 有键按下 */
+            switch (ucKeyCode)
+            {            
+                case KEY_LONG_DOWN_C:   /* C键长按 - 终止Lua */
+                    lua_yield(_L, 0);   
+                    break;
+
+                default:
+                    break;
+            }
+        }        
+    }
+}
+
+// 终止lua
+void lua_abort(void)
+{
+	s_lua_quit = 1;
+}
+
+// 装载文件并初始化lua全局对象
+void lua_DownLoadFile(char *_path)
+{
+    lua_DeInit();   // 先释放
+    
+    lua_Init();
+    
+    // 读文件到内存
+    s_lua_prog_len = ReadFileToMem(_path, s_lua_prog_buf, LUA_PROG_LEN_MAX);
+    
+    if (s_lua_prog_len > 0)
+    {
+        s_lua_prog_buf[s_lua_prog_len] = 0; /* 文件末尾补0 */    
+    }
+    
+    lua_do(s_lua_prog_buf);
+}
+
+// 重新封装下执行函数，支持打印调试信息
+void lua_do(char *buf)
+{
+    int re;
+	static int s_run = 0;   /* 避免重入 */
+    static const char *str;    
+
+	if (s_run > 0)
+	{
+		return;
+	}
+
+	s_run = 1;
+
+    
+    re = luaL_dostring(g_Lua, buf);
+	if (re != LUA_OK)
+	{        
+        str = lua_tostring(g_Lua, -1);
+        if (strstr(str, "attempt to yield from outside a coroutine"))   /* 用户终止了程序 */
+        {
+            /* 程序被用户终止\r\n 这是UTF8编码,需要GBK编码 */
+            printf("\xB3\xCC\xD0\xF2\xB1\xBB\xD3\xC3\xBB\xA7\xD6\xD5\xD6\xB9\r\n");    
+        }
+        else    /* 程序语法或执行错误 */
+        {
+            printf(str);
+            printf("\r\n");
+        }  
+		lua_pop(g_Lua, 1); //将错误信息出栈        
+	}
+
+    /* 显示Lua程序print的字符串. 内容在bsp_uart_fif文件 fputc 函数填充的 */
+    if (g_LuaMemo.Refresh == 1)     
+    {
+        LCD_SetEncode(ENCODE_GBK);
+        LCD_DrawMemo(&g_LuaMemo);            
+        LCD_SetEncode(ENCODE_UTF8);
+    } 
+        
+    s_run = 0;
+}
+
+// 通信程序用的函数，下载文件到lua程序缓冲区，不执行。
 void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_len)
 {
     uint32_t i;
@@ -181,8 +252,7 @@ void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_
         lua_DeInit();
     }
     lua_Init();
-    
-    //luaL_dostring(g_Lua, s_lua_prog_buf);
+
 }
 
 void lua_Poll(void)
@@ -484,6 +554,27 @@ static int check_runtime(lua_State* L)
     
     lua_pushnumber(L,     re); 
     return 1;
+}
+
+int l_my_print(lua_State* L) 
+{
+    int nargs = lua_gettop(L);
+
+    for (int i=1; i <= nargs; i++) 
+    {
+        if (lua_isstring(L, i)) 
+        {
+            /* Pop the next arg using lua_tostring(L, i) and do your print */
+            
+            //lua_tostring(L, i)
+        }
+        else 
+        {
+            /* Do something with non-strings if you like */
+        }
+    }
+
+    return 0;
 }
 
 /*

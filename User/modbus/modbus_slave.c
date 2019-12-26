@@ -1104,7 +1104,7 @@ static void MODS_64H(void)
 
     if (offset_addr + package_len >= total_len)
     {
-        luaL_dostring(g_Lua, s_lua_prog_buf);
+        lua_do(s_lua_prog_buf);
     }
 
 err_ret:
@@ -1163,7 +1163,7 @@ static void MODS_65H(void)
 
     if (g_Lua > 0)
     {
-        luaL_dostring(g_Lua, (char *)&g_tModS.RxBuf[4]);
+        lua_do((char *)&g_tModS.RxBuf[4]);
     }
 
 err_ret:

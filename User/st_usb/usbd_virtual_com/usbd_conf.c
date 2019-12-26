@@ -95,6 +95,9 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef * hpcd)
     /* Enable USB FS Clocks */
     __HAL_RCC_USB2_OTG_FS_CLK_ENABLE();
 
+    /* Disable USB clock during CSleep mode */
+    __HAL_RCC_USB2_OTG_FS_ULPI_CLK_SLEEP_DISABLE();
+
     /* Set USBFS Interrupt to the lowest priority */
     HAL_NVIC_SetPriority(OTG_FS_IRQn, 6, 0);
 
@@ -161,7 +164,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef * hpcd)
     __HAL_RCC_USB1_OTG_HS_CLK_ENABLE();
 
     /* Set USBHS Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority(OTG_HS_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);
 
     /* Enable USBHS Interrupt */
     HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
@@ -344,7 +347,6 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef * pdev)
   hpcd.Instance = USB2_OTG_FS;
   hpcd.Init.dev_endpoints = 8;
   hpcd.Init.use_dedicated_ep1 = 0;
-  hpcd.Init.ep0_mps = 0x40;
   hpcd.Init.low_power_enable = 0;
   hpcd.Init.phy_itface = PCD_PHY_EMBEDDED;
   hpcd.Init.Sof_enable = 0;
@@ -370,7 +372,6 @@ USBD_StatusTypeDef USBD_LL_Init(USBD_HandleTypeDef * pdev)
   hpcd.Instance = USB1_OTG_HS;
   hpcd.Init.dev_endpoints = 8;
   hpcd.Init.use_dedicated_ep1 = 0;
-  hpcd.Init.ep0_mps = 0x40;
 
   /* Be aware that enabling DMA mode will result in data being sent only by
    * multiple of 4 packet sizes. This is due to the fact that USB DMA does not
@@ -586,5 +587,16 @@ void USBD_LL_Delay(uint32_t Delay)
 {
   HAL_Delay(Delay);
 }
+
+//void HAL_HCD_PortEnabled_Callback(HCD_HandleTypeDef *hhcd)
+//{
+//  USBH_LL_PortEnabled(hhcd->pData);
+//} 
+
+
+//void HAL_HCD_PortDisabled_Callback(HCD_HandleTypeDef *hhcd)
+//{
+//  USBH_LL_PortDisabled(hhcd->pData);
+//} 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -247,7 +247,7 @@ void bsp_DelayMS(uint32_t n)
 *********************************************************************************************************
 *    函 数 名: bsp_DelayUS
 *    功能说明: us级延迟。 必须在systick定时器启动后才能调用此函数。
-*    形    参: n : 延迟长度，单位1 us
+*    形    参: n : 延迟长度，单位1 us. 最大值 10 737 418 us
 *    返 回 值: 无
 *********************************************************************************************************
 */
@@ -411,15 +411,16 @@ uint8_t bsp_CheckTimer(uint8_t _id)
 */
 int32_t bsp_GetRunTime(void)
 {
-    int32_t runtime;
+//    int32_t runtime;
 
-    DISABLE_INT(); /* 关中断 */
+//    DISABLE_INT(); /* 关中断 */
 
-    runtime = g_iRunTime; /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+//    runtime = g_iRunTime;   /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
 
-    ENABLE_INT(); /* 开中断 */
+//    ENABLE_INT(); /* 开中断 */
 
-    return runtime;
+//    return runtime;
+    return g_iRunTime;
 }
 
 /*
@@ -435,9 +436,9 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
     int32_t now_time;
     int32_t time_diff;
 
-    DISABLE_INT();                 /* 关中断 */
+//    DISABLE_INT();                 /* 关中断 */
     now_time = g_iRunTime;         /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
-    ENABLE_INT();                  /* 开中断 */
+//    ENABLE_INT();                  /* 开中断 */
 
     if (now_time >= _LastTime)
     {

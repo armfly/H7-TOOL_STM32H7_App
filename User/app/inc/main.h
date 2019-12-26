@@ -22,8 +22,9 @@ enum
     MS_SYSTEM_SET,      /* 系统设置 */
     MS_HARD_INFO,       /* 关于-硬件信息 */
     MS_ESP32_TEST,      /* ESP32模块升级状态 */
-    MS_USB_UART1,       /* 虚拟串口状态。RS232 RS485 TTL-UART */
+    MS_USB_EMMC,        /* 虚拟串口状态。RS232 RS485 TTL-UART */
     MS_MODIFY_PARAM,    /* 参数设置 */
+    MS_FILE_MANAGE,     /* 文件管理 */
     
     MS_PROG_INIT,       /* 脱机下载器预览界面 */
     MS_PROG_WORK,       /* 脱机下载器正式界面 */
@@ -34,6 +35,15 @@ enum
     MS_RESISTOR_METER,  /* 电阻表 */
     MS_TVCC_POWER,      /* 微型数控电源 */    
     MS_PULSE_METER,     /* 脉冲计 */
+    
+    MS_EXTEND_INIT,     /* 扩展菜单显示 */
+    MS_EXTEND_MENU1,    /* 第1级菜单  */
+    MS_EXTEND_MENU_LUA, /* 第2级菜单-LUA程序 */      
+    MS_EXTEND_MENU_REC, /* 第2级菜单-数据记录仪 */  
+    
+    
+    MS_LUA_SELECT_FILE, /* 浏览lua文件 */
+    MS_LUA_EXEC_FILE,   /* 执行lua文件 */
 };
 
 void DispHeader(char *_str);
@@ -43,6 +53,7 @@ void DispMeasBarEx(uint8_t _ucLine, char *_pName, char *_pValue, char *_pUnit, u
 void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActive);
 void DispHelpBar(char *_str1, char *_str2);
 void DispHeader2(uint8_t _idx, char *_str);
+void DispHeaderStr(char *_str);
 void DispInfoBar16(uint8_t _ucLine, char *_pName, char *_pValue);
 void DispInfoBar16Ex(uint8_t _ucLine, char *_pName, char *_pValue, uint16_t _ucColor);
 void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor);
@@ -57,6 +68,10 @@ void PlayKeyTone(void);
 
 
 extern uint16_t g_MainStatus;
+
+extern uint8_t qspi_file_buf[1024];
+extern uint8_t qspi_read_buf[1024];
+
 
 #endif
 

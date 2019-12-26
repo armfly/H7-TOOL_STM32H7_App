@@ -28,6 +28,8 @@
 #include "status_system_set.h"
 #include "status_tvcc_power.h"
 #include "status_pulse_meter.h"
+#include "status_extend_menu.h"
+#include "status_lua.h"
 
 #include "wifi_if.h"
 #include "ff.h"
@@ -43,6 +45,7 @@
 
 //#include "usbd_user.h"
 #include "usb_if.h"
+#include "file_lib.h"
 
 static void DispLogo(void);
 uint16_t GetStatusIndex(uint16_t _NowStatus);
@@ -59,7 +62,7 @@ static const uint16_t StatusOrder[] =
     MS_TEMP_METER,       /* 温度表 */
     MS_TVCC_POWER,       /* 微型数控电源 */   
     MS_PULSE_METER,      /* 脉冲计 */
-    MS_PROG_INIT,        /* 脱机下载器 */    
+    MS_EXTEND_INIT,      /* 扩展菜单 */    
 };
 
 /*
@@ -87,7 +90,6 @@ int main(void)
     DSO_SetGain(1, 3);
     DSO_SetGain(2, 3);
 
-    //usbd_OpenMassStorage();
     bsp_SetTVCC(3300);
 
     /* LwIP 初始化 */
@@ -102,7 +104,9 @@ int main(void)
     //PERIOD_Stop(&g_tRunLed); /* 停止LED闪烁 */    
     PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
     
-    usbd_Init();    /* 初始化USB协议栈 */
+    usbd_Init();        /* 初始化USB协议栈 */
+    
+    FileSystemLoad();   /* 挂载文件系统 */
     
     //wifi_state = WIFI_INIT;
 
@@ -124,23 +128,23 @@ int main(void)
             status_HardInfo();
             break;
 
+        case MS_MODIFY_PARAM:   /* 修改参数 */
+            status_ModifyParam();
+            break;   
+        
         case MS_ESP32_TEST:     /* ESP32模块固件升级 */
             status_ESP32Test();
             break;
 
-        case MS_USB_UART1:      /* USB虚拟串口，映射到硬件UART1， RS485 RS232 */
-            status_UsbUart1();
+        case MS_USB_EMMC:       /* USB虚拟磁盘，电脑操作emcc文件 */
+            status_UsbEMMC();
             break;
 
-        case MS_MODIFY_PARAM:   /* 修改参数 */
-            status_ModifyParam();
-            break;          
-
-        case MS_PROG_INIT:      /* 脱机下载器预览界面 */
-            status_ProgInit();
+        case MS_FILE_MANAGE:    /* 文件管理，烧写字库 */
+            status_FileManage();
             break;
 
-        case MS_PROG_WORK:      /* 脱机下载器正式工作 */
+        case MS_PROG_WORK:      /* 脱机下载器 */
             status_ProgWork();
             break;        
 
@@ -167,6 +171,26 @@ int main(void)
         case MS_PULSE_METER:    /* 脉冲测量 */
             status_PulseMeter();
             break;  
+        
+        case MS_EXTEND_INIT:    /* 扩展菜单，显示 */
+            status_ExtendInit();
+            break;
+
+        case MS_EXTEND_MENU1:    /* 扩展菜单，第1级 */
+            status_ExtendMenu1();
+            break;
+
+        case MS_EXTEND_MENU_REC: /* 扩展菜单，第2级-数据记录仪 */
+            status_ExtendMenuRec();
+            break;
+        
+        case MS_LUA_SELECT_FILE: /* lua文件浏览 */
+            status_LuaSelectFile();
+            break;
+        
+        case MS_LUA_EXEC_FILE:  /* lua执行状态 */    
+            status_LuaRun();
+            break;
         
         default:
             g_MainStatus = MS_LINK_MODE;
@@ -371,6 +395,27 @@ void DispHeader2(uint8_t _idx, char *_str)
     LCD_DrawLine(0, HEAD_HEIGHT, 239, HEAD_HEIGHT, HEAD_BODER_COLOR);
     
     LCD_Fill_Rect(0, HEAD_HEIGHT + 1, 240 - HEAD_HEIGHT - 1, 240, FORM_BACK_COLOR); /* 清屏正文区  */
+}
+
+/* 只刷新标题文字部分，不清屏 */
+void DispHeaderStr(char *_str)
+{
+    FONT_T tFont;
+    char buf[48];
+
+    /* 设置字体参数 */
+    {
+        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
+        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
+        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
+        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+    }
+    
+    LCD_Fill_Rect(HEAD_HEIGHT, 0, HEAD_HEIGHT, 240 - HEAD_HEIGHT, HEAD_BACK_COLOR);   /* 清屏标题栏文本区  */
+    
+    /* 显示标题文字 */
+    tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
+    LCD_DispStrEx(HEAD_HEIGHT, 4, _str, &tFont, 240 - HEAD_HEIGHT, ALIGN_CENTER);
 }
 
 /* 显示序号 */
@@ -744,6 +789,85 @@ void PlayKeyTone(void)
     {
         BEEP_KeyTone();
     }
+}
+
+
+void test_emmc(void)
+{
+	{		
+		printf("demo\r\n");
+		BSP_MMC_Init();
+		
+		uint8_t re;
+		uint32_t buf[512 * 8];
+		uint32_t i;
+		int32_t t1,t2;
+		
+		for (i = 0; i < 512; i++)
+		{
+			buf[i] = 0x12345678 + i;
+		}
+		
+		
+
+//		printf("Write,,,\r\n");
+//		t1 = bsp_GetRunTime();
+//		for (i = 0; i < 20000; i++)
+//		{
+//		
+//			buf[0] ++;
+//			
+//			re = BSP_MMC_WriteBlocks((uint32_t *) buf, i * 8, 8, 1000);	
+
+//			while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK);
+//			
+//			if (re == MMC_OK)
+//			{
+//				//printf("Write %d, ok %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
+//			}
+//			else
+//			{
+//				printf("Write %d, err %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
+//			}	
+//		}
+//		t2 = bsp_GetRunTime();
+//		printf("%dms, %dB/S\r\n", t2 - t1, (int)((8.0 * 20000 * 512 * 1000) /(t2 - t1)));
+		
+		
+		if (BSP_MMC_GetCardState() == MMC_TRANSFER_OK)
+		{
+			printf("BSP_MMC_GetCardState == 0K \r\n");
+		}
+		else
+		{
+			printf("BSP_MMC_GetCardState == Err \r\n");
+		}
+				
+		for (i = 0; i < 512; i++)
+		{
+			buf[i] = 0xFFFFFFFF;
+		}		
+
+		printf("Read,,,\r\n");
+		t1 = bsp_GetRunTime();
+		for (i = 0; i < 100; i++)
+		{		
+			re = BSP_MMC_ReadBlocks((uint32_t *) buf, i * 8, 1, 1000);									
+
+			while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK);
+			
+			if (re == MMC_OK)
+			{
+				printf("Read %d, ok %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
+			}
+			else
+			{
+				printf("Read %d, err %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
+			}
+		}
+		t2 = bsp_GetRunTime();
+		printf("%dms, %dB/S\r\n", t2 - t1, (int)((8.0 * 20000 * 512 * 1000ul) /(t2 - t1)));		
+	}	
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

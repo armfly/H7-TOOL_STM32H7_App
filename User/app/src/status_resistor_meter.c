@@ -75,24 +75,21 @@ void status_ResistorMeter(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S: /* S键按下 */
-                break;
-
-            case KEY_UP_S: /* S键释放 */
-                g_MainStatus = NextStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_S: /* S键长按 */
-                break;
-
-            case KEY_DOWN_C: /* C键按下 */
-                break;
-
-            case KEY_UP_C: /* C键释放 */
+            case KEY_UP_S:          /* S键释放 */
                 g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
-            case KEY_LONG_DOWN_C: /* C键长按 */
+            case KEY_LONG_DOWN_S:   /* S键长按 */
+                break;
+
+            case KEY_DOWN_C:        /* C键按下 */
+                break;
+
+            case KEY_UP_C:          /* C键释放 */
+                g_MainStatus = NextStatus(g_MainStatus);
+                break;
+
+            case KEY_LONG_DOWN_C:   /* C键长按 */
                 break;
 
             default:

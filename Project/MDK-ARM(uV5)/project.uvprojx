@@ -338,7 +338,7 @@
               <MiscControls>--no-multibyte-chars;--locale=english</MiscControls>
               <Define>USE_HAL_DRIVER, STM32H743xx,USE_USB_HS,STM32H7,NO_HOST</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\User\st_usb\usbd_mass_storage;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -383,6 +383,11 @@
           <GroupName>App</GroupName>
           <Files>
             <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\app\inc\main.h</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\main.c</FilePath>
@@ -398,11 +403,6 @@
               <FilePath>..\..\User\app\src\param.c</FilePath>
             </File>
             <File>
-              <FileName>main.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\app\inc\main.h</FilePath>
-            </File>
-            <File>
               <FileName>wifi_if.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\wifi_if.c</FilePath>
@@ -411,11 +411,6 @@
               <FileName>lcd_menu.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\lcd_menu.c</FilePath>
-            </File>
-            <File>
-              <FileName>demo_sd_fatfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\app\src\demo_sd_fatfs.c</FilePath>
             </File>
             <File>
               <FileName>status_system_set.c</FileName>
@@ -461,6 +456,77 @@
               <FileName>status_pluse_meter.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\status_pluse_meter.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_extend_menu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_extend_menu.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_lua.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_lua.c</FilePath>
+            </File>
+            <File>
+              <FileName>demo_sd_fatfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\demo_sd_fatfs.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>file_lib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\file_lib.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1154,14 +1220,14 @@
               <FilePath>..\..\Libraries\FatFs\src\option\syscall.c</FilePath>
             </File>
             <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\Libraries\FatFs\src\option\cc936.c</FilePath>
-            </File>
-            <File>
               <FileName>emmc_diskio_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\FatFs\src\drivers\emmc_diskio_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>cc936.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\FatFs\src\option\cc936.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2211,7 +2277,7 @@
               <RVCTZI>0</RVCTZI>
               <RVCTOtherData>0</RVCTOtherData>
               <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>0</IncludeInBuild>
+              <IncludeInBuild>1</IncludeInBuild>
               <AlwaysBuild>2</AlwaysBuild>
               <GenerateAssemblyFile>2</GenerateAssemblyFile>
               <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -2275,49 +2341,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>usbd_conf.c</FileName>
+              <FileName>usbd_mass_desc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_conf.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_desc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_desc.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_desc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_desc.h</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_it.c</FilePath>
+              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_mass_desc.c</FilePath>
             </File>
             <File>
               <FileName>usbd_storage.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_storage.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_storage.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_storage.h</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_usr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_usr.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbd_usr.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\User\st_usb\usbd_mass_storage\usbd_usr.h</FilePath>
             </File>
           </Files>
         </Group>

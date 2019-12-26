@@ -49,8 +49,21 @@ void LCD_InitMenu(MENU_T *_pMenu, char **_Text)
 
 /*
 *********************************************************************************************************
-*    函 数 名: LCD_DispMenu16
-*    功能说明: 显示菜单 16点阵汉字。 白底表示选中
+*    函 数 名: LCD_ClearMenu
+*    功能说明: 显示菜单 清屏
+*    形    参: 
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_ClearMenu(MENU_T *_pMenu)
+{
+    LCD_Fill_Rect(_pMenu->Left, _pMenu->Top, _pMenu->Height, _pMenu->Width, CL_MENU_BACK1);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_DispMenu
+*    功能说明: 显示菜单 显示光标行
 *    形    参: _pMenu : 菜单文字数组
 *              _Count : 菜单项个数
 *              _Cursor : 光标行
@@ -76,30 +89,134 @@ void LCD_DispMenu(MENU_T *_pMenu)
             break;
         }
 
-        if (i + _pMenu->Offset == _pMenu->Cursor)
-        {
+        if (i + _pMenu->Offset == _pMenu->Cursor)   /* 选钟行 */
+        {            
             /* 设置为反白 */
-            _pMenu->Font.FrontColor = CL_MENU_TEXT2;
-            _pMenu->Font.BackColor = CL_MENU_BACK2;
+            _pMenu->Font.FrontColor = CL_MENU_TEXT1;
+            _pMenu->Font.BackColor = CL_MASK;
+
+            y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
+
+            /* 清全行背景 */
+            LCD_Fill_Rect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, CL_MENU_BACK2);
+
+            /* 刷新文本 */
+            if (_pMenu->GBK == 1)
+            {               
+                LCD_SetEncode(ENCODE_GBK);
+            }
+            
+            LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+                                    _pMenu->Width, ALIGN_LEFT);             
+
+            LCD_SetEncode(ENCODE_UTF8);
+            
+            LCD_DrawRoundRect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, 5, CL_MENU_ACTIVE_BODER);
         }
         else
         {
             /* 恢复正常底色 */
             _pMenu->Font.FrontColor = CL_MENU_TEXT1;
             _pMenu->Font.BackColor = CL_MENU_BACK1;
+            
+            y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
+
+            /* 清段前背景 */
+            LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
+
+            /* 刷新文本 */
+            if (_pMenu->GBK == 1)
+            {
+                LCD_SetEncode(ENCODE_GBK);
+            }
+            LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+                                        _pMenu->Width, ALIGN_LEFT);               
+            LCD_SetEncode(ENCODE_UTF8);
+            
+            /* 清段后背景 */
+            LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);            
+        }
+    }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_DispMenu2
+*    功能说明: 显示菜单 不显示光标行
+*    形    参: _pMenu : 菜单文字数组
+*              _Count : 菜单项个数
+*              _Cursor : 光标行
+*              _FocusLine :  焦点行(0-3)
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void LCD_DispMenu2(MENU_T *_pMenu)
+{
+    uint8_t i;
+    uint8_t FontHeight;
+    uint16_t y;
+    uint8_t line_cap1, line_cap2;
+
+    FontHeight = LCD_GetFontWidth(&_pMenu->Font);
+
+    line_cap1 = _pMenu->LineCap / 2;                 /* 菜单文本前的高度 */
+    line_cap2 = _pMenu->LineCap - line_cap1; /* 菜单文本后的高度 */
+    for (i = 0; i < _pMenu->ViewLine; i++)
+    {
+        if (i >= _pMenu->Count)
+        {
+            break;
         }
 
-        y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
+        if (i + _pMenu->Offset == _pMenu->Cursor)   /* 选钟行 */
+        {            
+            /* 设置为反白 */
+            _pMenu->Font.FrontColor = CL_MENU_TEXT1;
+            _pMenu->Font.BackColor = CL_MASK;
 
-        /* 清段前背景 */
-        LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
+            y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
 
-        /* 刷新文本 */
-        LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
-                                    _pMenu->Width, ALIGN_LEFT);
+            /* 清全行背景 */
+            LCD_Fill_Rect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, CL_MENU_BACK1);
 
-        /* 清段后背景 */
-        LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);
+            /* 刷新文本 */
+            if (_pMenu->GBK == 1)
+            {
+                LCD_SetEncode(ENCODE_GBK);
+            }
+            
+            LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+                                            _pMenu->Width, ALIGN_LEFT);               
+
+            LCD_SetEncode(ENCODE_UTF8);
+            
+            LCD_DrawRoundRect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, 5, CL_MENU_ACTIVE_BODER);
+        }
+        else
+        {
+            /* 恢复正常底色 */
+            _pMenu->Font.FrontColor = CL_MENU_TEXT1;
+            _pMenu->Font.BackColor = CL_MENU_BACK1;
+            
+            y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
+
+            /* 清段前背景 */
+            LCD_Fill_Rect(_pMenu->Left, y, line_cap1, _pMenu->Width, _pMenu->Font.BackColor);
+
+            /* 刷新文本 */
+            if (_pMenu->GBK == 1)
+            {
+                LCD_SetEncode(ENCODE_GBK);
+            }
+            
+            LCD_DispStrEx(_pMenu->Left, y + line_cap1, (char *)_pMenu->Text[_pMenu->Offset + i], &_pMenu->Font,
+                                        _pMenu->Width, ALIGN_LEFT);
+            
+            LCD_SetEncode(ENCODE_UTF8);
+
+            /* 清段后背景 */
+            LCD_Fill_Rect(_pMenu->Left, y + line_cap1 + FontHeight, line_cap2, _pMenu->Width, _pMenu->Font.BackColor);            
+        }
     }
 }
 
@@ -126,9 +243,12 @@ void LCD_MoveDownMenu(MENU_T *_pMenu)
     }
     else
     {
-        _pMenu->Cursor = 0;
-        _pMenu->Offset = 0;
-        LCD_DispMenu(_pMenu); /* 刷新显示 */
+        if (_pMenu->RollBackEn == 1)    /* 回滚 */
+        {        
+            _pMenu->Cursor = 0;
+            _pMenu->Offset = 0;
+            LCD_DispMenu(_pMenu); /* 刷新显示 */
+        }
     }
 }
 
@@ -155,16 +275,19 @@ void LCD_MoveUpMenu(MENU_T *_pMenu)
     }
     else
     {
-        _pMenu->Cursor = _pMenu->Count - 1;
-        if (_pMenu->Count > _pMenu->ViewLine)
+        if (_pMenu->RollBackEn == 1)    /* 回滚 */
         {
-            _pMenu->Offset = _pMenu->Count - _pMenu->ViewLine;
+            _pMenu->Cursor = _pMenu->Count - 1;
+            if (_pMenu->Count > _pMenu->ViewLine)
+            {
+                _pMenu->Offset = _pMenu->Count - _pMenu->ViewLine;
+            }
+            else
+            {
+                _pMenu->Offset = 0;
+            }
+            LCD_DispMenu(_pMenu); /* 刷新显示 */
         }
-        else
-        {
-            _pMenu->Offset = 0;
-        }
-        LCD_DispMenu(_pMenu); /* 刷新显示 */
     }
 }
 

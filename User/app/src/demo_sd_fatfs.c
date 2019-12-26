@@ -90,7 +90,7 @@ static const char *FR_Table[] =
     "FR_LOCKED：由于文件共享策略操作被拒绝",                      /* (16) The operation is rejected according to the file sharing policy */
     "FR_NOT_ENOUGH_CORE：无法分配长文件名工作区",                 /* (17) LFN working buffer could not be allocated */
     "FR_TOO_MANY_OPEN_FILES：当前打开的文件数大于_FS_SHARE",      /* (18) Number of open files > _FS_SHARE */
-    "FR_INVALID_PARAMETER：参数无效"                                                 /* (19) Given parameter is invalid */
+    "FR_INVALID_PARAMETER：参数无效"                              /* (19) Given parameter is invalid */
 };
 
 /*

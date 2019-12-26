@@ -127,6 +127,10 @@ static __IO uint8_t CmdCplt, RxCplt, TxCplt, StatusMatch, TimeOut;
 static void QSPI_WriteEnable(QSPI_HandleTypeDef *hqspi);
 static void QSPI_AutoPollingMemReady(QSPI_HandleTypeDef *hqspi);
 
+static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi);
+
+uint8_t QSPI_MemoryMapped(void);
+
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_InitQSPI_W25Q256
@@ -179,6 +183,8 @@ void bsp_InitQSPI_W25Q256(void)
     {
         Error_Handler(__FILE__, __LINE__);
     }
+	
+	// QSPI_MemoryMapped();  内存映射，没有调通。读字库数据错乱
 }
 
 /*
@@ -249,22 +255,22 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi)
     /* 配置MDMA时钟 */
     QSPI_MDMA_CLK_ENABLE();
 
-    hmdma.Instance = MDMA_Channel1;                                                     /* 使用MDMA的通道1 */
-    hmdma.Init.Request = MDMA_REQUEST_QUADSPI_FIFO_TH;             /* QSPI的FIFO阀值触发中断 */
-    hmdma.Init.TransferTriggerMode = MDMA_BUFFER_TRANSFER;     /* 使用MDMA的buffer传输 */
-    hmdma.Init.Priority = MDMA_PRIORITY_HIGH;                                 /* 优先级高 */
-    hmdma.Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE; /* 小端格式 */
-    hmdma.Init.SourceInc = MDMA_SRC_INC_BYTE;                                 /* 源地址字节递增 */
-    hmdma.Init.DestinationInc = MDMA_DEST_INC_DISABLE;             /* 目的地址无效自增 */
+    hmdma.Instance = MDMA_Channel1;                            		/* 使用MDMA的通道1 */
+    hmdma.Init.Request = MDMA_REQUEST_QUADSPI_FIFO_TH;             	/* QSPI的FIFO阀值触发中断 */
+    hmdma.Init.TransferTriggerMode = MDMA_BUFFER_TRANSFER;     		/* 使用MDMA的buffer传输 */
+    hmdma.Init.Priority = MDMA_PRIORITY_HIGH;            			/* 优先级高 */
+    hmdma.Init.Endianness = MDMA_LITTLE_ENDIANNESS_PRESERVE; 		/* 小端格式 */
+    hmdma.Init.SourceInc = MDMA_SRC_INC_BYTE;            			/* 源地址字节递增 */
+    hmdma.Init.DestinationInc = MDMA_DEST_INC_DISABLE;             	/* 目的地址无效自增 */
     hmdma.Init.SourceDataSize = MDMA_SRC_DATASIZE_BYTE;             /* 源地址数据宽度字节 */
-    hmdma.Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;             /* 目的地址数据宽度字节 */
-    hmdma.Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;         /* 小端，右对齐 */
-    hmdma.Init.BufferTransferLength = 128;                                     /* 每次传输128个字节 */
-    hmdma.Init.SourceBurst = MDMA_SOURCE_BURST_SINGLE;             /* 源数据单次传输 */
+    hmdma.Init.DestDataSize = MDMA_DEST_DATASIZE_BYTE;             	/* 目的地址数据宽度字节 */
+    hmdma.Init.DataAlignment = MDMA_DATAALIGN_PACKENABLE;        	/* 小端，右对齐 */
+    hmdma.Init.BufferTransferLength = 128;                 			/* 每次传输128个字节 */
+    hmdma.Init.SourceBurst = MDMA_SOURCE_BURST_SINGLE;             	/* 源数据单次传输 */
     hmdma.Init.DestBurst = MDMA_DEST_BURST_SINGLE;                     /* 目的数据单次传输 */
 
-    hmdma.Init.SourceBlockAddressOffset = 0; /* 用于block传输，buffer传输用不到 */
-    hmdma.Init.DestBlockAddressOffset = 0;     /* 用于block传输，buffer传输用不到 */
+    hmdma.Init.SourceBlockAddressOffset = 0; 	/* 用于block传输，buffer传输用不到 */
+    hmdma.Init.DestBlockAddressOffset = 0;     	/* 用于block传输，buffer传输用不到 */
 
     /* 关联MDMA句柄到QSPI句柄里面  */
     __HAL_LINKDMA(hqspi, hmdma, hmdma);
@@ -578,17 +584,144 @@ uint32_t QSPI_ReadID(void)
 
     if (HAL_QSPI_Command(&QSPIHandle, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        ERROR_HANDLER();
+         Error_Handler(__FILE__, __LINE__);;
     }
 
     if (HAL_QSPI_Receive(&QSPIHandle, buf, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
-        ERROR_HANDLER();
+         Error_Handler(__FILE__, __LINE__);;
     }
 
     uiID = (buf[0] << 16) | (buf[1] << 8) | buf[2];
 
     return uiID;
+}
+
+
+/**
+  * @brief  This function configure the dummy cycles on memory side.
+  * @param  hqspi: QSPI handle
+  * @retval None
+  */
+static void QSPI_DummyCyclesCfg(QSPI_HandleTypeDef *hqspi)
+{
+	QSPI_CommandTypeDef s_command;
+	uint16_t reg=0;
+
+	/* Initialize the read volatile configuration register command */
+	s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+	s_command.Instruction       = READ_VOL_CFG_REG_CMD;
+	s_command.AddressMode       = QSPI_ADDRESS_NONE;
+	s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+	s_command.DataMode          = QSPI_DATA_1_LINE;
+	s_command.DummyCycles       = 0;
+	s_command.NbData            = 2;
+	s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
+	s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+	s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+
+	/* Configure the command */
+	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+	{
+		 Error_Handler(__FILE__, __LINE__);;
+	}
+
+	/* Reception of the data */
+	if (HAL_QSPI_Receive(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+	{
+		 Error_Handler(__FILE__, __LINE__);;
+	}
+
+	/* Enable write operations */
+	QSPI_WriteEnable(hqspi);
+
+	/* Update volatile configuration register (with new dummy cycles) */
+	s_command.Instruction = WRITE_VOL_CFG_REG_CMD;
+	MODIFY_REG(reg, 0xF0F0, ((DUMMY_CLOCK_CYCLES_READ_QUAD << 4) |
+						   (DUMMY_CLOCK_CYCLES_READ_QUAD << 12)));
+
+	/* Configure the write volatile configuration register command */
+	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+	{
+		 Error_Handler(__FILE__, __LINE__);;
+	}
+
+	/* Transmission of the data */
+	if (HAL_QSPI_Transmit(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+	{
+		 Error_Handler(__FILE__, __LINE__);;
+	}
+
+}
+
+/**
+  * @brief  This function set the QSPI memory in 4-byte address mode
+  * @param  hqspi: QSPI handle
+  * @retval None
+  */
+static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi)
+{
+  QSPI_CommandTypeDef s_command;
+
+  /* Initialize the command */
+  s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+  s_command.Instruction       = ENTER_4_BYTE_ADDR_MODE_CMD;
+  s_command.AddressMode       = QSPI_ADDRESS_NONE;
+  s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+  s_command.DataMode          = QSPI_DATA_NONE;
+  s_command.DummyCycles       = 0;
+  s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
+  s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+  s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+
+  /* Enable write operations */
+  QSPI_WriteEnable(hqspi);
+  
+  /* Send the command */
+  if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+  {
+     Error_Handler(__FILE__, __LINE__);;
+  }
+
+  /* Configure automatic polling mode to wait the memory is ready */
+  QSPI_AutoPollingMemReady(hqspi);
+
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: QSPI_MemoryMapped
+*    功能说明: QSPI内存映射，地址 0x90000000
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+uint8_t QSPI_MemoryMapped(void)
+{
+    QSPI_CommandTypeDef s_command;
+    QSPI_MemoryMappedTypeDef s_mem_mapped_cfg;
+
+    /* ????? */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction = QUAD_INOUT_FAST_READ_4_BYTE_ADDR_CMD;
+    s_command.AddressMode = QSPI_ADDRESS_4_LINES;
+    s_command.AddressSize = QSPI_ADDRESS_32_BITS;
+    s_command.DataMode = QSPI_DATA_4_LINES;
+    s_command.DummyCycles = 6;
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
+
+    /* ???????? */
+    s_mem_mapped_cfg.TimeOutActivation = QSPI_TIMEOUT_COUNTER_DISABLE;
+    s_mem_mapped_cfg.TimeOutPeriod = 0;
+
+    if (HAL_QSPI_MemoryMapped(&QSPIHandle, &s_command, &s_mem_mapped_cfg) != HAL_OK)
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 /*
@@ -668,5 +801,5 @@ void MDMA_IRQHandler(void)
 {
     HAL_MDMA_IRQHandler(QSPIHandle.hmdma);
 }
-
+          
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

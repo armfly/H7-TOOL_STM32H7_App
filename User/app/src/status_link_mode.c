@@ -98,7 +98,7 @@ void status_LinkMode(void)
                 break;
 
             case KEY_UP_S:          /* S键释放 */
-                g_MainStatus = NextStatus(g_MainStatus);
+                g_MainStatus = LastStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_DOWN_S:   /* S键长按 */
@@ -115,7 +115,7 @@ void status_LinkMode(void)
                     fIgnoreKey = 0;
                     break;
                 }
-                g_MainStatus = LastStatus(g_MainStatus);
+                g_MainStatus = NextStatus(g_MainStatus);
                 break;
 
             case KEY_LONG_DOWN_C:        /* C键 */

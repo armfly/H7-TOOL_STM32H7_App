@@ -113,7 +113,7 @@
 / Locale and Namespace Configurations
 /---------------------------------------------------------------------------*/
 
-#define _CODE_PAGE    936        /* 安富莱：支持简体中文 936 */
+#define _CODE_PAGE    936        /* 瀹夊瘜鑾憋細鏀寔绠�浣撲腑鏂囨枃浠跺悕 936 */
 /* This option specifies the OEM code page to be used on the target system.
 /  Incorrect setting of the code page can cause a file open failure.
 /
@@ -142,7 +142,7 @@
 */
 
 
-#define    _USE_LFN    3        /* 安富莱： 支持长文件名 */
+#define    _USE_LFN    3        /* 瀹夊瘜鑾憋細鏀寔闀挎枃浠跺悕 */
 #define    _MAX_LFN    255
 /* The _USE_LFN switches the support of long file name (LFN).
 /
