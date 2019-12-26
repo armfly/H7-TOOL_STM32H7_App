@@ -14,6 +14,9 @@
 #ifndef _BSP_TFT_LCD_H
 #define _BSP_TFT_LCD_H
 
+#define ENCODE_UTF8    0
+#define ENCODE_GBK     1
+
 #define BUTTON_BEEP() BEEP_KeyTone(); /* 按键提示音 */
 //#define BUTTON_BEEP()    /* 无按键提示音 */
 
@@ -113,10 +116,10 @@ enum
 /* 编辑框风格 */
 enum
 {
-    EDIT_BORDER_COLOR = CL_BLUE2,                 /* 编辑框四个边的颜色，未选中时 */
-    EDIT_BORDER_COLOR2 = CL_BLUE3,             /* 编辑框四个边的颜色,选中时 */
-    EDIT_BACK_COLOR = RGB(237, 125, 49), /* 编辑框背景，未选中时 */
-    EDIT_BACK_COLOR2 = RGB(255, 192, 0), /* 编辑框背景颜色，选中时 */
+    EDIT_BORDER_COLOR = CL_BLUE2,           /* 编辑框四个边的颜色，未选中时 */
+    EDIT_BORDER_COLOR2 = CL_BLUE3,          /* 编辑框四个边的颜色,选中时 */
+    EDIT_BACK_COLOR = RGB(237, 125, 49),    /* 编辑框背景，未选中时 */
+    EDIT_BACK_COLOR2 = RGB(255, 192, 0),    /* 编辑框背景颜色，选中时 */
 };
 
 /* 按钮风格 */
@@ -320,13 +323,32 @@ typedef struct
 typedef struct
 {
     uint8_t id;
-    uint16_t Left;     /* 左上角X坐标 */
-    uint16_t Top;         /* 左上角Y坐标 */
-    uint16_t Height; /* 高度 */
-    uint16_t Width;    /* 宽度 */
-    uint16_t Arc;         /* 圆角弧半径 */
-    uint16_t Color;    /* 填充颜色 */
+    uint16_t Left;      /* 左上角X坐标 */
+    uint16_t Top;       /* 左上角Y坐标 */
+    uint16_t Height;    /* 高度 */
+    uint16_t Width;     /* 宽度 */
+    uint16_t Arc;       /* 圆角弧半径 */
+    uint16_t Color;     /* 填充颜色 */
 } PANNEL_T;
+
+/* 多行文本框 */
+typedef struct
+{
+    uint8_t id;
+    uint16_t Left;      /* 左上角X坐标 */
+    uint16_t Top;       /* 左上角Y坐标 */
+    uint16_t Height;    /* 高度 */
+    uint16_t Width;     /* 宽度 */
+    uint16_t Arc;       /* 圆角弧半径 */
+    uint16_t Color;     /* 填充颜色 */
+    char *Text;         /* 执行文本区 */
+    uint32_t MaxLen;    /* 文本最大长度 */
+    uint16_t LineCount; /* 行数 */
+    uint32_t Len;       /* 字符串长度 */
+    FONT_T *Font;       /* 字体 */
+    uint16_t Cursor;    /* 行光标, 保留未用 */
+    uint8_t Refresh;    /* 1表示内容变化，需要显示刷新 */
+}MEMO_T;
 
 /* 背景光控制 */
 #define BRIGHT_MAX 255
@@ -385,9 +407,19 @@ void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
 void LCD_DrawRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth,
                                              uint16_t _usRadius, uint16_t _usColor);
 
+void LCD_InitMemo(MEMO_T *_pMemo);
+void LCD_DrawMemo(MEMO_T *_pMemo);
+void LCD_MemoAddStr(MEMO_T *_pMemo, char *_str);
+void LCD_MemoAddChar(MEMO_T *_pMemo, char _ch);
+void LCD_MemoClear(MEMO_T *_pMemo);
+    
+void LCD_SetEncode(uint8_t _code);
+uint8_t LCD_GetEncode(void);
+
 /* 下面3个变量，主要用于使程序同时支持不同的屏 */
-extern uint16_t g_LcdHeight;     /* 显示屏分辨率-高度 */
-extern uint16_t g_LcdWidth;         /* 显示屏分辨率-宽度 */
-extern uint8_t g_LcdDirection; /* 显示方向.0，1，2，3 */
+extern uint16_t g_LcdHeight;     	/* 显示屏分辨率-高度 */
+extern uint16_t g_LcdWidth;			/* 显示屏分辨率-宽度 */
+extern uint8_t g_LcdDirection; 		/* 显示方向.0，1，2，3 */
+extern uint8_t g_LcdSleepReq;		/* LCD休眠请求，用于硬件互斥 */
 
 #endif

@@ -19,7 +19,11 @@
 
 void usbd_Init(void);
 void usbd_OpenCDC(uint8_t _com);
+void usbd_OpenCDC2(uint8_t _com);
 void usbd_CloseCDC(void);
+
+void usbd_OpenMassStorage(void);
+void usbd_CloseMassStorage(void);
 
 #endif
 

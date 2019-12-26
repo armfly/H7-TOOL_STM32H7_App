@@ -51,13 +51,18 @@ void lua_Run(void);
 uint8_t lua_66H_Write(uint32_t _addr, uint8_t *_buf, uint32_t _len);
 uint8_t lua_67H_Read(uint32_t _addr, uint8_t *_buf, uint32_t _len);
 
+void lua_do(char *buf);
+void lua_DownLoadFile(char *_path);
+
 extern lua_State *g_Lua;
 
 extern uint8_t s_lua_read_buf[LUA_READ_LEN_MAX];
 extern uint8_t s_lua_read_len;
 
-extern char s_lua_prog_buf[LUA_PROG_LEN_MAX];
+extern char s_lua_prog_buf[LUA_PROG_LEN_MAX + 1];
 extern uint32_t s_lua_prog_len;
+
+
 
 #endif
 

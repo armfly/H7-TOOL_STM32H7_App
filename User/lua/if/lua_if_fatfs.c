@@ -11,7 +11,7 @@
 FATFS   g_lua_fs;
 FIL     g_lua_file1;
 
-char luaDiskPath[4]; /* 保存FatFS 磁盘路径 */
+char luaDiskPath[4] = "0:/"; /* 保存FatFS 磁盘路径 */
 
 static int lua_f_mount(lua_State* L);
 static int lua_f_dir(lua_State* L);
@@ -35,7 +35,7 @@ void lua_fatfs_RegisterFun(void)
 */
 static int lua_f_mount(lua_State* L)
 {
-    FATFS_LinkDriver(&SD_Driver, luaDiskPath);
+//    FATFS_LinkDriver(&SD_Driver, luaDiskPath);
     
     /* 挂载文件系统 */
     if (f_mount(&g_lua_fs, luaDiskPath, 0) != FR_OK)

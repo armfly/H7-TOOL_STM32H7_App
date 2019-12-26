@@ -1,6 +1,9 @@
 beep()
+print("½Å±¾°æ±¾ V1.04 2019-11-28")
 
---æ ¹æ®2ç‚¹æ–¹ç¨‹æ±‚å€¼
+local str  --ÓÃÓÚ´òÓ¡
+
+--¸ù¾İ2µã·½³ÌÇóÖµ
 function cacul(x1,y1,x2,y2,x)
 	local ff
 
@@ -12,7 +15,7 @@ function cacul(x1,y1,x2,y2,x)
 	return ff
 end
 	
---è¿”å›0-7é€šé“çš„ç”µå‹ V
+--·µ»Ø0-7Í¨µÀµÄµçÑ¹ V
 function ad7606_volt(ch)
 	local X1 = {39,		39,		39,		36,		73,		74,		73,		71}
 	local Y1 = {0,		0,		0,		0,		0,		0,		0,		0}
@@ -26,7 +29,7 @@ function ad7606_volt(ch)
 	return volt
 end
 
---è¿”å›0-7é€šé“çš„ç”µæµ mA
+--·µ»Ø0-7Í¨µÀµÄµçÁ÷ mA
 function ad7606_curr(ch)
 	local X1 = {75,		75,		74,		72,		73,		74,		73,		71}
 	local Y1 = {0,		0,		0,		0,		0,		0,		0,		0}
@@ -40,7 +43,7 @@ function ad7606_curr(ch)
 	return curr
 end
 
---è®¾ç½®DAC8563è¾“å‡ºç”µå‹ï¼Œå•ä½V, æµ®ç‚¹
+--ÉèÖÃDAC8563Êä³öµçÑ¹£¬µ¥Î»V, ¸¡µã
 function dac8563_volt(volt)
 	local X1 = 1000
 	local Y1 = -9.8551
@@ -58,29 +61,29 @@ function dac8563_volt(volt)
 	ex_dac(0, dac)
 end
 
---å¯åŠ¨ç¤ºæ³¢å™¨ï¼ŒADCé‡‡é›†ï¼Œå¤šé€šé“æ¨¡å¼
+--Æô¶¯Ê¾²¨Æ÷£¬ADC²É¼¯£¬¶àÍ¨µÀÄ£Ê½
 function start_dso(void)
-	print("å¯åŠ¨å¤šé€šé“ä½é€Ÿæµ‹é‡æ¨¡å¼")
-	write_reg16(0x01FF, 2) --å¤šé€šé“ä½é€Ÿæµ‹é‡
-	write_reg16(0x0200, 1) -- CH1é€‰DCè€¦åˆ
-	write_reg16(0x0201, 1) -- CH2é€‰DCè€¦åˆ
-	write_reg16(0x0202, 0) -- CH1é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
-	write_reg16(0x0203, 0) -- CH2é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
-	write_reg16(0x0204, 0) -- CH1é€šé“ç›´æµåå€¼ï¼Œæœªç”¨
-	write_reg16(0x0205, 0) -- CH2é€šé“ç›´æµåå€¼ï¼Œæœªç”¨
-	write_reg16(0x0206, 12) --é‡‡æ ·é¢‘ç‡1M
-	write_reg16(0x0207, 0) --é‡‡æ ·æ·±åº¦1K
-	write_reg16(0x0208, 0) --è§¦å‘ç”µå¹³
-	write_reg16(0x0209, 50) --è§¦å‘ä½ç½®
-	write_reg16(0x020A, 0) --è§¦å‘æ¨¡å¼ 0=è‡ªåŠ¨
-	write_reg16(0x020B, 0) --è§¦å‘é€šé“CH1
-	write_reg16(0x020C, 0) --è§¦å‘è¾¹æ²¿
-	write_reg16(0x020D, 2) --é€šé“ä½¿èƒ½
-	write_reg16(0x020E, 1) --å¼€å§‹é‡‡é›†
+	print("Æô¶¯¶àÍ¨µÀµÍËÙ²âÁ¿Ä£Ê½")
+	write_reg16(0x01FF, 2) --¶àÍ¨µÀµÍËÙ²âÁ¿
+	write_reg16(0x0200, 1) -- CH1Ñ¡DCñîºÏ
+	write_reg16(0x0201, 1) -- CH2Ñ¡DCñîºÏ
+	write_reg16(0x0202, 0) -- CH1Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
+	write_reg16(0x0203, 0) -- CH2Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
+	write_reg16(0x0204, 0) -- CH1Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ
+	write_reg16(0x0205, 0) -- CH2Í¨µÀÖ±Á÷Æ«Öµ£¬Î´ÓÃ
+	write_reg16(0x0206, 12) --²ÉÑùÆµÂÊ1M
+	write_reg16(0x0207, 0) --²ÉÑùÉî¶È1K
+	write_reg16(0x0208, 0) --´¥·¢µçÆ½
+	write_reg16(0x0209, 50) --´¥·¢Î»ÖÃ
+	write_reg16(0x020A, 0) --´¥·¢Ä£Ê½ 0=×Ô¶¯
+	write_reg16(0x020B, 0) --´¥·¢Í¨µÀCH1
+	write_reg16(0x020C, 0) --´¥·¢±ßÑØ
+	write_reg16(0x020D, 2) --Í¨µÀÊ¹ÄÜ
+	write_reg16(0x020E, 1) --¿ªÊ¼²É¼¯
 end
 
 
---æ£€æŸ¥ä¸€ä¸ªå€¼æ˜¯å¦åœ¨å…¬å·®èŒƒå›´ 1è¡¨ç¤ºerr 0è¡¨ç¤ºok
+--¼ì²éÒ»¸öÖµÊÇ·ñÔÚ¹«²î·¶Î§ 1±íÊ¾err 0±íÊ¾ok
 function check_err(data, mid, diff)
 	local re
 	local dd
@@ -99,18 +102,18 @@ function check_err(data, mid, diff)
 	return re
 end
 
---å…³é—­æ‰€æœ‰çš„ç»§ç”µå™¨
+--¹Ø±ÕËùÓĞµÄ¼ÌµçÆ÷
 function colse_all_y(void)
 	return ch 
 end
 
---æˆåŠŸå«ä¸€å£°ï¼Œå¤±è´¥å«ä¸‰å£°
+--³É¹¦½ĞÒ»Éù£¬Ê§°Ü½ĞÈıÉù
 function disp_result(err)
-	if (err == 0) then
-		print("*****æµ‹è¯•é€šè¿‡*****")
+	if (err == 0) then	
+		print("\n*****²âÊÔÍ¨¹ı*****")
 		beep()
 	else
-		print("*****æµ‹è¯•å¤±è´¥*****")
+		print("\n*****²âÊÔÊ§°Ü*****")
 		beep()
 		delayms(100)
 		beep()
@@ -119,99 +122,103 @@ function disp_result(err)
 	end	
 end
 
---æ ¡å‡†åˆå§‹åŒ–
+--Ğ£×¼³õÊ¼»¯
 function calib_init(void)
-	write_tvcc_dac(43) --è®¾ç½®TVCCå¤§æ¦‚3.3V
+	write_tvcc_dac(43) --ÉèÖÃTVCC´ó¸Å3.3V
 	delayms(100)
-	ex_start()	--ä¼šå…³é—­å…¨éƒ¨ç»§ç”µå™¨
-	start_dso()	--å¯åŠ¨å¤šé€šé“ä½é€Ÿé‡‡é›†æ¨¡å¼
-	write_reg16(0xBFFF, 1)	--æ‰“å¼€æ ¡å‡†å¼€å…³
+	ex_start()	--»á¹Ø±ÕÈ«²¿¼ÌµçÆ÷
+	start_dso()	--Æô¶¯¶àÍ¨µÀµÍËÙ²É¼¯Ä£Ê½
+	write_reg16(0xBFFF, 1)	--´ò¿ªĞ£×¼¿ª¹Ø
 end
 
---æ ¡å‡†TVCCè®¾ç½®ç”µå‹å’Œé‡‡æ ·ç”µå‹
+--Ğ£×¼TVCCÉèÖÃµçÑ¹ºÍ²ÉÑùµçÑ¹
 function calib_tvcc_volt(void)
 	local adc
 	local volt
 	local err
 	
+	close_all()
+	ex_dout(20,1)
+	ex_dout(21,1)
+		
 	err = 0
-	--å…ˆæ ¡å‡†TVCCè®¾ç½®ç”µå‹å’Œæ£€æµ‹ç”µå‹
+	--ÏÈĞ£×¼TVCCÉèÖÃµçÑ¹ºÍ¼ì²âµçÑ¹
 	print("")
-	print("---æ ¡å‡†TVCC---")
+	print("---Ğ£×¼TVCC---")
 	
-	---ç¬¬1æ¡£	
-	write_tvcc_dac(36)	--4.4Vå·¦å³
+	---µÚ1µµ	
+	write_tvcc_dac(36)	--4.4V×óÓÒ
 	delayms(1500)
-	volt = ad7606_volt(0) --è¯»å–AD7606 TVCCç”µå‹
+	volt = ad7606_volt(0) --¶ÁÈ¡AD7606 TVCCµçÑ¹
 	if (check_err(volt, 4.416, 0.05)==1) then
-		print("SET= 36", "å®é™…ç”µå‹=", volt, "err")
+		str = string.format("SET = 36  Êµ¼ÊµçÑ¹ = %f err", volt) print(str) delayms(5) 
 		err = err + 1
 	else
-		print("SET= 36", "å®é™…ç”µå‹=", volt, "ok")
+		str = string.format("SET = 36  Êµ¼ÊµçÑ¹ = %f ok", volt) print(str) delayms(5) 
 		write_regfloat(0xC0C0, 36)
 		write_regfloat(0xC0C2, volt)		
 	end
 
-	adc = read_adc(4) --è¯»cpu adc tvccç”µå‹
+	adc = read_adc(4) --¶Ácpu adc tvccµçÑ¹
 	if (check_err(adc, 46368, 0.1)==1) then
-		print("TVCC Volt ADC     =", adc, "err")
+		print("TVCC Volt ADC     =", adc, "err") delayms(5)
 		err = err + 1
 	else
-		print("TVCC Volt ADC     =", adc, "ok")
+		print("TVCC Volt ADC     =", adc, "ok") delayms(5)
 		write_regfloat(0xC0AC, adc)
 		write_regfloat(0xC0AE, volt)		
 	end	
 
-	adc = read_adc(2) --è¯»cpu adc é«˜ä¾§ç”µå‹
+	adc = read_adc(2) --¶Ácpu adc ¸ß²àµçÑ¹
 	if (check_err(adc, 8117, 0.1)==1) then
-		print("HighSide Volt ADC =", adc, "err")
+		print("HighSide Volt ADC =", adc, "err") delayms(5)
 		err = err + 1
 	else
-		print("HighSide Volt ADC =", adc, "ok")
+		print("HighSide Volt ADC =", adc, "ok") delayms(5)
 		write_regfloat(0xC084, adc)
 		write_regfloat(0xC086, volt)		
 	end	
 
-	---ç¬¬2æ¡£	
+	---µÚ2µµ	
 	print("")
 	write_tvcc_dac(100)
 	delayms(1500)
-	volt = ad7606_volt(0) --è¯»å–AD7606 TVCC ç”µå‹
+	volt = ad7606_volt(0) --¶ÁÈ¡AD7606 TVCC µçÑ¹
 	if (check_err(volt, 1.59, 0.1)==1) then
-		print("SET=100", "å®é™…ç”µå‹=", volt, "err")
+		str = string.format("SET = 100  Êµ¼ÊµçÑ¹ = %f err", volt) print(str) delayms(5) 
 		err = err + 1
 	else
-		print("SET=100", "å®é™…ç”µå‹=", volt, "ok")
+		str = string.format("SET = 100  Êµ¼ÊµçÑ¹ = %f ok", volt) print(str) delayms(5) 
 		write_regfloat(0xC0C4, 100)
 		write_regfloat(0xC0C6, volt)		
 	end
 
-	adc = read_adc(4) --è¯»cpu adc tvccç”µå‹
+	adc = read_adc(4) --¶Ácpu adc tvccµçÑ¹
 	if (check_err(adc, 16679, 0.1)==1) then
-		print("TVCC Volt ADC     =", adc, "err")
+		print("TVCC Volt ADC     =", adc, "err") delayms(5)
 		err = err + 1
 	else
-		print("TVCC Volt ADC     =", adc, "ok")
+		print("TVCC Volt ADC     =", adc, "ok") delayms(5)
 		write_regfloat(0xC0A8, adc)
 		write_regfloat(0xC0AA, volt)			
 	end	
 
-	adc = read_adc(2) --è¯»cpu adc é«˜ä¾§ç”µå‹
+	adc = read_adc(2) --¶Ácpu adc ¸ß²àµçÑ¹
 	if (check_err(adc, 2879, 0.1)==1) then
-		print("HighSide Volt ADC =", adc, "err")
+		print("HighSide Volt ADC =", adc, "err") delayms(5)
 		err = err + 1
 	else
-		print("HighSide Volt ADC =", adc, "ok")
+		print("HighSide Volt ADC =", adc, "ok") delayms(5)
 		write_regfloat(0xC080, adc)
 		write_regfloat(0xC082, volt)			
 	end	
 	
-	--æ¢å¤TVCCç”µå‹3.3ï¼Œåé¢å°±ä¸åŠ¨äº†
+	--»Ö¸´TVCCµçÑ¹3.3£¬ºóÃæ¾Í²»¶¯ÁË
 	write_tvcc_dac(47)		
 	return err
 end
 
---æ ¡å‡†CPUçš„DACè¾“å‡ºç”µå‹å’Œç”µæµ
+--Ğ£×¼CPUµÄDACÊä³öµçÑ¹ºÍµçÁ÷
 function calib_dac(void)
 	local i
 	local err
@@ -224,33 +231,37 @@ function calib_dac(void)
 	local volt_err = 0.1
 	local curr_err = 0.1
 	
+	close_all()
+	ex_dout(0,1)
+	ex_dout(19,1)	
+		
 	err = 0
-	dac_on()	--æ‰“å¼€DACç”µæºï¼Œè®¾ç½®ä¸ºç›´æµè¾“å‡º
+	dac_on()	--´ò¿ªDACµçÔ´£¬ÉèÖÃÎªÖ±Á÷Êä³ö
 	delayms(100)
 	
 	print("")
-	print("---æ ¡å‡†DACç”µå‹å’Œç”µæµ---")
+	print("---Ğ£×¼DACµçÑ¹ºÍµçÁ÷---")
 	for i = 0, 3, 1 do
 		dac = dac_tab[i + 1]
-		dac_write(dac)	--CPU DACè¾“å‡º
+		dac_write(dac)	--CPU DACÊä³ö
 		delayms(500)
 		
 		volt = ad7606_volt(1)
 		if (check_err(volt, volt_mid[i + 1], volt_err) == 1) then
-			print("DACç”µå‹", dac, volt, "err")
+			str = string.format("DACµçÑ¹ = %d  %f err", dac, volt) print(str) delayms(5) 
 			err = err + 1
 		else
-			print("DACç”µå‹", dac, volt, "ok")
+			str = string.format("DACµçÑ¹ = %d  %f ok", dac, volt) print(str) delayms(5) 
 			write_reg16(0xC0C8 + i * 2,  dac)
 			write_reg16(0xC0C9 + i * 2,  volt * 1000)	
 		end
 
-		curr = ad7606_curr(6)  --20mAç”µæµ
+		curr = ad7606_curr(6)  --20mAµçÁ÷
 		if (check_err(curr, curr_mid[i + 1], curr_err) == 1) then
-			print("DACç”µæµ", dac, curr, "err")
+			str = string.format("DACµçÁ÷ = %d  %f err", dac, curr) print(str) delayms(5) 
 			err = err + 1
 		else
-			print("DACç”µæµ", dac, curr, "ok")
+			str = string.format("DACµçÁ÷ = %d  %f ok", dac, curr) print(str) delayms(5) 
 			write_reg16(0xC0D0 + i * 2,  dac)
 			write_reg16(0xC0D1 + i * 2,  curr * 1000)			
 		end		
@@ -258,7 +269,7 @@ function calib_dac(void)
 	return err
 end
 
---æ ¡å‡†ç¤ºæ³¢å™¨åŠŸèƒ½
+--Ğ£×¼Ê¾²¨Æ÷¹¦ÄÜ
 function calib_ch1ch2(void)
 	local i
 	local err
@@ -274,12 +285,12 @@ function calib_ch1ch2(void)
 	ex_dout(4,1)
 		
 	print("")
-	print("---æ ¡å‡†ç¤ºæ³¢å™¨ç”µå‹---")	
+	print("---Ğ£×¼Ê¾²¨Æ÷µçÑ¹---")	delayms(5)
 	err = 0
-	print("æ‚¬ç©ºæ ¡å‡†é›¶ä½")
+	print("Ğü¿ÕĞ£×¼ÁãÎ»") delayms(5)
 	for i = 0, 7, 1 do
-		write_reg16(0x0202, i) -- CH1é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
-		write_reg16(0x0203, i) -- CH2é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
+		write_reg16(0x0202, i) -- CH1Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
+		write_reg16(0x0203, i) -- CH2Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
 		
 		if (i == 0) then
 			delayms(1200)
@@ -288,20 +299,22 @@ function calib_ch1ch2(void)
 		end
 		adc = read_adc(0)	
 		if (check_err(adc, zero_mid[i + 1], adc_err1)==1) then
-			print("  CH1", i, adc, "err")
+			str = string.format("  CH1 %d adc = %f err", i, adc)
+			print(str)
 			err = err + 1
 		else
-			print("  CH1", i, adc, "ok")
+			str = string.format("  CH1 %d adc = %f ok", i, adc) print(str) delayms(5) 	
+					
 			write_regfloat(0xC000 + 8 * i, adc)
 			write_regfloat(0xC002 + 8 * i, 0)		
 		end			
 
 		adc = read_adc(1)	
 		if (check_err(adc, zero_mid[i + 1], adc_err1)==1) then
-			print("  CH2", i, adc, "err")
+			str = string.format("  CH2 %d adc = %f err", i, adc) print(str) delayms(5) 
 			err = err + 1
 		else		
-			print("  CH2", i, adc, "ok")
+			str = string.format("  CH2 %d adc = %f ok", i, adc) print(str) delayms(5) 
 			write_regfloat(0xC040 + 8 * i, adc)
 			write_regfloat(0xC042 + 8 * i, 0)
 		end
@@ -317,10 +330,10 @@ function calib_ch1ch2(void)
 	ex_dout(14,1)	
 	delayms(1000)
 			
-	print("æ ¡å‡†æ»¡ä½")
+	print("Ğ£×¼ÂúÎ»")
 	for i = 0, 7, 1 do
-		write_reg16(0x0202, i) -- CH1é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
-		write_reg16(0x0203, i) -- CH2é€šé“å¢ç›Š0æ¡£ï¼Œä¸æ”¾å¤§
+		write_reg16(0x0202, i) -- CH1Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
+		write_reg16(0x0203, i) -- CH2Í¨µÀÔöÒæ0µµ£¬²»·Å´ó
 		
 		dac8563_volt(ch_tab[i + 1])
 		
@@ -328,10 +341,10 @@ function calib_ch1ch2(void)
 		adc = read_adc(0)	
 		volt = ad7606_volt(1)
 		if (check_err(adc, full_mid[i + 1], adc_err2)==1) then
-			print("  CH1", i, volt, adc, "err")
+			str = string.format("  CH1 %d volt = %f  adc = %f err", i, volt, adc) print(str) delayms(5) 
 			err = err + 1
 		else		
-			print("  CH1", i, volt, adc, "ok")
+			str = string.format("  CH1 %d volt = %f  adc = %f ok", i, volt, adc) print(str) delayms(5) 
 			write_regfloat(0xC004 + 8 * i, adc)
 			write_regfloat(0xC006 + 8 * i, volt)
 		end
@@ -339,21 +352,20 @@ function calib_ch1ch2(void)
 		adc = read_adc(1)	
 		volt = ad7606_volt(1)
 		if (check_err(adc, full_mid[i + 1], adc_err2)==1) then
-			print("  CH2", i, volt, adc, "err")
+			str = string.format("  CH2 %d volt = %f  adc = %f err", i, volt, adc) print(str) delayms(5) 
 			err = err + 1
 		else		
-			print("  CH2", i, volt, adc, "ok")
+			str = string.format("  CH2 %d volt = %f  adc = %f ok", i, volt, adc) print(str) delayms(5) 
 			write_regfloat(0xC044 + 8 * i, adc)
 			write_regfloat(0xC046 + 8 * i, volt)
 		end
 	end
 
 ::quit::	
-	if (err > 0)	
 	return err
 end
 
---æ ¡å‡†tvccç”µæµå’Œé«˜ä¾§ç”µæµ
+--Ğ£×¼tvccµçÁ÷ºÍ¸ß²àµçÁ÷
 function calib_curr(void)
 	local i
 	local err
@@ -362,7 +374,7 @@ function calib_curr(void)
 	local set_tabe1 = {0, 0.15 * 10, 0.3*10, 0.4*10}
 	local high_mid1 = {160, 7700, 15330, 20296}
 	local tvcc_mid = {477, 21458, 42877, 56882}
-	local adc_err1 = {0.5,0.1,0.1,0.1}
+	local adc_err1 = {0.6,0.1,0.1,0.1}
 	
 	local set_tabe2 = {0, 0.03 * 50, 0.05*50, 0.09 * 50}		
 	local high_mid2 = {1300, 16421, 26873, 48841}	
@@ -370,34 +382,34 @@ function calib_curr(void)
 	local volt
 	
 	print("")
-	print("---æ ¡å‡†TVCCç”µæµå’Œé«˜ä¾§ç”µæµ---")	
+	print("---Ğ£×¼TVCCµçÁ÷ºÍ¸ß²àµçÁ÷---")	
 	err = 0
 	
 	close_all()
 	ex_dout(20,1)
 	ex_dout(21,1)		
 		
-	--TVCCç”µæµå’Œé«˜ä¾§ç”µæµç›¸åŒã€‚å…ˆæµ‹1.2Aé‡ç¨‹
-	print("---1.2A---")	
-	write_reg16(0x0211, 1) --1.2Aé‡ç¨‹ HIGH_SIDE
+	--TVCCµçÁ÷ºÍ¸ß²àµçÁ÷ÏàÍ¬¡£ÏÈ²â1.2AÁ¿³Ì
+	print("---1.2A---")	 delayms(5)
+	write_reg16(0x0211, 1) --1.2AÁ¿³Ì HIGH_SIDE
 	for i = 0, 3, 1 do
 		volt = set_tabe1[i+1]
-		print("è¾“å‡ºç”µå‹", volt)
+		str = string.format("Êä³öµçÑ¹ = %fV", volt) print(str) delayms(5) 
 		if (volt == 0) then
 			ex_dout(20,0)
 			ex_dout(21,0)
 	
 			ex_dout(22,0)
 			ex_dout(23,0)
-			set_tvcc(5)	--è®¾ç½®TVCCè¾“å‡ºç”µå‹5v æ ¡å‡†0ä½
+			set_tvcc(5)	--ÉèÖÃTVCCÊä³öµçÑ¹5v Ğ£×¼0Î»
 			delayms(1000)
 		else
 			ex_dout(20,1)
 			ex_dout(21,1)
 					
-			set_tvcc(volt)	--è®¾ç½®TVCCè¾“å‡ºç”µå‹ã€‚è´Ÿè½½ç”µé˜»ä¸º10æ¬§
+			set_tvcc(volt)	--ÉèÖÃTVCCÊä³öµçÑ¹¡£¸ºÔØµç×èÎª10Å·
 			ex_dout(23,0) 
-			ex_dout(22,1)  --é€‰æ‹©10æ¬§è´Ÿè½½
+			ex_dout(22,1)  --Ñ¡Ôñ10Å·¸ºÔØ
 		end
 		
 		delayms(1000)
@@ -405,44 +417,44 @@ function calib_curr(void)
 		if (volt == 0) then
 			curr = 0
 		else
-			curr = ad7606_curr(5)	--10æ¬§è´Ÿè½½ï¼Œå¤§ç”µæµ
+			curr = ad7606_curr(5)	--10Å·¸ºÔØ£¬´óµçÁ÷
 		end
 
-		adc = read_adc(3)	--3=é«˜ä¾§ç”µæµcpu ADC
+		adc = read_adc(3)	--3=¸ß²àµçÁ÷cpu ADC
 		if (check_err(adc, high_mid1[i + 1], adc_err1[i + 1])==1) then
-			print("  é«˜ä¾§ç”µæµ", curr, adc, "err")
+			str = string.format("  ¸ß²àµçÁ÷ = %fmA  adc = %f err", curr, adc) print(str) delayms(5) 
 			err = err + 1
 		else
-			print("  é«˜ä¾§ç”µæµ", curr, adc, "ok")
+			str = string.format("  ¸ß²àµçÁ÷ = %fmA  adc = %f ok", curr, adc) print(str) delayms(5) 
 			write_regfloat(0xC098 + 4 * i, adc)
 			write_regfloat(0xC09A + 4 * i, curr)		
 		end			
 
-		adc = read_adc(5)	--5=tvccç”µæµ
+		adc = read_adc(5)	--5=tvccµçÁ÷
 		if (check_err(adc, tvcc_mid[i + 1], adc_err1[i + 1])==1) then
-			print("  TVCCç”µæµ", curr, adc, "err")
+			str = string.format("  TVCCµçÁ÷ = %fmA  adc = %f err", curr, adc) print(str) delayms(5) 
 			err = err + 1
 		else
-			print("  TVCCç”µæµ", curr, adc, "ok")
+			str = string.format("  TVCCµçÁ÷ = %fmA  adc = %f ok", curr, adc) print(str) delayms(5) 
 			write_regfloat(0xC0B0 + 4 * i, adc)
 			write_regfloat(0xC0B2 + 4 * i, curr)		
 		end	
 	end		
 	
-	--é«˜ä¾§ç”µæµç›¸åŒã€‚æµ‹é«˜ä¾§ç”µæµ100é‡ç¨‹
+	--¸ß²àµçÁ÷ÏàÍ¬¡£²â¸ß²àµçÁ÷100Á¿³Ì
 	print("")
-	print("---120mA---")	
-	write_reg16(0x0211, 0) --120mAé‡ç¨‹ HIGH_SIDE
+	print("---120mA---")	 delayms(5)
+	write_reg16(0x0211, 0) --120mAÁ¿³Ì HIGH_SIDE
 	for i = 0, 3, 1 do
 		volt = set_tabe2[i+1]
-		print("è¾“å‡ºç”µå‹", volt)
+		str = string.format("Êä³öµçÑ¹ = %fV", volt) print(str) delayms(5) 
 		if (volt == 0) then
 			ex_dout(22,0)
 			ex_dout(23,0)
 		else
-			set_tvcc(volt)	--è®¾ç½®TVCCè¾“å‡ºç”µå‹ã€‚è´Ÿè½½ç”µé˜»ä¸º10æ¬§
+			set_tvcc(volt)	--ÉèÖÃTVCCÊä³öµçÑ¹¡£¸ºÔØµç×èÎª10Å·
 			ex_dout(22,0) 
-			ex_dout(23,1)--é€‰æ‹©50æ¬§è´Ÿè½½
+			ex_dout(23,1)--Ñ¡Ôñ50Å·¸ºÔØ
 		end
 		
 		delayms(1000)
@@ -450,15 +462,15 @@ function calib_curr(void)
 		if (volt == 0) then
 			curr = 0
 		else
-			curr = ad7606_curr(7)	--50æ¬§è´Ÿè½½ï¼Œå¤§ç”µæµ
+			curr = ad7606_curr(7)	--50Å·¸ºÔØ£¬´óµçÁ÷
 		end
 
-		adc = read_adc(3)	--3=é«˜ä¾§ç”µæµcpu ADC
+		adc = read_adc(3)	--3=¸ß²àµçÁ÷cpu ADC
 		if (check_err(adc, high_mid2[i + 1], adc_err2[i + 1])==1) then
-			print("  é«˜ä¾§ç”µæµ", curr, adc, "err")
+			str = string.format("  ¸ß²àµçÁ÷ = %fmA  adc = %f err", curr, adc) print(str) delayms(5) 
 			err = err + 1
 		else
-			print("  é«˜ä¾§ç”µæµ", curr, adc, "ok")
+			str = string.format("  ¸ß²àµçÁ÷ = %fmA  adc = %f ok", curr, adc) print(str) delayms(5)
 			write_regfloat(0xC088 + 4 * i, adc)
 			write_regfloat(0xC08A + 4 * i, curr)		
 		end			
@@ -467,18 +479,18 @@ function calib_curr(void)
 	return err
 end
 
---æ ¡å‡†NTC
+--Ğ£×¼NTC
 function calib_ntc(void)
 	local i
 	local err
 	local adc
 	local ref = {0.0003, 0.0222, 9.9732, 99.958}
 	local Y = {5,6,16,17}
-	local adc_mid = {90, 283, 43376, 62376}
-	local adc_err = {0.5, 0.5, 0.1, 0.1}
+	local adc_mid = {105, 283, 43376, 62376}
+	local adc_err = {0.6, 0.7, 0.1, 0.1}
 	
 	print("")
-	print("---æ ¡å‡†NTC---")	
+	print("---Ğ£×¼NTC---")	
 	err = 0
 	
 	for i=0,3,1 do
@@ -487,10 +499,10 @@ function calib_ntc(void)
 		delayms(1000)
 		adc = read_adc(6)	--6=NTC adc
 		if (check_err(adc, adc_mid[i+1], adc_err[i+1])==1) then	
-			print("  ç”µé˜»", ref[i+1], adc, "err")
+			str = string.format("  µç×è = %fÅ·  adc = %f err", ref[i+1], adc) print(str) delayms(5)
 			err = err + 1
 		else
-			print("  ç”µé˜»", ref[i+1], adc, "ok")
+			str = string.format("  µç×è = %fÅ·  adc = %f ok", ref[i+1], adc) print(str) delayms(5)
 			write_regfloat(0xC0D8+4*i, adc)
 			write_regfloat(0xC0DA+4*i, ref[i+1])		
 		end	
@@ -498,7 +510,7 @@ function calib_ntc(void)
 	return err
 end
 
---å…³é—­æ‰€æœ‰çš„ç»§ç”µå™¨
+--¹Ø±ÕËùÓĞµÄ¼ÌµçÆ÷
 function close_all(void)
 	local i
 	
@@ -507,7 +519,7 @@ function close_all(void)
 	end
 end
 	
---æµ‹è¯•ä¸»å‡½æ•°
+--²âÊÔÖ÷º¯Êı
 function test_calib(void)
 	local err
 	local time1
@@ -515,51 +527,53 @@ function test_calib(void)
 	
 	time1 = get_runtime()
 	
-	print(time1)
-	
+	print("\r\n----¼ì²éÊ±ÖÓ----")
+	time2 = os.time()
+	print(os.date())
+	print(time2)
+	if (time2 < 1574937149) then 
+		print("*****Ê±ÖÓ´íÎó*****")
+		goto quit	
+	else
+		print("Ê±ÖÓOK > 1574937149")
+	end
+		
 	err = 0
-	--calib_init()
 	
-	close_all()
-	ex_dout(20,1)
-	ex_dout(21,1)
-	err = err + calib_tvcc_volt() --æ ¡å‡†TVCCç”µå‹
+	err = err + calib_tvcc_volt() --Ğ£×¼TVCCµçÑ¹
 	if (err > 0) then
 		goto quit
 	end
 	
-	close_all()
-	ex_dout(0,1)
-	ex_dout(19,1)	
-	err = err + calib_dac() --æ ¡å‡†DAC
+	err = err + calib_dac() --Ğ£×¼DAC
 	if (err > 0) then
 		goto quit
 	end
 	
-	err = err + calib_ch1ch2() --æ ¡å‡†ç¤ºæ³¢å™¨
+	err = err + calib_ch1ch2() --Ğ£×¼Ê¾²¨Æ÷
 	if (err > 0) then
 		goto quit
 	end	
 	
-	err = err + calib_curr() --æ ¡å‡†TVCCç”µæµå’Œé«˜ä¾§ç”µæµ
+	err = err + calib_curr() --Ğ£×¼TVCCµçÁ÷ºÍ¸ß²àµçÁ÷
 	if (err > 0) then
 		goto quit
 	end
 
-	err = err + calib_ntc() --æ ¡å‡†ntc
+	err = err + calib_ntc() --Ğ£×¼ntc
 	if (err > 0) then
 		goto quit
 	end
 	
-	save_param()	--ä¿å­˜å‚æ•°åˆ°eeprom
+	save_param()	--±£´æ²ÎÊıµ½eeprom
 	
 ::quit::	
-	disp_result(err)
+	disp_result(err)  delayms(5)
 	
 	close_all()
 	
 	time2 = get_runtime()
-	print("æµ‹è¯•æ—¶é—´: ", (time2 - time1) / 1000)
+	str = string.format("²âÊÔÊ±¼ä : %f Ãë",(time2 - time1) / 1000) print(str) delayms(5)
 end
 
 	calib_init()

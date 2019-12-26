@@ -37,7 +37,7 @@ enum
 #define QUAD_INOUT_FAST_READ_4_BYTE_ADDR_CMD 0xEC /* 32bit地址的4线快速读取命令 */
 
 /* 备份下面的命令，待以后扩展API使用 */
-#if 0
+#if 1
 
 /* Reset Operations */
 #define RESET_ENABLE_CMD 0x66
@@ -148,6 +148,8 @@ void QSPI_EraseSector(uint32_t address);
 uint8_t QSPI_WriteBuffer(uint8_t *_pBuf, uint32_t _uiWriteAddr, uint16_t _usWriteSize);
 void QSPI_ReadBuffer(uint8_t *_pBuf, uint32_t _uiReadAddr, uint32_t _uiSize);
 uint32_t QSPI_ReadID(void);
+
+uint8_t QSPI_MemoryMapped(void);
 
 #endif
 

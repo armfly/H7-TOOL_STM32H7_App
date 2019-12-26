@@ -72,7 +72,7 @@ void status_TVCCPower(void)
             case KEY_UP_S:      /* S键释放 */
                 if (ucAdjustMode == 0)
                 {
-                    g_MainStatus = NextStatus(MS_TVCC_POWER);
+                    g_MainStatus = LastStatus(MS_TVCC_POWER);
                 }
                 else
                 {
@@ -102,7 +102,7 @@ void status_TVCCPower(void)
             case KEY_UP_C:      /* C键释放 */
                 if (ucAdjustMode == 0)
                 {      
-                    g_MainStatus = LastStatus(MS_TVCC_POWER);       
+                    g_MainStatus = NextStatus(MS_TVCC_POWER);       
                 }
                 else 
                 {

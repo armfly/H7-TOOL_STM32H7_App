@@ -16,11 +16,13 @@
 
 #define USE_SMALL_FONT /* 定义此行表示使用小字库， 这个宏只在bsp_tft+lcd.c中使用 */
 
-/* 0x64000000 是NOR Flash的首地址 */
-#define HZK12_ADDR (0x64000000 + 0x0)     /* 12点阵汉字库地址 */
-#define HZK16_ADDR (0x64000000 + 0x2C9D0) /* 16点阵汉字库地址 */
-#define HZK24_ADDR (0x64000000 + 0x68190) /* 24点阵汉字库地址 */
-#define HZK32_ADDR (0x64000000 + 0xEDF00) /* 32点阵汉字库地址 */
+/* QSPI Flash 中2MB字库的地址分配 0x91E00000 */
+//#define QSPI_ADDR_HZK   (0x90000000 + 30 * 1024 * 1024)
+#define QSPI_ADDR_HZK   (30 * 1024 * 1024)
+#define HZK12_ADDR (QSPI_ADDR_HZK + 0x0)     /* 12点阵汉字库地址 */
+#define HZK16_ADDR (QSPI_ADDR_HZK + 0x2C9D0) /* 16点阵汉字库地址 */
+#define HZK24_ADDR (QSPI_ADDR_HZK + 0x68190) /* 24点阵汉字库地址 */
+#define HZK32_ADDR (QSPI_ADDR_HZK + 0xEDF00) /* 32点阵汉字库地址 */
 
 extern unsigned char const g_Ascii12[];
 extern unsigned char const g_Ascii16[];

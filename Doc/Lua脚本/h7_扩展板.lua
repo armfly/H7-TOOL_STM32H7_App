@@ -1,5 +1,5 @@
 beep()
---æµ‹è¯•è½¬æ¥æ¿ï¼Œå¾ªç¯ç‚¹ç¯
+--²âÊÔ×ª½Ó°å£¬Ñ­»·µãµÆ
 function test_ledout(void)
 	local i
 	local err
@@ -7,12 +7,12 @@ function test_ledout(void)
 	local flag
 	
 	print("")
-	print("----å¼€å§‹æµ‹è¯•è½¬æ¥æ¿(è¾“å‡º+FMCæ€»çº¿è¾“å…¥)----")
+	print("----¿ªÊ¼²âÊÔ×ª½Ó°å(Êä³ö+FMC×ÜÏßÊäÈë)----")
 
---è®¾ç½®TVCCè¾“å‡º
+--ÉèÖÃTVCCÊä³ö
 	write_tvcc_dac(47)
 
---è®¾ç½®D7-D0ä¸ºè¾“å‡º
+--ÉèÖÃD7-D0ÎªÊä³ö
 	gpio_cfg(0, 1)
 	gpio_cfg(1, 1)
 	gpio_cfg(2, 1)
@@ -21,11 +21,11 @@ function test_ledout(void)
 	gpio_cfg(5, 1)
 	gpio_cfg(6, 1)
 	gpio_cfg(7, 1)
---å…¨ç­
+--È«Ãğ
 	for i=0,7,1 do
 		gpio_write(i, 0)		
 	end
---å¾ªç¯ç‚¹äº®
+--Ñ­»·µãÁÁ
 	flag = 1
 	err = 0
 	for i=0,7,1 do
@@ -40,17 +40,17 @@ function test_ledout(void)
 		gpio_write(i, 0) 	
 		delayms(100)
 	end	
---å…¨éƒ¨ç‚¹äº®
+--È«²¿µãÁÁ
 	for i=0,7,1 do
 		gpio_write(i, 1)	
 	end
 
---æˆåŠŸå«ä¸€å£°ï¼Œå¤±è´¥å«ä¸‰å£°
+--³É¹¦½ĞÒ»Éù£¬Ê§°Ü½ĞÈıÉù
 	if (err == 0) then
-		print("æµ‹è¯•é€šè¿‡")
+		print("²âÊÔÍ¨¹ı")
 		beep()
 	else
-		print("æµ‹è¯•å¤±è´¥")
+		print("²âÊÔÊ§°Ü")
 		beep()
 		delayms(100)
 		beep()
@@ -59,11 +59,11 @@ function test_ledout(void)
 	end
 end
 
---æµ‹è¯•æ‰©å±•æ¿ç»§ç”µå™¨
+--²âÊÔÀ©Õ¹°å¼ÌµçÆ÷
 function test_extio_open_do(void)
 	local i
 	
-	print("ä¾æ¬¡æ‰“å¼€24ä¸ªç»§ç”µå™¨ - å¼€å§‹")
+	print("ÒÀ´Î´ò¿ª24¸ö¼ÌµçÆ÷ - ¿ªÊ¼")
 	beep()
 	extio_start()
 	for i=0,23,1 do	
@@ -71,14 +71,14 @@ function test_extio_open_do(void)
 		extio_set_do(i, 1)
 		delayms(500)
 	end
-	print("ä¾æ¬¡æ‰“å¼€24ä¸ªç»§ç”µå™¨ - ç»“æŸ")
+	print("ÒÀ´Î´ò¿ª24¸ö¼ÌµçÆ÷ - ½áÊø")
 end
 
---æµ‹è¯•æ‰©å±•æ¿ç»§ç”µå™¨
+--²âÊÔÀ©Õ¹°å¼ÌµçÆ÷
 function test_extio_close_do(void)
 	local i
 	
-	print("ä¾æ¬¡å…³é—­24ä¸ªç»§ç”µå™¨ - å¼€å§‹")
+	print("ÒÀ´Î¹Ø±Õ24¸ö¼ÌµçÆ÷ - ¿ªÊ¼")
 	beep()
 	extio_start()
 	for i=0,23,1 do	
@@ -86,42 +86,42 @@ function test_extio_close_do(void)
 		extio_set_do(i, 1)
 		delayms(500)
 	end
-	print("ä¾æ¬¡å…³é—­24ä¸ªç»§ç”µå™¨ - ç»“æŸ")
+	print("ÒÀ´Î¹Ø±Õ24¸ö¼ÌµçÆ÷ - ½áÊø")
 end
 
---æµ‹è¯•æ‰©å±•æ¿DI
+--²âÊÔÀ©Õ¹°åDI
 function test_extio_di(void)
 	local i
 	
-	print("æµ‹è¯•æ‰©å±•æ¿DI")
+	print("²âÊÔÀ©Õ¹°åDI")
 	beep()
 	for i=0,15,1 do	
 		print(extio_get_di(i))
 	end
 end
 
---æµ‹è¯•æ‰©å±•æ¿ADC
+--²âÊÔÀ©Õ¹°åADC
 function test_extio_adc(void)
 	local i
 	
-	print("æµ‹è¯•æ‰©å±•æ¿ADC")
+	print("²âÊÔÀ©Õ¹°åADC")
 	beep()
 	for i=0,7,1 do	
 		print(extio_get_adc(i))
 	end
 end
 
---æµ‹è¯•è½¬æ¥æ¿ï¼Œå¾ªç¯ç‚¹ç¯
+--²âÊÔ×ª½Ó°å£¬Ñ­»·µãµÆ
 function test_swd(void)
 	local err
 	local id
 	local str
 	
 	print("")
-	print("----å¼€å§‹æµ‹SWDåŠŸèƒ½----")
+	print("----¿ªÊ¼²âSWD¹¦ÄÜ----")
 	err = 0
-	swd_init(3.3)     --é…ç½®SWDï¼Œ3.3Vç”µå‹
-	id = swd_getid()  --è¯»ID
+	swd_init(3.3)     --ÅäÖÃSWD£¬3.3VµçÑ¹
+	id = swd_getid()  --¶ÁID
 	printhex(id,4)	
 	if (id ~= 0x0BB11477) then 
 		err = err + 1
@@ -134,12 +134,12 @@ function test_swd(void)
 		err = err + 1
 	end
 	
---æˆåŠŸå«ä¸€å£°ï¼Œå¤±è´¥å«ä¸‰å£°
+--³É¹¦½ĞÒ»Éù£¬Ê§°Ü½ĞÈıÉù
 	if (err == 0) then
-		print("*****æµ‹è¯•é€šè¿‡*****")
+		print("*****²âÊÔÍ¨¹ı*****")
 		beep()
 	else
-		print("*****æµ‹è¯•å¤±è´¥*****")
+		print("*****²âÊÔÊ§°Ü*****")
 		beep()
 		delayms(100)
 		beep()

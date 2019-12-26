@@ -68,7 +68,7 @@ void status_PulseMeter(void)
             case KEY_UP_S: /* S键释放 */
                 if (ucIgnoreKey == 0)
                 {
-                    g_MainStatus = NextStatus(g_MainStatus);
+                    g_MainStatus = LastStatus(g_MainStatus);
                 }        
                 ucIgnoreKey = 0;
                 break;
@@ -85,7 +85,7 @@ void status_PulseMeter(void)
             case KEY_UP_C: /* C键释放 */
                 if (ucIgnoreKey == 0)
                 {
-                    g_MainStatus = LastStatus(g_MainStatus);
+                    g_MainStatus = NextStatus(g_MainStatus);
                 }            
                 ucIgnoreKey = 0;
                 break;

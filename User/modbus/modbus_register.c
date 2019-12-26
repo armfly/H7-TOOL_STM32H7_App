@@ -1538,7 +1538,7 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
         }
         else if (reg_value == 2)
         {
-            luaL_dostring(g_Lua, "init()");
+            lua_do("init()");
         }
         else if (reg_value == 3)
         {

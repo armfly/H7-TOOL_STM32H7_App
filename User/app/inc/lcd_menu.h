@@ -29,10 +29,10 @@
 //#define CL_MENU_BACK3   RGB(142, 209, 158)
 
 #define MENU_LEFT       (0 + 5)
-#define MENU_TOP        (0 + 40)
+#define MENU_TOP        (0 + 38)
 #define MENU_WIDTH      (240 - 10)
 #define MENU_HEIGHT     (240 - 50)
-#define MENU_CAP        2
+#define MENU_CAP        3
 
 /* 菜单结构 */
 typedef struct
@@ -50,13 +50,19 @@ typedef struct
     uint16_t LineCap;       /* 行间距 */
 
     FONT_T Font;            /* 字体 */
+    
+    uint8_t RollBackEn;     /* 回滚使能 */
+    
+    uint8_t GBK;            /* 文字编码 0=UTF8, 1=GBK */
 } MENU_T;
 
 /* 菜单显示类 */
 void LCD_InitMenu(MENU_T *_pMenu, char **_Text);
 void LCD_DispMenu(MENU_T *_pMenu);
+void LCD_DispMenu2(MENU_T *_pMenu);
 void LCD_MoveDownMenu(MENU_T *_pMenu);
 void LCD_MoveUpMenu(MENU_T *_pMenu);
+void LCD_ClearMenu(MENU_T *_pMenu);
 
 #endif
 
