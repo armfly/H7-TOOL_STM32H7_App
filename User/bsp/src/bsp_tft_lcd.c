@@ -3,9 +3,8 @@
 *
 *    模块名称 : TFT液晶显示器驱动模块
 *    文件名称 : bsp_tft_lcd.c
-*    版    本 : V4.2
-*    说    明 : 支持3.0， 3.5， 4.3， 5.0， 7.0寸显示模块.
-*              3.0寸的支持的LCD内部驱动芯片型号有: SPFD5420A、OTM4001A、R61509V
+*    版    本 : V5.1
+*    说    明 : H7-TOOL 1.3寸屏专用
 *    修改记录 :
 *        版本号  日期       作者    说明
 *        v1.0    2011-08-21 armfly  ST固件库版本 V3.5.0版本。
@@ -50,6 +49,8 @@
 *                    - LCD_GetStrWidth() 函数更新。
 *                    - 显示字符串函数限制超出宽度 LCD_DispStrEx0()
 *                    - \t字符串中的\t划线指令更换为\v指令. 避免和Lua print的\t冲突
+*        V5.1   2019-12-29 
+*                    - 解决LCD_DrawMemo bug, Text==0时禁止显示
 *
 *    Copyright (C), 2015-2030, 安富莱电子 www.armfly.com
 *
@@ -159,20 +160,25 @@ uint8_t LCD_GetEncode(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern uint32_t wTransferState;
 void LCD_Task(void)
 {
-    if (g_LcdSleepReq == 1)        /* 进入休眠。按键中断服务程序中会设置1 */
+    /* 在DMA SPI传输完毕后才能设置LCD休眠 */
+    if (wTransferState == 1)
     {
-        g_LcdSleepReq = 0;
-        LCD_DispOff();              /* 该函数会操作SPI，不可以在中断服务程序中执行 */
-    }
-    else if (g_LcdSleepReq == 2)    /* 退出休眠。按键中断服务程序中会设置2 */
-    {
-        g_LcdSleepReq = 0;
-        LCD_DispOn();              /* 该函数会操作SPI，不可以在中断服务程序中执行 */
+        if (g_LcdSleepReq == 1)         /* 进入休眠。按键中断服务程序中会设置1 */
+        {
+            g_LcdSleepReq = 0;
+            LCD_DispOff();              /* 该函数会操作SPI，不可以在中断服务程序中执行 */
+        }
+        else if (g_LcdSleepReq == 2)    /* 退出休眠。按键中断服务程序中会设置2 */
+        {
+            g_LcdSleepReq = 0;
+            LCD_DispOn();               /* 该函数会操作SPI，不可以在中断服务程序中执行 */
+        }
     }
     
-    ST7789_DrawScreen();        /* 硬件SPI+DMA+刷屏 */
+    ST7789_DrawScreen();            /* 硬件SPI+DMA+刷屏 */
 }
 
 /*
@@ -3279,6 +3285,11 @@ void LCD_DrawMemo(MEMO_T *_pMemo)
     char buf[128];  /* 每行最大128字符 */
     
     _pMemo->Refresh = 0;
+    
+    if (_pMemo->Text == 0)
+    {
+        return;
+    }
     
     /* 绘制边框，填充窗口 */
     LCD_DrawRect(_pMemo->Left, _pMemo->Top, _pMemo->Height, _pMemo->Width, EDIT_BORDER_COLOR);

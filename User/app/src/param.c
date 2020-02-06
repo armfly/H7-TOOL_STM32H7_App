@@ -146,6 +146,8 @@ void InitBaseParam(void)
     g_tParam.UIStyle = 0;
     g_tParam.LcdSleepTime = 0;          /* 0: 1分钟  1: 5分钟  2 : 15分钟  3: 1小时  4：关闭 */
     
+    g_tParam.FileListFont24 = 0;        /* 1表示24点阵显示文件列表，0表示16点阵 */
+    
     SaveParam();
 }
 

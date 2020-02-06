@@ -10,7 +10,9 @@
 #ifndef _STATUS_PROGRAMMER_H_
 #define _STATUS_PROGRAMMER_H_
 
+void status_ProgSelectFile(void);
 void status_ProgWork(void);
+void status_ProgSetting(void);
 
 #endif
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file    DAP.c
  * @brief   Implementation of DAP.h
  *
@@ -1601,7 +1601,7 @@ void DAP_Setup(void) {
 
   // Default settings
   DAP_Data.debug_port  = 0U;
-  DAP_Data.fast_clock  = 1U;
+  DAP_Data.fast_clock  = 1U;   // ARMFLY
   DAP_Data.clock_delay = CLOCK_DELAY(DAP_DEFAULT_SWJ_CLOCK);
   DAP_Data.transfer.idle_cycles = 0U;
   DAP_Data.transfer.retry_count = 100U;

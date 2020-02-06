@@ -17,33 +17,34 @@
 /* 主程序状态字定义, MS = Main Status */
 enum
 {
-    MS_LINK_MODE = 0,   /* 联机状态 */
+    MS_LINK_MODE = 0,       /* 联机状态 */
 
-    MS_SYSTEM_SET,      /* 系统设置 */
-    MS_HARD_INFO,       /* 关于-硬件信息 */
-    MS_ESP32_TEST,      /* ESP32模块升级状态 */
-    MS_USB_EMMC,        /* 虚拟串口状态。RS232 RS485 TTL-UART */
-    MS_MODIFY_PARAM,    /* 参数设置 */
-    MS_FILE_MANAGE,     /* 文件管理 */
+    MS_SYSTEM_SET,          /* 系统设置 */
+    MS_HARD_INFO,           /* 关于-硬件信息 */
+    MS_ESP32_TEST,          /* ESP32模块升级状态 */
+    MS_USB_EMMC,            /* 虚拟串口状态。RS232 RS485 TTL-UART */
+    MS_MODIFY_PARAM,        /* 参数设置 */
+    MS_FILE_MANAGE,         /* 文件管理 */
     
-    MS_PROG_INIT,       /* 脱机下载器预览界面 */
-    MS_PROG_WORK,       /* 脱机下载器正式界面 */
+    MS_PROG_SELECT_FILE,    /* 脱机下载器浏览文件 */
+    MS_PROG_WORK,           /* 脱机下载器工作界面 */
+    MS_PROG_SETTING,        /* 脱机下载器临时参数设置 */
     
-    MS_VOLTAGE_METER,   /* 电压表 */
-    MS_CURRENT_METER,   /* 高侧电流表 */
-    MS_TEMP_METER,      /* 温度表 */
-    MS_RESISTOR_METER,  /* 电阻表 */
-    MS_TVCC_POWER,      /* 微型数控电源 */    
-    MS_PULSE_METER,     /* 脉冲计 */
+    MS_VOLTAGE_METER,       /* 电压表 */
+    MS_CURRENT_METER,       /* 高侧电流表 */
+    MS_TEMP_METER,          /* 温度表 */
+    MS_RESISTOR_METER,      /* 电阻表 */
+    MS_TVCC_POWER,          /* 微型数控电源 */    
+    MS_PULSE_METER,         /* 脉冲计 */
     
-    MS_EXTEND_INIT,     /* 扩展菜单显示 */
-    MS_EXTEND_MENU1,    /* 第1级菜单  */
-    MS_EXTEND_MENU_LUA, /* 第2级菜单-LUA程序 */      
-    MS_EXTEND_MENU_REC, /* 第2级菜单-数据记录仪 */  
+    MS_MINI_DSO,            /* 迷你示波器 */
     
+    MS_EXTEND_MENU1,        /* 第1级菜单  */
+    MS_EXTEND_MENU_LUA,     /* 第2级菜单-LUA程序 */      
+    MS_EXTEND_MENU_REC,     /* 第2级菜单-数据记录仪 */    
     
-    MS_LUA_SELECT_FILE, /* 浏览lua文件 */
-    MS_LUA_EXEC_FILE,   /* 执行lua文件 */
+    MS_LUA_SELECT_FILE,     /* 浏览lua文件 */
+    MS_LUA_EXEC_FILE,       /* 执行lua文件 */
 };
 
 void DispHeader(char *_str);
@@ -60,7 +61,7 @@ void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth
 void DispLabel(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
     uint16_t _usColor, char *_pStr, FONT_T *_tFont);
 void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-    char *_str, uint8_t _ucPercent, FONT_T *_tFont);
+    char *_str, float _Percent, FONT_T *_tFont);
 uint16_t NextStatus(uint16_t _NowStatus);
 uint16_t LastStatus(uint16_t _NowStatus);
 void DSO_StartMode2(void);

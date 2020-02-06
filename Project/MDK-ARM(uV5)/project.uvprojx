@@ -313,7 +313,7 @@
           <Cads>
             <interw>1</interw>
             <Optim>1</Optim>
-            <oTime>0</oTime>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -338,7 +338,7 @@
               <MiscControls>--no-multibyte-chars;--locale=english</MiscControls>
               <Define>USE_HAL_DRIVER, STM32H743xx,USE_USB_HS,STM32H7,NO_HOST</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\User\st_usb\usbd_mass_storage;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\User\st_usb\usbd_mass_storage;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app;..\..\User\daplink\source\target</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,14 +418,14 @@
               <FilePath>..\..\User\app\src\status_system_set.c</FilePath>
             </File>
             <File>
-              <FileName>status_current_meter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\app\src\status_current_meter.c</FilePath>
-            </File>
-            <File>
               <FileName>status_resistor_meter.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\status_resistor_meter.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_current_meter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_current_meter.c</FilePath>
             </File>
             <File>
               <FileName>status_temp_meter.c</FileName>
@@ -468,65 +468,14 @@
               <FilePath>..\..\User\app\src\status_lua.c</FilePath>
             </File>
             <File>
-              <FileName>demo_sd_fatfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\app\src\demo_sd_fatfs.c</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <uGnu>2</uGnu>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
               <FileName>file_lib.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\file_lib.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_mini_dso.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_mini_dso.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1013,6 +962,16 @@
               <FileName>stm32h7xx_hal_mmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_mmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_crc_ex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_crc_ex.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1513,6 +1472,36 @@
               <FileName>prog_if.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\prog_if.c</FilePath>
+            </File>
+            <File>
+              <FileName>elf_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\elf_file.c</FilePath>
+            </File>
+            <File>
+              <FileName>falsh_error.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\falsh_error.c</FilePath>
+            </File>
+            <File>
+              <FileName>SWD_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\SWD_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash_blob.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\programmer\flash_blob.h</FilePath>
+            </File>
+            <File>
+              <FileName>FlashOS.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\programmer\FlashOS.h</FilePath>
+            </File>
+            <File>
+              <FileName>SWD_flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\programmer\SWD_flash.h</FilePath>
             </File>
           </Files>
         </Group>

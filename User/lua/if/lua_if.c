@@ -41,11 +41,11 @@ static void lua_RegisterFunc(void);
 
 static void LuaYeildHook(lua_State *_L, lua_Debug *ar);
 
-/* lua源码调用该函数，会告警 */
-void exit(int status)
-{
-    ;
-}
+///* lua源码调用该函数，会告警 */
+//void exit(int status)
+//{
+//    return;
+//}
 
 int system(const char *cmd)
 {
@@ -126,6 +126,7 @@ void lua_DeInit(void)
 
 // 每行执行的钩子函数，用于终止lua程序
 extern MEMO_T g_LuaMemo;
+extern void PG_PrintText(char *_str);
 void LuaYeildHook(lua_State *_L, lua_Debug *ar)
 {
 	if (s_lua_quit == 1)
@@ -162,6 +163,29 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
             }
         }        
     }
+        
+    if (g_MainStatus == MS_PROG_WORK)
+    {
+        uint8_t ucKeyCode;
+
+        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        if (ucKeyCode != KEY_NONE)
+        {
+            /* 有键按下 */
+            switch (ucKeyCode)
+            {            
+                case KEY_LONG_DOWN_C:   /* C键长按 - 终止Lua */
+                    PG_PrintText("用户终止运行");
+                
+                    lua_yield(_L, 0); 
+                
+                    break;
+
+                default:
+                    break;
+            }
+        }        
+    }
 }
 
 // 终止lua
@@ -178,7 +202,7 @@ void lua_DownLoadFile(char *_path)
     lua_Init();
     
     // 读文件到内存
-    s_lua_prog_len = ReadFileToMem(_path, s_lua_prog_buf, LUA_PROG_LEN_MAX);
+    s_lua_prog_len = ReadFileToMem(_path, 0, s_lua_prog_buf, LUA_PROG_LEN_MAX);
     
     if (s_lua_prog_len > 0)
     {
@@ -329,15 +353,38 @@ uint8_t lua_67H_Read(uint32_t _addr, uint8_t *_buf, uint32_t _len)
 */
 static int beep(lua_State* L)
 {
-    //检查栈中的参数是否合法，1表示Lua调用时的第一个参数(从左到右)，依此类推。
-    //如果Lua代码在调用时传递的参数不为number，该函数将报错并终止程序的执行。
-//    double op1 = luaL_checknumber(L, 1);
-//    double op2 = luaL_checknumber(L, 2);
+    uint16_t usBeepTime;
+    uint16_t usStopTime;
+    uint16_t usCycle;
     
-    BEEP_KeyTone();
-    
-    //将函数的结果压入栈中。如果有多个返回值，可以在这里多次压入栈中。
-    //lua_pushnumber(L, op1 + op2);
+    if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数. */
+    {        
+        usBeepTime = luaL_checknumber(L, 1);
+        
+        if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第2个参数. */
+        {
+            usStopTime = luaL_checknumber(L, 2);
+        }
+        else
+        {
+            return 0;
+        }
+
+        if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第3个参数. */
+        {
+            usCycle = luaL_checknumber(L, 3);
+        } 
+        else
+        {
+            return 0;
+        }        
+            
+        BEEP_Start(usBeepTime, usStopTime, usCycle); /* 鸣叫50ms，停10ms， 1次 */
+    }
+    else
+    {
+        BEEP_Start(5, 1, 1); /* 鸣叫50ms，停10ms， 1次 */
+    }
     
     //返回值用于提示该C函数的返回值数量，即压入栈中的返回值数量。
     return 0;
@@ -379,7 +426,7 @@ static int delayms(lua_State* L)
 /*
 *********************************************************************************************************
 *    函 数 名: printhex
-*    功能说明: 打印hex格式.  pr       nthex(100, 2);    p       inthex("123");    
+*    功能说明: 打印hex格式.  printhex(100, 2);    printhex("123");    
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -543,7 +590,7 @@ static int get_runtime(lua_State* L)
 static int check_runtime(lua_State* L)
 {
     int32_t lasttime;
-    uint8_t re;
+    int32_t re;
     
     if (lua_type(L, 1) == LUA_TNUMBER) /* 判断第1个参数 */
     {

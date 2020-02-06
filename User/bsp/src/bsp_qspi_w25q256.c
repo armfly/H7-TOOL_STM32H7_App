@@ -127,7 +127,7 @@ static __IO uint8_t CmdCplt, RxCplt, TxCplt, StatusMatch, TimeOut;
 static void QSPI_WriteEnable(QSPI_HandleTypeDef *hqspi);
 static void QSPI_AutoPollingMemReady(QSPI_HandleTypeDef *hqspi);
 
-static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi);
+//static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi);
 
 uint8_t QSPI_MemoryMapped(void);
 
@@ -603,90 +603,90 @@ uint32_t QSPI_ReadID(void)
   * @param  hqspi: QSPI handle
   * @retval None
   */
-static void QSPI_DummyCyclesCfg(QSPI_HandleTypeDef *hqspi)
-{
-	QSPI_CommandTypeDef s_command;
-	uint16_t reg=0;
+//static void QSPI_DummyCyclesCfg(QSPI_HandleTypeDef *hqspi)
+//{
+//	QSPI_CommandTypeDef s_command;
+//	uint16_t reg=0;
 
-	/* Initialize the read volatile configuration register command */
-	s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
-	s_command.Instruction       = READ_VOL_CFG_REG_CMD;
-	s_command.AddressMode       = QSPI_ADDRESS_NONE;
-	s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
-	s_command.DataMode          = QSPI_DATA_1_LINE;
-	s_command.DummyCycles       = 0;
-	s_command.NbData            = 2;
-	s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
-	s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
-	s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+//	/* Initialize the read volatile configuration register command */
+//	s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+//	s_command.Instruction       = READ_VOL_CFG_REG_CMD;
+//	s_command.AddressMode       = QSPI_ADDRESS_NONE;
+//	s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+//	s_command.DataMode          = QSPI_DATA_1_LINE;
+//	s_command.DummyCycles       = 0;
+//	s_command.NbData            = 2;
+//	s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
+//	s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+//	s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
 
-	/* Configure the command */
-	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-	{
-		 Error_Handler(__FILE__, __LINE__);;
-	}
+//	/* Configure the command */
+//	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+//	{
+//		 Error_Handler(__FILE__, __LINE__);;
+//	}
 
-	/* Reception of the data */
-	if (HAL_QSPI_Receive(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-	{
-		 Error_Handler(__FILE__, __LINE__);;
-	}
+//	/* Reception of the data */
+//	if (HAL_QSPI_Receive(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+//	{
+//		 Error_Handler(__FILE__, __LINE__);;
+//	}
 
-	/* Enable write operations */
-	QSPI_WriteEnable(hqspi);
+//	/* Enable write operations */
+//	QSPI_WriteEnable(hqspi);
 
-	/* Update volatile configuration register (with new dummy cycles) */
-	s_command.Instruction = WRITE_VOL_CFG_REG_CMD;
-	MODIFY_REG(reg, 0xF0F0, ((DUMMY_CLOCK_CYCLES_READ_QUAD << 4) |
-						   (DUMMY_CLOCK_CYCLES_READ_QUAD << 12)));
+//	/* Update volatile configuration register (with new dummy cycles) */
+//	s_command.Instruction = WRITE_VOL_CFG_REG_CMD;
+//	MODIFY_REG(reg, 0xF0F0, ((DUMMY_CLOCK_CYCLES_READ_QUAD << 4) |
+//						   (DUMMY_CLOCK_CYCLES_READ_QUAD << 12)));
 
-	/* Configure the write volatile configuration register command */
-	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-	{
-		 Error_Handler(__FILE__, __LINE__);;
-	}
+//	/* Configure the write volatile configuration register command */
+//	if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+//	{
+//		 Error_Handler(__FILE__, __LINE__);;
+//	}
 
-	/* Transmission of the data */
-	if (HAL_QSPI_Transmit(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-	{
-		 Error_Handler(__FILE__, __LINE__);;
-	}
+//	/* Transmission of the data */
+//	if (HAL_QSPI_Transmit(hqspi, (uint8_t *)(&reg), HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+//	{
+//		 Error_Handler(__FILE__, __LINE__);;
+//	}
 
-}
+//}
 
 /**
   * @brief  This function set the QSPI memory in 4-byte address mode
   * @param  hqspi: QSPI handle
   * @retval None
   */
-static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi)
-{
-  QSPI_CommandTypeDef s_command;
+//static void QSPI_EnterFourBytesAddress(QSPI_HandleTypeDef *hqspi)
+//{
+//  QSPI_CommandTypeDef s_command;
 
-  /* Initialize the command */
-  s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
-  s_command.Instruction       = ENTER_4_BYTE_ADDR_MODE_CMD;
-  s_command.AddressMode       = QSPI_ADDRESS_NONE;
-  s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
-  s_command.DataMode          = QSPI_DATA_NONE;
-  s_command.DummyCycles       = 0;
-  s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
-  s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
-  s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
+//  /* Initialize the command */
+//  s_command.InstructionMode   = QSPI_INSTRUCTION_1_LINE;
+//  s_command.Instruction       = ENTER_4_BYTE_ADDR_MODE_CMD;
+//  s_command.AddressMode       = QSPI_ADDRESS_NONE;
+//  s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+//  s_command.DataMode          = QSPI_DATA_NONE;
+//  s_command.DummyCycles       = 0;
+//  s_command.DdrMode           = QSPI_DDR_MODE_DISABLE;
+//  s_command.DdrHoldHalfCycle  = QSPI_DDR_HHC_ANALOG_DELAY;
+//  s_command.SIOOMode          = QSPI_SIOO_INST_EVERY_CMD;
 
-  /* Enable write operations */
-  QSPI_WriteEnable(hqspi);
-  
-  /* Send the command */
-  if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
-  {
-     Error_Handler(__FILE__, __LINE__);;
-  }
+//  /* Enable write operations */
+//  QSPI_WriteEnable(hqspi);
+//  
+//  /* Send the command */
+//  if (HAL_QSPI_Command(hqspi, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+//  {
+//     Error_Handler(__FILE__, __LINE__);;
+//  }
 
-  /* Configure automatic polling mode to wait the memory is ready */
-  QSPI_AutoPollingMemReady(hqspi);
+//  /* Configure automatic polling mode to wait the memory is ready */
+//  QSPI_AutoPollingMemReady(hqspi);
 
-}
+//}
 
 /*
 *********************************************************************************************************

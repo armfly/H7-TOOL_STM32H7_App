@@ -29,6 +29,7 @@
 #include "status_tvcc_power.h"
 #include "status_pulse_meter.h"
 #include "status_extend_menu.h"
+#include "status_mini_dso.h"
 #include "status_lua.h"
 
 #include "wifi_if.h"
@@ -46,6 +47,7 @@
 //#include "usbd_user.h"
 #include "usb_if.h"
 #include "file_lib.h"
+#include "elf_file.h"
 
 static void DispLogo(void);
 uint16_t GetStatusIndex(uint16_t _NowStatus);
@@ -62,7 +64,7 @@ static const uint16_t StatusOrder[] =
     MS_TEMP_METER,       /* 温度表 */
     MS_TVCC_POWER,       /* 微型数控电源 */   
     MS_PULSE_METER,      /* 脉冲计 */
-    MS_EXTEND_INIT,      /* 扩展菜单 */    
+    MS_MINI_DSO,         /* 迷你示波器 */    
 };
 
 /*
@@ -81,6 +83,20 @@ int main(void)
     PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LED一直闪烁, 非阻塞 */
 
     DispLogo();
+    
+//    /* TEST CRC32 */
+//    {
+//        static uint32_t crc1, crc2, crc3;
+//        
+//        while (1)
+//        {
+//            crc1 = CRC32Software((uint8_t *)0x08000000, 32);
+//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 8);
+//                
+//            crc3 = calculate_CRC32((uint8_t *)0x08000000, 512*1024);
+//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 512*1024 / 4);
+//        }
+//    }
     
     bsp_InitESP32();
 
@@ -144,10 +160,18 @@ int main(void)
             status_FileManage();
             break;
 
-        case MS_PROG_WORK:      /* 脱机下载器 */
+        case MS_PROG_SELECT_FILE:    /* 脱机下载器 - 选择文件 */
+            status_ProgSelectFile();
+            break;  
+                
+        case MS_PROG_WORK:          /* 脱机下载器 - 工作阶段 */
             status_ProgWork();
-            break;        
+            break;     
 
+        case MS_PROG_SETTING:       /* 脱机下载器 - 参数设置 */
+            status_ProgSetting();
+            break;   
+                
         case MS_VOLTAGE_METER:  /* 电压表 */
             status_VoltageMeter();
             break;
@@ -172,8 +196,8 @@ int main(void)
             status_PulseMeter();
             break;  
         
-        case MS_EXTEND_INIT:    /* 扩展菜单，显示 */
-            status_ExtendInit();
+        case MS_MINI_DSO:    /* 扩展菜单，显示 */
+            status_MiniDSO();
             break;
 
         case MS_EXTEND_MENU1:    /* 扩展菜单，第1级 */
@@ -401,7 +425,6 @@ void DispHeader2(uint8_t _idx, char *_str)
 void DispHeaderStr(char *_str)
 {
     FONT_T tFont;
-    char buf[48];
 
     /* 设置字体参数 */
     {
@@ -557,6 +580,7 @@ void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActiv
     FONT_T tFont;    
     uint16_t x;
     uint16_t y;
+    uint16_t NameWidth;
     
     /* 设置字体参数 */
     {
@@ -583,9 +607,11 @@ void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActiv
     tFont.FrontColor = MEAS_NAME_COLOR;
     LCD_DispStr(MEAS_WIN_LEFT + 5, y + 4, _pName, &tFont);
 
+    NameWidth = LCD_GetStrWidth(_pName, &tFont);
+    
     /* 测量值 */
     tFont.FrontColor = MEAS_VALUE_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 120, y + 4, _pValue, &tFont);    
+    LCD_DispStr(MEAS_WIN_LEFT + 5 + NameWidth + 5, y + 4, _pValue, &tFont);    
 }
 
 /*
@@ -597,14 +623,14 @@ void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActiv
 *               _usHeight : 高度
 *               _usWidth : 宽度
 *               _str : 显示文字
-*               _ucPercent : 百分比
+*               _Percent : 百分比, 浮点数
 *               tFont : 字体
 *    返 回 值: 无
 *********************************************************************************************************
 */
 extern uint8_t s_DispRefresh;
 void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-    char *_str, uint8_t _ucPercent, FONT_T *_tFont)    
+    char *_str, float _Percent, FONT_T *_tFont)    
 {   
     uint16_t width;
     char buf[16];
@@ -612,14 +638,19 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
     uint16_t StrHeight;
     uint16_t x, y;
     
-    width = ((_usWidth - 4) * _ucPercent) / 100;
+    if (_Percent > 100)
+    {
+        _Percent = 100;
+    }
+    
+    width = ((_usWidth - 4) * _Percent) / 100;
     
     /* 填充矩形 */
     LCD_DrawRect(_usX,          _usY,     _usHeight,     _usWidth,  PROGRESS_BODER_COLOR);
     
     LCD_Fill_Rect(_usX + 2,     _usY + 2, _usHeight - 4, width,     PROGRESS_BACK_COLOR1);
     
-    if (_ucPercent < 100)
+    if (_Percent < 100)
     {
         LCD_Fill_Rect(_usX + width + 2, _usY + 2, _usHeight - 4, _usWidth - width - 4, PROGRESS_BACK_COLOR2); 
     }
@@ -628,7 +659,7 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
     y = _usY + (_usHeight - StrHeight) / 2;
     if (_str[0] == 0)   /* 居中显示百分比文字 */
     {              
-        sprintf(buf, "%02d%%", _ucPercent);
+        sprintf(buf, "%0.0f%%", _Percent);
         StrWidth = LCD_GetStrWidth(buf, _tFont);
         x = _usX + (_usWidth - StrWidth) / 2;
         LCD_DispStr(x, y, buf, _tFont);  
