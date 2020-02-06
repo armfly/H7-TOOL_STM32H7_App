@@ -85,7 +85,7 @@ static int qspi_write(lua_State* L)
     
     if (lua_type(L, 2) == LUA_TSTRING)     /* 判断第1个参数 */
     {        
-        data = luaL_checklstring(L, 2, &len); /* 1是参数的位置， len是stri        的长度 */        
+        data = luaL_checklstring(L, 2, &len); /* 1是参数的位置， len是string的长度 */        
     }
     
     if (len > QSPI_PAGE_SIZE)
@@ -120,7 +120,7 @@ static int qspi_read(lua_State* L)
 
     if (lua_type(L, 1) == LUA_TNUMBER)     /* 判断第1个参数 */
     {        
-        addr = luaL_checknumber(L, 1); /* 1是参数的位置， len是stri              的长度 */        
+        addr = luaL_checknumber(L, 1); /* 1是参数的位置， len是string的长度 */        
     }
     
     if (lua_type(L, 2) == LUA_TNUMBER) /* 判断第2个参数 */

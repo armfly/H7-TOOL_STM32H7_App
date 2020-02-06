@@ -95,11 +95,11 @@ typedef struct
     uint32_t TestWord;          /*　测试单元，用于检测eepromg功能 */
     uint8_t NtcType;            /* NTC热敏电阻类型 0 = 10K_B3950，1 = 100K_B3950 */
     
-    /* V2.04追加 */
     uint8_t KeyToneEnable;
     uint8_t UIStyle;            /* UI风格 */
     uint16_t LcdSleepTime;      /* 屏保时间 */
     
+    uint8_t FileListFont24;     /* 1表示24点阵显示文件列表，0表示16点阵 */
 } PARAM_T;
 
 /* 模拟量校准参数 */

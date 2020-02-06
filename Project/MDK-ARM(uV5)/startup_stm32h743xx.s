@@ -33,7 +33,7 @@
 ;   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Stack_Size		EQU     0x9200
+Stack_Size		EQU     0x7000
 
                 AREA    STACK, NOINIT, READWRITE, ALIGN=3
 Stack_Mem       SPACE   Stack_Size
@@ -44,7 +44,7 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size      EQU     0x00020000	;0x00012000 ?
+Heap_Size      EQU     0x0001F000	;0x00012000 ?
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
@@ -68,7 +68,7 @@ __Vectors       DCD     __initial_sp                      ; Top of Stack
                 DCD     MemManage_Handler                 ; MPU Fault Handler
                 DCD     BusFault_Handler                  ; Bus Fault Handler
                 DCD     UsageFault_Handler                ; Usage Fault Handler
-                DCD     0x00000107                        ; Reserved H7-TOOL APP 固件版本
+                DCD     0x00000108                        ; Reserved H7-TOOL APP 固件版本
                 DCD     0                                 ; Reserved
                 DCD     0                                 ; Reserved
                 DCD     0                                 ; Reserved

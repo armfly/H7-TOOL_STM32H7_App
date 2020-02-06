@@ -135,7 +135,7 @@ void status_SystemSetMain(void)
             case KEY_LONG_DOWN_C: /* C键长按 */
                 PlayKeyTone();
                 s_enter_sub_menu = 0;
-                g_MainStatus = MS_LINK_MODE;
+                g_MainStatus = MS_EXTEND_MENU1;
                 break;
 
             default:
@@ -366,7 +366,7 @@ void status_HardInfo(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-#define PARAM_NUM       3
+#define PARAM_NUM       4
 void status_ModifyParam(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */
@@ -448,6 +448,28 @@ void status_ModifyParam(void)
                     sprintf(buf, "%3d 分钟", min);
                 }
                 DispParamBar(2, "3 屏 保:", buf, active);
+            }      
+            
+            /* 第3个参数 - 文件列表字体  */
+            {
+                if (cursor == 3)
+                {
+                    active = 1;       
+                }
+                else 
+                {
+                    active = 0;
+                }
+                
+                if (g_tParam.FileListFont24 == 1)
+                {
+                    sprintf(buf, "24点阵");
+                }
+                else
+                {
+                    sprintf(buf, "16点阵");
+                }
+                DispParamBar(3, "4 列表字体:", buf, active);
             }             
         }
         
@@ -493,6 +515,17 @@ void status_ModifyParam(void)
                     {
                         g_tParam.LcdSleepTime = 4;
                     }
+                }  
+                else if (cursor == 3)
+                {
+                    if (g_tParam.FileListFont24 == 0)
+                    {
+                        g_tParam.FileListFont24 = 1;
+                    } 
+                    else
+                    {
+                        g_tParam.FileListFont24 = 0;
+                    }
                 }                 
                 fRefresh = 1;
                 fSaveParam = 1;
@@ -527,6 +560,17 @@ void status_ModifyParam(void)
                     {
                         g_tParam.LcdSleepTime = 0;
                     } 
+                }         
+                else if (cursor == 3)
+                {
+                    if (g_tParam.FileListFont24 == 0)
+                    {
+                        g_tParam.FileListFont24 = 1;
+                    } 
+                    else
+                    {
+                        g_tParam.FileListFont24 = 0;
+                    }
                 }                 
                 fRefresh = 1;
                 fSaveParam = 1;

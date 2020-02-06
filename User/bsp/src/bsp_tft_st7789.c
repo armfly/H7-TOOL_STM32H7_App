@@ -20,6 +20,8 @@
 #include "fonts.h"
 #include "param.h"
 
+#define LCD_DMA_CIRCULE_MODE    0
+
 /*
     H7-TOOL LCD口线分配
     ----- 第6版 -----
@@ -112,7 +114,7 @@ static void ST7789_SendByteQuick(uint8_t data);
 
 SPI_HandleTypeDef hspi5 = {0};
 DMA_HandleTypeDef hdma_tx = {0};
-__IO uint32_t wTransferState = 0;
+__IO uint32_t wTransferState = 99;
 
 static uint16_t *s_pDispBuf;
 static uint8_t s_DispRefresh = 0;
@@ -184,7 +186,13 @@ void bsp_InitSPI5ParamFast(void)
 	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
 	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_HALFWORD;
-	hdma_tx.Init.Mode                = DMA_NORMAL;
+    
+    #if LCD_DMA_CIRCULE_MODE == 1
+        hdma_tx.Init.Mode            = DMA_CIRCULAR;
+    #else
+        hdma_tx.Init.Mode            = DMA_NORMAL; 
+    #endif
+    
 	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
 
 	HAL_DMA_Init(&hdma_tx);
@@ -238,6 +246,8 @@ void bsp_InitSPI5_Fast(void)
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
 	wTransferState = 1;
+    
+    LCD_CS_1();
 }
 
 void DMA2_Stream3_IRQHandler(void)
@@ -303,26 +313,55 @@ static void ST7789_ConfigGPIO(void)
 */
 void ST7789_DrawScreen(void)
 {
+ #if LCD_DMA_CIRCULE_MODE == 1
+    static uint8_t first_run = 1;
+    
+    if (first_run == 1)
+    {
+        first_run = 0;       
+
+        ST7789_SetDispWin(0, 0, 240, 240);
+
+        bsp_InitSPI5ParamFast();
+        LCD_RS_1();
+        LCD_CS_0();
+
+        wTransferState = 0; 
+//        SCB_CleanInvalidateDCache();
+
+        HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);     
+    }
+#else    
+    static int32_t s_time1 = 0;
+    
     if (s_DispRefresh == 0)
     {
         return;
     }
     
+    /* 控制刷屏周期，限制最快50ms */
+    if (bsp_CheckRunTime(s_time1) < 50)
+    {
+         return;
+    }   
+    
+    /* 放到前面判断 */
+    while (wTransferState == 0){}    
+        
     s_DispRefresh = 0;
     
     ST7789_SetDispWin(0, 0, 240, 240);
 
 	bsp_InitSPI5ParamFast();
     LCD_RS_1();
-    LCD_CS_0();
+    LCD_CS_0();     /* 在DMA传输完毕后设置1 */
 	
 	wTransferState = 0; 
-	SCB_CleanInvalidateDCache();
-	
+        
 	HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);
-	while (wTransferState == 0){}
-		
-    LCD_CS_1();
+        
+    s_time1 = bsp_GetRunTime();
+#endif    
 }
 
 /*写指令到 LCD 模块*/
@@ -673,7 +712,20 @@ void ST7789_QuitWinMode(void)
 */
 void ST7789_DispOn(void)
 {
+#if LCD_DMA_CIRCULE_MODE == 1
+    LCD_CS_1();
+    Lcd_WriteIndex(0x11);    
+    
+    ST7789_SetDispWin(0, 0, 240, 240);
+
+    bsp_InitSPI5ParamFast();
+    LCD_RS_1();
+    LCD_CS_0();
+
+    HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);  
+#else    
     Lcd_WriteIndex(0x11);
+#endif    
 }
 
 /*
@@ -686,7 +738,14 @@ void ST7789_DispOn(void)
 */
 void ST7789_DispOff(void)
 {
+#if LCD_DMA_CIRCULE_MODE == 1
+    LCD_CS_1();
+    Lcd_WriteIndex(0x10);    
+    
+    HAL_SPI_Abort(&hspi5);
+#else      
     Lcd_WriteIndex(0x10);
+#endif    
 }
 
 /*
@@ -722,8 +781,14 @@ void ST7789_ClrScr(uint16_t _usColor)
 */
 void ST7789_PutPixel(uint16_t _usX, uint16_t _usY, uint16_t _usColor)
 {
-    #if 1    
-        s_pDispBuf[_usY * 240 + _usX] = _usColor;
+    #if 1
+        uint32_t idx;
+    
+        idx = _usY * 240 + _usX;
+        if (idx < 240 * 240 * 2)
+        {
+            s_pDispBuf[idx] = _usColor;
+        }
     #else
         ST7789_SetDispWin(_usX, _usY, 1, 1);
         Lcd_WriteData_16(_usColor);    
@@ -958,10 +1023,22 @@ void ST7789_FillRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 {
 #if 1
     uint16_t i, j;
+    uint16_t width, height;
     
-    for (i = 0; i < _usWidth; i++)
+    width = _usWidth;
+    height = _usHeight;
+    if (height > g_LcdHeight)
     {
-        for (j = 0; j < _usHeight; j++)
+        height = g_LcdHeight;
+    }
+    if (width > g_LcdWidth)
+    {
+        width = g_LcdWidth;
+    }   
+
+    for (i = 0; i < width; i++)
+    {
+        for (j = 0; j < height; j++)
         {
             ST7789_PutPixel(_usX + i, _usY + j, _usColor);
         }

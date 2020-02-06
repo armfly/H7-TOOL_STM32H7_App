@@ -119,6 +119,7 @@ void usbd_CloseCDC(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern void bsp_DelayMS(uint32_t n);
 void usbd_OpenMassStorage(void)
 {
     {

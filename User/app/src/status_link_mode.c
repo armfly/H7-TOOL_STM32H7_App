@@ -54,7 +54,7 @@ void status_LinkMode(void)
     uint8_t LastMinute = 99;
 
     DispHeader("联机模式");
-    DispHelpBar("长按S进入系统设置",
+    DispHelpBar("长按S进入扩展功能",
                 "长按C切换方向");  
     
     usbd_CloseCDC();
@@ -103,7 +103,7 @@ void status_LinkMode(void)
 
             case KEY_LONG_DOWN_S:   /* S键长按 */
                 PlayKeyTone();
-                g_MainStatus = MS_SYSTEM_SET;
+                g_MainStatus = MS_EXTEND_MENU1;
                 break;
 
             case KEY_DOWN_C:        /* C键按下 */

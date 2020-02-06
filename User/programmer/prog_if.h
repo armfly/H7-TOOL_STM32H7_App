@@ -14,30 +14,63 @@
 #ifndef __PROG_IF_H_
 #define __PROG_IF_H_
 
-#define DEV_SYS 1
-#define DEV_GPIO 2
-#define DEV_TIM 3
-#define DEV_DAC 4
-#define DEV_ADC 5
-#define DEV_I2C 6
-#define DEV_SPI 7
-#define DEV_UART 8
-#define DEV_485 9
-#define DEV_CAN 10
-#define DEV_SWD 11
+/* 编程过程中输出的消息 */
+enum
+{
+    PG_MSG_TEXT = 0,            /* 输出文本 */
+    PG_MSG_ERASE_PROGRESS,      /* 擦除进度消息 */
+    PG_MSG_PROG_PROGRESS,       /* 编程进度消息 */
+    PG_MSG_VERIFY_PROGRESS,     /* 校验进度消息 */
+    PG_MSG_TIME,                /* 已运行时间，ms单位 */
+};
 
-#define I2C_START (DEV_I2C + 00)
-#define I2C_STOP (DEV_I2C + 01)
-#define I2C_SEND_BYTE (DEV_I2C + 02)
-#define I2C_SEND_BYTES (DEV_I2C + 03)
-#define I2C_READ_BYTES (DEV_I2C + 04)
+typedef struct 
+{
+    char FilePath[128];     /* lua文件路径 */    
+    
+    uint32_t Time;
+    
+    uint32_t EraseChipTime1;
+    uint32_t EraseChipTime2;
+    
+    uint8_t Err;
+    
+    uint32_t FLMFuncTimeout;    /* 执行算法函数超时时间。擦除整片时可能耗时20秒 */
+    uint8_t FLMEraseChipFlag;   /* 临时处理，正在擦除全片*/
 
-void PG_Poll(void);
+    uint8_t AutoStart;      /* 检测到芯片后自动开始编程 */
+    
+    int32_t NowProgCount;   /* 编程次数。掉电清零 */
+    
+    uint8_t UidEnable;      /* 编程时是否填充UID */
+    uint32_t UidAddr;       /* 加密后的UID存储地址 */
+    const char *UidData;    /* UID数据缓冲区指针，由Lua生成 */
+    uint16_t UidLen;        /* UID数据缓冲区长度 */
+    uint8_t UidBlank;       /* 空标志 */
+    
+    uint8_t UsrEnable;      /* 编程时是否填充用户指定数据 */    
+    uint32_t UsrAddr;       /* 用户数据存储地址 */
+    const char *UsrData;    /* 用户数据缓冲区指针，由Lua生成 */
+    uint16_t UsrLen;        /* 用户数据缓冲区长度 */
+    uint8_t UsrBlank;       /* 空标志 */
+    
+    uint8_t SnEnable;       /* 编程时是否填充SN */
+    uint32_t SnAddr;        /* SN数据存储地址 */
+    const char *SnData;     /* SN数据缓冲区指针，由Lua生成 */
+    uint16_t SnLen;         /* SN数据缓冲区长度 */ 
+    uint8_t SndBlank;       /* 空标志 */    
+    
+}OFFLINE_PROG_T;
 
-void PG_Install(uint16_t _addr, uint8_t *_buf, uint16_t _len, uint16_t _total_len);
-uint8_t PG_WaitRunCompleted(uint16_t _usTimeout);
 
-extern uint8_t s_prog_ack_buf[2 * 1024];
-extern uint16_t s_prog_ack_len;
+extern OFFLINE_PROG_T g_tProg;
+
+uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr);
+
+uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, uint8_t _Mode);
+uint16_t PG_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen);
+
+uint16_t PG_EraseChip(uint32_t _FlashAddr);
+void DispProgProgress(char *_str, float _progress);
 
 #endif

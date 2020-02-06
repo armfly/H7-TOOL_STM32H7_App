@@ -28,6 +28,9 @@
 #include "IO_Config.h"
 #include "bsp.h"
 
+
+#define SPI_MODE_ENABLE        0                            /* 1 Ë°®Á§∫SPIÊ®°ÂºèÔºå 0Ë°®Á§∫GPIOÊ®°Âºè */
+
 //#include "uart.h"
 
 //#include "debug_cm.h"
@@ -437,12 +440,17 @@ static __forceinline uint32_t PIN_SWDIO_IN(void)
 /** SWDIO I/O pin: Set Output (used in SWD mode only).
 \param bit Output value for the SWDIO DAP hardware I/O pin.
 */
+
 static __forceinline void PIN_SWDIO_OUT(uint32_t bit)
 {
     if (bit & 1)
+    {
         BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
+    }
     else
+    {
         BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
+    }
 }
 
 /** SWDIO I/O pin: Switch to Output mode (used in SWD mode only).
@@ -631,7 +639,9 @@ static __inline void DAP_SETUP(void)
     
     EIO_D2_Config(ES_GPIO_OUT);        /* ≤‚ ‘“˝Ω≈ -  ‰≥ˆ */
     
-    bsp_InitSPI2_Fast();
+    #if SPI_MODE_ENABLE == 1
+        bsp_InitSPI2_Fast();
+    #endif
 }
 
 /** Reset Target Device with custom specific I/O pin or command sequence.

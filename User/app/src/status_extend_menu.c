@@ -22,7 +22,7 @@ const uint8_t *g_Menu1_Text[] =
     " 1 脱机烧录器",
     " 2 LUA小程序",
     " 3 数据记录仪",
-
+    " 4 系统设置",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -44,22 +44,23 @@ MENU_T g_tMenuRec;
 
 /*
 *********************************************************************************************************
-*    函 数 名: status_ExtendInit
-*    功能说明: 扩展功能菜单,仅显示出来. 长按开始选择
+*    函 数 名: status_ExtendMenu1
+*    功能说明: 扩展功能菜单- 第1级
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
 */
-void status_ExtendInit(void)
+void status_ExtendMenu1(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */
     uint8_t fRefresh;
     static uint8_t s_MenuInit = 0;
     
-    DispHeader("扩展功能");
-    DispHelpBar("长按S开始选择",
-                "长按C:快捷键(上次选择）"); 
 
+    DispHeader("扩展功能");
+//    DispHelpBar("",
+//                ""); 
+    
     if (s_MenuInit == 0)
     {
         s_MenuInit = 1;
@@ -75,88 +76,7 @@ void status_ExtendInit(void)
         g_tMenu1.RollBackEn = 1;  /* 允许回滚 */
         g_tMenu1.GBK = 0;
         LCD_InitMenu(&g_tMenu1, (char **)g_Menu1_Text); /* 初始化菜单结构 */
-    }
-    LCD_DispMenu2(&g_tMenu1);
-    
-    fRefresh = 1;
-    while (g_MainStatus == MS_EXTEND_INIT)
-    {
-        if (fRefresh) /* 刷新整个界面 */
-        {
-            fRefresh = 0;
-        }
-
-        bsp_Idle();
-        
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
-        {
-            /* 有键按下 */
-            switch (ucKeyCode)
-            {
-            case KEY_DOWN_S:    /* S键按下 */
-                break;
-
-            case KEY_UP_S:      /* S键释放 */
-                g_MainStatus = LastStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_S:    /* S键长按 */
-                g_MainStatus = MS_EXTEND_MENU1;
-                break;
-
-            case KEY_DOWN_C:    /* C键按下 */
-                break;
-
-            case KEY_UP_C:      /* C键释放 */
-                g_MainStatus = NextStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_C:    /* C键长按 - 快捷键 */
-                PlayKeyTone();
-
-                if (g_tMenu1.Cursor == 0)
-                {
-                    g_MainStatus = MS_PROG_WORK;
-                }
-//                else if (g_tMenu1.Cursor == 1)
-//                {
-//                    g_MainStatus = MS_MODIFY_PARAM;
-//                }
-//                else if (g_tMenu1.Cursor == 2)
-//                {
-//                    g_MainStatus = MS_ESP32_TEST;
-//                }
-//                else if (g_tMenu1.Cursor == 3)
-//                {
-//                    g_MainStatus = MS_USB_EMMC;
-//                }                 
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: status_ExtendMenu1
-*    功能说明: 扩展功能菜单- 第1级
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void status_ExtendMenu1(void)
-{
-    uint8_t ucKeyCode; /* 按键代码 */
-    uint8_t fRefresh;
-
-    DispHeader("请选择");
-    DispHelpBar("",
-                ""); 
-    
+    }    
     LCD_DispMenu(&g_tMenu1);
 
     fRefresh = 1;
@@ -198,7 +118,11 @@ void status_ExtendMenu1(void)
                 else if (g_tMenu1.Cursor == 2)
                 {
                     g_MainStatus = MS_EXTEND_MENU_REC;
-                }                               
+                }   
+                else if (g_tMenu1.Cursor == 3)
+                {
+                    g_MainStatus = MS_SYSTEM_SET;
+                }                 
                 break;
 
             case KEY_UP_C: /* C键 下 */
@@ -250,8 +174,8 @@ void status_ExtendMenuRec(void)
     LCD_DispMenu(&g_tMenuRec);
     
     DispHeader("请选择");
-    DispHelpBar("",
-                ""); 
+//    DispHelpBar("",
+//                ""); 
     
     LCD_DispMenu(&g_tMenuRec);
 
@@ -307,7 +231,7 @@ void status_ExtendMenuRec(void)
 
             case KEY_LONG_DOWN_C: /* C键长按 */
                 PlayKeyTone();
-                g_MainStatus = MS_LINK_MODE;
+                g_MainStatus = MS_EXTEND_MENU1;
                 break;
 
             default:

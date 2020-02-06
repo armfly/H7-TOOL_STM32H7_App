@@ -19,17 +19,6 @@
 #include "file_lib.h"
 #include "lua_if.h"
 
-/* Lua程序根目录 */
-#define LUA_ROOT_DIR    "0:/H7-TOOL/Lua"
-
-uint8_t *g_MenuLua_Text[FILE_MAX_NUM + 1] =
-{
-    /* 结束符号, 用于菜单函数自动识别菜单项个数 */
-    "&"
-};
-
-MENU_T g_tMenuLua;
-
 /*
 *********************************************************************************************************
 *    函 数 名: status_LuaSelectFile
@@ -40,133 +29,7 @@ MENU_T g_tMenuLua;
 */
 void status_LuaSelectFile(void)
 {
-    uint8_t ucKeyCode; /* 按键代码 */
-    uint8_t fRefresh;
-    uint8_t fListDir;
-    uint32_t i;
-    
-    DispHeader("文件浏览器");
-    
-    LCD_DispMenu(&g_tMenuLua);
-
-    strcpy(g_tFileList.Path, LUA_ROOT_DIR);
-    
-    fRefresh = 0;
-    fListDir = 1;
-    while (g_MainStatus == MS_LUA_SELECT_FILE)
-    {
-        if (fRefresh) /* 刷新整个界面 */
-        {
-            fRefresh = 0;
-            
-            LCD_ClearMenu(&g_tMenuLua);
-            LCD_DispMenu(&g_tMenuLua);
-        }
-
-        if (fListDir == 1)
-        {
-            fListDir = 0;
-            
-            ListDir(g_tFileList.Path);
-            
-            g_tMenuLua.Left = MENU_LEFT;
-            g_tMenuLua.Top = MENU_TOP;
-            g_tMenuLua.Height = MENU_HEIGHT;
-            g_tMenuLua.Width = MENU_WIDTH;
-            g_tMenuLua.LineCap = MENU_CAP;
-            g_tMenuLua.ViewLine = 7;
-            g_tMenuLua.Font.FontCode = FC_ST_24;
-            g_tMenuLua.Font.Space = 0;            
-            g_tMenuLua.RollBackEn = 1;
-            g_tMenuLua.GBK = 1;
-            
-            for (i = 0; i < g_tFileList.Count; i++)
-            {
-                g_MenuLua_Text[i] = (uint8_t *)g_tFileList.Name[i];
-            }
-            g_MenuLua_Text[i] = "&";
-                            
-            LCD_InitMenu(&g_tMenuLua, (char **)g_MenuLua_Text); /* 初始化菜单结构 */
-            
-            if (g_tFileList.Count >= 2)
-            {
-                g_tMenuLua.Cursor = 1;
-            }
-            else
-            {
-                g_tMenuLua.Cursor  = 0;     /* 光标初始位置设置为返回上级 */
-            }
-            
-            fRefresh = 1;
-        }
-        
-        bsp_Idle();
-        
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
-        {
-            /* 有键按下 */
-            switch (ucKeyCode)
-            {
-                case KEY_UP_S:          /* S键 上 */
-                    LCD_MoveUpMenu(&g_tMenuLua);
-                    break;
-
-                case KEY_LONG_DOWN_S:   /* S键 长按 */      
-                    if (g_tMenuLua.Cursor == 0)     /* 返回上级 */
-                    {
-                        uint8_t len;
-                        
-                        /* 0:/H7-TOOL/Lua */
-                        len = strlen(g_tFileList.Path);
-                        if (len <= sizeof(LUA_ROOT_DIR))   /* 已经在根目录了，退出 */
-                        {
-                            g_MainStatus = MS_EXTEND_MENU1;
-                        }
-                        else    /* 还在子目录 */
-                        {                        
-                            for (i = len - 1; i > 2; i--)
-                            {
-                                if (g_tFileList.Path[i] == '/')
-                                {
-                                    g_tFileList.Path[i] = 0;
-                                    fListDir = 1;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else 
-                    {
-                        if (g_tFileList.Type[g_tMenuLua.Cursor] == 0)   /* 目录 */
-                        {
-                            /* 路径后面追加目录 */
-                            strcat(g_tFileList.Path, "/");
-                            strcat(g_tFileList.Path, g_tFileList.Name[g_tMenuLua.Cursor]);
-                            fListDir = 1;
-                        }
-                        else    /* 文件 */
-                        {
-                            strcat(g_tFileList.Path, "/");
-                            strcat(g_tFileList.Path, g_tFileList.Name[g_tMenuLua.Cursor]);
-                            g_MainStatus = MS_LUA_EXEC_FILE;
-                        }
-                    }
-                    break;
-
-                case KEY_UP_C:          /* C键 下 */
-                    LCD_MoveDownMenu(&g_tMenuLua);
-                    break;
-
-                case KEY_LONG_DOWN_C:   /* C键长按 */
-                    g_MainStatus = MS_LINK_MODE;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    } 
+    SelectFile(LUA_ROOT_DIR, MS_LUA_SELECT_FILE, MS_EXTEND_MENU1, "*.lua");
 }
 
 /*
@@ -289,11 +152,10 @@ void FindBtnNoteCmd(void)
 			}
 		}
 	}
-
 }
 
 char g_OutText[2 * 1024] = {0}; /* 最多支持2K字节文本缓存 */
-MEMO_T g_LuaMemo;
+MEMO_T g_LuaMemo = {0};
 void status_LuaRun(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */

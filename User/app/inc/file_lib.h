@@ -14,6 +14,18 @@
 #include "ff_gen_drv.h"
 #include "sd_diskio_dma.h"
 
+/* Lua程序根目录 */
+#define LUA_ROOT_DIR    "0:/H7-TOOL/Lua"
+
+/* 脱机编程器用户文件目录 */
+#define PROG_USER_DIR    "0:/H7-TOOL/Programmer/User"
+
+/* 脱机编程器算法文件目录 */
+#define PROG_FLM_DIR    "0:/H7-TOOL/Programmer/FLM"
+
+/* 脱机编程器启动配置文件 */
+#define PROG_AUTORUN_FILE    "0:/H7-TOOL/Programmer/User/autorun.ini"
+
 /* 静态分配，单个目录下最多100个文件 */
 #define FILE_MAX_NUM        100
 #define FILE_NAME_MAX_LEN   32      /* 32字符, 只显示前面16字符 */
@@ -27,26 +39,53 @@ typedef struct
     char Path[200];     
 }FILE_LIST_T;
 
-extern FILE_LIST_T g_tFileList;
+/* prog ini文件结构 */
+typedef struct
+{
+    uint32_t Locked;            /* 程序锁死标志，1表示锁死，需要人工解除 */
 
+    uint32_t ProgramLimit;      /* 烧录次数限制 0表示不限制 */
+    uint32_t ProgrammedCount;
+    
+    uint32_t ProductSN;         /* 产品序号（整数部分） */
+    
+    uint32_t LastTotalTime;     /* 上次编程总时间 */
+    uint32_t LastEraseChipTime; /* 擦除整片的时间，仅仅用于进度指示. 按扇区擦除时不用这个变量 */
+}PROG_INI_T;
+
+extern PROG_INI_T g_tProgIni;
+extern FILE_LIST_T g_tFileList;
 
 extern FATFS fs;
 extern FIL g_file;
-extern char FsReadBuf[1024];
+extern char FsReadBuf[16*1024];
 extern char FsWriteBuf[1024];
 
 extern DIR DirInf;
 extern FILINFO FileInf;
 extern char DiskPath[4];   /* SD卡逻辑驱动路径，比盘符0，就是"0:/" */
 
+
 void FileSystemLoad(void);
 void FileSystemUnLoad(void);
-uint8_t CreateNewFile(char *_FileName);
-uint8_t CloseFile(FIL *_file);
 uint8_t DeleteFile(char *_Path);
-uint8_t ReadFile(FIL* fp, void* buff, UINT btr, UINT* br);
-uint8_t WriteFile(FIL* fp, const void* buff, UINT btw, UINT* bw);
-uint8_t OpenFile(FIL* fp, char *_Path);
-void ListDir(char *_Path);
-uint32_t ReadFileToMem(char *_Path, char *_Buff, uint32_t _MaxLen);
+void ListDir(char *_Path, char *_Filter);
+uint32_t ReadFileToMem(char *_Path, uint32_t _offset, char *_Buff, uint32_t _MaxLen);
+uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, char *_Filter);
+
+uint32_t GetFileSize(char *_Path);
+uint8_t CheckFileNamePostfix(char *_Path, char *_Filter);
+void GetDirOfFileName(char *_Path, char *_Dir);
+void FixFileName(char *_Path);
+
+
+void ini_ReadString(const char *_IniBuf, const char *_ParamName, char *_OutBuff, int32_t _BuffSize);
+int32_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName);
+void ini_WriteString(const char *_IniBuf, const char *_ParamName, const char *_NewStr, uint32_t _IniBufSize);
+void ini_WriteInteger(const char *_IniBuf, const char *_ParamName, int _IntValue, uint32_t _IniBufSize);
+int32_t ReadProgIniFile(char *_LuaPath, PROG_INI_T *pIni);
+int32_t WriteProgIniFile(char *_LuaPath, PROG_INI_T *_pIni);
+void LoadProgAutorunFile(char *_OutBuff, uint32_t _BuffSize);
+void SaveProgAutorunFile(const char *_NewStr);
+
 #endif

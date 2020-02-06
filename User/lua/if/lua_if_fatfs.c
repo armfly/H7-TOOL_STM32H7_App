@@ -61,7 +61,7 @@ static int lua_f_dir(lua_State* L)
     
     if (lua_type(L, 1) == LUA_TSTRING)     /* 判断第1个参数 */
     {        
-        data = luaL_checklstring(L, 1, &len); /* 1是参数的位置， len是stri        的长度 */        
+        data = luaL_checklstring(L, 1, &len); /* 1是参数的位置， len是string的长度 */        
     }
     
     ViewDir((char *)data);

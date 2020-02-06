@@ -28,6 +28,8 @@
 #include "DAP_config.h"
 #include "DAP.h"
 #include "target_family.h"
+#include "prog_if.h"
+#include "file_lib.h"
 
 // Default NVIC and Core debug base addresses
 // TODO: Read these addresses from ROM.
@@ -530,11 +532,11 @@ uint8_t swd_read_memory(uint32_t address, uint8_t *data, uint32_t size)
 uint8_t swd_write_memory(uint32_t address, uint8_t *data, uint32_t size)
 {
     uint32_t n = 0;
-
+    
     // Write bytes until word aligned
     while ((size > 0) && (address & 0x3)) {
         if (!swd_write_byte(address, *data)) {
-            return 0;
+            goto err_quit;
         }
 
         address++;
@@ -552,7 +554,7 @@ uint8_t swd_write_memory(uint32_t address, uint8_t *data, uint32_t size)
         }
 
         if (!swd_write_block(address, data, n)) {
-            return 0;
+           goto err_quit;;
         }
 
         address += n;
@@ -563,15 +565,17 @@ uint8_t swd_write_memory(uint32_t address, uint8_t *data, uint32_t size)
     // Write remaining bytes
     while (size > 0) {
         if (!swd_write_byte(address, *data)) {
-            return 0;
+           goto err_quit;
         }
 
         address++;
         data++;
         size--;
     }
-
     return 1;
+    
+err_quit:    
+    return 0;
 }
 
 // Execute system call.
@@ -683,8 +687,76 @@ uint8_t swd_write_core_register(uint32_t n, uint32_t val)
     return 0;
 }
 
+/*
+*********************************************************************************************************
+*    函 数 名: swd_wait_until_halted
+*    功能说明: 执行FLM中的函数，等待完成. 增加了超时控制，全局变量 g_tProg.FLMFuncTimeout
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+extern void PG_PrintPercent(float _Percent);
+extern uint8_t ProgCancelKey(void);
 static uint8_t swd_wait_until_halted(void)
 {
+#if 1
+    // Wait for target to stop
+    uint32_t val;
+    int32_t time1;
+
+    time1 = bsp_GetRunTime();
+    
+    while (1)
+    {
+        /* 擦除芯片 */
+        if (g_tProg.FLMEraseChipFlag == 1)
+        {
+            if (g_tProgIni.LastEraseChipTime == 0)
+            {
+                g_tProgIni.LastEraseChipTime = 20000;   /* 第1次缺省按20秒计算进度 */
+            }
+            
+            /* 整片擦除 */
+            {
+                int32_t tt;
+                float percent;
+                
+                tt = bsp_CheckRunTime(time1);
+                if (tt > g_tProg.FLMFuncTimeout)
+                {
+                    break;
+                }
+                else
+                {
+                    if ((tt % 250) == 0)
+                    {
+                        percent = ((float)tt / g_tProgIni.LastEraseChipTime) * 100;                
+                        PG_PrintPercent(percent);
+                    }
+                    bsp_Idle();
+                }                   
+            }
+        }
+        
+        if (!swd_read_word(DBG_HCSR, &val)) 
+        {
+            break;
+        }
+
+        if (val & S_HALT) 
+        {
+            return 1;
+        } 
+        
+        if (ProgCancelKey())
+        {
+            PG_PrintText("用户终止运行");    
+            break;         
+        }        
+    }
+
+    return 0;
+#else    
     // Wait for target to stop
     uint32_t val, i, timeout = MAX_TIMEOUT;
 
@@ -699,6 +771,7 @@ static uint8_t swd_wait_until_halted(void)
     }
 
     return 0;
+#endif    
 }
 
 uint8_t swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32_t entry, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
@@ -738,6 +811,46 @@ uint8_t swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32_t e
     }
 
     return 1;
+}
+
+uint32_t swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, uint32_t entry, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
+{
+    DEBUG_STATE state = {{0}, 0};
+    // Call flash algorithm function on target and wait for result.
+    state.r[0]     = arg1;                   // R0: Argument 1
+    state.r[1]     = arg2;                   // R1: Argument 2
+    state.r[2]     = arg3;                   // R2: Argument 3
+    state.r[3]     = arg4;                   // R3: Argument 4
+    state.r[9]     = sysCallParam->static_base;    // SB: Static Base
+    state.r[13]    = sysCallParam->stack_pointer;  // SP: Stack Pointer
+    state.r[14]    = sysCallParam->breakpoint;     // LR: Exit Point
+    state.r[15]    = entry;                        // PC: Entry Point
+    state.xpsr     = 0x01000000;          // xPSR: T = 1, ISR = 0
+
+    if (!swd_write_debug_state(&state)) {
+        return 0;
+    }
+
+    if (!swd_wait_until_halted()) {
+        return 0;
+    }
+
+    if (!swd_read_core_register(0, &state.r[0])) {
+        return 0;
+    }
+    
+    //remove the C_MASKINTS
+    if (!swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT)) {
+        return 0;
+    }
+
+//    // Flash functions return 0 if successful.
+//    if (state.r[0] != 0) {
+//        return 0;
+//    }
+
+//    return 1;
+    return state.r[0];
 }
 
 // SWD Reset
@@ -924,53 +1037,96 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
             break;
 
         case RESET_PROGRAM:
-            if (!swd_init_debug()) {
-                return 0;
-            }
-            
-            if (reset_connect == CONNECT_UNDER_RESET) {
-                // Assert reset
-                swd_set_target_reset(1); 
-                osDelay(2);
-            }
+            {
+                int k;
+                int err = 0;
+                
+                for (k = 0; k < 10; k++)
+                {
+                    err = 0;
+                    if (!swd_init_debug()) {
+                        err = 1;
+                        continue;
+                    }
+                    
+                    if (reset_connect == CONNECT_UNDER_RESET) {
+                        // Assert reset
+                        swd_set_target_reset(1); 
+                        osDelay(20);
+                    }
 
-            // Enable debug
-            while(swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN) == 0) {
-                if( --ap_retries <=0 )
-                    return 0;
-                // Target is in invalid state?
-                swd_set_target_reset(1);
-                osDelay(2);
-                swd_set_target_reset(0);
-                osDelay(2);
-            }
+                    // Enable debug
+                    while(swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN) == 0) {
+                        if( --ap_retries <=0 )
+                            return 0;
+                        // Target is in invalid state?
+                        swd_set_target_reset(1);
+                        osDelay(20);
+                        swd_set_target_reset(0);
+                        osDelay(20);
+                    }
 
-            // Enable halt on reset
-            if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
-                return 0;
-            }
-            
-            if (reset_connect == CONNECT_NORMAL) {
-                // Assert reset
-                swd_set_target_reset(1); 
-                osDelay(2);
-            }
-            
-            // Deassert reset
-            swd_set_target_reset(0);
-            osDelay(2);
-            
-            do {
-                if (!swd_read_word(DBG_HCSR, &val)) {
+                    // Enable halt on reset
+                    if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+                        err = 2;
+                        continue;
+                    }
+                    
+                    if (reset_connect == CONNECT_NORMAL) {
+                        // Assert reset
+                        swd_set_target_reset(1); 
+                        osDelay(10);
+                    }
+                    
+                    // Deassert reset
+                    swd_set_target_reset(0);
+                    osDelay(20);
+                    
+                    /* 2020-01-18 armfly 增加退出机制 */
+                    #if 1
+                    {
+                        uint32_t i;
+                        
+                        for (i = 0; i < 100000; i++)
+                        {
+                            if (!swd_read_word(DBG_HCSR, &val)) {
+                                err = 3;
+                                break;
+                            }
+                            
+                            if ((val & S_HALT) != 0)
+                            {
+                                break;
+                            }
+                        }    
+
+                        if (err > 0)
+                        {
+                            continue;   
+                        }
+                    }
+                    #else            
+                        do {
+                            if (!swd_read_word(DBG_HCSR, &val)) {
+                                return 0;
+                            }
+                        } while ((val & S_HALT) == 0);
+                    #endif
+
+                    // Disable halt on reset
+                    if (!swd_write_word(DBG_EMCR, 0)) {
+                        err = 4;
+                        continue;
+                    }  
+                    break;
+                }
+                
+                if (err > 0)
+                {
                     return 0;
                 }
-            } while ((val & S_HALT) == 0);
-
-            // Disable halt on reset
-            if (!swd_write_word(DBG_EMCR, 0)) {
-                return 0;
+                break;
             }
-
             break;
 
         case NO_DEBUG:

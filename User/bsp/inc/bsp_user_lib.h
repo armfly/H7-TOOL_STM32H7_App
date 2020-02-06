@@ -32,12 +32,15 @@ float CaculTwoPointFloat(float x1, float y1, float x2, float y2, float x);
 
 char BcdToChar(uint8_t _bcd);
 void HexToAscll(uint8_t *_pHex, char *_pAscii, uint16_t _BinBytes);
+uint16_t AsciiToHex(char *_pAscii, uint8_t *_pHex, uint16_t _MaxLen);
+
 uint32_t AsciiToUint32(char *pAscii);
 
 uint8_t CharToInt(char _ch);
 uint8_t TwoCharToInt(char *_ch);
 
 int str_to_int2(char *_pStr);
+int str_to_int3(char *_pStr);
 uint8_t ip_str_decode(char *_ipstr, uint8_t *_out);
 
 uint16_t GetHigh16OfFloat(float _ff);
@@ -46,6 +49,16 @@ uint32_t Get32BitOfFloat(float _ff);
 uint8_t float_isnan(float _ff);
 
 float BEBufToFloat(uint8_t *_pBuf);
+
+char *strlwr(char *str);
+char *strupr(char *str);
+char *StrUTF8ToGBK(char *utf8, char *gbk, uint16_t gbk_size);
+
+uint8_t CheckBlankBuf(const char *_buf, uint32_t _len, uint8_t _EmptyValue);
+
+uint32_t STM32_CRC32(uint32_t *_pBuf, uint32_t _Len);
+uint32_t CRC32Software(uint8_t *pData, uint32_t Length);
+uint32_t Calculate_CRC32(uint8_t *pStart, uint32_t uSize);
 
 #endif
 
