@@ -21,7 +21,7 @@
 #include "elf.h"
 #include "SWD_flash.h"
 #include "swd_host.h"
-
+#include "lua_if.h"
 
 /*
 Flash Programming Functions (Called by FlashOS)
@@ -43,7 +43,7 @@ extern unsigned long Verify      (unsigned long adr,   // Verify Function
 */
 
 const char *strFuncName[FUNC_NUM] = {"FlashDevice", "Init", "UnInit", "BlankCheck",
-        "EraseChip", "EraseSector", "ProgramPage", "Verify", "STM32_CRC32"};
+        "EraseChip", "EraseSector", "ProgramPage", "Verify", "STM32_CRC32","ReadExtID"};
 
 FLM_PARSE_T g_tFLM;
 
@@ -330,19 +330,19 @@ static uint8_t ELF_FillToAlgo(char *_path, program_target_t *_algo)
     //    flash_code,  // address of prog_blob
     //    0x00000400,  // ram_to_flash_bytes_to_be_written
     //};
-    uint32_t bytes;
+//    uint32_t bytes;
     
-    memcpy(FsReadBuf, (char *)BLOB_HEADER, 4 * 8);    
-    
-    if (g_tFLM.Load[0].Size + 32 > sizeof(FsReadBuf))
-    {
-        goto err;
-    }
-    bytes = ReadFileToMem(_path, g_tFLM.Load[0].Offset, FsReadBuf + 32, g_tFLM.Load[0].Size);          
-    if (bytes != g_tFLM.Load[0].Size)
-    {
-        goto err;
-    }
+//    memcpy(FsReadBuf, (char *)BLOB_HEADER, 4 * 8);    
+//    
+//    if (g_tFLM.Load[0].Size + 32 > sizeof(FsReadBuf))
+//    {
+//        goto err;
+//    }
+//    bytes = ReadFileToMem(_path, g_tFLM.Load[0].Offset, FsReadBuf + 32, g_tFLM.Load[0].Size);          
+//    if (bytes != g_tFLM.Load[0].Size)
+//    {
+//        goto err;
+//    }
     
     _algo->init = g_tFLM.Func[IDX_Init].Offset + g_AlgoRam.Addr + 32;
     _algo->uninit = g_tFLM.Func[IDX_UnInit].Offset + g_AlgoRam.Addr + 32;
@@ -366,22 +366,155 @@ static uint8_t ELF_FillToAlgo(char *_path, program_target_t *_algo)
     if (g_tFLM.Func[IDX_CaculCRC32].Offset > 0)
     {    
         _algo->cacul_crc32 = g_tFLM.Func[IDX_CaculCRC32].Offset + g_AlgoRam.Addr + 32;    
+    }  
+
+    _algo->read_extid = 0;
+    if (g_tFLM.Func[IDX_ReadExtID].Offset > 0)
+    {    
+        _algo->read_extid = g_tFLM.Func[IDX_ReadExtID].Offset + g_AlgoRam.Addr + 32;    
     } 
-    
-    _algo->sys_call_s.breakpoint = g_AlgoRam.Addr  + 1;
-    _algo->sys_call_s.static_base = g_AlgoRam.Addr + 0xC00;
-    _algo->sys_call_s.stack_pointer = g_AlgoRam.Addr + ALGO_RAM_SIZE;
-    
     
     _algo->algo_start = g_AlgoRam.Addr + g_tFLM.Load[0].Addr;
     _algo->algo_size = g_tFLM.Load[0].Size + 32;
-    _algo->algo_blob = (uint32_t *)FsReadBuf;    
+    
+    strncpy(_algo->algo_file_name, _path, sizeof(_algo->algo_file_name));
+    
     _algo->program_buffer_size = g_tFLM.Device.szPage;
-    _algo->program_buffer = g_AlgoRam.Addr + _algo->algo_size;
-    return 0;   /* 解析成功 */
+    _algo->program_buffer = g_AlgoRam.Addr + _algo->algo_size + 0;
 
-err:  
-    return 1;   /* 解析失败 */ 
+    _algo->sys_call_s.breakpoint = g_AlgoRam.Addr  + 1;
+    _algo->sys_call_s.static_base = _algo->program_buffer + _algo->program_buffer_size + 0;     /* 还有待研究，未明白用途 */
+    
+    {
+        uint32_t RamSize;
+        
+        lua_getglobal(g_Lua, "AlgoRamSize");  
+        if (lua_isinteger(g_Lua, -1)) 
+        {
+            RamSize = lua_tointeger(g_Lua, -1);
+        }
+        else
+        {
+            RamSize = 0x1000;
+        }
+        lua_pop(g_Lua, 1);        
+        _algo->sys_call_s.stack_pointer = g_AlgoRam.Addr + RamSize;    /* 设置栈顶指针 */ 
+
+        /* 打印FLM算法占用内存 */
+        {
+            printf("FLM memory Infomation :\r\n");
+            printf("  algo file : %s\r\n", _algo->algo_file_name);
+            printf("  algo ram address   : 0x%08X\r\n", _algo->algo_start);
+            printf("  algo size          : 0x%08X\r\n", _algo->algo_size);
+            printf("  buffer address     : 0x%08X\r\n", _algo->program_buffer);
+            printf("  buffer size        : 0x%08X\r\n", _algo->program_buffer_size);
+            printf("  breakpoint addres  : 0x%08X\r\n", _algo->sys_call_s.breakpoint);
+            printf("  static base adress : 0x%08X\r\n", _algo->sys_call_s.static_base);
+            printf("  stack pointer      : 0x%08X\r\n", _algo->sys_call_s.stack_pointer);
+        }
+        
+        /* 预留256字节全局变量空间和堆栈空间 */
+        if (_algo->sys_call_s.static_base + 0x100 > g_AlgoRam.Addr + RamSize)
+        {
+            printf("AlgoRamSize too small, out of memory\r\n");
+            return 1;   /* 出错 */
+        }
+    }
+    
+    return 0;   /* 解析成功 */
+}
+
+// 装载算法文件到目标MCU内存
+uint8_t LoadAlgoToTarget(void)
+{
+    const uint32_t BLOB_HEADER[] = {0xE00ABE00, 0x062D780D, 0x24084068, 0xD3000040, 0x1E644058, 0x1C49D1FA, 0x2A001E52, 0x4770D1F2};    
+    uint32_t bytes;
+    
+    if (0 == swd_set_target_state_hw(RESET_PROGRAM)) 
+    {
+        printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
+        return ERROR_RESET;
+    }
+    
+    #if 1   // for debug
+        memset(FsReadBuf, 0, 8*1024);
+        swd_write_memory(flash_algo.algo_start, (uint8_t *)FsReadBuf,  8*1024);
+    #endif
+    
+    if (g_tFLM.Load[0].Size + 32 < sizeof(FsReadBuf))   /* 小于16KB */
+    {
+        memcpy(FsReadBuf, (char *)BLOB_HEADER, 4 * 8);  
+        bytes = ReadFileToMem(flash_algo.algo_file_name, g_tFLM.Load[0].Offset, FsReadBuf + 32, g_tFLM.Load[0].Size);          
+        if (bytes != g_tFLM.Load[0].Size)
+        {
+            goto err;
+        } 
+        if (0 == swd_write_memory(flash_algo.algo_start, (uint8_t *)FsReadBuf, flash_algo.algo_size)) {
+            return ERROR_ALGO_DL;
+        }  
+        return 0;        
+    }
+    else    /* 大于16KB */
+    {
+        uint32_t FileOffset;
+        uint32_t MemAddr;  
+        uint32_t size;
+        
+        size = flash_algo.algo_size;
+        
+        FileOffset = g_tFLM.Load[0].Offset;
+        MemAddr = flash_algo.algo_start;
+        
+        /* 写第1个16KB */
+        memcpy(FsReadBuf, (char *)BLOB_HEADER, 4 * 8);
+        bytes = ReadFileToMem(flash_algo.algo_file_name, FileOffset, FsReadBuf + 32, sizeof(FsReadBuf) - 32);  
+        if (0 == swd_write_memory(MemAddr, (uint8_t *)FsReadBuf, sizeof(FsReadBuf))) 
+        {
+            return ERROR_ALGO_DL;
+        }  
+        
+        MemAddr += sizeof(FsReadBuf);
+        FileOffset += sizeof(FsReadBuf) - 32;
+        size -= sizeof(FsReadBuf);
+        
+        while (size)
+        {
+            if (size > sizeof(FsReadBuf))
+            {
+                bytes = ReadFileToMem(flash_algo.algo_file_name, FileOffset, FsReadBuf, sizeof(FsReadBuf));  
+                if (bytes != sizeof(FsReadBuf))
+                {
+                    goto err;
+                }                 
+                if (0 == swd_write_memory(MemAddr, (uint8_t *)FsReadBuf, sizeof(FsReadBuf))) 
+                {
+                    return ERROR_ALGO_DL;
+                } 
+                MemAddr += sizeof(FsReadBuf);
+                FileOffset += sizeof(FsReadBuf);
+                size -= sizeof(FsReadBuf);                
+            }
+            else
+            {
+                bytes = ReadFileToMem(flash_algo.algo_file_name, FileOffset, FsReadBuf, size);  
+                if (bytes != size)
+                {
+                    goto err;
+                }                 
+                if (0 == swd_write_memory(MemAddr, (uint8_t *)FsReadBuf, size)) 
+                {
+                    return ERROR_ALGO_DL;
+                } 
+                MemAddr += size;
+                FileOffset += size;
+                size -= size;                 
+            }
+        }
+    }
+    return 0;
+
+err:
+    return 1;
 }
 
 

@@ -18,6 +18,7 @@
 #include "file_lib.h"
 #include "lua_if.h"
 #include "prog_if.h"
+#include "lcd_menu.h"
 
 /* 三个按钮 */
 #define BTN1_X     (240 - BTN1_W - 5)
@@ -76,13 +77,20 @@
 #define PROGRESS_Y      240 - 30
 
 
+const uint8_t *g_MenuProg1_Text[] =
+{
+    " 1 返回",
+    " 2 清零本次计数",
+    " 3 清零累计计数",
+    " 4 输入产品序号",
+    /* 结束符号, 用于菜单函数自动识别菜单项个数 */
+    "&"
+};
 
-//static void DispGroupList(uint16_t _usIndex);
-//static void DispFileList(uint16_t _usIndex);
+MENU_T g_tMenuProg1;
 
-//static void FindLuaNote(char *_strNote1, char *_strNote2, uint16_t _MaxLen);
 void DispProgVoltCurrent(void);
-void DispProgProgress(char *_str, float _progress);
+
 static void DispProgCounter(void);
 
 extern void sysTickInit(void);
@@ -126,25 +134,13 @@ void status_ProgWork(void)
     BUTTON_T btn1, btn2, btn3;
     FONT_T tFontNote;
     FONT_T tFontText;
-    FONT_T tFontBtn;
-    //static uint8_t cursor = 0;   
+    FONT_T tFont24;
+    FONT_T tFontBtn;   
     uint8_t cursor = 0;  
-//    static uint8_t s_first = 0;
     uint8_t fRunOnce = 0; 
     uint8_t ucAutoState = 0;
     uint8_t ucDetectCount = 0;    /* 连续多少次没有检测到芯片则认为目标板已拔出 */
     int32_t iDetectTime;
-    
-//    if (s_first == 0)
-//    {
-//        s_first = 1;
-//        
-//        strcpy(g_tProg.FilePath, "");   /* 初始路径 */
-//    }
-//    else
-//    {
-//        strcpy(g_tProg.FilePath, g_tFileList.Path);
-//    }
     
     /* 读autorun.ini文件，获得缺省lua文件路径 */
     LoadProgAutorunFile(g_tProg.FilePath, sizeof(g_tProg.FilePath));
@@ -164,7 +160,12 @@ void status_ProgWork(void)
         tFontBtn.FontCode = FC_ST_16;               /* 字体代码 16点阵 */
         tFontBtn.FrontColor = INFO_NAME_COLOR;      /* 字体颜色 */
         tFontBtn.BackColor = CL_MASK;               /* 文字背景颜色 */      
-        tFontBtn.Space = 0;                         /* 文字间距，单位 = 像素 */        
+        tFontBtn.Space = 0;                         /* 文字间距，单位 = 像素 */   
+
+        tFont24.FontCode = FC_ST_24;               /* 字体代码 24点阵 */
+        tFont24.FrontColor = INFO_NAME_COLOR;      /* 字体颜色 */
+        tFont24.BackColor = CL_MASK;               /* 文字背景颜色 */      
+        tFont24.Space = 0;                         /* 文字间距，单位 = 像素 */          
     }    
 
     LCD_ClrScr(FORM_BACK_COLOR); 
@@ -193,8 +194,8 @@ void status_ProgWork(void)
             uint16_t len;
             uint8_t line = 0;
             
-            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件 */
-            
+            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件 */            
+
             /* 从lua文件中获得注释字符串Note01 */
             lua_getglobal(g_Lua, "Note01");    
             if (lua_isstring(g_Lua, -1))
@@ -205,35 +206,7 @@ void status_ProgWork(void)
             {
                 pNote1 = "";
             }
-            
-            /* 从lua文件中获得程序文件名 */
-            lua_getglobal(g_Lua, "DataFile_0");  
-            if (lua_isstring(g_Lua, -1))
-            {
-                pDataFileName = lua_tostring(g_Lua, -1);
-                
-                {
-                    char path[256];
-                    
-                    /* 传入的文件名是相对路径 */
-                    if (strlen(pDataFileName) + strlen(PROG_USER_DIR) > sizeof(path))
-                    {
-                        /* 文件名过长 */
-                    }
-                
-                    GetDirOfFileName(g_tProg.FilePath, path);
-                    strcat(path, "/");
-                    strcat(path, pDataFileName);
-    
-                    FixFileName(path);  /* 去掉路径中的..上级目录 */
-                    
-                    ulDataFileSize = GetFileSize(path);     /* 获得程序文件的大小，bin */
-                }
-            }
-            else
-            {
-                pDataFileName = "";
-            }        
+            lua_pop(g_Lua, 1);            
             
             LCD_SetEncode(ENCODE_GBK);            
             
@@ -266,14 +239,10 @@ void status_ProgWork(void)
                         break;
                     }
                 }
-            }            
-            
+            }                        
             LCD_DispStr(5 + 3,      5 + 3 + 40, (char *)pNote1, &tFontNote);  /* 显示lua中的注释 */        
             
             LCD_SetEncode(ENCODE_UTF8);
-            
-            sprintf(buf, "程序大小: %d", ulDataFileSize);
-            LCD_DispStrEx(TEXT1_X,    TEXT1_Y, buf, &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
             
             /* 读ini配置文件 */
             ReadProgIniFile(g_tProg.FilePath, &g_tProgIni);
@@ -335,7 +304,11 @@ void status_ProgWork(void)
         
         if (fRunOnce == 1)
         {
-            fRunOnce = 0;
+            fRunOnce = 0;          
+            
+            PERIOD_Start(&g_tRunLed, 100, 100, 0);    /* 烧录过程LED快速闪烁 */
+            
+//            DEBUG_D2_TRIG();    /* 测试执行时间 - 编程开始 */
             
             /* 读ini配置文件 */
             ReadProgIniFile(g_tProg.FilePath, &g_tProgIni);
@@ -354,8 +327,8 @@ void status_ProgWork(void)
                 {                  
                     continue;
                 }
-            }            
-            
+            }                       
+
             g_tProg.Time = bsp_GetRunTime();    /* 记录开始时间 */
             g_tProg.Err = 100;
             g_tProg.EraseChipTime1 = 0;
@@ -368,44 +341,38 @@ void status_ProgWork(void)
                     lua_if.c 中的钩子函数LuaYeildHook()实现长按S键终止lua执行。
                     界面的绘制由编程函数内部负责刷新
                 */
-                PG_PrintText("开始烧录..\r\n");
+                PG_PrintText("开始烧录...");
                 
                 lua_do("ret_str = start_prog()");   /* 执行编程，阻塞只到编程完毕 */
-                
-                lua_getglobal(g_Lua, "ret_str");    
-                if (lua_isstring(g_Lua, -1))
-                {
-                    ret_str = lua_tostring(g_Lua, -1); 
-                }
-                else
-                {
-                    ret_str = "";
-                }
-                //ua_pop(g_Lua, 1);
-                if (strcmp(ret_str, "OK") == 0)
-                {
-                    g_tProg.Err = 0;
-                }
-                else
-                {
-                     g_tProg.Err = 1;
-                }
-                
-                /* 编程完毕 */
-                {
-                    char buf[32];
-                    
-                    if (g_tProg.Err == 0)
+                {                    
+                    lua_getglobal(g_Lua, "ret_str"); 
+                    if (lua_isstring(g_Lua, -1))
                     {
-                        g_tProg.NowProgCount++;
-
-                        sprintf(buf, "本次计数: %d", g_tProg.NowProgCount);
-                        LCD_DispStrEx(TEXT2_X,    TEXT2_Y, buf, &tFontText,  TEXT_WIDTH, ALIGN_LEFT);                        
+                        ret_str = lua_tostring(g_Lua, -1); 
+                    }
+                    else
+                    {
+                        ret_str = "";
+                    }
+                    lua_pop(g_Lua, 1);
+                    
+                    if (strcmp(ret_str, "OK") == 0)
+                    {
+                        g_tProg.Err = 0;
+                    }
+                    else
+                    {
+                        g_tProg.Err = 1;
                     }
                 }
-                
+
+                /* 编程完毕 */                
                 if (g_tProg.Err == 0)
                 {
+                    g_tProg.NowProgCount++;     /* 当前次数加1，掉电会清零 */
+                    
+                    PERIOD_Start(&g_tRunLed, 1000, 0, 0);    /* 烧录成功 LED常亮 */
+                    
                     g_tProgIni.ProgrammedCount++;       /* 已编程计数器加1 */
                     
                     WriteProgIniFile(g_tProg.FilePath, &g_tProgIni);    /* 写入ini文件 */
@@ -422,10 +389,16 @@ void status_ProgWork(void)
                         iDetectTime = bsp_GetRunTime();
                         
                         PG_PrintText("烧录成功,等待移除");
-                    }                    
+                    }
+                    else
+                    {
+                        ucAutoState = 0;
+                    }    
                 }  
                 else    /* 烧录失败 */
                 {
+                    PERIOD_Stop(&g_tRunLed);    /* 烧录失败，LED熄灭 */
+                    
                     /* 连续自动烧录 */
                     if (g_tProg.AutoStart == 1)
                     {
@@ -435,6 +408,15 @@ void status_ProgWork(void)
                         
                         PG_PrintText("烧录失败,等待移除");
                     }
+                    
+                    /* 出错时，进度条变为红色 */
+                    ProgressBarSetColor(CL_RED);                /* 红色进度 */
+                    if (g_tProg.Percent < 10)
+                    {
+                        g_tProg.Percent = 10;
+                    }
+                    DispProgProgress(0, g_tProg.Percent, 0xFFFFFFFE);   /* 0xFFFF FFFE 表示维持之前的地址 */
+                    ProgressBarSetColor(PROGRESS_BACK_COLOR1);  /* 恢复缺省颜色 */
                 }
             }
             else
@@ -445,68 +427,61 @@ void status_ProgWork(void)
             }
         }
         
-        if (ucAutoState == 1)
+        if (g_tProg.AutoStart == 1)
         {
-            uint32_t id;
-
-            if (bsp_CheckRunTime(iDetectTime) > 50)
+            if (ucAutoState == 1)           /* 连续烧录状态，等待移除 */
             {
-                iDetectTime = bsp_GetRunTime();
-                
-                sysTickInit();          /* 这是DAP驱动中的初始化函数,全局变量初始化 */
-                swd_init_debug();       /* 进入swd debug状态 */
-                
-                if (swd_read_idcode(&id) == 0)  /* 0 = 出错 */
+                if (bsp_CheckRunTime(iDetectTime) > 50)
                 {
-                    if (++ucDetectCount > 3)      /* 连续3次读取失败 */
+                    iDetectTime = bsp_GetRunTime();
+                    if (WaitChipRemove())           /* 等待芯片移除 */
+                    {
+                        if (++ucDetectCount > 3)    /* 连续3次读取失败 */
+                        {
+                            ucDetectCount = 0;
+                            
+                            ucAutoState = 2;
+                            
+                            if (g_tProg.Err == 0)
+                            {
+                                PG_PrintText("连续烧录,等待插入");
+                            }
+                            else
+                            {
+                                PG_PrintText("上次失败,等待插入");
+                            }                       
+                            
+                            bsp_PutKey(KEY_DB_S);   /* 任意发一个本状态无用的按键消息，避免背光超时关闭 */
+                        }
+                    }
+                    else
                     {
                         ucDetectCount = 0;
-                        
-                        ucAutoState = 2;
-                        
-                        if (g_tProg.Err == 0)
-                        {
-                            PG_PrintText("连续烧录,等待插入");
-                        }
-                        else
-                        {
-                            PG_PrintText("上次失败,等待插入");
-                        }                       
-                        
-                        bsp_PutKey(KEY_DB_S);       /* 任意发一个本状态无用的按键消息，避免背光超时关闭 */
                     }
                 }
-                else
-                {
-                    ucDetectCount = 0;
-                }
             }
-        }
-        else if (ucAutoState == 2)
-        {
-            uint32_t id;
-
-            if (bsp_CheckRunTime(iDetectTime) > 50)
+            else if (ucAutoState == 2)              /* 连续烧录状态，等待插入 */
             {
-                iDetectTime = bsp_GetRunTime();
-                
-                sysTickInit();          /* 这是DAP驱动中的初始化函数,全局变量初始化 */
-                swd_init_debug();       /* 进入swd debug状态 */                
-                if (swd_read_idcode(&id) != 0)  /* 不等于0表示检测OK */
+                if (bsp_CheckRunTime(iDetectTime) > 50)
                 {
-                    if (++ucDetectCount > 6)      /* 连续6次 300ms */
+                    iDetectTime = bsp_GetRunTime();
+                                   
+                    if (WaitChipInsert())           /* 等待芯片插入 */
                     {
-                        ucAutoState = 0;
-                        fRunOnce = 1;
+                        if (++ucDetectCount > 3)    /* 连续3次 300ms */
+                        {
+                            ucAutoState = 0;
+                            fRunOnce = 1;
+                        }
                     }
-                }
-                else
-                {
-                    ucDetectCount = 0;
+                    else
+                    {
+                        ucDetectCount = 0;
+                    }
                 }
             }
         }
-                    
+        
         ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
@@ -557,62 +532,9 @@ void status_ProgWork(void)
             }
         }
     }
+    
+    PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
 }
-
-/* 
-char s_lua_prog_buf[LUA_PROG_LEN_MAX + 1];
-uint32_t s_lua_prog_len;
-
-根据LUA文件查找程序注释
-
---Note01=数码管产品
---Note02=LED-485-034(V2.1)
-*/
-//void FindLuaNote(char *_strNote1, char *_strNote2, uint16_t _MaxLen)
-//{
-//	/* 解析文件，填充按钮提示栏 */
-//	{
-//        uint16_t i,j;
-//		char *pText;
-//		char *p;
-//		char head[12];
-//        char *pOut[2];
-
-//        pOut[0] = _strNote1;
-//        pOut[1] = _strNote2;
-//        
-//        _strNote1[0] = 0;
-//        _strNote2[0] = 0;
-//		pText = s_lua_prog_buf;
-//		for (i = 0; i < 2; i++)
-//		{
-//			sprintf(head, "--Note%02d=", i + 1);
-
-//			p = strstr(pText, head);
-//			if (p > 0)
-//			{
-//				p += 9;
-//				for (j = 0; j < _MaxLen; j++)
-//				{
-//					pOut[i][j] = p[j];
-//					if (p[j] == 0 || p[j] == 0x0D || p[j] == 0x0A)
-//					{
-//						pOut[i][j] = 0;
-//						break;
-//					}
-//				}
-//				pOut[i][j] = 0;
-//			}
-//			else
-//			{
-//				strcpy(pOut[i], "----");
-//			}
-//		}
-//	}
-//    
-//    /* 找到数据文件名，并计算文件大小 */
-//    ;
-//}
 
 /*
 *********************************************************************************************************
@@ -633,12 +555,14 @@ void ProgFinishedCallBack(uint8_t _ErrCode)
 *    功能说明: 显示编程进度
 *    形    参:  _str :  文本提示. 0表示不刷新显示
 *               _progress : 进度百分比， -1表示不刷新
+*               _addr :  内存地址，0xFFFFFFFF表示不显示
 *    返 回 值: 无
 *********************************************************************************************************
 */
-void DispProgProgress(char *_str, float _progress)
+void DispProgProgress(char *_str, float _progress, uint32_t _addr)
 {    
     FONT_T tFont16;
+    static uint32_t s_LastAddress = 0;
     
     /* 设置字体参数 */
     {
@@ -672,8 +596,22 @@ void DispProgProgress(char *_str, float _progress)
         /* 烧录进度条 */
         if (_progress > 0)
         {
+            if (_addr == 0xFFFFFFFF)        /* 不显示地址 */
+            {
+                buf[0] = 0;
+            }
+            else if (_addr == 0xFFFFFFFE)   /* 用于显示出错的地址 */
+            {
+                sprintf(buf, "0x%08X", s_LastAddress);
+            }
+            else    /* 显示地址 */
+            {
+                sprintf(buf, "0x%08X", _addr);
+                s_LastAddress = _addr;
+            }
+            
             tFont16.BackColor = CL_MASK;        
-            DispProgressBar(PROGRESS_X, PROGRESS_Y, 24, 230, "", _progress, &tFont16);             
+            DispProgressBar(PROGRESS_X, PROGRESS_Y, 24, 230, buf, _progress, &tFont16);             
             tFont16.BackColor = FORM_BACK_COLOR;  /* 文字背景颜色 */
         }
     }
@@ -689,23 +627,43 @@ void DispProgProgress(char *_str, float _progress)
 */
 void status_ProgSetting(void)
 {
-	uint8_t ucKeyCode;
-    uint8_t fRefresh;	
-    char buf[48];
-	
-	DispHeader("烧录器参数");
-    DispHelpBar("长按S确认",
-                "长按C返回");  
-
-    sprintf(buf, "关闭");
-    DispParamBar(0, "TVCC :", buf, 1);
+    uint8_t ucKeyCode; /* 按键代码 */
+    uint8_t fRefresh;
+    static uint8_t s_MenuInit = 0;
     
+    DispHeader("烧录器参数");
+//    DispHelpBar("",
+//                ""); 
+    
+    if (s_MenuInit == 0)
+    {
+        s_MenuInit = 1;
+        
+        g_tMenuProg1.Left = MENU_LEFT;
+        g_tMenuProg1.Top = MENU_TOP;
+        g_tMenuProg1.Height = MENU_HEIGHT;
+        g_tMenuProg1.Width = MENU_WIDTH;
+        g_tMenuProg1.LineCap = MENU_CAP;
+        g_tMenuProg1.ViewLine = 8;
+        g_tMenuProg1.Font.FontCode = FC_ST_24;
+        g_tMenuProg1.Font.Space = 0;
+        g_tMenuProg1.RollBackEn = 1;  /* 允许回滚 */
+        g_tMenuProg1.GBK = 0;
+        LCD_InitMenu(&g_tMenuProg1, (char **)g_MenuProg1_Text); /* 初始化菜单结构 */
+    }    
+    LCD_DispMenu(&g_tMenuProg1);
+
     fRefresh = 1;
     while (g_MainStatus == MS_PROG_SETTING)
     {
         if (fRefresh) /* 刷新整个界面 */
         {
-            fRefresh = 0;			
+            fRefresh = 0;
+
+            if (g_tMenuProg1.Cursor == 0)
+            {
+                ;
+            }
         }
 
         bsp_Idle();
@@ -716,25 +674,57 @@ void status_ProgSetting(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_UP_S:      /* S键释放 - 移动按钮焦点*/    
-                break;
+                case KEY_UP_S: /* S键 上 */
+                    LCD_MoveUpMenu(&g_tMenuProg1);
+                    break;
 
-            case KEY_UP_C:      /* C键释放 - 确认执行按钮功能 */ 			
-                break;
+                case KEY_LONG_DOWN_S: /* S键 上 */
+                    if (g_tMenuProg1.Cursor == 0)           /* 返回 */
+                    {
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProg1.Cursor == 1)      /* 本次计数清零 */
+                    {
+                        g_tProg.NowProgCount = 0;
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProg1.Cursor == 2)      /* 累积次数清零 */
+                    {
+                        /* 累积次数，无限制时才允许手动清零 */
+                        if (g_tProgIni.ProgramLimit == 0)
+                        {
+                            g_tProgIni.ProgrammedCount = 0;                     /* 已编程计数器加1 */                    
+                            WriteProgIniFile(g_tProg.FilePath, &g_tProgIni);    /* 写入ini文件 */ 
+                        }
+                        else
+                        {
+                            /* 弹窗显示信息 */
+                            DispMsgBox(20, 180, 20, 200, "请通过U盘模式更改");
+                            bsp_DelayMS(2000);
+                            LCD_DispMenu(&g_tMenuProg1);                            
+                        }
+                        g_MainStatus = MS_PROG_WORK;
+                    }   
+                    else if (g_tMenuProg1.Cursor == 3)      /* 输入产品序号 */
+                    {
+                        //g_MainStatus = MS_SYSTEM_SET;
+                    }                 
+                    break;
 
-            case KEY_LONG_DOWN_S:    /* S键长按 - 确认后，闪烁，修改参数 */
-				g_MainStatus = MS_PROG_WORK;
-                break;
-            
-            case KEY_LONG_DOWN_C:    /* C键长按 */
-                g_MainStatus = MS_PROG_WORK;
-                break;
+                case KEY_UP_C: /* C键 下 */
+                    LCD_MoveDownMenu(&g_tMenuProg1);
+                    break;
 
-            default:
-                break;
+                case KEY_LONG_DOWN_C: /* C键长按 */
+                    PlayKeyTone();
+                    g_MainStatus = MS_PROG_WORK;
+                    break;
+
+                default:
+                    break;
             }
         }
-    }	
+    }
 }
 
 /*
@@ -756,9 +746,15 @@ static void DispProgCounter(void)
     tFontText.BackColor = FORM_BACK_COLOR;      /* 文字背景颜色 */      
     tFontText.Space = 0;                        /* 文字间距，单位 = 像素 */       
 
-    sprintf(buf, "本次计数: %d", g_tProg.NowProgCount);
-    LCD_DispStrEx(TEXT2_X,    TEXT2_Y, buf, &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
-
+    /* 显示本次计数 */
+    LCD_DispStrEx(TEXT1_X,    TEXT1_Y, "本次", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
+    LCD_DispStrEx(TEXT2_X,    TEXT2_Y - 2, "计数", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
+    
+    tFontText.FontCode = FC_ST_32;
+    sprintf(buf, "%05d", g_tProg.NowProgCount);    /* 最大 99999 */
+    LCD_DispStrEx(TEXT1_X + 38,    TEXT1_Y + 4, buf, &tFontText,  16 * 5, ALIGN_LEFT);
+    tFontText.FontCode = FC_ST_16;
+    
     /* 显示剩余次数 */
     if (g_tProgIni.Locked == 1)
     {

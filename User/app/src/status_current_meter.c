@@ -74,40 +74,40 @@ void status_CurrentMeter(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S:    /* S键按下 */
-                break;
+                case KEY_DOWN_S:    /* S键按下 */
+                    break;
 
-            case KEY_UP_S:      /* S键释放 */
-                if (g_tVar.StartBatCap == 0)
-                {
-                    g_MainStatus = LastStatus(g_MainStatus);
-                }
-                
-                break;
+                case KEY_UP_S:      /* S键释放 */
+                    if (g_tVar.StartBatCap == 0)
+                    {
+                        g_MainStatus = LastStatus(g_MainStatus);
+                    }
+                    
+                    break;
 
-            case KEY_LONG_DOWN_S:    /* S键长按 */
-                g_tVar.StartBatCap = 1;
-                g_tVar.BatteryCapacity = 0;
-                PlayKeyTone();
-                break;
+                case KEY_LONG_DOWN_S:    /* S键长按 */
+                    g_tVar.StartBatCap = 1;
+                    g_tVar.BatteryCapacity = 0;
+                    PlayKeyTone();
+                    break;
 
-            case KEY_DOWN_C:    /* C键按下 */
-                break;
+                case KEY_DOWN_C:    /* C键按下 */
+                    break;
 
-            case KEY_UP_C:      /* C键释放 */
-                if (g_tVar.StartBatCap == 0)
-                {                
-                    g_MainStatus = NextStatus(g_MainStatus);
-                }
-                break;
+                case KEY_UP_C:      /* C键释放 */
+                    if (g_tVar.StartBatCap == 0)
+                    {                
+                        g_MainStatus = NextStatus(g_MainStatus);
+                    }
+                    break;
 
-            case KEY_LONG_DOWN_C:    /* C键长按 */
-                g_tVar.StartBatCap = 0;
-                PlayKeyTone();
-                break;
+                case KEY_LONG_DOWN_C:    /* C键长按 */
+                    g_tVar.StartBatCap = 0;
+                    PlayKeyTone();
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }

@@ -50,7 +50,6 @@ void status_LinkMode(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */
     uint8_t fRefresh;
-    uint8_t fIgnoreKey = 0;
     uint8_t LastMinute = 99;
 
     DispHeader("联机模式");
@@ -88,51 +87,49 @@ void status_LinkMode(void)
 
         bsp_Idle();
         
-        ucKeyCode = bsp_GetKey();   /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        ucKeyCode = bsp_GetKey();       /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S:        /* S键按下 */
-                break;
-
-            case KEY_UP_S:          /* S键释放 */
-                g_MainStatus = LastStatus(g_MainStatus);
-                break;
-
-            case KEY_LONG_DOWN_S:   /* S键长按 */
-                PlayKeyTone();
-                g_MainStatus = MS_EXTEND_MENU1;
-                break;
-
-            case KEY_DOWN_C:        /* C键按下 */
-                break;
-
-            case KEY_UP_C:          /* C键释放 */
-                if (fIgnoreKey == 1)
-                {
-                    fIgnoreKey = 0;
+                case KEY_DOWN_S:        /* S键按下 */
                     break;
-                }
-                g_MainStatus = NextStatus(g_MainStatus);
-                break;
 
-            case KEY_LONG_DOWN_C:        /* C键 */
-                PlayKeyTone();
-                if (++g_tParam.DispDir > 3)
-                {
-                    g_tParam.DispDir = 0;
-                }
-                LCD_SetDirection(g_tParam.DispDir);
-                SaveParam();
-                DispHeader("联机模式");
-                fRefresh = 1;
-                fIgnoreKey = 1; /* 需要忽略J即将到来的弹起按键 */
-                break;
+                case KEY_UP_S:          /* S键释放 */
+                    g_MainStatus = LastStatus(g_MainStatus);
+                    break;
 
-            default:
-                break;
+                case KEY_LONG_DOWN_S:   /* S键长按 */
+                    PlayKeyTone();
+                    g_MainStatus = MS_EXTEND_MENU1;
+                    break;
+
+                case KEY_DOWN_C:        /* C键按下 */
+                    break;
+
+                case KEY_UP_C:          /* C键释放 */
+                    g_MainStatus = NextStatus(g_MainStatus);
+                    break;
+
+                case KEY_LONG_DOWN_C:   /* C键长按 */
+                    PlayKeyTone();
+                    if (++g_tParam.DispDir > 3)
+                    {
+                        g_tParam.DispDir = 0;
+                    }
+                    LCD_SetDirection(g_tParam.DispDir);
+                    SaveParam();
+                    DispHeader("联机模式");
+                    DispHelpBar("长按S进入扩展功能",
+                                "长按C切换方向");                     
+                    fRefresh = 1;
+                    RTC_ReadClock();   
+                    DispClock();        /* 显示时钟 */
+                    break;
+
+                default:
+                    break;
             }
         }
     }

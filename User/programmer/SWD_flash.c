@@ -9,27 +9,24 @@
 
 extern const program_target_t flash_algo;
 
-
 error_t target_flash_init(uint32_t flash_start)
 {
-//    DAP_Data.clock_delay = 5;
-//    DAP_Data.fast_clock = 0;
-    
-    if (0 == swd_set_target_state_hw(RESET_PROGRAM)) {
-        return ERROR_RESET;
-    }
-    
-//    DAP_Data.clock_delay = 1;
-//    DAP_Data.fast_clock = 1;    
 
-    // Download flash programming algorithm to target and initialise.
-    if (0 == swd_write_memory(flash_algo.algo_start, (uint8_t *)flash_algo.algo_blob, flash_algo.algo_size)) {
-        return ERROR_ALGO_DL;
-    }
-
+    /*
+        FLM算法函数 Iint Init (unsigned long adr, unsigned long clk, unsigned long fnc) 
+        
+        Initialize Flash Programming Functions
+        Parameter:      adr:  Device Base Address
+        clk:  Clock Frequency (Hz)
+        fnc:  Function Code (1 - Erase, 2 - Program, 3 - Verify)
+        Return Value:   0 - OK,  1 - Failed
+    */    
+    
     g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
     
-    if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 0, 0)) {
+    LoadAlgoToTarget();
+    
+    if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 1, 0)) {
         return ERROR_INIT;
     }
 
@@ -48,6 +45,10 @@ error_t target_flash_uninit(void)
 
 error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t size)
 {
+    if ( flash_algo.program_page == 0)
+    {
+        return ERROR_SUCCESS;
+    }
     /*
         FLM中的超时3秒, 如果是解除读保护，这个时间就不够，因此不要在此赋值
         g_tProg.FLMFuncTimeout = g_tFLM.Device.toProg;  // page编程超时
@@ -83,6 +84,11 @@ error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t si
 /* 校验函数 */
 error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t size)
 {    
+    if ( flash_algo.verify == 0)
+    {
+        return ERROR_SUCCESS;
+    }
+    
     g_tProg.FLMFuncTimeout = 3000;
     while (size > 0) 
     {
@@ -115,12 +121,17 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
 /* 查空函数, 1表示不空需要擦除 */
 uint8_t target_flash_check_blank(uint32_t addr, uint32_t size)
 {    
-        // Run verify programming
+    if ( flash_algo.check_blank == 0)
+    {
+        return ERROR_SUCCESS;
+    }
+    
+    // Run verify programming
     if (1 == swd_flash_syscall_exec(&flash_algo.sys_call_s,
                                 flash_algo.check_blank,
                                 addr,
                                 size,
-                                0xFF,
+                                g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
                                 0)) {
         return 1;
     }
@@ -132,7 +143,11 @@ uint8_t target_flash_check_blank(uint32_t addr, uint32_t size)
 uint32_t target_flash_cacul_crc32(uint32_t addr, uint32_t size, uint32_t ini_value)
 {    
     uint32_t crc;
-    
+   
+    if ( flash_algo.cacul_crc32 == 0)
+    {
+        return 0;
+    }       
         // Run verify programming
     crc = swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                 flash_algo.cacul_crc32,
@@ -145,6 +160,11 @@ uint32_t target_flash_cacul_crc32(uint32_t addr, uint32_t size, uint32_t ini_val
 
 error_t target_flash_erase_sector(uint32_t addr)
 {   
+    if ( flash_algo.erase_sector == 0)
+    {
+        return ERROR_SUCCESS;
+    } 
+    
     g_tProg.FLMFuncTimeout = 60 * 1000;
     
     if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.erase_sector, addr, 0, 0, 0)) {
@@ -155,8 +175,13 @@ error_t target_flash_erase_sector(uint32_t addr)
 }
 
 error_t target_flash_erase_chip(void)
-{
+{   
     error_t status = ERROR_SUCCESS;  
+
+    if ( flash_algo.erase_chip == 0)
+    {
+        return ERROR_SUCCESS;
+    }     
     
     g_tProg.FLMFuncTimeout = 60 * 1000;
     
@@ -166,4 +191,36 @@ error_t target_flash_erase_chip(void)
     }
 
     return status;
+}
+
+/* 读取外部SPI FLASH的id */
+uint32_t target_flash_read_extid(uint32_t addr)
+{    
+    uint32_t id;
+//   
+//    if ( flash_algo.read_extid == 0)
+//    {
+//        return 0;
+//    }       
+
+//    id = swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
+//                                flash_algo.read_extid,
+//                                addr,
+//                                0,
+//                                0,
+//                                0);
+
+    g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
+    
+//    if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 0, 0)) {
+//        return ERROR_INIT;
+//    }
+    id = swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
+                                flash_algo.read_extid,
+                                addr,
+                                0,
+                                0,
+                                0);
+    return id;    
+    return id;
 }

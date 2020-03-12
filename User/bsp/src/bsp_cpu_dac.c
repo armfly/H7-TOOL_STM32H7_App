@@ -634,28 +634,28 @@ void dac1_StartDacWave(void)
 
     switch (g_tDacWave.Type)
     {
-    case DAC_WAVE_NO:
-        dac1_StopWave();
-        DAC_POWER_ON(); /* 打开DAC供电电路 */
-        break;
+        case DAC_WAVE_NO:
+            dac1_StopWave();
+            DAC_POWER_ON(); /* 打开DAC供电电路 */
+            break;
 
-    case DAC_WAVE_SIN:
-        bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-        top = dac1_VoltToDac(g_tDacWave.VoltMax);
-        dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
-        break;
+        case DAC_WAVE_SIN:
+            bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+            top = dac1_VoltToDac(g_tDacWave.VoltMax);
+            dac1_SetSinWave(bottom, top, g_tDacWave.Freq);
+            break;
 
-    case DAC_WAVE_SQUARE:
-        bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-        top = dac1_VoltToDac(g_tDacWave.VoltMax);
-        dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
-        break;
+        case DAC_WAVE_SQUARE:
+            bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+            top = dac1_VoltToDac(g_tDacWave.VoltMax);
+            dac1_SetRectWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+            break;
 
-    case DAC_WAVE_TRI:
-        bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
-        top = dac1_VoltToDac(g_tDacWave.VoltMax);
-        dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
-        break;
+        case DAC_WAVE_TRI:
+            bottom = dac1_VoltToDac(g_tDacWave.VoltMin);
+            top = dac1_VoltToDac(g_tDacWave.VoltMax);
+            dac1_SetTriWave(bottom, top, g_tDacWave.Freq, g_tDacWave.Duty);
+            break;
     }
 }
 

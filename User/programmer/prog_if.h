@@ -14,24 +14,29 @@
 #ifndef __PROG_IF_H_
 #define __PROG_IF_H_
 
-/* 编程过程中输出的消息 */
-enum
+#include "lua_if.h"
+
+/* */
+typedef enum
 {
-    PG_MSG_TEXT = 0,            /* 输出文本 */
-    PG_MSG_ERASE_PROGRESS,      /* 擦除进度消息 */
-    PG_MSG_PROG_PROGRESS,       /* 编程进度消息 */
-    PG_MSG_VERIFY_PROGRESS,     /* 校验进度消息 */
-    PG_MSG_TIME,                /* 已运行时间，ms单位 */
-};
+    CHIP_SWD_ARM     = 0,
+    CHIP_SWIM_STM8   = 1,
+    CHIP_SPI_FLASH   = 2,
+    CHIP_I2C_EEPROM  = 3,
+}CHIP_TYPE_E;
 
 typedef struct 
 {
-    char FilePath[128];     /* lua文件路径 */    
+    char FilePath[128];         /* lua文件路径 */    
+    
+    CHIP_TYPE_E ChipType;       /* 芯片类型 */
     
     uint32_t Time;
     
     uint32_t EraseChipTime1;
     uint32_t EraseChipTime2;
+    
+    float Percent;              /* 烧录进度 */
     
     uint8_t Err;
     
@@ -62,15 +67,24 @@ typedef struct
     
 }OFFLINE_PROG_T;
 
-
 extern OFFLINE_PROG_T g_tProg;
 
-uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr);
+void PG_ReloadLuaVar(void);
 
-uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, uint8_t _Mode);
-uint16_t PG_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen);
+uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr);
 
-uint16_t PG_EraseChip(uint32_t _FlashAddr);
-void DispProgProgress(char *_str, float _progress);
+uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, uint8_t _Mode);
+
+uint16_t PG_SWD_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen);
+
+uint16_t PG_SWD_EraseChip(uint32_t _FlashAddr);
+uint16_t PG_SWD_EraseSector(uint32_t _FlashAddr);
+
+void DispProgProgress(char *_str, float _progress, uint32_t _addr);
+
+uint32_t GetChipTypeFromLua(lua_State *L);
+
+uint8_t WaitChipInsert(void);
+uint8_t WaitChipRemove(void);
 
 #endif

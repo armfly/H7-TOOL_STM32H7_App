@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H743IIKx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.3.1</PackID>
+          <PackID>Keil.STM32H7xx_DFP.2.4.0</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00200000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1503,6 +1503,16 @@
               <FileType>5</FileType>
               <FilePath>..\..\User\programmer\SWD_flash.h</FilePath>
             </File>
+            <File>
+              <FileName>stm8_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\stm8_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm8_swim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\stm8_swim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1808,6 +1818,11 @@
               <FileName>lua_if_uart.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\User\lua\if\lua_if_uart.h</FilePath>
+            </File>
+            <File>
+              <FileName>lua_if_swim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\lua\if\lua_if_swim.c</FilePath>
             </File>
           </Files>
         </Group>

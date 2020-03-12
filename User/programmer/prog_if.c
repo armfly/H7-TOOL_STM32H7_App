@@ -17,18 +17,23 @@
 #include "bsp.h"
 #include "param.h"
 #include "file_lib.h"
+#include "lua_if.h"
 #include "prog_if.h"
 #include "swd_host.h"
 #include "swd_flash.h"
 #include "elf_file.h"
 #include "main.h"
-#include "lua_if.h"
+#include "stm8_flash.h"
 
 extern const program_target_t flash_algo;
 
 OFFLINE_PROG_T g_tProg = {0};
 
 PROG_INI_T g_tProgIni = {0};
+
+uint8_t flash_buff[sizeof(FsReadBuf)];
+
+uint8_t PG_LuaUidSnUsr(void);
 
 /*
 *********************************************************************************************************
@@ -45,6 +50,197 @@ uint8_t ProgCancelKey(void)
         return 1;
     }
     return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetChipTypeFromLua
+*    功能说明: 从lua中解析芯片类型. 存放在全局变量 g_tProg.ChipType
+*    形    参: 无
+*    返 回 值: 1表示需要立即终止
+*********************************************************************************************************
+*/
+uint32_t GetChipTypeFromLua(lua_State *L)
+{
+    g_tProg.ChipType = CHIP_SWD_ARM;
+    
+    if (L > 0)
+    {
+        /* 器件接口类型: "SWD", "SWIM", "SPI", "I2C" */
+        if (lua_getglobal(L, "CHIP_TYPE") != 0)
+        {
+            const char *name;
+             
+            if (lua_isstring(g_Lua, -1)) 
+            {
+                name = lua_tostring(g_Lua, -1);
+                if (strcmp(name, "SWD") == 0)
+                {
+                    g_tProg.ChipType = CHIP_SWD_ARM;
+                }
+                else if (strcmp(name, "SWIM") == 0)
+                {
+                    g_tProg.ChipType = CHIP_SWIM_STM8;
+                }            
+                else if (strcmp(name, "SPI") == 0)
+                {
+                    g_tProg.ChipType = CHIP_SPI_FLASH;
+                } 
+                else if (strcmp(name, "I2C") == 0)
+                {
+                    g_tProg.ChipType = CHIP_I2C_EEPROM;
+                }                
+            }           
+        }
+        lua_pop(L, 1);
+    }
+    return g_tProg.ChipType;
+}        
+
+/*
+*********************************************************************************************************
+*    函 数 名: WaitChipRemove
+*    功能说明: 检测芯片移除状态
+*    形    参: 无
+*    返 回 值: 1表示已经移除，0表示芯片还在位
+*********************************************************************************************************
+*/
+extern void sysTickInit(void);
+uint8_t WaitChipRemove(void)
+{    
+#if 1   /* 由LUA程序提供函数 */ 
+    const char *ret_str;
+
+    lua_do("ret_str = CheckChipRemove()"); 
+    lua_getglobal(g_Lua, "ret_str"); 
+    if (lua_isstring(g_Lua, -1))
+    {
+        ret_str = lua_tostring(g_Lua, -1); 
+    }
+    else
+    {
+        ret_str = "";
+    }
+    lua_pop(g_Lua, 1);
+        
+    if (strcmp(ret_str, "removed") == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+#else
+    uint32_t id;
+            
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        sysTickInit();          /* 这是DAP驱动中的初始化函数,全局变量初始化 */
+        swd_init_debug();       /* 进入swd debug状态 */
+    
+        if (swd_read_idcode(&id) == 0)  /* 未检测到 */
+        {
+            return 1;
+        }
+        return 0;     
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        if (SWIM_DetectIC(&id) == 0)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    } 
+    else
+    {
+        return 1;
+    }
+#endif    
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: WaitChipInsert
+*    功能说明: 检测芯片插入状态
+*    形    参: 无
+*    返 回 值: 1表示已经插入，0表示未检测到
+*********************************************************************************************************
+*/
+uint8_t WaitChipInsert(void)
+{
+#if 1   /* 由LUA程序提供函数 */ 
+    const char *ret_str;
+
+    lua_do("ret_str = CheckChipInsert()"); 
+    lua_getglobal(g_Lua, "ret_str"); 
+    if (lua_isstring(g_Lua, -1))
+    {
+        ret_str = lua_tostring(g_Lua, -1); 
+    }
+    else
+    {
+        ret_str = "";
+    }
+    lua_pop(g_Lua, 1);
+        
+    if (strcmp(ret_str, "inserted") == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+#else 
+    uint32_t id;
+            
+    //g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        sysTickInit();          /* 这是DAP驱动中的初始化函数,全局变量初始化 */
+        swd_init_debug();       /* 进入swd debug状态 */
+    
+        if (swd_read_idcode(&id) > 0)  /* 0 = 出错 */
+        {
+            return 1;
+        }   
+    }
+
+    //g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        if (SWIM_DetectIC(&id) > 0)
+        {
+            return 1;
+        }
+    } 
+    
+    return 0;
+#endif    
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_ReloadLuaVar
+*    功能说明: 读取lua文件全局变量. 
+*    形    参: _str : 字符串
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+extern void h7swim_ReadLuaVar(void);
+void PG_ReloadLuaVar(void)
+{
+    GetChipTypeFromLua(g_Lua);
+    
+    PG_LuaUidSnUsr();
+
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        ;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)  
+    {
+        h7swim_ReadLuaVar();        /* 读取LUA中的全局变量 */
+    }
 }
 
 /*
@@ -67,7 +263,7 @@ void PG_PrintText(char *_str)
             
     if (g_MainStatus == MS_PROG_WORK)
     {
-        DispProgProgress(str, -1);      /* -1表示不刷新进度 */
+        DispProgProgress(str, -1, 0xFFFFFFFF);      /* -1表示不刷新进度 */
     }
     
     bsp_Idle();
@@ -82,14 +278,16 @@ void PG_PrintText(char *_str)
 *********************************************************************************************************
 */
 extern void DispProgVoltCurrent(void);
-void PG_PrintPercent(float _Percent)
+void PG_PrintPercent(float _Percent, uint32_t _Addr)
 {
-    printf("%dms, %f\r\n", bsp_GetRunTime(), _Percent); 
+    printf("  %dms, %0.2f%%\r\n", bsp_CheckRunTime(g_tProg.Time), _Percent); 
     if (g_MainStatus == MS_PROG_WORK)
     {       
-        DispProgProgress(0, _Percent);      /* 0表示不刷新文本 */
+        g_tProg.Percent = _Percent;
         
-        DispProgVoltCurrent();  /* 刷新TVCC电压和电流 */
+        DispProgProgress(0, _Percent, _Addr);   /* 0表示不刷新文本 */
+        
+        DispProgVoltCurrent();                  /* 刷新TVCC电压和电流 */
     }
     
     bsp_Idle();
@@ -216,13 +414,14 @@ uint8_t PG_CheckFlashMem(uint32_t _FlashAddr, char *_Buff, uint32_t _BuffSize)
 *********************************************************************************************************
 */
 uint8_t PG_LuaUidSnUsr(void)
-{
+{   
+    uint8_t err = 0;
+    
     /* 从lua文件中获得变量：是否启用填充uid加密 */
     lua_getglobal(g_Lua, "UID_ENABLE");  
     if (lua_isinteger(g_Lua, -1))
     {
-        g_tProg.UidEnable = lua_tointeger(g_Lua, -1);
-        
+        g_tProg.UidEnable = lua_tointeger(g_Lua, -1);                
         if (g_tProg.UidEnable == 1)
         {
             lua_getglobal(g_Lua, "UID_SAVE_ADDR");  
@@ -232,10 +431,15 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
-                PG_PrintText("脚本错误 UID_SAVE_ADDR"); 
+                err = 1;
+            }
+            lua_pop(g_Lua, 1);
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 UID_SAVE_ADDR");                 
                 goto err_quit;
             }
-                
+            
             lua_getglobal(g_Lua, "UID_DATA");  
             if (lua_isstring(g_Lua, -1)) 
             {
@@ -243,7 +447,12 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
-                PG_PrintText("脚本错误 UID_DATA"); 
+                err = 1;
+            }
+            lua_pop(g_Lua, 1);
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 UID_DATA");                 
                 goto err_quit;
             }            
             
@@ -254,22 +463,27 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
-                PG_PrintText("脚本错误 UID_LEN"); 
-                goto err_quit;
+                err = 1;
             }
+            lua_pop(g_Lua, 1);
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 UID_LEN");                
+                goto err_quit;
+            }             
         }
     }
     else
     {
         g_tProg.UidEnable = 0;
     }
-
+    lua_pop(g_Lua, 1);
+    
     /* 从lua文件中获得变量：是否启用填充产品序号 */
     lua_getglobal(g_Lua, "SN_ENABLE");  
     if (lua_isinteger(g_Lua, -1))
     {
-        g_tProg.SnEnable = lua_tointeger(g_Lua, -1);
-        
+        g_tProg.SnEnable = lua_tointeger(g_Lua, -1);        
         if (g_tProg.SnEnable == 1)
         {
             lua_getglobal(g_Lua, "SN_SAVE_ADDR");  
@@ -279,10 +493,15 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
-                PG_PrintText("脚本错误 SN_SAVE_ADDR"); 
+                err = 1;
+            }
+            lua_pop(g_Lua, 1);
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 SN_SAVE_ADDR");              
                 goto err_quit;
-            }            
-
+            }
+            
             lua_getglobal(g_Lua, "SN_DATA");  
             if (lua_isstring(g_Lua, -1)) 
             {
@@ -290,7 +509,12 @@ uint8_t PG_LuaUidSnUsr(void)
             } 
             else
             {
-                PG_PrintText("脚本错误 SN_DATA");
+                err = 1;
+            } 
+            lua_pop(g_Lua, 1);            
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 SN_DATA");      
                 goto err_quit;
             }            
 
@@ -301,7 +525,12 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
-                PG_PrintText("脚本错误 SN_LEN");
+                err = 1;
+            } 
+            lua_pop(g_Lua, 1);            
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 SN_LEN");    
                 goto err_quit;
             }            
         }
@@ -309,24 +538,29 @@ uint8_t PG_LuaUidSnUsr(void)
     else
     {
         g_tProg.SnEnable = 0;
-    }        
+    }  
+    lua_pop(g_Lua, 1);    
     
     /* 从lua文件中获得变量：是否启用填充用户定制数据 */
     lua_getglobal(g_Lua, "USR_ENABLE");  
     if (lua_isinteger(g_Lua, -1))
     {
-        g_tProg.UsrEnable = lua_tointeger(g_Lua, -1);
-        
+        g_tProg.UsrEnable = lua_tointeger(g_Lua, -1);        
         if (g_tProg.UsrEnable == 1)
         {
             lua_getglobal(g_Lua, "USR_SAVE_ADDR");  
             if (lua_isinteger(g_Lua, -1)) 
             {
                 g_tProg.UsrAddr = lua_tointeger(g_Lua, -1);
-            }
+            } 
             else
             {
-                PG_PrintText("脚本错误 USR_SAVE_ADDR"); 
+                err = 1;
+            } 
+            lua_pop(g_Lua, 1);            
+            if (err == 1)
+            {
+                PG_PrintText("脚本错误 USR_SAVE_ADDR");  
                 goto err_quit;
             }            
 
@@ -337,9 +571,14 @@ uint8_t PG_LuaUidSnUsr(void)
             } 
             else
             {
+                err = 1;
+            } 
+            lua_pop(g_Lua, 1);            
+            if (err == 1)
+            {
                 PG_PrintText("脚本错误 USR_DATA");
                 goto err_quit;
-            }            
+            }             
 
             lua_getglobal(g_Lua, "USR_LEN");  
             if (lua_isinteger(g_Lua, -1)) 
@@ -348,15 +587,22 @@ uint8_t PG_LuaUidSnUsr(void)
             }
             else
             {
+                err = 1;
+            } 
+            lua_pop(g_Lua, 1);            
+            if (err == 1)
+            {
                 PG_PrintText("脚本错误 USR_LEN");
                 goto err_quit;
-            }            
+            }             
         }
     }
     else
     {
         g_tProg.UsrEnable = 0;
-    } 
+    }
+    lua_pop(g_Lua, 1);
+    
     return 0;
     
 err_quit:
@@ -365,16 +611,14 @@ err_quit:
            
 /*
 *********************************************************************************************************
-*    函 数 名: PG_ProgFile
-*    功能说明: 开始编程flash。 由lua程序调用。阻塞运行，只到编程结束。
+*    函 数 名: PG_SWD_ProgFile
+*    功能说明: SWD接口（STM32) 开始编程flash。 由lua程序调用。阻塞运行，只到编程结束。
 *    形    参:  _Path : 文件名
 *               _FlashAddr : flash起始地址
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
-extern void ProgFinishedCallBack(uint8_t _ErrCode);
-uint8_t flash_buff[sizeof(FsReadBuf)];
-uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
+uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr)
 {
     char path[256];
     uint16_t name_len;
@@ -393,11 +637,18 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
         goto quit;        
     }
     
-    GetDirOfFileName(g_tProg.FilePath, path);   /* 从lua文件名、中获取目录 */
-    strcat(path, "/");
-    strcat(path, _Path);
+    if (_Path[0] == '0' && _Path[1] == ':')         /* 是绝对路径 */
+    {
+        strncpy(path, _Path, sizeof(path));
+    }
+    else    /* 是相对路路径 */ 
+    {
+        GetDirOfFileName(g_tProg.FilePath, path);   /* 从lua文件名、中获取目录 */
+        strcat(path, "/");
+        strcat(path, _Path);
 
-    FixFileName(path);  /* 去掉路径中的..上级目录 */
+        FixFileName(path);  /* 去掉路径中的..上级目录 */
+    }
     
     /* 解析文件名 */
     name_len = strlen(_Path);
@@ -408,20 +659,16 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
         goto quit;
     }  
     
-    /* 文件支持 1.hex,  2.bin */
+    /* 文件仅支持 bin */
     memcpy(ext_name, &_Path[name_len - 4], 5);
     strlwr(ext_name);   /* 转换为小写 */
-    if (strcmp(ext_name, ".hex") == 0)
-    {
-        ;
-    }
-    else if (strcmp(ext_name, ".bin") == 0)
+    if (strcmp(ext_name, ".bin") == 0)
     {
         ;
     }
     else
     {
-        PG_PrintText("数据文件扩展名不正确");
+        PG_PrintText("数据文件格式错误");
         err = 1;
         goto quit;
     }
@@ -431,11 +678,17 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
     if (lua_isinteger(g_Lua, -1))
     {
         EraseChipEnable = lua_tointeger(g_Lua, -1);
+        
+        if (flash_algo.erase_chip == 0)     /* 算法中没有erase_chip函数 */
+        {
+            EraseChipEnable = 0;    /* 只能按扇区擦除 */
+        }
     }
     else
     {
         EraseChipEnable = 0;
-    }   
+    }
+    lua_pop(g_Lua, 1);           
         
 	if (swd_init_debug() == 0)
     {
@@ -443,7 +696,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
         err = 1;
         goto quit;        
     }
-	
+    
 	err_t = target_flash_init(_FlashAddr);
     if (err_t == ERROR_RESET)
     {
@@ -460,7 +713,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
     }
     else if (err_t == ERROR_INIT)
     {
-        PG_PrintText("执行算法失败");        
+        PG_PrintText("执行init算法失败");        
         err = 1;
         goto quit;        
     }
@@ -501,7 +754,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
     {
         /* 空片检查 */
         PG_PrintText("正在检查空片 ");  
-        PG_PrintPercent(0);    
+        PG_PrintPercent(0, _FlashAddr);    
         {
             uint32_t addr;
             uint32_t FileOffset = 0;
@@ -522,6 +775,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                 {
                     fBlankChip = 0;     /* 0表示不空 */
                 }
+                PG_PrintPercent(100, _FlashAddr); 
             }
             else
             {
@@ -533,9 +787,25 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                         PG_PrintText("用户终止运行");    
                         err = 1;
                         goto quit;                
-                    }	
+                    }	                   
                     
-                    if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                    err = 0;
+                    if (g_tFLM.Device.DevType ==  EXTSPI)
+                    {
+                        if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                        {
+                            err = 1;
+                        }
+                    }
+                    else
+                    {
+                        if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                        {
+                            err = 1;
+                        }
+                    }
+                    
+                    if (err == 1)
                     {
                         PG_PrintText("swd_read_memory error");    
                         err = 1;
@@ -562,8 +832,12 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                     {
                         float percent = -1;
                         
-                        percent = ((float)addr / FileLen) * 100;                
-                        PG_PrintPercent(percent);           
+                        percent = ((float)addr / FileLen) * 100;    
+                        if (percent > 100)
+                        {
+                            percent = 100;
+                        }
+                        PG_PrintPercent(percent, g_tFLM.Device.DevAdr + addr);           
                     }
                 }
             }
@@ -616,7 +890,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
     }
     
     /* 擦除 */
-    if (EraseChipEnable == 0)   /* 无需整片擦除 */
+    if (EraseChipEnable == 0)   /* 按扇区擦除 */
     {
         if (fBlankChip == 0)    /* 不是空片才进行擦除 */
         {
@@ -626,7 +900,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
             uint8_t fEraseReq = 0;
             
             PG_PrintText("正在擦除扇区...");    
-            PG_PrintPercent(0);  
+            PG_PrintPercent(0, 0xFFFFFFFF);  
             bsp_Idle();
             
             /* 遍历整个flash空间，决定哪个扇区需要擦除 */
@@ -679,7 +953,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                 }                
                     
                 if (fEraseReq == 1)
-                {                    
+                {              
                     if (target_flash_erase_sector(addr) != 0)
                     {
                         PG_PrintText("扇区擦除失败");
@@ -687,12 +961,23 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                         goto quit;
                     }
 
-                    /* 擦除成功，进度指示 */
+                    /* 擦除成功，进度指示。 STML051，扇区只有128字节，4ms一个扇区。显示进度太占用时间。 */
                     {
                         float percent;
-                                                                      
-                        percent = ((float)FinishedSize / FileLen) * 100;                
-                        PG_PrintPercent(percent);           
+                        static int32_t s_time1 = 0;
+                                                
+                        percent = ((float)FinishedSize / FileLen) * 100; 
+                        if (percent >= 100)
+                        {
+                            percent = 100;
+                            s_time1 = 0;    /* 强制显示1次 */
+                        }
+                        /* 控制一下显示间隔，最快100ms */
+                        if (bsp_CheckRunTime(s_time1) > 100)
+                        {
+                            PG_PrintPercent(percent, addr);
+                            s_time1 = bsp_GetRunTime();
+                        }
                     }                     
                 }
                 
@@ -717,7 +1002,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
             g_tProg.FLMEraseChipFlag = 1;                          
 
             PG_PrintText("正在擦除整片...");    
-            PG_PrintPercent(0);   
+            PG_PrintPercent(0, 0xFFFFFFFF);   
             bsp_Idle();
             
             {   
@@ -747,7 +1032,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
 
     /* 编程page */
     PG_PrintText("正在编程...");    
-    PG_PrintPercent(0);    
+    PG_PrintPercent(0, 0xFFFFFFFF);    
     {
         uint32_t addr;
 		uint32_t FileOffset = 0;
@@ -755,7 +1040,8 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
 		uint32_t bytes;
         uint32_t i;
         uint32_t j;
-        uint32_t FileBuffSize;        
+        uint32_t FileBuffSize; 
+        float percent = 0;          
    
 		PageSize = g_tFLM.Device.szPage;
 		if (PageSize > sizeof(FsReadBuf))
@@ -803,17 +1089,34 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                 PG_FixFlashMem(addr, FsReadBuf, bytes); 
                 
                 for (i = 0; i < bytes / PageSize; i++)
-                {
+                {                                
                     if (target_flash_program_page(addr, (uint8_t *)&FsReadBuf[i * PageSize], PageSize) != 0)
                     {
-                        PG_PrintText("编程失败");        
+                        {
+                            char buf[128];
+                            
+                            sprintf(buf, "编程失败, 0x%08X", addr);
+                            PG_PrintText(buf); 
+                        }                              
                         err = 1;
                         goto quit;
                     }
                        
                     addr += PageSize;
                     FileOffset += PageSize;
-                }                  
+                }  
+                /* 进度指示 */
+                {
+                    if (percent < 100)
+                    {        
+                        percent = ((float)FileOffset / FileLen) * 100;
+                        if (percent > 100)
+                        {
+                            percent = 100;
+                        }                        
+                        PG_PrintPercent(percent, addr);                   
+                    }
+                }                
             }
             else /* 文件以外的page */
             {
@@ -829,7 +1132,12 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                         {                        
                             if (target_flash_program_page(addr, (uint8_t *)&FsReadBuf[i * PageSize], PageSize) != 0)
                             {
-                                PG_PrintText("编程失败");        
+                                {
+                                    char buf[128];
+                                    
+                                    sprintf(buf, "编程失败, 0x%08X", addr);
+                                    PG_PrintText(buf); 
+                                }        
                                 err = 1;
                                 goto quit;
                             }
@@ -841,28 +1149,19 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
                 {
                     addr += bytes;
                 }
-            }
-            
-            /* 进度指示 */
-            {
-                float percent;
-                
-                percent = ((float)FileOffset / FileLen) * 100;                
-                PG_PrintPercent(percent);           
-            }
+            }            
         }
     }
     
     /* 校验 */
     PG_PrintText("正在校验...");    
-    PG_PrintPercent(0);    
+    PG_PrintPercent(0, 0xFFFFFFFF);    
     {
         uint32_t addr;
 		uint32_t FileOffset = 0;
 		uint16_t PageSize;
 		uint32_t bytes;
    
-		//PageSize = g_tFLM.Device.szPage;
         PageSize = sizeof(flash_buff);
 		if (PageSize > sizeof(flash_buff))
 		{
@@ -898,6 +1197,7 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
             /* 修改缓冲区，填充UID加密数据或产品序号 */
             PG_FixFlashMem(g_tFLM.Device.DevAdr + addr, FsReadBuf, PageSize);
 
+
             if (flash_algo.cacul_crc32 > 0)
             {
                 uint32_t crc1, crc2;
@@ -916,8 +1216,370 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
             }
             else
             {
+                /* 读回进行校验 */                    
+                if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                {
+                    char buf[128];
+                    
+                    sprintf(buf, "swd_read_memory error, addr = %X, len = %X", g_tFLM.Device.DevAdr + addr, bytes);
+                    PG_PrintText(buf);    
+                    err = 1;
+                    goto quit;  
+                }
+                    
+                if (memcmp(FsReadBuf, flash_buff, bytes) != 0)
+                {
+                    {
+                        char buf[128];
+                        
+                        sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                        PG_PrintText(buf); 
+                    }                     
+                    err = 1;
+                    goto quit;				
+                }  
+                addr += PageSize;
+                FileOffset += PageSize;                
+            }            
+
+            /* 进度指示 */
+            {
+                float percent = -1;
+                
+                percent = ((float)FileOffset / FileLen) * 100;
+                if (percent > 100)
+                {
+                    percent = 100;
+                }                
+                PG_PrintPercent(percent, g_tFLM.Device.DevAdr + addr);                
+            }
+        }
+    } 
+quit:
+    return err;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_SWIM_ProgFile
+*    功能说明: SWIM接口（STM8) 开始编程flash。 由lua程序调用。阻塞运行，只到编程结束。
+*    形    参:  _Path : 文件名
+*               _FlashAddr : flash起始地址
+*    返 回 值: 0 = ok, 其他表示错误
+*********************************************************************************************************
+*/
+uint16_t PG_SWIM_ProgFile(char *_Path, uint32_t _FlashAddr)
+{
+    char path[256];
+    uint16_t name_len;
+    uint8_t err = 0;
+    char ext_name[5];
+    uint32_t FileLen;
+//    uint8_t EraseChipEnable = 0;
+//    uint8_t fBlankChip = 0;
+//    uint32_t BlockSize;
+    uint8_t FlashProgFlag = 0;
+        
+    if (_FlashAddr >= 0x008000)
+    {
+        FlashProgFlag = 1;      /* Flash地址 */
+    }
+    else
+    {
+        FlashProgFlag = 0;      /* EEPROM地址 */
+    }
+    
+    /* 传入的文件名是相对路径 */
+    if (strlen(_Path) + strlen(PROG_USER_DIR) > sizeof(path))
+    {
+        PG_PrintText("文件路径太长"); 
+        err = 1;
+        goto quit;        
+    }
+    
+    if (_Path[0] == '0' && _Path[1] == ':')     /* 是绝对路径 */
+    {
+        strncpy(path, _Path, sizeof(path));
+    }
+    else    /* 是相对路路径 */ 
+    {    
+        GetDirOfFileName(g_tProg.FilePath, path);   /* 从lua文件名、中获取目录 */
+        strcat(path, "/");
+        strcat(path, _Path);
+
+        FixFileName(path);  /* 去掉路径中的..上级目录 */
+    }
+    
+    /* 解析文件名 */
+    name_len = strlen(_Path);
+    if (name_len < 5)
+    {      
+        PG_PrintText("数据文件名过短 "); 
+        err = 1;
+        goto quit;
+    }  
+    
+    /* 文件支持 1.hex,  2.bin */
+    memcpy(ext_name, &_Path[name_len - 4], 5);
+    strlwr(ext_name);   /* 转换为小写 */
+    if (strcmp(ext_name, ".hex") == 0)
+    {
+        ;
+    }
+    else if (strcmp(ext_name, ".bin") == 0)
+    {
+        ;
+    }
+    else
+    {
+        PG_PrintText("数据文件扩展名不正确");
+        err = 1;
+        goto quit;
+    }
+    
+//    /* 从lua文件中获得变量：是否整片擦除 */
+//    lua_getglobal(g_Lua, "ERASE_CHIP_ENABLE");  
+//    if (lua_isinteger(g_Lua, -1))
+//    {
+//        EraseChipEnable = lua_tointeger(g_Lua, -1);
+//    }
+//    else
+//    {
+//        EraseChipEnable = 0;
+//    }
+//    lua_pop(g_Lua, 1);
+        
+    FileLen = GetFileSize(path);
+    if (FileLen == 0)
+    {
+        PG_PrintText("读取数据文件失败");        
+        err = 1;
+        goto quit;         
+    }  
+    
+    {
+        uint32_t DevSize;
+        
+        if (_FlashAddr >= 0x08000)
+        {
+            DevSize = s_STM8_FlashSize;
+        }
+        else
+        {
+            DevSize = s_STM8_EEPromSize;
+        }
+    
+        if (FileLen > DevSize)
+        {
+            PG_PrintText("数据文件过大");    
+            err = 1;
+            goto quit; 
+        }
+    }
+    
+    /* 动态生成加密UID, 产品序号，USR用户数据 */
+    if (PG_LuaUidSnUsr() != 0)
+    {
+        err = 1;
+        goto quit;         
+    }
+
+    /* 编程page */
+    PG_PrintText("正在编程...");    
+    PG_PrintPercent(0, 0xFFFFFFFF);    
+    {
+        uint32_t addr;
+		uint32_t FileOffset = 0;
+		uint16_t PageSize;
+		uint32_t bytes;
+        uint32_t i;
+        uint32_t j;
+        uint32_t FileBuffSize;  
+        uint32_t DeviceSize;
+   
+		PageSize = s_STM8_BlockSize;
+		if (PageSize > sizeof(FsReadBuf))
+		{
+			PageSize = sizeof(FsReadBuf);
+		}
+		
+        /* 整定文件缓冲区大小为PageSize的整数倍 */
+        FileBuffSize = sizeof(FsReadBuf);   
+        FileBuffSize = (FileBuffSize / PageSize) * PageSize;
+        
+        if (FlashProgFlag == 1)
+        {
+            addr = 0x008000;    /* Flash地址 */
+            DeviceSize = s_STM8_FlashSize;
+        }
+        else
+        {
+            if (s_STM8_SerialType == STM8L)
+            {
+                addr = 0x001000;    /* EEPROM地址 */
+            }
+            else
+            {
+                addr = 0x004000;    /* EEPROM地址 */
+            }
+            DeviceSize = s_STM8_EEPromSize;
+        }
+        for (j = 0; j < (DeviceSize + sizeof(FsReadBuf) - 1) / sizeof(FsReadBuf); j++)
+        {
+            if (ProgCancelKey())
+            {
+                PG_PrintText("用户终止运行");    
+                err = 1;
+                goto quit;                
+            }
+            
+            /* 读文件, 按最大缓冲区读取到内存 */
+            if (_FlashAddr + FileLen > addr && _FlashAddr < addr + sizeof(FsReadBuf))
+            {
+                bytes = ReadFileToMem(path, FileOffset, FsReadBuf, sizeof(FsReadBuf));   
+                
+                if (bytes != sizeof(FsReadBuf))
+                {
+                    if (FileOffset + sizeof(FsReadBuf) < FileLen)
+                    {
+                        PG_PrintText("读取数据文件失败");        
+                        err = 1;
+                        goto quit;
+                    }
+                    
+                    if (bytes < PageSize)
+                    {
+                        memset(&FsReadBuf[bytes], 0x00 ,PageSize - bytes);      /* 填充空值 00 */
+                        
+                        bytes = PageSize;
+                    }
+                }
+                
+                /* 修改缓冲区，填充UID加密数据或产品序号 */
+                PG_FixFlashMem(addr, FsReadBuf, bytes); 
+                
+                for (i = 0; i < bytes / PageSize; i++)
+                {
+                    STM8_FLASH_Unlock();
+                    
+                    if (STM8_FLASH_ProgramBuf(addr, (uint8_t *)&FsReadBuf[i * PageSize], PageSize) == 0)
+                    {
+                        PG_PrintText("编程失败");        
+                        err = 1;
+                        goto quit;
+                    }
+                       
+                    addr += PageSize;
+                    FileOffset += PageSize;
+                    
+                            
+                    /* 进度指示 - 每2KB刷新一次 */
+                    if ((FileOffset % 2048) == 0)
+                    {
+                        float percent;
+                        
+                        percent = ((float)FileOffset / FileLen) * 100;
+                        if (percent > 100)
+                        {
+                            percent = 100;
+                        }                        
+                        PG_PrintPercent(percent, addr);           
+                    }                    
+                }                  
+            }
+            else /* 文件以外的page */
+            {
+                bytes = sizeof(FsReadBuf);
+                if (PG_CheckFlashMem(addr, FsReadBuf, bytes))
+                {
+                    memset(FsReadBuf, 0x00, sizeof(FsReadBuf));       /* 填充空值 00 */
+                    
+                    for (i = 0; i < bytes / PageSize; i++)
+                    {
+                        /* 修改缓冲区，填充UID加密数据或产品序号 */
+                        if (PG_FixFlashMem(addr, &FsReadBuf[i * PageSize], PageSize) == 1)
+                        {                        
+                            if (STM8_FLASH_ProgramBuf(addr, (uint8_t *)&FsReadBuf[i * PageSize], PageSize) == 0)
+                            {
+                                PG_PrintText("编程失败");        
+                                err = 1;
+                                goto quit;
+                            }
+                        }
+                        addr += PageSize;
+                    }                     
+                }
+                else
+                {
+                    addr += bytes;
+                }
+            }
+        }
+    }
+    
+    /* 校验 */
+    PG_PrintText("正在校验...");    
+    PG_PrintPercent(0, 0xFFFFFFFF);    
+    {
+        uint32_t addr;
+		uint32_t FileOffset = 0;
+		uint16_t PageSize;
+		uint32_t bytes;
+        uint32_t DeviceSize;
+   
+        if (FlashProgFlag == 1)
+        {
+            addr = _FlashAddr;    /* Flash地址 */
+            DeviceSize = s_STM8_FlashSize;
+        }
+        else
+        {
+            addr = _FlashAddr;    /* EEPROM地址 */
+            DeviceSize = s_STM8_EEPromSize;
+        }
+
+        PageSize = sizeof(flash_buff);
+		if (PageSize > sizeof(flash_buff))
+		{
+			PageSize = sizeof(flash_buff);
+		}
+        
+        if (PageSize >= sizeof(FsReadBuf))
+        {
+            PageSize = sizeof(FsReadBuf);
+        }
+		
+        if (PageSize >= DeviceSize)
+        {
+            PageSize = DeviceSize;
+        }
+            
+        for (; FileOffset < FileLen; )
+        {
+            if (ProgCancelKey())
+            {
+                PG_PrintText("用户终止运行");    
+                err = 1;
+                goto quit;                
+            }
+            
+			bytes = ReadFileToMem(path, FileOffset, FsReadBuf, PageSize); 
+			if (bytes != PageSize)
+			{
+                if (FileOffset + PageSize < FileLen)
+                {
+                    PG_PrintText("读取数据文件失败");        
+                    err = 1;
+                    goto quit;
+                }
+			}		
+			
+            /* 修改缓冲区，填充UID加密数据或产品序号 */
+            PG_FixFlashMem(addr, FsReadBuf, PageSize);
+
+            {
                 /* 读回进行校验 */
-                swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes);			
+                STM8_FLASH_ReadBuf(addr, flash_buff, bytes);			
                 if (memcmp(FsReadBuf, flash_buff, bytes) != 0)
                 {
                     PG_PrintText("校验数据失败");        
@@ -932,28 +1594,22 @@ uint16_t PG_ProgFile(char *_Path, uint32_t _FlashAddr)
             {
                 float percent = -1;
                 
-                percent = ((float)addr / FileLen) * 100;                
-                PG_PrintPercent(percent);           
+                percent = ((float)FileOffset / FileLen) * 100;
+                if (percent > 100)
+                {
+                    percent = 100;
+                }                
+                PG_PrintPercent(percent, addr);           
             }
         }
     } 
-    
-    /* 如果 UID加密数据、产品序号、用户数据不在编程文件的范围，则需要单独处理 */
-    {
-        ;
-    }
-    
-    //PG_PrintText("烧录成功");  可能多段烧写，此显示由Lua程序实现
-    
-//	swd_set_target_state_hw(RUN);
 quit:
-//    ProgFinishedCallBack(err);
     return err;
 }
 
 /*
 *********************************************************************************************************
-*    函 数 名: PG_ProgBuf
+*    函 数 名: PG_SWD_ProgBuf
 *    功能说明: 开始编程flash。 读修改写，限制在一个page内
 *    形    参:  _FlashAddr
 *				_DataBuf : 数据buf
@@ -962,7 +1618,7 @@ quit:
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
-uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, uint8_t _Mode)
+uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, uint8_t _Mode)
 {
     uint8_t err = 0;
     error_t err_t;
@@ -1012,7 +1668,7 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
     }    
 
     /* 循环执行：读回比对、查空、擦除、编程page、比对 */   
-    PG_PrintPercent(0);    
+    PG_PrintPercent(0, 0xFFFFFFFF);    
     {
         uint32_t addr;
 		uint32_t FileOffset = 0;
@@ -1048,7 +1704,7 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
             {
                 //PG_PrintText("正在擦除...");   
                 
-                /*　开始擦除 - STM32F429 包含解除度保护 */
+                /*　开始擦除 - STM32F429 包含解除读保护 */
                 if (target_flash_erase_chip() != 0)
                 {
                     PG_PrintText("整片擦除失败");        
@@ -1079,15 +1735,20 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
                 {
                     if (target_flash_verify_page(g_tFLM.Device.DevAdr + PageStartAddr, _DataBuf, PageSize) != 0)
                     {
-                        PG_PrintText("verify_page failed");        
+                        PG_PrintText("校验数据失败");        
                         err = 1;
                         goto quit;                    
                     }
                 }
                 else
-                {
+                {	
                     /* 读回进行校验 */
-                    swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes);			
+                    if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                    {
+                        PG_PrintText("swd_read_memory error");        
+                        err = 1;
+                        goto quit;				
+                    }                     
                     if (memcmp((uint8_t *)&_DataBuf[FileOffset], flash_buff, bytes) != 0)
                     {
                         PG_PrintText("校验数据失败");        
@@ -1124,7 +1785,12 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
                 memset(flash_buff, 0xFF, PageSize);
                 
                 /* 读回进行校验 */
-                swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes);			
+                if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+                {
+                    PG_PrintText("swd_read_memory error");        
+                    err = 1;
+                    goto quit;				
+                }                
                 if (memcmp((uint8_t *)&_DataBuf[FileOffset], flash_buff, bytes) != 0)
                 {
                     PG_PrintText("校验数据失败");        
@@ -1168,7 +1834,7 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
                     /* 读回进行校验 */
                     if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
                     {
-                        PG_PrintText("读回数据失败");        
+                        PG_PrintText("swd_read_memory error");        
                         err = 1;
                         goto quit;				
                     }   
@@ -1189,8 +1855,12 @@ uint16_t PG_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen, ui
             {
                 float percent;
                 
-                percent = ((float)addr / FileLen) * 100;                
-                PG_PrintPercent(percent);           
+                percent = ((float)addr / FileLen) * 100;
+                if (percent > 100)
+                {
+                    percent = 100;
+                }                
+                PG_PrintPercent(percent, g_tFLM.Device.DevAdr + addr);           
             }
         }
     }
@@ -1202,7 +1872,7 @@ quit:
 
 /*
 *********************************************************************************************************
-*    函 数 名: PG_ProgBuf_OB
+*    函 数 名: PG_SWD_ProgBuf_OB
 *    功能说明: 开始编程option 。解锁读保护时，擦除或编程时间可能很长（比如20秒）。
 *               本函数会处理执行期间的进度
 *               显示
@@ -1213,14 +1883,14 @@ quit:
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
-uint16_t PG_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen)
+uint16_t PG_SWD_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen)
 {
     uint8_t err = 0;
     
     /* armfly : 根据擦除扇区的超时估算整片擦除时间 */
     g_tProg.FLMEraseChipFlag = 1;                
-
-    err = PG_ProgBuf(_FlashAddr, _DataBuf, _BufLen, 2);
+    
+    err = PG_SWD_ProgBuf(_FlashAddr, _DataBuf, _BufLen, 2);
     
     g_tProg.FLMEraseChipFlag = 0;
     
@@ -1229,13 +1899,13 @@ uint16_t PG_ProgBuf_OB(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen)
 
 /*
 *********************************************************************************************************
-*    函 数 名: PG_EraseChip
+*    函 数 名: PG_SWD_EraseChip
 *    功能说明: 开始擦除全片. 对于STM32 OPTION BYTES 会进行解除读保护操作
 *    形    参: _FlashAddr 起始地址
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
-uint16_t PG_EraseChip(uint32_t _FlashAddr)
+uint16_t PG_SWD_EraseChip(uint32_t _FlashAddr)
 {
     uint8_t err = 0;
     error_t err_t;
@@ -1277,7 +1947,60 @@ uint16_t PG_EraseChip(uint32_t _FlashAddr)
         goto quit;
     }                    
 
-    PG_PrintPercent(100);           
+    PG_PrintPercent(100, 0xFFFFFFFF);           
+	
+quit:
+    return err;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_SWD_EraseSector
+*    功能说明: 开始擦除扇区
+*    形    参: _FlashAddr 起始地址
+*    返 回 值: 0 = ok, 其他表示错误
+*********************************************************************************************************
+*/
+uint16_t PG_SWD_EraseSector(uint32_t _FlashAddr)
+{
+    uint8_t err = 0;
+    error_t err_t;
+    
+	if (swd_init_debug() == 0)
+    {
+        PG_PrintText("SWD初始化失败！");        
+        err = 1;
+        goto quit;        
+    }
+	
+	err_t = target_flash_init(_FlashAddr);
+    if (err_t == ERROR_RESET)
+    {
+        PG_PrintText("复位目标MCU失败");
+        err = 1;
+        goto quit;        
+
+    }
+    else if (err_t == ERROR_ALGO_DL)
+    {
+        PG_PrintText("下载算法失败");        
+        err = 1;
+        goto quit;        
+    }
+    else if (err_t == ERROR_INIT)
+    {
+        PG_PrintText("执行算法失败");        
+        err = 1;
+        goto quit;        
+    } 
+    
+    /*　开始擦除 */
+    if (target_flash_erase_sector(_FlashAddr) != 0)
+    {
+        PG_PrintText("擦除扇区失败");        
+        err = 1;
+        goto quit;
+    }                          
 	
 quit:
     return err;

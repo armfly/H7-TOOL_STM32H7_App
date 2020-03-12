@@ -115,228 +115,228 @@ uint8_t wifi_task(void)
 
     switch (wifi_state)
     {
-    case WIFI_STOP:
-        break;
-
-    case WIFI_INIT:
-        //            g_tVar.WiFiDebugEn  = 1;
-
-        wifi_led_joinap(); /* 连接AP过程，快闪 */
-
-        comSetBaud(COM_ESP32, 115200);
-        bsp_InitESP32(); /* 内部有 20ms 延迟 */
-        s_last_time = bsp_GetRunTime();
-        WIFI_CheckAck("", 0); /* 0参数表示初始化函数内部的静态变量 */
-        wifi_state++;
-        break;
-
-    case WIFI_INIT + 1:
-        re = WIFI_CheckAck("ready", 300);
-        if (re == 1)
-        {
-            wifi_state++; /* 收到正确应答 */
-        }
-        else if (re == 2)
-        {
-            wifi_state = WIFI_INIT; /* 超时 */
-        }
-        break;
-
-    case WIFI_INIT + 2:
-        /* 关闭回显功能，主机发送的字符，模块无需返回 */
-        ESP32_SendAT("ATE0");
-        ESP32_WaitResponse("OK\r\n", 100);
-
-        /* 获取MAC */
-        {
-            uint8_t mac[6];
-            const uint8_t mac_0[6] = {0, 0, 0, 0, 0, 0};
-
-            ESP32_GetMac(mac);
-
-            if (memcmp(mac, g_tParam.WiFiMac, 6) != 0 && memcmp(mac, mac_0, 6) != 0)
-            {
-                memcpy(g_tParam.WiFiMac, mac, 6);
-                SaveParam();
-            }
-        }
-
-        /* 根据参数决定是否扮演softAP */
-        if (g_tParam.APSelfEn == 1)
-        {
-            wifi_state = WIFI_SOFT_AP;
-        }
-        else
-        {
-            wifi_state = WIFI_LINK_AP;
-        }
-        break;
-
-    case WIFI_LINK_AP:
-        ESP32_SetWiFiMode(1); /* 1 = STA, 2 = SAP,  3 = SAP + Station模式 */
-
-        if (g_tParam.DHCPEn == 0) /* DHCH = 0, 使用静态IP */
-        {
-            ESP32_SendAT("AT+CWDHCP_CUR=1,0");
-            ESP32_WaitResponse("OK\r\n", 300);
-
-            ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway); /* 设置静态IP */
-        }
-        else /* DHCH = 1, 使用动态IP */
-        {
-            ESP32_SendAT("AT+CWDHCP_CUR=1,1");
-            ESP32_WaitResponse("OK\r\n", 300);
-        }
-        wifi_led_joinap(); /* 连接wifi过程中快速闪烁 */
-        wifi_state++;
-        break;
-
-    case WIFI_LINK_AP + 1:
-        if (ESP32_ValidSSID((char *)g_tParam.AP_SSID) == 0 || ESP32_ValidPassword((char *)g_tParam.AP_PASS) == 0)
-        {
-            wifi_state = WIFI_STOP; /* iFi SSID和密码参数异常 */
+        case WIFI_STOP:
             break;
-        }
 
-        sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", g_tParam.AP_SSID, g_tParam.AP_PASS);
-        ESP32_SendAT(buf);
-        s_last_time = bsp_GetRunTime();
-        wifi_state++;
-        break;
+        case WIFI_INIT:
+            //            g_tVar.WiFiDebugEn  = 1;
 
-    case WIFI_LINK_AP + 2:
-        if (ESP32_ReadLineNoWait(buf, 64))
-        {
-            if (memcmp(buf, "OK", 2) == 0)
+            wifi_led_joinap(); /* 连接AP过程，快闪 */
+
+            comSetBaud(COM_ESP32, 115200);
+            bsp_InitESP32(); /* 内部有 20ms 延迟 */
+            s_last_time = bsp_GetRunTime();
+            WIFI_CheckAck("", 0); /* 0参数表示初始化函数内部的静态变量 */
+            wifi_state++;
+            break;
+
+        case WIFI_INIT + 1:
+            re = WIFI_CheckAck("ready", 300);
+            if (re == 1)
             {
-                wifi_state = WIFI_LINK_AP + 3; /* 连接AP OK */
+                wifi_state++; /* 收到正确应答 */
             }
-            else if (memcmp(buf, "WIFI CONNECTED", 14) == 0 || memcmp(buf, "WIFI GOT IP", 11) == 0)
+            else if (re == 2)
             {
-                ; /* 连接过程中，正常应答，不理会，继续等待最后的OK */
+                wifi_state = WIFI_INIT; /* 超时 */
             }
-            else if (memcmp(buf, "+CWJAP:", 7) == 0 || memcmp(buf, "FAIL", 4) == 0 || memcmp(buf, "DISCONNECT", 10) == 0)
+            break;
+
+        case WIFI_INIT + 2:
+            /* 关闭回显功能，主机发送的字符，模块无需返回 */
+            ESP32_SendAT("ATE0");
+            ESP32_WaitResponse("OK\r\n", 100);
+
+            /* 获取MAC */
             {
-                wifi_state = WIFI_INIT; /* 连接失败 */
-            }
-        }
+                uint8_t mac[6];
+                const uint8_t mac_0[6] = {0, 0, 0, 0, 0, 0};
 
-        if (bsp_CheckRunTime(s_last_time) > 20 * 1000) /* 超时 */
-        {
-            wifi_state = WIFI_INIT;
-        }
-        break;
+                ESP32_GetMac(mac);
 
-    case WIFI_LINK_AP + 3:             /* 连接AP OK */
-        g_tVar.HomeWiFiLinkOk = 1; /* 已连接到HOME WIFI */
-        wifi_led_ok();                         /* LED熄灭 */
-
-        ESP32_CIPMUX(1); /* 启用多连接模式 */
-        //ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
-
-        /* 创建TCP服务器. */
-        ESP32_CreateTCPServer(g_tParam.LocalTCPPort);
-
-        /* 创建UDP监听端口, id = 0 */
-        ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
-
-        wifi_state = WIFI_READY;
-        break;
-
-    /*---------------------------------------------------------------------------*/
-    case WIFI_WATCH_DOG: /* WiFi看护 */
-        retry = 0;
-        wifi_state++;
-        break;
-
-    case WIFI_WATCH_DOG + 1: /* WiFi看护 */
-        wifi_link_tcp_ok = 0;
-        wifi_join_ap_ok = 0;
-        ESP32_SendAT("AT+CIPSTATUS");
-        s_last_time = bsp_GetRunTime();
-        wifi_state++;
-        break;
-
-    case WIFI_WATCH_DOG + 2:
-        while (1)
-        {
-            rx_len = ESP32_ReadLineNoWait(buf, 64);
-            if (rx_len == 0)
-            {
-                break;
-            }
-            else if (rx_len > 7 && memcmp(buf, "STATUS:", 7) == 0)
-            {
-                /*  STATUS:3 */
-                if (buf[7] == '2' || buf[7] == '3' || buf[7] == '4')
+                if (memcmp(mac, g_tParam.WiFiMac, 6) != 0 && memcmp(mac, mac_0, 6) != 0)
                 {
-                    wifi_join_ap_ok = 1; /* 连接AP ok */
-                }
-                else
-                {
-                    if (g_tParam.APSelfEn == 1) /* 做SoftAP */
-                    {
-                        ; /* 不判断, 根据UDP状态判断 */
-                    }
-                    else /* 做STA站点 */
-                    {
-                        wifi_join_ap_ok = 0; /* 没有连接到AP */
-                    }
+                    memcpy(g_tParam.WiFiMac, mac, 6);
+                    SaveParam();
                 }
             }
-            else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:0,\"UDP\"", 18) == 0)
-            {
-                if (g_tParam.APSelfEn == 1)
-                {
-                    wifi_join_ap_ok = 1;
-                }
-            }
-            else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
-            {
-                /* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
-                wifi_link_tcp_ok = 1;
-            }
-            else if (rx_len >= 2 && memcmp(buf, "OK", 2) == 0)
-            {
-                if (wifi_join_ap_ok == 1)
-                {
-                    wifi_state = WIFI_READY;
-                }
-                else
-                {
-                    //wifi_state = WIFI_INIT; 不要立即改变状态，等3次查询失败后再走
-                }
-            }
-            else if (rx_len >= 5 && memcmp(buf, "busy p...", 5) == 0) /* 内部忙 */
-            {
-                ;
-            }
-        }
 
-        if (bsp_CheckRunTime(s_last_time) > 100) /* 超时 */
-        {
-            if (++retry > 2)
+            /* 根据参数决定是否扮演softAP */
+            if (g_tParam.APSelfEn == 1)
             {
-                if (wifi_join_ap_ok == 0)
-                {
-                    wifi_state = WIFI_INIT; /* 复位WIFI模块，重连AP */
-                }
-                else
-                {
-                    wifi_state = WIFI_READY; /* 应该进不来 */
-                }
+                wifi_state = WIFI_SOFT_AP;
             }
             else
             {
-                wifi_state--;
+                wifi_state = WIFI_LINK_AP;
             }
-        }
-        break;
+            break;
 
-    /*---------------------------------------------------------------------------*/
-    case WIFI_READY: /* wifi 就绪 */
-        wifi_Poll();
-        break;
+        case WIFI_LINK_AP:
+            ESP32_SetWiFiMode(1); /* 1 = STA, 2 = SAP,  3 = SAP + Station模式 */
+
+            if (g_tParam.DHCPEn == 0) /* DHCH = 0, 使用静态IP */
+            {
+                ESP32_SendAT("AT+CWDHCP_CUR=1,0");
+                ESP32_WaitResponse("OK\r\n", 300);
+
+                ESP32_SetLocalIP(g_tParam.WiFiIPAddr, g_tParam.WiFiNetMask, g_tParam.WiFiGateway); /* 设置静态IP */
+            }
+            else /* DHCH = 1, 使用动态IP */
+            {
+                ESP32_SendAT("AT+CWDHCP_CUR=1,1");
+                ESP32_WaitResponse("OK\r\n", 300);
+            }
+            wifi_led_joinap(); /* 连接wifi过程中快速闪烁 */
+            wifi_state++;
+            break;
+
+        case WIFI_LINK_AP + 1:
+            if (ESP32_ValidSSID((char *)g_tParam.AP_SSID) == 0 || ESP32_ValidPassword((char *)g_tParam.AP_PASS) == 0)
+            {
+                wifi_state = WIFI_STOP; /* iFi SSID和密码参数异常 */
+                break;
+            }
+
+            sprintf(buf, "AT+CWJAP_CUR=\"%s\",\"%s\"", g_tParam.AP_SSID, g_tParam.AP_PASS);
+            ESP32_SendAT(buf);
+            s_last_time = bsp_GetRunTime();
+            wifi_state++;
+            break;
+
+        case WIFI_LINK_AP + 2:
+            if (ESP32_ReadLineNoWait(buf, 64))
+            {
+                if (memcmp(buf, "OK", 2) == 0)
+                {
+                    wifi_state = WIFI_LINK_AP + 3; /* 连接AP OK */
+                }
+                else if (memcmp(buf, "WIFI CONNECTED", 14) == 0 || memcmp(buf, "WIFI GOT IP", 11) == 0)
+                {
+                    ; /* 连接过程中，正常应答，不理会，继续等待最后的OK */
+                }
+                else if (memcmp(buf, "+CWJAP:", 7) == 0 || memcmp(buf, "FAIL", 4) == 0 || memcmp(buf, "DISCONNECT", 10) == 0)
+                {
+                    wifi_state = WIFI_INIT; /* 连接失败 */
+                }
+            }
+
+            if (bsp_CheckRunTime(s_last_time) > 20 * 1000) /* 超时 */
+            {
+                wifi_state = WIFI_INIT;
+            }
+            break;
+
+        case WIFI_LINK_AP + 3:             /* 连接AP OK */
+            g_tVar.HomeWiFiLinkOk = 1; /* 已连接到HOME WIFI */
+            wifi_led_ok();                         /* LED熄灭 */
+
+            ESP32_CIPMUX(1); /* 启用多连接模式 */
+            //ESP32_CloseTcpUdp(LINK_ID_UDP_SERVER);
+
+            /* 创建TCP服务器. */
+            ESP32_CreateTCPServer(g_tParam.LocalTCPPort);
+
+            /* 创建UDP监听端口, id = 0 */
+            ESP32_CreateUDPServer(LINK_ID_UDP_SERVER, g_tParam.LocalTCPPort);
+
+            wifi_state = WIFI_READY;
+            break;
+
+        /*---------------------------------------------------------------------------*/
+        case WIFI_WATCH_DOG: /* WiFi看护 */
+            retry = 0;
+            wifi_state++;
+            break;
+
+        case WIFI_WATCH_DOG + 1: /* WiFi看护 */
+            wifi_link_tcp_ok = 0;
+            wifi_join_ap_ok = 0;
+            ESP32_SendAT("AT+CIPSTATUS");
+            s_last_time = bsp_GetRunTime();
+            wifi_state++;
+            break;
+
+        case WIFI_WATCH_DOG + 2:
+            while (1)
+            {
+                rx_len = ESP32_ReadLineNoWait(buf, 64);
+                if (rx_len == 0)
+                {
+                    break;
+                }
+                else if (rx_len > 7 && memcmp(buf, "STATUS:", 7) == 0)
+                {
+                    /*  STATUS:3 */
+                    if (buf[7] == '2' || buf[7] == '3' || buf[7] == '4')
+                    {
+                        wifi_join_ap_ok = 1; /* 连接AP ok */
+                    }
+                    else
+                    {
+                        if (g_tParam.APSelfEn == 1) /* 做SoftAP */
+                        {
+                            ; /* 不判断, 根据UDP状态判断 */
+                        }
+                        else /* 做STA站点 */
+                        {
+                            wifi_join_ap_ok = 0; /* 没有连接到AP */
+                        }
+                    }
+                }
+                else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:0,\"UDP\"", 18) == 0)
+                {
+                    if (g_tParam.APSelfEn == 1)
+                    {
+                        wifi_join_ap_ok = 1;
+                    }
+                }
+                else if (rx_len >= 18 && memcmp(buf, "+CIPSTATUS:4,\"TCP\"", 18) == 0)
+                {
+                    /* +CIPSTATUS:4,"TCP","192.168.1.3",9800,37299,0 */
+                    wifi_link_tcp_ok = 1;
+                }
+                else if (rx_len >= 2 && memcmp(buf, "OK", 2) == 0)
+                {
+                    if (wifi_join_ap_ok == 1)
+                    {
+                        wifi_state = WIFI_READY;
+                    }
+                    else
+                    {
+                        //wifi_state = WIFI_INIT; 不要立即改变状态，等3次查询失败后再走
+                    }
+                }
+                else if (rx_len >= 5 && memcmp(buf, "busy p...", 5) == 0) /* 内部忙 */
+                {
+                    ;
+                }
+            }
+
+            if (bsp_CheckRunTime(s_last_time) > 100) /* 超时 */
+            {
+                if (++retry > 2)
+                {
+                    if (wifi_join_ap_ok == 0)
+                    {
+                        wifi_state = WIFI_INIT; /* 复位WIFI模块，重连AP */
+                    }
+                    else
+                    {
+                        wifi_state = WIFI_READY; /* 应该进不来 */
+                    }
+                }
+                else
+                {
+                    wifi_state--;
+                }
+            }
+            break;
+
+        /*---------------------------------------------------------------------------*/
+        case WIFI_READY: /* wifi 就绪 */
+            wifi_Poll();
+            break;
     }
 
     return 0;
