@@ -84,20 +84,6 @@ int main(void)
 
     DispLogo();
     
-//    /* TEST CRC32 */
-//    {
-//        static uint32_t crc1, crc2, crc3;
-//        
-//        while (1)
-//        {
-//            crc1 = CRC32Software((uint8_t *)0x08000000, 32);
-//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 8);
-//                
-//            crc3 = calculate_CRC32((uint8_t *)0x08000000, 512*1024);
-//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 512*1024 / 4);
-//        }
-//    }
-    
     bsp_InitESP32();
 
     DSO_InitHard();
@@ -107,7 +93,7 @@ int main(void)
     DSO_SetGain(2, 3);
 
     bsp_SetTVCC(3300);
-
+    
     /* LwIP 初始化 */
     {
         /* 如果不插网线，此函数执行时间过长 */
@@ -117,7 +103,6 @@ int main(void)
         lwip_pro();
     }
 
-    //PERIOD_Stop(&g_tRunLed); /* 停止LED闪烁 */    
     PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
     
     usbd_Init();        /* 初始化USB协议栈 */
@@ -132,93 +117,93 @@ int main(void)
     {
         switch (g_MainStatus)
         {
-        case MS_LINK_MODE:      /* 联机状态 */
-            status_LinkMode();
-            break;
+            case MS_LINK_MODE:      /* 联机状态 */
+                status_LinkMode();
+                break;
 
-        case MS_SYSTEM_SET:     /* 系统设置 */
-            status_SystemSetMain();
-            break;
+            case MS_SYSTEM_SET:     /* 系统设置 */
+                status_SystemSetMain();
+                break;
 
-        case MS_HARD_INFO:      /* 硬件信息 */
-            status_HardInfo();
-            break;
+            case MS_HARD_INFO:      /* 硬件信息 */
+                status_HardInfo();
+                break;
 
-        case MS_MODIFY_PARAM:   /* 修改参数 */
-            status_ModifyParam();
-            break;   
-        
-        case MS_ESP32_TEST:     /* ESP32模块固件升级 */
-            status_ESP32Test();
-            break;
+            case MS_MODIFY_PARAM:   /* 修改参数 */
+                status_ModifyParam();
+                break;   
+            
+            case MS_ESP32_TEST:     /* ESP32模块固件升级 */
+                status_ESP32Test();
+                break;
 
-        case MS_USB_EMMC:       /* USB虚拟磁盘，电脑操作emcc文件 */
-            status_UsbEMMC();
-            break;
+            case MS_USB_EMMC:       /* USB虚拟磁盘，电脑操作emcc文件 */
+                status_UsbEMMC();
+                break;
 
-        case MS_FILE_MANAGE:    /* 文件管理，烧写字库 */
-            status_FileManage();
-            break;
+            case MS_FILE_MANAGE:    /* 文件管理，烧写字库 */
+                status_FileManage();
+                break;
 
-        case MS_PROG_SELECT_FILE:    /* 脱机下载器 - 选择文件 */
-            status_ProgSelectFile();
-            break;  
-                
-        case MS_PROG_WORK:          /* 脱机下载器 - 工作阶段 */
-            status_ProgWork();
-            break;     
+            case MS_PROG_SELECT_FILE:    /* 脱机下载器 - 选择文件 */
+                status_ProgSelectFile();
+                break;   
+            
+            case MS_PROG_WORK:          /* 脱机下载器 - 工作阶段 */
+                status_ProgWork();
+                break;            
 
-        case MS_PROG_SETTING:       /* 脱机下载器 - 参数设置 */
-            status_ProgSetting();
-            break;   
-                
-        case MS_VOLTAGE_METER:  /* 电压表 */
-            status_VoltageMeter();
-            break;
+            case MS_PROG_SETTING:       /* 脱机下载器 - 参数设置 */
+                status_ProgSetting();
+                break;   
+                    
+            case MS_VOLTAGE_METER:  /* 电压表 */
+                status_VoltageMeter();
+                break;
 
-        case MS_CURRENT_METER:  /* 高侧电流表 */
-            status_CurrentMeter();
-            break;
+            case MS_CURRENT_METER:  /* 高侧电流表 */
+                status_CurrentMeter();
+                break;
 
-        case MS_TEMP_METER:     /* 温度表 */
-            status_TempMeter();
-            break;
+            case MS_TEMP_METER:     /* 温度表 */
+                status_TempMeter();
+                break;
 
-        case MS_RESISTOR_METER: /* 电阻表 */
-            status_ResistorMeter();
-            break;
+            case MS_RESISTOR_METER: /* 电阻表 */
+                status_ResistorMeter();
+                break;
 
-        case MS_TVCC_POWER:     /* 微型电源 */
-            status_TVCCPower();
-            break;        
-        
-        case MS_PULSE_METER:    /* 脉冲测量 */
-            status_PulseMeter();
-            break;  
-        
-        case MS_MINI_DSO:    /* 扩展菜单，显示 */
-            status_MiniDSO();
-            break;
+            case MS_TVCC_POWER:     /* 微型电源 */
+                status_TVCCPower();
+                break;        
+            
+            case MS_PULSE_METER:    /* 脉冲测量 */
+                status_PulseMeter();
+                break;  
+            
+            case MS_MINI_DSO:    /* 扩展菜单，显示 */
+                status_MiniDSO();
+                break;
 
-        case MS_EXTEND_MENU1:    /* 扩展菜单，第1级 */
-            status_ExtendMenu1();
-            break;
+            case MS_EXTEND_MENU1:    /* 扩展菜单，第1级 */
+                status_ExtendMenu1();
+                break;
 
-        case MS_EXTEND_MENU_REC: /* 扩展菜单，第2级-数据记录仪 */
-            status_ExtendMenuRec();
-            break;
-        
-        case MS_LUA_SELECT_FILE: /* lua文件浏览 */
-            status_LuaSelectFile();
-            break;
-        
-        case MS_LUA_EXEC_FILE:  /* lua执行状态 */    
-            status_LuaRun();
-            break;
-        
-        default:
-            g_MainStatus = MS_LINK_MODE;
-            break;
+            case MS_EXTEND_MENU_REC: /* 扩展菜单，第2级-数据记录仪 */
+                status_ExtendMenuRec();
+                break;
+            
+            case MS_LUA_SELECT_FILE: /* lua文件浏览 */
+                status_LuaSelectFile();
+                break;
+            
+            case MS_LUA_EXEC_FILE:  /* lua执行状态 */    
+                status_LuaRun();
+                break;
+            
+            default:
+                g_MainStatus = MS_LINK_MODE;
+                break;
         }
     }
 }
@@ -629,6 +614,12 @@ void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActiv
 *********************************************************************************************************
 */
 extern uint8_t s_DispRefresh;
+static uint16_t s_ProgressBarColor1 = PROGRESS_BACK_COLOR1;
+void ProgressBarSetColor(uint16_t _Color)
+{
+    s_ProgressBarColor1 = _Color;
+}
+
 void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
     char *_str, float _Percent, FONT_T *_tFont)    
 {   
@@ -648,7 +639,7 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
     /* 填充矩形 */
     LCD_DrawRect(_usX,          _usY,     _usHeight,     _usWidth,  PROGRESS_BODER_COLOR);
     
-    LCD_Fill_Rect(_usX + 2,     _usY + 2, _usHeight - 4, width,     PROGRESS_BACK_COLOR1);
+    LCD_Fill_Rect(_usX + 2,     _usY + 2, _usHeight - 4, width,     s_ProgressBarColor1);
     
     if (_Percent < 100)
     {
@@ -668,6 +659,11 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
     {
         x = _usX + 4;
         LCD_DispStr(x, y, _str, _tFont);  
+        
+        sprintf(buf, "%0.0f%%", _Percent);
+        StrWidth = LCD_GetStrWidth(buf, _tFont);
+        x = _usX + (_usWidth - StrWidth) / 2;
+        LCD_DispStr(x, y, buf, _tFont);         
     }     
 }
 
@@ -761,12 +757,6 @@ void DispInfoBar16Ex(uint8_t _ucLine, char *_pName, char *_pValue, uint16_t _ucC
     x = 5;
     y = HEAD_HEIGHT + 5 + _ucLine * INFO_HEIGHT;
     
-//    /* 绘制边框 */
-//    LCD_DrawRoundRect(x, y, MEAS_WIN_HEIGHT, MEAS_WIN_WIDTH, MEAS_WIN_HEIGHT / 4, MEAS_BODER_COLOR);
-//    
-//    /* 填充矩形 */
-//    LCD_FillRoundRect(x + 1, y + 1, MEAS_WIN_HEIGHT - 2, MEAS_WIN_WIDTH - 2, MEAS_WIN_HEIGHT / 4, CL_YELLOW);
-    
     /* 参数名字 */
     tFont.FrontColor = INFO_NAME_COLOR;
     LCD_DispStr(x, y, _pName, &tFont);
@@ -822,83 +812,31 @@ void PlayKeyTone(void)
     }
 }
 
+/*
+*********************************************************************************************************
+*    函 数 名: DispMsgBox
+*    功能说明: 显示一个消息框. 字体16点阵
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void DispMsgBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, char *_str)    
+{   
+    FONT_T tFont;
+    
+    /* 设置字体参数 */
+    {
+        tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
+        tFont.FrontColor = MEAS_NAME_COLOR; /* 字体颜色 */
+        tFont.BackColor = CL_MASK;          /* 文字背景颜色 */
+        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+    }
+    
+    DispBox(_usX, _usY, _usHeight, _usWidth, MEAS_BACK_COLOR);
 
-void test_emmc(void)
-{
-	{		
-		printf("demo\r\n");
-		BSP_MMC_Init();
-		
-		uint8_t re;
-		uint32_t buf[512 * 8];
-		uint32_t i;
-		int32_t t1,t2;
-		
-		for (i = 0; i < 512; i++)
-		{
-			buf[i] = 0x12345678 + i;
-		}
-		
-		
-
-//		printf("Write,,,\r\n");
-//		t1 = bsp_GetRunTime();
-//		for (i = 0; i < 20000; i++)
-//		{
-//		
-//			buf[0] ++;
-//			
-//			re = BSP_MMC_WriteBlocks((uint32_t *) buf, i * 8, 8, 1000);	
-
-//			while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK);
-//			
-//			if (re == MMC_OK)
-//			{
-//				//printf("Write %d, ok %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
-//			}
-//			else
-//			{
-//				printf("Write %d, err %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
-//			}	
-//		}
-//		t2 = bsp_GetRunTime();
-//		printf("%dms, %dB/S\r\n", t2 - t1, (int)((8.0 * 20000 * 512 * 1000) /(t2 - t1)));
-		
-		
-		if (BSP_MMC_GetCardState() == MMC_TRANSFER_OK)
-		{
-			printf("BSP_MMC_GetCardState == 0K \r\n");
-		}
-		else
-		{
-			printf("BSP_MMC_GetCardState == Err \r\n");
-		}
-				
-		for (i = 0; i < 512; i++)
-		{
-			buf[i] = 0xFFFFFFFF;
-		}		
-
-		printf("Read,,,\r\n");
-		t1 = bsp_GetRunTime();
-		for (i = 0; i < 100; i++)
-		{		
-			re = BSP_MMC_ReadBlocks((uint32_t *) buf, i * 8, 1, 1000);									
-
-			while (BSP_MMC_GetCardState() != MMC_TRANSFER_OK);
-			
-			if (re == MMC_OK)
-			{
-				printf("Read %d, ok %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
-			}
-			else
-			{
-				printf("Read %d, err %02X %02X %02X %02X\r\n", i, (buf[0] >> 24) & 0xFF, (buf[0] >> 16)  & 0xFF, (buf[0] >> 8)  & 0xFF, buf[0] & 0xFF );
-			}
-		}
-		t2 = bsp_GetRunTime();
-		printf("%dms, %dB/S\r\n", t2 - t1, (int)((8.0 * 20000 * 512 * 1000ul) /(t2 - t1)));		
-	}	
+    /* 参数名字 */
+    tFont.FrontColor = MEAS_NAME_COLOR;
+    LCD_DispStr(_usX + 5, _usY + 4, _str, &tFont);
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -62,42 +62,42 @@ void status_PulseMeter(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S: /* S键按下 */
-                break;
+                case KEY_DOWN_S: /* S键按下 */
+                    break;
 
-            case KEY_UP_S: /* S键释放 */
-                if (ucIgnoreKey == 0)
-                {
-                    g_MainStatus = LastStatus(g_MainStatus);
-                }        
-                ucIgnoreKey = 0;
-                break;
+                case KEY_UP_S: /* S键释放 */
+                    if (ucIgnoreKey == 0)
+                    {
+                        g_MainStatus = LastStatus(g_MainStatus);
+                    }        
+                    ucIgnoreKey = 0;
+                    break;
 
-            case KEY_LONG_DOWN_S: /* S键长按 */
-                bsp_StartDetectPulse(); 
-                PlayKeyTone();
-                ucIgnoreKey = 1;
-                break;
+                case KEY_LONG_DOWN_S: /* S键长按 */
+                    bsp_StartDetectPulse(); 
+                    PlayKeyTone();
+                    ucIgnoreKey = 1;
+                    break;
 
-            case KEY_DOWN_C: /* C键按下 */
-                break;
+                case KEY_DOWN_C: /* C键按下 */
+                    break;
 
-            case KEY_UP_C: /* C键释放 */
-                if (ucIgnoreKey == 0)
-                {
-                    g_MainStatus = NextStatus(g_MainStatus);
-                }            
-                ucIgnoreKey = 0;
-                break;
+                case KEY_UP_C: /* C键释放 */
+                    if (ucIgnoreKey == 0)
+                    {
+                        g_MainStatus = NextStatus(g_MainStatus);
+                    }            
+                    ucIgnoreKey = 0;
+                    break;
 
-            case KEY_LONG_DOWN_C: /* C键长按 */
-                bsp_StopDetectPulse(); 
-                PlayKeyTone();                
-                ucIgnoreKey = 1;
-                break;
+                case KEY_LONG_DOWN_C: /* C键长按 */
+                    bsp_StopDetectPulse(); 
+                    PlayKeyTone();                
+                    ucIgnoreKey = 1;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }

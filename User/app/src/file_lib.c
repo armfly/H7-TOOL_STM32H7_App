@@ -220,6 +220,8 @@ uint32_t ReadFileToMem(char *_Path, uint32_t _offset, char *_Buff, uint32_t _Max
     re = f_read(&g_file, _Buff, _MaxLen,  &br);
     f_close(&g_file);
     
+    SCB_InvalidateDCache_by_Addr((uint32_t *)_Buff,  _MaxLen);
+    
     return br;
 }
 
@@ -878,7 +880,6 @@ void ListDir(char *_Path, char *_Filter)
         return;
     }
 
-    printf("info        |  filesize | name1 | name2\r\n");
     for (cnt = 0;; cnt++)
     {
         result = f_readdir(&DirInf, &FileInf); /* 读取目录项，索引会自动下移 */

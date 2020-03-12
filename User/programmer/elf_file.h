@@ -13,7 +13,7 @@
 
 #include "FlashOS.h"
 
-#define FUNC_NUM    9               /* 全局符号个数（函数和一个常量数组） */
+#define FUNC_NUM    10               /* 全局符号个数（函数和一个常量数组） */
 #define LOAD_NUM    4               /* 需要加载到RAM的段个数 */
 
 #define SECTOR_INFO_NUM    32       /* 需要加载到RAM的段个数 */
@@ -29,6 +29,7 @@ enum
     IDX_ProgramPage,
     IDX_Verify,
     IDX_CaculCRC32,
+    IDX_ReadExtID,
 };
 
 typedef struct
@@ -72,5 +73,6 @@ extern FLM_PARSE_T g_tFLM;
 extern ELF_RAM_T g_AlgoRam;
 
 uint8_t ELF_ParseFile(char *_path);
+uint8_t LoadAlgoToTarget(void);
 
 #endif

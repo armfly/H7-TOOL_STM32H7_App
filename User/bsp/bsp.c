@@ -16,14 +16,12 @@
 */
 #include "bsp.h"
 
-/*
-*********************************************************************************************************
-*                                       函数声明
-*********************************************************************************************************
-*/
 static void SystemClock_Config(void);
 static void CPU_CACHE_Enable(void);
 static void MPU_Config(void);
+
+uint8_t s_D0State = 2;
+uint8_t s_D2State = 2;
 
 /*
 *********************************************************************************************************
@@ -67,30 +65,33 @@ void bsp_Init(void)
 #endif
 
     bsp_InitKey();     /* 按键初始化，要放在滴答定时器之前，因为按钮检测是通过滴答定时器扫描 */
-    bsp_InitTimer(); /* 初始化滴答定时器 */
+    bsp_InitTimer();    /* 初始化滴答定时器 */
 
     ENABLE_INT();
 
     PERIOD_InitVar();
 
-    bsp_InitUart();        /* 初始化串口 */
-    bsp_InitLed();        /* 初始化LED */
-    bsp_InitI2C();        /* 初始化I2C总线 */
-    bsp_InitSPIBus(); /* 初始化SPI总线 */
+    bsp_InitUart();     /* 初始化串口 */
+    bsp_InitLed();      /* 初始化LED */
+    bsp_InitI2C();      /* 初始化I2C总线 */
+    bsp_InitSPIBus();   /* 初始化SPI总线 */
                                         //    bsp_InitSFlash();    /* 识别串行flash W25Q64 */
 
     BEEP_InitHard();
-    ee_CheckOk(); /* 检测EEPROM */
+    ee_CheckOk();       /* 检测EEPROM */
 
-    HC595_InitHard(); /* 配置示波器模块上的GPIO芯片 */
+    HC595_InitHard();   /* 配置示波器模块上的GPIO芯片 */
 
-    bsp_InitDAC1(); /* 配置DAC引脚 */
+    bsp_InitDAC1();     /* 配置DAC引脚 */
 
-    bsp_InitTVCC(); /* TVCC控制引脚 */
+    bsp_InitTVCC();     /* TVCC控制引脚 */
 
-    bsp_InitMCP4725(); /* 示波器偏置电压 */
+    bsp_InitMCP4725();  /* 示波器偏置电压 */
 
-    bsp_InitExtIO(); /* 输出端口初始化 */
+    bsp_InitExtIO();    /* 输出端口初始化 */
+    s_D0State = 2;      /* 用于调试, DEBUG_D0_TRIG()  */
+    s_D2State = 2;      /* 用于调试, DEBUG_D2_TRIG()  */
+
     LCD_InitHard();
 
     bsp_InitQSPI_W25Q256(); /* 初始化QSPI */
@@ -337,9 +338,22 @@ static void MPU_Config(void)
 	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
 	MPU_InitStruct.SubRegionDisable = 0x00;
 	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
-
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
 
+    /* 配置FMC IO空间的属性为Write through */
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0x60000000;
+	MPU_InitStruct.Size             = ARM_MPU_REGION_SIZE_32B;
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;     /* 不要CASHE */
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER4;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+    
     /*使能 MPU */
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }
@@ -451,6 +465,6 @@ void bsp_Idle(void)
 void HAL_Delay(uint32_t Delay)
 {
     bsp_DelayUS(Delay * 1000);
-}
+}    
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -19,7 +19,7 @@
 *        V1.4    2015-05-22 armfly  完善 bsp_InitHardTimer() ，增加条件编译选择TIM2-5
 *        V1.5    2018-11-26 armfly  s_tTmr赋初值0; 增加g_ucEnableSystickISR变量避免HAL提前打开systick中断
 *                                   引起的异常。
-*
+*        V1.6    2020-02-19 armfly  g_iRunTime 运行时间改用 TIMx->CNT 实现，避免1ms中断丢失导致时长不准
 *    Copyright (C), 2015-2030, 安富莱电子 www.armfly.com
 *
 *********************************************************************************************************
@@ -36,9 +36,9 @@
 
 #ifdef USE_TIM2
 #define TIM_HARD TIM2
-#define RCC_TIM_HARD_CLK_ENABLE() __HAL_RCC_TIM2_CLK_ENABLE()
-#define TIM_HARD_IRQn TIM2_IRQn
-#define TIM_HARD_IRQHandler TIM2_IRQHandler
+#define RCC_TIM_HARD_CLK_ENABLE()   __HAL_RCC_TIM2_CLK_ENABLE()
+#define TIM_HARD_IRQn               TIM2_IRQn
+#define TIM_HARD_IRQHandler         TIM2_IRQHandler
 #endif
 
 #ifdef USE_TIM3
@@ -61,6 +61,8 @@
 #define TIM_HARD_IRQn TIM5_IRQn
 #define TIM_HARD_IRQHandler TIM5_IRQHandler
 #endif
+
+__IO uint32_t g_uiTimeHighWord = 0; 
 
 /* 保存 TIM定时中断到后执行的回调函数指针 */
 static void (*s_TIM_CallBack1)(void);
@@ -153,18 +155,20 @@ void SysTick_ISR(void)
         }
     }
 
+//    DEBUG_D2_TRIG();
+    
     /* 每隔1ms，对软件定时器的计数器进行减一操作 */
     for (i = 0; i < TMR_COUNT; i++)
     {
         bsp_SoftTimerDec(&s_tTmr[i]);
     }
 
-    /* 全局运行时间每1ms增1 */
-    g_iRunTime++;
-    if (g_iRunTime == 0x7FFFFFFF) /* 这个变量是 int32_t 类型，最大数为 0x7FFFFFFF */
-    {
-        g_iRunTime = 0;
-    }
+//    /* 全局运行时间每1ms增1 用硬件定时器实现了 */
+//    g_iRunTime++;
+//    if (g_iRunTime == 0x7FFFFFFF) /* 这个变量是 int32_t 类型，最大数为 0x7FFFFFFF */
+//    {
+//        g_iRunTime = 0;
+//    }
 
     bsp_RunPer1ms(); /* 每隔1ms调用一次此函数，此函数在 bsp.c */
 
@@ -420,6 +424,9 @@ int32_t bsp_GetRunTime(void)
 //    ENABLE_INT(); /* 开中断 */
 
 //    return runtime;
+    
+    g_iRunTime = TIM_HARD->CNT / 1000;
+    
     return g_iRunTime;
 }
 
@@ -437,7 +444,7 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
     int32_t time_diff;
 
 //    DISABLE_INT();                 /* 关中断 */
-    now_time = g_iRunTime;         /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
+    now_time = TIM_HARD->CNT / 1000; 
 //    ENABLE_INT();                  /* 开中断 */
 
     if (now_time >= _LastTime)
@@ -619,6 +626,10 @@ void bsp_InitHardTimer(void)
     
     /* 启动定时器 */
     HAL_TIM_Base_Start(&TimHandle);
+    
+    /* 启动溢出中断，用于运行时间计数, us单位 */    
+    TIMx->SR = (uint16_t)~TIM_IT_UPDATE;   /* 清除UPDATE中断标志 */
+    TIMx->DIER |= TIM_IT_UPDATE;           /* 使能UPDATE中断 */    
 }
 
 /*
@@ -692,21 +703,32 @@ void bsp_StartHardTimer(uint8_t _CC, uint32_t _uiTimeOut, void *_pCallBack)
 */
 void TIM_HARD_IRQHandler(void)
 {
+    uint32_t timesr;
     uint16_t itstatus = 0x0, itenable = 0x0;
     TIM_TypeDef *TIMx = TIM_HARD;
 
-    itstatus = TIMx->SR & TIM_IT_CC1;
+    timesr = TIMx->SR;
+    
+    /* 溢出中断，用于CPU运行时间计算. 65.535ms进入一次 */
+    if (timesr & TIM_IT_UPDATE)
+    {
+        TIMx->SR = (uint16_t)~TIM_IT_UPDATE;
+        
+        g_uiTimeHighWord++;
+    }
+    
+    itstatus = timesr & TIM_IT_CC1;
     itenable = TIMx->DIER & TIM_IT_CC1;
     if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
     {
         TIMx->SR = (uint16_t)~TIM_IT_CC1;
-        TIMx->DIER &= (uint16_t)~TIM_IT_CC1; /* 禁能CC1中断 */
+        TIMx->DIER &= (uint16_t)~TIM_IT_CC1;    /* 禁能CC1中断 */
 
         /* 先关闭中断，再执行回调函数。因为回调函数可能需要重启定时器 */
         s_TIM_CallBack1();
     }
 
-    itstatus = TIMx->SR & TIM_IT_CC2;
+    itstatus = timesr & TIM_IT_CC2;
     itenable = TIMx->DIER & TIM_IT_CC2;
     if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
     {
@@ -717,7 +739,7 @@ void TIM_HARD_IRQHandler(void)
         s_TIM_CallBack2();
     }
 
-    itstatus = TIMx->SR & TIM_IT_CC3;
+    itstatus = timesr & TIM_IT_CC3;
     itenable = TIMx->DIER & TIM_IT_CC3;
     if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
     {
@@ -728,7 +750,7 @@ void TIM_HARD_IRQHandler(void)
         s_TIM_CallBack3();
     }
 
-    itstatus = TIMx->SR & TIM_IT_CC4;
+    itstatus = timesr & TIM_IT_CC4;
     itenable = TIMx->DIER & TIM_IT_CC4;
     if ((itstatus != (uint16_t)RESET) && (itenable != (uint16_t)RESET))
     {

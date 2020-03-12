@@ -12,7 +12,7 @@
 #ifndef __BSP_FMC_IO_H
 #define __BSP_FMC_IO_H
 
-#define EIO_READ_FMC() *(uint16_t *)0x60001000
+#define EIO_READ_FMC() *(uint16_t *)0x60000000
 
 /* 供外部调用的函数声明 */
 enum
@@ -41,15 +41,17 @@ enum
 /* IO功能选择 */
 typedef enum
 {
-    ES_GPIO_IN = 0,    /* GPIO 输入， FMC输入 */
-    ES_GPIO_OUT = 1, /* GPIO 输出， FMC输入 */
-    ES_FMC_OUT = 2,    /* GPIO 输入， FMC输出 */
+    ES_GPIO_IN = 0,     /* GPIO 输入， FMC输入 */
+    ES_GPIO_OUT = 1,    /* GPIO 输出， FMC输入 */
+    ES_FMC_OUT = 2,     /* GPIO 输入， FMC输出 */
 
-    ES_FMC_NOE = 3, /* D8专用，FMC_D8和FMC_NOE并联 */
-    ES_FMC_NWE = 4, /* D9专用，FMC_D9和FMC_NWE并联 */
+    ES_FMC_NOE = 3,     /* D8专用，FMC_D8和FMC_NOE并联 */
+    ES_FMC_NWE = 4,     /* D9专用，FMC_D9和FMC_NWE并联 */
 
-    ES_GPIO_UART = 5, /* 作为GPIO串口功能 */
+    ES_GPIO_UART = 5,   /* 作为GPIO串口功能 */
     ES_GPIO_CAN = 6,    /* CAN功能 */
+    
+    ES_GPIO_I2C = 7,    /* I2C功能 */
 } EIO_SELECT_E;
 
 void bsp_InitExtIO(void);

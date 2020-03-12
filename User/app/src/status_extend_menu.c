@@ -100,42 +100,42 @@ void status_ExtendMenu1(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_UP_S: /* S键 上 */
-                LCD_MoveUpMenu(&g_tMenu1);
-                break;
+                case KEY_UP_S: /* S键 上 */
+                    LCD_MoveUpMenu(&g_tMenu1);
+                    break;
 
-            case KEY_LONG_DOWN_S: /* S键 上 */
-                PlayKeyTone();
+                case KEY_LONG_DOWN_S: /* S键 上 */
+                    PlayKeyTone();
 
-                if (g_tMenu1.Cursor == 0)
-                {
-                    g_MainStatus = MS_PROG_WORK;
-                }
-                else if (g_tMenu1.Cursor == 1)
-                {
-                    g_MainStatus = MS_LUA_SELECT_FILE;
-                }
-                else if (g_tMenu1.Cursor == 2)
-                {
-                    g_MainStatus = MS_EXTEND_MENU_REC;
-                }   
-                else if (g_tMenu1.Cursor == 3)
-                {
-                    g_MainStatus = MS_SYSTEM_SET;
-                }                 
-                break;
+                    if (g_tMenu1.Cursor == 0)
+                    {
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenu1.Cursor == 1)
+                    {
+                        g_MainStatus = MS_LUA_SELECT_FILE;
+                    }
+                    else if (g_tMenu1.Cursor == 2)
+                    {
+                        g_MainStatus = MS_EXTEND_MENU_REC;
+                    }   
+                    else if (g_tMenu1.Cursor == 3)
+                    {
+                        g_MainStatus = MS_SYSTEM_SET;
+                    }                 
+                    break;
 
-            case KEY_UP_C: /* C键 下 */
-                LCD_MoveDownMenu(&g_tMenu1);
-                break;
+                case KEY_UP_C: /* C键 下 */
+                    LCD_MoveDownMenu(&g_tMenu1);
+                    break;
 
-            case KEY_LONG_DOWN_C: /* C键长按 */
-                PlayKeyTone();
-                g_MainStatus = MS_LINK_MODE;
-                break;
+                case KEY_LONG_DOWN_C: /* C键长按 */
+                    PlayKeyTone();
+                    g_MainStatus = MS_LINK_MODE;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }
@@ -200,30 +200,30 @@ void status_ExtendMenuRec(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_UP_S: /* S键 上 */
-                LCD_MoveUpMenu(&g_tMenuRec);
-                break;
+                case KEY_UP_S: /* S键 上 */
+                    LCD_MoveUpMenu(&g_tMenuRec);
+                    break;
 
-            case KEY_LONG_DOWN_S: /* S键 上 */
-                PlayKeyTone();
+                case KEY_LONG_DOWN_S: /* S键 上 */
+                    PlayKeyTone();
 
-//                if (g_tMenuRec.Cursor == 0)
-//                {
-//                    g_MainStatus = MS_PROG_WORK;
-//                }
-//                else if (g_tMenuRec.Cursor == 1)
-//                {
-//                    g_MainStatus = MS_MODIFY_PARAM;
-//                }
-//                else if (g_tMenuRec.Cursor == 2)
-//                {
-//                    g_MainStatus = MS_ESP32_TEST;
-//                }
-//                else if (g_tMenuRec.Cursor == 3)
-//                {
-//                    g_MainStatus = MS_USB_EMMC;
-//                }                                
-                break;
+    //                if (g_tMenuRec.Cursor == 0)
+    //                {
+    //                    g_MainStatus = MS_PROG_WORK;
+    //                }
+    //                else if (g_tMenuRec.Cursor == 1)
+    //                {
+    //                    g_MainStatus = MS_MODIFY_PARAM;
+    //                }
+    //                else if (g_tMenuRec.Cursor == 2)
+    //                {
+    //                    g_MainStatus = MS_ESP32_TEST;
+    //                }
+    //                else if (g_tMenuRec.Cursor == 3)
+    //                {
+    //                    g_MainStatus = MS_USB_EMMC;
+    //                }                                
+                    break;
 
             case KEY_UP_C: /* C键 下 */
                 LCD_MoveDownMenu(&g_tMenuRec);

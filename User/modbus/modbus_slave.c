@@ -20,7 +20,7 @@
 #include "modbus_iap.h"
 #include "lua_if.h"
 #include "usbd_cdc_interface.h"
-
+#include "prog_if.h"
 
 static void MODS_AnalyzeApp(void);
 
@@ -222,58 +222,58 @@ static void MODS_AnalyzeApp(void)
 {
     switch (g_tModS.RxBuf[1]) /* 第2个字节 功能码 */
     {
-    case 0x01: /* 读取线圈状态*/
-        MODS_01H();
-        break;
+        case 0x01: /* 读取线圈状态*/
+            MODS_01H();
+            break;
 
-    case 0x02: /* 读取输入状态 */
-        MODS_02H();
-        break;
+        case 0x02: /* 读取输入状态 */
+            MODS_02H();
+            break;
 
-    case 0x03: /* 读取1个或多个参数保持寄存器 在一个或多个保持寄存器中取得当前的二进制值*/
-        MODS_03H();
-        break;
+        case 0x03: /* 读取1个或多个参数保持寄存器 在一个或多个保持寄存器中取得当前的二进制值*/
+            MODS_03H();
+            break;
 
-    case 0x04: /* 读取1个或多个模拟量输入寄存器 */
-        MODS_04H();
-        break;
+        case 0x04: /* 读取1个或多个模拟量输入寄存器 */
+            MODS_04H();
+            break;
 
-    case 0x05: /* 强制单线圈（） */
-        MODS_05H();
-        break;
+        case 0x05: /* 强制单线圈（） */
+            MODS_05H();
+            break;
 
-    case 0x06: /* 写单个参数保持寄存器 (存储在CPU的FLASH中，或EEPROM中的参数)*/
-        MODS_06H();
-        break;
+        case 0x06: /* 写单个参数保持寄存器 (存储在CPU的FLASH中，或EEPROM中的参数)*/
+            MODS_06H();
+            break;
 
-    case 0x10: /* 写多个参数保持寄存器 (存储在CPU的FLASH中，或EEPROM中的参数)*/
-        MODS_10H();
-        break;
+        case 0x10: /* 写多个参数保持寄存器 (存储在CPU的FLASH中，或EEPROM中的参数)*/
+            MODS_10H();
+            break;
 
-    case 0x0F:
-        MODS_0FH(); /* 强制多个线圈（对应D01/D02/D03） */
-        break;
+        case 0x0F:
+            MODS_0FH(); /* 强制多个线圈（对应D01/D02/D03） */
+            break;
 
-        //        case 0x15:    /* 写文件寄存器 */
-        //            MODS_15H();
-        //            break;
+            //        case 0x15:    /* 写文件寄存器 */
+            //            MODS_15H();
+            //            break;
 
-    case 0x60: /* 读取波形数据专用功能码 */
-        MODS_60H();
-        break;
+        case 0x60: /* 读取波形数据专用功能码 */
+            MODS_60H();
+            break;
 
-    case 0x64: /* 小程序下载接口 */
-        MODS_64H();
-        break;
+        case 0x64: /* 小程序下载接口 */
+            MODS_64H();
+            break;
 
-    case 0x65: /* 临时执行小程序 */
-        MODS_65H();
-        break;
+        case 0x65: /* 临时执行小程序 */
+            MODS_65H();
+            break;
 
-    default:
-        g_tModS.RspCode = RSP_ERR_CMD;
-        MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
-        break;
+        default:
+            g_tModS.RspCode = RSP_ERR_CMD;
+            MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
+            break;
     }
 }
 
@@ -1163,7 +1163,18 @@ static void MODS_65H(void)
 
     if (g_Lua > 0)
     {
+        /* PC机启动编程时，记录开始时间 */
+        if (memcmp((char *)&g_tModS.RxBuf[4], "start_prog()", 12) == 0)
+        {
+            g_tProg.Time = bsp_GetRunTime();    /* 记录开始时间 */
+        }
+        else if (memcmp((char *)&g_tModS.RxBuf[4], "erase_chip", 10) == 0)
+        {
+            g_tProg.FLMEraseChipFlag = 1;   /* 擦除时间很长，等待中给出进度信息 */
+        }
         lua_do((char *)&g_tModS.RxBuf[4]);
+        
+        g_tProg.FLMEraseChipFlag = 0;
     }
 
 err_ret:

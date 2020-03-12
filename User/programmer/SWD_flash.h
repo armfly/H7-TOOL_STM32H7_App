@@ -13,5 +13,6 @@ error_t target_flash_erase_sector(uint32_t addr);
 error_t target_flash_erase_chip(void);
 uint8_t target_flash_check_blank(uint32_t addr, uint32_t size);
 uint32_t target_flash_cacul_crc32(uint32_t addr, uint32_t size, uint32_t ini_value);
+uint32_t target_flash_read_extid(uint32_t addr);
 
 #endif // __SWD_FLASH_H__

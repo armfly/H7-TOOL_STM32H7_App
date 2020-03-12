@@ -235,6 +235,19 @@ static const uint32_t crc32c_table[256] = {
 //	return crc;
 //}
 
+//    /* TEST CRC32 */
+//    {
+//        static uint32_t crc1, crc2, crc3;
+//        
+//        while (1)
+//        {
+//            crc1 = CRC32Software((uint8_t *)0x08000000, 32);
+//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 8);
+//                
+//            crc3 = calculate_CRC32((uint8_t *)0x08000000, 512*1024);
+//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 512*1024 / 4);
+//        }
+//    }
 uint32_t Calculate_CRC32 (uint8_t *pStart, uint32_t uSize)
 {
 	#define INIT  0xffffffffL
@@ -567,7 +580,7 @@ char BcdToChar(uint8_t _bcd)
     }
     else if (_bcd < 16)
     {
-        return _bcd + 'A';
+        return _bcd - 10 + 'A';
     }
     else
     {

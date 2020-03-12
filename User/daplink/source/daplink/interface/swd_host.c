@@ -65,11 +65,22 @@ static SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
 static DAP_STATE dap_state;
 static uint32_t  soft_reset = SYSRESETREQ;
 
-#if  1  // armfly debug
-void swd_set_target_reset(uint8_t asserted)
+#if  0  // armfly debug
+__attribute__((weak)) void swd_set_target_reset(uint8_t asserted)
 {
     (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);
 }
+#else
+void swd_set_target_reset(uint8_t asserted)
+{       
+    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);   
+
+//    if(asserted == 0)
+//	{
+//		swd_write_word((uint32_t)&SCB->AIRCR, ((0x5FA << SCB_AIRCR_VECTKEY_Pos) |(SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) | SCB_AIRCR_SYSRESETREQ_Msk));
+//	}    
+}
+#endif
 
 uint32_t target_get_apsel()
 {
@@ -80,7 +91,7 @@ uint32_t target_get_apsel()
 //    }
     return 0;
 }
-#endif
+
 
 static uint32_t swd_get_apsel(uint32_t adr)
 {
@@ -695,8 +706,9 @@ uint8_t swd_write_core_register(uint32_t n, uint32_t val)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-extern void PG_PrintPercent(float _Percent);
+void PG_PrintPercent(float _Percent, uint32_t _Addr);
 extern uint8_t ProgCancelKey(void);
+extern void PG_PrintText(char *_str);
 static uint8_t swd_wait_until_halted(void)
 {
 #if 1
@@ -731,7 +743,7 @@ static uint8_t swd_wait_until_halted(void)
                     if ((tt % 250) == 0)
                     {
                         percent = ((float)tt / g_tProgIni.LastEraseChipTime) * 100;                
-                        PG_PrintPercent(percent);
+                        PG_PrintPercent(percent, 0xFFFFFFFF);
                     }
                     bsp_Idle();
                 }                   
@@ -745,6 +757,7 @@ static uint8_t swd_wait_until_halted(void)
 
         if (val & S_HALT) 
         {
+            g_tProg.FLMEraseChipFlag = 0;
             return 1;
         } 
         
@@ -754,7 +767,7 @@ static uint8_t swd_wait_until_halted(void)
             break;         
         }        
     }
-
+    g_tProg.FLMEraseChipFlag = 0;
     return 0;
 #else    
     // Wait for target to stop
@@ -1049,11 +1062,11 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                         continue;
                     }
                     
-                    if (reset_connect == CONNECT_UNDER_RESET) {
-                        // Assert reset
-                        swd_set_target_reset(1); 
-                        osDelay(20);
-                    }
+//                    if (reset_connect == CONNECT_UNDER_RESET) {
+//                        // Assert reset
+//                        swd_set_target_reset(1); 
+//                        osDelay(20);
+//                    }
 
                     // Enable debug
                     while(swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN) == 0) {
@@ -1072,11 +1085,11 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                         continue;
                     }
                     
-                    if (reset_connect == CONNECT_NORMAL) {
+//                    if (reset_connect == CONNECT_NORMAL) {
                         // Assert reset
                         swd_set_target_reset(1); 
-                        osDelay(10);
-                    }
+                        osDelay(20);
+//                    }
                     
                     // Deassert reset
                     swd_set_target_reset(0);
@@ -1125,7 +1138,6 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                 {
                     return 0;
                 }
-                break;
             }
             break;
 

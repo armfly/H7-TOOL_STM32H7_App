@@ -18,7 +18,7 @@
 #include "lcd_menu.h"
 #include "file_lib.h"
 #include "lua_if.h"
-
+#include "prog_if.h"
 /*
 *********************************************************************************************************
 *    函 数 名: status_LuaSelectFile
@@ -196,7 +196,8 @@ void status_LuaRun(void)
         tFontMemo.Space = 0;                    /* 文字间距，单位 = 像素 */                
     }     
     
-    lua_DownLoadFile(g_tFileList.Path);
+    lua_DownLoadFile(g_tFileList.Path);    
+    GetChipTypeFromLua(g_Lua);  /* 从lua中解析芯片类型 */
     
     /* 从lua文件中解析按钮名字和程序语句 */
     FindBtnNoteCmd();

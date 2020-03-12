@@ -21,24 +21,23 @@
 /* 
     STM32-V7开发板接线
 
-    PG6/QUADSPI_BK1_NCS AF10
-    PF10/QUADSPI_CLK    AF9
-    PF8/QUADSPI_BK1_IO0 AF10
-    PF9/QUADSPI_BK1_IO1 AF10
-    PF7/QUADSPI_BK1_IO2 AF9
-    PF6/QUADSPI_BK1_IO3 AF9
+    PG6/QUADSPI_BK1_NCS     AF10
+    PF10/QUADSPI_CLK        AF9
+    PF8/QUADSPI_BK1_IO0     AF10
+    PF9/QUADSPI_BK1_IO1     AF10
+    PF7/QUADSPI_BK1_IO2     AF9
+    PF6/QUADSPI_BK1_IO3     AF9
 
     W25Q256JV有512块，每块有16个扇区，每个扇区Sector有16页，每页有256字节，共计32MB
-    
-    
+        
     H7-TOOL开发板接线
 
-    PG6/QUADSPI_BK1_NCS  AF10
-    PB2/QUADSPI_CLK    AF9
-    PD11/QUADSPI_BK1_IO0 AF10
-    PD12/QUADSPI_BK1_IO1 AF10
-    PF7/QUADSPI_BK1_IO2  AF9
-    PD13/QUADSPI_BK1_IO3 AF9
+    PG6/QUADSPI_BK1_NCS     AF10
+    PB2/QUADSPI_CLK         AF9
+    PD11/QUADSPI_BK1_IO0    AF10
+    PD12/QUADSPI_BK1_IO1    AF10
+    PF7/QUADSPI_BK1_IO2     AF9
+    PD13/QUADSPI_BK1_IO3    AF9
 */
 
 /* QSPI引脚和时钟相关配置宏定义 */
@@ -160,8 +159,9 @@ void bsp_InitQSPI_W25Q256(void)
     */
     QSPIHandle.Init.SampleShifting = QSPI_SAMPLE_SHIFTING_HALFCYCLE;
 
-    /*Flash大小是2^(FlashSize + 1) = 2^25 = 32MB */
-    QSPIHandle.Init.FlashSize = QSPI_FLASH_SIZE - 1;
+    /* Flash大小是2^(FlashSize + 1) = 2^25 = 32MB */
+    /* 正确值应该是 QSPI_FLASH_SIZE - 1; 但内存映射模式访问最后一个字节时，CPU预取下个数据会导致异常。扩大一点解决问题。 */
+    QSPIHandle.Init.FlashSize = QSPI_FLASH_SIZE;    
 
     /* 命令之间的CS片选至少保持1个时钟周期的高电平 */
     QSPIHandle.Init.ChipSelectHighTime = QSPI_CS_HIGH_TIME_1_CYCLE;
@@ -329,19 +329,19 @@ void QSPI_EraseSector(uint32_t address)
     QSPI_WriteEnable(&QSPIHandle);
 
     /* 基本配置 */
-    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
-    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                        /* 32位地址 */
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                                /* W25Q256JV不支持DDR */
-    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                        /* 每次传输都发指令 */
+    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;         /* 1线方式发送指令 */
+    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                /* 32位地址 */
+    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;     /* 无交替字节 */
+    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                   /* W25Q256JV不支持DDR */
+    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;      /* DDR模式，数据输出延迟 */
+    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;               /* 每次传输都发指令 */
 
     /* 擦除配置 */
-    sCommand.Instruction = SUBSECTOR_ERASE_4_BYTE_ADDR_CMD; /* 32bit地址方式的扇区擦除命令，扇区大小4KB*/
-    sCommand.AddressMode = QSPI_ADDRESS_1_LINE;                            /* 地址发送是1线方式 */
-    sCommand.Address = address;                                                            /* 扇区首地址，保证是4KB整数倍 */
-    sCommand.DataMode = QSPI_DATA_NONE;                                            /* 无需发送数据 */
-    sCommand.DummyCycles = 0;                                                                /* 无需空周期 */
+    sCommand.Instruction = SUBSECTOR_ERASE_4_BYTE_ADDR_CMD;     /* 32bit地址方式的扇区擦除命令，扇区大小4KB*/
+    sCommand.AddressMode = QSPI_ADDRESS_1_LINE;                 /* 地址发送是1线方式 */
+    sCommand.Address = address;                                 /* 扇区首地址，保证是4KB整数倍 */
+    sCommand.DataMode = QSPI_DATA_NONE;                         /* 无需发送数据 */
+    sCommand.DummyCycles = 0;                                   /* 无需空周期 */
 
     if (HAL_QSPI_Command_IT(&QSPIHandle, &sCommand) != HAL_OK)
     {
@@ -382,20 +382,20 @@ uint8_t QSPI_WriteBuffer(uint8_t *_pBuf, uint32_t _uiWriteAddr, uint16_t _usWrit
     QSPI_WriteEnable(&QSPIHandle);
 
     /* 基本配置 */
-    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
-    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                        /* 32位地址 */
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                                /* W25Q256JV不支持DDR */
-    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    sCommand.SIOOMode = QSPI_SIOO_INST_ONLY_FIRST_CMD;            /* 仅发送一次命令 */
+    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;         /* 1线方式发送指令 */
+    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                /* 32位地址 */
+    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;     /* 无交替字节 */
+    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                   /* W25Q256JV不支持DDR */
+    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;      /* DDR模式，数据输出延迟 */
+    sCommand.SIOOMode = QSPI_SIOO_INST_ONLY_FIRST_CMD;          /* 仅发送一次命令 */
 
     /* 写序列配置 */
-    sCommand.Instruction = QUAD_IN_FAST_PROG_4_BYTE_ADDR_CMD; /* 32bit地址的4线快速写入命令 */
-    sCommand.DummyCycles = 0;                                                                    /* 不需要空周期 */
-    sCommand.AddressMode = QSPI_ADDRESS_1_LINE;                                /* 4线地址方式 */
-    sCommand.DataMode = QSPI_DATA_4_LINES;                                        /* 4线数据方式 */
-    sCommand.NbData = _usWriteSize;                                                        /* 写数据大小 */
-    sCommand.Address = _uiWriteAddr;                                                    /* 写入地址 */
+    sCommand.Instruction = QUAD_IN_FAST_PROG_4_BYTE_ADDR_CMD;   /* 32bit地址的4线快速写入命令 */
+    sCommand.DummyCycles = 0;                                   /* 不需要空周期 */
+    sCommand.AddressMode = QSPI_ADDRESS_1_LINE;                 /* 4线地址方式 */
+    sCommand.DataMode = QSPI_DATA_4_LINES;                      /* 4线数据方式 */
+    sCommand.NbData = _usWriteSize;                             /* 写数据大小 */
+    sCommand.Address = _uiWriteAddr;                            /* 写入地址 */
 
     if (HAL_QSPI_Command(&QSPIHandle, &sCommand, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
@@ -442,20 +442,20 @@ void QSPI_ReadBuffer(uint8_t *_pBuf, uint32_t _uiReadAddr, uint32_t _uiSize)
     RxCplt = 0;
 
     /* 基本配置 */
-    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
-    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                        /* 32位地址 */
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                                /* W25Q256JV不支持DDR */
-    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                        /* 每次传输要发指令 */
+    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;             /* 1线方式发送指令 */
+    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                    /* 32位地址 */
+    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;         /* 无交替字节 */
+    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                       /* W25Q256JV不支持DDR */
+    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;          /* DDR模式，数据输出延迟 */
+    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                   /* 每次传输要发指令 */
 
     /* 读取数据 */
-    sCommand.Instruction = QUAD_INOUT_FAST_READ_4_BYTE_ADDR_CMD; /* 32bit地址的4线快速读取命令 */
-    sCommand.DummyCycles = 6;                                                                         /* 空周期 */
-    sCommand.AddressMode = QSPI_ADDRESS_4_LINES;                                 /* 4线地址 */
-    sCommand.DataMode = QSPI_DATA_4_LINES;                                             /* 4线数据 */
-    sCommand.NbData = _uiSize;                                                                     /* 读取的数据大小 */
-    sCommand.Address = _uiReadAddr;                                                             /* 读取数据的起始地址 */
+    sCommand.Instruction = QUAD_INOUT_FAST_READ_4_BYTE_ADDR_CMD;    /* 32bit地址的4线快速读取命令 */
+    sCommand.DummyCycles = 6;                                       /* 空周期 */
+    sCommand.AddressMode = QSPI_ADDRESS_4_LINES;                    /* 4线地址 */
+    sCommand.DataMode = QSPI_DATA_4_LINES;                          /* 4线数据 */
+    sCommand.NbData = _uiSize;                                      /* 读取的数据大小 */
+    sCommand.Address = _uiReadAddr;                                 /* 读取数据的起始地址 */
 
     if (HAL_QSPI_Command(&QSPIHandle, &sCommand, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
@@ -469,7 +469,25 @@ void QSPI_ReadBuffer(uint8_t *_pBuf, uint32_t _uiReadAddr, uint32_t _uiSize)
     }
 
     /* 等接受完毕 */
-    while (RxCplt == 0)
+    //while (RxCplt == 0)
+    {
+        int32_t s_time;
+            
+        s_time = bsp_GetRunTime();
+
+        while (1)
+        {
+            if (RxCplt != 0)
+            {
+                break;
+            }
+    
+            if (bsp_CheckRunTime(s_time) >= 100)
+            {
+                break;
+            }
+        }
+    }
         ;
     RxCplt = 0;
 }
@@ -487,18 +505,18 @@ static void QSPI_WriteEnable(QSPI_HandleTypeDef *hqspi)
     QSPI_CommandTypeDef sCommand = {0};
 
     /* 基本配置 */
-    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
-    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                        /* 32位地址 */
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                                /* W25Q256JV不支持DDR */
-    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                        /* 每次传输都发指令 */
+    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;             /* 1线方式发送指令 */
+    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                    /* 32位地址 */
+    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;         /* 无交替字节 */
+    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                       /* W25Q256JV不支持DDR */
+    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;          /* DDR模式，数据输出延迟 */
+    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                   /* 每次传输都发指令 */
 
     /* 写使能 */
-    sCommand.Instruction = WRITE_ENABLE_CMD;    /* 写使能指令 */
-    sCommand.AddressMode = QSPI_ADDRESS_NONE; /* 无需地址 */
-    sCommand.DataMode = QSPI_DATA_NONE;                /* 无需数据 */
-    sCommand.DummyCycles = 0;                                    /* 空周期  */
+    sCommand.Instruction = WRITE_ENABLE_CMD;                        /* 写使能指令 */
+    sCommand.AddressMode = QSPI_ADDRESS_NONE;                       /* 无需地址 */
+    sCommand.DataMode = QSPI_DATA_NONE;                             /* 无需数据 */
+    sCommand.DummyCycles = 0;                                       /* 空周期  */
 
     if (HAL_QSPI_Command(&QSPIHandle, &sCommand, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {
@@ -526,18 +544,18 @@ static void QSPI_AutoPollingMemReady(QSPI_HandleTypeDef *hqspi)
     QSPI_AutoPollingTypeDef sConfig = {0};
 
     /* 基本配置 */
-    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
-    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                        /* 32位地址 */
-    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                                /* W25Q256JV不支持DDR */
-    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                        /* 每次传输都发指令 */
+    sCommand.InstructionMode = QSPI_INSTRUCTION_1_LINE;             /* 1线方式发送指令 */
+    sCommand.AddressSize = QSPI_ADDRESS_32_BITS;                    /* 32位地址 */
+    sCommand.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;         /* 无交替字节 */
+    sCommand.DdrMode = QSPI_DDR_MODE_DISABLE;                       /* W25Q256JV不支持DDR */
+    sCommand.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;          /* DDR模式，数据输出延迟 */
+    sCommand.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                   /* 每次传输都发指令 */
 
     /* 读取状态*/
-    sCommand.Instruction = READ_STATUS_REG_CMD; /* 读取状态命令 */
-    sCommand.AddressMode = QSPI_ADDRESS_NONE;        /* 无需地址 */
-    sCommand.DataMode = QSPI_DATA_1_LINE;                /* 1线数据 */
-    sCommand.DummyCycles = 0;                                        /* 无需空周期 */
+    sCommand.Instruction = READ_STATUS_REG_CMD;                     /* 读取状态命令 */
+    sCommand.AddressMode = QSPI_ADDRESS_NONE;                       /* 无需地址 */
+    sCommand.DataMode = QSPI_DATA_1_LINE;                           /* 1线数据 */
+    sCommand.DummyCycles = 0;                                       /* 无需空周期 */
 
     /* 屏蔽位设置的bit0，匹配位等待bit0为0，即不断查询状态寄存器bit0，等待其为0 */
     sConfig.Mask = 0x01;
@@ -568,19 +586,19 @@ uint32_t QSPI_ReadID(void)
     uint8_t buf[3];
 
     /* 基本配置 */
-    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;         /* 1线方式发送指令 */
-    s_command.AddressSize = QSPI_ADDRESS_32_BITS;                         /* 32位地址 */
-    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE; /* 无交替字节 */
-    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;                             /* W25Q256JV不支持DDR */
-    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;    /* DDR模式，数据输出延迟 */
-    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                     /* 每次传输都发指令 */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;            /* 1线方式发送指令 */
+    s_command.AddressSize = QSPI_ADDRESS_32_BITS;                   /* 32位地址 */
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;        /* 无交替字节 */
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;                      /* W25Q256JV不支持DDR */
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;         /* DDR模式，数据输出延迟 */
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;                  /* 每次传输都发指令 */
 
     /* 读取JEDEC ID */
-    s_command.Instruction = READ_ID_CMD2;             /* 读取ID命令 */
-    s_command.AddressMode = QSPI_ADDRESS_NONE; /* 1线地址 */
-    s_command.DataMode = QSPI_DATA_1_LINE;         /* 1线地址 */
-    s_command.DummyCycles = 0;                                 /* 无空周期 */
-    s_command.NbData = 3;                                             /* 读取三个数据 */
+    s_command.Instruction = READ_ID_CMD2;                           /* 读取ID命令 */
+    s_command.AddressMode = QSPI_ADDRESS_NONE;                      /* 1线地址 */
+    s_command.DataMode = QSPI_DATA_1_LINE;                          /* 1线地址 */
+    s_command.DummyCycles = 0;                                      /* 无空周期 */
+    s_command.NbData = 3;                                           /* 读取三个数据 */
 
     if (HAL_QSPI_Command(&QSPIHandle, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
     {

@@ -27,7 +27,7 @@
 */
 void status_MiniDSO(void)
 {
-    uint8_t ucKeyCode; /* 按键代码 */
+    uint8_t ucKeyCode;  /* 按键代码 */
     uint8_t fRefresh;
     
     DispHeader("迷你示波器");
@@ -37,43 +37,43 @@ void status_MiniDSO(void)
     fRefresh = 1;
     while (g_MainStatus == MS_MINI_DSO)
     {
-        if (fRefresh) /* 刷新整个界面 */
+        if (fRefresh)   /* 刷新整个界面 */
         {
             fRefresh = 0;
         }
 
         bsp_Idle();
         
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        ucKeyCode = bsp_GetKey();   /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
             switch (ucKeyCode)
             {
-            case KEY_DOWN_S:    /* S键按下 */
-                break;
+                case KEY_DOWN_S:        /* S键按下 */
+                    break;
 
-            case KEY_UP_S:      /* S键释放 */
-                g_MainStatus = LastStatus(g_MainStatus);
-                break;
+                case KEY_UP_S:          /* S键释放 */
+                    g_MainStatus = LastStatus(g_MainStatus);
+                    break;
 
-            case KEY_LONG_DOWN_S:    /* S键长按 */
-                ;
-                break;
+                case KEY_LONG_DOWN_S:    /* S键长按 */
+                    ;
+                    break;
 
-            case KEY_DOWN_C:    /* C键按下 */
-                break;
+                case KEY_DOWN_C:        /* C键按下 */
+                    break;
 
-            case KEY_UP_C:      /* C键释放 */
-                g_MainStatus = NextStatus(g_MainStatus);
-                break;
+                case KEY_UP_C:          /* C键释放 */
+                    g_MainStatus = NextStatus(g_MainStatus);
+                    break;
 
-            case KEY_LONG_DOWN_C:    /* C键长按 - 快捷键 */
-                ;
-                break;
+                case KEY_LONG_DOWN_C:   /* C键长按 - 快捷键 */
+                    ;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
     }

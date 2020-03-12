@@ -3,12 +3,6 @@
 *
 *    模块名称 : BSP模块(For STM32H7)
 *    文件名称 : bsp.h
-*    版    本 : V1.0
-*    说    明 : 这是硬件底层驱动程序的主文件。每个c文件可以 #include "bsp.h" 来包含所有的外设驱动模块。
-*               bsp = Borad surport packet 板级支持包
-*    修改记录 :
-*        版本号  日期         作者       说明
-*        V1.0    2018-07-29  Eric2013   正式发布
 *
 *    Copyright (C), 2018-2030, 安富莱电子 www.armfly.com
 *
@@ -23,11 +17,11 @@
 
 /* 开关全局中断的宏 */
 #define ENABLE_INT()    __set_PRIMASK(0)    /* 使能全局中断 */
-#define DISABLE_INT()   __set_PRIMASK(1)  /* 禁止全局中断 */
+#define DISABLE_INT()   __set_PRIMASK(1)    /* 禁止全局中断 */
 
 /* 这个宏仅用于调试阶段排错 */
-#define BSP_Printf printf
-//#define BSP_Printf(...)
+//#define BSP_Printf printf
+#define BSP_Printf(...)
 
 #define ERROR_HANDLER()     Error_Handler(__FILE__, __LINE__)
 
@@ -113,6 +107,45 @@ void bsp_Idle(void);
 void bsp_GetCpuID(uint32_t *_id);
 void Error_Handler(char *file, uint32_t line);
 
+/* 用于调试测试时间 D2 和 D0 */
+#define DEBUG_D2_TRIG()                     \
+    if (s_D2State == 0)                     \
+    {                                       \
+        BSP_SET_GPIO_1(GPIOE, GPIO_PIN_6);  \
+        s_D2State = 1;                      \
+    }                                       \
+    else if (s_D2State == 1)                \
+    {                                       \
+        BSP_SET_GPIO_0(GPIOE, GPIO_PIN_6);  \
+        s_D2State = 0;                      \
+    }                                       \
+    else                                    \
+    {                                       \
+        EIO_D2_Config(ES_GPIO_OUT);         \
+        BSP_SET_GPIO_1(GPIOE, GPIO_PIN_6);  \
+        s_D2State = 1;                      \
+    }                                       
+extern uint8_t s_D2State;
+
+#define DEBUG_D0_TRIG()                     \
+    if (s_D0State == 0)                     \
+    {                                       \
+        BSP_SET_GPIO_1(GPIOI, GPIO_PIN_0);  \
+        s_D0State = 1;                      \
+    }                                       \
+    else if (s_D0State == 1)                \
+    {                                       \
+        BSP_SET_GPIO_0(GPIOI, GPIO_PIN_0);  \
+        s_D0State = 0;                      \
+    }                                       \
+    else                                    \
+    {                                       \
+        EIO_D0_Config(ES_GPIO_OUT);         \
+        BSP_SET_GPIO_1(GPIOI, GPIO_PIN_0);  \
+        s_D0State = 1;                      \
+    }                                       
+extern uint8_t s_D0State;
+    
 #endif
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -483,32 +483,32 @@ uint16_t LCD_GetFontWidth(FONT_T *_tFont)
 
     switch (_tFont->FontCode)
     {
-    case FC_ST_12:
-        font_width = 12;
-        break;
+        case FC_ST_12:
+            font_width = 12;
+            break;
 
-    case FC_ST_16:
-    case FC_RA8875_16:
-        font_width = 16;
-        break;
+        case FC_ST_16:
+        case FC_RA8875_16:
+            font_width = 16;
+            break;
 
-    case FC_RA8875_24:
-    case FC_ST_24:
-        font_width = 24;
-        break;
+        case FC_RA8875_24:
+        case FC_ST_24:
+            font_width = 24;
+            break;
 
-    case FC_ST_32:
-    case FC_RA8875_32:
-        font_width = 32;
-        break;
+        case FC_ST_32:
+        case FC_RA8875_32:
+            font_width = 32;
+            break;
 
-    case FC_ST_62X40:
-        font_width = 40;
-        break;
+        case FC_ST_62X40:
+            font_width = 40;
+            break;
 
-    case FC_ST_96X40:
-        font_width = 40;
-        break;
+        case FC_ST_96X40:
+            font_width = 40;
+            break;
     }
     return font_width;
 }
@@ -528,32 +528,32 @@ uint16_t LCD_GetFontHeight(FONT_T *_tFont)
 
     switch (_tFont->FontCode)
     {
-    case FC_ST_12:
-        height = 12;
-        break;
+        case FC_ST_12:
+            height = 12;
+            break;
 
-    case FC_ST_16:
-    case FC_RA8875_16:
-        height = 16;
-        break;
+        case FC_ST_16:
+        case FC_RA8875_16:
+            height = 16;
+            break;
 
-    case FC_RA8875_24:
-    case FC_ST_24:
-        height = 24;
-        break;
+        case FC_RA8875_24:
+        case FC_ST_24:
+            height = 24;
+            break;
 
-    case FC_ST_32:
-    case FC_RA8875_32:
-        height = 32;
-        break;
+        case FC_ST_32:
+        case FC_RA8875_32:
+            height = 32;
+            break;
 
-    case FC_ST_62X40:
-        height = 62;
-        break;
+        case FC_ST_62X40:
+            height = 62;
+            break;
 
-    case FC_ST_96X40:
-        height = 96;
-        break;
+        case FC_ST_96X40:
+            height = 96;
+            break;
     }
     return height;
 }
@@ -598,111 +598,111 @@ uint16_t LCD_GetStrWidth(char *_ptr, FONT_T *_tFont)
 
             switch (_tFont->FontCode)
             {
-            case FC_RA8875_16:
-                font_width = g_RA8875_Ascii16_width[code1 - 0x20];
-                break;
+                case FC_RA8875_16:
+                    font_width = g_RA8875_Ascii16_width[code1 - 0x20];
+                    break;
 
-            case FC_RA8875_24:
-                if (a_flag == 0)
-                {
-                    font_width = g_RA8875_Ascii24_width[code1 - 0x20];
-                }
-                else
-                {
+                case FC_RA8875_24:
+                    if (a_flag == 0)
                     {
-                        m = 0;
-                        while (1)
+                        font_width = g_RA8875_Ascii24_width[code1 - 0x20];
+                    }
+                    else
+                    {
                         {
-                            address = m * (72 + 2);
-                            m++;
-                            if (code1 == g_Ascii24_VarWidth[address + 0])
+                            m = 0;
+                            while (1)
                             {
-                                font_width = g_Ascii24_VarWidth[address + 1];
-                                break;
-                            }
-                            else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
-                            {
-                                //                              /* 字库搜索完毕，未找到，则填充全FF */
-                                //                              memset(g_Ascii32_VarWidth, 0xFF, 128);
-                                break;
+                                address = m * (72 + 2);
+                                m++;
+                                if (code1 == g_Ascii24_VarWidth[address + 0])
+                                {
+                                    font_width = g_Ascii24_VarWidth[address + 1];
+                                    break;
+                                }
+                                else if ((g_Ascii24_VarWidth[address + 0] == 0xFF) && (g_Ascii24_VarWidth[address + 1] == 0xFF))
+                                {
+                                    //                              /* 字库搜索完毕，未找到，则填充全FF */
+                                    //                              memset(g_Ascii32_VarWidth, 0xFF, 128);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-                break;
+                    break;
 
-            case FC_RA8875_32:
-                if (a_flag == 0)
-                {
-                    font_width = g_RA8875_Ascii32_width[code1 - 0x20];
-                }
-                else
-                {
+                case FC_RA8875_32:
+                    if (a_flag == 0)
                     {
-                        m = 0;
-                        while (1)
+                        font_width = g_RA8875_Ascii32_width[code1 - 0x20];
+                    }
+                    else
+                    {
                         {
-                            address = m * (128 + 2);
-                            m++;
-                            if (code1 == g_Ascii32_VarWidth[address + 0])
+                            m = 0;
+                            while (1)
                             {
-                                font_width = g_Ascii32_VarWidth[address + 1];
-                                break;
-                            }
-                            else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
-                            {
-                                //                              /* 字库搜索完毕，未找到，则填充全FF */
-                                //                              memset(g_Ascii32_VarWidth, 0xFF, 128);
-                                break;
+                                address = m * (128 + 2);
+                                m++;
+                                if (code1 == g_Ascii32_VarWidth[address + 0])
+                                {
+                                    font_width = g_Ascii32_VarWidth[address + 1];
+                                    break;
+                                }
+                                else if ((g_Ascii32_VarWidth[address + 0] == 0xFF) && (g_Ascii32_VarWidth[address + 1] == 0xFF))
+                                {
+                                    //                              /* 字库搜索完毕，未找到，则填充全FF */
+                                    //                              memset(g_Ascii32_VarWidth, 0xFF, 128);
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-                break;
+                    break;
 
-            case FC_ST_12:
-                font_width = 6;
-                break;
+                case FC_ST_12:
+                    font_width = 6;
+                    break;
 
-            case FC_ST_16:
-                font_width = 8;
-                break;
+                case FC_ST_16:
+                    font_width = 8;
+                    break;
 
-            case FC_ST_24:
-                font_width = 12;
-                break;
+                case FC_ST_24:
+                    font_width = 12;
+                    break;
 
-            case FC_ST_32:
-                font_width = 16;
-                break;
+                case FC_ST_32:
+                    font_width = 16;
+                    break;
 
-            case FC_ST_62X40:
-                //对秒进行特殊处理
-                if (code1 == 0x5E)
-                {
-                    font_width = 28;
-                }
-                else
-                {
-                    font_width = 40;
-                }
-                break;
+                case FC_ST_62X40:
+                    //对秒进行特殊处理
+                    if (code1 == 0x5E)
+                    {
+                        font_width = 28;
+                    }
+                    else
+                    {
+                        font_width = 40;
+                    }
+                    break;
 
-            case FC_ST_96X40:
-                //对秒进行特殊处理
-                if (code1 == 0x5E)
-                {
-                    font_width = 28;
-                }
-                else
-                {
-                    font_width = 40;
-                }
-                break;
+                case FC_ST_96X40:
+                    //对秒进行特殊处理
+                    if (code1 == 0x5E)
+                    {
+                        font_width = 28;
+                    }
+                    else
+                    {
+                        font_width = 40;
+                    }
+                    break;
 
-            default:
-                font_width = 8;
-                break;
+                default:
+                    font_width = 8;
+                    break;
             }
         }
         else /* 汉字 */
@@ -795,53 +795,53 @@ static void _LCD_ReadSmallDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
     pAscDot = 0;
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 24 / 2;
-        pAscDot = g_Ascii12;
-        fAllHz = 1;
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 24 / 2;
+            pAscDot = g_Ascii12;
+            fAllHz = 1;
+            break;
 
-    case FC_ST_16:
-        /* 缺省是16点阵 */
-        font_bytes = 32 / 2;
-        pAscDot = g_Ascii16;
-        fAllHz = 1;
-        break;
+        case FC_ST_16:
+            /* 缺省是16点阵 */
+            font_bytes = 32 / 2;
+            pAscDot = g_Ascii16;
+            fAllHz = 1;
+            break;
 
-    case FC_ST_24:
-        font_bytes = 48;
-        pAscDot = g_Ascii24;
-        break;
+        case FC_ST_24:
+            font_bytes = 48;
+            pAscDot = g_Ascii24;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 64;
-        pAscDot = g_Ascii32;
-        break;
+        case FC_ST_32:
+            font_bytes = 64;
+            pAscDot = g_Ascii32;
+            break;
 
-    case FC_ST_62X40:
-        font_bytes = 310;
-        pAscDot = g_Ascii62x40;
-        break;
+        case FC_ST_62X40:
+            font_bytes = 310;
+            pAscDot = g_Ascii62x40;
+            break;
 
-    case FC_ST_96X40:
-        font_bytes = 480;
-        pAscDot = g_Ascii96x40;
-        break;
+        case FC_ST_96X40:
+            font_bytes = 480;
+            pAscDot = g_Ascii96x40;
+            break;
 
-    case FC_RA8875_24:
-        font_bytes = 72;
-        pAscDot = g_Ascii24_VarWidth;
-        fAllHz = 2;
-        break;
+        case FC_RA8875_24:
+            font_bytes = 72;
+            pAscDot = g_Ascii24_VarWidth;
+            fAllHz = 2;
+            break;
 
-    case FC_RA8875_32:
-        font_bytes = 128;
-        pAscDot = g_Ascii32_VarWidth;
-        fAllHz = 2;
-        break;
+        case FC_RA8875_32:
+            font_bytes = 128;
+            pAscDot = g_Ascii32_VarWidth;
+            fAllHz = 2;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
 
     if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
@@ -898,36 +898,36 @@ static void _LCD_ReadSmallDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
     pAscDot = 0;
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 12;
-#if 0
-                pAscDot = ASC12_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
-#else
-        pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
-#endif
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 12;
+    #if 0
+            pAscDot = ASC12_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    #else
+            pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
+    #endif
+            break;
 
-    case FC_ST_16:
-        font_bytes = 16;
-#if 0
-                pAscDot = ASC16_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
-#else
-        pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
-#endif
-        break;
+        case FC_ST_16:
+            font_bytes = 16;
+    #if 0
+                    pAscDot = ASC16_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    #else
+            pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
+    #endif
+            break;
 
-    case FC_ST_24:
-        font_bytes = 48;
-        pAscDot = ASC24_ADDR;
-        break;
+        case FC_ST_24:
+            font_bytes = 48;
+            pAscDot = ASC24_ADDR;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 64;
-        pAscDot = ASC32_ADDR;
-        break;
+        case FC_ST_32:
+            font_bytes = 64;
+            pAscDot = ASC32_ADDR;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
     if (_code >= 0x20 && _code <= 0x7E)
     {
@@ -977,41 +977,41 @@ static void _LCD_ReadAsciiDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
     pAscDot = 0;
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 24 / 2;
-        pAscDot = g_Ascii12;
-        fAllHz = 1;
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 24 / 2;
+            pAscDot = g_Ascii12;
+            fAllHz = 1;
+            break;
 
-    case FC_ST_16:
-        /* 缺省是16点阵 */
-        font_bytes = 32 / 2;
-        pAscDot = g_Ascii16;
-        fAllHz = 1;
-        break;
+        case FC_ST_16:
+            /* 缺省是16点阵 */
+            font_bytes = 32 / 2;
+            pAscDot = g_Ascii16;
+            fAllHz = 1;
+            break;
 
-    case FC_ST_24:
-        font_bytes = 48;
-        pAscDot = g_Ascii24;
-        break;
+        case FC_ST_24:
+            font_bytes = 48;
+            pAscDot = g_Ascii24;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 64;
-        pAscDot = g_Ascii32;
-        break;
+        case FC_ST_32:
+            font_bytes = 64;
+            pAscDot = g_Ascii32;
+            break;
 
-    case FC_ST_62X40:
-        font_bytes = 310;
-        pAscDot = g_Ascii62x40;
-        break;
+        case FC_ST_62X40:
+            font_bytes = 310;
+            pAscDot = g_Ascii62x40;
+            break;
 
-    case FC_ST_96X40:
-        font_bytes = 480;
-        pAscDot = g_Ascii96x40;
-        break;
+        case FC_ST_96X40:
+            font_bytes = 480;
+            pAscDot = g_Ascii96x40;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
 
     if (fAllHz == 1) /* 内嵌全部ASCII字符点阵 */
@@ -1047,36 +1047,36 @@ static void _LCD_ReadAsciiDot(uint8_t _code, uint8_t _fontcode, uint8_t *_pBuf)
     pAscDot = 0;
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 12;
-#if 0
-                pAscDot = ASC12_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
-#else
-        pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
-#endif
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 12;
+    #if 0
+                    pAscDot = ASC12_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    #else
+            pAscDot = (uint32_t)&g_Ascii12[' ' * 12]; /* 使用CPU内嵌的16点阵字符 */
+    #endif
+            break;
 
-    case FC_ST_16:
-        font_bytes = 16;
-#if 0
-                pAscDot = ASC16_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
-#else
-        pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
-#endif
-        break;
+        case FC_ST_16:
+            font_bytes = 16;
+    #if 0
+                    pAscDot = ASC16_ADDR;    /* 字库芯片的16点阵字符不好看,笔画细了，而且是非等宽字体 */
+    #else
+            pAscDot = (uint32_t)&g_Ascii16[' ' * 16]; /* 使用CPU内嵌的16点阵字符 */
+    #endif
+            break;
 
-    case FC_ST_24:
-        font_bytes = 48;
-        pAscDot = ASC24_ADDR;
-        break;
+        case FC_ST_24:
+            font_bytes = 48;
+            pAscDot = ASC24_ADDR;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 64;
-        pAscDot = ASC32_ADDR;
-        break;
+        case FC_ST_32:
+            font_bytes = 64;
+            pAscDot = ASC32_ADDR;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
     if (_code >= 0x20 && _code <= 0x7E)
     {
@@ -1174,28 +1174,28 @@ static void _LCD_ReadHZDotQSPI(uint8_t _code1, uint8_t _code2, uint8_t _fontcode
             pDot = 0; /* 仅仅用于避免告警 */
             switch (_fontcode)
             {
-            case FC_ST_12: /* 12点阵 */
-                font_bytes = 24;
-                pDot = (uint8_t *)g_Hz12;
-                break;
+                case FC_ST_12: /* 12点阵 */
+                    font_bytes = 24;
+                    pDot = (uint8_t *)g_Hz12;
+                    break;
 
-            case FC_ST_16:
-                font_bytes = 32;
-                pDot = (uint8_t *)g_Hz16;
-                break;
+                case FC_ST_16:
+                    font_bytes = 32;
+                    pDot = (uint8_t *)g_Hz16;
+                    break;
 
-            case FC_ST_24:
-                font_bytes = 72;
-                pDot = (uint8_t *)g_Hz24;
-                break;
+                case FC_ST_24:
+                    font_bytes = 72;
+                    pDot = (uint8_t *)g_Hz24;
+                    break;
 
-            case FC_ST_32:
-                font_bytes = 128;
-                pDot = (uint8_t *)g_Hz32;
-                break;
+                case FC_ST_32:
+                    font_bytes = 128;
+                    pDot = (uint8_t *)g_Hz32;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             m = 0;
@@ -1247,28 +1247,28 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
     pDot = 0; /* 仅仅用于避免告警 */
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 24;
-        pDot = (uint8_t *)g_Hz12;
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 24;
+            pDot = (uint8_t *)g_Hz12;
+            break;
 
-    case FC_ST_16:
-        font_bytes = 32;
-        pDot = (uint8_t *)g_Hz16;
-        break;
+        case FC_ST_16:
+            font_bytes = 32;
+            pDot = (uint8_t *)g_Hz16;
+            break;
 
-    case FC_ST_24:
-        font_bytes = 72;
-        pDot = (uint8_t *)g_Hz24;
-        break;
+        case FC_ST_24:
+            font_bytes = 72;
+            pDot = (uint8_t *)g_Hz24;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 128;
-        pDot = (uint8_t *)g_Hz32;
-        break;
+        case FC_ST_32:
+            font_bytes = 128;
+            pDot = (uint8_t *)g_Hz32;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
 
     m = 0;
@@ -1299,28 +1299,28 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
 
     switch (_fontcode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_bytes = 24;
-        offset = HZK12_ADDR;
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_bytes = 24;
+            offset = HZK12_ADDR;
+            break;
 
-    case FC_ST_16:
-        font_bytes = 32;
-        offset = HZK16_ADDR;
-        break;
+        case FC_ST_16:
+            font_bytes = 32;
+            offset = HZK16_ADDR;
+            break;
 
-    case FC_ST_24:
-        font_bytes = 72;
-        offset = HZK24_ADDR;
-        break;
+        case FC_ST_24:
+            font_bytes = 72;
+            offset = HZK24_ADDR;
+            break;
 
-    case FC_ST_32:
-        font_bytes = 128;
-        offset = HZK32_ADDR;
-        break;
+        case FC_ST_32:
+            font_bytes = 128;
+            offset = HZK32_ADDR;
+            break;
 
-    default:
-        return;
+        default:
+            return;
     }
 
     /* 此处需要根据字库文件存放位置进行修改 
@@ -1352,28 +1352,28 @@ static void _LCD_ReadHZDot(uint8_t _code1, uint8_t _code2, uint8_t _fontcode, ui
             pDot = 0; /* 仅仅用于避免告警 */
             switch (_fontcode)
             {
-            case FC_ST_12: /* 12点阵 */
-                font_bytes = 24;
-                pDot = (uint8_t *)g_Hz12;
-                break;
+                case FC_ST_12: /* 12点阵 */
+                    font_bytes = 24;
+                    pDot = (uint8_t *)g_Hz12;
+                    break;
 
-            case FC_ST_16:
-                font_bytes = 32;
-                pDot = (uint8_t *)g_Hz16;
-                break;
+                case FC_ST_16:
+                    font_bytes = 32;
+                    pDot = (uint8_t *)g_Hz16;
+                    break;
 
-            case FC_ST_24:
-                font_bytes = 72;
-                pDot = (uint8_t *)g_Hz24;
-                break;
+                case FC_ST_24:
+                    font_bytes = 72;
+                    pDot = (uint8_t *)g_Hz24;
+                    break;
 
-            case FC_ST_32:
-                font_bytes = 128;
-                pDot = (uint8_t *)g_Hz32;
-                break;
+                case FC_ST_32:
+                    font_bytes = 128;
+                    pDot = (uint8_t *)g_Hz32;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
 
             m = 0;
@@ -1493,47 +1493,47 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
     
     switch (_tFont->FontCode)
     {
-    case FC_ST_12: /* 12点阵 */
-        font_height = 12;
-        font_width = 12;
-        asc_bytes = 1;
-        hz_bytes = 2;
-        break;
+        case FC_ST_12: /* 12点阵 */
+            font_height = 12;
+            font_width = 12;
+            asc_bytes = 1;
+            hz_bytes = 2;
+            break;
 
-    case FC_ST_16:
-        font_height = 16;
-        font_width = 16;
-        asc_bytes = 1;
-        hz_bytes = 2;
-        break;
+        case FC_ST_16:
+            font_height = 16;
+            font_width = 16;
+            asc_bytes = 1;
+            hz_bytes = 2;
+            break;
 
-    case FC_ST_24:
-        font_height = 24;
-        font_width = 24;
-        asc_bytes = 2;
-        hz_bytes = 3;
-        break;
+        case FC_ST_24:
+            font_height = 24;
+            font_width = 24;
+            asc_bytes = 2;
+            hz_bytes = 3;
+            break;
 
-    case FC_ST_32:
-        font_height = 32;
-        font_width = 32;
-        asc_bytes = 2;
-        hz_bytes = 4;
-        break;
+        case FC_ST_32:
+            font_height = 32;
+            font_width = 32;
+            asc_bytes = 2;
+            hz_bytes = 4;
+            break;
 
-    case FC_ST_62X40:
-        font_height = 62;
-        font_width = 80;
-        asc_bytes = 5;
-        hz_bytes = 10;
-        break;
+        case FC_ST_62X40:
+            font_height = 62;
+            font_width = 80;
+            asc_bytes = 5;
+            hz_bytes = 10;
+            break;
 
-    case FC_ST_96X40:
-        font_height = 96;
-        font_width = 80;
-        asc_bytes = 5;
-        hz_bytes = 10;
-        break;
+        case FC_ST_96X40:
+            font_height = 96;
+            font_width = 80;
+            asc_bytes = 5;
+            hz_bytes = 10;
+            break;
     }
 
     str_width = LCD_GetStrWidth(_ptr, _tFont); /* 计算字符串实际宽度(RA8875内部ASCII点阵宽度为变长 */
@@ -2541,33 +2541,33 @@ void LCD_DispControl(void *_pControl)
 
     switch (id)
     {
-    case ID_ICON:
-        //void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode);
-        break;
+        case ID_ICON:
+            //void LCD_DrawIcon(const ICON_T *_tIcon, FONT_T *_tFont, uint8_t _ucFocusMode);
+            break;
 
-    case ID_WIN:
-        LCD_DrawWin((WIN_T *)_pControl);
-        break;
+        case ID_WIN:
+            LCD_DrawWin((WIN_T *)_pControl);
+            break;
 
-    case ID_LABEL:
-        LCD_DrawLabel((LABEL_T *)_pControl);
-        break;
+        case ID_LABEL:
+            LCD_DrawLabel((LABEL_T *)_pControl);
+            break;
 
-    case ID_BUTTON:
-        LCD_DrawButton((BUTTON_T *)_pControl);
-        break;
+        case ID_BUTTON:
+            LCD_DrawButton((BUTTON_T *)_pControl);
+            break;
 
-    case ID_CHECK:
-        LCD_DrawCheckBox((CHECK_T *)_pControl);
-        break;
+        case ID_CHECK:
+            LCD_DrawCheckBox((CHECK_T *)_pControl);
+            break;
 
-    case ID_EDIT:
-        LCD_DrawEdit((EDIT_T *)_pControl);
-        break;
+        case ID_EDIT:
+            LCD_DrawEdit((EDIT_T *)_pControl);
+            break;
 
-    case ID_GROUP:
-        LCD_DrawGroupBox((GROUP_T *)_pControl);
-        break;
+        case ID_GROUP:
+            LCD_DrawGroupBox((GROUP_T *)_pControl);
+            break;
     }
 }
 
