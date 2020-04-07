@@ -235,7 +235,29 @@ void PG_ReloadLuaVar(void)
 
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
-        ;
+        /* g_tParam.ResetType;   0表示由lua脚本决定  1表示强制硬件复位 2表示强制软件复位 */
+        if (g_tParam.ResetType == 0)    /* 缺省 */
+        {
+            /* 读取复位类型： 软件还是硬件复位 */
+            lua_getglobal(g_Lua, "RESET_TYPE");  
+            if (lua_isinteger(g_Lua, -1)) 
+            {
+                g_tProg.ResetType = (REST_TYPE_E)lua_tointeger(g_Lua, -1);
+            }
+            else
+            {
+                g_tProg.ResetType = SOFT_RESET;
+            }
+            lua_pop(g_Lua, 1);            
+        }
+        else if (g_tParam.ResetType == 1)
+        {
+            g_tProg.ResetType = HARD_RESET;     /* 强制硬件复位 */
+        }
+        else
+        {
+            g_tProg.ResetType = SOFT_RESET;     /* 强制软件复位 */
+        }        
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)  
     {

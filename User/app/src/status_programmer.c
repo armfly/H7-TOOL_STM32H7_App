@@ -83,6 +83,7 @@ const uint8_t *g_MenuProg1_Text[] =
     " 2 清零本次计数",
     " 3 清零累计计数",
     " 4 输入产品序号",
+    " 5 修改编程参数",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -134,7 +135,6 @@ void status_ProgWork(void)
     BUTTON_T btn1, btn2, btn3;
     FONT_T tFontNote;
     FONT_T tFontText;
-    FONT_T tFont24;
     FONT_T tFontBtn;   
     uint8_t cursor = 0;  
     uint8_t fRunOnce = 0; 
@@ -160,12 +160,7 @@ void status_ProgWork(void)
         tFontBtn.FontCode = FC_ST_16;               /* 字体代码 16点阵 */
         tFontBtn.FrontColor = INFO_NAME_COLOR;      /* 字体颜色 */
         tFontBtn.BackColor = CL_MASK;               /* 文字背景颜色 */      
-        tFontBtn.Space = 0;                         /* 文字间距，单位 = 像素 */   
-
-        tFont24.FontCode = FC_ST_24;               /* 字体代码 24点阵 */
-        tFont24.FrontColor = INFO_NAME_COLOR;      /* 字体颜色 */
-        tFont24.BackColor = CL_MASK;               /* 文字背景颜色 */      
-        tFont24.Space = 0;                         /* 文字间距，单位 = 像素 */          
+        tFontBtn.Space = 0;                         /* 文字间距，单位 = 像素 */          
     }    
 
     LCD_ClrScr(FORM_BACK_COLOR); 
@@ -185,8 +180,6 @@ void status_ProgWork(void)
         if (s_lua_read_len > 0)
         {              
             const char *pNote1;
-            const char *pDataFileName;
-            uint32_t ulDataFileSize = 0;
             char *p;
             char buf[32];   
 
@@ -493,6 +486,11 @@ void status_ProgWork(void)
                     {
                         cursor = 0;
                     }
+                    if (g_tProg.AutoStart == 1)
+                    {
+                        g_tProg.AutoStart = 0;
+                        PG_PrintText("退出连续烧录");
+                    }
                     fRefresh = 1;
                     break;
 
@@ -708,7 +706,11 @@ void status_ProgSetting(void)
                     else if (g_tMenuProg1.Cursor == 3)      /* 输入产品序号 */
                     {
                         //g_MainStatus = MS_SYSTEM_SET;
-                    }                 
+                    }           
+                    else if (g_tMenuProg1.Cursor == 4)      /* 修改编程参数 */
+                    {
+                        g_MainStatus = MS_PROG_MODIFY_PARAM;
+                    }           
                     break;
 
                 case KEY_UP_C: /* C键 下 */
@@ -724,6 +726,187 @@ void status_ProgSetting(void)
                     break;
             }
         }
+    }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: status_ProgModifyParam
+*    功能说明: 修改复位类型等参数
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+#define PARAM_NUM  3
+void status_ProgModifyParam(void)
+{
+    uint8_t ucKeyCode; /* 按键代码 */
+    uint8_t fRefresh = 1;
+    uint8_t fSaveParam = 0;
+    uint8_t cursor = 0;
+    char buf[48];
+    uint8_t ucIgnoreKey = 1; 
+    uint8_t active;
+
+    DispHeader2(93, "烧录参数");
+    DispHelpBar("长按S键选择参数",
+                "短按S、C键修改参数值");
+    
+    while (g_MainStatus == MS_PROG_MODIFY_PARAM)
+    {
+        bsp_Idle();
+
+        if (fRefresh == 1)
+        {
+            fRefresh = 0;
+            
+            /* 第1个参数 - 复位类型 */
+            {
+                if (cursor == 0)
+                {
+                    active = 1;       
+                }
+                else 
+                {
+                    active = 0;
+                }
+                if (g_tParam.ResetType == 0)
+                {               
+                    sprintf(buf, "由lua决定");
+                    DispParamBar(0, "复位类型:", buf, active);
+                }
+                else if (g_tParam.ResetType == 1)
+                {
+                    sprintf(buf, "强制硬件");
+                    DispParamBar(0, "复位类型:", buf, active);
+                }    
+                else
+                {
+                    sprintf(buf, "强制软件");
+                    DispParamBar(0, "复位类型:", buf, active);
+                }                 
+            }
+            
+            /* 第2个参数 - 编程参数2  */
+            {
+                if (cursor == 1)
+                {
+                    active = 1;       
+                }
+                else 
+                {
+                    active = 0;
+                }
+                DispParamBar(1, "参数2:", "保留", active);
+            }   
+
+             /* 第3个参数 - 编程参数3  */
+            {
+                if (cursor == 2)
+                {
+                    active = 1;       
+                }
+                else 
+                {
+                    active = 0;
+                }
+                
+                DispParamBar(2, "参数3:", "保留", active);
+            }      
+            
+        }
+        
+        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        if (ucKeyCode != KEY_NONE)
+        {
+            /* 有键按下 */
+            switch (ucKeyCode)
+            {
+                case KEY_UP_S:      /* S键 弹起 */
+                    if (ucIgnoreKey == 1)
+                    {
+                        ucIgnoreKey = 0;
+                        break;
+                    }
+                    
+                    if (cursor == 0)
+                    {
+                        if (g_tParam.ResetType  == 0)
+                        {
+                            g_tParam.ResetType = 1;
+                        }
+                        else if (g_tParam.ResetType  == 1)
+                        {
+                            g_tParam.ResetType = 2;
+                        } 
+                        else
+                        {
+                            g_tParam.ResetType = 0;
+                        }
+                    }
+                    else if (cursor == 1)
+                    {
+
+                    }     
+                    else if (cursor == 2)
+                    {
+
+                    }                  
+                    fRefresh = 1;
+                    fSaveParam = 1;
+                    break;
+
+                case KEY_UP_C:      /* C键 下 */
+                    if (cursor == 0)
+                    {                
+                        if (g_tParam.ResetType  == 0)
+                        {
+                            g_tParam.ResetType = 2;
+                        }
+                        else if (g_tParam.ResetType  == 2)
+                        {
+                            g_tParam.ResetType = 1;
+                        } 
+                        else
+                        {
+                            g_tParam.ResetType = 0;
+                        }
+                    }
+                    else if (cursor == 1)
+                    {
+
+                    } 
+                    else if (cursor == 2)
+                    {
+
+                    }                         
+                    fRefresh = 1;
+                    fSaveParam = 1;
+                    break;
+
+                case KEY_LONG_DOWN_S:        /* S键长按 - 选择参数 */
+                    if (++cursor >= PARAM_NUM)
+                    {
+                        cursor = 0;
+                    }
+                    ucIgnoreKey = 1;
+                    fRefresh = 1;
+                    break;
+
+                case KEY_LONG_DOWN_C:        /* C键长按 - 返回 */
+                    PlayKeyTone();
+                    g_MainStatus = MS_PROG_SETTING;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+    
+    if (fSaveParam == 1)
+    {
+        SaveParam();    /* 保存参数 */
     }
 }
 

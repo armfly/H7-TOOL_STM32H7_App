@@ -237,6 +237,8 @@ static void bsp_InitKeyVar(void)
 */
 void bsp_PutKey(uint8_t _KeyCode)
 {
+    s_KeyTimeOutCount = GetSleepTimeMinute() * 60 * 100u;  /* 10ms单位 */
+    
     /* 屏幕熄灭阶段，丢弃唤醒键 */
     if (s_LcdOn == 0)
     {        
@@ -258,8 +260,6 @@ void bsp_PutKey(uint8_t _KeyCode)
     {
         s_tKey.Write = 0;
     }
-            
-    s_KeyTimeOutCount = GetSleepTimeMinute() * 60 * 100u;  /* 10ms单位 */
 }
 
 /*

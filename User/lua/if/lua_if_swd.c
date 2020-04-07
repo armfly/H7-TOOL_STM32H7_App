@@ -9,12 +9,14 @@
 #include "target_reset.h"
 #include "target_config.h"
 #include "swd_host.h"
+#include "swd_host_multi.h"
 #include "Systick_Handler.h"
 #include "main.h"
 #include "target_family.h"
 #include "stm8_flash.h"
 #include "stm8_swim.h"
 #include "swd_flash.h"
+#include "SW_DP_Multi.h"
 
 /* 为了避免和DAP驱动中的函数混淆，本模块函数名前缀用 h7swd */
 
@@ -103,7 +105,7 @@ static int h7_ReladLuaVar(lua_State* L)
 /*
 *********************************************************************************************************
 *    函 数 名: h7swd_Init
-*    功能说明: 读芯片ID
+*    功能说明: 初始化swd
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -112,9 +114,16 @@ static int h7swd_Init(lua_State* L)
 {
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {   
-        sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */
-            
-        swd_init_debug();           /* 进入swd debug状态 */    
+        sysTickInit();          /* 这是DAP驱动中的初始化函数,全局变量初始化 */
+
+        if (g_gMulSwd.MultiMode == 0)
+        {
+            swd_init_debug();       /* 进入swd debug状态 */    
+        }
+        else
+        {
+            MUL_swd_init_debug();   /* 进入swd debug状态 */   
+        }
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)
     {        
@@ -141,17 +150,32 @@ static int h7swd_Init(lua_State* L)
 static int h7swd_ReadID(lua_State* L)
 {
     uint32_t id;
+    uint32_t id_buf[4];
 
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
-        if (swd_read_idcode(&id) == 0)
+		if (g_gMulSwd.MultiMode == 0)
         {
-            lua_pushnumber(L, 0);    /* 出错 */
-        }
-        else
-        {
-            lua_pushnumber(L, id);    /* 成功,返回ID */
-        } 
+	        if (swd_read_idcode(&id) == 0)   
+	        {
+	            lua_pushnumber(L, 0);    /* 出错 */
+	        }
+	        else
+	        {
+	            lua_pushnumber(L, id);    /* 成功,返回ID */
+	        } 
+		}
+		else
+		{
+	        if (MUL_swd_read_idcode(id_buf) == 0)        
+	        {
+	            lua_pushnumber(L, 0);    /* 出错 */
+	        }
+	        else
+	        {
+	            lua_pushnumber(L, id);    /* 成功,返回ID */
+	        } 			
+		}
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)
     {
@@ -272,16 +296,32 @@ static int h7swd_ReadMemory(lua_State* L)
     
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
-        if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
-        {
-            lua_pushnumber(L, 0);    /* 出错 */
-        }
-        else
-        {
-            lua_pushnumber(L, 1);    /* 成功 */
-        }
+        if (g_gMulSwd.MultiMode == 0)   /* 单机模式 */
+        {    
+            if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
+            {
+                lua_pushnumber(L, 0);    /* 出错 */
+            }
+            else
+            {
+                lua_pushnumber(L, 1);    /* 成功 */
+            }
 
-        lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+            lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+        }
+        else    /* 1拖4模式 */
+        {
+            if (MUL_swd_read_memory(addr, s_lua_read_buf, num) == 0)
+            {
+                lua_pushnumber(L, 0);    /* 出错 */
+            }
+            else
+            {
+                lua_pushnumber(L, 1);    /* 成功 */
+            }
+            
+            lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+        }
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)
     {
@@ -498,30 +538,61 @@ static int h7_reset(lua_State* L)
 static int h7_DetectIC(lua_State* L)
 {
     if (g_tProg.ChipType == CHIP_SWD_ARM)
-    {    
-        uint8_t i;
-        uint32_t id = 0;
-        
-        for (i = 0; i < 3; i++)
+    {            
+        if (g_gMulSwd.MultiMode == 0)
         {
-            sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */
-        
-            bsp_DelayUS(5 * 1000);     /* 延迟10ms */
+            uint8_t i;
+            uint32_t id = 0;
             
-            swd_init_debug();           /* 进入swd debug状态 */
-            
-            if (swd_read_idcode(&id) == 0)
+            for (i = 0; i < 3; i++)
             {
-                id = 0;     /* 出错继续检测 */
+                sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */
+            
+                bsp_DelayUS(5 * 1000);     /* 延迟10ms */
+                
+                swd_init_debug();           /* 进入swd debug状态 */
+                
+                if (swd_read_idcode(&id) == 0)
+                {
+                    id = 0;     /* 出错继续检测 */
+                }
+                else
+                {
+                    break;            
+                }   
             }
-            else
-            {
-                break;            
-            }   
-        }
         
-        lua_pushnumber(L, id);    /* 成功,返回ID */
-        return 1;
+            lua_pushnumber(L, id);    /* 成功,返回ID */
+            return 1;
+        }
+        else    /* 1拖4模式 */
+        {
+            uint8_t i;
+            uint32_t id[4] = {0};
+            
+            sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */            
+            for (i = 0; i < 3; i++)
+            {
+                bsp_DelayUS(5 * 1000);     /* 延迟5ms */
+                
+                MUL_swd_init_debug();           /* 进入swd debug状态 */
+                
+                if (MUL_swd_read_idcode(id) == 0)
+                {
+                    //id = 0;     /* 出错继续检测 */
+                }
+                else
+                {
+                    break;            
+                }   
+            }
+        
+            lua_pushnumber(L, id[0]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[1]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[2]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[3]);    /* 成功,返回ID */            
+            return 4;            
+        }
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8) 
     {

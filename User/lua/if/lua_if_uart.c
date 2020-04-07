@@ -45,6 +45,7 @@ static int lua_uart_cfg(lua_State* L);
     
 static int lua_uart_send(lua_State* L);
 static int lua_uart_recive(lua_State* L);
+static int lua_uart_clear_rx_fifo(lua_State* L);
 
 static int lua_uart_WriteReg16(lua_State* L);
 static int lua_uart_WriteReg32(lua_State* L);
@@ -75,6 +76,7 @@ void lua_uart_RegisterFun(void)
     lua_register(g_Lua, "uart_cfg", lua_uart_cfg);
     lua_register(g_Lua, "uart_send", lua_uart_send);
     lua_register(g_Lua, "uart_recive", lua_uart_recive);
+    lua_register(g_Lua, "uart_clear_rx", lua_uart_clear_rx_fifo);
     
     lua_register(g_Lua, "modbus_write_u16", lua_uart_WriteReg16); 
     lua_register(g_Lua, "modbus_write_u32", lua_uart_WriteReg32);
@@ -303,7 +305,7 @@ static int lua_uart_recive(lua_State* L)
     }
     
     time1 = bsp_GetRunTime();
-    timeout = luaL_checknumber(L, 2);   
+    timeout = luaL_checknumber(L, 3);   
     len = 0;
     while (1)
     {
@@ -331,6 +333,37 @@ static int lua_uart_recive(lua_State* L)
     lua_pushnumber(L, len);        
     lua_pushlstring(L, (char *)s_lua_read_buf, len); 
     return 2;   /* 返回2个参数 */
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: lua_uart_clear_rx_fifo
+*    功能说明: 清接收缓冲区数据
+*    形    参: prot, maxlen, timeout
+*    返 回 值: len, readdata
+*********************************************************************************************************
+*/
+static int lua_uart_clear_rx_fifo(lua_State* L)
+{
+    COM_PORT_E port;        /* com号: 支持 COM1, COM4, COM7, COM8 */
+    
+    if (lua_type(L, 1) == LUA_TNUMBER)      /* 判断第1个参数 : com 端口 */
+    {
+        port = (COM_PORT_E)luaL_checknumber(L, 1);
+        if (VALID_PORT(port))
+        {
+            ;
+        }
+        else
+        {
+            LUA_ERR_PARAM_PRINT("\r\nerror : %s,%s,%d\r\n", "uart_recive", "port=",port);
+            return 0;
+        }
+    }    
+    
+    comClearRxFifo(port);   /* 清除接收缓冲区 */
+    
+    return 0;   /* 返回0个参数 */
 }
 
 /*
@@ -475,25 +508,40 @@ static int lua_uart_WriteReg16(lua_State* L)
         return 0;
     }
     
-    txbuf[pos++] = addr485;
-    txbuf[pos++] = 0x10;
-    txbuf[pos++] = regaddr >> 8;
-    txbuf[pos++] = regaddr;
-    
-    txbuf[pos++] = regnum >> 8;
-    txbuf[pos++] = regnum;
-    
-    txbuf[pos++] = regnum * 2;
-    
-    for (i = 0; i < regnum; i++)
+    if (regnum == 1)    /* 1个寄存器使用0x06功能 */
     {
-        txbuf[pos++] = value[i] >> 8;
-        txbuf[pos++] = value[i];
+        
+        txbuf[pos++] = addr485;
+        txbuf[pos++] = 0x06;
+        txbuf[pos++] = regaddr >> 8;
+        txbuf[pos++] = regaddr;
+        txbuf[pos++] = value[0] >> 8;
+        txbuf[pos++] = value[0];
+        crc = CRC16_Modbus(txbuf, pos);
+        txbuf[pos++] = crc >> 8;
+        txbuf[pos++] = crc;
     }
-    crc = CRC16_Modbus(txbuf, pos);
-    txbuf[pos++] = crc >> 8;
-    txbuf[pos++] = crc;
-    
+    else    /* 多个寄存器使用0x10功能 */
+    {
+        txbuf[pos++] = addr485;
+        txbuf[pos++] = 0x10;
+        txbuf[pos++] = regaddr >> 8;
+        txbuf[pos++] = regaddr;
+        
+        txbuf[pos++] = regnum >> 8;
+        txbuf[pos++] = regnum;
+        
+        txbuf[pos++] = regnum * 2;
+        
+        for (i = 0; i < regnum; i++)
+        {
+            txbuf[pos++] = value[i] >> 8;
+            txbuf[pos++] = value[i];
+        }
+        crc = CRC16_Modbus(txbuf, pos);
+        txbuf[pos++] = crc >> 8;
+        txbuf[pos++] = crc;        
+    }
     comSendBuf((COM_PORT_E)port, txbuf, pos);
     
     errcode = ERR_TIMEOUT;
@@ -503,6 +551,7 @@ static int lua_uart_WriteReg16(lua_State* L)
         lua_pushnumber(L, RSP_OK);          /* 成功返回0 */
         return 1;
     }
+    
     if (rxlen == 5 && (rxbuf[1] & 0x80))    /* 错误应答 */
     {
         /* 01 86 02 C1 C2 */

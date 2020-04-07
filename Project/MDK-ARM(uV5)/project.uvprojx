@@ -1004,9 +1004,14 @@
           <GroupName>Doc</GroupName>
           <Files>
             <File>
-              <FileName>02.例程修改记录.txt</FileName>
+              <FileName>CHANGELOG</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\Doc\02.例程修改记录.txt</FilePath>
+              <FilePath>..\..\CHANGELOG</FilePath>
+            </File>
+            <File>
+              <FileName>待解决问题.txt</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\Doc\待解决问题.txt</FilePath>
             </File>
           </Files>
         </Group>
@@ -1961,6 +1966,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\daplink\source\daplink\cmsis-dap\SWO.c</FilePath>
             </File>
+            <File>
+              <FileName>SW_DP_Multi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\daplink\source\daplink\cmsis-dap\SW_DP_Multi.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2041,6 +2051,11 @@
               <FileName>SysTick_Handler.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\daplink\source\rtos_none\SysTick_Handler.c</FilePath>
+            </File>
+            <File>
+              <FileName>swd_host_multi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\daplink\source\daplink\interface\swd_host_multi.c</FilePath>
             </File>
           </Files>
         </Group>

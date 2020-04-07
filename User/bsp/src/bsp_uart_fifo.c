@@ -26,6 +26,7 @@
 */
 
 #include "bsp.h"
+#include "main.h"
 
 #if UART1_FIFO_EN == 1
     /* 串口1的GPIO  PA9, PA10   RS323 DB9接口 */
@@ -1075,6 +1076,8 @@ void bsp_SetUartParam(COM_PORT_E _ucPort, uint32_t BaudRate, uint32_t Parity, ui
         /* Initialization Error */
         Error_Handler(__FILE__, __LINE__);
     }
+    
+    comClearRxFifo(_ucPort);   /* 清除接收缓冲区 */
 }
 
 /*
@@ -1703,6 +1706,7 @@ void UART8_IRQHandler(void)
 extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
 extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
 extern MEMO_T g_LuaMemo;
+extern uint16_t g_MainStatus;
 int fputc(int ch, FILE *f)
 {
     uint8_t buf[1];
@@ -1712,7 +1716,10 @@ int fputc(int ch, FILE *f)
 #if PRINT_TO_UDP == 1
     lua_udp_SendBuf(buf, 1, LUA_UDP_PORT);
     
-    LCD_MemoAddChar(&g_LuaMemo, ch);
+    if (g_MainStatus == MS_LUA_EXEC_FILE)
+    {
+        LCD_MemoAddChar(&g_LuaMemo, ch);
+    }
 #else
     USBCom_SendBuf(1, buf, 1);
 #endif

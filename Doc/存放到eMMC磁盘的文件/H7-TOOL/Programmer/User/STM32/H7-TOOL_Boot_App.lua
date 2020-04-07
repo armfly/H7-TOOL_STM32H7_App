@@ -42,8 +42,12 @@ function cofig_chip1(void)
 		0x08000000,								--目标地址
 		
 		AlgoFile_FLASH,							--算法文件
-		"0:/H7-TOOL/Firmware/h7_tool_app.bin",  --数据文件
-		0x08020000,								--目标地址
+		"0:/H7-TOOL/Firmware/H7-BOOT.bin",  	--数据文件
+		0x08000000,								--目标地址
+				
+--		AlgoFile_FLASH,							--算法文件
+--		"0:/H7-TOOL/Firmware/h7_tool_app.bin",  --数据文件
+--		0x08020000,								--目标地址
 
 --		AlgoFile_QSPI,							--算法文件
 --		"0:/H7-TOOL/Fonts/GB2312ZK.bin",  		--数据文件
@@ -54,6 +58,8 @@ function cofig_chip1(void)
 	ERASE_CHIP_ENABLE = 0
 	
 	FLASH_ADDRESS = 0x08000000	--定义FLASH起始地址
+	
+	RESET_TYPE = 0		-- 0表示软件复位  1表示硬件复位
 	
 	--是否核对CPU内核ID
 	CHECK_MCU_ID = 0
@@ -375,7 +381,7 @@ function swd_start_prog(void)
 	end
 	
 	for i = 1, #TaskList, 3 do		
-		if (TaskList[i] ~= "") then
+		if (TaskList[i] ~= "") then					
 			print("------------------------")
 			str = string.format("FLM : %s", TaskList[i])  print(str)
 			str = string.format("Data: %s", TaskList[i + 1]) print(str)

@@ -25,11 +25,19 @@ typedef enum
     CHIP_I2C_EEPROM  = 3,
 }CHIP_TYPE_E;
 
+typedef enum
+{
+    SOFT_RESET  = 0,    
+    HARD_RESET  = 1
+}REST_TYPE_E;
+
 typedef struct 
 {
     char FilePath[128];         /* lua文件路径 */    
     
     CHIP_TYPE_E ChipType;       /* 芯片类型 */
+    
+    REST_TYPE_E ResetType;      /* 复位类型 */
     
     uint32_t Time;
     

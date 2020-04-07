@@ -1,6 +1,16 @@
---H7-TOOL主板功能初测
+--F01=主板功能预测试,test_gpio()
+--F02=TVCC+NTC测试,test_tvcc()
+--F03=示波器电路测试,test_ch1ch2()
+--F04=执行01-02-03,test_gpio() test_tvcc() test_ch1ch2()
+--F05=测试转接板LED,test_ledout()
+--F06=时钟,print(os.date())
+--F07=扩展板继电器全开,test_extio_open_do()
+--F08=扩展板继电器全关,test_extio_close_do()
+--F09=扩展板DI读取,test_extio_di()
+--F10=,close_all()
+
 beep()
-print("H7-TOOL主板功能初测程序已加载")
+print("H7-TOOL主板功能初测程序已加载 2020-01-10")
 
 --测试GPIO输入输出
 function test_gpio(void)
@@ -10,23 +20,23 @@ function test_gpio(void)
 	local time1
 	
 	print("")
-	print("----检查时钟----")
+	print("----检查时钟----") delayms(5)
 	time1 = os.time()
 	print(os.date())
 	print(time1)
 	if (time1 < 1574937149) then 
-		print("*****时钟错误*****")
+		print("*****时钟错误*****") delayms(5)
 		beep()
 		delayms(100)
 		beep()
 		delayms(100)
 		beep()			
 	else
-		print("时钟OK > 1574937149")
+		print("时钟OK > 1574937149") delayms(5)
 	end
 
-	print("")
-	print("----开始测试----")
+	print("") delayms(5)
+	print("----开始测试----") delayms(5)
 	err=0
 	terr=0
 --设置TVCC输出3.3V
@@ -188,6 +198,7 @@ function test_ch1ch2(void)
 	local dac2 = {4095, 1024, 512, 256, 128, 64, 32, 16}
 	local mid2 = {43121, 41400, 37714, 37575, 37556, 37494, 37633, 42601}
 	local diff2 = {0.2, 0.1, 0.08, 0.08, 0.08, 0.08, 0.12, 0.17}
+	local str
 		
 	print("") delayms(5)
 	print("----开始示波器电路----") delayms(5)
@@ -205,13 +216,17 @@ function test_ch1ch2(void)
 		errd = mid1[i] * diff1[i];
 		if (adc < mid1[i] - errd  or adc > mid1[i] + errd) then 
 			err = err + 1
-			print("dac=", dac) delayms(5)
-			print(" adc=", adc) delayms(5)
-			print(" error") delayms(5)
+			--print("dac=", dac) delayms(5)
+			--print(" adc=", adc) delayms(5)
+			--print(" error") delayms(5)
+			str = string.format("dac=%f adc=%f error", dac, adc)
+			print(str)  delayms(5)	
 		else
-			print("dac=", dac) delayms(5)
-			print(" adc=", adc) delayms(5)
-			print(" ok") delayms(5)
+			--print("dac=", dac) delayms(5)
+			--print(" adc=", adc) delayms(5)
+			--print(" ok") delayms(5)
+			str = string.format("dac=%f adc=%f ok", dac, adc)
+			print(str)  delayms(5)	
 		end
 	end
 	
@@ -224,13 +239,11 @@ function test_ch1ch2(void)
 		errd = mid2[i] * diff2[i];
 		if (adc < mid2[i] - errd  or adc > mid2[i] + errd) then 
 			err = err + 1
-			print("dac=", dac) delayms(5)
-			print(" adc=", adc) delayms(5)
-			print(" error") delayms(5)
+			str = string.format("dac=%f adc=%f error", dac, adc)
+			print(str)  delayms(5)	
 		else
-			print("dac=", dac) delayms(5)
-			print(" adc=", adc) delayms(5)
-			print(" ok") delayms(5)
+			str = string.format("dac=%f adc=%f ok", dac, adc)
+			print(str)  delayms(5)	
 		end
 	end
 
@@ -296,7 +309,7 @@ function test_tvcc(void)
 		if (adc < mid1[i] - errd  or adc > mid1[i] + errd) then 
 			err = err + 1
 			print(name[i], adc, "error") delayms(5)
-			print(" OK=", mid1[i] - errd, mid1[i] + errd) delayms(5)
+			print("  正确范围 = ", mid1[i] - errd, mid1[i] + errd) delayms(5)
 		else
 			print(name[i], adc, "ok") delayms(5)
 		end
@@ -312,7 +325,7 @@ function test_tvcc(void)
 		if (adc < mid2[i] - errd  or adc > mid2[i] + errd) then 
 			err = err + 1
 			print(name[i], adc, "error")  delayms(5)
-			print(" OK=", mid1[i] - errd, mid1[i] + errd) delayms(5)
+			print("  正确范围 = ", mid2[i] - errd, mid2[i] + errd) delayms(5)
 		else
 			print(name[i], adc, "ok") delayms(5)
 		end

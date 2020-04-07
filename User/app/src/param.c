@@ -148,6 +148,8 @@ void InitBaseParam(void)
     
     g_tParam.FileListFont24 = 0;        /* 1表示24点阵显示文件列表，0表示16点阵 */
     
+    g_tParam.ResetType = 0;              /* ARM芯片复位模式 */
+    
     SaveParam();
 }
 

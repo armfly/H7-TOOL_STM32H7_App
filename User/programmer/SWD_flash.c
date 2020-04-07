@@ -24,6 +24,25 @@ error_t target_flash_init(uint32_t flash_start)
     
     g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
     
+    if (g_tProg.ResetType == HARD_RESET)
+    {
+        printf("hardware reset\r\n");
+        if (0 == swd_set_target_state_hw(RESET_PROGRAM)) 
+        {
+            printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
+            return ERROR_RESET;
+        }        
+    }
+    else    //if (g_tProg.ResetType == SOFT_RESET)
+    {
+        printf("sorfwate reset\r\n");
+        if (0 == swd_set_target_state_sw(RESET_PROGRAM)) 
+        {
+            printf("error: swd_set_target_state_sw(RESET_PROGRAM)\r\n");
+            return ERROR_RESET;
+        }
+    }
+  
     LoadAlgoToTarget();
     
     if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 1, 0)) {
@@ -222,5 +241,4 @@ uint32_t target_flash_read_extid(uint32_t addr)
                                 0,
                                 0);
     return id;    
-    return id;
 }

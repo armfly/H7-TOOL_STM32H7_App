@@ -47,13 +47,15 @@ function cofig_chip1(void)
 
 		AlgoFile_QSPI,							--算法文件
 		"0:/H7-TOOL/Fonts/GB2312ZK.bin",  		--数据文件
-		0x90000000,								--目标地址		
+		0x91E00000,								--目标地址		
 	}
 	
 	--1表示整片擦除，0表示按扇区擦除. 有些CPU整片擦除速度快很多，有些慢很多
 	ERASE_CHIP_ENABLE = 0
 	
 	FLASH_ADDRESS = 0x08000000	--定义FLASH起始地址
+
+	RESET_TYPE = 0		-- 0表示软件复位  1表示硬件复位
 	
 	--是否核对CPU内核ID
 	CHECK_MCU_ID = 0

@@ -52,6 +52,8 @@ typedef enum
     ES_GPIO_CAN = 6,    /* CAN功能 */
     
     ES_GPIO_I2C = 7,    /* I2C功能 */
+    
+    ES_GPIO_SWD_OUT = 8,    /* 1拖4 SWD接口用 */
 } EIO_SELECT_E;
 
 void bsp_InitExtIO(void);

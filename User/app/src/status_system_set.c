@@ -706,7 +706,7 @@ void status_UsbEMMC(void)
 {
     uint8_t ucKeyCode;          /* 按键代码 */
     
-    DispHeader2(93, "USB eMMM磁盘");
+    DispHeader2(93, "USB eMMC磁盘");
     DispHelpBar("请在电脑操作eMMC文件",
                 "");
     

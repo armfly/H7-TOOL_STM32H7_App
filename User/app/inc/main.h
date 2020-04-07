@@ -29,6 +29,7 @@ enum
     MS_PROG_SELECT_FILE,    /* 脱机下载器浏览文件 */
     MS_PROG_WORK,           /* 脱机下载器工作界面 */
     MS_PROG_SETTING,        /* 脱机下载器参数设置 */
+    MS_PROG_MODIFY_PARAM,   /* 修改参数比如复位类型 */
     
     MS_VOLTAGE_METER,       /* 电压表 */
     MS_CURRENT_METER,       /* 高侧电流表 */

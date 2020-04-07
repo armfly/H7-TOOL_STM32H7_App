@@ -13,6 +13,7 @@
 void status_ProgSelectFile(void);
 void status_ProgWork(void);
 void status_ProgSetting(void);
+void status_ProgModifyParam(void);
 
 #endif
 

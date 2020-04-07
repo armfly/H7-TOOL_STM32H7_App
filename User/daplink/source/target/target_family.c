@@ -126,28 +126,43 @@ uint8_t target_family_valid(void)
 
 uint8_t target_set_state(TARGET_RESET_STATE state)
 {
-    if (g_board_info.target_set_state) { //target specific
+    if (g_board_info.target_set_state) 
+    {  //target specific
         g_board_info.target_set_state(state);
     }
-    if (g_target_family) { 
-        if (g_target_family->target_set_state) {
+    if (g_target_family) 
+    { 
+        if (g_target_family->target_set_state) 
+        {
             //customize target state
             return g_target_family->target_set_state(state);
-        } else {
-            if (g_target_family->default_reset_type == kHardwareReset) {
+        } 
+        else 
+        {
+            if (g_target_family->default_reset_type == kHardwareReset) 
+            {
                 return swd_set_target_state_hw(state);
-            } else if (g_target_family->default_reset_type == kSoftwareReset) {
-                if (g_board_info.soft_reset_type) { //board has precedence
+            } 
+            else if (g_target_family->default_reset_type == kSoftwareReset) 
+            {
+                if (g_board_info.soft_reset_type) 
+                { //board has precedence
                     swd_set_soft_reset(g_board_info.soft_reset_type);
-                } else if (g_target_family->soft_reset_type) {
+                } 
+                else if (g_target_family->soft_reset_type) 
+                {
                     swd_set_soft_reset(g_target_family->soft_reset_type);
                 }
                 return swd_set_target_state_sw(state);
-            }else {
+            }
+            else             
+            {
                 return 1;
             } 
         }
-    }else{
+    }
+    else
+    {
         return 0;
     }
 }

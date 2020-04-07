@@ -1,3 +1,10 @@
+--F01=自动校准,test_calib()
+--F02=---校准TVCC---,calib_tvcc_volt()
+--F03=---校准DAC电压和电流---,calib_dac()
+--F04=---校准示波器电压---,calib_ch1ch2()
+--F05=--校准TVCC电流和高侧电流,calib_curr()
+--F06=---校准NTC---,calib_ntc()
+
 beep()
 print("脚本版本 V1.04 2019-11-28")
 
