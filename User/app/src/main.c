@@ -43,6 +43,7 @@
 #include "target_reset.h"
 #include "target_config.h"
 #include "swd_host.h"
+#include "SW_DP_Multi.h"
 
 //#include "usbd_user.h"
 #include "usb_if.h"
@@ -86,13 +87,15 @@ int main(void)
     
     bsp_InitESP32();
 
+    bsp_SetTVCC(3300);
+    
     DSO_InitHard();
     DSO_SetDC(1, 1);
     DSO_SetDC(2, 1);
     DSO_SetGain(1, 3);
     DSO_SetGain(2, 3);
 
-    bsp_SetTVCC(3300);
+    g_gMulSwd.MultiMode = 0;    /* 测试一拖四模式 */
     
     /* LwIP 初始化 */
     {
@@ -155,7 +158,11 @@ int main(void)
 
             case MS_PROG_SETTING:       /* 脱机下载器 - 参数设置 */
                 status_ProgSetting();
-                break;   
+                break;
+
+            case MS_PROG_MODIFY_PARAM:  /* 脱机下载器 - 修改复位类型 */
+                status_ProgModifyParam();
+                break;             
                     
             case MS_VOLTAGE_METER:  /* 电压表 */
                 status_VoltageMeter();

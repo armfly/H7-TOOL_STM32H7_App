@@ -430,16 +430,11 @@ uint8_t LoadAlgoToTarget(void)
     const uint32_t BLOB_HEADER[] = {0xE00ABE00, 0x062D780D, 0x24084068, 0xD3000040, 0x1E644058, 0x1C49D1FA, 0x2A001E52, 0x4770D1F2};    
     uint32_t bytes;
     
-    if (0 == swd_set_target_state_hw(RESET_PROGRAM)) 
-    {
-        printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
-        return ERROR_RESET;
-    }
-    
-    #if 1   // for debug
-        memset(FsReadBuf, 0, 8*1024);
-        swd_write_memory(flash_algo.algo_start, (uint8_t *)FsReadBuf,  8*1024);
-    #endif
+//    if (0 == swd_set_target_state_sw(RESET_PROGRAM)) 
+//    {
+//        printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
+//        return ERROR_RESET;
+//    }
     
     if (g_tFLM.Load[0].Size + 32 < sizeof(FsReadBuf))   /* 小于16KB */
     {

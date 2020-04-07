@@ -30,6 +30,7 @@
 #include "target_family.h"
 #include "prog_if.h"
 #include "file_lib.h"
+#include "SW_DP_Multi.h"
 
 // Default NVIC and Core debug base addresses
 // TODO: Read these addresses from ROM.
@@ -60,7 +61,7 @@ typedef struct {
     uint32_t xpsr;
 } DEBUG_STATE;
 
-static SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
+SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
 
 static DAP_STATE dap_state;
 static uint32_t  soft_reset = SYSRESETREQ;
@@ -144,6 +145,11 @@ uint8_t swd_init(void)
     //       and fixed.
     DAP_Setup();
     PORT_SWD_SETUP();
+    
+    if (g_gMulSwd.MultiMode > 0)
+    {
+        MUL_SWD_GPIOConfig();
+    }
     return 1;
 }
 

@@ -148,7 +148,7 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
             LCD_SetEncode(ENCODE_UTF8);
         }
 
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        ucKeyCode = bsp_GetKey2(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
@@ -168,7 +168,7 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
     {
         uint8_t ucKeyCode;
 
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        ucKeyCode = bsp_GetKey2(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
@@ -180,6 +180,14 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
                     lua_yield(_L, 0); 
                     break;
 
+                case KEY_UP_S:
+                case KEY_UP_C:
+                    if (g_tProg.AutoStart == 1)
+                    {
+                        ;
+                    }
+                    break;
+                
                 default:
                     break;
             }
@@ -720,6 +728,58 @@ int l_my_print(lua_State* L)
 
 /*
 *********************************************************************************************************
+*    函 数 名: get_key
+*    功能说明: 读取键值
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int get_key(lua_State* L)
+{
+    uint8_t key;
+    
+    key = bsp_GetKey();
+    lua_pushnumber(L, key); 
+    return 1;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: put_key
+*    功能说明: 模拟一个键值
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int put_key(lua_State* L)
+{
+    uint8_t key;
+    
+    if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 */
+    {
+        key = luaL_checknumber(L, 1);
+    }
+    
+    bsp_PutKey(key);
+    return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: clear_key
+*    功能说明: 清除按键缓冲区
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int clear_key(lua_State* L)
+{   
+    bsp_ClearKey();
+    return 0;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: lua_RegisterFunc
 *    功能说明: 注册lua可调用的c函数
 *    形    参: 无
@@ -738,6 +798,9 @@ static void lua_RegisterFunc(void)
     lua_register(g_Lua, "read_clock", read_clock);
     lua_register(g_Lua, "get_runtime", get_runtime);
     lua_register(g_Lua, "check_runtime", check_runtime);
+    lua_register(g_Lua, "get_key", get_key);
+    lua_register(g_Lua, "put_key", put_key);
+    lua_register(g_Lua, "clear_key", clear_key);
     
     /* 注册接口函数 */
     lua_gpio_RegisterFun();    
@@ -756,4 +819,4 @@ static void lua_RegisterFunc(void)
     lua_uart_RegisterFun();
 }
 
-
+/***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

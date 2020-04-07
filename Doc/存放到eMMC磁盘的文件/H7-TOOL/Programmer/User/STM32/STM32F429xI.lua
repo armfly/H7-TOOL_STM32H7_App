@@ -61,6 +61,8 @@ function cofig_chip1(void)
 	ERASE_CHIP_ENABLE = 0
 	
 	FLASH_ADDRESS = 0x08000000	--定义FLASH起始地址
+
+	RESET_TYPE = 0		-- 0表示软件复位  1表示硬件复位	
 	
 	--是否核对CPU内核ID
 	CHECK_MCU_ID = 0

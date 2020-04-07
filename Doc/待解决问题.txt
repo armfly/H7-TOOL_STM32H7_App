@@ -1,0 +1,7 @@
+--本文件记录一些待解决或待优化的问题--
+
+1. qspi_read(), lua连续读取存在问题.
+2. 文件管理界面，写字库操作1分钟，屏保进入后再唤醒，程序实际在刷屏函数中出不来。
+3. systick 中断优先级 = 0、  stm32h7xx_hal_conf.h
+#define  TICK_INT_PRIORITY            0 // ((uint32_t)0x0F) /*!< tick interrupt priority */
+4. bsp_CheckRunTime, bsp_GetRunTime 函数内部去掉关闭中断的操作，影响QSPI写操作。

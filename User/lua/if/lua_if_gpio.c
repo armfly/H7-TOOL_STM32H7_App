@@ -62,18 +62,19 @@ static int lua_GpioCfg(lua_State* L)
         return 1;
     }
     
-    if (_dir == 0)
-    {
-        EIO_ConfigPort(_no, ES_GPIO_IN);
-    }
-    else if (_dir == 1)
-    {
-        EIO_ConfigPort(_no, ES_GPIO_OUT);
-    }    
-    else if (_dir == 2)
-    {
-        EIO_ConfigPort(_no, ES_FMC_OUT);
-    }
+//    if (_dir == 0)
+//    {
+//        EIO_ConfigPort(_no, ES_GPIO_IN);
+//    }
+//    else if (_dir == 1)
+//    {
+//        EIO_ConfigPort(_no, ES_GPIO_OUT);
+//    }    
+//    else if (_dir == 2)
+//    {
+//        EIO_ConfigPort(_no, ES_FMC_OUT);
+//    }
+    EIO_ConfigPort(_no, (EIO_SELECT_E)_dir);
     return 1;
 }
 
