@@ -28,6 +28,8 @@
 #include "bsp.h"
 #include "main.h"
 
+#define UART_GPIO_SPEED     GPIO_SPEED_FREQ_HIGH
+
 #if UART1_FIFO_EN == 1
     /* 串口1的GPIO  PA9, PA10   RS323 DB9接口 */
     #define USART1_CLK_ENABLE()             __HAL_RCC_USART1_CLK_ENABLE()
@@ -607,7 +609,7 @@ void RS485_InitTXE(void)
     /* 配置引脚为推挽输出 */
     gpio_init.Mode = GPIO_MODE_OUTPUT_PP;           /* 推挽输出 */
     gpio_init.Pull = GPIO_NOPULL;                   /* 上下拉电阻不使能 */
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;    /* GPIO速度等级 */
+    gpio_init.Speed = UART_GPIO_SPEED;    /* GPIO速度等级 */
     gpio_init.Pin = RS485_TXEN_PIN;
     HAL_GPIO_Init(RS485_TXEN_GPIO_PORT, &gpio_init);
 }
@@ -1111,7 +1113,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = USART1_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = USART1_TX_AF;
     HAL_GPIO_Init(USART1_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1143,7 +1145,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = USART2_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = USART2_TX_AF;
     HAL_GPIO_Init(USART2_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1174,7 +1176,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = USART3_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = USART3_TX_AF;
     HAL_GPIO_Init(USART3_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1205,7 +1207,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = UART4_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = UART4_TX_AF;
     HAL_GPIO_Init(UART4_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1236,7 +1238,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = UART5_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = UART5_TX_AF;
     HAL_GPIO_Init(UART5_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1267,7 +1269,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = USART6_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = USART6_TX_AF;
     HAL_GPIO_Init(USART6_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1298,7 +1300,7 @@ static void InitHardUart(void)
     GPIO_InitStruct.Pin = UART7_TX_PIN;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     GPIO_InitStruct.Alternate = UART7_TX_AF;
     HAL_GPIO_Init(UART7_TX_GPIO_PORT, &GPIO_InitStruct);
 
@@ -1331,7 +1333,7 @@ static void InitHardUart(void)
 
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Speed = UART_GPIO_SPEED;
     
     #ifdef UART8_TX_PIN
     GPIO_InitStruct.Pin = UART8_TX_PIN;
@@ -1694,63 +1696,5 @@ void UART8_IRQHandler(void)
     UartIRQ(&g_tUart8);
 }
 #endif
-
-/*
-*********************************************************************************************************
-*    函 数 名: fputc
-*    功能说明: 重定义putc函数，这样可以使用printf函数从串口1打印输出
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
-extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
-extern MEMO_T g_LuaMemo;
-extern uint16_t g_MainStatus;
-int fputc(int ch, FILE *f)
-{
-    uint8_t buf[1];
-
-    buf[0] = ch;
-    
-#if PRINT_TO_UDP == 1
-    lua_udp_SendBuf(buf, 1, LUA_UDP_PORT);
-    
-    if (g_MainStatus == MS_LUA_EXEC_FILE)
-    {
-        LCD_MemoAddChar(&g_LuaMemo, ch);
-    }
-#else
-    USBCom_SendBuf(1, buf, 1);
-#endif
-	
-    //comSendChar(COM1, ch);
-    return ch;
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: fgetc
-*    功能说明: 重定义getc函数，这样可以使用getchar函数从串口1输入数据
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-int fgetc(FILE *f)
-{
-    //#if 1    /* 从串口接收FIFO中取1个数据, 只有取到数据才返回 */
-    //    uint8_t ucData;
-
-    //    while(comGetChar(COM1, &ucData) == 0);
-
-    //    return ucData;
-    //#else
-    //    /* 等待串口1输入数据 */
-    //    while (USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == RESET);
-
-    //    return (int)USART_ReceiveData(USART1);
-    //#endif
-    return 0;
-}
     
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

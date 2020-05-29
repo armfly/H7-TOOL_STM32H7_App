@@ -56,9 +56,11 @@ char *StrUTF8ToGBK(char *utf8, char *gbk, uint16_t gbk_size);
 
 uint8_t CheckBlankBuf(const char *_buf, uint32_t _len, uint8_t _EmptyValue);
 
-uint32_t STM32_CRC32(uint32_t *_pBuf, uint32_t _Len);
-uint32_t CRC32Software(uint8_t *pData, uint32_t Length);
-uint32_t Calculate_CRC32(uint8_t *pStart, uint32_t uSize);
+uint32_t soft_crc32(uint8_t *pStart, uint32_t uSize);
+uint32_t STM32_CRC32_Word(uint32_t *_pBuf, uint32_t _Len);
+
+uint32_t Soft_CRC32_byte(uint8_t *pData, uint32_t Length);
+uint32_t STM32_CRC32_byte(uint8_t *_pBuf, uint32_t _Len);
 
 #endif
 

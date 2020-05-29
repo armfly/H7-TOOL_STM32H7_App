@@ -230,7 +230,7 @@ void bsp_InitSPI5_Fast(void)
     /* 配置GPIO为SPI功能 */
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP; /* 上拉 */
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM; //GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = SPI5_SCK_AF;
 
     GPIO_InitStruct.Pin = SPI5_SCK_PIN;
@@ -282,7 +282,7 @@ static void ST7789_ConfigGPIO(void)
 
         gpio_init.Mode = GPIO_MODE_OUTPUT_PP;        /* 设置推挽输出 */
         gpio_init.Pull = GPIO_NOPULL;                        /* 上下拉电阻不使能 */
-        gpio_init.Speed = GPIO_SPEED_FREQ_HIGH; /* GPIO速度等级 */
+        gpio_init.Speed = GPIO_SPEED_FREQ_MEDIUM;     /* GPIO_SPEED_FREQ_MEDIUM GPIO_SPEED_FREQ_HIGH */
 
         gpio_init.Pin = LCD_RS_PIN;
         HAL_GPIO_Init(LCD_RS_GPIO, &gpio_init);

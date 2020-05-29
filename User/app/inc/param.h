@@ -102,6 +102,7 @@ typedef struct
     uint8_t FileListFont24;     /* 1表示24点阵显示文件列表，0表示16点阵 */
     
     uint8_t ResetType;          /* 0表示由lua脚本决定  1表示强制硬件复位 2表示强制软件复位 */
+    uint8_t MultiProgMode;      /* 1表示1路，2表示2路，3表示3路，4表示4路 */
 } PARAM_T;
 
 /* 模拟量校准参数 */
@@ -183,6 +184,8 @@ typedef struct
     uint8_t CalibEnable;
 
     uint8_t GpioMode[16];       /* 保存GPIO模式参数、输入、输出或特殊功能 */
+
+    uint8_t SaveAlgoToCFile;     /* 解析FLM时，保存解析结果到C文件，仅仅用于debug */
 
 } VAR_T;
 

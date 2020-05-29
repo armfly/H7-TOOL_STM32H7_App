@@ -148,7 +148,8 @@ void InitBaseParam(void)
     
     g_tParam.FileListFont24 = 0;        /* 1表示24点阵显示文件列表，0表示16点阵 */
     
-    g_tParam.ResetType = 0;              /* ARM芯片复位模式 */
+    g_tParam.ResetType = 0;             /* ARM芯片复位模式 */
+    g_tParam.MultiProgMode = 4;         /* 多机烧录模式 */
     
     SaveParam();
 }
@@ -163,6 +164,9 @@ void InitBaseParam(void)
 */
 void LoadCalibParam(void)
 {
+    uint8_t init;
+    uint8_t i;
+    
     if (sizeof(g_tCalib) > PARAM_CALIB_SIZE)
     {
         /* 校准参数分配空间不足 */
@@ -170,14 +174,25 @@ void LoadCalibParam(void)
     }    
     
     /* 读取EEPROM中的参数 */
-    ee_ReadBytes((uint8_t *)&g_tCalib, PARAM_CALIB_ADDR, sizeof(g_tCalib));    
-
-    if (g_tCalib.CalibVer != CALIB_VER)
+    init = 1;
+    for (i = 0; i < 3; i++)
+    {
+        ee_ReadBytes((uint8_t *)&g_tCalib, PARAM_CALIB_ADDR, sizeof(g_tCalib)); 
+        if (g_tCalib.CalibVer == CALIB_VER)
+        {       
+            init = 0;
+            break;
+        }
+        bsp_DelayUS(50 * 1000); /* 延迟50ms */
+    }
+    
+    /* 第一次运行，赋缺省值 */
+    if (init == 1)
     {
         g_tCalib.CalibVer = CALIB_VER;
         
         InitCalibParam();    /* 初始化校准参数 */
-    }    
+    }  
 }
 
 /*
@@ -281,9 +296,9 @@ void InitCalibParam(void)
     g_tCalib.NtcRes.y4 = 99.94;
 
     g_tCalib.TVCCSet.x1 = 127;
-    g_tCalib.TVCCSet.y1 = 1265;
+    g_tCalib.TVCCSet.y1 = 1.265;
     g_tCalib.TVCCSet.x2 = 34;
-    g_tCalib.TVCCSet.y2 = 4687;    
+    g_tCalib.TVCCSet.y2 = 4.687;    
         
     g_tCalib.Dac10V.x1 = 500;
     g_tCalib.Dac10V.y1 = -9302;        /*  */

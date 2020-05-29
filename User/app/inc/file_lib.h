@@ -48,9 +48,7 @@ typedef struct
     uint32_t ProgrammedCount;
     
     uint32_t ProductSN;         /* 产品序号（整数部分） */
-    
-    uint32_t LastTotalTime;     /* 上次编程总时间 */
-    uint32_t LastEraseChipTime; /* 擦除整片的时间，仅仅用于进度指示. 按扇区擦除时不用这个变量 */
+
 }PROG_INI_T;
 
 extern PROG_INI_T g_tProgIni;

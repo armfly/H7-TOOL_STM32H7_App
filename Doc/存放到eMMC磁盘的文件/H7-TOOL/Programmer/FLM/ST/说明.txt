@@ -1,8 +1,0 @@
-
-2020-02-26
-1、如下产品的FLM算法已优化，增加了CRC校验和查空函数
-STM32F0xx
-STM32F10x
-STM32F4xx
-STM32F7xx
-STM32H7x

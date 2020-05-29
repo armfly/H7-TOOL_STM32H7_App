@@ -18,9 +18,9 @@
 #include "modbus_iap.h"
 #include "lua_if.h"
 
-uint8_t fSaveReq_06H = 0;         /* 保存基本参数请求，用于06H和10H写寄存器函数 */
-uint8_t fResetReq_06H = 0;     /* 需要复位CPU，因为网络参数变化 */
-uint8_t fSaveCalibParam = 0; /* 保存校准参数请求，用于06H和10H写寄存器函数 */
+uint8_t fSaveReq_06H = 0;       /* 保存基本参数请求，用于06H和10H写寄存器函数 */
+uint8_t fResetReq_06H = 0;      /* 需要复位CPU，因为网络参数变化 */
+uint8_t fSaveCalibParam = 0;    /* 保存校准参数请求，用于06H和10H写寄存器函数 */
 
 static uint8_t WriteCalibRegValue_06H(uint16_t _reg_addr, uint16_t _reg_value);
 static uint8_t ReadCalibRegValue_03H(uint16_t reg_addr, uint16_t *reg_value);
@@ -1221,9 +1221,12 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             {
                 if (g_tDSO.FreqID < FREQ_NUM - 1)
                 {
-
                     DSO_StartADC(TabelFreq[g_tDSO.FreqID]);
                 }
+            }
+            else if (g_tDSO.Run == 0)
+            {
+                DSO_StopADC();
             }
             break;
 

@@ -18,25 +18,28 @@
 #include "bsp.h"
 #include "param.h"
 
+#define H7_GPIO_SPEED       GPIO_SPEED_MEDIUM    // GPIO_SPEED_MEDIUM GPIO_SPEED_FREQ_HIGH
+
+
 /* 配置GPIO为推挽输出 */
 #define GPIO_INIT_OUT_PP(gpio, pin)            \
     gpio_init.Mode = GPIO_MODE_OUTPUT_PP;        \
     gpio_init.Pull = GPIO_NOPULL;                \
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    gpio_init.Speed = H7_GPIO_SPEED; \
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);
 
 #define GPIO_INIT_OUT_OD(gpio, pin)            \
     gpio_init.Mode = GPIO_MODE_OUTPUT_OD;        \
     gpio_init.Pull = GPIO_NOPULL;                \
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    gpio_init.Speed = H7_GPIO_SPEED; \
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);
     
 #define GPIO_INIT_INPUT(gpio, pin)             \
     gpio_init.Mode = GPIO_MODE_INPUT;            \
     gpio_init.Pull = GPIO_NOPULL;                \
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    gpio_init.Speed = H7_GPIO_SPEED; \
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);
 
@@ -51,7 +54,7 @@
 #define GPIO_INIT_UART7(gpio, pin)               \
     gpio_init.Mode = GPIO_MODE_AF_PP;            \
     gpio_init.Pull = GPIO_NOPULL;                \
-    gpio_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH; \
+    gpio_init.Speed = GPIO_SPEED_MEDIUM; \
     gpio_init.Alternate = GPIO_AF11_UART7;         \
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);   

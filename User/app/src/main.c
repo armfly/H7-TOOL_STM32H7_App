@@ -68,6 +68,35 @@ static const uint16_t StatusOrder[] =
     MS_MINI_DSO,         /* 迷你示波器 */    
 };
 
+
+uint32_t stm32crc(uint32_t *ptr, int len)
+{
+	uint32_t xbit, data;
+	uint32_t crc = 0xFFFFFFFF;    // init value
+    uint32_t polynom = 0x04c11db7;
+
+	while (len--) {
+		xbit = 1u << 31;
+
+		data = *ptr++;
+		for (int bits = 0; bits < 32; bits++) 
+		{
+			if (crc & 0x80000000) {
+				crc <<= 1;
+				crc ^= polynom;
+			}
+			else
+				crc <<= 1;
+
+			if (data & xbit)
+				crc ^= polynom;
+
+			xbit >>= 1;
+		}
+	}
+	return crc;
+}
+
 /*
 *********************************************************************************************************
 *    函 数 名: main
@@ -95,7 +124,14 @@ int main(void)
     DSO_SetGain(1, 3);
     DSO_SetGain(2, 3);
 
-    g_gMulSwd.MultiMode = 0;    /* 测试一拖四模式 */
+    /* 测试一拖四模式 */
+    {
+        g_gMulSwd.MultiMode = 0;   
+        g_gMulSwd.Active[0] = 1;
+        g_gMulSwd.Active[1] = 1;
+        g_gMulSwd.Active[2] = 1;
+        g_gMulSwd.Active[3] = 1;
+    }
     
     /* LwIP 初始化 */
     {
@@ -111,6 +147,8 @@ int main(void)
     usbd_Init();        /* 初始化USB协议栈 */
     
     FileSystemLoad();   /* 挂载文件系统 */
+        
+    lua_Init();         /* 启动lua */
     
     //wifi_state = WIFI_INIT;
 
@@ -628,7 +666,7 @@ void ProgressBarSetColor(uint16_t _Color)
 }
 
 void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-    char *_str, float _Percent, FONT_T *_tFont)    
+    char *_str1, float _Percent, char *_str2, FONT_T *_tFont)    
 {   
     uint16_t width;
     char buf[16];
@@ -655,7 +693,7 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
 
     StrHeight = LCD_GetFontHeight(_tFont);
     y = _usY + (_usHeight - StrHeight) / 2;
-    if (_str[0] == 0)   /* 居中显示百分比文字 */
+    if (_str1[0] == 0)   /* 只显示显示百分比文字 */
     {              
         sprintf(buf, "%0.0f%%", _Percent);
         StrWidth = LCD_GetStrWidth(buf, _tFont);
@@ -664,13 +702,19 @@ void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t 
     }
     else
     {
+        /* 显示左侧文本 */
         x = _usX + 4;
-        LCD_DispStr(x, y, _str, _tFont);  
+        LCD_DispStr(x, y, _str1, _tFont);  
         
+        /* 显示百分比 */
         sprintf(buf, "%0.0f%%", _Percent);
         StrWidth = LCD_GetStrWidth(buf, _tFont);
         x = _usX + (_usWidth - StrWidth) / 2;
-        LCD_DispStr(x, y, buf, _tFont);         
+        LCD_DispStr(x, y, buf, _tFont);
+
+        /* 显示右侧文本 */
+        x = x + 36;
+        LCD_DispStr(x, y, _str2, _tFont);          
     }     
 }
 

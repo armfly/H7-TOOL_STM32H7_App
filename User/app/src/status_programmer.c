@@ -19,6 +19,7 @@
 #include "lua_if.h"
 #include "prog_if.h"
 #include "lcd_menu.h"
+#include "SW_DP_Multi.h"
 
 /* 三个按钮 */
 #define BTN1_X     (240 - BTN1_W - 5)
@@ -57,12 +58,12 @@
 /* 供电电压*/
 #define TEXT_VOLT_X     5
 #define TEXT_VOLT_Y     TEXT4_Y + 25
-#define TEXT_VOLT_W     60
+#define TEXT_VOLT_W     62
 
 /* 供电电流 */
-#define TEXT_CURR_X     TEXT_VOLT_X + TEXT_VOLT_W + 5
+#define TEXT_CURR_X     TEXT_VOLT_X + TEXT_VOLT_W + 8
 #define TEXT_CURR_Y     TEXT_VOLT_Y
-#define TEXT_CURR_W     60
+#define TEXT_CURR_W     62
 
 /* 烧录时间 */
 #define PROG_TIME_X     160
@@ -79,11 +80,10 @@
 
 const uint8_t *g_MenuProg1_Text[] =
 {
-    " 1 返回",
+    " 1 修改编程参数",    
     " 2 清零本次计数",
     " 3 清零累计计数",
     " 4 输入产品序号",
-    " 5 修改编程参数",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -168,27 +168,26 @@ void status_ProgWork(void)
     {                
         s_lua_read_len = ReadFileToMem(g_tProg.FilePath, 0, s_lua_prog_buf, LUA_PROG_LEN_MAX);  /* 读lua文件 */
         
-        //DispBox(5, 5, 56, 230, CL_WHITE);
         {
             /* 绘制边框 */
-            LCD_DrawRoundRect(5, 5, 56, 230, 3, MEAS_BODER_COLOR);
+            LCD_DrawRoundRect(4, 4, 64, 240 - 8, 3, MEAS_BODER_COLOR);
             
             /* 填充矩形 */
-            LCD_FillRoundRect(5 + 1, 5 + 1, 64, 230 - 2, 3, CL_WHITE);            
+            LCD_FillRoundRect(4 + 1, 4 + 1, 64 - 2, 240 - 10, 2, CL_WHITE);                 
         }      
         
         if (s_lua_read_len > 0)
         {              
             const char *pNote1;
             char *p;
-            char buf[32];   
+            char buf[64];   
 
-            uint8_t i;
+            uint8_t i,j;
             uint16_t len;
             uint8_t line = 0;
             
-            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件 */            
-
+            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件 */  
+            
             /* 从lua文件中获得注释字符串Note01 */
             lua_getglobal(g_Lua, "Note01");    
             if (lua_isstring(g_Lua, -1))
@@ -205,34 +204,32 @@ void status_ProgWork(void)
             
             /* 显示lua文件名，两行最多56字符。 需要处理过长的文件名，每行只能显示28字符 */
             p = &g_tProg.FilePath[strlen(PROG_USER_DIR) + 1];
-            for (i = 0; i < 2; i++)
+            if (strlen(p) > 28)
+            {
+                line = 2;
+            }
+            else
+            {
+                line = 1;
+            }
+            
+            for (j = 0; j < line; j++)
             {
                 len = 0;
-                while (1)
+                for (i = 0; i < 28; i++)
                 {
                     buf[len] = *p++;
                     if (buf[len] == 0)
                     {
-                        LCD_DispStr(5 + 3,      5 + 3 + 20 * line,      buf, &tFontNote);   
-                        i = 2;
                         break;
                     }
                     len++;
-                    
-                    if (buf[len] >= 0x80)   /* 汉字需要双字节处理,自动断行 */
-                    {
-                        buf[len] = *p++;
-                        len++;
-                    }      
-
-                    if (len > 27)
-                    {
-                        buf[len] = 0;
-                        LCD_DispStr(5 + 3,      5 + 3 + 20 * line++,      buf, &tFontNote);   
-                        break;
-                    }
                 }
-            }                        
+                buf[len] = 0;
+                LCD_DispStr(5 + 3,      5 + 3 + 20 * j,      buf, &tFontNote);                 
+            }          
+
+            tFontNote.FrontColor = MEAS_VALUE_COLOR; 
             LCD_DispStr(5 + 3,      5 + 3 + 40, (char *)pNote1, &tFontNote);  /* 显示lua中的注释 */        
             
             LCD_SetEncode(ENCODE_UTF8);
@@ -324,8 +321,6 @@ void status_ProgWork(void)
 
             g_tProg.Time = bsp_GetRunTime();    /* 记录开始时间 */
             g_tProg.Err = 100;
-            g_tProg.EraseChipTime1 = 0;
-            g_tProg.EraseChipTime2 = 0;
             if (g_Lua > 0)
             {
                 const char *ret_str;
@@ -336,6 +331,47 @@ void status_ProgWork(void)
                 */
                 PG_PrintText("开始烧录...");
                 
+                if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+                {
+                    g_gMulSwd.MultiMode = g_tParam.MultiProgMode;
+
+                    if (g_tParam.MultiProgMode == 0)
+                    {
+                        g_gMulSwd.Active[0] = 0;
+                        g_gMulSwd.Active[1] = 0;
+                        g_gMulSwd.Active[2] = 0;
+                        g_gMulSwd.Active[3] = 0;
+                    }
+                    else if (g_tParam.MultiProgMode == 1)
+                    {
+                        g_gMulSwd.Active[0] = 1;
+                        g_gMulSwd.Active[1] = 0;
+                        g_gMulSwd.Active[2] = 0;
+                        g_gMulSwd.Active[3] = 0;
+                    }
+                    else if (g_tParam.MultiProgMode == 2)
+                    {
+                        g_gMulSwd.Active[0] = 1;
+                        g_gMulSwd.Active[1] = 1;
+                        g_gMulSwd.Active[2] = 0;
+                        g_gMulSwd.Active[3] = 0;
+                    }
+                    else if (g_tParam.MultiProgMode == 3)
+                    {
+                        g_gMulSwd.Active[0] = 1;
+                        g_gMulSwd.Active[1] = 1;
+                        g_gMulSwd.Active[2] = 1;
+                        g_gMulSwd.Active[3] = 0;
+                    }
+                    else if (g_tParam.MultiProgMode == 4)
+                    {
+                        g_gMulSwd.Active[0] = 1;
+                        g_gMulSwd.Active[1] = 1;
+                        g_gMulSwd.Active[2] = 1;
+                        g_gMulSwd.Active[3] = 1;
+                    }                                
+                }
+            
                 lua_do("ret_str = start_prog()");   /* 执行编程，阻塞只到编程完毕 */
                 {                    
                     lua_getglobal(g_Lua, "ret_str"); 
@@ -362,13 +398,29 @@ void status_ProgWork(void)
                 /* 编程完毕 */                
                 if (g_tProg.Err == 0)
                 {
-                    g_tProg.NowProgCount++;     /* 当前次数加1，掉电会清零 */
+                    PERIOD_Start(&g_tRunLed, 1000, 0, 0);   /* 烧录成功 LED常亮 */
                     
-                    PERIOD_Start(&g_tRunLed, 1000, 0, 0);    /* 烧录成功 LED常亮 */
-                    
-                    g_tProgIni.ProgrammedCount++;       /* 已编程计数器加1 */
-                    
-                    WriteProgIniFile(g_tProg.FilePath, &g_tProgIni);    /* 写入ini文件 */
+                    /* 累加计数器并写入ini文件 */
+                    if (g_gMulSwd.MultiMode > 0)
+                    {
+                        uint8_t i;
+                        
+                        for (i = 0; i < 4; i++)
+                        {
+                            if (g_gMulSwd.Active[i] == 1)
+                            {
+                                g_tProg.NowProgCount++;                 /* 当前次数加1，掉电会清零 */
+                                g_tProgIni.ProgrammedCount++;           /* 已编程计数器加1 */
+                            }
+                        }
+                    }
+                    else
+                    {
+                        g_tProg.NowProgCount++;                 /* 当前次数加1，掉电会清零 */
+                        g_tProgIni.ProgrammedCount++;           /* 已编程计数器加1 */                        
+                    }
+                        
+                    WriteProgIniFile(g_tProg.FilePath, &g_tProgIni);    /* 写入ini文件 */                    
                     
                     /* 读ini配置文件 */
                     ReadProgIniFile(g_tProg.FilePath, &g_tProgIni);
@@ -390,7 +442,7 @@ void status_ProgWork(void)
                 }  
                 else    /* 烧录失败 */
                 {
-                    PERIOD_Stop(&g_tRunLed);    /* 烧录失败，LED熄灭 */
+                    PERIOD_Stop(&g_tRunLed);        /* 烧录失败，LED熄灭 */
                     
                     /* 连续自动烧录 */
                     if (g_tProg.AutoStart == 1)
@@ -437,7 +489,7 @@ void status_ProgWork(void)
                             
                             if (g_tProg.Err == 0)
                             {
-                                PG_PrintText("连续烧录,等待插入");
+                                PG_PrintText("等待插入");
                             }
                             else
                             {
@@ -469,10 +521,35 @@ void status_ProgWork(void)
                     }
                     else
                     {
+//                        if (g_tProg.Err == 0)
+//                        {
+//                            PG_PrintText("等待插入");
+//                        }
+//                        else
+//                        {
+//                            PG_PrintText("上次失败,等待插入");
+//                        } 
+                            
                         ucDetectCount = 0;
                     }
                 }
             }
+        }
+        
+        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 - 检测D1触发信号 */            
+        {
+            static uint8_t s_LastState = 2;
+            uint8_t NowState;
+
+            NowState = EIO_GetInputLevel(EIO_D1);
+            if (s_LastState == 1)
+            {
+                if (NowState == 0)
+                {
+                    bsp_PutKey(KEY_UP_C);   /* 模拟用户按键 */
+                }
+            }
+            s_LastState = NowState;
         }
         
         ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
@@ -571,7 +648,8 @@ void DispProgProgress(char *_str, float _progress, uint32_t _addr)
     } 
           
     {
-        char buf[48];
+        char buf1[32];
+        char buf2[32];
         uint32_t t1;     
         
         if (g_tProg.Time > 0)  
@@ -579,15 +657,18 @@ void DispProgProgress(char *_str, float _progress, uint32_t _addr)
             t1 = bsp_CheckRunTime(g_tProg.Time);
             
             /* 烧录时间 */
-            sprintf(buf, "%3d.%02d 秒", t1 / 1000, (t1 % 1000) / 10);
-            LCD_DispStr(PROG_TIME_X,    PROG_TIME_Y,    buf, &tFont16);
+            sprintf(buf2, "%3d.%02d 秒", t1 / 1000, (t1 % 1000) / 10);
+        }
+        else
+        {
+            buf2[0] = 0;
         }
         
         /* 烧录步骤提示 */
         if (_str > 0)
         {
             LCD_SetEncode(ENCODE_GBK);
-            LCD_DispStrEx(PROG_STEP_X, PROG_STEP_Y,  _str, &tFont16, 144, 0);
+            LCD_DispStrEx(PROG_STEP_X, PROG_STEP_Y,  _str, &tFont16, 240 - 10, 0);
             LCD_SetEncode(ENCODE_UTF8);
         }
         
@@ -596,20 +677,20 @@ void DispProgProgress(char *_str, float _progress, uint32_t _addr)
         {
             if (_addr == 0xFFFFFFFF)        /* 不显示地址 */
             {
-                buf[0] = 0;
+                buf1[0] = 0;
             }
             else if (_addr == 0xFFFFFFFE)   /* 用于显示出错的地址 */
             {
-                sprintf(buf, "0x%08X", s_LastAddress);
+                sprintf(buf1, "0x%08X", s_LastAddress);
             }
             else    /* 显示地址 */
             {
-                sprintf(buf, "0x%08X", _addr);
+                sprintf(buf1, "0x%08X", _addr);
                 s_LastAddress = _addr;
             }
             
             tFont16.BackColor = CL_MASK;        
-            DispProgressBar(PROGRESS_X, PROGRESS_Y, 24, 230, buf, _progress, &tFont16);             
+            DispProgressBar(PROGRESS_X, PROGRESS_Y, 24, 230, buf1, _progress, buf2, &tFont16);             
             tFont16.BackColor = FORM_BACK_COLOR;  /* 文字背景颜色 */
         }
     }
@@ -677,10 +758,10 @@ void status_ProgSetting(void)
                     break;
 
                 case KEY_LONG_DOWN_S: /* S键 上 */
-                    if (g_tMenuProg1.Cursor == 0)           /* 返回 */
+                    if (g_tMenuProg1.Cursor == 0)      /* 修改编程参数 */
                     {
-                        g_MainStatus = MS_PROG_WORK;
-                    }
+                        g_MainStatus = MS_PROG_MODIFY_PARAM;
+                    }                    
                     else if (g_tMenuProg1.Cursor == 1)      /* 本次计数清零 */
                     {
                         g_tProg.NowProgCount = 0;
@@ -706,11 +787,7 @@ void status_ProgSetting(void)
                     else if (g_tMenuProg1.Cursor == 3)      /* 输入产品序号 */
                     {
                         //g_MainStatus = MS_SYSTEM_SET;
-                    }           
-                    else if (g_tMenuProg1.Cursor == 4)      /* 修改编程参数 */
-                    {
-                        g_MainStatus = MS_PROG_MODIFY_PARAM;
-                    }           
+                    }                     
                     break;
 
                 case KEY_UP_C: /* C键 下 */
@@ -745,7 +822,6 @@ void status_ProgModifyParam(void)
     uint8_t fSaveParam = 0;
     uint8_t cursor = 0;
     char buf[48];
-    uint8_t ucIgnoreKey = 1; 
     uint8_t active;
 
     DispHeader2(93, "烧录参数");
@@ -760,9 +836,42 @@ void status_ProgModifyParam(void)
         {
             fRefresh = 0;
             
-            /* 第1个参数 - 复位类型 */
+           /* 第1个参数 - 多路模式  */
             {
                 if (cursor == 0)
+                {
+                    active = 1;       
+                }
+                else 
+                {
+                    active = 0;
+                }
+                
+                if (g_tParam.MultiProgMode == 1)
+                {
+                    DispParamBar(0, "多路模式:", "1路", active);
+                }
+                else if (g_tParam.MultiProgMode == 2)
+                {
+                    DispParamBar(0, "多路模式:", "1-2路", active);
+                }
+                else if (g_tParam.MultiProgMode == 3)
+                {
+                    DispParamBar(0, "多路模式:", "1-3路", active);
+                } 
+                else if (g_tParam.MultiProgMode == 4)
+                {
+                    DispParamBar(0, "多路模式:", "1-4路", active);
+                }
+                else
+                {
+                    DispParamBar(0, "多路模式:", "关闭", active);
+                }                               
+            }   
+            
+            /* 第2个参数 - 复位类型 */
+            {
+                if (cursor == 1)
                 {
                     active = 1;       
                 }
@@ -773,32 +882,21 @@ void status_ProgModifyParam(void)
                 if (g_tParam.ResetType == 0)
                 {               
                     sprintf(buf, "由lua决定");
-                    DispParamBar(0, "复位类型:", buf, active);
+                    DispParamBar(1, "复位类型:", buf, active);
                 }
                 else if (g_tParam.ResetType == 1)
                 {
                     sprintf(buf, "强制硬件");
-                    DispParamBar(0, "复位类型:", buf, active);
+                    DispParamBar(1, "复位类型:", buf, active);
                 }    
                 else
                 {
                     sprintf(buf, "强制软件");
-                    DispParamBar(0, "复位类型:", buf, active);
+                    DispParamBar(1, "复位类型:", buf, active);
                 }                 
             }
             
-            /* 第2个参数 - 编程参数2  */
-            {
-                if (cursor == 1)
-                {
-                    active = 1;       
-                }
-                else 
-                {
-                    active = 0;
-                }
-                DispParamBar(1, "参数2:", "保留", active);
-            }   
+ 
 
              /* 第3个参数 - 编程参数3  */
             {
@@ -810,7 +908,7 @@ void status_ProgModifyParam(void)
                 {
                     active = 0;
                 }
-                
+           
                 DispParamBar(2, "参数3:", "保留", active);
             }      
             
@@ -823,13 +921,18 @@ void status_ProgModifyParam(void)
             switch (ucKeyCode)
             {
                 case KEY_UP_S:      /* S键 弹起 */
-                    if (ucIgnoreKey == 1)
-                    {
-                        ucIgnoreKey = 0;
-                        break;
-                    }
-                    
                     if (cursor == 0)
+                    {
+                        if (g_tParam.MultiProgMode < 4)
+                        {
+                            g_tParam.MultiProgMode++;
+                        }
+                        else
+                        {
+                            g_tParam.MultiProgMode = 0;
+                        }                         
+                    }
+                    else if (cursor == 1)
                     {
                         if (g_tParam.ResetType  == 0)
                         {
@@ -842,11 +945,7 @@ void status_ProgModifyParam(void)
                         else
                         {
                             g_tParam.ResetType = 0;
-                        }
-                    }
-                    else if (cursor == 1)
-                    {
-
+                        }                        
                     }     
                     else if (cursor == 2)
                     {
@@ -858,7 +957,18 @@ void status_ProgModifyParam(void)
 
                 case KEY_UP_C:      /* C键 下 */
                     if (cursor == 0)
-                    {                
+                    {        
+                        if (g_tParam.MultiProgMode > 0 && g_tParam.MultiProgMode < 5)
+                        {
+                            g_tParam.MultiProgMode--;
+                        }
+                        else
+                        {
+                            g_tParam.MultiProgMode = 4;
+                        }
+                    }
+                    else if (cursor == 1)
+                    {
                         if (g_tParam.ResetType  == 0)
                         {
                             g_tParam.ResetType = 2;
@@ -871,10 +981,6 @@ void status_ProgModifyParam(void)
                         {
                             g_tParam.ResetType = 0;
                         }
-                    }
-                    else if (cursor == 1)
-                    {
-
                     } 
                     else if (cursor == 2)
                     {
@@ -889,7 +995,6 @@ void status_ProgModifyParam(void)
                     {
                         cursor = 0;
                     }
-                    ucIgnoreKey = 1;
                     fRefresh = 1;
                     break;
 
@@ -923,20 +1028,23 @@ static void DispProgCounter(void)
     char buf[32];
     int32_t count;  
     FONT_T tFontText;
+    FONT_T tFont2;
 
     tFontText.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
     tFontText.FrontColor = INFO_NAME_COLOR;     /* 字体颜色 */
     tFontText.BackColor = FORM_BACK_COLOR;      /* 文字背景颜色 */      
     tFontText.Space = 0;                        /* 文字间距，单位 = 像素 */       
 
+    tFont2.FontCode = FC_ST_32;    /* 字体代码 16点阵 */
+    tFont2.FrontColor = CL_WHITE;  /* 字体颜色 */
+    tFont2.BackColor = HEAD_SN_COLOR;    /* 文字背景颜色 */
+    tFont2.Space = 0;              /* 文字间距，单位 = 像素 */ 
+    
     /* 显示本次计数 */
     LCD_DispStrEx(TEXT1_X,    TEXT1_Y, "本次", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
-    LCD_DispStrEx(TEXT2_X,    TEXT2_Y - 2, "计数", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
-    
-    tFontText.FontCode = FC_ST_32;
+    LCD_DispStrEx(TEXT2_X,    TEXT2_Y, "计数", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);    
     sprintf(buf, "%05d", g_tProg.NowProgCount);    /* 最大 99999 */
-    LCD_DispStrEx(TEXT1_X + 38,    TEXT1_Y + 4, buf, &tFontText,  16 * 5, ALIGN_LEFT);
-    tFontText.FontCode = FC_ST_16;
+    LCD_DispStrEx(TEXT1_X + 38,    TEXT1_Y + 4, buf, &tFont2,  16 * 6, ALIGN_CENTER);
     
     /* 显示剩余次数 */
     if (g_tProgIni.Locked == 1)
@@ -986,15 +1094,17 @@ void DispProgVoltCurrent(void)
     
     /* 设置字体参数 */
     {
-        tFont16.FontCode = FC_ST_16;    /* 字体代码 16点阵 */
-        tFont16.FrontColor = CL_WHITE;  /* 字体颜色 */
-        tFont16.BackColor = HEAD_SN_COLOR;    /* 文字背景颜色 */
-        tFont16.Space = 0;              /* 文字间距，单位 = 像素 */ 
+        tFont16.FontCode = FC_ST_16;            /* 字体代码 16点阵 */
+        tFont16.FrontColor = RGB(50,50,50);     /* 字体颜色 */
+        tFont16.BackColor = RGB(254, 120, 128); /* 文字背景颜色 */
+        tFont16.Space = 0;                      /* 文字间距，单位 = 像素 */ 
     } 
     
+    tFont16.BackColor = RGB(255, 220, 41);      /* 文字背景颜色 */    
     sprintf(buf, "%0.3fV", g_tVar.TVCCVolt);
     LCD_DispStrEx(TEXT_VOLT_X, TEXT_VOLT_Y, buf, &tFont16, TEXT_VOLT_W, 1);  
 
+    tFont16.BackColor = RGB(150, 240, 40);      /* 文字背景颜色 */
     sprintf(buf, "%0.0fmA", g_tVar.TVCCCurr);
     LCD_DispStrEx(TEXT_CURR_X, TEXT_CURR_Y, buf, &tFont16, TEXT_CURR_W, 1);         
 }    
