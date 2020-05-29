@@ -31,8 +31,6 @@
 #include "DAP_config.h"
 #include "DAP.h"
 
-
-
 /* 
     SPI_BAUDRATEPRESCALER_4 = 50MHz SCK时钟，不能工作。
     SPI_BAUDRATEPRESCALER_8 = 25MHz SCK时钟，稳定读写。 写并读2048字节，耗时5ms，等效传输速度 800KB/s
@@ -48,11 +46,33 @@
     
     
     SPI_BAUDRATEPRESCALER_32 : 稳定读写 STM32F030RCT6
+    
+    已经废弃SPI硬件模式，改用软件SPI模式
 */
-#define SPI_MODE_BAUD       g_SwdSpiBaud        /* SPI_BAUDRATEPRESCALER_4 不稳定 */
 
-#define PIN_SWCLK_SET       PIN_SWCLK_TCK_SET
-#define PIN_SWCLK_CLR       PIN_SWCLK_TCK_CLR
+/*
+    无延迟最高速度时，烧写H7-TOOL程序
+    正在校验...(FLM_CRC32)
+      19968ms, 0.00%
+      20894ms, 100.00%
+    编程成功
+
+    --延迟 PIN_DELAY_SLOW(0)
+    正在校验...(FLM_CRC32)
+      20708ms, 0.00%
+      21648ms, 100.00%
+
+    --延迟 PIN_DELAY_SLOW(1)
+    正在校验...(FLM_CRC32)
+      21417ms, 0.00%
+      22376ms, 100.00%
+*/
+
+//#define PIN_SWCLK_SET()       PIN_SWCLK_TCK_SET();PIN_SWCLK_TCK_SET()
+//#define PIN_SWCLK_CLR()       PIN_SWCLK_TCK_CLR();PIN_SWCLK_TCK_CLR()
+
+#define PIN_SWCLK_SET()       PIN_SWCLK_TCK_SET()
+#define PIN_SWCLK_CLR()       PIN_SWCLK_TCK_CLR()
 
 /* SPI软件模式，低速配置 */
 #define PIN_DELAY_S()           PIN_DELAY_SLOW(DAP_Data.clock_delay)
@@ -60,9 +80,8 @@
 #define SW_WRITE_BIT_SLOW(bit)  PIN_SWDIO_OUT(bit); PIN_SWCLK_CLR(); PIN_DELAY_S(); PIN_SWCLK_SET(); PIN_DELAY_S()
 #define SW_READ_BIT_SLOW(bit)   PIN_SWCLK_CLR();  PIN_DELAY_S(); bit = PIN_SWDIO_IN(); PIN_SWCLK_SET(); PIN_DELAY_S()
 
-/* SPI软件模式，高速配置 */
 #define SW_CLOCK_CYCLE_FAST()   PIN_SWCLK_CLR();  PIN_SWCLK_SET();
-#if 0   /* 优化GPIO操作 */
+#if 1   /* 优化GPIO操作 */
     #define SW_WRITE_BIT_FAST(bit)  \
             if (bit & 1)                \
             {                           \
@@ -82,47 +101,45 @@
 
 #if (DAP_SWD != 0)
 
-uint32_t g_SwdSpiBaud = SPI_BAUDRATEPRESCALER_32;
+/* 优化 PD3 PD4 同步操作节省30ns */   
 
-#if 1    /* 优化 PD3 PD4 同步操作节省30ns */   
+//#define SWCLK_TCK_PIN_PORT           GPIOD
+//#define SWCLK_TCK_PIN                GPIO_PIN_3
 
-    //#define SWCLK_TCK_PIN_PORT           GPIOD
-    //#define SWCLK_TCK_PIN                GPIO_PIN_3
+//#define SWDIO_OUT_PIN_PORT           GPIOD
+//#define SWDIO_OUT_PIN                GPIO_PIN_4
 
-    //#define SWDIO_OUT_PIN_PORT           GPIOD
-    //#define SWDIO_OUT_PIN                GPIO_PIN_4
+//#define BSP_SET_GPIO_1(gpio, pin)   gpio->BSRR = pin
+//#define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)pin << 16U
 
-    //#define BSP_SET_GPIO_1(gpio, pin)   gpio->BSRR = pin
-    //#define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)pin << 16U
+#define SEND_32BIT_ONCE_FAST()           \
+        if (val & 1)                \
+        {                           \
+            GPIOD->BSRR = GPIO_PIN_4 + (GPIO_PIN_3 << 16U); \
+            val >>= 1;  \
+            PIN_SWCLK_SET();     \
+        } \
+        else \
+        { \
+            GPIOD->BSRR = (GPIO_PIN_4 + GPIO_PIN_3) << 16U; \
+            val >>= 1;  \
+            PIN_SWCLK_SET(); \
+        } 
 
-    #define SEND_32BIT_ONCE()                   \
-                    if (val & 1)                \
-                    {                           \
-                        GPIOD->BSRR = GPIO_PIN_4 + (GPIO_PIN_3 << 16U); \
-                        val >>= 1;  \
-                        PIN_SWCLK_SET();     \
-                    } \
-                    else \
-                    { \
-                        GPIOD->BSRR = (GPIO_PIN_4 + GPIO_PIN_3) << 16U; \
-                        val >>= 1;  \
-                        PIN_SWCLK_SET(); \
-                    } 
-#else    /* 未优化 */            
-    #define SEND_32BIT_ONCE()                   \
-                    if (val & 1)                \
-                    {                           \
-                        BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);  \
-                    } \
-                    else \
-                    { \
-                        BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN); \
-                    } \
-                    PIN_SWCLK_CLR();  \
-                    val >>= 1;  \
-                    PIN_SWCLK_SET();                
-#endif
-                    
+#define SEND_32BIT_ONCE_SLOW()           \
+        if (val & 1)                \
+        {                           \
+            GPIOD->BSRR = GPIO_PIN_4 + (GPIO_PIN_3 << 16U); \
+            val >>= 1;  \
+            PIN_SWCLK_SET(); PIN_DELAY_S();   \
+        } \
+        else \
+        { \
+            GPIOD->BSRR = (GPIO_PIN_4 + GPIO_PIN_3) << 16U; \
+            val >>= 1;  \
+            PIN_SWCLK_SET(); PIN_DELAY_S();  \
+        } 
+        
 static const uint8_t ParityTable256[256] = 
 {
 #   define P2(n) n, n^1, n^1, n
@@ -225,14 +242,14 @@ uint8_t SWD_TransferFast(uint32_t request, uint32_t *data)
 
         /* armfly ： 优化奇偶校验算法 */
         parity = GetParity(val);
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();  
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();
-        SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();SEND_32BIT_ONCE();       
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();  
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();
+        SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();SEND_32BIT_ONCE_FAST();       
 
       SW_WRITE_BIT_FAST(parity);             /* Write Parity Bit */               
     }                                                                        
@@ -280,126 +297,135 @@ uint8_t SWD_TransferFast(uint32_t request, uint32_t *data)
 }
 
 uint8_t SWD_TransferSlow(uint32_t request, uint32_t *data) 
-{ 
-  uint32_t ack;                                                              
-  uint32_t bit;                                                              
-  uint32_t val;                                                              
-  uint32_t parity;                                                           
-                                                                             
-  uint32_t n;                                                                
-                                                                             
-  /* Packet Request */                                                       
-  parity = 0U;                                                               
-  SW_WRITE_BIT_SLOW(1U);                     /* Start Bit */                      
-  bit = request >> 0;                                                        
-  SW_WRITE_BIT_SLOW(bit);                    /* APnDP Bit */                      
-  parity += bit;                                                             
-  bit = request >> 1;                                                        
-  SW_WRITE_BIT_SLOW(bit);                    /* RnW Bit */                        
-  parity += bit;                                                             
-  bit = request >> 2;                                                        
-  SW_WRITE_BIT_SLOW(bit);                    /* A2 Bit */                         
-  parity += bit;                                                             
-  bit = request >> 3;                                                        
-  SW_WRITE_BIT_SLOW(bit);                    /* A3 Bit */                         
-  parity += bit;                                                             
-  SW_WRITE_BIT_SLOW(parity);                 /* Parity Bit */                     
-  SW_WRITE_BIT_SLOW(0U);                     /* Stop Bit */                       
-  SW_WRITE_BIT_SLOW(1U);                     /* Park Bit */                       
-                                                                             
-  /* Turnaround */                                                           
-  PIN_SWDIO_OUT_DISABLE();                                                   
-  for (n = DAP_Data.swd_conf.turnaround; n; n--) {                           
-    SW_CLOCK_CYCLE_SLOW();                                                        
-  }                                                                          
-                                                                             
-  /* Acknowledge response */                                                 
-  SW_READ_BIT_SLOW(bit);                                                          
-  ack  = bit << 0;                                                           
-  SW_READ_BIT_SLOW(bit);                                                          
-  ack |= bit << 1;                                                           
-  SW_READ_BIT_SLOW(bit);                                                          
-  ack |= bit << 2;                                                           
-                                                                             
-  if (ack == DAP_TRANSFER_OK) {         /* OK response */                    
-    /* Data transfer */                                                      
-    if (request & DAP_TRANSFER_RnW) {                                        
-      /* Read data */                                                        
-      val = 0U;                                                              
-      parity = 0U;                                                           
-      for (n = 32U; n; n--) {                                                
-        SW_READ_BIT_SLOW(bit);               /* Read RDATA[0:31] */               
-        parity += bit;                                                       
-        val >>= 1;                                                           
-        val  |= bit << 31;                                                   
-      }                                                                      
-      SW_READ_BIT_SLOW(bit);                 /* Read Parity */                    
-      if ((parity ^ bit) & 1U) {                                             
-        ack = DAP_TRANSFER_ERROR;                                            
-      }                                                                      
-      if (data) { *data = val; }                                             
-      /* Turnaround */                                                       
-      for (n = DAP_Data.swd_conf.turnaround; n; n--) {                       
-        SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-      PIN_SWDIO_OUT_ENABLE();                                                
-    } else {                                                                 
-      /* Turnaround */                                                       
-      for (n = DAP_Data.swd_conf.turnaround; n; n--) {                       
-        SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-      PIN_SWDIO_OUT_ENABLE();                                                
-      /* Write data */                                                       
-      val = *data;                                                           
-      parity = 0U;                                                           
-      for (n = 32U; n; n--) {                                                
-        SW_WRITE_BIT_SLOW(val);              /* Write WDATA[0:31] */              
-        parity += val;                                                       
-        val >>= 1;                                                           
-      }                                                                      
-      SW_WRITE_BIT_SLOW(parity);             /* Write Parity Bit */               
-    }                                                                        
-    /* Idle cycles */                                                        
-    n = DAP_Data.transfer.idle_cycles;                                       
-    if (n) {                                                                 
-      PIN_SWDIO_OUT(0U);                                                     
-      for (; n; n--) {                                                       
-        SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-    }                                                                        
-    PIN_SWDIO_OUT(1U);                                                       
-    return ((uint8_t)ack);                                                   
-  }                                                                          
-                                                                             
-  if ((ack == DAP_TRANSFER_WAIT) || (ack == DAP_TRANSFER_FAULT)) {           
-    /* WAIT or FAULT response */                                             
-    if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) { 
-      for (n = 32U+1U; n; n--) {                                             
+{
+  uint32_t ack;
+  uint32_t bit;
+  uint32_t val;
+  uint32_t parity;
+
+  uint32_t n;
+
+  /* Packet Request */
+  parity = 0U;
+  SW_WRITE_BIT_SLOW(1U);                     /* Start Bit */
+  bit = request >> 0;
+  SW_WRITE_BIT_SLOW(bit);                    /* APnDP Bit */
+  parity += bit;
+  bit = request >> 1;
+  SW_WRITE_BIT_SLOW(bit);                    /* RnW Bit */
+  parity += bit;
+  bit = request >> 2;
+  SW_WRITE_BIT_SLOW(bit);                    /* A2 Bit */
+  parity += bit;
+  bit = request >> 3;
+  SW_WRITE_BIT_SLOW(bit);                    /* A3 Bit */
+  parity += bit;
+  SW_WRITE_BIT_SLOW(parity);                 /* Parity Bit */
+  SW_WRITE_BIT_SLOW(0U);                     /* Stop Bit */
+  SW_WRITE_BIT_SLOW(1U);                     /* Park Bit */
+
+  /* Turnaround */
+  PIN_SWDIO_OUT_DISABLE();
+  for (n = DAP_Data.swd_conf.turnaround; n; n--) {
+    SW_CLOCK_CYCLE_SLOW();
+  }
+
+  /* Acknowledge response */
+  SW_READ_BIT_SLOW(bit);
+  ack  = bit << 0;
+  SW_READ_BIT_SLOW(bit);
+  ack |= bit << 1;
+  SW_READ_BIT_SLOW(bit);
+  ack |= bit << 2;
+
+  if (ack == DAP_TRANSFER_OK) {         /* OK response */
+    /* Data transfer */
+    if (request & DAP_TRANSFER_RnW) {
+      /* Read data */
+        /* armfly ： 优化奇偶校验算法 */
+      val = 0U;
+      for (n = 32U; n; n--) {
+        SW_READ_BIT_SLOW(bit);               /* Read RDATA[0:31] */
+        val >>= 1;
+        val  |= bit << 31;
+      }
+
+      parity = GetParity(val);
+
+
+      SW_READ_BIT_SLOW(bit);                 /* Read Parity */
+      if ((parity ^ bit) & 1U) {
+        ack = DAP_TRANSFER_ERROR;
+      }
+      if (data) { *data = val; }
+      /* Turnaround */
+      for (n = DAP_Data.swd_conf.turnaround; n; n--) {
+        SW_CLOCK_CYCLE_SLOW();
+      }
+      PIN_SWDIO_OUT_ENABLE();
+    } else {
+      /* Turnaround */
+      for (n = DAP_Data.swd_conf.turnaround; n; n--) {
+        SW_CLOCK_CYCLE_SLOW();
+      }
+      PIN_SWDIO_OUT_ENABLE();
+      /* Write data */
+      val = *data;
+
+        /* armfly ： 优化奇偶校验算法 */
+        parity = GetParity(val);
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+        SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();SEND_32BIT_ONCE_SLOW();
+
+      SW_WRITE_BIT_SLOW(parity);             /* Write Parity Bit */
+    }
+    /* Idle cycles */
+    n = DAP_Data.transfer.idle_cycles;
+    if (n) {
+      PIN_SWDIO_OUT(0U);
+      for (; n; n--) {
+        SW_CLOCK_CYCLE_SLOW();
+      }
+    }
+    PIN_SWDIO_OUT(1U);
+    return ((uint8_t)ack);
+  }
+
+  if ((ack == DAP_TRANSFER_WAIT) || (ack == DAP_TRANSFER_FAULT)) {
+    /* WAIT or FAULT response */
+    if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) {
+      for (n = 32U+1U; n; n--) {
         SW_CLOCK_CYCLE_SLOW();               /* Dummy Read RDATA[0:31] + Parity */
-      }                                                                      
-    }                                                                        
-    /* Turnaround */                                                         
-    for (n = DAP_Data.swd_conf.turnaround; n; n--) {                         
-      SW_CLOCK_CYCLE_SLOW();                                                      
-    }                                                                        
-    PIN_SWDIO_OUT_ENABLE();                                                  
+      }
+    }
+    /* Turnaround */
+    for (n = DAP_Data.swd_conf.turnaround; n; n--) {
+      SW_CLOCK_CYCLE_SLOW();
+    }
+    PIN_SWDIO_OUT_ENABLE();
     if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) == 0U)) {
-      PIN_SWDIO_OUT(0U);                                                     
-      for (n = 32U+1U; n; n--) {                                             
+      PIN_SWDIO_OUT(0U);
+      for (n = 32U+1U; n; n--) {
         SW_CLOCK_CYCLE_SLOW();               /* Dummy Write WDATA[0:31] + Parity */
-      }                                                                      
-    }                                                                        
-    PIN_SWDIO_OUT(1U);                                                       
-    return ((uint8_t)ack);                                                   
-  }                                                                          
-                                                                             
-  /* Protocol error */                                                       
-  for (n = DAP_Data.swd_conf.turnaround + 32U + 1U; n; n--) {                
-    SW_CLOCK_CYCLE_SLOW();                   /* Back off data phase */            
-  }                                                                          
-  PIN_SWDIO_OUT_ENABLE();                                                    
-  PIN_SWDIO_OUT(1U);                                                         
-  return ((uint8_t)ack);                                                       
+      }
+    }
+    PIN_SWDIO_OUT(1U);
+    return ((uint8_t)ack);
+  }
+
+  /* Protocol error */
+  for (n = DAP_Data.swd_conf.turnaround + 32U + 1U; n; n--) {
+    SW_CLOCK_CYCLE_SLOW();                   /* Back off data phase */
+  }
+  PIN_SWDIO_OUT_ENABLE();
+  PIN_SWDIO_OUT(1U);
+  return ((uint8_t)ack);
 }
 
 // SWD Transfer I/O

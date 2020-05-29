@@ -1,4 +1,3 @@
-
 /*
     
 */
@@ -6,17 +5,17 @@
 #ifndef __SW_DAP_MULTI_H__
 #define __SW_DAP_MULTI_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
-#include "flash_blob.h"
-#include "target_reset.h"
-#ifdef TARGET_MCU_CORTEX_A
-#include "debug_ca.h"
-#else
-#include "debug_cm.h"
-#endif
+//#include "flash_blob.h"
+//#include "target_reset.h"
+//#ifdef TARGET_MCU_CORTEX_A
+//#include "debug_ca.h"
+//#else
+//#include "debug_cm.h"
+//#endif
 
 typedef struct
 {
@@ -50,8 +49,8 @@ void MUL_SWD_GPIOConfig(void);
 void MUL_RefreshGpioParam(void);
 void MUL_SEND_32BIT(uint32_t val);
 
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//}
+//#endif
 
 #endif  /* __DAP_H__ */

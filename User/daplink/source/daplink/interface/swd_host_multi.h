@@ -1,5 +1,5 @@
 /**
- * @file    swd_host_mulit.h
+ * @file    swd_host_multi.h
  * @brief   Host driver for accessing the DAP
  *
  * DAPLink Interface Firmware

@@ -28,7 +28,7 @@ uint32_t s_lua_func_init_idx;
 uint32_t s_lua_func_write_idx;
 uint32_t s_lua_func_read_idx;
 
-uint8_t s_lua_read_buf[LUA_READ_LEN_MAX];
+ALIGN_32BYTES(uint8_t s_lua_read_buf[LUA_READ_LEN_MAX]);
 uint32_t s_lua_read_len;
 
 static uint8_t s_lua_quit = 0;
@@ -233,6 +233,7 @@ void lua_do(char *buf)
 
 	s_run = 1;
 
+    while(bsp_GetKey2());   /* 读空按键FIFO, */
     
     re = luaL_dostring(g_Lua, buf);
 	if (re != LUA_OK)
@@ -780,6 +781,20 @@ static int clear_key(lua_State* L)
 
 /*
 *********************************************************************************************************
+*    函 数 名: load_file
+*    功能说明: 加载lua文件
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int load_file(lua_State* L)
+{   
+    return 0;
+}
+
+
+/*
+*********************************************************************************************************
 *    函 数 名: lua_RegisterFunc
 *    功能说明: 注册lua可调用的c函数
 *    形    参: 无
@@ -801,6 +816,8 @@ static void lua_RegisterFunc(void)
     lua_register(g_Lua, "get_key", get_key);
     lua_register(g_Lua, "put_key", put_key);
     lua_register(g_Lua, "clear_key", clear_key);
+    
+    lua_register(g_Lua, "load_file", load_file);
     
     /* 注册接口函数 */
     lua_gpio_RegisterFun();    

@@ -1469,8 +1469,9 @@ void DSO_StartADC( uint32_t _uiFreq)
 */
 void DSO_StopADC(void)
 {    
+    DSO_PauseADC();
     bsp_StopAdcCH1();
-    bsp_StopAdcCH1();
+    bsp_StopAdcCH2();
 }
 
 /*

@@ -244,10 +244,6 @@ extern uint32_t DAP_ExecuteCommand       (const uint8_t *request, uint8_t *respo
 
 extern void     DAP_Setup (void);
 
-extern uint32_t g_SwdSpiBaud;
-
-#define SWD_SPI_BAUD(x)    g_SwdSpiBaud = x
-
 // Configurable delay for clock generation
 #ifndef DELAY_SLOW_CYCLES
 #define DELAY_SLOW_CYCLES       3U      // Number of cycles for one iteration

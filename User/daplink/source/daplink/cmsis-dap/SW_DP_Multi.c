@@ -1,5 +1,14 @@
 /*
     由 SW_DP_Multi.c 文件修改得到，支持1-4路并发操作
+    
+    
+    编译器优化3， 烧写1MB文件，STM32L476RGT6
+    单路  16.77   16.51   16.51s
+    多路  17.89   17.62   17.62s
+    
+    编译器优化0， 烧写1MB文件，STM32L476RGT6
+    单路  16.82   16.56   16.56s
+    多路  18.79   18.52   18.52s
 */
 /*
 *********************************************************************************************************
@@ -57,12 +66,12 @@
     BSP_SET_GPIO_1(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);  
 
     D0  PD14 PA15 PI0   - DIR PH8       RESET 共用
-    D1  PD15 PA8 PH19   - DIR PG8       POWER OFF 控制
+    D1  PD15 PA8 PH19   - DIR PG8       外部触发编程
     
     D2  PE6  PD0 PB7     - DIR PD9       SWCLK_4
     D3  PE5  PD1 PH11    - DIR PG10      SWDIO_4
-    D4  PE4  PE7 PH12    - DIR PG12          SWDIO_3    
-    D5  PE2  PE8 PI5     - DIR PG7       SWDIO_2
+    D4  PE4  PE7 PH12    - DR PG12          SWDIO_3    
+    D5  PE2  PE8 PI5     - DIR PG7       ISWDIO_2
     D6  PE9  PD3 PA0     - DIR PD10         SWCLK_3
     D7  PE10 PI6         - DIR PI1      SWCLK_2    
     D8  PE11 PD4  PI3    - DIR PG9       SWDIO_1     
@@ -207,26 +216,48 @@ static __forceinline void MUL_PIN_SWCLK_CLR(void)
 }
 
 /* */
-void MUL_SEND_32BIT(uint32_t val)
-{    
-    uint32_t i;
-    
-    for (i = 0; i < 32; i++)
-    {
-        if (val & 1)
-        {
-            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_1;
-            val >>= 1;
-            MUL_PIN_SWCLK_SET();
-        }
-        else
-        {
-
-            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_0;
-            val >>= 1;
-            MUL_PIN_SWCLK_SET();
-        } 
+#define MUL_SEND_32BIT_ONCE_FAST()  \
+    if (val & 1) {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_1;   \
+        val >>= 1;      \
+        MUL_PIN_SWCLK_SET();    \
+    }   \
+    else {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_0; \
+        val >>= 1;  \
+        MUL_PIN_SWCLK_SET();    \
     }
+static __forceinline void MUL_SEND_32BIT(uint32_t val)
+{    
+//    uint32_t i;
+//    
+//    for (i = 0; i < 32; i++)
+//    {
+//        if (val & 1)
+//        {
+//            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_1;
+//            val >>= 1;
+//            MUL_PIN_SWCLK_SET();
+//        }
+//        else
+//        {
+
+//            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_0;
+//            val >>= 1;
+//            MUL_PIN_SWCLK_SET();
+//        } 
+//    }
+    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
+    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
+    
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
 }
 
 /* SPI软件模式，低速配置 */
@@ -254,8 +285,8 @@ extern uint8_t GetParity(uint32_t data);
 */ 
 void MUL_SWD_GPIOConfig(void)
 {
-    EIO_D0_Config(ES_GPIO_OUT);         /* FMC输入功能依然有效 */
-    EIO_D1_Config(ES_GPIO_OUT);
+    EIO_D0_Config(ES_GPIO_OUT); 
+    EIO_D1_Config(ES_GPIO_IN);          /* 输入 */        
     EIO_D2_Config(ES_GPIO_OUT);
     EIO_D3_Config(ES_GPIO_OUT);
     EIO_D4_Config(ES_GPIO_OUT);
@@ -585,127 +616,262 @@ uint8_t* MUL_SWD_TransferFast(uint32_t request, uint32_t *data)
     return s_ack;
 }
 
-uint8_t MUL_SWD_TransferSlow(uint32_t request, uint32_t *data) 
+uint8_t* MUL_SWD_TransferSlow(uint32_t request, uint32_t *data) 
 { 
-  uint32_t ack;                                                              
-  uint32_t bit;                                                              
-  uint32_t val;                                                              
-  uint32_t parity;                                                           
+    static uint8_t s_ack[4]; 
+    uint32_t ack;
+    uint8_t *ack_buf;    
+    uint32_t bit;  
+    uint8_t *bit_buf = (uint8_t *)&bit;    
+    uint32_t val;   
+    uint32_t val_buf[4];  
+    uint32_t pb_buf[4];
+    uint32_t pb;
+    uint32_t n;    
+    uint8_t i;
+    uint8_t route = 0;
+    
+    for (i = 0; i < 4; i++)
+    {
+        g_gMulSwd.TempIgnore[i] = 0;
+    }
+    
+    MUL_RefreshGpioParam();     /* 刷新GPIO寄存器变量 */
+    
+    MUL_PIN_SWDIO_OUT_ENABLE();  
+    
+    /* Packet Request */                                                       
+    pb = 0U;                                                               
+    MUL_SW_WRITE_BIT_SLOW(1U);                     /* Start Bit */                      
+    bit = request >> 0;                                                        
+    MUL_SW_WRITE_BIT_SLOW(bit);                    /* APnDP Bit */                      
+    pb += bit;                                                             
+    bit = request >> 1;                                                        
+    MUL_SW_WRITE_BIT_SLOW(bit);                    /* RnW Bit */                        
+    pb += bit;                                                             
+    bit = request >> 2;                                                        
+    MUL_SW_WRITE_BIT_SLOW(bit);                    /* A2 Bit */                         
+    pb += bit;                                                             
+    bit = request >> 3;                                                        
+    MUL_SW_WRITE_BIT_SLOW(bit);                    /* A3 Bit */                         
+    pb += bit;                                                             
+    MUL_SW_WRITE_BIT_SLOW(pb);                     /* Parity Bit */                     
+    MUL_SW_WRITE_BIT_SLOW(0U);                     /* Stop Bit */                       
+    MUL_SW_WRITE_BIT_SLOW(1U);                     /* Park Bit */                       
                                                                              
-  uint32_t n;                                                                
+    /* Turnaround */                                                           
+    MUL_PIN_SWDIO_OUT_DISABLE();                                                   
+    for (n = DAP_Data.swd_conf.turnaround; n; n--) 
+    {                           
+        MUL_SW_CLOCK_CYCLE_SLOW();                                                        
+    }                                                                          
                                                                              
-  /* Packet Request */                                                       
-  parity = 0U;                                                               
-  MUL_SW_WRITE_BIT_SLOW(1U);                     /* Start Bit */                      
-  bit = request >> 0;                                                        
-  MUL_SW_WRITE_BIT_SLOW(bit);                    /* APnDP Bit */                      
-  parity += bit;                                                             
-  bit = request >> 1;                                                        
-  MUL_SW_WRITE_BIT_SLOW(bit);                    /* RnW Bit */                        
-  parity += bit;                                                             
-  bit = request >> 2;                                                        
-  MUL_SW_WRITE_BIT_SLOW(bit);                    /* A2 Bit */                         
-  parity += bit;                                                             
-  bit = request >> 3;                                                        
-  MUL_SW_WRITE_BIT_SLOW(bit);                    /* A3 Bit */                         
-  parity += bit;                                                             
-  MUL_SW_WRITE_BIT_SLOW(parity);                 /* Parity Bit */                     
-  MUL_SW_WRITE_BIT_SLOW(0U);                     /* Stop Bit */                       
-  MUL_SW_WRITE_BIT_SLOW(1U);                     /* Park Bit */                       
-                                                                             
-  /* Turnaround */                                                           
-  MUL_PIN_SWDIO_OUT_DISABLE();                                                   
-  for (n = DAP_Data.swd_conf.turnaround; n; n--) {                           
-    MUL_SW_CLOCK_CYCLE_SLOW();                                                        
-  }                                                                          
-                                                                             
-  /* Acknowledge response */                                                 
-  MUL_SW_READ_BIT_SLOW(bit);                                                          
-  ack  = bit << 0;                                                           
-  MUL_SW_READ_BIT_SLOW(bit);                                                          
-  ack |= bit << 1;                                                           
-  MUL_SW_READ_BIT_SLOW(bit);                                                          
-  ack |= bit << 2;                                                           
-                                                                             
-  if (ack == DAP_TRANSFER_OK) {         /* OK response */                    
-    /* Data transfer */                                                      
-    if (request & DAP_TRANSFER_RnW) {                                        
-      /* Read data */                                                        
-      val = 0U;                                                              
-      parity = 0U;                                                           
-      for (n = 32U; n; n--) {                                                
-        MUL_SW_READ_BIT_SLOW(bit);               /* Read RDATA[0:31] */               
-        parity += bit;                                                       
-        val >>= 1;                                                           
-        val  |= bit << 31;                                                   
-      }                                                                      
-      MUL_SW_READ_BIT_SLOW(bit);                 /* Read Parity */                    
-      if ((parity ^ bit) & 1U) {                                             
-        ack = DAP_TRANSFER_ERROR;                                            
-      }                                                                      
-      if (data) { *data = val; }                                             
-      /* Turnaround */                                                       
-      for (n = DAP_Data.swd_conf.turnaround; n; n--) {                       
-        MUL_SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-      MUL_PIN_SWDIO_OUT_ENABLE();                                                
-    } else {                                                                 
-      /* Turnaround */                                                       
-      for (n = DAP_Data.swd_conf.turnaround; n; n--) {                       
-        MUL_SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-      MUL_PIN_SWDIO_OUT_ENABLE();                                                
-      /* Write data */                                                       
-      val = *data;                                                           
-      parity = 0U;                                                           
-      for (n = 32U; n; n--) {                                                
-        MUL_SW_WRITE_BIT_SLOW(val);              /* Write WDATA[0:31] */              
-        parity += val;                                                       
-        val >>= 1;                                                           
-      }                                                                      
-      MUL_SW_WRITE_BIT_SLOW(parity);             /* Write Parity Bit */               
-    }                                                                        
-    /* Idle cycles */                                                        
-    n = DAP_Data.transfer.idle_cycles;                                       
-    if (n) {                                                                 
-      MUL_PIN_SWDIO_OUT(0U);                                                     
-      for (; n; n--) {                                                       
-        MUL_SW_CLOCK_CYCLE_SLOW();                                                    
-      }                                                                      
-    }                                                                        
-    MUL_PIN_SWDIO_OUT(1U);                                                       
-    return ((uint8_t)ack);                                                   
-  }                                                                          
-                                                                             
-  if ((ack == DAP_TRANSFER_WAIT) || (ack == DAP_TRANSFER_FAULT)) {           
-    /* WAIT or FAULT response */                                             
-    if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) { 
-      for (n = 32U+1U; n; n--) {                                             
-        MUL_SW_CLOCK_CYCLE_SLOW();               /* Dummy Read RDATA[0:31] + Parity */
-      }                                                                      
-    }                                                                        
-    /* Turnaround */                                                         
-    for (n = DAP_Data.swd_conf.turnaround; n; n--) {                         
-      MUL_SW_CLOCK_CYCLE_SLOW();                                                      
-    }                                                                        
-    MUL_PIN_SWDIO_OUT_ENABLE();                                                  
-    if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) == 0U)) {
-      MUL_PIN_SWDIO_OUT(0U);                                                     
-      for (n = 32U+1U; n; n--) {                                             
-        MUL_SW_CLOCK_CYCLE_SLOW();               /* Dummy Write WDATA[0:31] + Parity */
-      }                                                                      
-    }                                                                        
-    MUL_PIN_SWDIO_OUT(1U);                                                       
-    return ((uint8_t)ack);                                                   
-  }                                                                          
-                                                                             
-  /* Protocol error */                                                       
-  for (n = DAP_Data.swd_conf.turnaround + 32U + 1U; n; n--) {                
-    MUL_SW_CLOCK_CYCLE_SLOW();                   /* Back off data phase */            
-  }                                                                          
-  MUL_PIN_SWDIO_OUT_ENABLE();                                                    
-  MUL_PIN_SWDIO_OUT(1U);                                                         
-  return ((uint8_t)ack);                                                       
+    /* Acknowledge response */                                                 
+    MUL_SW_READ_BIT_SLOW(bit);                                                          
+    ack  = bit << 0;                                                           
+    MUL_SW_READ_BIT_SLOW(bit);                                                          
+    ack |= bit << 1;                                                           
+    MUL_SW_READ_BIT_SLOW(bit);                                                          
+    ack |= bit << 2;                                                           
+    
+    ack_buf = (uint8_t *)&ack;      /* 4个芯片同时应答 */
+
+    route = 0;
+    for (i = 0; i < 4; i++)
+    {
+        if (g_gMulSwd.Ignore[i] == 0)
+        {
+            if (ack_buf[i] == DAP_TRANSFER_OK)
+            {
+                route = DAP_TRANSFER_OK;        /* 4个芯片有1个OK，后面就优先处理OK流程 */
+            }
+            else
+            {
+                g_gMulSwd.TempIgnore[i] = 1;    /* 收到其他应答 */
+            }
+        }
+    }
+    
+    if (route == DAP_TRANSFER_OK)           /* OK response */  
+    {                  
+        MUL_RefreshGpioParam();     /* 刷新GPIO寄存器变量 */
+        
+        if (request & DAP_TRANSFER_RnW)     /* 读数据 */
+        {                                        
+            /* Read data */                                                        
+            /* armfly ： 优化奇偶校验算法 */  
+            
+            for (i = 0; i < 4; i++)
+            {
+                val_buf[i] = 0;
+            }
+            for (n = 32U; n; n--) 
+            {                                                
+                MUL_SW_READ_BIT_SLOW(bit);               /* Read RDATA[0:31] */ 
+                
+                for (i = 0; i < 4; i++)
+                {
+                    val_buf[i] >>= 1;                                                           
+                    val_buf[i]  |= bit_buf[i] << 31;  
+                }
+            }    
+            
+            for (i = 0; i < 4; i++)
+            {
+                pb_buf[i] = GetParity(val_buf[i]);
+            }
+            
+            MUL_SW_READ_BIT_SLOW(bit);                 /* Read Parity */                    
+            
+            for (i = 0; i < 4; i++)
+            {
+                if ((pb_buf[i] ^ bit_buf[i]) & 1U) 
+                {                                             
+                    ack_buf[i] = DAP_TRANSFER_ERROR;   
+                    if (data > 0)
+                    {
+                        data[i] = 0;
+                    }                    
+                }
+                else
+                {
+                    if (data > 0)
+                    {
+                        data[i] = val_buf[i];
+                    }
+                }
+            }  
+            
+            /* Turnaround */                                                       
+            for (n = DAP_Data.swd_conf.turnaround; n; n--) 
+            {                       
+                MUL_SW_CLOCK_CYCLE_SLOW();                                                    
+            }                                                                      
+            MUL_PIN_SWDIO_OUT_ENABLE();                                                
+        } 
+        else    /* 写数据 */
+        {                                                                 
+            /* Turnaround */                                                       
+            for (n = DAP_Data.swd_conf.turnaround; n; n--) 
+            {                       
+                MUL_SW_CLOCK_CYCLE_SLOW();                                                    
+            }                                                                      
+            MUL_PIN_SWDIO_OUT_ENABLE();  
+            
+            /* Write data */                                                       
+            val = *data;     
+
+            /* armfly ： 优化奇偶校验算法 */
+            pb = GetParity(val);
+            MUL_SEND_32BIT(val);      
+
+            MUL_SW_WRITE_BIT_SLOW(pb);             /* Write Parity Bit */               
+        }                                                                        
+        /* Idle cycles */                                                        
+        n = DAP_Data.transfer.idle_cycles;                                       
+        if (n) 
+        {                                                                 
+            MUL_PIN_SWDIO_OUT(0U);                                                     
+            for (; n; n--) 
+            {                                                       
+                MUL_SW_CLOCK_CYCLE_SLOW();                                                    
+            }                                                                      
+        }                                                                        
+        MUL_PIN_SWDIO_OUT(1U);                                                                                                      
+    }  
+    
+    /* 处理异常 */
+    for (i = 0; i < 4; i++)
+    {
+        g_gMulSwd.TempIgnore[i] = 0;
+    }    
+    route = 0;
+    for (i = 0; i < 4; i++)
+    {
+        if (g_gMulSwd.Ignore[i] == 0)
+        {
+            if (ack_buf[i] == DAP_TRANSFER_WAIT || ack_buf[i] == DAP_TRANSFER_FAULT)
+            {
+                route = ack_buf[i];
+            }
+            else
+            {
+                g_gMulSwd.TempIgnore[i] = 1;    /* 收到其他应答 */
+            }
+        }
+    }  
+    
+    if ((route == DAP_TRANSFER_WAIT) || (route == DAP_TRANSFER_FAULT)) 
+    {           
+        MUL_RefreshGpioParam();     /* 刷新GPIO寄存器变量 */
+        
+        /* WAIT or FAULT response */                                             
+        if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) != 0U)) 
+        { 
+            for (n = 32U+1U; n; n--) 
+            {                                             
+                MUL_SW_CLOCK_CYCLE_SLOW();               /* Dummy Read RDATA[0:31] + Parity */
+            }                                                                      
+        }                                                                        
+        /* Turnaround */                                                         
+        for (n = DAP_Data.swd_conf.turnaround; n; n--) 
+        {                         
+            MUL_SW_CLOCK_CYCLE_SLOW();                                                      
+        }                                                                        
+        MUL_PIN_SWDIO_OUT_ENABLE();                                                  
+        if (DAP_Data.swd_conf.data_phase && ((request & DAP_TRANSFER_RnW) == 0U)) 
+        {
+            MUL_PIN_SWDIO_OUT(0U);                                                     
+            for (n = 32U+1U; n; n--) 
+            {                                             
+                MUL_SW_CLOCK_CYCLE_SLOW();               /* Dummy Write WDATA[0:31] + Parity */
+            }                                                                      
+        }                                                                        
+        MUL_PIN_SWDIO_OUT(1U);                                                                                                        
+    }                                                                          
+   
+    /* 处理异常 */
+    for (i = 0; i < 4; i++)
+    {
+        g_gMulSwd.TempIgnore[i] = 0;
+    }
+    route = 0;
+    for (i = 0; i < 4; i++)
+    {        
+        if (g_gMulSwd.Ignore[i] == 0)
+        {
+            if (ack_buf[i] == DAP_TRANSFER_WAIT || ack_buf[i] == DAP_TRANSFER_FAULT 
+                || ack_buf[i] == DAP_TRANSFER_OK)
+            {
+                g_gMulSwd.TempIgnore[i] = 1;
+            }
+            else
+            {
+                g_gMulSwd.TempIgnore[i] = 0;    /* 收到其他应答 */
+                route = DAP_TRANSFER_ERROR;
+            }
+        }
+    }
+    if (route == DAP_TRANSFER_ERROR)
+    {
+        MUL_RefreshGpioParam();     /* 刷新GPIO寄存器变量 */
+        
+        /* Protocol error */                                                       
+        for (n = DAP_Data.swd_conf.turnaround + 32U + 1U; n; n--) 
+        {                
+            MUL_SW_CLOCK_CYCLE_SLOW();                   /* Back off data phase */            
+        }                                                                          
+        MUL_PIN_SWDIO_OUT_ENABLE();                                                    
+        MUL_PIN_SWDIO_OUT(1U);                                                         
+    }
+    
+    for (i = 0; i < 4; i++)
+    {
+        g_gMulSwd.TempIgnore[i] = 0;
+        
+        s_ack[i] = ack_buf[i];
+    }
+    return s_ack;                                               
 }
 
 // SWD Transfer I/O
@@ -714,14 +880,14 @@ uint8_t MUL_SWD_TransferSlow(uint32_t request, uint32_t *data)
 //   return:  ACK[2:0]
 uint8_t*  MUL_SWD_Transfer(uint32_t request, uint32_t *data) 
 {
-//    if (DAP_Data.fast_clock) 
-//    {
+    if (DAP_Data.fast_clock) 
+    {
         return MUL_SWD_TransferFast(request, data);        
-//    } 
-//    else 
-//    {
-//        return MUL_SWD_TransferSlow(request, data);
-//    }
+    } 
+    else 
+    {
+        return MUL_SWD_TransferSlow(request, data);
+    }
 }
 
 /********************************* armfly 优化时序速度 ***************************/

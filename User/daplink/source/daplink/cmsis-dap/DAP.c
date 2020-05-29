@@ -36,6 +36,8 @@
 #include "DAP.h"
 #include "info.h"
 
+#include "prog_if.h"
+
 #define DAP_FW_VER      "1.10"  // Firmware Version
 
 
@@ -1599,21 +1601,32 @@ uint32_t DAP_ExecuteCommand(const uint8_t *request, uint8_t *response) {
 // Setup DAP
 void DAP_Setup(void) {
 
-  // Default settings
-  DAP_Data.debug_port  = 0U;
-  DAP_Data.fast_clock  = 1U;   // ARMFLY
-  DAP_Data.clock_delay = CLOCK_DELAY(DAP_DEFAULT_SWJ_CLOCK);
-  DAP_Data.transfer.idle_cycles = 0U;
-  DAP_Data.transfer.retry_count = 100U;
-  DAP_Data.transfer.match_retry = 0U;
-  DAP_Data.transfer.match_mask  = 0x00000000U;
-#if (DAP_SWD != 0)
-  DAP_Data.swd_conf.turnaround  = 1U;
-  DAP_Data.swd_conf.data_phase  = 0U;
-#endif
-#if (DAP_JTAG != 0)
-  DAP_Data.jtag_dev.count = 0U;
-#endif
+    // Default settings
+    DAP_Data.debug_port  = 0U;
 
-  DAP_SETUP();  // Device specific setup
+    if (g_tProg.SwdClockDelay == 0)
+    {
+        DAP_Data.fast_clock  = 1;
+    }
+    else
+    {
+        DAP_Data.fast_clock  = 0;
+        //DAP_Data.clock_delay = CLOCK_DELAY(DAP_DEFAULT_SWJ_CLOCK);
+        DAP_Data.clock_delay = g_tProg.SwdClockDelay;      
+    }
+
+
+    DAP_Data.transfer.idle_cycles = 0U;
+    DAP_Data.transfer.retry_count = 100U;
+    DAP_Data.transfer.match_retry = 0U;
+    DAP_Data.transfer.match_mask  = 0x00000000U;
+    #if (DAP_SWD != 0)
+        DAP_Data.swd_conf.turnaround  = 1U;
+        DAP_Data.swd_conf.data_phase  = 0U;
+    #endif
+    #if (DAP_JTAG != 0)
+        DAP_Data.jtag_dev.count = 0U;
+    #endif
+
+    DAP_SETUP();  // Device specific setup
 }

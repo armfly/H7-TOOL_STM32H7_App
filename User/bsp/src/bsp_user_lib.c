@@ -77,7 +77,7 @@ const uint8_t s_CRCLo[] = {
         0x43, 0x83, 0x41, 0x81, 0x80, 0x40
 };
 
-uint32_t Crc32Table[256]=
+const uint32_t Crc32Table[256]=
 {
         0x00000000,0x04C11DB7,0x09823B6E,0x0D4326D9,0x130476DC,0x17C56B6B,0x1A864DB2,0x1E475005,
         0x2608EDB8,0x22C9F00F,0x2F8AD6D6,0x2B4BCB61,0x350C9B64,0x31CD86D3,0x3C8EA00A,0x384FBDBD,
@@ -113,12 +113,14 @@ uint32_t Crc32Table[256]=
         0xAFB010B1,0xAB710D06,0xA6322BDF,0xA2F33668,0xBCB4666D,0xB8757BDA,0xB5365D03,0xB1F740B4
 };
 
-//查表法
-uint32_t CRC32Software(uint8_t *pData, uint32_t Length)
+/*
+    Soft_CRC32_byte和STM32_CRC32_byte计算结果一致
+*/
+uint32_t Soft_CRC32_byte(uint8_t *pData, uint32_t Length)
 {        
     uint32_t nReg;//CRC寄存器
     uint32_t nTemp=0;
-    uint16_t i, n;
+    uint32_t i, n;
 
     nReg = 0xFFFFFFFF;
     for (n = 0; n < Length; n++)
@@ -135,28 +137,41 @@ uint32_t CRC32Software(uint8_t *pData, uint32_t Length)
     return nReg;
 }
 
-/* STM32的CRC */
+/* 硬件方式，按字节计算 */
+uint32_t STM32_CRC32_byte(uint8_t *_pBuf, uint32_t _Len)
+{
+    uint32_t i;
+    
+    __HAL_RCC_CRC_CLK_ENABLE();
+    
+    CRC->CR |= CRC_CR_RESET;
+    for (i = 0; i < _Len; i++)
+    {
+        CRC->DR = *_pBuf++;
+    }    
+    return (CRC->DR);
+}
 
 /*
 *********************************************************************************************************
-*    函 数 名: STM32_CRC32
-*    功能说明: 计算字符串长度.0是结束符
+*    函 数 名: STM32_CRC32_Word
+*    功能说明: 硬件CRC32计算。必须4字节整数倍. 必须在STM32之间使用.
 *    形    参: _pBuf : 缓冲区. 32bit对齐
 *              _Len : 字节长度
 *    返 回 值: 无
 *********************************************************************************************************
 */
-uint32_t STM32_CRC32(uint32_t *_pBuf, uint32_t _Len)
+uint32_t STM32_CRC32_Word(uint32_t *_pBuf, uint32_t _Len)
 {
     uint32_t i;
- 
+    
     __HAL_RCC_CRC_CLK_ENABLE();
     
     CRC->CR |= CRC_CR_RESET;
     for (i = 0; i < _Len / 4; i++)
     {
         CRC->DR = *_pBuf++;
-    }
+    }    
     return (CRC->DR);
 }
 
@@ -227,28 +242,16 @@ static const uint32_t crc32c_table[256] = {
 	0xBE2DA0A5L, 0x4C4623A6L, 0x5F16D052L, 0xAD7D5351L
 };
 
-//uint32_t crc32c(uint32_t crc, const uint8_t *data, uint32_t length)
-//{
-//	while (length--)
-//		crc = crc32c_table[(crc ^ *data++) & 0xFFL] ^ (crc >> 8);
-// 
-//	return crc;
-//}
-
-//    /* TEST CRC32 */
-//    {
-//        static uint32_t crc1, crc2, crc3;
-//        
-//        while (1)
-//        {
-//            crc1 = CRC32Software((uint8_t *)0x08000000, 32);
-//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 8);
-//                
-//            crc3 = calculate_CRC32((uint8_t *)0x08000000, 512*1024);
-//            crc2 = STM32_CRC32((uint32_t *)0x08000000, 512*1024 / 4);
-//        }
-//    }
-uint32_t Calculate_CRC32 (uint8_t *pStart, uint32_t uSize)
+/*
+*********************************************************************************************************
+*    函 数 名: soft_crc32
+*    功能说明: 软件计算CRC32, 和PC机主流一致。 脱机编程器使用这个函数。
+*    形    参: _pBuf : 缓冲区. 32bit对齐
+*              _Len : 字节长度
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+uint32_t soft_crc32_c(uint8_t *pStart, uint32_t uSize)
 {
 	#define INIT  0xffffffffL
 	#define XOROT 0xffffffffL
@@ -267,6 +270,11 @@ uint32_t Calculate_CRC32 (uint8_t *pStart, uint32_t uSize)
 	return uCRCValue ^ XOROT;
 }
 
+uint32_t  CRC_ChkSumCalcTbl_32Bit (uint32_t   init_val, uint32_t  *ptbl, uint8_t *pdata, uint32_t nbr_octets);
+uint32_t soft_crc32(uint8_t *pData, uint32_t uSize)
+{   
+    return CRC_ChkSumCalcTbl_32Bit(0xffffffffL, (uint32_t *)crc32c_table, pData, uSize);
+}
 
 /*
 *********************************************************************************************************

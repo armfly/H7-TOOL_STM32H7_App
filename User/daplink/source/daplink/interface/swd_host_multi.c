@@ -45,7 +45,7 @@
 #define DHCSR 0xE000EDF0
 #define REGWnR (1 << 16)
 
-#define MAX_SWD_RETRY 100       //10
+#define MAX_SWD_RETRY 1000       //10
 #define MAX_TIMEOUT   1000000  // Timeout for syscalls on target
 
 //#define SCB_AIRCR_PRIGROUP_Pos              8                                             /*!< SCB AIRCR: PRIGROUP Position */
@@ -61,10 +61,38 @@ typedef struct {
     uint32_t xpsr;
 } DEBUG_STATE;
 
-static SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
+//static SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
 
 static DAP_STATE dap_state;
 static uint32_t  soft_reset = SYSRESETREQ;
+
+/*
+    判断ACK = DAP_TRANSFER_OK
+*/
+uint8_t MUL_CheckAckTransferOk(uint8_t *_ack)
+{
+    uint8_t err = 0;
+    uint8_t i;
+    
+    
+    for (i = 0; i < 4; i++)
+    {
+        if (g_gMulSwd.Active[i] == 1)
+        {
+            if (_ack[i] != DAP_TRANSFER_OK)
+            {
+                err++;
+            }
+        }
+    }
+    
+    if (err == 0)
+    {
+        return 1;
+    }
+    
+    return 0;
+}
 
 #if  0  // armfly debug
 __attribute__((weak)) void MUL_swd_set_target_reset(uint8_t asserted)
@@ -74,20 +102,19 @@ __attribute__((weak)) void MUL_swd_set_target_reset(uint8_t asserted)
 #else
 void MUL_swd_set_target_reset(uint8_t asserted)
 {       
-    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);   
-
-    if (asserted == 0)
-    {
-        EIO_SetOutLevel(EIO_D0, 1);
-    }
-    else
-    {
-        EIO_SetOutLevel(EIO_D0, 0);
-    }
 //    if(asserted == 0)
 //	{
 //		swd_write_word((uint32_t)&SCB->AIRCR, ((0x5FA << SCB_AIRCR_VECTKEY_Pos) |(SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) | SCB_AIRCR_SYSRESETREQ_Msk));
-//	}    
+//	}   
+//    
+    if (asserted == 0)
+    {
+        EIO_SetOutLevel(EIO_D0, 0);     /* 转接板NRESET 反相 */
+    }
+    else
+    {
+        EIO_SetOutLevel(EIO_D0, 1);
+    }
 }
 #endif
 
@@ -113,7 +140,7 @@ static uint32_t MUL_swd_get_apsel(uint32_t adr)
 
 void MUL_swd_set_reset_connect(SWD_CONNECT_TYPE type)
 {
-    reset_connect = type;
+//    reset_connect = type;
 }
 
 /* 小端转换 */
@@ -145,6 +172,7 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
     uint8_t i;
     uint8_t err_cout[4];
 
+    /* */
     for (i = 0; i < 4; i++)
     {
         err_cout[i] = 0;
@@ -152,6 +180,7 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
         ret_ack[i] = 0;     /* 函数返回 */
         
         g_gMulSwd.Ignore[i] = 0;            /* 先不忽略 */
+        g_gMulSwd.TempIgnore[i] = 0; 
         if (g_gMulSwd.Active[i] == 0)       /* 通道未激活 */
         {
             g_gMulSwd.Ignore[i] = 1;        /* 传送数据时，忽略该通道 */            
@@ -159,11 +188,11 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
         }
         else    /* 通道已经激活 */
         {
-            if (g_gMulSwd.Error[i] == 1)    /* 该通道已经错误，后续不在重试 */
-            {
-                g_gMulSwd.Ignore[i] = 1;    /* 传送数据时，忽略该通道 */
-                done |= (1 << i);
-            }
+//            if (g_gMulSwd.Error[i] == 1)    /* 该通道已经错误，后续不在重试 */
+//            {
+//                g_gMulSwd.Ignore[i] = 1;    /* 传送数据时，忽略该通道 */
+//                done |= (1 << i);
+//            }
         }
     }
     
@@ -189,7 +218,7 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
                         done |= (1 << i);
                         g_gMulSwd.Ignore[i] = 1; 
                         ret_ack[i] = DAP_TRANSFER_WAIT;                        
-                        //g_gMulSwd.Error[i] = 1;         /* 设置错误标志 */       
+                        g_gMulSwd.Error[i] = 1;         /* 设置错误标志 */       
                     }
                 }
                 else    /* 错误 */
@@ -197,7 +226,7 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
                     done |= (1 << i);
                     g_gMulSwd.Ignore[i] = 1; 
                     ret_ack[i] = DAP_TRANSFER_ERROR;                    
-                    //g_gMulSwd.Error[i] = 1;             /* 设置错误标志 */   
+                    g_gMulSwd.Error[i] = 1;             /* 设置错误标志 */   
                 }                
             }
         }        
@@ -218,18 +247,9 @@ uint8_t MUL_swd_init(void)
     DAP_Setup();
     PORT_SWD_SETUP();
     
-    g_gMulSwd.MultiMode = 0;    /* 测试多机模式 */
-    if (g_gMulSwd.MultiMode > 0)
+    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
         MUL_SWD_GPIOConfig();
-
-        memset((uint8_t *)&g_gMulSwd, 0, sizeof(g_gMulSwd));
-        
-        g_gMulSwd.Active[0] = 1;
-        g_gMulSwd.Active[1] = 0;
-        g_gMulSwd.Active[2] = 0;
-        g_gMulSwd.Active[3] = 0;
-        
         MUL_RefreshGpioParam();
     }
     return 1;
@@ -290,8 +310,7 @@ uint8_t MUL_swd_write_dp(uint8_t adr, uint32_t val)
     MUL_int2array(data, val, 4);
     
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)data);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     }       
@@ -366,8 +385,7 @@ uint8_t MUL_swd_write_ap(uint32_t adr, uint32_t val)
     int2array(data, val, 4);
 
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)data);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck)) 
     {
         ack = 1;
     } 
@@ -381,8 +399,7 @@ uint8_t MUL_swd_write_ap(uint32_t adr, uint32_t val)
 
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck =  MUL_swd_transfer_retry(req, NULL);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck)) 
     {
         ack = 1;
     } 
@@ -418,8 +435,7 @@ static uint8_t MUL_swd_write_block(uint32_t address, uint8_t *data, uint32_t siz
     req = SWD_REG_AP | SWD_REG_W | (1 << 2);
     int2array(tmp_in, address, 4);
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_in);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck)) 
     {
         ack = 1;
     } 
@@ -436,8 +452,7 @@ static uint8_t MUL_swd_write_block(uint32_t address, uint8_t *data, uint32_t siz
 
     for (i = 0; i < size_in_words; i++) {
         pAck = MUL_swd_transfer_retry(req, (uint32_t *)data);
-        if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-            pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+        if (MUL_CheckAckTransferOk(pAck)) 
         {
             ack = 1;
         } 
@@ -455,8 +470,7 @@ static uint8_t MUL_swd_write_block(uint32_t address, uint8_t *data, uint32_t siz
     // dummy read
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck = MUL_swd_transfer_retry(req, NULL);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck)) 
     {
         ack = 1;
     } 
@@ -492,8 +506,7 @@ static uint8_t MUL_swd_read_block(uint32_t address, uint32_t *p1,uint32_t *p2,ui
     int2array(tmp_in, address, 4);
 
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_in);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -510,8 +523,7 @@ static uint8_t MUL_swd_read_block(uint32_t address, uint32_t *p1,uint32_t *p2,ui
 
     // initiate first read, data comes back in next read
     pAck = MUL_swd_transfer_retry(req, NULL);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -526,8 +538,7 @@ static uint8_t MUL_swd_read_block(uint32_t address, uint32_t *p1,uint32_t *p2,ui
     for (i = 0; i < (size_in_words - 1); i++) 
     {
         pAck = MUL_swd_transfer_retry(req, (uint32_t *)buf32);
-        if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-            pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+        if (MUL_CheckAckTransferOk(pAck))
         {
             ack = DAP_TRANSFER_OK;
         } 
@@ -548,8 +559,7 @@ static uint8_t MUL_swd_read_block(uint32_t address, uint32_t *p1,uint32_t *p2,ui
     // read last word
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)buf32);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK)
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
 
@@ -569,7 +579,7 @@ static uint8_t MUL_swd_read_block(uint32_t address, uint32_t *p1,uint32_t *p2,ui
 static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
 {
     uint8_t tmp_in[4];
-    uint8_t tmp_out[4];
+//    uint8_t tmp_out[4];
     uint8_t req, ack;
     uint8_t *pAck;
 
@@ -578,8 +588,7 @@ static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
     req = SWD_REG_AP | SWD_REG_W | (1 << 2);
 
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_in);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -594,9 +603,8 @@ static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
     // read data
     req = SWD_REG_AP | SWD_REG_R | (3 << 2);
 
-    pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_out);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    pAck = MUL_swd_transfer_retry(req, (uint32_t *)val);
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -611,8 +619,7 @@ static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
     // dummy read
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)val);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -644,8 +651,7 @@ static uint8_t MUL_swd_write_data(uint32_t address, uint32_t data)
     req = SWD_REG_AP | SWD_REG_W | (1 << 2);
 
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_in);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -662,8 +668,7 @@ static uint8_t MUL_swd_write_data(uint32_t address, uint32_t data)
     req = SWD_REG_AP | SWD_REG_W | (3 << 2);
 
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)tmp_in);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -678,8 +683,7 @@ static uint8_t MUL_swd_write_data(uint32_t address, uint32_t data)
     // dummy read
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck = MUL_swd_transfer_retry(req, NULL);
-    if (pAck[0] == DAP_TRANSFER_OK || pAck[1] == DAP_TRANSFER_OK ||
-        pAck[2] == DAP_TRANSFER_OK || pAck[3] == DAP_TRANSFER_OK) 
+    if (MUL_CheckAckTransferOk(pAck))
     {
         ack = DAP_TRANSFER_OK;
     } 
@@ -882,8 +886,7 @@ err_quit:
 // Execute system call.
 static uint8_t MUL_swd_write_debug_state(DEBUG_STATE *state)
 {
-    uint32_t i;
-    uint8_t ret = 0;    
+    uint32_t i;  
 
     if (!MUL_swd_write_dp(DP_SELECT, 0)) {
         return 0;
@@ -929,32 +932,49 @@ static uint8_t MUL_swd_write_debug_state(DEBUG_STATE *state)
 //    if (status & (STICKYERR | WDATAERR)) {
 //        return 0;
 //    }
-    /* 只要有1个通道成功就返回成功 */
+
     {
         uint8_t *pAck;
         uint32_t status[4];
-        
+        uint8_t err = 0;
+
         pAck = MUL_swd_read_dp(DP_CTRL_STAT, status);
  
         for (i = 0; i < 4; i++)
         {
-            if (pAck[i] == 1 && (status[i] & (STICKYERR | WDATAERR)))
+            if (g_gMulSwd.Active[i] == 1)
             {
-               ret = 1;
+                if (pAck[i] == 1)                    
+                {
+                    if (status[i] & (STICKYERR | WDATAERR))
+                    {
+                        err = 1;
+                    }
+                }
+                else
+                {
+                    err = 1;
+                }
             }
             else
             {
-                g_gMulSwd.Error[i] = 1;     /* 出错 */
+                ;
             }
-        }    
+        }   
+
+        if (err == 1)
+        {
+            return 0;
+        }
     }
 
-    return ret;
+    return 1;
 }
 
 uint8_t MUL_swd_read_core_register(uint32_t n, uint32_t *val)
 {
     int i = 0, timeout = 100;
+    uint32_t readval[4];    
 
     if (!MUL_swd_write_word(DCRSR, n)) {
         return 0;
@@ -962,13 +982,36 @@ uint8_t MUL_swd_read_core_register(uint32_t n, uint32_t *val)
 
     // wait for S_REGRDY
     for (i = 0; i < timeout; i++) {
-        if (!MUL_swd_read_word(DHCSR, val)) {
+        uint8_t continu_wait;
+        
+        if (!MUL_swd_read_word(DHCSR, readval)) {
             return 0;
         }
 
-        if (*val & S_REGRDY) {
-            break;
+//        if (*val & S_REGRDY) {
+//            break;
+//        }
+        continu_wait = 0;
+        if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+        {
+            continu_wait = 1;
         }
+        if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+        {
+            continu_wait = 1;
+        }
+        if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
+        {
+            continu_wait = 1;
+        }
+        if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
+        {
+            continu_wait = 1;
+        }   
+        if (continu_wait == 0)
+        {
+            break;
+        }        
     }
 
     if (i == timeout) {
@@ -985,6 +1028,7 @@ uint8_t MUL_swd_read_core_register(uint32_t n, uint32_t *val)
 uint8_t MUL_swd_write_core_register(uint32_t n, uint32_t val)
 {
     int i = 0, timeout = 100;
+    uint32_t readval[4];
 
     if (!MUL_swd_write_word(DCRDR, val)) {
         return 0;
@@ -996,11 +1040,34 @@ uint8_t MUL_swd_write_core_register(uint32_t n, uint32_t val)
 
     // wait for S_REGRDY
     for (i = 0; i < timeout; i++) {
-        if (!MUL_swd_read_word(DHCSR, &val)) {
+        uint8_t err;
+        
+        if (!MUL_swd_read_word(DHCSR, readval)) {
             return 0;
         }
 
-        if (val & S_REGRDY) {
+//        if ((readval[0] & S_REGRDY) && (readval[1] & S_REGRDY) && (readval[2] & S_REGRDY) && (readval[3] & S_REGRDY)) {
+//            return 1;
+//        }        
+        err = 0;
+        if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+        {
+            err = 1;
+        }
+        if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+        {
+            err = 1;
+        }
+        if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
+        {
+            err = 1;
+        }
+        if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
+        {
+            err = 1;
+        }   
+        if (err == 0)
+        {
             return 1;
         }
     }
@@ -1021,85 +1088,91 @@ extern uint8_t ProgCancelKey(void);
 extern void PG_PrintText(char *_str);
 static uint8_t MUL_swd_wait_until_halted(void)
 {
-#if 1
-    // Wait for target to stop
-    uint32_t val;
+    uint32_t val[4];
     int32_t time1;
-
+    int32_t addtime = 0;
+    int32_t tt0 = 0;
+    
     time1 = bsp_GetRunTime();
     
+    if (g_tProg.FLMFuncDispProgress == 1)
+    {
+        addtime = 5000;     /* 给5秒的余量 */
+    }        
     while (1)
     {
-        /* 擦除芯片 */
-        if (g_tProg.FLMEraseChipFlag == 1)
+        /* 超时控制 */
         {
-            if (g_tProgIni.LastEraseChipTime == 0)
-            {
-                g_tProgIni.LastEraseChipTime = 20000;   /* 第1次缺省按20秒计算进度 */
-            }
+            int32_t tt;
+            float percent;
             
-            /* 整片擦除 */
+            tt = bsp_CheckRunTime(time1);
+            if (tt0 != tt)
             {
-                int32_t tt;
-                float percent;
-                
-                tt = bsp_CheckRunTime(time1);
-                if (tt > g_tProg.FLMFuncTimeout)
+                tt0 = tt;
+                if (tt > g_tProg.FLMFuncTimeout + addtime)
                 {
-                    break;
+                    printf("error : swd_wait_until_halted() timeout\r\n");
+                    break;      /* 超时退出 */
                 }
                 else
                 {
-                    if ((tt % 250) == 0)
+                    if (g_tProg.FLMFuncDispProgress == 1)
                     {
-                        percent = ((float)tt / g_tProgIni.LastEraseChipTime) * 100;                
-                        PG_PrintPercent(percent, 0xFFFFFFFF);
+                        /* 250ms打印1次 */
+                        if ((tt % 250) == 0)
+                        {
+                            percent = ((float)tt / g_tProg.FLMFuncTimeout) * 100;                                
+                            PG_PrintPercent(percent, g_tProg.FLMFuncDispAddr);
+                        }
+                        bsp_Idle();
                     }
-                    bsp_Idle();
-                }                   
-            }
+                }
+            }                   
         }
         
-        if (!MUL_swd_read_word(DBG_HCSR, &val)) 
+        if (!MUL_swd_read_word(DBG_HCSR, val)) 
         {
             break;
         }
-
-        if (val & S_HALT) 
-        {
-            g_tProg.FLMEraseChipFlag = 0;
-            return 1;
-        } 
         
+        {
+            uint8_t err = 0;
+            uint8_t i;
+            
+            for (i = 0; i < 4; i++)
+            {
+                if (g_gMulSwd.Active[i] == 1)
+                {
+                    if ((val[i] & S_HALT) == 0)
+                    {
+                        err = 1;
+                        break;
+                    }
+                }
+            }
+            if (err == 0)
+            {
+                g_tProg.FLMFuncDispProgress = 0;
+                return 1;   /* 成功 */
+            }
+        }
+
         if (ProgCancelKey())
         {
             PG_PrintText("用户终止运行");    
             break;         
         }        
     }
-    g_tProg.FLMEraseChipFlag = 0;
+    g_tProg.FLMFuncDispProgress = 0;
     return 0;
-#else    
-    // Wait for target to stop
-    uint32_t val, i, timeout = MAX_TIMEOUT;
-
-    for (i = 0; i < timeout; i++) {
-        if (!MUL_swd_read_word(DBG_HCSR, &val)) {
-            return 0;
-        }
-
-        if (val & S_HALT) {
-            return 1;
-        }
-    }
-
-    return 0;
-#endif    
 }
 
 uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32_t entry, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
 {
     DEBUG_STATE state = {{0}, 0};
+    uint32_t R0[4];
+    
     // Call flash algorithm function on target and wait for result.
     state.r[0]     = arg1;                   // R0: Argument 1
     state.r[1]     = arg2;                   // R1: Argument 2
@@ -1119,7 +1192,8 @@ uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32
         return 0;
     }
 
-    if (!MUL_swd_read_core_register(0, &state.r[0])) {
+    //if (!MUL_swd_read_core_register(0, &state.r[0])) {
+    if (!MUL_swd_read_core_register(0, R0)) {
         return 0;
     }
     
@@ -1129,16 +1203,33 @@ uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32
     }
 
     // Flash functions return 0 if successful.
-    if (state.r[0] != 0) {
-        return 0;
+    //if (state.r[0] != 0) {
+    {
+        uint8_t err = 0;
+        uint8_t i;
+        
+        for (i = 0; i < 4; i++)
+        {
+            if (g_gMulSwd.Active[i] == 1 && R0[i] != 0)
+            {
+                err = 1;
+            }
+        }
+        
+        if (err == 1)
+        {
+            return 0;
+        }
     }
-
-    return 1;
+    
+    return 1;   /* 成功 */
 }
 
 uint32_t MUL_swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, uint32_t entry, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
 {
     DEBUG_STATE state = {{0}, 0};
+    static uint32_t R0[4];
+    
     // Call flash algorithm function on target and wait for result.
     state.r[0]     = arg1;                   // R0: Argument 1
     state.r[1]     = arg2;                   // R1: Argument 2
@@ -1158,7 +1249,7 @@ uint32_t MUL_swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, ui
         return 0;
     }
 
-    if (!MUL_swd_read_core_register(0, &state.r[0])) {
+    if (!MUL_swd_read_core_register(0, R0)) {
         return 0;
     }
     
@@ -1173,7 +1264,7 @@ uint32_t MUL_swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, ui
 //    }
 
 //    return 1;
-    return state.r[0];
+    return (uint32_t)R0;
 }
 
 // SWD Reset
@@ -1269,7 +1360,7 @@ uint8_t MUL_swd_init_debug(void)
 {
     uint32_t tmp[4] = {0,0,0,0};
     int i = 0;
-    int timeout = 100;
+    int timeout = 1000;
     uint8_t *pAck;
     
     // init dap state with fake values
@@ -1279,6 +1370,21 @@ uint8_t MUL_swd_init_debug(void)
     int8_t retries = 4;
     int8_t do_abort = 0;
     
+    g_gMulSwd.Ignore[0] = 0;
+    g_gMulSwd.Ignore[1] = 0;
+    g_gMulSwd.Ignore[2] = 0;
+    g_gMulSwd.Ignore[3] = 0;
+    
+    
+    g_gMulSwd.Error[0] = 0;
+    g_gMulSwd.Error[1] = 0;
+    g_gMulSwd.Error[2] = 0;
+    g_gMulSwd.Error[3] = 0;
+    
+    g_gMulSwd.CoreID[0] = 0;
+    g_gMulSwd.CoreID[1] = 0;
+    g_gMulSwd.CoreID[2] = 0;
+    g_gMulSwd.CoreID[3] = 0;
     do {
         if (do_abort) {
             //do an abort on stale target, then reset the device
@@ -1306,16 +1412,25 @@ uint8_t MUL_swd_init_debug(void)
             continue;
         }
 
-//        if (g_gMulSwd.CoreID[0] > 0 && g_gMulSwd.CoreID[1] > 0
-//            && g_gMulSwd.CoreID[2] > 0 && g_gMulSwd.CoreID[3] > 0)
-        if (g_gMulSwd.CoreID[0] > 0)
         {
-            ;
-        }
-        else
-        {
-            do_abort = 1;
-            continue;            
+            uint8_t err = 0;
+            
+            for (i = 0; i < 4; i++)
+            {
+                if (g_gMulSwd.Active[i] == 1)
+                {
+                    if (g_gMulSwd.CoreID[i] == 0)
+                    {
+                        err = 1;
+                    }
+                }
+            }
+            
+            if (err == 1)
+            {
+                do_abort = 1;
+                continue;      
+            }
         }
         
         if (!MUL_swd_clear_errors()) {
@@ -1360,7 +1475,8 @@ uint8_t MUL_swd_init_debug(void)
                 pAck = MUL_swd_read_dp(DP_CTRL_STAT, tmp);            
                 for (k = 0; k < 4; k++)
                 {
-                    if (g_gMulSwd.Active[i] == 0 || g_gMulSwd.Error[i] == 1)       /* 通道未激活 */
+                    //if (g_gMulSwd.Active[i] == 0 || g_gMulSwd.Error[i] == 1)       /* 通道未激活 */
+                    if (g_gMulSwd.Active[i] == 0)       /* 通道未激活 */
                     {
                         done |= (1 << k);
                         err |= (1 << k);
@@ -1422,7 +1538,7 @@ uint8_t MUL_swd_init_debug(void)
 
 uint8_t MUL_swd_set_target_state_hw(TARGET_RESET_STATE state)
 {
-    uint32_t val;
+    uint32_t val[4];
     int8_t ap_retries = 2;
     /* Calling MUL_swd_init prior to entering RUN state causes operations to fail. */
     if (state != RUN) {
@@ -1489,21 +1605,39 @@ uint8_t MUL_swd_set_target_state_hw(TARGET_RESET_STATE state)
                     osDelay(20);
                     
                     /* 2020-01-18 armfly 增加退出机制 */
-                    #if 1
                     {
                         uint32_t i;
-                        
+
                         for (i = 0; i < 100000; i++)
                         {
-                            if (!MUL_swd_read_word(DBG_HCSR, &val)) {
+                            uint8_t errflag;
+                            
+                            if (!MUL_swd_read_word(DBG_HCSR, val)) {
                                 err = 3;
                                 break;
+                            }                                      
+                                
+                            errflag = 0;
+                            if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+                            {
+                                errflag = 1;
                             }
-                            
-                            if ((val & S_HALT) != 0)
+                            if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+                            {
+                                errflag = 1;
+                            }
+                            if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+                            {
+                                errflag = 1;
+                            }
+                            if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+                            {
+                                errflag = 1;
+                            }   
+                            if (errflag == 0)
                             {
                                 break;
-                            }
+                            }                     
                         }    
 
                         if (err > 0)
@@ -1511,13 +1645,6 @@ uint8_t MUL_swd_set_target_state_hw(TARGET_RESET_STATE state)
                             continue;   
                         }
                     }
-                    #else            
-                        do {
-                            if (!MUL_swd_read_word(DBG_HCSR, &val)) {
-                                return 0;
-                            }
-                        } while ((val & S_HALT) == 0);
-                    #endif
 
                     // Disable halt on reset
                     if (!MUL_swd_write_word(DBG_EMCR, 0)) {
@@ -1578,11 +1705,40 @@ uint8_t MUL_swd_set_target_state_hw(TARGET_RESET_STATE state)
             }
 
             // Wait until core is halted
-            do {
-                if (!MUL_swd_read_word(DBG_HCSR, &val)) {
-                    return 0;
+            {
+                uint32_t i;
+                
+                for (i = 0; i < 100000; i++)
+                {
+                    uint8_t errflag;
+                    
+                    if (!MUL_swd_read_word(DBG_HCSR, val)) {
+                        break;
+                    }                                      
+                        
+                    errflag = 0;
+                    if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+                    {
+                        errflag = 1;
+                    }
+                    if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+                    {
+                        errflag = 1;
+                    }
+                    if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+                    {
+                        errflag = 1;
+                    }
+                    if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+                    {
+                        errflag = 1;
+                    }   
+                    if (errflag == 0)
+                    {
+                        break;
+                    }  
                 }
-            } while ((val & S_HALT) == 0);
+            }
             break;
 
         case RUN:
@@ -1605,7 +1761,7 @@ uint8_t MUL_swd_set_target_state_hw(TARGET_RESET_STATE state)
 
 uint8_t MUL_swd_set_target_state_sw(TARGET_RESET_STATE state)
 {
-    uint32_t val;
+    uint32_t val[4];
     int8_t ap_retries = 2;
     /* Calling MUL_swd_init prior to enterring RUN state causes operations to fail. */
     if (state != RUN) {
@@ -1643,11 +1799,37 @@ uint8_t MUL_swd_set_target_state_sw(TARGET_RESET_STATE state)
             }
 
             // Wait until core is halted
-            do {
-                if (!MUL_swd_read_word(DBG_HCSR, &val)) {
+            while(1)
+            {
+                uint8_t err;
+                
+                if (!MUL_swd_read_word(DBG_HCSR, val)) 
+                {
                     return 0;
                 }
-            } while ((val & S_HALT) == 0);
+                
+                err = 0;
+                if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+                {
+                    err = 1;
+                }   
+                if (err == 0)
+                {
+                    break;
+                }
+            }
 
             // Enable halt on reset
             if (!MUL_swd_write_word(DBG_EMCR, VC_CORERESET)) {
@@ -1655,22 +1837,47 @@ uint8_t MUL_swd_set_target_state_sw(TARGET_RESET_STATE state)
             }
 
             // Perform a soft reset
-            if (!MUL_swd_read_word(NVIC_AIRCR, &val)) {
+            if (!MUL_swd_read_word(NVIC_AIRCR, val)) {
                 return 0;
             }
 
-            if (!MUL_swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+            if (!MUL_swd_write_word(NVIC_AIRCR, VECTKEY | (val[0] & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
                 return 0;
             }
 
             osDelay(2);
 
-            do {
-                if (!MUL_swd_read_word(DBG_HCSR, &val)) {
+            while(1)
+            {
+                uint8_t err;
+                
+                if (!MUL_swd_read_word(DBG_HCSR, val)) 
+                {
                     return 0;
                 }
-            } while ((val & S_HALT) == 0);
-
+                
+                err = 0;
+                if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+                {
+                    err = 1;
+                }
+                if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+                {
+                    err = 1;
+                }   
+                if (err == 0)
+                {
+                    break;
+                }
+            }
             // Disable halt on reset
             if (!MUL_swd_write_word(DBG_EMCR, 0)) {
                 return 0;
@@ -1723,10 +1930,10 @@ uint8_t MUL_swd_set_target_state_sw(TARGET_RESET_STATE state)
 
             // Wait until core is halted
             do {
-                if (!MUL_swd_read_word(DBG_HCSR, &val)) {
+                if (!MUL_swd_read_word(DBG_HCSR, val)) {
                     return 0;
                 }
-            } while ((val & S_HALT) == 0);
+            } while ((val[0] & S_HALT) == 0 || (val[2] & S_HALT) == 0 || (val[2] & S_HALT) == 0 || (val[3] & S_HALT) == 0);
             break;
 
         case RUN:

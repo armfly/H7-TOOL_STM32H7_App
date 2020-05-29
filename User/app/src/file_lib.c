@@ -19,6 +19,7 @@
 #include "lcd_menu.h"
 #include "main.h"
 #include "prog_if.h"
+#include "prog_if.h"
 
 /*
     1、V7开发板的SD卡接口是用的SDMMC1，而这个接口仅支持AXI SRAM区访问，其它SRAM和TCP均不支持。
@@ -556,12 +557,6 @@ int32_t ReadProgIniFile(char *_LuaPath, PROG_INI_T *pIni)
     /* 解析 ProductSN */
     pIni->ProductSN = ini_ReadInteger(FsReadBuf, "ProductSN");  
 
-    /* 上次编程总时间 */
-    pIni->LastTotalTime = ini_ReadInteger(FsReadBuf, "LastTotalTime");
-
-    /* 擦除整片的时间 */
-    pIni->LastEraseChipTime = ini_ReadInteger(FsReadBuf, "LastEraseChipTime");   
-
     return 1;
 
 err_quit:
@@ -569,8 +564,6 @@ err_quit:
     pIni->ProductSN = 0;
     pIni->ProgramLimit = 0;
     pIni->ProgrammedCount = 0;
-    pIni->LastTotalTime = 0;
-    pIni->LastEraseChipTime = 0;
     return -1;
 }
 
@@ -610,8 +603,6 @@ int32_t WriteProgIniFile(char *_LuaPath, PROG_INI_T *_pIni)
     sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProgramLimit = %d\r\n", _pIni->ProgramLimit);
     sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProgrammedCount = %d\r\n", _pIni->ProgrammedCount);
     sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProductSN = %d\r\n", _pIni->ProductSN);    
-    sprintf(&FsReadBuf[strlen(FsReadBuf)], "LastTotalTime = %d\r\n", _pIni->LastTotalTime);
-    sprintf(&FsReadBuf[strlen(FsReadBuf)], "LastEraseChipTime = %d\r\n", _pIni->LastEraseChipTime);
     
     /*　打开ini文件准备写 */
     re = f_open(&g_file, path, FA_WRITE | FA_CREATE_ALWAYS);
@@ -1100,6 +1091,443 @@ uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, c
         }
     } 
     return RetValue;    
+}
+
+extern _ARMABI int remove(const char * /*filename*/) __attribute__((__nonnull__(1)));
+   /*
+    * causes the file whose name is the string pointed to by filename to be
+    * removed. Subsequent attempts to open the file will fail, unless it is
+    * created anew. If the file is open, the behaviour of the remove function
+    * is implementation-defined.
+    * Returns: zero if the operation succeeds, nonzero if it fails.
+    */
+extern _ARMABI int rename(const char * /*old*/, const char * /*new*/) __attribute__((__nonnull__(1,2)));
+   /*
+    * causes the file whose name is the string pointed to by old to be
+    * henceforth known by the name given by the string pointed to by new. The
+    * file named old is effectively removed. If a file named by the string
+    * pointed to by new exists prior to the call of the rename function, the
+    * behaviour is implementation-defined.
+    * Returns: zero if the operation succeeds, nonzero if it fails, in which
+    *          case if the file existed previously it is still known by its
+    *          original name.
+    */
+extern _ARMABI FILE *tmpfile(void);
+   /*
+    * creates a temporary binary file that will be automatically removed when
+    * it is closed or at program termination. The file is opened for update.
+    * Returns: a pointer to the stream of the file that it created. If the file
+    *          cannot be created, a null pointer is returned.
+    */
+extern _ARMABI char *tmpnam(char * /*s*/);
+   /*
+    * generates a string that is not the same as the name of an existing file.
+    * The tmpnam function generates a different string each time it is called,
+    * up to TMP_MAX times. If it is called more than TMP_MAX times, the
+    * behaviour is implementation-defined.
+    * Returns: If the argument is a null pointer, the tmpnam function leaves
+    *          its result in an internal static object and returns a pointer to
+    *          that object. Subsequent calls to the tmpnam function may modify
+    *          the same object. if the argument is not a null pointer, it is
+    *          assumed to point to an array of at least L_tmpnam characters;
+    *          the tmpnam function writes its result in that array and returns
+    *          the argument as its value.
+    */
+
+//extern _ARMABI int fclose(FILE * /*stream*/) __attribute__((__nonnull__(1)));
+_ARMABI int fclose(FILE * stream)
+   /*
+    * causes the stream pointed to by stream to be flushed and the associated
+    * file to be closed. Any unwritten buffered data for the stream are
+    * delivered to the host environment to be written to the file; any unread
+    * buffered data are discarded. The stream is disassociated from the file.
+    * If the associated buffer was automatically allocated, it is deallocated.
+    * Returns: zero if the stream was succesfully closed, or nonzero if any
+    *          errors were detected or if the stream was already closed.
+    */
+{
+    FIL *fp;
+    FRESULT result;
+    
+    fp = (FIL *)stream;
+    result = f_close(fp);
+    
+    if (result != FR_OK)
+    {
+        return result;
+    }
+    return 0;
+}
+
+extern _ARMABI int fflush(FILE * /*stream*/);
+   /*
+    * If the stream points to an output or update stream in which the most
+    * recent operation was output, the fflush function causes any unwritten
+    * data for that stream to be delivered to the host environment to be
+    * written to the file. If the stream points to an input or update stream,
+    * the fflush function undoes the effect of any preceding ungetc operation
+    * on the stream.
+    * Returns: nonzero if a write error occurs.
+    */
+
+_ARMABI FILE *fopen(const char * filename /*filename*/,
+                           const char * mode /*mode*/)
+   /*
+    * opens the file whose name is the string pointed to by filename, and
+    * associates a stream with it.
+    * The argument mode points to a string beginning with one of the following
+    * sequences:
+    * "r"         open text file for reading
+    * "w"         create text file for writing, or truncate to zero length
+    * "a"         append; open text file or create for writing at eof
+    * "rb"        open binary file for reading
+    * "wb"        create binary file for writing, or truncate to zero length
+    * "ab"        append; open binary file or create for writing at eof
+    * "r+"        open text file for update (reading and writing)
+    * "w+"        create text file for update, or truncate to zero length
+    * "a+"        append; open text file or create for update, writing at eof
+    * "r+b"/"rb+" open binary file for update (reading and writing)
+    * "w+b"/"wb+" create binary file for update, or truncate to zero length
+    * "a+b"/"ab+" append; open binary file or create for update, writing at eof
+    *
+    * Opening a file with read mode ('r' as the first character in the mode
+    * argument) fails if the file does not exist or cannot be read.
+    * Opening a file with append mode ('a' as the first character in the mode
+    * argument) causes all subsequent writes to be forced to the current end of
+    * file, regardless of intervening calls to the fseek function. In some
+    * implementations, opening a binary file with append mode ('b' as the
+    * second or third character in the mode argument) may initially position
+    * the file position indicator beyond the last data written, because of the
+    * NUL padding.
+    * When a file is opened with update mode ('+' as the second or third
+    * character in the mode argument), both input and output may be performed
+    * on the associated stream. However, output may not be directly followed
+    * by input without an intervening call to the fflush fuction or to a file
+    * positioning function (fseek, fsetpos, or rewind), and input be not be
+    * directly followed by output without an intervening call to the fflush
+    * fuction or to a file positioning function, unless the input operation
+    * encounters end-of-file. Opening a file with update mode may open or
+    * create a binary stream in some implementations. When opened, a stream
+    * is fully buffered if and only if it does not refer to an interactive
+    * device. The error and end-of-file indicators for the stream are
+    * cleared.
+    * Returns: a pointer to the object controlling the stream. If the open
+    *          operation fails, fopen returns a null pointer.
+    */
+{
+    /*
+        fatfs官网有兼容方式定义格式
+        http://elm-chan.org/fsw/ff/doc/open.html
+    
+        POSIX	FatFs
+        "r"	    FA_READ
+        "r+"	FA_READ | FA_WRITE
+        "w"	    FA_CREATE_ALWAYS | FA_WRITE
+        "w+"	FA_CREATE_ALWAYS | FA_WRITE | FA_READ
+        "a"     FA_OPEN_APPEND | FA_WRITE
+        "a+"    FA_OPEN_APPEND | FA_WRITE | FA_READ
+        "wx"    FA_CREATE_NEW | FA_WRITE
+        "w+x"   FA_CREATE_NEW | FA_WRITE | FA_READ
+    */
+    FRESULT result;
+    BYTE ff_mode;
+
+    if (strcmp(mode, "r") == 0)         ff_mode = FA_READ;
+    else if (strcmp(mode, "r+") == 0)   ff_mode = FA_READ | FA_WRITE;
+    else if (strcmp(mode, "w") == 0)    ff_mode = FA_CREATE_ALWAYS | FA_WRITE;
+    else if (strcmp(mode, "w+") == 0)   ff_mode = FA_CREATE_ALWAYS | FA_WRITE | FA_READ;
+    else if (strcmp(mode, "a") == 0)    ff_mode = FA_OPEN_APPEND | FA_WRITE;
+    else if (strcmp(mode, "a+") == 0)   ff_mode = FA_OPEN_APPEND | FA_WRITE | FA_READ;
+    else if (strcmp(mode, "wx") == 0)   ff_mode = FA_CREATE_NEW | FA_WRITE;
+    else if (strcmp(mode, "w+x") == 0)  ff_mode = FA_CREATE_NEW | FA_WRITE | FA_READ;
+    
+    /* 打开文件 */
+    f_close(&g_file);
+    result = f_open(&g_file, filename, ff_mode);
+    if (result == FR_OK)
+    {
+        return (FILE *)&g_file;
+    }
+    
+    return 0;
+}
+
+_ARMABI FILE *freopen(const char * filename /*filename*/,
+                    const char * mode /*mode*/,
+                    FILE * stream /*stream*/)
+   /*
+    * opens the file whose name is the string pointed to by filename and
+    * associates the stream pointed to by stream with it. The mode argument is
+    * used just as in the fopen function.
+    * The freopen function first attempts to close any file that is associated
+    * with the specified stream. Failure to close the file successfully is
+    * ignored. The error and end-of-file indicators for the stream are cleared.
+    * Returns: a null pointer if the operation fails. Otherwise, freopen
+    *          returns the value of the stream.
+    */  
+{  
+    return 0;
+}
+                    
+extern _ARMABI void setbuf(FILE * __restrict /*stream*/,
+                    char * __restrict /*buf*/) __attribute__((__nonnull__(1)));
+   /*
+    * Except that it returns no value, the setbuf function is equivalent to the
+    * setvbuf function invoked with the values _IOFBF for mode and BUFSIZ for
+    * size, or (if buf is a null pointer), with the value _IONBF for mode.
+    * Returns: no value.
+    */
+extern _ARMABI int setvbuf(FILE * __restrict /*stream*/,
+                   char * __restrict /*buf*/,
+                   int /*mode*/, size_t /*size*/) __attribute__((__nonnull__(1)));
+   /*
+    * may be used after the stream pointed to by stream has been associated
+    * with an open file but before it is read or written. The argument mode
+    * determines how stream will be buffered, as follows: _IOFBF causes
+    * input/output to be fully buffered; _IOLBF causes output to be line
+    * buffered (the buffer will be flushed when a new-line character is
+    * written, when the buffer is full, or when input is requested); _IONBF
+    * causes input/output to be completely unbuffered. If buf is not the null
+    * pointer, the array it points to may be used instead of an automatically
+    * allocated buffer (the buffer must have a lifetime at least as great as
+    * the open stream, so the stream should be closed before a buffer that has
+    * automatic storage duration is deallocated upon block exit). The argument
+    * size specifies the size of the array. The contents of the array at any
+    * time are indeterminate.
+    * Returns: zero on success, or nonzero if an invalid value is given for
+    *          mode or size, or if the request cannot be honoured.
+    */
+                   
+extern _ARMABI size_t fread(void * ptr /*ptr*/,
+                    size_t size/*size*/, size_t nmemb/*nmemb*/, FILE * stream /*stream*/)
+   /*
+    * reads into the array pointed to by ptr, up to nmemb members whose size is
+    * specified by size, from the stream pointed to by stream. The file
+    * position indicator (if defined) is advanced by the number of characters
+    * successfully read. If an error occurs, the resulting value of the file
+    * position indicator is indeterminate. If a partial member is read, its
+    * value is indeterminate. The ferror or feof function shall be used to
+    * distinguish between a read error and end-of-file.
+    * Returns: the number of members successfully read, which may be less than
+    *          nmemb if a read error or end-of-file is encountered. If size or
+    *          nmemb is zero, fread returns zero and the contents of the array
+    *          and the state of the stream remain unchanged.
+    */
+{
+    FRESULT result;
+    uint32_t br = 0;
+    FIL *fp;
+    
+    fp = (FIL *)stream;    
+    
+    result = f_read(fp, ptr, nmemb,  &br);
+    if (result == FR_OK)
+    {
+        return br;
+    }
+    
+    return 0;
+}
+
+extern _ARMABI int setvbuf(FILE * __restrict /*stream*/,
+                   char * __restrict /*buf*/,
+                   int /*mode*/, size_t /*size*/) __attribute__((__nonnull__(1)));
+   /*
+    * may be used after the stream pointed to by stream has been associated
+    * with an open file but before it is read or written. The argument mode
+    * determines how stream will be buffered, as follows: _IOFBF causes
+    * input/output to be fully buffered; _IOLBF causes output to be line
+    * buffered (the buffer will be flushed when a new-line character is
+    * written, when the buffer is full, or when input is requested); _IONBF
+    * causes input/output to be completely unbuffered. If buf is not the null
+    * pointer, the array it points to may be used instead of an automatically
+    * allocated buffer (the buffer must have a lifetime at least as great as
+    * the open stream, so the stream should be closed before a buffer that has
+    * automatic storage duration is deallocated upon block exit). The argument
+    * size specifies the size of the array. The contents of the array at any
+    * time are indeterminate.
+    * Returns: zero on success, or nonzero if an invalid value is given for
+    *          mode or size, or if the request cannot be honoured.
+    */
+
+extern _ARMABI size_t fwrite(const void * __restrict /*ptr*/,
+                    size_t /*size*/, size_t /*nmemb*/, FILE * __restrict /*stream*/) __attribute__((__nonnull__(1,4)));
+   /*
+    * writes, from the array pointed to by ptr up to nmemb members whose size
+    * is specified by size, to the stream pointed to by stream. The file
+    * position indicator (if defined) is advanced by the number of characters
+    * successfully written. If an error occurs, the resulting value of the file
+    * position indicator is indeterminate.
+    * Returns: the number of members successfully written, which will be less
+    *          than nmemb only if a write error is encountered.
+    */
+
+extern _ARMABI int fseek(FILE * /*stream*/, long int /*offset*/, int /*whence*/) __attribute__((__nonnull__(1)));
+   /*
+    * sets the file position indicator for the stream pointed to by stream.
+    * For a binary stream, the new position is at the signed number of
+    * characters specified by offset away from the point specified by whence.
+    * The specified point is the beginning of the file for SEEK_SET, the
+    * current position in the file for SEEK_CUR, or end-of-file for SEEK_END.
+    * A binary stream need not meaningfully support fseek calls with a whence
+    * value of SEEK_END.
+    * For a text stream, either offset shall be zero, or offset shall be a
+    * value returned by an earlier call to the ftell function on the same
+    * stream and whence shall be SEEK_SET.
+    * The fseek function clears the end-of-file indicator and undoes any
+    * effects of the ungetc function on the same stream. After an fseek call,
+    * the next operation on an update stream may be either input or output.
+    * Returns: nonzero only for a request that cannot be satisfied.
+    */ 
+_ARMABI int fseek(FILE *stream, long int offset, int whence)
+{
+    return 0;
+}
+ 
+extern _ARMABI long int ftell(FILE * /*stream*/) __attribute__((__nonnull__(1)));
+   /*
+    * obtains the current value of the file position indicator for the stream
+    * pointed to by stream. For a binary stream, the value is the number of
+    * characters from the beginning of the file. For a text stream, the file
+    * position indicator contains unspecified information, usable by the fseek
+    * function for returning the file position indicator to its position at the
+    * time of the ftell call; the difference between two such return values is
+    * not necessarily a meaningful measure of the number of characters written
+    * or read.
+    * Returns: if successful, the current value of the file position indicator.
+    *          On failure, the ftell function returns -1L and sets the integer
+    *          expression errno to an implementation-defined nonzero value.
+    */
+_ARMABI long int ftell(FILE *stream)  
+{
+    FIL *fp;
+    
+    fp = (FIL *)stream;    
+   
+    return fp->fptr;
+}
+
+extern _ARMABI void clearerr(FILE * /*stream*/) __attribute__((__nonnull__(1)));
+   /*
+    * clears the end-of-file and error indicators for the stream pointed to by
+    * stream. These indicators are cleared only when the file is opened or by
+    * an explicit call to the clearerr function or to the rewind function.
+    * Returns: no value.
+    */
+void clearerr(FILE *stream)
+{
+    FIL *fp;
+    
+    fp = (FIL *)stream;
+    
+    fp->err = 0;
+}
+
+
+extern _ARMABI int feof(FILE * /*stream*/) __attribute__((__nonnull__(1)));
+   /*
+    * tests the end-of-file indicator for the stream pointed to by stream.
+    * Returns: nonzero iff the end-of-file indicator is set for stream.
+    */
+_ARMABI int feof(FILE *stream)
+{
+    FIL *fp;
+    
+    fp = (FIL *)stream;
+    if (fp->fptr >= fp->obj.objsize)
+    {
+        return 1;
+    }
+    return 0;   
+}
+
+extern _ARMABI int ferror(FILE * /*stream*/) __attribute__((__nonnull__(1)));
+   /*
+    * tests the error indicator for the stream pointed to by stream.
+    * Returns: nonzero iff the error indicator is set for stream.
+    */
+_ARMABI int ferror(FILE *stream)
+{
+    FIL *fp;
+    
+    fp = (FIL *)stream;
+    
+    return fp->err;
+}
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: fgetc
+*    功能说明: 重定义getc函数，这样可以使用getchar函数从串口1输入数据
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+int fgetc(FILE *f)
+{
+    if (f == &__stdin)
+    {     
+        return 0;   /* sacan 标准输入，还未做 */
+    }
+    else    /* 文件操作， lua dofile()会执行这个分支 */
+    {
+        FRESULT result;
+        uint32_t br = 0;
+        FIL *fp;
+        char buf[2];
+        
+        fp = (FIL *)f;    
+        
+        result = f_read(fp, buf, 1,  &br);
+        if (result == FR_OK)
+        {
+            return buf[0];
+        } 
+        
+        return 0;
+    }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: fputc
+*    功能说明: 重定义putc函数，这样可以使用printf函数从串口1打印输出
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
+extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
+extern MEMO_T g_LuaMemo;
+extern uint16_t g_MainStatus;
+int fputc(int ch, FILE *f)
+{
+    if (f == &__stdout)
+    {
+        uint8_t buf[1];
+
+        buf[0] = ch;
+
+    #if PRINT_TO_UDP == 1
+        lua_udp_SendBuf(buf, 1, LUA_UDP_PORT);
+        
+        if (g_MainStatus == MS_LUA_EXEC_FILE)
+        {
+            LCD_MemoAddChar(&g_LuaMemo, ch);
+        }
+    #else
+        USBCom_SendBuf(1, buf, 1);
+    #endif
+        
+        //comSendChar(COM1, ch);
+        return ch;
+    }
+    else
+    {
+        /* FatFS文件操作，还未做 */
+        return 0;
+    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

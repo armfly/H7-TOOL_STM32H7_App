@@ -16,25 +16,28 @@
 #include "bsp.h"
 #include "main.h"
 #include "lcd_menu.h"
+#include "SW_DP_Multi.h"
 
 const uint8_t *g_Menu1_Text[] =
 {
-    " 1 脱机烧录器",
-    " 2 LUA小程序",
-    " 3 数据记录仪",
-    " 4 系统设置",
+    " 1 脱机烧录器(单路)",
+    " 2 脱机烧录器(多路)",
+    " 3 LUA小程序",
+    " 4 数据记录仪",
+    " 6 系统设置", 
+
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
-    "&"
+    "&"    
 };
 
 MENU_T g_tMenu1;
 
-const uint8_t *g_MenuRec_Text[] =
+const uint8_t *g_MenuRec_Text[] = 
 {
-    " 1 串口记录仪",
-    " 2 CAN记录仪",
-    " 3 IO记录仪",
-    " 4 模拟量记录仪",
+//    " 1 串口记录仪",
+//    " 2 CAN记录仪",
+//    " 3 IO记录仪",
+//    " 4 模拟量记录仪",
 
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
@@ -109,17 +112,23 @@ void status_ExtendMenu1(void)
 
                     if (g_tMenu1.Cursor == 0)
                     {
+                        g_gMulSwd.MultiMode = 0;
                         g_MainStatus = MS_PROG_WORK;
                     }
                     else if (g_tMenu1.Cursor == 1)
                     {
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;        
+                        g_MainStatus = MS_PROG_WORK;
+                    }                    
+                    else if (g_tMenu1.Cursor == 2)
+                    {
                         g_MainStatus = MS_LUA_SELECT_FILE;
                     }
-                    else if (g_tMenu1.Cursor == 2)
+                    else if (g_tMenu1.Cursor == 3)
                     {
                         g_MainStatus = MS_EXTEND_MENU_REC;
                     }   
-                    else if (g_tMenu1.Cursor == 3)
+                    else if (g_tMenu1.Cursor == 4)
                     {
                         g_MainStatus = MS_SYSTEM_SET;
                     }                 

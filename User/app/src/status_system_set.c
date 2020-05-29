@@ -987,11 +987,12 @@ void FM_DispProgress(uint8_t _percent, uint32_t _time1)
 	
     if (s_percent == 0 || s_percent != _percent || s_ms != _time1 / 100)
     {
-        DispProgressBar(5, 200, 24, 240 - 2 * 5, "", _percent, &tFont); 
-
         /* 100.2 秒 */
         sprintf(buf, "%d.%d 秒", _time1 / 1000, (_time1 % 1000) / 100);
-        LCD_DispStr(160, 200 + 4, buf, &tFont);
+        
+        DispProgressBar(5, 200, 24, 240 - 2 * 5, "", _percent, buf, &tFont); 
+
+//        LCD_DispStr(160, 200 + 4, buf, &tFont);
         ST7789_DrawScreen();    /* 硬件SPI+DMA+刷屏 */ 
 
         s_percent = _percent;

@@ -24,8 +24,8 @@
 #include "DAP_config.h"
 #include "prog_if.h"
 
-//#define DEBUG_SWIM_TRIG()
-#define DEBUG_SWIM_TRIG()     DEBUG_D0_TRIG()     /* 调试用，在采样时刻翻转 */
+#define DEBUG_SWIM_TRIG()
+//#define DEBUG_SWIM_TRIG()     DEBUG_D0_TRIG()     /* 调试用，在采样时刻翻转 */
 
 #define CFG_GPIO_OTYPER(GPIOx, pin_bit) GPIOx->OTYPER = GPIOx->OTYPER & (~(0x00000001 << pin_bit))
 
@@ -249,140 +249,6 @@ err_quit:
 */ 
 uint8_t SWIM_EntrySequence(void)
 {      
-#if 0    
-    uint8_t re;
-    
-    SWIM_RESET_0();     /* 硬件复位 */
-    
-    bsp_DelayUS(200);
-    
-    SWIM_OUT_ENABLE();
-    
-    /* 低电平持续1.2ms */
-    SWIM_OUT_0();
-    bsp_DelayUS(1200);
-    
-    /* 4个1KHz脉冲 */
-    SWIM_OUT_DISABLE();bsp_DelayUS(500);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(500);
-    SWIM_OUT_DISABLE();bsp_DelayUS(500);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(500);
-    SWIM_OUT_DISABLE();bsp_DelayUS(500);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(500);
-    SWIM_OUT_DISABLE();bsp_DelayUS(500);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(500);
- 
-    /* 4个2KHz脉冲 */
-    SWIM_OUT_DISABLE();bsp_DelayUS(250);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(250);
-    SWIM_OUT_DISABLE();bsp_DelayUS(250);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(250);
-    SWIM_OUT_DISABLE();bsp_DelayUS(250);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(250);
-    SWIM_OUT_DISABLE();bsp_DelayUS(250);SWIM_OUT_ENABLE();SWIM_OUT_0();bsp_DelayUS(250);
-
-    SWIM_OUT_1();
-    SWIM_OUT_DISABLE();
-        
-    /* 芯片需要给 16us低电平应答 */
-//    while(SWIM_IS_HIGH());  /* 等待变低 */ 
-//    
-//    while(SWIM_IS_LOW());   /* 等待变高 */ 
-    
-    bsp_DelayUS(100);       /* 延迟500us */
-    
-    g_HighSpeed = 0;        /* 低速模式 */
-        
-    /* 
-        0x7F80 : SWIM control status register (SWIM_CSR)     
-    */        
-    re = SWIM_WriteByte(0x7F80, 0xB5);
-    if (re == 0)
-    {
-        goto err_quit;
-    }    
-    
-    g_HighSpeed = 1; 
-    
-    bsp_DelayUS(200);
-    
-    SWIM_RESET_1();   
-
-    bsp_DelayMS(10);        /* 延迟10ms */
-    
-//    {
-//        uint8_t re;
-//        
-//        re = SWIM_ReadByte(0x007F99);
-//        
-//        bsp_DelayUS(400);                   /* 延迟400us */
-//        
-//        /* 
-//            0x50CD : SWIM clock control register (CLK_SWIMCCR) 
-//            0: SWIM clock is divided by 2 (recommended)
-//            1: SWIM clock is not divided by 2 (not recommended as communication is less reliable)
-//        */
-//        re = SWIM_ReadByte(0x50CD);
-
-//        bsp_DelayUS(400);                   /* 延迟400us */
-//        
-//        SWIM_OUT_ENABLE();
-//        
-//        SWIM_OUT_0();
-//        bsp_DelayNS(16000);    
-//        
-//        SWIM_OUT_1();
-//        SWIM_OUT_DISABLE();
-
-//        bsp_DelayUS(200);
-//        
-//        SWIM_WriteByte(0x7F80, 0xB0);       /* 切换到速模式 */
-//        
-//        g_HighSpeed = 1;                    
-//        
-//        bsp_DelayUS(400);                   /* 延迟400us */
-//        
-//        SWIM_WriteByte(0x7F80, 0xB4);
-//        
-//        bsp_DelayUS(400);                   /* 延迟400us */
-//        
-//        SWIM_WriteByte(0x50C6, 0x00);       /* STM8_CLK_CKDIVR = 0x50C6 */
-//        
-//        bsp_DelayUS(400);                   /* 延迟400us */
-//        
-//        {
-//            uint8_t buf[4];
-//            
-//            re = SWIM_ReadBuf(0x004FFC, buf, 4);
-//            if (re == 0)
-//            {
-//                goto err_quit;
-//            }
-//            
-//            if (buf[0] == 0)
-//            {
-//                bsp_DelayUS(400);
-//            }
-//            
-//            SWIM_ReadBuf(0x00505F, buf, 1);
-//            
-//            SWIM_ReadBuf(0x004800, buf, 1);     /* OPTION BYTES ,第1个字节 71表示读保护 */
-//            
-//            if (buf[0] != 0)    /* 读保护了 */
-//            {
-//                SWIM_WriteByte(0x4800, 0x00);
-//            }             
-//            
-//            SWIM_ReadBuf(0x004801, buf, 1);
-//            
-//            SWIM_ReadBuf(0x004802, buf, 1);
-
-//            if (buf[0] == 0)
-//            {
-//                bsp_DelayUS(400);
-//            }        
-//        }    
-//    }
-    return 1;
-    
-err_quit:
-    return 0;
-
-#else
-
     uint8_t re;
     
     SWIM_RESET_0();     /* 硬件复位 */
@@ -519,7 +385,6 @@ err_quit:
     
 err_quit:
     return 0;
-#endif    
 }
 
 /*
