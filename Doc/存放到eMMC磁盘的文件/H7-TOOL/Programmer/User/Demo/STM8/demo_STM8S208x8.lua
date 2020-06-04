@@ -62,7 +62,7 @@ function config_chip1(void)
 	TVCC_VOLT = 3.3
 
 	--1表示整片擦除，0表示按扇区擦除. 有些CPU整片擦除速度快很多，有些慢很多
-	ERASE_CHIP_ENABLE = 0
+	ERASE_CHIP_ENABLE = 1
 
 	RESET_TYPE = 0				-- 0表示软件复位  1表示硬件复位
 

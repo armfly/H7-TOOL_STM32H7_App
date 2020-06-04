@@ -27,7 +27,7 @@ function config_cpu(void)
 
 	EEPROM_ADDRESS = 0x004000 	--定义FLASH起始地址(STM8S和STM8L不同）
 
-	for i = 1, #TaskList, 3 do
+	for i = 1, #DeviceList, 3 do
 		if (CHIP_NAME == DeviceList[i]) then
 			FLASH_SIZE  = DeviceList[i + 1]	--FLASH总容量
 			EEPROM_SIZE = DeviceList[i + 2]	--EEPROM容量

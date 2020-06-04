@@ -69,7 +69,7 @@ function config_chip1(void)
 	if (MULTI_MODE == 0) then
 		SWD_CLOCK_DELAY = 0		--单路编程
 	else
-		SWD_CLOCK_DELAY = 0		--多路编程，根据实际板子调节，和CPU主频、电缆长度有关
+		SWD_CLOCK_DELAY = 1		--多路编程，根据实际板子调节，和CPU主频、电缆长度有关
 	end
 
 	--1表示整片擦除，0表示按扇区擦除. 有些CPU整片擦除速度快很多，有些慢很多

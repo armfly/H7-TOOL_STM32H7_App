@@ -1373,7 +1373,14 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr)
         }    
         else    /* VERIFY_READ_BACK */
         {
-            PG_PrintText("正在校验...(Readback)");  
+            if (flash_algo.verify > 0)                
+            {    
+                PG_PrintText("正在校验...(FLM_Verify)");  
+            }
+            else
+            {
+                PG_PrintText("正在校验...(Readback)");  
+            }
         }
         
         /* 加载MCU的编程算法到目标机内存 */
@@ -1444,6 +1451,23 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr)
             {
                 uint32_t crc1, crc2;
 
+                /* 文件长度不是4字节整数倍，则补齐后再进行硬件CRC32 */
+                {
+                    uint8_t rem;
+                    uint8_t k;
+                    
+                    rem = bytes % 4;
+                    if (rem > 0)
+                    {
+                        rem = 4 - rem;
+                        for (k = 0; k < rem; k++)
+                        {
+                            FsReadBuf[bytes + k] = g_tFLM.Device.valEmpty;
+                        }
+                        bytes += rem;
+                    }
+                }
+                
                 if (flash_algo.cacul_crc32 > 0 && g_tProg.VerifyMode == VERIFY_AUTO)     /* 执行FLM中的crc算法 */
                 {
                     crc1 = target_flash_cacul_crc32(g_tFLM.Device.DevAdr + addr, bytes, 0xFFFFFFFF);
@@ -1509,8 +1533,23 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr)
                 addr += PageSize;
                 FileOffset += PageSize;                  
             }
+            else if (flash_algo.verify > 0)     /* FLM有verify校验函数 */
+            {
+                if (target_flash_verify_page(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) != 0)
+                {
+                    {
+                        char buf[128];
+                        
+                        sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                        PG_PrintText(buf); 
+                    }   
+                    err = 1;
+                    goto quit;                    
+                }
+            }
             else    /* readback 校验 */
             {
+                
                 if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
                 {
                     uint8_t i;
