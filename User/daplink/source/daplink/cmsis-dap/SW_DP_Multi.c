@@ -209,55 +209,10 @@ static __forceinline void MUL_PIN_SWCLK_SET(void)
     BSP_SET_GPIO_1(MUL_GPIO_SWD, g_gMulSwd.SWCLK_Pins);
 }
 
-/* */
+/* 高速 */
 static __forceinline void MUL_PIN_SWCLK_CLR(void)
 {
     BSP_SET_GPIO_0(MUL_GPIO_SWD, g_gMulSwd.SWCLK_Pins);
-}
-
-/* */
-#define MUL_SEND_32BIT_ONCE_FAST()  \
-    if (val & 1) {      \
-        MUL_GPIO_SWD->BSRR = CLK_0_DIO_1;   \
-        val >>= 1;      \
-        MUL_PIN_SWCLK_SET();    \
-    }   \
-    else {      \
-        MUL_GPIO_SWD->BSRR = CLK_0_DIO_0; \
-        val >>= 1;  \
-        MUL_PIN_SWCLK_SET();    \
-    }
-static __forceinline void MUL_SEND_32BIT(uint32_t val)
-{    
-//    uint32_t i;
-//    
-//    for (i = 0; i < 32; i++)
-//    {
-//        if (val & 1)
-//        {
-//            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_1;
-//            val >>= 1;
-//            MUL_PIN_SWCLK_SET();
-//        }
-//        else
-//        {
-
-//            MUL_GPIO_SWD->BSRR = g_gMulSwd.CLK_0_DIO_0;
-//            val >>= 1;
-//            MUL_PIN_SWCLK_SET();
-//        } 
-//    }
-    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
-    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
-    
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
-    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
 }
 
 /* SPI软件模式，低速配置 */
@@ -272,6 +227,60 @@ static __forceinline void MUL_SEND_32BIT(uint32_t val)
 
 #define MUL_SW_READ_BIT_FAST(bit)   MUL_PIN_SWCLK_CLR();  bit = MUL_PIN_SWDIO_IN(); MUL_PIN_SWCLK_SET();
                     
+
+/* 高速模式*/
+#define MUL_SEND_32BIT_ONCE_FAST()  \
+    if (val & 1) {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_1;   \
+        val >>= 1;      \
+        MUL_PIN_SWCLK_SET();    \
+    }   \
+    else {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_0; \
+        val >>= 1;  \
+        MUL_PIN_SWCLK_SET();    \
+    }
+static __forceinline void MUL_SEND_32BIT_FAST(uint32_t val)
+{    
+    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
+    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
+    
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+    MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
+}
+
+/* 低速模式 */
+#define MUL_SEND_32BIT_ONCE_SLOW()  \
+    if (val & 1) {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_1;   PIN_DELAY_S();\
+        val >>= 1;      \
+        MUL_PIN_SWCLK_SET();    PIN_DELAY_S();\
+    }   \
+    else {      \
+        MUL_GPIO_SWD->BSRR = CLK_0_DIO_0;  PIN_DELAY_S();\
+        val >>= 1;  \
+        MUL_PIN_SWCLK_SET();    PIN_DELAY_S();\
+    }
+static __forceinline void MUL_SEND_32BIT_SLOW(uint32_t val)
+{    
+    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
+    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
+    
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+    MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
+}
 
 extern uint8_t GetParity(uint32_t data);
 
@@ -505,7 +514,7 @@ uint8_t* MUL_SWD_TransferFast(uint32_t request, uint32_t *data)
 
             /* armfly ： 优化奇偶校验算法 */
             pb = GetParity(val);
-            MUL_SEND_32BIT(val);      
+            MUL_SEND_32BIT_FAST(val);      
 
             MUL_SW_WRITE_BIT_FAST(pb);             /* Write Parity Bit */               
         }                                                                        
@@ -763,7 +772,7 @@ uint8_t* MUL_SWD_TransferSlow(uint32_t request, uint32_t *data)
 
             /* armfly ： 优化奇偶校验算法 */
             pb = GetParity(val);
-            MUL_SEND_32BIT(val);      
+            MUL_SEND_32BIT_SLOW(val);      
 
             MUL_SW_WRITE_BIT_SLOW(pb);             /* Write Parity Bit */               
         }                                                                        

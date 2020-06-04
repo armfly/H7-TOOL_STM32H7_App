@@ -676,6 +676,7 @@ static int h7swd_Read32(lua_State* L)
 {
     uint32_t addr;
     uint32_t num = 4;
+    uint8_t err = 0;
 
     if (lua_type(L, 1) == LUA_TNUMBER)      /* 判断第1个参数 */
     {        
@@ -683,42 +684,51 @@ static int h7swd_Read32(lua_State* L)
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错返回0 */
-        return 1;
+        return 0;   /* 返回 nil */
     }
     
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {    
+            memset(s_lua_read_buf, 0, 4 * num);
             if (MUL_swd_read_memory(addr, s_lua_read_buf, num) == 0)
+            {
+                err = 1;
+            }
+
+            lua_pushnumber(L, *(uint32_t *)s_lua_read_buf);
+            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + num));
+            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 2 * num));
+            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 3 * num));
+            
+            if (err == 1)
             {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint32_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 3 * num));
+            }            
             return 5;
         }
         else
         {            
             if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
             {
+                err = 1;    /* 出错 */
+            }
+            
+            lua_pushnumber(L, *(uint32_t *)s_lua_read_buf); 
+            
+            if (err == 1)
+            {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint32_t *)s_lua_read_buf); 
-            
+            }             
             return 2;
         }
     }
@@ -726,21 +736,26 @@ static int h7swd_Read32(lua_State* L)
     {
         if (SWIM_ReadBuf(addr, s_lua_read_buf, num) == 0)
         {
+            err = 1;    /* 出错 */
+        }
+        lua_pushnumber(L, *(uint32_t *)s_lua_read_buf); 
+        
+        if (err == 1)        
+        {
             lua_pushnumber(L, 0);    /* 出错 */
         }
         else
         {
             lua_pushnumber(L, 1);    /* 成功 */
         }
-        
-        lua_pushnumber(L, *(uint32_t *)s_lua_read_buf); 
         return 2;        
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错 */   
-        return 1;
-    }   
+        lua_pushnumber(L, 0);    /* 出错 */
+        lua_pushnumber(L, 0);    /* 出错 */ 
+        return 2;
+    }
 }
 
 /*
@@ -756,6 +771,7 @@ static int h7swd_Read16(lua_State* L)
 {
     uint32_t addr;
     uint32_t num = 2;
+    uint8_t err = 0;
 
     if (lua_type(L, 1) == LUA_TNUMBER)      /* 判断第1个参数 */
     {        
@@ -763,42 +779,51 @@ static int h7swd_Read16(lua_State* L)
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错返回0 */
-        return 1;
+        return 0;   /* 返回 nil */
     }
     
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {    
+            memset(s_lua_read_buf, 0, 4 * num);
             if (MUL_swd_read_memory(addr, s_lua_read_buf, num) == 0)
+            {
+                err = 1;
+            }
+
+            lua_pushnumber(L, *(uint16_t *)s_lua_read_buf);
+            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + num));
+            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 2 * num));
+            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 3 * num));
+            
+            if (err == 1)
             {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint16_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 3 * num));
+            }            
             return 5;
         }
         else
         {            
             if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
             {
+                err = 1;    /* 出错 */
+            }
+            
+            lua_pushnumber(L, *(uint16_t *)s_lua_read_buf); 
+            
+            if (err == 1)
+            {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint16_t *)s_lua_read_buf); 
-            
+            }             
             return 2;
         }
     }
@@ -806,21 +831,26 @@ static int h7swd_Read16(lua_State* L)
     {
         if (SWIM_ReadBuf(addr, s_lua_read_buf, num) == 0)
         {
+            err = 1;    /* 出错 */
+        }
+        lua_pushnumber(L, *(uint16_t *)s_lua_read_buf); 
+        
+        if (err == 1)        
+        {
             lua_pushnumber(L, 0);    /* 出错 */
         }
         else
         {
             lua_pushnumber(L, 1);    /* 成功 */
         }
-        
-        lua_pushnumber(L, *(uint16_t *)s_lua_read_buf); 
         return 2;        
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错 */   
-        return 1;
-    }   
+        lua_pushnumber(L, 0);    /* 出错 */
+        lua_pushnumber(L, 0);    /* 出错 */ 
+        return 2;
+    }
 }
 
 /*
@@ -834,8 +864,9 @@ static int h7swd_Read16(lua_State* L)
 */
 static int h7swd_Read8(lua_State* L)
 {
-    uint32_t addr;
+     uint32_t addr;
     uint32_t num = 1;
+    uint8_t err = 0;
 
     if (lua_type(L, 1) == LUA_TNUMBER)      /* 判断第1个参数 */
     {        
@@ -843,42 +874,51 @@ static int h7swd_Read8(lua_State* L)
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错返回0 */
-        return 1;
+        return 0;   /* 返回 nil */
     }
     
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {    
+            memset(s_lua_read_buf, 0, 4 * num);
             if (MUL_swd_read_memory(addr, s_lua_read_buf, num) == 0)
+            {
+                err = 1;
+            }
+
+            lua_pushnumber(L, *(uint8_t *)s_lua_read_buf);
+            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + num));
+            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 2 * num));
+            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 3 * num));
+            
+            if (err == 1)
             {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint8_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 3 * num));
+            }            
             return 5;
         }
         else
         {            
             if (swd_read_memory(addr, s_lua_read_buf, num) == 0)
             {
+                err = 1;    /* 出错 */
+            }
+            
+            lua_pushnumber(L, *(uint8_t *)s_lua_read_buf); 
+            
+            if (err == 1)
+            {
                 lua_pushnumber(L, 0);    /* 出错 */
             }
             else
             {
                 lua_pushnumber(L, 1);    /* 成功 */
-            }
-            
-            lua_pushnumber(L, *(uint8_t *)s_lua_read_buf); 
-            
+            }             
             return 2;
         }
     }
@@ -886,21 +926,26 @@ static int h7swd_Read8(lua_State* L)
     {
         if (SWIM_ReadBuf(addr, s_lua_read_buf, num) == 0)
         {
+            err = 1;    /* 出错 */
+        }
+        lua_pushnumber(L, *(uint8_t *)s_lua_read_buf); 
+        
+        if (err == 1)        
+        {
             lua_pushnumber(L, 0);    /* 出错 */
         }
         else
         {
             lua_pushnumber(L, 1);    /* 成功 */
         }
-        
-        lua_pushnumber(L, *(uint8_t *)s_lua_read_buf); 
         return 2;        
     }
     else
     {
-        lua_pushnumber(L, 0);    /* 出错 */   
-        return 1;
-    }   
+        lua_pushnumber(L, 0);    /* 出错 */
+        lua_pushnumber(L, 0);    /* 出错 */ 
+        return 2;
+    } 
 }
 
 /*
@@ -952,6 +997,10 @@ static int h7_LoadAlgoFile(lua_State* L)
     if (lua_type(L, 4) == LUA_TNUMBER) /* 判断第4个参数 (一般不用）*/
     {
         g_tVar.SaveAlgoToCFile = luaL_checknumber(L, 4);
+    }
+    else
+    {
+        g_tVar.SaveAlgoToCFile = 0;
     }
     
     g_AlgoRam.Valid = 1;
@@ -1070,20 +1119,32 @@ static int h7_ProgFile(lua_State* L)
 extern void MUL_swd_set_target_reset(uint8_t asserted);
 static int h7_reset(lua_State* L)
 {   
+    uint32_t delay;
+    
+    
+    if (lua_type(L, 1) == LUA_TNUMBER) /* 判断第1个参数 */
+    {
+        delay = luaL_checknumber(L, 1);       
+    }
+    else
+    {
+        delay = 20;     /* 没有形参，则用20ms */
+    } 
+    
     /* 硬件复位 */
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
         MUL_swd_set_target_reset(1);
-        osDelay(20);
+        osDelay(delay);
         MUL_swd_set_target_reset(0);
-        osDelay(20); 
+        osDelay(delay); 
     }
     else        
     {
         swd_set_target_reset(1);
-        osDelay(20);
+        osDelay(delay);
         swd_set_target_reset(0);
-        osDelay(20); 
+        osDelay(delay); 
     }
     
     return 0;

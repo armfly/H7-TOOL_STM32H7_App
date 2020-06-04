@@ -33,6 +33,8 @@ function config_cpu(void)
 		"STM8L152C4",  16 * 1024, 1 * 1024,
 		"STM8L152C6",  32 * 1024, 1 * 1024,
 		"STM8L152C8",  64 * 1024, 2 * 1024,
+		"STM8L152K4",  16 * 1024, 1 * 1024,
+		"STM8L152K6",  32 * 1024, 1 * 1024,
 		"STM8L152K8",  64 * 1024, 2 * 1024,
 		"STM8L152R8",  64 * 1024, 2 * 1024,
 		"STM8L152M8",  64 * 1024, 2 * 1024,
@@ -55,7 +57,7 @@ function config_cpu(void)
 
 	EEPROM_ADDRESS = 0x001000 	--定义EEPROM起始地址(STM8S和STM8L不同）
 
-	for i = 1, #TaskList, 3 do
+	for i = 1, #DeviceList, 3 do
 		if (CHIP_NAME == DeviceList[i]) then
 			FLASH_SIZE  = DeviceList[i + 1]	--FLASH总容量
 			EEPROM_SIZE = DeviceList[i + 2]	--EEPROM容量
@@ -75,8 +77,20 @@ function config_cpu(void)
 
 	OB_ADDRESS     = "4800 4802 4807 4808 4809 480A 480B 480C"
 
-	OB_SECURE_OFF  = "AA 00 00 00 00 00 00 00"	--SECURE_ENABLE = 0时，编程完毕后写入该值 (不含反码字节）
-	OB_SECURE_ON   = "00 00 00 00 00 00 00 00"	--SECURE_ENABLE = 1时，编程完毕后写入该值
+	OB_SECURE_OFF  = "AA 00 00 00 00 00 00 00 00"	--SECURE_ENABLE = 0时，编程完毕后写入该值 (不含反码字节）
+	OB_SECURE_ON   = "00 00 00 00 00 00 00 00 00"	--SECURE_ENABLE = 1时，编程完毕后写入该值
+
+	MCU_REMOVE_PROTECT = 1		--1表示使用 MCU_RemoveProtect() 解除保护
+end
+
+-- STM8L05x/15x, medium density STM8L05x/15x and STM8AL31xx/STM8AL3Lxx and high density STM8L05x/15x/16x microcontrollers,
+-- 需要操作2次写入才能解除保护
+function MCU_RemoveProtect(void)
+	pg_prog_buf_ob("4800", "AA")
+	delayms(5)
+	pg_prog_buf_ob("4800", "AA")
+	delayms(5)
+	pg_reset()
 end
 
 ---------------------------结束-----------------------------------

@@ -1,6 +1,6 @@
 -------------------------------------------------------
 -- 文件名 : prog_lib.lua
--- 版  本 : V1.0  2020-04-23
+-- 版  本 : V1.1  2020-06-03
 -- 说  明 :脱机编程共用函数库
 -------------------------------------------------------
 
@@ -43,7 +43,18 @@ function prog_or_erase(mode)
 
 	config_chip1()		--配置烧录参数
 
-	print("SWCLK时钟延迟: ", SWD_CLOCK_DELAY)
+	if (CHIP_TYPE == "SWD") then
+		print("SWCLK时钟延迟: ", SWD_CLOCK_DELAY)
+	else if (CHIP_TYPE == "SWIM") then
+		print("CHIP_NAME = "..CHIP_NAME)
+		print(" flash  size = ", FLASH_SIZE)
+		print(" eeprom size = ", EEPROM_SIZE)
+		if (FLASH_SIZE == nil or EEPROM_SIZE == nil) then
+			err = "chip name is invalid"
+			goto quit
+		end
+	end
+	end
 
 --	set_tvcc(0)			--断电
 --	delayms(20)
@@ -133,7 +144,7 @@ function prog_or_erase(mode)
 				else
 					err = swim_start_prog()	--编程STM8 (SWD)
 				end
-			else
+			else	--擦除
 				if (mode == 1) then
 					err = erase_chip(FLASH_ADDRESS)	--擦除CPU Flash
 				else
@@ -294,14 +305,22 @@ function swd_start_prog(void)
 		for i = 1, #OB_WRP_ADDRESS, 1 do
 			local wrp
 
-			re,ob_data = pg_read_mem(OB_WRP_ADDRESS[i], 1)
+			if (MCU_READ_OPTION == 1) then
+				re,ob_data = MCU_ReadOptionsByte(OB_WRP_ADDRESS[i], 1)
+			else
+				re,ob_data = pg_read_mem(OB_WRP_ADDRESS[i], 1)
+			end
 			if (re == 0) then
 				print("  读寄存器失败")
 				pg_print_text("  已保护，设置读保护")
 				remove_protect = 1
 				break
 			else
-				wrp = tonumber(string.byte(ob_data,1,1))
+				if (MCU_READ_OPTION == 1) then
+					wrp = ob_data
+				else
+					wrp = tonumber(string.byte(ob_data,1,1))
+				end
 				str = string.format("  0x%08X ： 0x%02X & 0x%02X == 0x%02X", OB_WRP_ADDRESS[i], wrp, OB_WRP_MASK[i], OB_WRP_VALUE[i])
 				if ((wrp & OB_WRP_MASK[i]) ~= OB_WRP_VALUE[i]) then
 					str = str.."(已保护)"
@@ -405,18 +424,13 @@ function swim_start_prog(void)
 
 	pg_init()
 
-	--先设置读保护，再解除读保护。自动擦除全片。
-	pg_print_text("擦除全片")
-	re = pg_prog_buf_ob(OB_ADDRESS, OB_SECURE_ON)
-	if (re == 0) then
-		err = "加锁失败"  goto quit
-		goto quit
-	end
-	pg_init()	--加锁后复位后生效
-	re = pg_prog_buf_ob(OB_ADDRESS, OB_SECURE_OFF)
-	if (re == 0) then
-		err = "解锁失败"  goto quit
-		goto quit
+	if (ERASE_CHIP_ENABLE == 1) then
+		--先设置读保护，再解除读保护。自动擦除全片。
+		pg_print_text("擦除全片")
+		--先加保护再解除保护，达到清空芯片的目的
+		set_read_protect(1)
+		pg_init()
+		set_read_protect(0)
 	end
 
 	--动态填充SN UID USR数据
@@ -646,20 +660,29 @@ function set_read_protect(on)
 
 	time1 = get_runtime()
 
-	--设置TVCC电压
-	set_tvcc(TVCC_VOLT)
-	delayms(20)
-
-	--检测IC,打印内核ID
-	local core_id = pg_detect_ic()
-	if (core_id == 0) then
-		err = "未检测到IC"  print(err) return err
-	else
-		str = string.format("core_id = 0x%08X", core_id)
-		print(str)
-	end
+--	--设置TVCC电压
+--	set_tvcc(TVCC_VOLT)
+--	delayms(20)
+--
+--	--检测IC,打印内核ID
+--	local core_id = pg_detect_ic()
+--	if (core_id == 0) then
+--		err = "未检测到IC"  print(err) return err
+--	else
+--		str = string.format("core_id = 0x%08X", core_id)
+--		print(str)
+--	end
 
 	if (CHIP_TYPE == "SWD") then
+
+		--新唐专用的解除保护
+		if (MCU_REMOVE_PROTECT == 1) then
+			if (on == 0) then
+				print("MCU_RemoveProtect()")
+				MCU_RemoveProtect()
+			end
+		end
+
 		if (AlgoFile_OPT == "") then
 			err = "没有OPT算法文件"  print(err) return err
 		end
@@ -671,7 +694,13 @@ function set_read_protect(on)
 		end
 	else
 		if (CHIP_TYPE == "SWIM") then
-
+			--STM8专用的解除保护
+			if (MCU_REMOVE_PROTECT == 1) then
+				if (on == 0) then
+					print("MCU_RemoveProtect()")
+					MCU_RemoveProtect()
+				end
+			end
 		else
 			print("不支持该功能")
 			return "err"
@@ -764,10 +793,10 @@ function erase_chip(FlashAddr)
 		end
 	else
 		if (CHIP_TYPE == "SWIM") then
-			if (FlashAddr == 0x08000) then
+			if (FlashAddr == FLASH_ADDRESS) then
 				str = string.format("开始擦除flash. 地址 : 0x%X 长度 : %dKB ", FlashAddr, FLASH_SIZE / 1024)
 			else
-				str = string.format("开始擦除eeprom. 地址 : 0x%X 长度 : %dKB ", FlashAddr, EEPROM_SIZE / 1024)
+				str = string.format("开始擦除eeprom. 地址 : 0x%X 长度 : %dB ", FlashAddr, EEPROM_SIZE)
 			end
 			print(str)
 		else

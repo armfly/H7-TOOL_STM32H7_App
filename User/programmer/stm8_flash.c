@@ -605,11 +605,15 @@ uint8_t STM8_ProgramOptionBytes(uint8_t *_AddrBuf, uint16_t _AddrLen, uint8_t *_
         bsp_DelayUS(500);
         if (Address == 0x4800)
         {
-            STM8_WaitIAPSR_Flag(STM8_FLASH_IAPSR_EOP, 1, 1000);      /* 1000ms超时 */
+            re = STM8_WaitIAPSR_Flag(STM8_FLASH_IAPSR_EOP, 1, 2000);      /* 1000ms超时 */
         }
         else
         {
-            STM8_WaitIAPSR_Flag(STM8_FLASH_IAPSR_EOP, 1, 50);       /* 50ms超时 */
+            re = STM8_WaitIAPSR_Flag(STM8_FLASH_IAPSR_EOP, 1, 50);       /* 50ms超时 */
+        }
+        if (re == 0)
+        {
+            goto err_quit;
         }
         bsp_DelayUS(50);     
         STM8_WriteReg_CR2(0);                   /* 不确定是否需要这句话 解除编程操作*/  

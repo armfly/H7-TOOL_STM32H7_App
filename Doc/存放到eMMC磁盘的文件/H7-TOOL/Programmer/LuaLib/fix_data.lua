@@ -128,6 +128,7 @@ function sn_new(void)
 	local bin = {}
 	local out = {}
 	local sn1
+	local s
 
 	sn1 = pg_read_sn()	--读上次SN （必须是整数）
 	str = string.format("last sn = %d", sn1) print(str)
@@ -141,15 +142,15 @@ function sn_new(void)
 
 	--拼接为二进制串返回
 	if (SN_LITTLE_ENDIN == 1) then
-		s =    string.char(sn1)
-		s = s..string.char(sn1 >> 8)
-		s = s..string.char(sn1 >> 16)
-		s = s..string.char(sn1 >> 24)
+		s =    string.char(sn1 & 0xFF)
+		s = s..string.char((sn1 >> 8) & 0xFF)
+		s = s..string.char((sn1 >> 16) & 0xFF)
+		s = s..string.char((sn1 >> 24) & 0xFF)
 	else
-		s =    string.char(sn1 >> 24)
-		s = s..string.char(sn1 >> 16)
-		s = s..string.char(sn1 >> 8)
-		s = s..string.char(sn1)
+		s =    string.char((sn1 >> 24) & 0xFF)
+		s = s..string.char((sn1 >> 16) & 0xFF)
+		s = s..string.char((sn1 >> 8) & 0xFF)
+		s = s..string.char(sn1 & 0xFF)
 	end
 	return s;
 end
@@ -183,10 +184,10 @@ function uid_encrypt(uid)
     out[4] = out[2] ~ 0x78
 
 	--拼接为二进制串返回
-	s =    string.char(out[1])
-	s = s..string.char(out[2])
-	s = s..string.char(out[3])
-	s = s..string.char(out[4])
+	s =    string.char(out[1] & 0xFF)
+	s = s..string.char(out[2] & 0xFF)
+	s = s..string.char(out[3] & 0xFF)
+	s = s..string.char(out[4] & 0xFF)
 	return s
 end
 

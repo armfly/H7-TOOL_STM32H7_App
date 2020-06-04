@@ -1,9 +1,9 @@
 --以下快捷方式将显示在PC软件界面(STM8)
 --F01=自动编程,start_prog()
---F03=擦除flash,erase_chip(0x08000)
---F04=擦除eeprom,erase_chip(0x04000)
---F05=打印flash,print_flash(0x08000,1024,32,0x08000)
---F06=打印eeprom,print_flash(0x04000,256,32,0x04000)
+--F03=擦除flash,erase_chip(FLASH_ADDRESS)
+--F04=擦除eeprom,erase_chip(EEPROM_ADDRESS)
+--F05=打印flash,print_flash(FLASH_ADDRESS,512,16,FLASH_ADDRESS)
+--F06=打印eeprom,print_flash(EEPROM_ADDRESS,256,16,EEPROM_ADDRESS)
 --F07=打印UID,print_flash(UID_ADDR,12)
 --F08=打印内核id,print_core_id()
 --F09=修改RAM,pg_write_mem(0, "1234")
@@ -51,10 +51,10 @@ function config_chip1(void)
 	--编程任务列表，可以任意追加
 	--数据文件名支持绝对路径和相对路径，相对路径时和lua文件同目录，支持../上级目录
 	TaskList = {
-		"0:/H7-TOOL/Programmer/User/TestBin/8K_55.bin",	--数据文件 (""表示忽略)
+		"0:/H7-TOOL/Programmer/User/TestBin/8K_5A.bin",	--数据文件
 		0x008000,										--目标地址 (0x008000 Flash)
 
-		"0:/H7-TOOL/Programmer/User/TestBin/512.bin",	--数据文件 (""表示忽略)
+		"0:/H7-TOOL/Programmer/User/TestBin/128.bin",	--数据文件
 		EEPROM_ADDRESS,									--目标地址 (0x004000 EEPROM)
 	}
 
@@ -62,7 +62,7 @@ function config_chip1(void)
 	TVCC_VOLT = 3.3
 
 	--1表示整片擦除，0表示按扇区擦除. 有些CPU整片擦除速度快很多，有些慢很多
-	ERASE_CHIP_ENABLE = 0
+	ERASE_CHIP_ENABLE = 1
 
 	RESET_TYPE = 0				-- 0表示软件复位  1表示硬件复位
 
@@ -75,8 +75,8 @@ function config_chip1(void)
 	AUTO_REMOVE_PROTECT = 1		--1表示自动解除读保护和写保护
 
 	--OPTION BYTES 配置
-	OB_ENABLE	= 0 			--1表示编程完毕后写OPTION BYTES
-	SECURE_ENABLE  = 0			--选择加密还是不加密
+	OB_ENABLE	= 1 			--1表示编程完毕后写OPTION BYTES
+	SECURE_ENABLE  = 1			--选择加密还是不加密
 
 	pg_reload_var()				--用于更新c程序的全局变量
 end

@@ -105,7 +105,18 @@ void h7swim_ReadLuaVar(void)
     {
         PG_PrintText("脚本错误 EEPROM_SIZE"); 
     }
-    lua_pop(g_Lua, 1);    
+    lua_pop(g_Lua, 1);
+
+    lua_getglobal(g_Lua, "STM8_HVOFF");  
+    if (lua_isinteger(g_Lua, -1)) 
+    {
+        s_STM8_HVOFF = lua_tointeger(g_Lua, -1);
+    }
+    else
+    {
+        s_STM8_HVOFF = 0;
+    }
+    lua_pop(g_Lua, 1);
 }
 
 ///*

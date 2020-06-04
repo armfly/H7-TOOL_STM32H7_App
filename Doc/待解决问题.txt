@@ -6,9 +6,4 @@
 #define  TICK_INT_PRIORITY            0 // ((uint32_t)0x0F) /*!< tick interrupt priority */
 4. bsp_CheckRunTime, bsp_GetRunTime 函数内部去掉关闭中断的操作，影响QSPI写操作。
 
-2020-05-29  V1.20版 遗留问题
-5. 1拖4功能。烧写H750成功率100% 烧写STM32F030 时，偶尔出错
-    - 怀疑GPIO阻抗匹配问题。已将QSPI Flash GPIO速度和TFT LCD SPI的GPIO速度降低。但是改善不明显
-    - 也可能和程序运行状态有关，比如USB访问，以太网访问。一段时间几秒钟内总是出错。过了一段时间，总是成功。
-    - 也许和目标CPU的程序有关，因为烧写的测试程序是全55。CPU上电后进入异常中断。
   

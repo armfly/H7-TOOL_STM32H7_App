@@ -1012,6 +1012,9 @@ void status_ProgModifyParam(void)
     if (fSaveParam == 1)
     {
         SaveParam();    /* 保存参数 */
+        
+        /* 通知lua程序，多路编程参数变化 */
+        lua_do("MULTI_MODE = pg_read_c_var(\"MultiProgMode\")");
     }
 }
 
