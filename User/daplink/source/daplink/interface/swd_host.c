@@ -20,6 +20,7 @@
  */
 
 #ifndef TARGET_MCU_CORTEX_A
+
 //#include "cmsis_os2.h"
 #include "target_reset.h"
 #include "target_config.h"
@@ -40,10 +41,10 @@
 // AP CSW register, base value
 #define CSW_VALUE (CSW_RESERVED | CSW_MSTRDBG | CSW_HPROT | CSW_DBGSTAT | CSW_SADDRINC)
 
-#define DCRDR 0xE000EDF8
-#define DCRSR 0xE000EDF4
-#define DHCSR 0xE000EDF0
-#define REGWnR (1 << 16)
+#define DCRDR   0xE000EDF8
+#define DCRSR   0xE000EDF4
+#define DHCSR   0xE000EDF0
+#define REGWnR  (1 << 16)
 
 #define MAX_SWD_RETRY 100//10
 #define MAX_TIMEOUT   1000000  // Timeout for syscalls on target
@@ -61,7 +62,7 @@ typedef struct {
     uint32_t xpsr;
 } DEBUG_STATE;
 
-SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;
+SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;   // CONNECT_NORMAL;CONNECT_UNDER_RESET
 
 static DAP_STATE dap_state;
 static uint32_t  soft_reset = SYSRESETREQ;
@@ -73,9 +74,18 @@ __attribute__((weak)) void swd_set_target_reset(uint8_t asserted)
 }
 #else
 void swd_set_target_reset(uint8_t asserted)
-{       
-    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);   
-
+{    
+//    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);  
+    if (asserted)
+    {
+        //printf("reset gpio = 0\r\n");        
+        PIN_nRESET_OUT(0);
+    }
+    else
+    {
+        //printf("reset gpio = 1\r\n");   
+        PIN_nRESET_OUT(1);   
+    }
 //    if(asserted == 0)
 //	{
 //		swd_write_word((uint32_t)&SCB->AIRCR, ((0x5FA << SCB_AIRCR_VECTKEY_Pos) |(SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) | SCB_AIRCR_SYSRESETREQ_Msk));
@@ -841,6 +851,8 @@ uint8_t swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32_t e
 uint32_t swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, uint32_t entry, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
 {
     DEBUG_STATE state = {{0}, 0};
+    static uint32_t R0[1];
+    
     // Call flash algorithm function on target and wait for result.
     state.r[0]     = arg1;                   // R0: Argument 1
     state.r[1]     = arg2;                   // R1: Argument 2
@@ -861,6 +873,7 @@ uint32_t swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, uint32
     }
 
     if (!swd_read_core_register(0, &state.r[0])) {
+    
         return 0;
     }
     
@@ -869,13 +882,8 @@ uint32_t swd_flash_syscall_exec_ex(const program_syscall_t *sysCallParam, uint32
         return 0;
     }
 
-//    // Flash functions return 0 if successful.
-//    if (state.r[0] != 0) {
-//        return 0;
-//    }
-
-//    return 1;
-    return state.r[0];
+    R0[0] = state.r[0];
+    return (uint32_t)R0;    /* 返回存放结果的内存地址 */
 }
 
 // SWD Reset
@@ -936,10 +944,213 @@ static uint8_t JTAG2SWD()
         return 0;
     }
 
+    /* 旧协议，J-LINK如此发送 */
+    if (!swd_switch(0xEDB6)) {
+        return 0;
+    }
+
+    if (!swd_reset()) {
+        return 0;
+    }
+    
     if (!swd_read_idcode(&tmp)) {
         return 0;
     }
 
+    return 1;
+}
+
+static uint8_t JTAG2SWD_2(uint32_t *tmp)
+{
+    *tmp = 0;
+    
+    if (!swd_reset()) {
+        return 0;
+    }
+
+    if (!swd_switch(0xE79E)) {
+        return 0;
+    }
+
+    if (!swd_reset()) {
+        return 0;
+    }
+
+    /* 旧协议，J-LINK如此发送 */
+    if (!swd_switch(0xEDB6)) {
+        return 0;
+    }
+
+    if (!swd_reset()) {
+        return 0;
+    }
+    
+    if (!swd_read_idcode(tmp)) {
+        return 0;
+    }
+
+    return 1;
+}
+
+
+// 根据CPUID返回ARM内核系列
+typedef struct
+{
+    uint32_t PartNo;
+    char *Name;
+}ARM_CORE_LIST_T;
+
+const char * swd_arm_core_info(uint32_t cpuid)
+{
+   /*
+    【M0】
+    [31:24] Implementer  Implementer code: 0x41 = ARM.
+    [23:20] Variant  Implementation defined. In ARM implementations this is the major revision number n in the rn part of the rnpn revision status, 
+        Product revision status: 0x0.
+    [19:16] Constant    Indicates the architecture, ARMv6-M: 0xC.
+    [15:4]  Partno  Indicates part number, Cortex-M0: 0xC20.
+    [3:0]   Revision    Indicates revision. In ARM implementations this is the minor revision number n in the pn part of the rnpn revision status, 
+        see Product revision status. For example, for release r0p0: 0x0.
+
+    【M0+】
+    [31:24] IMPLEMENTER Implementer code: 0x41 ARM.
+    [23:20] VARIANT Major revision number n in the rnpm revision status. See Product revision status:0x0.
+    [19:16] ARCHITECTURE    Indicates the architecture, ARMv6-M: 0xC.
+    [15:4]  PARTNO  Indicates part number, Cortex-M0+: 0xC60.
+    [3:0]   REVISION    Minor revision number m in the rnpm revision status. See Product revision status. 0x1.
+
+    【M1】
+    [31:24] IMPLEMENTER  Implementer code:0x41 = ARM
+    [23:20] VARIANT  Implementation defined variant number: 0x0 for r0p1
+    [19:16] Constant    Reads as 0xC
+    [15:4]  PARTNO  Number of processor within family: 0xC21
+    [3:0]   REVISION    Implementation defined revision number: 0x1 = r0p1   
+
+    【M23】
+    [31:24] IMPLEMENTER Implementer code:0x41 = Arm.
+    [23:20] VARIANT Major revision number n in the rnpm revision status: 0x1 = Revision 1.
+    [19:16] ARCHITECTURE  Constant that defines the architecture of the processor: 0xC = Armv8-M architecture.
+    [15:4]  PARTNO  Part number of the processor: 0xD20 = Cortex-M23.
+    [3:0]   REVISION   Minor revision number m in the rnpm revision status: 0x0 = Patch 0.
+        
+    【M3】
+    [31:24] IMPLEMENTER Indicates implementer: 0x41 = ARM?
+    [23:20] VARIANT Indicates processor revision: 0x0 = Revision 0
+    [19:16] (Constant)  Reads as 0xF
+    [15:4]  PARTNO  Indicates part number: 0xC24 = Cortex??M3
+    [3:0]   REVISION    Indicates patch release: 0x1= Patch 1.
+
+    【M33】
+    [31:24] Implementer Implementer code: 0x41  Arm?
+    [23:20] Variant Variant number, the n value in the rnpm product revision identifier: 0x0    Revision 0
+    [19:16] Constant    Reads as 0xF
+    [15:4]  PartNo  Part number of the processor: 0xD21 Cortex??M33
+    [3:0]   Revision    Revision number, the m value in the rnpm product revision identifier: 0x3   Patch 3.
+
+    【M4】
+    [31:24] IMPLEMENTER Indicates implementer: 0x41 = Arm?
+    [23:20] VARIANT Indicates processor revision: 0x0 = Revision 0
+    [19:16] (Constant)  Reads as 0xF
+    [15:4]  PARTNO  Indicates part number: 0xC24 = Cortex?-M4
+    [3:0]   REVISION    Indicates patch release: 0x1= Patch 1.
+                
+    【M55】
+    [31:24] Implementer Implementer code: 0x41  Arm?Limited
+    [23:20] Variant Variant number, the n value in the rnpm product revision identifier: 0x0    Revision 0
+    [19:16] Architecture    Reads as 0b1111, Armv8.1?M with Main Extension
+    [15:4]  PartNo  Part number of the processor: 0xD22 Cortex?-M55
+    [3:0]   Revision    Revision number, the m value in the rnpm product revision identifier: 0x1   Patch 1.
+
+
+    【M7】
+    [31:24] IMPLEMENTER  Indicates implementer: 0x41  Arm.
+    [23:20] VARIANT  Indicates processor revision: 0x0 Revision 0. 0x1 Revision 1.
+    [19:16] ARCHITECTURE Reads as 0xF.
+    [15:4]  PARTNO  Indicates part number: 0xC27  Cortex-M7.
+    [3:0]   REVISION  Indicates patch release: 0x0  Patch 0.
+
+
+    【M35P】
+    */
+    uint8_t i;
+    uint32_t partno;
+    char *p;
+    
+    const ARM_CORE_LIST_T list[] = 
+    {
+        {0xC60, "Cortex-M0+"},
+        {0xC20, "Cortex-M0"},
+        {0xC21, "Cortex-M1"},
+        {0xC23, "Cortex-M3"},
+        {0xC24, "Cortex-M4"},
+        {0xD22, "Cortex-M55"},
+        {0xD21, "Cortex-M33"},
+        {0xC27, "Cortex-M7"},
+        {0xD20, "Cortex-M23"},
+        
+        {0xFFF, "End"},      // 结束标致行
+    };
+        
+    partno = (cpuid >> 4) & 0xFFF;
+    
+    for (i = 0; i < 255; i++)
+    {
+        if (list[i].PartNo == 0xFFF)
+        {
+            p = "Unknow";
+            break;
+        }
+            
+        if (list[i].PartNo == partno)
+        {
+            p = list[i].Name;
+            break;
+        }
+    }
+    
+    return p;
+}
+
+uint8_t swd_freeze_dog(void)
+{
+    const char *ret_str; 
+    
+    lua_do("ret = InitUnderReset()");
+    lua_getglobal(g_Lua, "ret"); 
+    if (lua_isstring(g_Lua, -1))
+    {
+        ret_str = lua_tostring(g_Lua, -1); 
+    }
+    else
+    {
+        ret_str = "";
+    }
+    lua_pop(g_Lua, 1);
+
+    if (strcmp(ret_str, "OK") == 0)
+    {
+        return 1;   /* 成功 */
+    }
+    
+    return 0;       /* 失败 */
+}       
+
+uint8_t swd_MUC_Init(void)
+{
+    lua_do("if (MCU_Init ~= nil) then MCU_Init() end");
+    
+    return 1;
+}   
+
+// 检测SWD，用于判断芯片是否移除. 只检测一次 
+uint8_t swd_detect_core(uint32_t *_id)
+{
+    swd_init();
+        
+    if (!JTAG2SWD_2(_id)) 
+    {
+        return 0;
+    }
     return 1;
 }
 
@@ -955,30 +1166,24 @@ uint8_t swd_init_debug(void)
     int8_t retries = 4;
     int8_t do_abort = 0;
     do {
-        if (do_abort) {
+        if (do_abort == 1) 
+        {
             //do an abort on stale target, then reset the device
             swd_write_dp(DP_ABORT, DAPABORT);
+            
             swd_set_target_reset(1);
-            osDelay(2);
+            osDelay(20);
             swd_set_target_reset(0);
-            osDelay(2);
+            osDelay(20);
             do_abort = 0;
-        }
-        swd_init();
+        }        
         
-#if 0    // armfly debug        
-        // call a target dependant function
-        // this function can do several stuff before really
-        // initing the debug
-        if (g_target_family && g_target_family->target_before_init_debug) {
-            g_target_family->target_before_init_debug();
-        }
-#endif
+        swd_init();
         
         if (!JTAG2SWD()) {
             do_abort = 1;
             continue;
-        }
+        }	
 
         if (!swd_clear_errors()) {
             do_abort = 1;
@@ -1017,21 +1222,12 @@ uint8_t swd_init_debug(void)
             do_abort = 1;
             continue;
         }
-
-#if 0    // armfly debug                
-        // call a target dependant function:
-        // some target can enter in a lock state
-        // this function can unlock these targets
-        if (g_target_family && g_target_family->target_unlock_sequence) {
-            g_target_family->target_unlock_sequence();
-        }
-#endif
-        
+		
         if (!swd_write_dp(DP_SELECT, 0)) {
             do_abort = 1;
             continue;
-        }
-        
+        }				
+
         return 1;
     
     } while (--retries > 0);
@@ -1066,7 +1262,7 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                 int k;
                 int err = 0;
                 
-                for (k = 0; k < 10; k++)
+                for (k = 0; k < 3; k++)
                 {
                     err = 0;
                     if (!swd_init_debug()) {
@@ -1074,11 +1270,11 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                         continue;
                     }
                     
-//                    if (reset_connect == CONNECT_UNDER_RESET) {
-//                        // Assert reset
-//                        swd_set_target_reset(1); 
-//                        osDelay(20);
-//                    }
+                    if (reset_connect == CONNECT_UNDER_RESET) {
+                        // Assert reset
+                        swd_set_target_reset(1); 
+                        osDelay(20);
+                    }
 
                     // Enable debug
                     while(swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN) == 0) {
@@ -1097,22 +1293,22 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                         continue;
                     }
                     
-//                    if (reset_connect == CONNECT_NORMAL) {
+                    if (reset_connect == CONNECT_NORMAL) {
                         // Assert reset
                         swd_set_target_reset(1); 
                         osDelay(20);
-//                    }
+                    }
                     
                     // Deassert reset
                     swd_set_target_reset(0);
                     osDelay(20);
                     
-                    /* 2020-01-18 armfly 增加退出机制 */
+                    /* 2020-01-18 armfly 增加退出机制, 200ms */
                     #if 1
                     {
                         uint32_t i;
                         
-                        for (i = 0; i < 100000; i++)
+                        for (i = 0; i < 500; i++)
                         {
                             if (!swd_read_word(DBG_HCSR, &val)) {
                                 err = 3;
@@ -1123,6 +1319,8 @@ uint8_t swd_set_target_state_hw(TARGET_RESET_STATE state)
                             {
                                 break;
                             }
+                            
+                            bsp_DelayUS(1000);
                         }    
 
                         if (err > 0)
@@ -1226,13 +1424,14 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
 {
     uint32_t val;
     int8_t ap_retries = 2;
-    /* Calling swd_init prior to enterring RUN state causes operations to fail. */
-    if (state != RUN) {
-        swd_init();
-    }
+//    /* Calling swd_init prior to enterring RUN state causes operations to fail. */
+//    if (state != RUN) {
+//        swd_init();
+//    }
 
     switch (state) {
         case RESET_HOLD:
+            swd_init();
             swd_set_target_reset(1);
             break;
 
@@ -1245,13 +1444,20 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             break;
 
         case RESET_PROGRAM:
-            if (!swd_init_debug()) {
-                return 0;
-            }
+//            swd_init();
+//               
+//            if (!swd_init_debug()) {
+//                return 0;
+//            }
 
+            /*
+                DBG_HCSR : 调试控制和状态寄存器. 提供内核状态信息，允许内核进入调试模式，
+                    和提供单步功能。
+            */
             // Enable debug and halt the core (DHCSR <- 0xA05F0003)
             while (swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) == 0) {
                 if ( --ap_retries <=0 ) {
+                    printf("error : swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT)\r\n");
                     return 0;
                 }
                 // Target is in invalid state?
@@ -1259,9 +1465,8 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
                 osDelay(2);
                 swd_set_target_reset(0);
                 osDelay(2);
-            }
-
-
+            }          
+            
             /* 2020-01-18 armfly 增加退出机制 */
             #if 1
             // Wait until core is halted
@@ -1271,6 +1476,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
                 for (i = 0; i < 100000; i++)
                 {
                     if (!swd_read_word(DBG_HCSR, &val)) {
+                        printf("error: swd_read_word(DBG_HCSR, &val) --1 i = %d\r\n", i);
                         return 0;
                     }
                     
@@ -1282,6 +1488,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
                 
                 if (i == 100000)
                 {
+                    printf("error: swd_read_word(DBG_HCSR, &val) --1\r\n"); 
                     return 0;   /* 超时 */
                 }
             }
@@ -1296,15 +1503,18 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             
             // Enable halt on reset
             if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+                printf("error: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
                 return 0;
             }
 
             // Perform a soft reset
             if (!swd_read_word(NVIC_AIRCR, &val)) {
+                printf("error: swd_read_word(NVIC_AIRCR, &val)\r\n");
                 return 0;
             }
 
             if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+                printf("error: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
                 return 0;
             }
 
@@ -1322,6 +1532,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
                 for (i = 0; i < 100000; i++)
                 {
                     if (!swd_read_word(DBG_HCSR, &val)) {
+                        printf("error: swd_read_word(DBG_HCSR, &val) --2 i = %d\r\n", i);
                         return 0;
                     }
                     
@@ -1333,6 +1544,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
                 
                 if (i == 100000)
                 {
+                    printf("error: swd_read_word(DBG_HCSR, &val) --2\r\n"); 
                     return 0;   /* 超时 */
                 }
             }            
@@ -1345,6 +1557,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             break;
 
         case NO_DEBUG:
+            swd_init();
             if (!swd_write_word(DBG_HCSR, DBGKEY)) {
                 return 0;
             }
@@ -1352,6 +1565,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             break;
 
         case DEBUG:
+            swd_init();
             if (!JTAG2SWD()) {
                 return 0;
             }
@@ -1378,6 +1592,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             break;
 
         case HALT:
+            swd_init();
             if (!swd_init_debug()) {
                 return 0;
             }
@@ -1403,6 +1618,7 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             break;
 
         case POST_FLASH_RESET:
+            swd_init();
             // This state should be handled in target_reset.c, nothing needs to be done here.
             break;
 
@@ -1410,6 +1626,156 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
             return 0;
     }
 
+    return 1;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: swd_enter_debug_program
+*    功能说明: 让芯片进入debug状态。 整合了 swd_init_debug()、 swd_set_target_state_sw、
+*           swd_set_target_state_hw()几个函数，增加了各种MCU的异常处理
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+uint8_t swd_enter_debug_program(void)
+{
+    uint32_t val;
+    
+    //osDelay(200);
+    
+    /* 拉低RESET */
+    swd_set_target_reset(1);
+    osDelay(20);
+    
+    if (swd_init_debug() == 0)
+    {
+        return 0;
+    }
+	
+    if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+    {
+        swd_set_target_reset(0);    /* 退出硬件复位 */
+        osDelay(20);
+        
+        if (swd_init_debug() == 0)
+        {
+            return 0;
+        }
+        
+        if (swd_freeze_dog() == 0) 
+        {
+            ;
+        }   
+    }
+
+    /*
+        DBG_HCSR : 调试控制和状态寄存器. 提供内核状态信息，允许内核进入调试模式，
+            和提供单步功能。
+    */
+    // Enable debug and halt the core (DHCSR <- 0xA05F0003)
+    {
+        uint8_t i;
+        
+        for (i = 0; i < 4; i++)
+        {
+            if (swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
+            {
+                break;
+            }
+            swd_set_target_reset(1);
+            osDelay(20);
+            swd_set_target_reset(0);
+            osDelay(i * 5);     /* 硬件复位退出后立即写指令 */            
+        }
+    }     
+        
+    /* 2020-01-18 armfly 增加退出机制 */
+    {
+        uint32_t i;
+        
+        for (i = 0; i < 100000; i++)
+        {
+            if (!swd_read_word(DBG_HCSR, &val)) {
+                printf("error: swd_read_word(DBG_HCSR, &val) --1 i = %d\r\n", i);
+                return 0;
+            }
+            
+            if ((val & S_HALT) != 0)
+            {
+                break;
+            }
+        }
+        
+        if (i == 100000)
+        {
+            printf("error: swd_read_word(DBG_HCSR, &val) --1\r\n"); 
+            return 0;   /* 超时 */
+        }
+    }
+        
+    // Enable halt on reset
+    if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+        printf("error: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
+        return 0;
+    }
+    
+    swd_set_target_reset(0);        /* 退出硬件复位 */    
+    osDelay(20);
+    
+    // Perform a soft reset
+    if (!swd_read_word(NVIC_AIRCR, &val)) {
+        printf("error: swd_read_word(NVIC_AIRCR, &val)\r\n");
+        return 0;
+    }
+
+    if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+        printf("error: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
+        return 0;
+    }
+
+    osDelay(2);
+
+    /* 增加超时退出机制 */
+    {
+        uint32_t i;
+        
+        for (i = 0; i < 100000; i++)
+        {
+            if (!swd_read_word(DBG_HCSR, &val)) {
+                printf("error: swd_read_word(DBG_HCSR, &val) --2 i = %d\r\n", i);
+                return 0;
+            }
+            
+            if ((val & S_HALT) != 0)
+            {
+                break;
+            }
+        }
+        
+        if (i == 100000)
+        {
+            printf("error: swd_read_word(DBG_HCSR, &val) --2\r\n"); 
+            return 0;   /* 超时 */
+        }
+    }
+
+    // Disable halt on reset
+    if (!swd_write_word(DBG_EMCR, 0)) {
+        return 0;
+    }
+
+    {
+        uint32_t cpuid;
+        
+        /* NVIC_CPUID = 0xE000ED00 */
+        if (!swd_read_memory(NVIC_CPUID, (uint8_t *)&cpuid, 4))
+        {
+             return 0;          
+        } 
+        printf(".NVIC_CPUID = %08X, %s\r\n", cpuid, swd_arm_core_info(cpuid));        
+    }
+        
     return 1;
 }
 #endif

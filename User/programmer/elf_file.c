@@ -13,6 +13,8 @@
 *
 *    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
 *
+*    本文件为安富莱电子原创，仅供学习使用，禁止在同类产品中商用.
+*
 *********************************************************************************************************
 */
 #include "bsp.h"
@@ -353,8 +355,19 @@ static uint8_t ELF_FillToAlgo(char *_path, program_target_t *_algo)
     
     _algo->init = g_tFLM.Func[IDX_Init].Offset + g_AlgoRam.Addr + 32;
     _algo->uninit = g_tFLM.Func[IDX_UnInit].Offset + g_AlgoRam.Addr + 32;
-    _algo->erase_chip = g_tFLM.Func[IDX_EraseChip].Offset + g_AlgoRam.Addr + 32;
-    _algo->erase_sector = g_tFLM.Func[IDX_EraseSector].Offset + g_AlgoRam.Addr + 32;
+    
+    _algo->erase_chip = 0;
+    if (g_tFLM.Func[IDX_EraseChip].Offset > 0)
+    {
+        _algo->erase_chip = g_tFLM.Func[IDX_EraseChip].Offset + g_AlgoRam.Addr + 32;
+    }
+    
+    _algo->erase_sector = 0; 
+    if (g_tFLM.Func[IDX_EraseSector].Offset > 0)
+    {
+        _algo->erase_sector = g_tFLM.Func[IDX_EraseSector].Offset + g_AlgoRam.Addr + 32;
+    }
+    
     _algo->program_page = g_tFLM.Func[IDX_ProgramPage].Offset + g_AlgoRam.Addr + 32;
     
     _algo->verify = 0;
@@ -466,14 +479,16 @@ static uint8_t ELF_FillToAlgo(char *_path, program_target_t *_algo)
             printf("  ReadExtID   : 0x%08X\r\n", g_tFLM.Func[IDX_ReadExtID].Offset);
             
             /* 算法占用地址 */
-            printf("  ----Algo RAM Info---------------------------\r\n");
-            printf("  algo ram address   : 0x%08X\r\n", _algo->algo_start);
-            printf("  algo size          : 0x%08X\r\n", _algo->algo_size);
-            printf("  buffer address     : 0x%08X\r\n", _algo->program_buffer);
-            printf("  buffer size        : 0x%08X\r\n", _algo->program_buffer_size);
-            printf("  breakpoint addres  : 0x%08X\r\n", _algo->sys_call_s.breakpoint);
-            printf("  static base adress : 0x%08X\r\n", _algo->sys_call_s.static_base);
-            printf("  stack pointer      : 0x%08X\r\n", _algo->sys_call_s.stack_pointer);            
+            #if 0
+                printf("  ----Algo RAM Info---------------------------\r\n");
+                printf("  algo ram address   : 0x%08X\r\n", _algo->algo_start);
+                printf("  algo size          : 0x%08X\r\n", _algo->algo_size);
+                printf("  buffer address     : 0x%08X\r\n", _algo->program_buffer);
+                printf("  buffer size        : 0x%08X\r\n", _algo->program_buffer_size);
+                printf("  breakpoint addres  : 0x%08X\r\n", _algo->sys_call_s.breakpoint);
+                printf("  static base adress : 0x%08X\r\n", _algo->sys_call_s.static_base);
+                printf("  stack pointer      : 0x%08X\r\n", _algo->sys_call_s.stack_pointer); 
+            #endif
         }
         
         /* 预留256字节全局变量空间和堆栈空间 */

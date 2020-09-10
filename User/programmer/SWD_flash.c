@@ -307,68 +307,71 @@ uint8_t LoadCheckCRCAlgoToTarget(void)
 extern void PG_PrintText(char *_str);
 error_t target_flash_enter_debug_program(void)
 {
-    /* SWD进入debug状态 */
+    g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
+    
+    
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
-        if (MUL_swd_init_debug() == 0)
+//        /* SWD进入debug状态 */
+//        if (MUL_swd_init_debug() == 0)
+//        {
+//            PG_PrintText("SWD初始化失败！");        
+//            return ERROR_FAILURE;   
+//        }
+
+//        if (0 == MUL_swd_set_target_state_sw(RESET_PROGRAM)) 
+//        {
+//            printf("error: swd_set_target_state_sw(RESET_PROGRAM)\r\n");
+//            
+//            if (MUL_swd_init_debug() == 0)
+//            {
+//                PG_PrintText("SWD初始化失败！");        
+//                return ERROR_FAILURE;   
+//            }
+//        
+//            if (0 == MUL_swd_set_target_state_hw(RESET_PROGRAM)) 
+//            {
+//                printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
+//                return ERROR_RESET;
+//            }                
+//        }   
+
+        if (MUL_swd_enter_debug_program() == 0)
         {
-            PG_PrintText("SWD初始化失败！");        
-            return ERROR_FAILURE;   
+            return ERROR_FAILURE; 
         }
     }
     else
     {
-        if (swd_init_debug() == 0)
+//        if (swd_init_debug() == 0)
+//        {
+//            PG_PrintText("SWD初始化失败！");        
+//            return ERROR_FAILURE;     
+//        }
+//        
+//        if (0 == swd_set_target_state_sw(RESET_PROGRAM)) 
+//        {
+//            printf("error: swd_set_target_state_sw(RESET_PROGRAM)\r\n");
+
+//            if (swd_init_debug() == 0)
+//            {
+//                PG_PrintText("SWD初始化失败！");        
+//                return ERROR_FAILURE;     
+//            }
+//        
+//            if (0 == swd_set_target_state_hw(RESET_PROGRAM)) 
+//            {
+//                printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
+//                return ERROR_RESET;
+//            }              
+//        }         
+        
+        if (swd_enter_debug_program() == 0)
         {
-            PG_PrintText("SWD初始化失败！");        
-            return ERROR_FAILURE;     
+            return ERROR_FAILURE; 
         }
     }
     
-    g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
-    
-    if (g_tProg.ResetType == HARD_RESET)
-    {
-        printf("hardware reset\r\n");
-        
-        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-        {
-            if (0 == MUL_swd_set_target_state_hw(RESET_PROGRAM)) 
-            {
-                printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
-                return ERROR_RESET;
-            }    
-        }
-        else
-        {
-            if (0 == swd_set_target_state_hw(RESET_PROGRAM)) 
-            {
-                printf("error: swd_set_target_state_hw(RESET_PROGRAM)\r\n");
-                return ERROR_RESET;
-            }             
-        }
-    }
-    else    //if (g_tProg.ResetType == SOFT_RESET)
-    {
-        printf("sorfware reset\r\n");
-        
-        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-        {
-            if (0 == MUL_swd_set_target_state_sw(RESET_PROGRAM)) 
-            {
-                printf("error: swd_set_target_state_sw(RESET_PROGRAM)\r\n");
-                return ERROR_RESET;
-            }
-        }
-        else
-        {
-            if (0 == swd_set_target_state_sw(RESET_PROGRAM)) 
-            {
-                printf("error: swd_set_target_state_sw(RESET_PROGRAM)\r\n");
-                return ERROR_RESET;
-            }            
-        }
-    }
     return ERROR_SUCCESS;
 }
 
@@ -380,19 +383,51 @@ error_t target_flash_enter_debug_program(void)
 *    返 回 值: 0 = ok， 其他值表示错误
 *********************************************************************************************************
 */
-error_t target_flash_init(uint32_t flash_start)
+error_t target_flash_init(uint32_t flash_start, unsigned long clk, unsigned long fnc)
 {   
+	
+	/*
+		http://www.keil.com/pack/doc/cmsis/Pack/html/algorithmFunc.html#Verify
+
+	int Init (unsigned long adr, unsigned long clk, unsigned long fnc);
+    
+    Parameters
+        adr	Device base address
+        clk	Clock frequency (Hz)
+        fnc	Function code
+	Returns
+        status information:
+        0 on success.
+        1 on failure.
+    
+    The function Init initializes the microcontroller for Flash programming. 
+       It is invoked whenever an attempt is made to download the program to Flash.
+
+        The argument adr specifies the base address of the device.
+
+        The argument clk specifies the clock frequency for prgramming the device.
+
+        The argument fnc is a number:
+
+	1 stands for Erase.
+	2 stands for Program.
+	3 stands for Verify.
+	
+        Thus, different initialization sections can be implemented for each individual Flash programming step.
+        The argument fnc is a number:
+    */
+    
     g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
     
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {    
-        if (0 == MUL_swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 1, 0)) {
+        if (0 == MUL_swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, clk, fnc, 0)) {
             return ERROR_INIT;
         }
     }
     else
     {
-        if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, 0, 1, 0)) {
+        if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.init, flash_start, clk, fnc, 0)) {
             return ERROR_INIT;
         }        
     }
@@ -509,12 +544,19 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
                                         flash_algo.program_buffer,
                                         0);
             
-            for (i = 0; i < 4; i++)
+            if (ret_val == 0)   /* 通信错误 */
             {
-                if (g_gMulSwd.Active[i] == 1 && ret_val[i] != addr + size)
+                err = 1;
+            }
+            else
+            {
+                for (i = 0; i < 4; i++)
                 {
-                    g_gMulSwd.Error[i] = 1;
-                    err = 1;
+                    if (g_gMulSwd.Active[i] == 1 && ret_val[i] != addr + size)
+                    {
+                        g_gMulSwd.Error[i] = 1;
+                        err = 1;        /* 结果错误 */
+                    }
                 }
             }
             if (err == 1)
@@ -524,21 +566,32 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
         }
         else
         {
+            uint32_t *ret_val;
+            
             // Write page to buffer
             if (!swd_write_memory(flash_algo.program_buffer, (uint8_t *)buf, write_size)) {
                 return ERROR_ALGO_DATA_SEQ;
             }
         
             // Run verify programming
-            if (swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
+            ret_val = (uint32_t *)swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                         flash_algo.verify,
                                         addr,
                                         flash_algo.program_buffer_size,
                                         flash_algo.program_buffer,
-                                        0) != addr + size) 
+                                        0);
+            if (ret_val == 0)   /* 通信错误 */
             {
                 return ERROR_WRITE;
-            }            
+            }
+            else
+            {
+                if (ret_val[0] != addr + size)
+                {
+                    printf("target_flash_verify_page() %08X != %08X(ok)\r\n", ret_val[0], addr + size);
+					return ERROR_WRITE;
+                }
+            }           
         }
 		addr += write_size;
 		buf  += write_size;
@@ -549,38 +602,172 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
 }
 
 
+//#define CHK_BLANK_ERROR     0   /* 执行查空失败 */
+//#define CHK_IS_BLANK        1   /* 是空片 */
+//#define CHK_NOT_BLANK       2   /* 不是空片 */
+
 /* 查空函数, 1表示不空需要擦除 */
 uint8_t target_flash_check_blank(uint32_t addr, uint32_t size)
 {    
     if ( flash_algo.check_blank == 0)
     {
-        return ERROR_SUCCESS;
+        return CHK_IS_BLANK;
     }
     
     g_tProg.FLMFuncTimeout = 3000;
+        
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
-        if (1 == MUL_swd_flash_syscall_exec(&flash_algo.sys_call_s,
+        uint32_t *ret_val;
+        
+        /* FLM函数返回1表示芯片不空，0表示芯片是空的 */
+        ret_val = (uint32_t *)MUL_swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                     flash_algo.check_blank,
                                     addr,
                                     size,
                                     g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
-                                    0)) {
-            return 1;
+                                    0);
+        if (ret_val == 0)    /* 通信异常 */
+        {
+            return CHK_BLANK_ERROR;
+        }
+        else    /* > 0 通信OK */
+        {
+            {
+                uint8_t blank = 1;
+                uint8_t i;
+    
+                /* FLM函数返回1表示芯片不空，0表示芯片是空的 */
+                for (i = 0; i < 4; i++)
+                {
+                    if (g_gMulSwd.Active[i] == 1 && ret_val[i] != 0)
+                    {
+                        blank = 0;
+                        break;
+                    }
+                }
+                
+                if (blank == 0)
+                {
+                    return CHK_NOT_BLANK;
+                }
+                else
+                {
+                    return CHK_IS_BLANK;
+                }
+            }
         }
     }
     else
     {
-        if (1 == swd_flash_syscall_exec(&flash_algo.sys_call_s,
+        uint32_t *ret_val;
+        
+        ret_val = (uint32_t *)swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                     flash_algo.check_blank,
                                     addr,
                                     size,
                                     g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
-                                    0)) {
-            return 1;
+                                    0);
+        if (ret_val == 0)   /* 通信异常 */
+        {
+            return CHK_BLANK_ERROR;
+        }
+        else    /* > 0 通信OK */
+        {
+            /* FLM函数返回1表示芯片不空，0表示芯片是空的 */
+            if (1 == ret_val[0]) 
+            {
+                return CHK_NOT_BLANK;
+            }
+            else
+            {
+                return CHK_IS_BLANK;
+            }
         }
     }
-    return 0;
+}
+
+/* 
+    查空函数, 1表示不空需要擦除 
+    芯片厂家FLM文件没有 check_blank 函数，则加载一个查空函数
+*/
+uint8_t target_flash_check_blank_ex(uint32_t addr, uint32_t size)
+{        
+    program_syscall_t sys_call_s;
+    
+    if (flash_algo_check_blank.check_blank == 0)
+    {
+        return ERROR_SUCCESS;
+    }
+
+    g_tProg.FLMFuncTimeout = 3000;
+    
+    sys_call_s.breakpoint = flash_algo_check_blank.sys_call_s.breakpoint + g_AlgoRam.Addr;
+    sys_call_s.stack_pointer = flash_algo_check_blank.sys_call_s.stack_pointer + g_AlgoRam.Addr;
+    sys_call_s.static_base = flash_algo_check_blank.program_buffer + flash_algo_check_blank.program_buffer_size  + g_AlgoRam.Addr;
+    
+    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+    {
+        uint32_t *ret_val;
+        
+        ret_val = (uint32_t *)MUL_swd_flash_syscall_exec_ex(&sys_call_s,
+                                    flash_algo_check_blank.check_blank + g_AlgoRam.Addr + 32,
+                                    addr,
+                                    size,
+                                    g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
+                                    0);
+        if (ret_val == 0)    /* 通信异常 */
+        {
+            return CHK_BLANK_ERROR;
+        }
+        else    /* > 0 通信OK */
+        {
+            {
+                uint8_t blank = 1;
+                uint8_t i;
+    
+                /* FLM函数返回1表示芯片不空，0表示芯片是空的 */
+                for (i = 0; i < 4; i++)
+                {
+                    if (g_gMulSwd.Active[i] == 1 && ret_val[i] != 0)
+                    {
+                        blank = 0;
+                        break;
+                    }
+                }
+                
+                if (blank == 0)
+                {
+                    return CHK_NOT_BLANK;
+                }
+                else
+                {
+                    return CHK_IS_BLANK;
+                }
+            }
+        }
+    }
+    else
+    {
+        uint8_t ret_val;
+        
+        ret_val = swd_flash_syscall_exec(&sys_call_s,
+                                    flash_algo_check_blank.check_blank + g_AlgoRam.Addr + 32,
+                                    addr,
+                                    size,
+                                    g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
+                                    0);
+
+        /* FLM函数返回1表示芯片不空，0表示芯片是空的 */
+        if (ret_val == 0) 
+        {
+            return CHK_NOT_BLANK;
+        }
+        else
+        {
+            return CHK_IS_BLANK;
+        }
+    }
 }
 
 /* 计算flash crc32 */
@@ -616,53 +803,7 @@ uint32_t target_flash_cacul_crc32(uint32_t addr, uint32_t size, uint32_t ini_val
 }
 
 /* 
-    查空函数, 1表示不空需要擦除 
-    芯片厂家FLM文件没有 check_blank 函数，则加载一个查空函数
-*/
-uint8_t target_flash_check_blank_ex(uint32_t addr, uint32_t size)
-{        
-    program_syscall_t sys_call_s;
-    
-    if (flash_algo_check_blank.check_blank == 0)
-    {
-        return ERROR_SUCCESS;
-    }
-
-    g_tProg.FLMFuncTimeout = 3000;
-    
-    sys_call_s.breakpoint = flash_algo_check_blank.sys_call_s.breakpoint + g_AlgoRam.Addr;
-    sys_call_s.stack_pointer = flash_algo_check_blank.sys_call_s.stack_pointer + g_AlgoRam.Addr;
-    sys_call_s.static_base = flash_algo_check_blank.program_buffer + flash_algo_check_blank.program_buffer_size  + g_AlgoRam.Addr;
-    
-    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-    {
-        if (1 == MUL_swd_flash_syscall_exec(&sys_call_s,
-                                    flash_algo_check_blank.check_blank + g_AlgoRam.Addr + 32,
-                                    addr,
-                                    size,
-                                    g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
-                                    0)) {
-            return 1;   /* 需要擦除 */
-        }
-    }
-    else
-    {
-        if (1 == swd_flash_syscall_exec(&sys_call_s,
-                                    flash_algo_check_blank.check_blank + g_AlgoRam.Addr + 32,
-                                    addr,
-                                    size,
-                                    g_tFLM.Device.valEmpty,     /* 空值，多半为0xFF,  STM32L051为0x00 */
-                                    0)) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-/* 
     计算flash crc32 
-
-    芯片厂家FLM文件没有 check_blank 函数，则加载一个查空函数
 */
 uint32_t target_flash_cacul_crc32_ex(uint32_t addr, uint32_t size, uint32_t ini_value)
 {    

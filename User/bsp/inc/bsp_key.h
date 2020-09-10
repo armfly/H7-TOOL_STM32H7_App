@@ -113,6 +113,8 @@ uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID);
 void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t _RepeatSpeed);
 void bsp_ClearKey(void);
 
+void bsp_LcdSleepEnable(uint8_t _mode);
+
 #endif
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

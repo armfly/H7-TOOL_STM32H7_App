@@ -17,7 +17,6 @@
 #include "modbus_slave.h"
 #include "modbus_reg_addr.h"
 #include "modbus_register.h"
-#include "modbus_iap.h"
 #include "lua_if.h"
 #include "usbd_cdc_interface.h"
 #include "prog_if.h"
@@ -35,13 +34,11 @@ static void MODS_05H(void);
 static void MODS_06H(void);
 static void MODS_10H(void);
 static void MODS_0FH(void);
-static void MODS_64H(void);
-static void MODS_65H(void);
-//static void MODS_66H(void);
-//static void MODS_67H(void);
-//static void MODS_68H(void);
 
-static void MODS_60H(void); /* PC发这个指令读取波形数据 */
+static void MODS_65H(void);
+static void MODS_60H(void);
+
+extern void MODS_64H(void);
 
 void MODS_ReciveNew(uint8_t _byte);
 
@@ -255,19 +252,15 @@ static void MODS_AnalyzeApp(void)
             MODS_0FH(); /* 强制多个线圈（对应D01/D02/D03） */
             break;
 
-            //        case 0x15:    /* 写文件寄存器 */
-            //            MODS_15H();
-            //            break;
-
         case 0x60: /* 读取波形数据专用功能码 */
             MODS_60H();
             break;
 
-        case 0x64: /* 小程序下载接口 */
+        case 0x64: /* 文件下载 */
             MODS_64H();
             break;
 
-        case 0x65: /* 临时执行小程序 */
+        case 0x65: /* 临时执行小程序-废弃 */
             MODS_65H();
             break;
 
@@ -1060,76 +1053,12 @@ fail:
     }
 }
 
-/*
-*********************************************************************************************************
-*    函 数 名: MODS_64H
-*    功能说明: 小程序下载接口
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-static void MODS_64H(void)
-{
-    /*
-        主机发送: 小程序数据
-            01  ; 站号
-            64  ; 功能码
-            0100 0000 ; 总长度 4字节
-            0000 0000 : 偏移地址 4字节
-            0020 0000 : 本包数据长度 4字节
-            xx ... xx : 程序数据，n个
-            CCCC      : CRC16
-    
-        从机应答:
-            01  ; 从机地址
-            64  ; 功能码            
-            00  ; 执行结果，0表示OK  1表示错误
-            CCCC : CRC16
-    */
-    uint32_t total_len; /* 程序长度 */
-    uint32_t offset_addr;
-    uint32_t package_len; /* 本包数据长度 */
 
-    g_tModS.RspCode = RSP_OK;
-
-    if (g_tModS.RxCount < 11)
-    {
-        g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
-        goto err_ret;
-    }
-    total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
-    offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
-    package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
-
-    lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len); /* 将lua程序保存到内存 */
-
-    if (offset_addr + package_len >= total_len)
-    {
-        lua_do(s_lua_prog_buf);
-    }
-
-err_ret:
-    if (g_tModS.RxBuf[0] != 0x00) /* 00广播地址不应答, FF地址应答g_tParam.Addr485 */
-    {
-        if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
-        {
-            g_tModS.TxCount = 0;
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;                         /* 功能码 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;                         /* 执行结果 00 */
-            MODS_SendWithCRC();
-        }
-        else
-        {
-            MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
-        }
-    }
-}
 
 /*
 *********************************************************************************************************
 *    函 数 名: MODS_65H
-*    功能说明: 执行临时脚本
+*    功能说明: 执行临时脚本. 该功能已废弃，用64H替代了。
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -1163,57 +1092,6 @@ static void MODS_65H(void)
 
     if (g_Lua > 0)
     {
-        /* PC机启动编程时，记录开始时间 */
-        if (memcmp((char *)&g_tModS.RxBuf[4], "start_prog()", 12) == 0 || 
-            memcmp((char *)&g_tModS.RxBuf[4], "erase_chip_mcu()", 16) == 0 ||
-            memcmp((char *)&g_tModS.RxBuf[4], "erase_chip_qspi()", 17) == 0 ||
-            memcmp((char *)&g_tModS.RxBuf[4], "erase_chip_eeprom()", 18) == 0)
-        {
-            g_tProg.Time = bsp_GetRunTime();    /* 记录开始时间 */
-            
-            if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-            {
-                g_gMulSwd.MultiMode = g_tParam.MultiProgMode;
-
-                if (g_tParam.MultiProgMode == 0)
-                {
-                    g_gMulSwd.Active[0] = 0;
-                    g_gMulSwd.Active[1] = 0;
-                    g_gMulSwd.Active[2] = 0;
-                    g_gMulSwd.Active[3] = 0;
-                }
-                else if (g_tParam.MultiProgMode == 1)
-                {
-                    g_gMulSwd.Active[0] = 1;
-                    g_gMulSwd.Active[1] = 0;
-                    g_gMulSwd.Active[2] = 0;
-                    g_gMulSwd.Active[3] = 0;
-                }
-                else if (g_tParam.MultiProgMode == 2)
-                {
-                    g_gMulSwd.Active[0] = 1;
-                    g_gMulSwd.Active[1] = 1;
-                    g_gMulSwd.Active[2] = 0;
-                    g_gMulSwd.Active[3] = 0;
-                }
-                else if (g_tParam.MultiProgMode == 3)
-                {
-                    g_gMulSwd.Active[0] = 1;
-                    g_gMulSwd.Active[1] = 1;
-                    g_gMulSwd.Active[2] = 1;
-                    g_gMulSwd.Active[3] = 0;
-                }
-                else if (g_tParam.MultiProgMode == 4)
-                {
-                    g_gMulSwd.Active[0] = 1;
-                    g_gMulSwd.Active[1] = 1;
-                    g_gMulSwd.Active[2] = 1;
-                    g_gMulSwd.Active[3] = 1;
-                }                                
-            }            
-        }
-        
-
         lua_do((char *)&g_tModS.RxBuf[4]);
     }
 
@@ -1226,146 +1104,6 @@ err_ret:
             g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
             g_tModS.TxBuf[g_tModS.TxCount++] = 0x65;                         /* 功能码 */
             g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;                         /* 执行结果 00 */
-
-            MODS_SendWithCRC();
-        }
-        else
-        {
-            MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
-        }
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: MODS_66H
-*    功能说明: wirte文件
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void MODS_66H(void)
-{
-    /*
-        66H - write file
-        主机发送:
-            01  ; 站号
-            66  ; 功能码
-            0100 0000 ; 总长度 4字节
-            0000 0000 : 偏移地址 4字节
-            0020 0000 : 本包数据长度 4字节
-            xx ... xx : 数据，n个
-            CCCC      : CRC16    
-            
-        从机应答:
-            01  ; 从机地址
-            66  ; 功能码
-            00  ; 执行结果，0表示OK  1表示错误
-            CCCC : CRC16    
-    */
-    uint32_t total_len; /* 程序长度 */
-    uint32_t offset_addr;
-    uint32_t package_len; /* 本包数据长度 */
-
-    g_tModS.RspCode = RSP_OK;
-
-    if (g_tModS.RxCount < 11)
-    {
-        g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
-        goto err_ret;
-    }
-    total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
-    offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
-    package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
-
-    lua_DownLoad(offset_addr, &g_tModS.RxBuf[14], package_len, total_len); /* 将数据保存到内存 */
-
-err_ret:
-    if (g_tModS.RxBuf[0] != 0x00) /* 00广播地址不应答, FF地址应答g_tParam.Addr485 */
-    {
-        if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
-        {
-            g_tModS.TxCount = 0;
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x64;                         /* 功能码 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;                         /* 执行结果 00 */
-            MODS_SendWithCRC();
-        }
-        else
-        {
-            MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
-        }
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: MODS_67H
-*    功能说明: read file
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void MODS_67H(void)
-{
-    /*
-        67H -  read file
-        主机发送:
-            01  ; 站号
-            67  ; 功能码
-            0100 0000 ; 总长度 4字节 -- 先保留，好像用不到
-            0000 0000 : 偏移地址 4字节
-            0020 0000 : 数据长度 4字节
-            CCCC      : CRC16    
-            
-        从机应答:
-            01  ; 从机地址
-            67  ; 功能码
-            00  ; 执行结果，0表示OK  1表示错误
-            0000 0000 : 偏移地址 4字节
-            0000 0000 : 后续数据长度
-            xxx  : 数据体
-            CCCC : CRC16    
-
-    */
-    //    uint32_t total_len;        /* 程序长度 */
-    uint32_t offset_addr;
-    uint32_t package_len; /* 本包数据长度 */
-
-    g_tModS.RspCode = RSP_OK;
-
-    if (g_tModS.RxCount < 11)
-    {
-        g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
-        goto err_ret;
-    }
-    //    total_len = BEBufToUint32(&g_tModS.RxBuf[2]);
-    offset_addr = BEBufToUint32(&g_tModS.RxBuf[6]);
-    package_len = BEBufToUint32(&g_tModS.RxBuf[10]);
-
-    lua_67H_Read(offset_addr, &g_tModS.TxBuf[11], package_len);
-
-err_ret:
-    if (g_tModS.RxBuf[0] != 0x00) /* 00广播地址不应答, FF地址应答g_tParam.Addr485 */
-    {
-        if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
-        {
-            g_tModS.TxCount = 0;
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x67;                         /* 功能码 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;                         /* 执行结果 00 */
-
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[6];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[7];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[8];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[9];
-
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[10];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[11];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[12];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[13];
-
-            g_tModS.TxCount += package_len;
 
             MODS_SendWithCRC();
         }

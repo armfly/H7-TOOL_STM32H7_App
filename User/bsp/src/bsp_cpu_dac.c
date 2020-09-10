@@ -71,7 +71,7 @@
 #define DACx_DMA_IRQHandler             DMA1_Stream5_IRQHandler
 
 /* DMA波形缓冲区 */
-#define WAVE_SAMPLE_SIZE 128
+
 uint16_t g_Wave1[WAVE_SAMPLE_SIZE];
 //uint16_t g_Wave2[128];
 
@@ -261,10 +261,16 @@ static void TIM6_Config(uint32_t _freq)
     /* Time base configuration */
     htim.Instance = TIM6;
 
-    if (_freq < 100)
+    if (_freq < 400)
     {
-        htim.Init.Prescaler = 100;
-        htim.Init.Period = ((SystemCoreClock / 2) / htim.Init.Prescaler) / _freq - 1;
+        htim.Init.Prescaler = 100 - 1;
+        htim.Init.Period = ((SystemCoreClock / 2) / (htim.Init.Prescaler + 1)) / _freq - 1;
+        htim.Init.ClockDivision = 0;
+    }    
+    else if (_freq < 4000)
+    {
+        htim.Init.Prescaler = 10 - 1;
+        htim.Init.Period = ((SystemCoreClock / 2) / (htim.Init.Prescaler + 1)) / _freq - 1;
         htim.Init.ClockDivision = 0;
     }
     else
@@ -274,9 +280,6 @@ static void TIM6_Config(uint32_t _freq)
         htim.Init.ClockDivision = 0;
     }
 
-    htim.Init.Period = (SystemCoreClock / 2) / _freq - 1;
-    htim.Init.Prescaler = 0;
-    htim.Init.ClockDivision = 0;
     htim.Init.CounterMode = TIM_COUNTERMODE_UP;
     htim.Init.RepetitionCounter = 0;
     HAL_TIM_Base_Init(&htim);

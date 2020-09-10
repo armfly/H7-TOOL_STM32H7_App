@@ -19,7 +19,7 @@
 #include "lcd_menu.h"
 #include "main.h"
 #include "prog_if.h"
-#include "prog_if.h"
+#include "md5.h"
 
 /*
     1、V7开发板的SD卡接口是用的SDMMC1，而这个接口仅支持AXI SRAM区访问，其它SRAM和TCP均不支持。
@@ -193,6 +193,54 @@ uint8_t DeleteFile(char *_Path)
 
 /*
 *********************************************************************************************************
+*    函 数 名: MakeDir
+*    功能说明: 创建目录. 自动创建每级目录
+*    形    参: _Path, 路径全名
+*    返 回 值: 0成功  1失败
+*********************************************************************************************************
+*/
+uint8_t MakeDir(char *_Path)
+{   
+    FRESULT re;
+    char buf[256];
+    uint16_t i;
+    
+    /* 0:/H7-TOOL/Programmer/Device */
+    for (i = 0; i < 256; i++)
+    {
+        buf[i] = _Path[i];
+        
+        if (buf[i] == '/')
+        {
+            buf[i] = 0;
+            
+            if (i > 2)
+            {
+                re = f_mkdir(buf);
+            }
+            
+             buf[i] = '/';
+        }
+        else if (buf[i] == 0)
+        {
+            if (i > 2)
+            {
+                re = f_mkdir(buf);
+            }            
+            break;
+        }
+    }
+    
+    if (re == FR_EXIST || re == FR_OK)
+    {
+        return 0;
+    }
+    
+    return 1;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: ReadFileToMem
 *    功能说明: 读取完整的文件到内存
 *    形    参: _Path : 文件路径+文件名
@@ -212,11 +260,10 @@ uint32_t ReadFileToMem(char *_Path, uint32_t _offset, char *_Buff, uint32_t _Max
     {
         return 0;
     }
- 
     if (_offset > 0)
     {
         f_lseek(&g_file, _offset);
-    }
+    }  
     
     re = f_read(&g_file, _Buff, _MaxLen,  &br);
     f_close(&g_file);
@@ -224,6 +271,53 @@ uint32_t ReadFileToMem(char *_Path, uint32_t _offset, char *_Buff, uint32_t _Max
     SCB_InvalidateDCache_by_Addr((uint32_t *)_Buff,  _MaxLen);
     
     return br;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: WriteFile
+*    功能说明: 写文件
+*    形    参: _Path : 文件路径+文件名 .lua文件，后缀改为.ini作为计数文件
+*              _offset : 偏移
+*              _Len : 长度
+*    返 回 值: -1表示错误  0表示OK
+*********************************************************************************************************
+*/
+int32_t WriteFile(char *_Path, uint32_t _offset, char *_Buff, uint32_t _Len)
+{
+    FRESULT re;
+    uint32_t FileSize;
+    
+    if (_offset == 0)
+    {
+        re = f_open(&g_file, _Path, FA_WRITE | FA_CREATE_ALWAYS);
+        if (re != FR_OK)
+        {
+            goto err_quit;
+        }
+    }
+    else
+    {
+        re = f_open(&g_file, _Path, FA_WRITE | FA_READ);
+        if (re != FR_OK)
+        {
+            goto err_quit;
+        }
+        f_lseek(&g_file, _offset);
+    }    
+    
+    re = f_write(&g_file, _Buff, _Len,  &FileSize);
+    if (re != FR_OK)
+    {
+        goto err_quit;
+    }    
+       
+    f_close(&g_file);   
+    return 0;
+
+err_quit:
+    f_close(&g_file);   
+    return -1;
 }
 
 /*
@@ -795,6 +889,11 @@ uint8_t CheckFileNamePostfix(char *_Path, char *_Filter)
     char FixName[10];
     char *p;
     
+    if (_Filter[0] == 0)
+    {
+        return 1;
+    }
+    
     p = GetFileNamePostfix(_Path);          /* 获得后缀名，不包括小数点 */
     strncpy(FixName, p, sizeof(FixName) - 1);   
     
@@ -911,6 +1010,174 @@ void ListDir(char *_Path, char *_Filter)
         g_tFileList.Name[g_tFileList.Count][i] = 0;
         g_tFileList.Count++;
     }
+    
+    f_closedir(&DirInf);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: FileDataTimeToStr
+*    功能说明: 文件的日期时间转换为HEX格式
+*    形    参:  _data : FatFS格式的日期
+*               _time : FatFS格式的时间
+*    返 回 值: 日期ASCII码, 2020-12-38 01:01:59  (19字节)
+*********************************************************************************************************
+*/
+void FileDataTimeToStr(uint16_t _date, uint16_t _time, char *_out)
+{
+    unsigned short year;
+    unsigned short month;
+    unsigned short day;
+    unsigned short hour;
+    unsigned short minute;
+    unsigned short second;
+    
+    year = _date & 0xFE00;      // 0b1111 1110 0000 0000;
+    year = year >> 9;
+    year += 1980;
+    
+    month = _date & 0x01E0;     // 0b0000 0001 1110 0000;
+    month = month >> 5;
+    day = _date & 0x001F;       // 0b0000 0000 0001 1111;
+    
+    hour = _time & 0xF800;      // 0b1111 1000 0000 0000;
+    hour = hour >> 11;
+
+    minute = _time & 0x07E0;    // 0b0000 0111 1110 0000;
+    minute = minute >> 5;
+    
+    second = _time & 0x001F;    // 0b0000 0000 0001 1111;
+    second = (second * 2) % 60;
+    
+    printf("%02u-%02u", hour, minute);
+    
+    sprintf(_out, "%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetFileMD5
+*    功能说明: 得到文件的MD5码
+*    形    参: _Path : 文件名
+*              _OutMD5 : 输出结果 16字节
+*             _FileSize : 文件大小
+*    返 回 值: 文件大小. 0表示打开文件失败
+*********************************************************************************************************
+*/
+uint32_t GetFileMD5(char *_Path, char *_OutMD5)
+{
+    uint32_t bytes;  
+    uint32_t offset = 0;
+    MD5_CTX md5;    
+    FRESULT re;
+    uint32_t size;
+       
+    memset(_OutMD5, 0, 16);    
+    
+    re = f_open(&g_file, _Path, FA_OPEN_EXISTING | FA_READ);
+    if (re != FR_OK)
+    {
+        return 0;
+    }
+    size = f_size(&g_file);
+    
+    f_close(&g_file);  
+
+	MD5Init(&md5);
+
+    while (1)
+    {
+        bytes = ReadFileToMem(_Path, offset, FsReadBuf, sizeof(FsReadBuf)); 
+        offset += bytes;
+        if (bytes > 0)
+        {
+            MD5Update(&md5, (uint8_t *)FsReadBuf, bytes);
+        }
+        else
+        {
+            break;
+        }
+    }
+	MD5Final(&md5, (uint8_t *)_OutMD5);
+    return size;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: ListFileToMem
+*    功能说明: 列出文件. 保存指定内存.  一条记录一样，tab间隔,回车换行。
+*    形    参:  _Path : 目录
+*               _OutBuf : 输出缓冲区
+*               _BufSize : 缓冲区大小
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void ListFileToMem(char *_Path, char *_OutBuf, uint32_t _BufSize)
+{
+    FRESULT result;
+    uint32_t cnt = 0;
+    uint32_t i;
+    
+    _OutBuf[0] = 0;
+    
+    /* 打开根文件夹 */
+    result = f_opendir(&DirInf, _Path); /* 如果不带参数，则从当前目录开始 */
+    if (result != FR_OK)
+    {
+        //printf("打开根目录失败  (%s)\r\n", FR_Table[result]);
+        return;
+    }
+
+    while (1)
+    {
+        result = f_readdir(&DirInf, &FileInf); /* 读取目录项，索引会自动下移 */
+        if (result != FR_OK || FileInf.fname[0] == 0)
+        {
+            break;
+        }
+
+        if (FileInf.fname[0] == '.')
+        {       
+            continue;
+        }
+
+        /* 判断是文件还是子目录 */
+        if (FileInf.fattrib & AM_DIR)
+        {       
+            _OutBuf[cnt++] = 'D';    /* 目录 */
+        }
+        else
+        {
+            _OutBuf[cnt++] = 'F';    /* 目录 */;    /* 文件 */            
+        }        
+        sprintf(&_OutBuf[cnt], "%08X",  FileInf.fsize);
+        cnt += 8;        
+        _OutBuf[cnt++] = '|';
+
+        FileDataTimeToStr(FileInf.fdate, FileInf.ftime, &_OutBuf[cnt]);
+        cnt += 19;
+        _OutBuf[cnt++] = '|';     
+        
+        for (i = 0; i < 256; i++)
+        {
+            if (FileInf.fname[i] == 0)
+            {
+                break;
+            }
+            
+            if (cnt >= _BufSize - 1)
+            {
+                break;
+            }
+            
+            _OutBuf[cnt++] = FileInf.fname[i];
+        }       
+        
+        _OutBuf[cnt++] = '\r';
+        _OutBuf[cnt++] = '\n';
+    }
+    
+    _OutBuf[cnt++] = 0;
     
     f_closedir(&DirInf);
 }

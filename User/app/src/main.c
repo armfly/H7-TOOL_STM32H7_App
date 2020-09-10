@@ -151,9 +151,19 @@ int main(void)
     lua_Init();         /* 启动lua */
     
     //wifi_state = WIFI_INIT;
-
+  
     /* 主程序采用状态机实现程序功能切换 */
     g_MainStatus = MS_LINK_MODE; /* 初始状态 = 联机界面 */
+    if (g_tParam.StartRun == 1)
+    {
+        g_gMulSwd.MultiMode = 0;        /* 单路烧录 */
+        g_MainStatus = MS_PROG_WORK;
+    }
+    else if (g_tParam.StartRun == 2)
+    {
+        g_gMulSwd.MultiMode = g_tParam.MultiProgMode; 
+        g_MainStatus = MS_PROG_WORK;    /* 多路烧录 */
+    }    
     while (1)
     {
         switch (g_MainStatus)

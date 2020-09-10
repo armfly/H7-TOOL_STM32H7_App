@@ -15,7 +15,6 @@
 #include "param.h"
 #include "modbus_reg_addr.h"
 #include "modbus_register.h"
-#include "modbus_iap.h"
 #include "lua_if.h"
 
 uint8_t fSaveReq_06H = 0;       /* 保存基本参数请求，用于06H和10H写寄存器函数 */

@@ -41,6 +41,7 @@ typedef enum {
 
 uint8_t swd_init(void);
 uint8_t swd_off(void);
+uint8_t swd_detect_core(uint32_t *_id);
 uint8_t swd_init_debug(void);
 uint8_t swd_clear_errors(void);
 uint8_t swd_read_dp(uint8_t adr, uint32_t *val);
@@ -63,6 +64,9 @@ uint8_t swd_transfer_retry(uint32_t req, uint32_t *data);
 void int2array(uint8_t *res, uint32_t data, uint8_t len);
 void swd_set_reset_connect(SWD_CONNECT_TYPE type);
 void swd_set_soft_reset(uint32_t soft_reset_type);
+
+
+uint8_t swd_enter_debug_program(void);
 
 
 uint8_t swd_read_idcode(uint32_t *id);

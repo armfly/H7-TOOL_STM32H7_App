@@ -61,8 +61,9 @@ int16_t dac1_VoltToDac(int16_t _volt);
 int16_t dac1_DacToCurr(uint16_t _dac);
 int16_t dac1_CurrToDac(int16_t _curr);
 
-extern uint16_t g_Wave1[128];
-extern uint16_t g_Wave2[128];
+#define WAVE_SAMPLE_SIZE 128
+extern uint16_t g_Wave1[WAVE_SAMPLE_SIZE];
+//extern uint16_t g_Wave2[128];
 
 extern DAC_WAVE_T g_tDacWave;
 

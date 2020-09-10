@@ -18,7 +18,7 @@
 #define __LUA_IF_SWIM_H
 
 void lua_swim_RegisterFun(void);
-uint16_t PG_SWIM_ProgFile(char *_Path, uint32_t _FlashAddr);
+uint16_t PG_SWIM_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, uint32_t _FileIndex);
 
 #endif
 

@@ -45,6 +45,7 @@ extern "C" {
 
 uint8_t MUL_swd_init(void);
 uint8_t MUL_swd_off(void);
+uint8_t MUL_swd_detect_core(uint32_t *_id);
 uint8_t MUL_swd_init_debug(void);
 uint8_t MUL_MUL_swd_clear_errors(void);
 uint8_t *MUL_swd_read_dp(uint8_t adr, uint32_t *val);
@@ -70,6 +71,7 @@ void MUL_swd_set_soft_reset(uint32_t soft_reset_type);
 
 
 uint8_t MUL_swd_read_idcode(uint32_t *id);
+uint8_t MUL_swd_enter_debug_program(void);
 
 #ifdef __cplusplus
 }

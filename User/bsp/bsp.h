@@ -96,6 +96,8 @@
 #include "bsp_ntc.h"
 #include "bsp_ext_io.h"
 
+#include "bsp_rng.h"
+
 #define HARD_MODEL              0x0750
 #define BOOT_VERSION            *(uint16_t *)(0x08000000 + 28)
 #define APP_VERSION             *(uint16_t *)(0x08020000 + 28)

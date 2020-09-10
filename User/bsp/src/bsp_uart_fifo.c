@@ -624,7 +624,7 @@ void RS485_InitTXE(void)
 */
 void RS485_SetBaud(uint32_t _baud)
 {
-    comSetBaud(COM3, _baud);
+    comSetBaud(COM_RS485, _baud);
 }
 
 /*

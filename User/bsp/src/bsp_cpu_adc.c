@@ -244,16 +244,20 @@ ADC_HandleTypeDef             AdcHandle2 = {0};
 ADC_ChannelConfTypeDef        sConfig1 = {0};
 ADC_ChannelConfTypeDef        sConfig2 = {0};
 
-/* Variable containing ADC conversions data */
-ALIGN_32BYTES (uint16_t   aADCH1ConvertedData[ADC_BUFFER_SIZE]);
-ALIGN_32BYTES (uint16_t   aADCH2ConvertedData[ADC_BUFFER_SIZE]);
+#if 1   /* 2020-07-17 修改为指针访问，腾出内存给heap */
+    /* 0x38000000  64KB */
+    uint16_t *aADCH1ConvertedData = (uint16_t *)0x38000000;
+    uint16_t *aADCH2ConvertedData = (uint16_t *)(0x38000000 + 32 * 1024);
 
-#if 1    /* 传送校准后的浮点数 */
-float g_Ch1WaveBuf[ADC_BUFFER_SIZE];
-float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
-#else    /* 传送ADC值 */
-uint16_t g_Ch1WaveBuf[ADC_BUFFER_SIZE];
-uint16_t g_Ch2WaveBuf[ADC_BUFFER_SIZE];
+    /* 0x20000000  128KB */
+    float *g_Ch1WaveBuf = (float *)0x20000000;
+    float *g_Ch2WaveBuf = (float *)(0x20000000 + 64 * 1024);
+#else
+    ALIGN_32BYTES (uint16_t   aADCH1ConvertedData[ADC_BUFFER_SIZE]);
+    ALIGN_32BYTES (uint16_t   aADCH2ConvertedData[ADC_BUFFER_SIZE]);
+
+    float g_Ch1WaveBuf[ADC_BUFFER_SIZE];
+    float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
 #endif
 
 #define SCAN_MODE_ADC1_NUM            2        /* 低速扫描模式, ADC1通道个数 */
@@ -425,7 +429,7 @@ void IRQ_WatchDog(void)
                 (avg_last < g_tDSO.TrigLevel && avg_now >= g_tDSO.TrigLevel && g_tDSO.TrigEdge == TRIG_EDGE_RISING))                
             {
                 /* Disable the ADC Analog watchdog interrupt */
-                __HAL_ADC_DISABLE_IT(hadc, ADC_IT_AWD1);
+                __HAL_ADC_DISABLE_IT(hadc, ADC_IT_AWD1);  
                 
                 /* 采样深度 */
                 if (g_tDSO.SampleSizeID < BUFF_SIZE_NUM)
@@ -499,6 +503,18 @@ void DSO_InitHard(void)
     
     DSO_SetGain(1, g_tDSO.Gain1);
     DSO_SetGain(2, g_tDSO.Gain2);
+    
+    /* V1.30 */
+    {
+        uint32_t i;
+        
+        for (i = 0; i < ADC_BUFFER_SIZE; i++)
+        {
+            g_Ch1WaveBuf[i] = 0;
+            g_Ch2WaveBuf[i] = 0;
+        }
+    }
+    
 }
 
 /*
@@ -664,6 +680,13 @@ void DSO_SetCurrGain(uint8_t _gain)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+
+void __DSO_EnableDog(void)
+{
+    HAL_NVIC_EnableIRQ(ADC_IRQn);    
+    HAL_NVIC_EnableIRQ(ADC3_IRQn); 
+}
+
 void DSO_SetTriger(void)
 {    
     ADC_AnalogWDGConfTypeDef WdgCfg;    
@@ -737,10 +760,39 @@ void DSO_SetTriger(void)
     /* NVIC configuration for ADC interrupt */
     /* Priority: high-priority */
     HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ADC_IRQn);    
+    HAL_NVIC_DisableIRQ(ADC_IRQn);    
     
     HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ADC3_IRQn);    
+    HAL_NVIC_DisableIRQ(ADC3_IRQn); 
+
+    {
+        uint32_t TransBuffSize;    /* 通信传输的采样深度- PC软件设置的 */
+        int32_t pre_time;
+        
+        if (g_tDSO.TrigMode == TRIG_MODE_NORMAL || g_tDSO.TrigMode == TRIG_MODE_SINGLE)
+        {
+            /* 采样深度 */
+            if (g_tDSO.SampleSizeID < BUFF_SIZE_NUM)
+            {
+                TransBuffSize = TabelBufSize[g_tDSO.SampleSizeID];
+            }
+            else
+            {
+                TransBuffSize = 1 * 1024;
+            }
+            
+            /* 计算预采集时间 us单位 */
+            pre_time = ((int64_t)(TransBuffSize * (g_tDSO.TrigPos) / 100) * 1000000) / TabelFreq[g_tDSO.FreqID];
+            if (pre_time == 0)
+            {
+                __DSO_EnableDog();                
+            }
+            else
+            {
+                bsp_StartHardTimer(2, pre_time, __DSO_EnableDog);    
+            }
+        }
+    }
 }
 
 /*

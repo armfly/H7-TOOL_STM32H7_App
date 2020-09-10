@@ -83,7 +83,6 @@ void bsp_Init(void)
     HC595_InitHard();   /* 配置示波器模块上的GPIO芯片 */
 
     bsp_InitDAC1();     /* 配置DAC引脚 */
-
     bsp_InitTVCC();     /* TVCC控制引脚 */
 
     bsp_InitMCP4725();  /* 示波器偏置电压 */
@@ -96,7 +95,9 @@ void bsp_Init(void)
 
     bsp_InitQSPI_W25Q256(); /* 初始化QSPI */
 
-    bsp_InitRTC(); /* 初始化时钟 */
+    bsp_InitRTC();      /* 初始化时钟 */
+    
+    bsp_InitRNG();      /* 配置启用随机数模块 */
 }
 
 /*
@@ -221,7 +222,7 @@ static void SystemClock_Config(void)
     {
         Error_Handler(__FILE__, __LINE__);
     }
-
+    
     /*
       使用IO的高速模式，要使能IO补偿，即调用下面三个函数 
       （1）使能CSI clock
@@ -233,6 +234,16 @@ static void SystemClock_Config(void)
     __HAL_RCC_SYSCFG_CLK_ENABLE();
 
     HAL_EnableCompensationCell();
+
+    /* AXI SRAM的时钟是上电自动使能的，而D2域的SRAM1，SRAM2和SRAM3要单独使能 */	
+    #if 1
+    __HAL_RCC_D2SRAM1_CLK_ENABLE();
+    __HAL_RCC_D2SRAM2_CLK_ENABLE();
+    __HAL_RCC_D2SRAM3_CLK_ENABLE();
+
+    __HAL_RCC_BKPRAM_CLKAM_ENABLE();       
+    __HAL_RCC_D3SRAM1_CLKAM_ENABLE();
+    #endif    
 }
 
 /*

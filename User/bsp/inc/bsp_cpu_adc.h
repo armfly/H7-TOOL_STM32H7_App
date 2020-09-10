@@ -91,21 +91,25 @@ typedef enum
     AN_USB_VOLT,    /* USB供电电压检测 */
 } ADC_CHAN_E;
 
-/* Definition of ADCH1 conversions data table size */
-#define ADC_BUFFER_SIZE ((uint32_t)16 * 1024) /* Size of array aADCH1ConvertedData[], Aligned on cache line size */
+
 #define DSO_PACKAGE_SIZE 1024
 
+/* Definition of ADCH1 conversions data table size */
+#define ADC_BUFFER_SIZE ((uint32_t)16 * 1024) /* Size of array aADCH1ConvertedData[], Aligned on cache line size */
+
 /* Variable containing ADC conversions data */
-extern ALIGN_32BYTES(uint16_t aADCH1ConvertedData[ADC_BUFFER_SIZE]);
-
-extern ALIGN_32BYTES(uint16_t aADCH2ConvertedData[ADC_BUFFER_SIZE]);
-
 #if 1
-extern float g_Ch1WaveBuf[ADC_BUFFER_SIZE]; /* 校准以后的值 */
-extern float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
+    extern uint16_t *aADCH1ConvertedData;
+    extern uint16_t *aADCH2ConvertedData;
+
+    extern float *g_Ch1WaveBuf; /* 校准以后的值 */
+    extern float *g_Ch2WaveBuf;
 #else
-extern uint16_t g_Ch1WaveBuf[ADC_BUFFER_SIZE];
-extern uint16_t g_Ch2WaveBuf[ADC_BUFFER_SIZE];
+    extern ALIGN_32BYTES(uint16_t aADCH1ConvertedData[ADC_BUFFER_SIZE]);
+    extern ALIGN_32BYTES(uint16_t aADCH2ConvertedData[ADC_BUFFER_SIZE]);
+
+    extern float g_Ch1WaveBuf[ADC_BUFFER_SIZE]; /* 校准以后的值 */
+    extern float g_Ch2WaveBuf[ADC_BUFFER_SIZE];
 #endif
 
 extern DSO_T g_tDSO;
