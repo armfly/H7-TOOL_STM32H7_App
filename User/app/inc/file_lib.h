@@ -68,7 +68,11 @@ void FileSystemLoad(void);
 void FileSystemUnLoad(void);
 uint8_t DeleteFile(char *_Path);
 void ListDir(char *_Path, char *_Filter);
+void ListFileToMem(char *_Path, char *_OutBuf, uint32_t _BufSize);
+uint8_t MakeDir(char *_Path);
 uint32_t ReadFileToMem(char *_Path, uint32_t _offset, char *_Buff, uint32_t _MaxLen);
+int32_t WriteFile(char *_Path, uint32_t _offset, char *_Buff, uint32_t _Len);
+
 uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, char *_Filter);
 
 uint32_t GetFileSize(char *_Path);
@@ -85,5 +89,6 @@ int32_t ReadProgIniFile(char *_LuaPath, PROG_INI_T *pIni);
 int32_t WriteProgIniFile(char *_LuaPath, PROG_INI_T *_pIni);
 void LoadProgAutorunFile(char *_OutBuff, uint32_t _BuffSize);
 void SaveProgAutorunFile(const char *_NewStr);
+uint32_t GetFileMD5(char *_Path, char *_OutMD5);
 
 #endif

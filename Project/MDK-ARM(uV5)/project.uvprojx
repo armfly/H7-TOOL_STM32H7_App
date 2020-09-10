@@ -185,6 +185,7 @@
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
             <RvdsMve>0</RvdsMve>
+            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -338,7 +339,7 @@
               <MiscControls>--locale=english</MiscControls>
               <Define>USE_HAL_DRIVER, STM32H743xx,USE_USB_HS,STM32H7,NO_HOST</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\User\st_usb\usbd_mass_storage;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app;..\..\User\daplink\source\target</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32H7xx\Include;..\..\Libraries\STM32H7xx_HAL_Driver\Inc;..\..\User\bsp\inc;..\..\User;..\..\User\bsp;..\..\User\fonts;..\..\User\images;..\..\User\app\inc;..\..\Libraries\FatFs\src;..\..\Libraries\FatFs\src\drivers;..\..\Libraries\LwIP\src\include;..\..\Libraries\LwIP\src\apps;..\..\Libraries\LwIP\system;..\..\Libraries\LwIP\phy_drv;..\..\User\lwip_if;..\..\User\lwip_http;..\..\User\lwip_tcp;..\..\Libraries\STM32_USB_Device_Library\Core\Inc;..\..\Libraries\STM32_USB_Device_Library\Class\MSC\Inc;..\..\User\modbus;..\..\User\programmer;..\..\User\lua\src;..\..\User\lua\if;..\..\User\st_usb;..\..\User\st_usb\usbd_virtual_com;..\..\User\st_usb\usbd_mass_storage;..\..\Libraries\STM32_USB_Device_Library\Class\CDC\Inc;..\..\User\daplink\source\daplink\cmsis-dap;..\..\User\daplink\source\target;..\..\User\daplink\source\family\st\stm32h7;..\..\User\daplink\source\hic_hal;..\..\User\daplink\source\daplink;..\..\User\daplink\source\hic_hal\stm32\stm32h750;..\..\User\daplink\source\rtos_none;..\..\User\daplink\source\daplink\interface;..\..\User\daplink\source\daplink\settings;..\..\User\daplink\source\usb;..\..\User\teeny_usb\usb_stack\inc;..\..\User\teeny_usb\usb_stack\class;..\..\User\teeny_usb\usb_app;..\..\User\daplink\source\target;..\..\User\encrypt_lib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -351,7 +352,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <uClangAs>0</uClangAs>
+            <ClangAsOpt>4</ClangAsOpt>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -759,6 +760,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_ext_io.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1023,6 +1029,11 @@
               <FileName>stm32h7xx_hal_crc_ex.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_crc_ex.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32h7xx_hal_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Libraries\STM32H7xx_HAL_Driver\Src\stm32h7xx_hal_rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1519,20 +1530,25 @@
               <FileType>5</FileType>
               <FilePath>..\..\User\modbus\modbus_reg_addr.h</FilePath>
             </File>
+            <File>
+              <FileName>modbus_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\modbus\modbus_file.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Programmer</GroupName>
           <Files>
             <File>
-              <FileName>prog_if.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\programmer\prog_if.c</FilePath>
-            </File>
-            <File>
               <FileName>elf_file.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\elf_file.c</FilePath>
+            </File>
+            <File>
+              <FileName>prog_if.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\prog_if.c</FilePath>
             </File>
             <File>
               <FileName>falsh_error.c</FileName>
@@ -1573,6 +1589,16 @@
               <FileName>edc_crc_a.asm</FileName>
               <FileType>2</FileType>
               <FilePath>..\..\User\programmer\edc_crc_a.asm</FilePath>
+            </File>
+            <File>
+              <FileName>swd_prog_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\swd_prog_file.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm8_prog_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\stm8_prog_file.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1801,6 +1827,11 @@
           <GroupName>Lua_IF</GroupName>
           <Files>
             <File>
+              <FileName>lua_if_swd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\lua\if\lua_if_swd.c</FilePath>
+            </File>
+            <File>
               <FileName>lua_if.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\..\User\lua\if\lua_if.h</FilePath>
@@ -1844,11 +1875,6 @@
               <FileName>lua_if_fatfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\lua\if\lua_if_fatfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>lua_if_swd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\lua\if\lua_if_swd.c</FilePath>
             </File>
             <File>
               <FileName>lua_if_adc.c</FileName>
@@ -2176,7 +2202,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2265,7 +2291,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2404,7 +2430,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2488,7 +2514,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2597,7 +2623,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2701,7 +2727,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
-                <uClangAs>2</uClangAs>
+                <ClangAsOpt>0</ClangAsOpt>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2734,6 +2760,21 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Encrypt</GroupName>
+          <Files>
+            <File>
+              <FileName>md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\encrypt_lib\md5.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc32_stm32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\encrypt_lib\crc32_stm32.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
   </Targets>
@@ -2743,5 +2784,20 @@
     <components/>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>&lt;Project Info&gt;</LayName>
+        <LayDesc></LayDesc>
+        <LayUrl></LayUrl>
+        <LayKeys></LayKeys>
+        <LayCat></LayCat>
+        <LayLic></LayLic>
+        <LayTarg>0</LayTarg>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

@@ -4,6 +4,7 @@
 #include "file_lib.h"
 #include "main.h"
 #include "prog_if.h"
+#include "crc32_stm32.h"
 
 /* 
 
@@ -201,6 +202,33 @@ void lua_abort(void)
 	s_lua_quit = 1;
 }
 
+/*
+判断lua中变量是否存在
+basic types
+#define LUA_TNONE		(-1)
+
+#define LUA_TNIL		0
+#define LUA_TBOOLEAN		1
+#define LUA_TLIGHTUSERDATA	2
+#define LUA_TNUMBER		3
+#define LUA_TSTRING		4
+#define LUA_TTABLE		5
+#define LUA_TFUNCTION		6
+#define LUA_TUSERDATA		7
+#define LUA_TTHREAD		8
+
+#define LUA_NUMTAGS		9
+*/
+int lua_CheckGlobal(const char *name)
+{
+    int re;
+    
+    re = lua_getglobal(g_Lua, name);
+    lua_pop(g_Lua, 1);
+    
+    return re;
+}
+                
 // 装载文件并初始化lua全局对象
 void lua_DownLoadFile(char *_path)
 {
@@ -223,15 +251,8 @@ void lua_DownLoadFile(char *_path)
 void lua_do(char *buf)
 {
     int re;
-	static int s_run = 0;   /* 避免重入 */
+
     static const char *str;    
-
-	if (s_run > 0)
-	{
-		return;
-	}
-
-	s_run = 1;
 
     while(bsp_GetKey2());   /* 读空按键FIFO, */
     
@@ -252,15 +273,13 @@ void lua_do(char *buf)
 		lua_pop(g_Lua, 1); //将错误信息出栈        
 	}
 
-    /* 显示Lua程序print的字符串. 内容在bsp_uart_fif文件 fputc 函数填充的 */
+    /* 显示Lua程序print的字符串. 内容在bsp_uart_fifo文件 fputc 函数填充的 */
     if (g_LuaMemo.Refresh == 1)     
     {
         LCD_SetEncode(ENCODE_GBK);
         LCD_DrawMemo(&g_LuaMemo);            
         LCD_SetEncode(ENCODE_UTF8);
     } 
-        
-    s_run = 0;
 }
 
 // 通信程序用的函数，下载文件到lua程序缓冲区，不执行。
@@ -270,21 +289,27 @@ void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_
     
     for (i = 0; i < _len; i++)
     {
-        if (_addr < LUA_PROG_LEN_MAX)
+        if (_addr + i < LUA_PROG_LEN_MAX)
         {
             s_lua_prog_buf[_addr + i] = _buf[i];
         }
     }
     
-    s_lua_prog_len = _total_len;
-    s_lua_prog_buf[s_lua_prog_len] = 0;
-    
-    if (g_Lua > 0)
+    if (_total_len < LUA_PROG_LEN_MAX)
     {
-        lua_DeInit();
+        s_lua_prog_len = _total_len;
+        s_lua_prog_buf[s_lua_prog_len] = 0;
     }
-    lua_Init();
-
+    else
+    {
+        s_lua_prog_len = 0;
+    }
+    
+//    if (g_Lua > 0)
+//    {
+//        lua_DeInit();
+//    }
+//    lua_Init();
 }
 
 void lua_Poll(void)
@@ -463,6 +488,120 @@ static int delayms(lua_State* L)
 
 /*
 *********************************************************************************************************
+*    函 数 名: HexToTable
+*    功能说明: HEX格式的string转换为table返回。用于lua api  "0800 0123" --> {0x0800, 0x0123}
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int HexToTable(lua_State* L)
+{
+    const char *data;
+    size_t len;
+    int i;
+    uint32_t temp;
+    uint32_t start;
+    uint16_t cnt = 0;
+    
+    if (lua_type(L, 1) == LUA_TSTRING)          /* 判断第1个参数 */
+    {        
+        data = luaL_checklstring(L, 1, &len);   /* 1是参数的位置， len是string的长度 */     
+    }    
+    else
+    {
+        return 0;
+    }
+    
+    temp = 0;
+    for (i = 0; i < len; i++)
+    {
+        if (data[i] == ' ')
+        {
+            if (start == 1)
+            {
+                cnt++;
+                lua_pushnumber(L, temp);    /* 添加返回值 */
+                
+                start = 0;
+                temp = 0;
+            }
+        }
+        else
+        {
+            start = 1;
+            
+            temp = temp * 16;
+            temp += CharToInt(data[i]);            
+        }
+    }
+
+    if (start == 1)
+    {
+        cnt++;
+        lua_pushnumber(L, temp);    /* 添加返回值 */
+    }
+    
+    return cnt;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: HexToLuaString
+*    功能说明: HEX格式的string转换为二进制string返回。用于lua api  "0800 0123" --> 0x08 0x00, 0x01 0x23
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int HexToBinString(lua_State* L)
+{
+    const char *data;
+    size_t len;
+    int i;
+    uint32_t temp;
+    uint32_t start;
+    uint16_t cnt = 0;
+    
+    if (lua_type(L, 1) == LUA_TSTRING)          /* 判断第1个参数 */
+    {        
+        data = luaL_checklstring(L, 1, &len);   /* 1是参数的位置， len是string的长度 */     
+    }
+    else
+    {
+        return 0;
+    }
+    
+    temp = 0;
+    start = 0;
+    for (i = 0; i < len; i++)
+    {
+        if ( (data[i] >= '0' && data[i] <= '9') || (data[i] >= 'A' && data[i] <= 'F') 
+            || (data[i] >= 'a' && data[i] <= 'f') )
+        {
+            if (start == 0)
+            {
+                temp = CharToInt(data[i]) * 16;
+                start = 1;
+            }
+            else
+            {
+                start = 0;
+                temp += CharToInt(data[i]);
+                
+                if (cnt < LUA_READ_LEN_MAX)
+                {
+                    s_lua_read_buf[cnt++] = temp;
+                }
+            }       
+        }
+    }
+    
+    lua_pushlstring(L, (char *)s_lua_read_buf, cnt); 
+    
+    return 1;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: print_hex
 *    功能说明: 打印二进制数据    print_hex("123", 16)  print_hex("123", 16, 0x08000000)
 *    形    参: 第1个是二进制数据，第2个是换行位置(缺省16)
@@ -559,6 +698,7 @@ static int print_hex(lua_State* L)
             ch = *data++;  
             addr++;
             
+  
             buf[pos++] = BcdToChar(ch >> 4);
             buf[pos++] = BcdToChar(ch & 0x0F);
             buf[pos++] = ' ';
@@ -595,6 +735,7 @@ static int print_hex(lua_State* L)
     
     return 1;
 }
+
 
 /*
 *********************************************************************************************************
@@ -792,6 +933,66 @@ static int load_file(lua_State* L)
     return 0;
 }
 
+/*
+*********************************************************************************************************
+*    函 数 名: get_rng
+*    功能说明: 获得随机数
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int get_rng(lua_State* L)
+{
+    uint16_t len;
+
+    if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 : 随机数长度 */
+    {
+        len = luaL_checknumber(L, 1);
+    }
+
+    if (len > 1024)
+    {
+        len = 1024;
+    }
+    
+    bsp_GenRNG(s_lua_read_buf, len);    
+
+    lua_pushlstring(L, (char *)s_lua_read_buf, len); 
+    return 1;
+}
+
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: crc32_stm32
+*    功能说明: 计算CRC32，用STM32硬件CRC单元.  
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int crc32_stm32(lua_State* L)
+{
+    const char *data;
+    size_t len;    
+    uint32_t temp;
+    uint32_t crc;
+    
+    if (lua_type(L, 1) == LUA_TSTRING)          /* 判断第1个参数 */
+    {        
+        data = luaL_checklstring(L, 1, &len);   /* 1是参数的位置， len是string的长度 */     
+    }
+
+    if (lua_type(L, 2) == LUA_TNUMBER)          /* 判断第2个参数 */
+    {        
+        temp = luaL_checknumber(L, 2);  
+    }    
+    
+    crc = STM32_CRC32_LE((uint8_t *)data, len, temp);
+    
+    lua_pushnumber(L, crc); 
+    return 1;
+}
 
 /*
 *********************************************************************************************************
@@ -809,6 +1010,9 @@ static void lua_RegisterFunc(void)
     lua_register(g_Lua, "delayus", delayus);
     lua_register(g_Lua, "delayms", delayms);
     lua_register(g_Lua, "print_hex", print_hex);
+    lua_register(g_Lua, "hex_to_table", HexToTable);
+    lua_register(g_Lua, "hex_to_bin", HexToBinString);    
+        
     lua_register(g_Lua, "write_clock", write_clock);
     lua_register(g_Lua, "read_clock", read_clock);
     lua_register(g_Lua, "get_runtime", get_runtime);
@@ -816,8 +1020,11 @@ static void lua_RegisterFunc(void)
     lua_register(g_Lua, "get_key", get_key);
     lua_register(g_Lua, "put_key", put_key);
     lua_register(g_Lua, "clear_key", clear_key);
-    
+        
     lua_register(g_Lua, "load_file", load_file);
+    
+    lua_register(g_Lua, "get_rng", get_rng);
+    lua_register(g_Lua, "crc32_stm32", crc32_stm32);
     
     /* 注册接口函数 */
     lua_gpio_RegisterFun();    

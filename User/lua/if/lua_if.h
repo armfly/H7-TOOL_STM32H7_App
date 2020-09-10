@@ -41,9 +41,6 @@
 
 #define LUA_READ_LEN_MAX    (4 * 1024)
 
-//#define LUA_ERR_PRINT(...)
-#define LUA_ERR_PARAM_PRINT     printf
-
 void lua_Test(void);
 void lua_Init(void);
 void lua_DeInit(void);
@@ -52,7 +49,7 @@ void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_
 void lua_Run(void);
 uint8_t lua_66H_Write(uint32_t _addr, uint8_t *_buf, uint32_t _len);
 uint8_t lua_67H_Read(uint32_t _addr, uint8_t *_buf, uint32_t _len);
-
+int lua_CheckGlobal(const char *name);
 void lua_do(char *buf);
 void lua_DownLoadFile(char *_path);
 

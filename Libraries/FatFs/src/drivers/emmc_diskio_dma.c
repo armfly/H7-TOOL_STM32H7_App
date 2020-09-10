@@ -249,7 +249,6 @@ DRESULT SD_write(BYTE lun, const BYTE *buff, DWORD sector, UINT count)
   SCB_CleanDCache_by_Addr((uint32_t*)alignedAddr, count*BLOCKSIZE + ((uint32_t)buff - alignedAddr));
 #endif
 
-
   if(BSP_MMC_WriteBlocks_DMA((uint32_t*)buff,
                             (uint32_t)(sector),
                             count) == MMC_OK)

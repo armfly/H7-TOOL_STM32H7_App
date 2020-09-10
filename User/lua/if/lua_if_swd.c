@@ -38,6 +38,7 @@ static int h7_ProgBuf(lua_State* L);
 static int h7_ProgBuf_OB(lua_State* L);
 static int h7_Read_OptionBytes(lua_State* L);
 static int h7_reset(lua_State* L);
+static int h7_reset_pin(lua_State* L);
 static int h7_DetectIC(lua_State* L);
 static int h7_PrintText(lua_State* L);
 static int h7_EraseChip(lua_State* L);
@@ -82,14 +83,16 @@ void lua_swd_RegisterFun(void)
     lua_register(g_Lua, "pg_write8", h7swd_Write8);    
     lua_register(g_Lua, "pg_read8", h7swd_Read8);
     
-    lua_register(g_Lua, "pg_get_ext_id", h7swd_ReadExtID);     
-        
+    lua_register(g_Lua, "pg_get_ext_id", h7swd_ReadExtID);       
+
+
     lua_register(g_Lua, "pg_load_algo_file", h7_LoadAlgoFile);
     lua_register(g_Lua, "pg_prog_file", h7_ProgFile);
     lua_register(g_Lua, "pg_prog_buf", h7_ProgBuf);
     lua_register(g_Lua, "pg_prog_buf_ob", h7_ProgBuf_OB);
     lua_register(g_Lua, "pg_read_ob", h7_Read_OptionBytes);    
     lua_register(g_Lua, "pg_reset", h7_reset);
+    lua_register(g_Lua, "pg_reset_pin", h7_reset_pin);    
     lua_register(g_Lua, "pg_detect_ic", h7_DetectIC);
     lua_register(g_Lua, "pg_erase_chip", h7_EraseChip);   
     lua_register(g_Lua, "pg_erase_sector", h7_EraseSector);       
@@ -101,6 +104,8 @@ void lua_swd_RegisterFun(void)
     lua_register(g_Lua, "pg_reload_var", h7_ReloadLuaVar);
     
     lua_register(g_Lua, "pg_read_c_var", h7_ReadCVar);
+    
+    
 }
 
 /*
@@ -111,7 +116,7 @@ void lua_swd_RegisterFun(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-extern uint8_t PG_LuaUidSnUsr(void);
+extern uint8_t PG_LuaFixData(void);
 static int h7_ReloadLuaVar(lua_State* L)
 {
     const char *pVarName;
@@ -121,14 +126,18 @@ static int h7_ReloadLuaVar(lua_State* L)
     {
         pVarName = luaL_checklstring(L, 1, &len);   /* 1是参数的位置， len是string的长度 */   
             
-        if (strcmp(pVarName, "UidSnUsr") == 0)
+        if (strcmp(pVarName, "FixData") == 0)
         {
-            PG_LuaUidSnUsr(); 
+            PG_LuaFixData(); 
         }
         else if (strcmp(pVarName, "ChipInfo") == 0)
         {
             PG_ReloadLuaVar();
-        }    
+        }
+        else if (strcmp(pVarName, "StarPorgTime") == 0)
+        {
+            g_tProg.Time = bsp_GetRunTime();    /* 记录开始时间 */
+        }         
     }
     else
     {
@@ -158,6 +167,14 @@ static int h7_ReadCVar(lua_State* L)
         {
             lua_pushnumber(L, g_gMulSwd.MultiMode);   
         }
+        else if (strcmp(pVarName, "ToolSn") == 0)
+        {
+            lua_pushnumber(L, g_tParam.ToolSn);   
+        }
+        else if (strcmp(pVarName, "FactoryId") == 0)
+        {
+            lua_pushnumber(L, g_tParam.FactoryId);   
+        }         
         else
         {
             lua_pushnumber(L, 0);    /* 出错 */
@@ -204,7 +221,7 @@ static int h7swd_Init(lua_State* L)
         ;
     }
             
-    return 1;
+    return 0;
 }
 
 /*
@@ -698,10 +715,18 @@ static int h7swd_Read32(lua_State* L)
             }
 
             lua_pushnumber(L, *(uint32_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 3 * num));
-            
+            if (g_gMulSwd.MultiMode >= 2)
+            {
+                lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + num));
+            }
+            if (g_gMulSwd.MultiMode >= 3)
+            {            
+                lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 2 * num));
+            }
+            if (g_gMulSwd.MultiMode >= 4)
+            {            
+                lua_pushnumber(L, *(uint32_t *)(s_lua_read_buf + 3 * num));
+            }
             if (err == 1)
             {
                 lua_pushnumber(L, 0);    /* 出错 */
@@ -710,7 +735,7 @@ static int h7swd_Read32(lua_State* L)
             {
                 lua_pushnumber(L, 1);    /* 成功 */
             }            
-            return 5;
+            return g_gMulSwd.MultiMode + 1;
         }
         else
         {            
@@ -793,9 +818,9 @@ static int h7swd_Read16(lua_State* L)
             }
 
             lua_pushnumber(L, *(uint16_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 3 * num));
+            if (g_gMulSwd.MultiMode >= 2) lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + num));
+            if (g_gMulSwd.MultiMode >= 3) lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 2 * num));
+            if (g_gMulSwd.MultiMode >= 4) lua_pushnumber(L, *(uint16_t *)(s_lua_read_buf + 3 * num));
             
             if (err == 1)
             {
@@ -805,7 +830,7 @@ static int h7swd_Read16(lua_State* L)
             {
                 lua_pushnumber(L, 1);    /* 成功 */
             }            
-            return 5;
+            return g_gMulSwd.MultiMode + 1;
         }
         else
         {            
@@ -888,9 +913,9 @@ static int h7swd_Read8(lua_State* L)
             }
 
             lua_pushnumber(L, *(uint8_t *)s_lua_read_buf);
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + num));
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 2 * num));
-            lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 3 * num));
+            if (g_gMulSwd.MultiMode >= 2) lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + num));
+            if (g_gMulSwd.MultiMode >= 3) lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 2 * num));
+            if (g_gMulSwd.MultiMode >= 4) lua_pushnumber(L, *(uint8_t *)(s_lua_read_buf + 3 * num));
             
             if (err == 1)
             {
@@ -900,7 +925,7 @@ static int h7swd_Read8(lua_State* L)
             {
                 lua_pushnumber(L, 1);    /* 成功 */
             }            
-            return 5;
+            return g_gMulSwd.MultiMode + 1;
         }
         else
         {            
@@ -1048,7 +1073,7 @@ static int h7_LoadAlgoFile(lua_State* L)
 /*
 *********************************************************************************************************
 *    函 数 名: h7_ProgFile
-*    功能说明: 开始编程，从文件读取数据
+*    功能说明: 开始编程，从文件读取数据。 
 *    形    参: file_path 数据文件名称, 目标flash地址
 *    返 回 值: 0 失败   1 成功
 *********************************************************************************************************
@@ -1058,8 +1083,15 @@ static int h7_ProgFile(lua_State* L)
     const char *file_name;
     size_t len = 0;
     uint32_t FlashAddr;
+    uint32_t EndAddr;
+    uint32_t CtrlByte;
+	uint32_t FileIndex = 0;
     
-    if (lua_type(L, 1) == LUA_TSTRING)     /* 判断第1个参数 */
+    /*
+        lua调用:
+        pg_prog_file(TaskList[i + 1], TaskList[i + 2], EndAddress, TaskList[i + 3])
+    */
+    if (lua_type(L, 1) == LUA_TSTRING)      /* 判断第1个参数 */
     {        
         file_name = luaL_checklstring(L, 1, &len); /* 1是参数的位置， len是string的长度 */   
     }
@@ -1069,7 +1101,7 @@ static int h7_ProgFile(lua_State* L)
         return 1;
     }
     
-    if (lua_type(L, 2) == LUA_TNUMBER) /* 判断第2个参数 */
+    if (lua_type(L, 2) == LUA_TNUMBER)      /* 判断第2个参数 */
     {
         FlashAddr = luaL_checknumber(L, 2);       
     }
@@ -1078,10 +1110,40 @@ static int h7_ProgFile(lua_State* L)
         lua_pushnumber(L, 0);    /* 出错 */
         return 1;
     } 
+
+    if (lua_type(L, 3) == LUA_TNUMBER)      /* 判断第3个参数 - 结束地址 */
+    {
+        EndAddr = luaL_checknumber(L, 3);       
+    }
+    else
+    {
+        lua_pushnumber(L, 0);    /* 出错 */
+        return 1;
+    } 
+    
+    if (lua_type(L, 4) == LUA_TNUMBER)      /* 判断第4个参数 - 控制字节， bit0表示滚码是否在本次烧录中写入 */
+    {
+        CtrlByte = luaL_checknumber(L, 4);       
+    }
+    else
+    {
+        lua_pushnumber(L, 0);    /* 出错 */
+        return 1;
+    }    
+
+    if (lua_type(L, 5) == LUA_TNUMBER)      /* 判断第5个参数 - 文件序号 */
+    {
+        FileIndex = luaL_checknumber(L, 5);       
+    }
+    else
+    {
+        lua_pushnumber(L, 0);    /* 出错 */
+        return 1;
+    }  
        
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {    
-        if (PG_SWD_ProgFile((char *)file_name, FlashAddr) == 0)
+        if (PG_SWD_ProgFile((char *)file_name, FlashAddr, EndAddr, CtrlByte, FileIndex) == 0)
         {
             lua_pushnumber(L, 1);    /*OK */
         }
@@ -1092,7 +1154,7 @@ static int h7_ProgFile(lua_State* L)
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)
     {
-        if (PG_SWIM_ProgFile((char *)file_name, FlashAddr) == 0)
+        if (PG_SWIM_ProgFile((char *)file_name, FlashAddr, EndAddr, CtrlByte, FileIndex) == 0)
         {
             lua_pushnumber(L, 1);    /*OK */
         }
@@ -1131,9 +1193,12 @@ static int h7_reset(lua_State* L)
         delay = 20;     /* 没有形参，则用20ms */
     } 
     
+    printf("hardware reset %dms\r\n", delay);
+    
     /* 硬件复位 */
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
+
         MUL_swd_set_target_reset(1);
         osDelay(delay);
         MUL_swd_set_target_reset(0);
@@ -1152,6 +1217,40 @@ static int h7_reset(lua_State* L)
 
 /*
 *********************************************************************************************************
+*    函 数 名: h7_reset_pin
+*    功能说明: 执行硬件复位
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int h7_reset_pin(lua_State* L)
+{   
+    uint32_t state;
+        
+    if (lua_type(L, 1) == LUA_TNUMBER) /* 判断第1个参数 */
+    {
+        state = luaL_checknumber(L, 1);       
+    }
+    else
+    {
+        return 0;
+    }    
+    
+    /* 硬件复位 */
+    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+    {
+        MUL_swd_set_target_reset(state);
+    }
+    else        
+    {
+        swd_set_target_reset(state);
+    }    
+    return 0;
+}
+
+
+/*
+*********************************************************************************************************
 *    函 数 名: h7_DetectIC
 *    功能说明: 检测CPU ID
 *    形    参: 无
@@ -1160,61 +1259,79 @@ static int h7_reset(lua_State* L)
 */
 static int h7_DetectIC(lua_State* L)
 {
+    uint32_t mode = 0;
+        
+    if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 */
+    {
+        mode = luaL_checknumber(L, 1);  /* 1表示仅用于检测芯片插入状态, 无需检测3次 */      
+    }
+    
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {            
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
             uint8_t i;
-            uint32_t id[4] = {0};
+            uint32_t id[4] = {0}; 
             
-            sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */            
-            for (i = 0; i < 3; i++)
+            if (mode == 1)  /* 仅仅用于识别芯片是否在位 */
             {
-                bsp_DelayUS(5 * 1000);     /* 延迟5ms */
-                
+                //MUL_swd_detect_core(id);
                 MUL_swd_init_debug();           /* 进入swd debug状态 */
-                
-                if (MUL_swd_read_idcode(id) == 0)
-                {
-                    //id = 0;     /* 出错继续检测 */
-                }
-                else
-                {
-                    break;            
-                }   
+                MUL_swd_read_idcode(id);
             }
-        
+            else    /* 用于可靠识别芯片ID */
+            {            
+                sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */            
+                for (i = 0; i < 3; i++)
+                {               
+                    MUL_swd_init_debug();           /* 进入swd debug状态 */
+                    
+                    if (MUL_swd_read_idcode(id) == 0)
+                    {
+                        //id = 0;     /* 出错继续检测 */
+                    }
+                    else
+                    {
+                        break;            
+                    }
+                    bsp_DelayUS(5 * 1000);     /* 延迟5ms */                
+                }            
+            }
             lua_pushnumber(L, id[0]);    /* 成功,返回ID */
             lua_pushnumber(L, id[1]);    /* 成功,返回ID */
             lua_pushnumber(L, id[2]);    /* 成功,返回ID */
             lua_pushnumber(L, id[3]);    /* 成功,返回ID */            
-            return 4;  
+            return 4;            
         }
         else
         {            
             uint8_t i;
             uint32_t id = 0;
             
-            for (i = 0; i < 3; i++)
+            if (mode == 1)  /* 仅仅用于识别芯片是否在位 */
             {
-                sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */
-            
-                bsp_DelayUS(5 * 1000);     /* 延迟10ms */
-                
-                swd_init_debug();           /* 进入swd debug状态 */
-                
-                if (swd_read_idcode(&id) == 0)
-                {
-                    id = 0;     /* 出错继续检测 */
-                }
-                else
-                {
-                    break;            
-                }   
+                swd_detect_core(&id);
             }
-        
+            else    /* 用于可靠识别芯片ID */
+            {                  
+                sysTickInit();    /* 这是DAP驱动中的初始化函数,全局变量初始化 */
+                for (i = 0; i < 3; i++)
+                {           
+                    swd_init_debug();           /* 进入swd debug状态 */
+                    
+                    if (swd_read_idcode(&id) == 0)
+                    {
+                        id = 0;     /* 出错继续检测 */
+                    }
+                    else
+                    {
+                        break;            
+                    }
+                    bsp_DelayUS(5 * 1000);     /* 延迟5ms */
+                }
+            }            
             lua_pushnumber(L, id);    /* 成功,返回ID */
-            return 1;          
+            return 1;            
         }
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8) 
@@ -1422,7 +1539,14 @@ static int h7_ProgBuf_OB(lua_State* L)
                 {
                     DataBuf2[len++] = ~DataBuf2[len - 2];
                 }
-            }            
+            }
+            else if (Address == 0xFFFFFFFD)          /* 遇到0xFFFFFFFD,则插入前第4个数据取反的数据 */
+            {
+                if (len >= 4)
+                {
+                    DataBuf2[len++] = ~DataBuf2[len - 4];
+                }
+            }             
             else
             {    
                 DataBuf2[len++] = *pData++;                 
@@ -1473,6 +1597,9 @@ static int h7_Read_OptionBytes(lua_State* L)
     size_t AddrLen = 0;
     uint8_t err = 0;
     uint16_t len = 0;
+    uint8_t OneByteMode = 0;
+    uint16_t offset = 0;
+    uint8_t ByteBuf[4] = {0};   
     
     if (lua_type(L, 1) == LUA_TSTRING)              /* 判断第1个参数 */
     {
@@ -1490,6 +1617,17 @@ static int h7_Read_OptionBytes(lua_State* L)
         lua_pushnumber(L, 0);    /* 出错 */
         return 1;
     }
+    
+    /* 如果有第2个参数，则返回1个字节 */
+    if (lua_type(L, 2) == LUA_TNUMBER)      /* 判断第3个参数 */
+    {
+        offset = luaL_checknumber(L, 2);  
+        OneByteMode = 1;    /* 单字节模式 */    
+    }
+    else
+    {
+        OneByteMode = 0;    /* 完整数据 */
+    }    
         
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
@@ -1512,6 +1650,11 @@ static int h7_Read_OptionBytes(lua_State* L)
             {
                 TempAddr = LastAddress + 1;
                 LastAddress++;
+            }
+            else if (Address == 0xFFFFFFFD)         /* 遇到0xFFFFFFFD,则插入前第4个数据取反的数据 */
+            {
+                TempAddr = LastAddress + 4;
+                LastAddress++;
             }            
             else
             {
@@ -1532,13 +1675,32 @@ static int h7_Read_OptionBytes(lua_State* L)
                 s_lua_read_buf[1 * MUL_BUF_STEP + len] = buf[1];
                 s_lua_read_buf[2 * MUL_BUF_STEP + len] = buf[2];
                 s_lua_read_buf[3 * MUL_BUF_STEP + len] = buf[3];
+
+                if (OneByteMode == 1)   /* 单字节模式 */
+                {
+                    if (len == offset)
+                    {
+                        ByteBuf[0] = buf[0];
+                        ByteBuf[1] = buf[1];
+                        ByteBuf[2] = buf[2];
+                        ByteBuf[3] = buf[3];
+                    }
+                }                
             }
-            else
+            else    /* 单路模式 */
             {
                 if (swd_read_memory(TempAddr, &s_lua_read_buf[len], 1) == 0)
                 {
                     err = 1;
                     break;
+                }
+                
+                if (OneByteMode == 1)   /* 单字节模式 */
+                {
+                    if (len == offset)
+                    {
+                        ByteBuf[0] = s_lua_read_buf[len];
+                    }
                 }
             }
             len++;            
@@ -1558,7 +1720,7 @@ static int h7_Read_OptionBytes(lua_State* L)
                             
             if (Address == 0xFFFF)          /* 遇到0xFFFFFFFF,则插入一个取反的数据 */
             {
-                if (SWIM_ReadBuf(LastAddress + 1, &s_lua_read_buf[len++], 1) == 0)
+                if (SWIM_ReadBuf(LastAddress + 1, &s_lua_read_buf[len], 1) == 0)
                 {
                     err = 1;
                     break;
@@ -1566,13 +1728,22 @@ static int h7_Read_OptionBytes(lua_State* L)
             }
             else
             {
-                if (SWIM_ReadBuf(Address, &s_lua_read_buf[len++], 1) == 0)
+                if (SWIM_ReadBuf(Address, &s_lua_read_buf[len], 1) == 0)
                 {
                     err = 1;
                     break;
                 }
                 LastAddress = Address;               
             }
+                        
+            if (OneByteMode == 1)   /* 单字节模式 */
+            {
+                if (len == offset)
+                {
+                    ByteBuf[0] = s_lua_read_buf[len];
+                }
+            }            
+            len++;
         }        
     }
     else
@@ -1591,15 +1762,38 @@ static int h7_Read_OptionBytes(lua_State* L)
 
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
-        lua_pushlstring(L, (char *)(s_lua_read_buf + 0 * MUL_BUF_STEP), len); 
-        lua_pushlstring(L, (char *)(s_lua_read_buf + 1 * MUL_BUF_STEP), len); 
-        lua_pushlstring(L, (char *)(s_lua_read_buf + 2 * MUL_BUF_STEP), len); 
-        lua_pushlstring(L, (char *)(s_lua_read_buf + 3 * MUL_BUF_STEP), len); 
+        if (OneByteMode == 1)   /* 单字节模式 */
+        {       
+            s_lua_read_buf[0] = ByteBuf[0];
+            s_lua_read_buf[1] = ByteBuf[1];
+            s_lua_read_buf[2] = ByteBuf[2];            
+            s_lua_read_buf[3] = ByteBuf[3];                        
+            
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 0 * 1), 1); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 1 * 1), 1); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 2 * 1), 1); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 3 * 1), 1);
+        }
+        else    /* 完整模式 */
+        {
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 0 * MUL_BUF_STEP), len); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 1 * MUL_BUF_STEP), len); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 2 * MUL_BUF_STEP), len); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 3 * MUL_BUF_STEP), len);            
+        }
         return 5;         
     }
     else
     {    
-        lua_pushlstring(L, (char *)s_lua_read_buf, len);
+        if (OneByteMode == 1)   /* 单字节模式 */
+        {
+            s_lua_read_buf[0] = ByteBuf[0];
+            lua_pushlstring(L, (char *)s_lua_read_buf, 1);
+        }
+        else    /* 完整模式 */
+        {
+            lua_pushlstring(L, (char *)s_lua_read_buf, len);
+        }
         return 2;         
     }
    
@@ -1769,13 +1963,13 @@ static int h7swd_ReadExtID(lua_State* L)
             id = 0;
         }
         
-        id = target_flash_init(0x90000000);
+        id = target_flash_init(0x90000000, 0, FLM_INIT_ERASE);
 
         /* SWD进入debug状态 */
         target_flash_enter_debug_program();
         /* 装载算法代码到目标机内存 */
         LoadAlgoToTarget();
-        target_flash_init(0x90000000);
+        target_flash_init(0x90000000, 0, FLM_INIT_ERASE);
         
         id = target_flash_read_extid(0x90000000);
     
@@ -1800,6 +1994,5 @@ static int h7swd_ReadExtID(lua_State* L)
     }
     return 1;
 }
-
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

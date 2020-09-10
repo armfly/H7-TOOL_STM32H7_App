@@ -135,6 +135,7 @@ void status_SystemSetMain(void)
                 case KEY_LONG_DOWN_C: /* C键长按 */
                     PlayKeyTone();
                     s_enter_sub_menu = 0;
+                                
                     g_MainStatus = MS_EXTEND_MENU1;
                     break;
 

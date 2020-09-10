@@ -230,15 +230,18 @@ uint8_t *USBD_MSC_SerialStrDescriptor(USBD_SpeedTypeDef speed,
 {
 	printf_ok("%d, USBD_MSC_SerialStrDescriptor \r\n", bsp_GetRunTime());
 
-    /* 临时代码.  USB MSC枚举，必须暂停几秒再继续，才能成功。以后再查原因 */
-    {
-        static int32_t s_time = 0;    
-        if (bsp_CheckRunTime(s_time) > 5000)
-        {
-            bsp_DelayUS(10 * 1000 * 1000);  /* 等待10秒 */
-        }
-        s_time = bsp_GetRunTime();
-    }
+    /* 	
+		临时代码.  USB MSC枚举，必须暂停几秒再继续，才能成功。以后再查原因 
+		升级固件库后无此问题了，屏蔽到如下代码
+	*/
+//    {
+//        static int32_t s_time = 0;    
+//        if (bsp_CheckRunTime(s_time) > 5000)
+//        {
+//            bsp_DelayUS(10 * 1000 * 1000);  /* 等待10秒 */
+//        }
+//        s_time = bsp_GetRunTime();
+//    }
     
 	*length = USB_SIZ_STRING_SERIAL;
 

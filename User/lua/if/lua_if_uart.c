@@ -21,6 +21,9 @@
 #include "bsp.h"
 #include "modbus_slave.h"
 
+#define LUA_ERR_PARAM_PRINT(...)
+//#define LUA_ERR_PARAM_PRINT     printf
+
 #define VALID_PORT(x) (x ==  COM1 || x ==  COM4 || x ==  COM7 || x ==  COM8)
 
 #define WRITE_REG_MAX_NUM   16      /* 写保持寄存器最大个数 */

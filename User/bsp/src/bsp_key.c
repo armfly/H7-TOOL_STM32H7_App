@@ -245,7 +245,7 @@ void bsp_PutKey(uint8_t _KeyCode)
         uint8_t key;
         
         key = ((_KeyCode - 1) % KEY_MSG_STEP) + 1;
-        if (key == KEY_1_UP || key == KEY_1_LONG_UP)
+        if (key == KEY_1_UP || key == KEY_1_LONG_UP || KEY_1_AUTO_UP | KEY_1_DB_UP)
         {
             s_LcdOn = 1;            
             g_LcdSleepReq = 2;    /* 控制LCD唤醒, 在bsp_Idle执行. 不可以在此调用 LCD_DispOff() */
@@ -537,6 +537,26 @@ void bsp_KeyScan10ms(void)
             s_LcdOn = 0;                /* 屏幕关闭 */
         }
     }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_LcdSleepEnable
+*    功能说明: 背光关闭功能使能控制。应用: 脱机烧录如果超过1分钟，中途会关闭背光。
+*    形    参: _mode : 0表示临时屏蔽背光控制  1表示恢复背光控制
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_LcdSleepEnable(uint8_t _mode)
+{
+    if (_mode == 0)
+    {
+        s_KeyTimeOutCount = 0;
+    }
+    else if (_mode == 1)
+    {
+        s_KeyTimeOutCount = GetSleepTimeMinute() * 60 * 100u;  /* 10ms单位 */
+    }    
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

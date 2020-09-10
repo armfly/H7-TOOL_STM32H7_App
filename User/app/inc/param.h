@@ -101,8 +101,13 @@ typedef struct
     
     uint8_t FileListFont24;     /* 1表示24点阵显示文件列表，0表示16点阵 */
     
-    uint8_t ResetType;          /* 0表示由lua脚本决定  1表示强制硬件复位 2表示强制软件复位 */
+    uint8_t ResetTypeNotUsed;	/* 0表示由lua脚本决定  1表示强制硬件复位 2表示强制软件复位 */
     uint8_t MultiProgMode;      /* 1表示1路，2表示2路，3表示3路，4表示4路 */
+    
+	uint16_t FactoryId;         /* 工厂代码 */
+    uint16_t ToolSn;          	/* 烧录器编号 */
+    
+    uint8_t StartRun;           /* 开机启动，0表示缺省，1表示单机烧录 2表示多路烧录 */
 } PARAM_T;
 
 /* 模拟量校准参数 */
