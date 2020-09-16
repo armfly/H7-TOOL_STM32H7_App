@@ -67,6 +67,8 @@ SWD_CONNECT_TYPE reset_connect = CONNECT_NORMAL;   // CONNECT_NORMAL;CONNECT_UND
 static DAP_STATE dap_state;
 static uint32_t  soft_reset = SYSRESETREQ;
 
+static uint8_t s_reset_state = 0;
+
 #if  0  // armfly debug
 __attribute__((weak)) void swd_set_target_reset(uint8_t asserted)
 {
@@ -78,11 +80,14 @@ void swd_set_target_reset(uint8_t asserted)
 //    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);  
     if (asserted)
     {
+        s_reset_state = 1;
         //printf("reset gpio = 0\r\n");        
         PIN_nRESET_OUT(0);
     }
     else
     {
+        s_reset_state = 0;
+        
         //printf("reset gpio = 1\r\n");   
         PIN_nRESET_OUT(1);   
     }
@@ -92,6 +97,11 @@ void swd_set_target_reset(uint8_t asserted)
 //	}    
 }
 #endif
+
+uint8_t swd_get_target_reset(void)
+{    
+    return s_reset_state;
+}
 
 uint32_t target_get_apsel()
 {
@@ -150,16 +160,25 @@ void swd_set_soft_reset(uint32_t soft_reset_type)
 
 uint8_t swd_init(void)
 {
+    static uint8_t s_first_run = 0;
     //TODO - DAP_Setup puts GPIO pins in a hi-z state which can
     //       cause problems on re-init.  This needs to be investigated
     //       and fixed.
     DAP_Setup();
-    PORT_SWD_SETUP();
     
-    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+    PORT_SWD_SETUP();   /* V1.31内部已取消reset硬件设置 */
+    
+       // Set RESET HIGH
+    //pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);//TODO - fix reset logic
+    //BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
+    
+    if (s_first_run == 0)
     {
-        MUL_SWD_GPIOConfig();
+        s_first_run = 1;
+        BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
+    
     }
+
     return 1;
 }
 
@@ -1166,7 +1185,7 @@ uint8_t swd_init_debug(void)
     int8_t retries = 4;
     int8_t do_abort = 0;
     do {
-        if (do_abort == 1) 
+        if (do_abort != 0) 
         {
             //do an abort on stale target, then reset the device
             swd_write_dp(DP_ABORT, DAPABORT);
@@ -1174,37 +1193,38 @@ uint8_t swd_init_debug(void)
             swd_set_target_reset(1);
             osDelay(20);
             swd_set_target_reset(0);
-            osDelay(20);
+            //printf("reset, delay %dms\r\n", g_tProg.SwdResetDelay);
+            osDelay(g_tProg.SwdResetDelay);
             do_abort = 0;
         }        
         
         swd_init();
         
         if (!JTAG2SWD()) {
-            do_abort = 1;
+            do_abort = 1;   /* 这种情况返回，有可能是用户程序禁止了SWD口 */
             continue;
         }	
 
         if (!swd_clear_errors()) {
-            do_abort = 1;
+            do_abort = 2;
             continue;
         }
 
         if (!swd_write_dp(DP_SELECT, 0)) {
-            do_abort = 1;
+            do_abort = 3;
             continue;
             
         }
         
         // Power up
         if (!swd_write_dp(DP_CTRL_STAT, CSYSPWRUPREQ | CDBGPWRUPREQ)) {
-            do_abort = 1;
+            do_abort = 4;
             continue;
         }
 
         for (i = 0; i < timeout; i++) {
             if (!swd_read_dp(DP_CTRL_STAT, &tmp)) {
-                do_abort = 1;
+                do_abort = 5;
                 break;
             }
             if ((tmp & (CDBGPWRUPACK | CSYSPWRUPACK)) == (CDBGPWRUPACK | CSYSPWRUPACK)) {
@@ -1214,17 +1234,17 @@ uint8_t swd_init_debug(void)
         }
         if ((i == timeout) || (do_abort == 1)) {
             // Unable to powerup DP
-            do_abort = 1;
+            do_abort = 6;
             continue;
         }
 
         if (!swd_write_dp(DP_CTRL_STAT, CSYSPWRUPREQ | CDBGPWRUPREQ | TRNNORMAL | MASKLANE)) {
-            do_abort = 1;
+            do_abort = 7;
             continue;
         }
 		
         if (!swd_write_dp(DP_SELECT, 0)) {
-            do_abort = 1;
+            do_abort = 8;
             continue;
         }				
 
@@ -1642,24 +1662,29 @@ uint8_t swd_enter_debug_program(void)
 {
     uint32_t val;
     
-    //osDelay(200);
-    
-    /* 拉低RESET */
+
+    /* 进入编程状态，先复位一次，应对已看门狗低功耗程序的片子 */
     swd_set_target_reset(1);
-    osDelay(20);
+    osDelay(10);
+    swd_set_target_reset(0);
     
     if (swd_init_debug() == 0)
     {
+        printf("error 1: swd_init_debug()\r\n");
         return 0;
     }
 	
     if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
     {
-        swd_set_target_reset(0);    /* 退出硬件复位 */
-        osDelay(20);
+        if (swd_get_target_reset() == 0)
+        {
+            swd_set_target_reset(1);    /* 硬件复位 */
+            osDelay(g_tProg.SwdResetDelay);
+        }
         
         if (swd_init_debug() == 0)
         {
+            printf("error 2: swd_init_debug()\r\n");
             return 0;
         }
         
@@ -1677,7 +1702,7 @@ uint8_t swd_enter_debug_program(void)
     {
         uint8_t i;
         
-        for (i = 0; i < 4; i++)
+        for (i = 0; i < 10; i++)
         {
             if (swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
             {
@@ -1686,10 +1711,43 @@ uint8_t swd_enter_debug_program(void)
             swd_set_target_reset(1);
             osDelay(20);
             swd_set_target_reset(0);
-            osDelay(i * 5);     /* 硬件复位退出后立即写指令 */            
+            osDelay(i * 5);     /* 硬件复位退出后 立即写指令 */            
         }
     }     
+
+    // Enable halt on reset
+    if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+        printf("error 3: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
+        return 0;   /* 超时 */
+    }
+    
+    swd_read_word(DBG_HCSR, &val);
+    if ((val & S_HALT) == 0)
+    {
+        if (swd_get_target_reset() == 0)
+        {
+            swd_set_target_reset(1); 
+            osDelay(20);
+        }
         
+        if (swd_get_target_reset() == 1)
+        {
+            swd_set_target_reset(0);        /* 退出硬件复位 */    
+            osDelay(g_tProg.SwdResetDelay);
+        }  
+    }
+    
+//    // Perform a soft reset
+//    if (!swd_read_word(NVIC_AIRCR, &val)) {
+//        printf("error 2: swd_read_word(NVIC_AIRCR, &val)\r\n");
+//        return 0;
+//    }
+
+//    if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+//        printf("error 3: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
+//        return 0;
+//    }    
+                    
     /* 2020-01-18 armfly 增加退出机制 */
     {
         uint32_t i;
@@ -1697,7 +1755,7 @@ uint8_t swd_enter_debug_program(void)
         for (i = 0; i < 100000; i++)
         {
             if (!swd_read_word(DBG_HCSR, &val)) {
-                printf("error: swd_read_word(DBG_HCSR, &val) --1 i = %d\r\n", i);
+                printf("error 4: swd_read_word(DBG_HCSR, &val) i = %d\r\n", i);
                 return 0;
             }
             
@@ -1709,59 +1767,15 @@ uint8_t swd_enter_debug_program(void)
         
         if (i == 100000)
         {
-            printf("error: swd_read_word(DBG_HCSR, &val) --1\r\n"); 
+            printf("error 5: swd_read_word(DBG_HCSR, &val)\r\n"); 
             return 0;   /* 超时 */
         }
     }
-        
-    // Enable halt on reset
-    if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
-        printf("error: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
-        return 0;
-    }
     
-    swd_set_target_reset(0);        /* 退出硬件复位 */    
-    osDelay(20);
-    
-    // Perform a soft reset
-    if (!swd_read_word(NVIC_AIRCR, &val)) {
-        printf("error: swd_read_word(NVIC_AIRCR, &val)\r\n");
-        return 0;
-    }
-
-    if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
-        printf("error: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
-        return 0;
-    }
-
-    osDelay(2);
-
-    /* 增加超时退出机制 */
-    {
-        uint32_t i;
-        
-        for (i = 0; i < 100000; i++)
-        {
-            if (!swd_read_word(DBG_HCSR, &val)) {
-                printf("error: swd_read_word(DBG_HCSR, &val) --2 i = %d\r\n", i);
-                return 0;
-            }
-            
-            if ((val & S_HALT) != 0)
-            {
-                break;
-            }
-        }
-        
-        if (i == 100000)
-        {
-            printf("error: swd_read_word(DBG_HCSR, &val) --2\r\n"); 
-            return 0;   /* 超时 */
-        }
-    }
 
     // Disable halt on reset
     if (!swd_write_word(DBG_EMCR, 0)) {
+        printf("error 6: swd_write_word(DBG_EMCR, 0)\r\n"); 
         return 0;
     }
 

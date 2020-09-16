@@ -243,6 +243,8 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
         {
             /* 恢复芯片厂家的FLM算法代码到目标机内存 */
             LoadAlgoToTarget();
+            
+            
         }
         
         PG_PrintPercent(100, _FlashAddr); 
@@ -265,7 +267,7 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                 waittime = 5;
                 
                 bsp_DelayMS(20);
-            }
+            }            
             
             PG_PrintText("正在擦除扇区...");    
             PG_PrintPercent(0, 0xFFFFFFFF);  

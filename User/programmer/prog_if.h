@@ -60,6 +60,11 @@ typedef struct
     uint8_t VerifyOptionByteDisalbe;   /* 1 表示芯片设置读保护时,不校验 (STM32F207VC设置读保护后会即可生效导致无法校验) */
     
     uint32_t SwdClockDelay;     /* SWD时钟延迟，0表示最快，值越大速度越慢 */
+    
+    uint32_t SwdResetDelay;     /* 硬件复位后的延迟时间，ms */
+    uint32_t ResetMode;         /* 复位延迟 */
+    
+    
 }OFFLINE_PROG_T;
 
 /* lua脚本fix_data_begin()返回一个table，用于通知C程序哪些内存地址需要填充数据 */

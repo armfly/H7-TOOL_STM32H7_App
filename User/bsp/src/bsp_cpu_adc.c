@@ -310,6 +310,11 @@ static float AdcSumAvg(uint8_t _AdcNo, uint8_t _Offset);
 void bsp_StopAdcCH1(void);
 void bsp_StopAdcCH2(void);
 
+void __DSO_EnableDog(void);
+void __DSO_DisableDog(void);
+
+void DSO_SetTrigerToggle(uint8_t _TrigEdge);
+
 /*
 *********************************************************************************************************
 *    函 数 名: DSO_TrigFinished
@@ -344,9 +349,14 @@ void IRQ_WatchDog(void)
     uint8_t triged = 0;
     uint16_t *pAdcBuf;
     ADC_HandleTypeDef *hadc;
+    static uint8_t s_TrigToggle = 0;
     
 //    HAL_ADC_IRQHandler(&AdcHandle1);
 //    HAL_ADC_IRQHandler(&AdcHandle2);    
+    
+//    __DSO_DisableDog();
+    
+
     
     /* CH1 触发 */
     tmp_isr = AdcHandle1.Instance->ISR;
@@ -362,6 +372,20 @@ void IRQ_WatchDog(void)
         triged = 1;
     }
 
+//    if (s_TrigToggle == 1)
+//    {
+//        if (g_tDSO.TrigEdge == TRIG_EDGE_FALLING)
+//        {
+//            DSO_SetTrigerToggle(TRIG_EDGE_FALLING);   /* 切换触发方向 */
+//        }
+//        else
+//        {
+//            DSO_SetTrigerToggle(TRIG_EDGE_RISING);   /* 切换触发方向 */
+//        }
+//        s_TrigToggle = 0;
+//        return;
+//    }
+    
     /* CH2 触发*/
     tmp_isr = AdcHandle2.Instance->ISR;
     tmp_ier = AdcHandle2.Instance->IER;
@@ -458,9 +482,25 @@ void IRQ_WatchDog(void)
                     BeginPos = ADC_BUFFER_SIZE + BeginPos;
                 }
         
-                g_tDSO.DmaPos = BeginPos;    /* 保存触发前的位置 */                
+                g_tDSO.DmaPos = BeginPos;    /* 保存触发前的位置 */ 
+
+                s_TrigToggle = 0;                
             }
+            else
+            {
+                if (g_tDSO.TrigEdge == TRIG_EDGE_FALLING)
+                {
+                    DSO_SetTrigerToggle(TRIG_EDGE_RISING);   /* 切换触发方向 */
+                }
+                else
+                {
+                    DSO_SetTrigerToggle(TRIG_EDGE_FALLING);   /* 切换触发方向 */
+                }
+                    
+                s_TrigToggle = 1;
+            }            
         }
+
     }        
 }
 void ADC_IRQHandler(void)
@@ -687,6 +727,12 @@ void __DSO_EnableDog(void)
     HAL_NVIC_EnableIRQ(ADC3_IRQn); 
 }
 
+void __DSO_DisableDog(void)
+{
+    HAL_NVIC_DisableIRQ(ADC_IRQn);    
+    HAL_NVIC_DisableIRQ(ADC3_IRQn); 
+}
+
 void DSO_SetTriger(void)
 {    
     ADC_AnalogWDGConfTypeDef WdgCfg;    
@@ -793,6 +839,123 @@ void DSO_SetTriger(void)
             }
         }
     }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: DSO_SetTrigerToggle
+*    功能说明: 切换触发方向
+*    形    参: _TrigEdge : 触发边沿模式
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void DSO_SetTrigerToggle(uint8_t _TrigEdge)
+{    
+    ADC_AnalogWDGConfTypeDef WdgCfg;    
+
+   
+    /* ADC 通道1模拟看门狗配置 */
+    WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
+    WdgCfg.Channel = ADCH1_CHANNEL;            
+    WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;    // ADC_ANALOGWATCHDOG_ALL_REG;
+    if (g_tDSO.TrigChan == 0)
+    {
+        WdgCfg.ITMode = ENABLE;        
+    }
+    else
+    {
+        WdgCfg.ITMode = DISABLE;    
+    }
+    
+    if (g_tDSO.TrigMode == TRIG_MODE_NORMAL || g_tDSO.TrigMode == TRIG_MODE_SINGLE)
+    {
+        if (_TrigEdge == TRIG_EDGE_RISING)
+        {
+            WdgCfg.HighThreshold = g_tDSO.TrigLevel;
+            WdgCfg.LowThreshold = 0;
+        }
+        else if (_TrigEdge == TRIG_EDGE_FALLING)
+        {
+            WdgCfg.HighThreshold = 65535;
+            WdgCfg.LowThreshold = g_tDSO.TrigLevel;
+        }
+    }
+    else    /* 自动触发，关闭看门狗 */
+    {
+        WdgCfg.HighThreshold = 65535;
+        WdgCfg.LowThreshold = 0;
+    }
+
+    HAL_ADC_AnalogWDGConfig(&AdcHandle1, &WdgCfg);    
+
+    /* ADC 通道2模拟看门狗配置 */
+    WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;
+    WdgCfg.Channel = ADCH2_CHANNEL;            
+    WdgCfg.WatchdogMode = ADC_ANALOGWATCHDOG_ALL_REG;    // ADC_ANALOGWATCHDOG_ALL_REG;
+    if (g_tDSO.TrigChan == 1)
+    {
+        WdgCfg.ITMode = ENABLE;        
+    }
+    else
+    {
+        WdgCfg.ITMode = DISABLE;    
+    }
+    if (g_tDSO.TrigMode == TRIG_MODE_NORMAL || g_tDSO.TrigMode == TRIG_MODE_SINGLE)
+    {
+        if (_TrigEdge == TRIG_EDGE_RISING)
+        {
+            WdgCfg.HighThreshold = g_tDSO.TrigLevel;
+            WdgCfg.LowThreshold = 0;
+        }
+        else if (_TrigEdge == TRIG_EDGE_FALLING)
+        {
+            WdgCfg.HighThreshold = 65535;
+            WdgCfg.LowThreshold = g_tDSO.TrigLevel;
+        }
+    }
+    else    /* 自动触发，关闭看门狗 */
+    {
+        WdgCfg.HighThreshold = 65535;
+        WdgCfg.LowThreshold = 0;
+    }    
+    HAL_ADC_AnalogWDGConfig(&AdcHandle2, &WdgCfg);    
+
+//    /* NVIC configuration for ADC interrupt */
+//    /* Priority: high-priority */
+//    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+//    HAL_NVIC_DisableIRQ(ADC_IRQn);    
+//    
+//    HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
+//    HAL_NVIC_DisableIRQ(ADC3_IRQn); 
+
+//    {
+//        uint32_t TransBuffSize;    /* 通信传输的采样深度- PC软件设置的 */
+//        int32_t pre_time;
+//        
+//        if (g_tDSO.TrigMode == TRIG_MODE_NORMAL || g_tDSO.TrigMode == TRIG_MODE_SINGLE)
+//        {
+//            /* 采样深度 */
+//            if (g_tDSO.SampleSizeID < BUFF_SIZE_NUM)
+//            {
+//                TransBuffSize = TabelBufSize[g_tDSO.SampleSizeID];
+//            }
+//            else
+//            {
+//                TransBuffSize = 1 * 1024;
+//            }
+//            
+//            /* 计算预采集时间 us单位 */
+//            pre_time = ((int64_t)(TransBuffSize * (g_tDSO.TrigPos) / 100) * 1000000) / TabelFreq[g_tDSO.FreqID];
+//            if (pre_time == 0)
+//            {
+//                __DSO_EnableDog();                
+//            }
+//            else
+//            {
+//                bsp_StartHardTimer(2, pre_time, __DSO_EnableDog);    
+//            }
+//        }
+//    }
 }
 
 /*
@@ -2123,9 +2286,10 @@ void DSO_LockWave(void)
     uint32_t i;
     uint32_t pos;
     uint32_t TransSize;
-    
-    SCB_InvalidateDCache_by_Addr((uint32_t *)aADCH1ConvertedData,  2 * ADC_BUFFER_SIZE);
-    SCB_InvalidateDCache_by_Addr((uint32_t *)aADCH2ConvertedData,  2 * ADC_BUFFER_SIZE);
+
+//    ADC缓冲区已禁止CASHE      
+//    SCB_InvalidateDCache_by_Addr((uint32_t *)aADCH1ConvertedData,  2 * ADC_BUFFER_SIZE);
+//    SCB_InvalidateDCache_by_Addr((uint32_t *)aADCH2ConvertedData,  2 * ADC_BUFFER_SIZE);
     
     pos = g_tDSO.DmaPos;
     TransSize = TabelBufSize[g_tDSO.SampleSizeID];
@@ -2164,6 +2328,8 @@ void DSO_LockWave(void)
             }    
         }
     }
+    
+//    SCB_InvalidateDCache_by_Addr((uint32_t *)g_Ch1WaveBuf,  128 * 1024);
 }
 
 

@@ -234,7 +234,6 @@ void PG_ReloadLuaVar(void)
         
         /*  SwdClockDelay;  SWD接口时序延迟 */
         {
-            /* 读取复位类型： 软件还是硬件复位 */
             lua_getglobal(g_Lua, "SWD_CLOCK_DELAY");  
             if (lua_isinteger(g_Lua, -1)) 
             {    
@@ -246,6 +245,35 @@ void PG_ReloadLuaVar(void)
             }
             lua_pop(g_Lua, 1);            
         }
+        
+        /*  复位延迟 */
+        {
+            lua_getglobal(g_Lua, "RESET_DELAY");  
+            if (lua_isinteger(g_Lua, -1)) 
+            {    
+                g_tProg.SwdResetDelay = lua_tointeger(g_Lua, -1);
+            }
+            else
+            {
+                g_tProg.SwdResetDelay = 20;
+            }
+            lua_pop(g_Lua, 1);            
+        }
+
+        /* 读取复位类型： 软件还是硬件复位 */
+        {
+           
+            lua_getglobal(g_Lua, "RESET_MODE");  
+            if (lua_isinteger(g_Lua, -1)) 
+            {    
+                g_tProg.ResetMode = lua_tointeger(g_Lua, -1);
+            }
+            else
+            {
+                g_tProg.ResetMode = 0;
+            }
+            lua_pop(g_Lua, 1);            
+        }         
         
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)  

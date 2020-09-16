@@ -365,6 +365,39 @@ static void MPU_Config(void)
 	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
 	HAL_MPU_ConfigRegion(&MPU_InitStruct);
     
+//    uint16_t *aADCH1ConvertedData = (uint16_t *)0x38000000;
+//    uint16_t *aADCH2ConvertedData = (uint16_t *)(0x38000000 + 32 * 1024);
+
+//    /* 0x20000000  128KB */
+//    float *g_Ch1WaveBuf = (float *)0x20000000;
+//    float *g_Ch2WaveBuf = (float *)(0x20000000 + 64 * 1024);    
+    /* 配置ADC 空间的属性为Write through */
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0x38000000;
+	MPU_InitStruct.Size             = ARM_MPU_REGION_SIZE_64KB;
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;     /* 不要CASHE */
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER5;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+	MPU_InitStruct.Enable           = MPU_REGION_ENABLE;
+	MPU_InitStruct.BaseAddress      = 0x20000000;
+	MPU_InitStruct.Size             = ARM_MPU_REGION_SIZE_128KB;
+	MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+	MPU_InitStruct.IsBufferable     = MPU_ACCESS_NOT_BUFFERABLE;
+	MPU_InitStruct.IsCacheable      = MPU_ACCESS_NOT_CACHEABLE;     /* 不要CASHE */
+	MPU_InitStruct.IsShareable      = MPU_ACCESS_NOT_SHAREABLE;
+	MPU_InitStruct.Number           = MPU_REGION_NUMBER6;
+	MPU_InitStruct.TypeExtField     = MPU_TEX_LEVEL1;
+	MPU_InitStruct.SubRegionDisable = 0x00;
+	MPU_InitStruct.DisableExec      = MPU_INSTRUCTION_ACCESS_ENABLE;
+	HAL_MPU_ConfigRegion(&MPU_InitStruct);
+    
     /*使能 MPU */
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
 }

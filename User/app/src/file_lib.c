@@ -33,7 +33,7 @@ FATFS fs;
 #pragma location = 0x24001000
 FIL file;
 #pragma location = 0x24002000
-char FsReadBuf[8*1024];
+char FsReadBuf[16*1024];
 #pragma location = 0x24003000
 char FsWriteBuf[8*1024] = {"FatFS Write Demo \r\n www.armfly.com \r\n"};
 #pragma location = 0x24004000

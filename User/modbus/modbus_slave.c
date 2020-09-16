@@ -39,6 +39,7 @@ static void MODS_65H(void);
 static void MODS_60H(void);
 
 extern void MODS_64H(void);
+extern void MODS_66H(void);
 
 void MODS_ReciveNew(uint8_t _byte);
 
@@ -252,7 +253,7 @@ static void MODS_AnalyzeApp(void)
             MODS_0FH(); /* 强制多个线圈（对应D01/D02/D03） */
             break;
 
-        case 0x60: /* 读取波形数据专用功能码 */
+        case 0x60:  /* 读取波形数据专用功能码 */
             MODS_60H();
             break;
 
@@ -260,10 +261,14 @@ static void MODS_AnalyzeApp(void)
             MODS_64H();
             break;
 
-        case 0x65: /* 临时执行小程序-废弃 */
+        case 0x65:  /* 临时执行小程序-废弃 */
             MODS_65H();
             break;
 
+        case 0x66:   /* SWD操作指令(读内存，写内存等) */
+            MODS_66H();
+            break;
+        
         default:
             g_tModS.RspCode = RSP_ERR_CMD;
             MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
