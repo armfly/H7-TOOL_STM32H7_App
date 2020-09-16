@@ -309,6 +309,29 @@ void MUL_SWD_GPIOConfig(void)
 
 /*
 *********************************************************************************************************
+*    函 数 名: MUL_PORT_SWD_SETUP
+*    功能说明: MUL_swd_init()调用该函数。初始化4路SWD硬件GPIO，并设置初始状态
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/ 
+void MUL_PORT_SWD_SETUP(void)
+{
+    //    Set SWCLK HIGH
+    //    Set SWDIO HIGH
+    //    Set RESET LOW  转接板有反相器三极管    
+    MUL_SWD_GPIOConfig();
+    MUL_RefreshGpioParam();
+    
+    MUL_PIN_SWDIO_OUT_ENABLE();
+    MUL_PIN_SWDIO_OUT(1);
+    MUL_PIN_SWCLK_SET();
+    
+    //EIO_SetOutLevel(0, 0);    /* D0输出0V, 转接板RESET输出高 */
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: MUL_RefreshGpioParam
 *    功能说明: 根据通道状态刷新GPIO配置
 *    形    参: 无

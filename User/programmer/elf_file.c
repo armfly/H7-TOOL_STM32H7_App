@@ -461,7 +461,9 @@ static uint8_t ELF_FillToAlgo(char *_path, program_target_t *_algo)
             printf("  Reserved    : 0x%08X\r\n", g_tFLM.Device.Res);
             printf("  Erased Content : 0x%02X\r\n", g_tFLM.Device.valEmpty);
             printf("  Program Page TimeOut   : %d\r\n", g_tFLM.Device.toProg);
-            printf("  Erase Sector TimeOut   : %d\r\n", g_tFLM.Device.toErase);
+            printf("  Erase Sector TimeOut   : %d\r\n", g_tFLM.Device.toErase);            
+            printf("  Erase Sector Size      : %08X, %dKB (0x%X)\r\n", 
+                g_tFLM.Device.sectors[0].AddrSector, g_tFLM.Device.sectors[0].szSector / 1024, g_tFLM.Device.sectors[0].szSector);
             
             /* 算法函数偏移地址 */
             printf("  ----Algo function offset ---------------\r\n");            

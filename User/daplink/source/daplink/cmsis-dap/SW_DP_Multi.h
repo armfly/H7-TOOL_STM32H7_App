@@ -49,6 +49,8 @@ void MUL_SWD_GPIOConfig(void);
 void MUL_RefreshGpioParam(void);
 void MUL_SEND_32BIT(uint32_t val);
 
+void MUL_PORT_SWD_SETUP(void);
+
 //#ifdef __cplusplus
 //}
 //#endif

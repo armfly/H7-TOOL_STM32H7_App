@@ -1535,6 +1535,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\modbus\modbus_file.c</FilePath>
             </File>
+            <File>
+              <FileName>modbus_swd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\modbus\modbus_swd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

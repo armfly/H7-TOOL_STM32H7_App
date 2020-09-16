@@ -363,7 +363,7 @@ static __inline void PORT_SWD_SETUP(void)
     
     // Set RESET HIGH
     //pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);//TODO - fix reset logic
-    BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
+    //BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
 }
 
 /** Disable JTAG/SWD I/O Pins.

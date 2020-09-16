@@ -452,17 +452,21 @@ static void MODS64_WriteFile(void)
     uint32_t package_len; /* 本包数据长度 */
     uint8_t err = 0;
     uint8_t *pData;
-    static char s_FileName[256 + 1];    
-  
+    static char s_FileName[256 + 1]; 
+    static uint32_t s_FileOffset;   /* 文件已写的数据偏移 */
+    static uint32_t s_FileRxLen;    /* 文件已接收的长度 */
+    static uint32_t s_HeaderLen;    /* 头部长度 */
+    static uint32_t s_LastPackaOffsetAddr;      /* 上一包的偏移地址, 用于重复帧识别 */
+    
     func = BEBufToUint16(&g_tModS.RxBuf[2]);
-    total_len = BEBufToUint32(&g_tModS.RxBuf[4]);
+    total_len = BEBufToUint32(&g_tModS.RxBuf[4]);       /* 文件总长度 */
     offset_addr = BEBufToUint32(&g_tModS.RxBuf[8]);
     package_len = BEBufToUint32(&g_tModS.RxBuf[12]);
     
     pData = &g_tModS.RxBuf[16];
 
     /* 文件大小（4字节) + MD5 (16字节） + 文件名长度 + 文件名字符串 + 文件数据 */
-    if (offset_addr == 0)
+    if (offset_addr == 0)   /* 第1包数据 */
     {
         uint16_t NameLen;
         uint32_t NewFileSize;
@@ -470,26 +474,26 @@ static void MODS64_WriteFile(void)
         uint16_t i;        
         uint32_t OldFileSize;
         char OldMD5[16];
-        uint32_t DataLen;
+        uint32_t DataLen;        
+        
+        s_HeaderLen = 0;        /* 头部长度 */
+        s_LastPackaOffsetAddr = 0;
 
-        NewFileSize = BEBufToUint32(pData); pData += 4;
+        NewFileSize = BEBufToUint32(pData); pData += 4;  s_HeaderLen += 4;
         
-        NewMD5 = (char *)pData;  pData += 16;
+        NewMD5 = (char *)pData;  pData += 16;  s_HeaderLen += 16;
         
-        NameLen = *pData; pData++;        
+        NameLen = *pData; pData++; s_HeaderLen++;       
         for (i = 0; i < NameLen; i++)
         {
-            s_FileName[i] = *pData++;            
+            s_FileName[i] = *pData++;  s_HeaderLen++;          
         }
         s_FileName[NameLen] = 0;
+        s_FileOffset = 0;
+        s_FileRxLen = 0;
         
-//        printf(s_FileName); printf("\r\n");
-        
-        #if 0   /* 测试代码，用来验证通信速度 */
-            err = 1;    
-        #else
         OldFileSize = GetFileMD5(s_FileName, OldMD5); /* 获得本地文件的长度和MD5 */
-        
+
         /* 文件长度和MD5码均相等，则不重复写入 */
         if (NewFileSize == OldFileSize && memcmp(OldMD5, NewMD5, 16) == 0)
         {
@@ -497,35 +501,93 @@ static void MODS64_WriteFile(void)
         }
         else
         {                       
-            DataLen = package_len - NameLen - 21;            
-            memcpy(FsReadBuf, (char *)pData, DataLen);            
-            if (WriteFile(s_FileName, 0, (char *)FsReadBuf, DataLen) == 0)
+            DataLen = package_len - NameLen - 21;
+            if (DataLen > 0)
             {
-                err = 0;    /* 文件写入OK */
+                memcpy(FsReadBuf, (char *)pData, DataLen);
+                s_FileRxLen = DataLen;
             }
             else
             {
-                err = 2;    /* 文件写入失败 */
+                err = 0;    /* 文件写入OK */
             }
+
+            /* 第1包就文件结束 */
+            if (s_FileOffset + s_FileRxLen >= total_len)
+            {
+                if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, s_FileRxLen) == 0)
+                {
+                    s_FileOffset = s_FileRxLen;
+                    
+                    err = 0;    /* 文件写入OK */
+                }
+                else
+                {
+                    err = 2;    /* 文件写入失败 */
+                }
+            }       
         }
-        #endif
     }
-    else
+    else    /* 第2包以后的数据 */
     {
         uint32_t DataLen;
-        uint32_t offset;
         
-        offset = offset_addr;
-        DataLen = package_len;
-        memcpy(FsReadBuf, (char *)pData, DataLen); 
-        if (WriteFile(s_FileName, offset, (char *)FsReadBuf, DataLen) == 0)
+        DataLen = package_len;   
+
+        if (s_LastPackaOffsetAddr != offset_addr)   /* 不是重复帧 */
         {
-            err = 0;    /* 文件写入OK */
+            s_LastPackaOffsetAddr = offset_addr;
+            
+            if (s_FileRxLen + DataLen < sizeof(FsReadBuf))
+            {
+                memcpy(&FsReadBuf[s_FileRxLen], (char *)pData, DataLen);
+                s_FileRxLen += DataLen;
+                err = 0;    /* 文件写入OK */
+            }
+            else    /* 超过16KB了 */
+            {
+                uint32_t len0;
+                uint32_t len1;
+                
+                len0 = sizeof(FsReadBuf) - s_FileRxLen;     /* 补齐16KB需要的字节数. 本次将保存的 */
+                /* 复制一部分数据，筹齐16KB */
+                memcpy(&FsReadBuf[s_FileRxLen], (char *)pData, len0);
+                if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, sizeof(FsReadBuf)) == 0)
+                {
+                    s_FileOffset += sizeof(FsReadBuf);
+                    err = 0;    /* 文件写入OK */
+                }
+                else
+                {
+                    err = 2;    /* 文件写入失败 */
+                }            
+                
+                len1 = DataLen - len0;       /* 剩余未保存的 */
+                
+                /* 将未保存的数据继续缓存 */
+                memcpy(FsReadBuf, (char *)pData + len0, len1);
+                s_FileRxLen = len1; 
+            }
+            
+            /* 文件数据传输完毕 */
+            if (s_FileOffset + s_FileRxLen >= total_len - s_HeaderLen)
+            {
+                if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, s_FileRxLen) == 0)
+                {
+                    s_FileOffset += s_FileRxLen;
+                    
+                    err = 0;    /* 文件写入OK */
+                }
+                else
+                {
+                    err = 2;    /* 文件写入失败, 立即终止 */
+                }            
+            }
         }
-        else
+        else    /* 重复帧 */
         {
-            err = 2;    /* 文件写入失败 */
-        }        
+            err = 0;
+        }
     }
 
     g_tModS.TxCount = 0;
