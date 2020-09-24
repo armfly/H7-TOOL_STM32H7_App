@@ -34,7 +34,6 @@ void LoadCalibParam(void);
 */
 void LoadParam(void)
 {
-
     /* 读取EEPROM中的参数 */
     ee_ReadBytes((uint8_t *)&g_tParam, PARAM_ADDR, sizeof(PARAM_T));
 

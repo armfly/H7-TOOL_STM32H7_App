@@ -31,7 +31,8 @@
 #include "status_extend_menu.h"
 #include "status_mini_dso.h"
 #include "status_lua.h"
-
+#include "status_can_monitor.h"
+#include "status_uart_monitor.h"
 #include "wifi_if.h"
 #include "ff.h"
 #include "ff_gen_drv.h"
@@ -254,6 +255,22 @@ int main(void)
             
             case MS_LUA_EXEC_FILE:  /* lua执行状态 */    
                 status_LuaRun();
+                break;
+            
+            case MS_MONITOR_UART:   /* 串口监视 */
+                status_MonitorUart();
+                break;
+
+            case MS_MONITOR_CAN:    /* CAN监视 */
+                status_MonitorCan();
+                break;
+            
+            case MS_MONITOR_GPIO:   /* IO监视器 */
+                status_MonitorUart();
+                break;
+            
+            case MS_MONITOR_ANALOG: /* 模拟量监视器 */              
+                status_MonitorUart();
                 break;
             
             default:

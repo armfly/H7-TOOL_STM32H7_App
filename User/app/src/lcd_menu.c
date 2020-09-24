@@ -92,14 +92,23 @@ void LCD_DispMenu(MENU_T *_pMenu)
         if (i + _pMenu->Offset == _pMenu->Cursor)   /* 选钟行 */
         {            
             /* 设置为反白 */
-            _pMenu->Font.FrontColor = CL_MENU_TEXT1;
+            
             _pMenu->Font.BackColor = CL_MASK;
 
             y = _pMenu->Top + i * (FontHeight + _pMenu->LineCap);
 
             /* 清全行背景 */
-            LCD_Fill_Rect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, CL_MENU_BACK2);
-
+            if (_pMenu->ActiveBackColor == 0)
+            {
+                _pMenu->Font.FrontColor = CL_MENU_TEXT2;
+                LCD_Fill_Rect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, CL_MENU_BACK2);
+            }
+            else
+            {
+                _pMenu->Font.FrontColor = CL_MENU_TEXT3;
+                LCD_Fill_Rect(_pMenu->Left, y, _pMenu->LineCap + FontHeight, _pMenu->Width, CL_MENU_BACK3);
+            }
+                
             /* 刷新文本 */
             if (_pMenu->GBK == 1)
             {               

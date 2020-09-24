@@ -344,9 +344,6 @@ void ST7789_DrawScreen(void)
     {
          return;
     }   
-    
-    /* 放到前面判断 */
-    while (wTransferState == 0){}    
         
     s_DispRefresh = 0;
     
@@ -359,6 +356,8 @@ void ST7789_DrawScreen(void)
 	wTransferState = 0; 
         
 	HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);
+
+    while (wTransferState == 0){}  
         
     s_time1 = bsp_GetRunTime();
 #endif    

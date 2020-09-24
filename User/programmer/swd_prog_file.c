@@ -1270,7 +1270,7 @@ uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen
             
             if (_Mode == 2) /* 擦除所在扇区后，写入，其他数据会清空. 用于Options bytes编程 */
             {
-                
+                uint32_t write_size;
                                 
                 /*　开始擦除 - STM32F429 包含解除读保护 */ 
                 //printf("\r\nOption Bytes: erase_chip()\r\n");
@@ -1296,8 +1296,15 @@ uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen
                 //PG_PrintText("正在编程...");
                 g_tProg.FLMFuncDispProgress = 1;
                 g_tProg.FLMFuncDispAddr = g_tFLM.Device.DevAdr + PageStartAddr;
+                
+                write_size = PageSize;
+                if (write_size > g_tFLM.Device.szDev)
+                {
+                    write_size = g_tFLM.Device.szDev;
+                }
+                
                 //printf("Option Bytes: program_page()\r\n");
-                if (target_flash_program_page(g_tFLM.Device.DevAdr + PageStartAddr, _DataBuf, PageSize) != 0)
+                if (target_flash_program_page(g_tFLM.Device.DevAdr + PageStartAddr, _DataBuf, write_size) != 0)
                 {
                     PG_PrintText("program_page failed");        
                     err = 1;

@@ -63,6 +63,8 @@
 #define USBD_SELF_POWERED                     1
 #define USBD_DEBUG_LEVEL                      0
 
+#define MSC_MEDIA_PACKET                     1024*16 //512
+
 /* Exported macro ------------------------------------------------------------*/
 /* Memory management macros */   
 #define USBD_malloc               malloc

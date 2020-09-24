@@ -54,6 +54,8 @@ typedef struct
     uint8_t RollBackEn;     /* 回滚使能 */
     
     uint8_t GBK;            /* 文字编码 0=UTF8, 1=GBK */
+    
+    uint8_t ActiveBackColor;    /* 选中行背景色,0表示黄色 1表示参数修改状态 */
 } MENU_T;
 
 /* 菜单显示类 */

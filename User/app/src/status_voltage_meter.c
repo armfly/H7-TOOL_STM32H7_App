@@ -100,7 +100,7 @@ void status_VoltageMeter(void)
 */
 static void AutoVoltRange(void)
 {
-    float range[] = {13.8, 6.4, 3.2, 1.6, 0.8, 0.4, 0.2, 0.1};
+    float range[] = {13.8, 6.4, 3.2, 1.6, 0.8, 0.4, 0.2, 0.095};
     uint8_t i;
 
     for (i = 0; i < 8; i++)

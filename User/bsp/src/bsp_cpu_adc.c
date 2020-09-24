@@ -349,14 +349,6 @@ void IRQ_WatchDog(void)
     uint8_t triged = 0;
     uint16_t *pAdcBuf;
     ADC_HandleTypeDef *hadc;
-    static uint8_t s_TrigToggle = 0;
-    
-//    HAL_ADC_IRQHandler(&AdcHandle1);
-//    HAL_ADC_IRQHandler(&AdcHandle2);    
-    
-//    __DSO_DisableDog();
-    
-
     
     /* CH1 触发 */
     tmp_isr = AdcHandle1.Instance->ISR;
@@ -371,20 +363,6 @@ void IRQ_WatchDog(void)
         DmaPos = ADC_BUFFER_SIZE - CT_CH1_DMA_Stream->NDTR;        /* DMA传输位置 */        
         triged = 1;
     }
-
-//    if (s_TrigToggle == 1)
-//    {
-//        if (g_tDSO.TrigEdge == TRIG_EDGE_FALLING)
-//        {
-//            DSO_SetTrigerToggle(TRIG_EDGE_FALLING);   /* 切换触发方向 */
-//        }
-//        else
-//        {
-//            DSO_SetTrigerToggle(TRIG_EDGE_RISING);   /* 切换触发方向 */
-//        }
-//        s_TrigToggle = 0;
-//        return;
-//    }
     
     /* CH2 触发*/
     tmp_isr = AdcHandle2.Instance->ISR;
@@ -482,27 +460,42 @@ void IRQ_WatchDog(void)
                     BeginPos = ADC_BUFFER_SIZE + BeginPos;
                 }
         
-                g_tDSO.DmaPos = BeginPos;    /* 保存触发前的位置 */ 
-
-                s_TrigToggle = 0;                
+                g_tDSO.DmaPos = BeginPos;    /* 保存触发前的位置 */             
             }
             else
-            {
+            {                
                 if (g_tDSO.TrigEdge == TRIG_EDGE_FALLING)
                 {
-                    DSO_SetTrigerToggle(TRIG_EDGE_RISING);   /* 切换触发方向 */
+                    if (avg_last < g_tDSO.TrigLevel)
+                    {
+                        DSO_SetTrigerToggle(TRIG_EDGE_RISING);
+                    }
+                    else
+                    {
+                        DSO_SetTrigerToggle(TRIG_EDGE_FALLING);
+                    }
                 }
-                else
+                else    /* TRIG_EDGE_RISING */
                 {
-                    DSO_SetTrigerToggle(TRIG_EDGE_FALLING);   /* 切换触发方向 */
+                    if (avg_last < g_tDSO.TrigLevel)
+                    {
+                        DSO_SetTrigerToggle(TRIG_EDGE_RISING);
+                    }
+                    else
+                    {
+                        DSO_SetTrigerToggle(TRIG_EDGE_FALLING);
+                    }
                 }
-                    
-                s_TrigToggle = 1;
+                
+                /* Clear ADC Analog watchdog flag */
+                AdcHandle1.Instance->ISR = ADC_FLAG_AWD1;  
+                AdcHandle2.Instance->ISR = ADC_FLAG_AWD1;                
             }            
         }
 
     }        
 }
+
 void ADC_IRQHandler(void)
 {
     IRQ_WatchDog();

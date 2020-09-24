@@ -17,6 +17,7 @@
 #include "stm8_swim.h"
 #include "swd_flash.h"
 #include "SW_DP_Multi.h"
+#include "debug_cm.h"
 
 /* 为了避免和DAP驱动中的函数混淆，本模块函数名前缀用 h7swd */
 
@@ -1179,6 +1180,7 @@ static int h7_ProgFile(lua_State* L)
 *********************************************************************************************************
 */
 extern void MUL_swd_set_target_reset(uint8_t asserted);
+#define NVIC_Addr    (0xe000e000)
 static int h7_reset(lua_State* L)
 {   
     uint32_t delay;
@@ -1200,13 +1202,33 @@ static int h7_reset(lua_State* L)
     {
 
         MUL_swd_set_target_reset(1);
-        osDelay(delay);
+        
+        // Perform a soft reset
+        {
+            uint32_t val[4];
+            
+            MUL_swd_read_word(NVIC_AIRCR, val);
+
+            swd_write_word(NVIC_AIRCR, VECTKEY | (val[0] & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+        }
+        
+        osDelay(delay);        
+ 
         MUL_swd_set_target_reset(0);
         osDelay(delay); 
     }
     else        
     {
         swd_set_target_reset(1);
+        // Perform a soft reset
+        {
+            uint32_t val;
+            
+            swd_read_word(NVIC_AIRCR, &val);
+
+            swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+        }
+        
         osDelay(delay);
         swd_set_target_reset(0);
         osDelay(delay); 

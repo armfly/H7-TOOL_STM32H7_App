@@ -342,12 +342,17 @@ typedef struct
     uint16_t Arc;       /* 圆角弧半径 */
     uint16_t Color;     /* 填充颜色 */
     char *Text;         /* 执行文本区 */
+    
     uint32_t MaxLen;    /* 文本最大长度 */
     uint16_t LineCount; /* 行数 */
     uint32_t Len;       /* 字符串长度 */
+    uint32_t FifoRead;  /* FIFO读位置 */
+    uint32_t FifoWrite; /* FIFO写位置 */
     FONT_T *Font;       /* 字体 */
     uint16_t Cursor;    /* 行光标, 保留未用 */
     uint8_t Refresh;    /* 1表示内容变化，需要显示刷新 */
+    uint8_t WordWrap;   /* 1表示自动换行 */
+    int32_t LineOffset; /* 查询时向前翻行的行数 */
 }MEMO_T;
 
 /* 背景光控制 */
@@ -412,7 +417,9 @@ void LCD_DrawMemo(MEMO_T *_pMemo);
 void LCD_MemoAddStr(MEMO_T *_pMemo, char *_str);
 void LCD_MemoAddChar(MEMO_T *_pMemo, char _ch);
 void LCD_MemoClear(MEMO_T *_pMemo);
-    
+void LCD_MemoPageDown(MEMO_T *_pMemo, uint16_t  _LineNum);
+void LCD_MemoPageUp(MEMO_T *_pMemo, uint16_t  _LineNum);
+
 void LCD_SetEncode(uint8_t _code);
 uint8_t LCD_GetEncode(void);
 

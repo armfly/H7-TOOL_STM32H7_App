@@ -6,4 +6,7 @@
 #define  TICK_INT_PRIORITY            0 // ((uint32_t)0x0F) /*!< tick interrupt priority */
 4. bsp_CheckRunTime, bsp_GetRunTime 函数内部去掉关闭中断的操作，影响QSPI写操作。
 
+2020-09-16  V1.31固件
+普通触发模式还有遗留问题：拖动触发位置滚动条时，超出波形范围后H7-TOOL程序假死（频繁进入看门狗中断），暂未解决。H7-TOOL界面翻到电压档界面可恢复。
+
   

@@ -63,9 +63,11 @@
 #define CL_MENU_TEXT1           RGB(189, 189, 189)  /* 菜单文字颜色 */
 //#define CL_MENU_BACK1           RGB(5, 54, 131)   /* 菜单文字背景颜色 */
 #define CL_MENU_BACK1           CL_WHITE            /* 菜单文字背景颜色 */
-#define CL_MENU_TEXT2           RGB(189, 189, 189)  /* 光标选中文字颜色 */
-#define CL_MENU_BACK2           CL_YELLOW            /* 光标选中文字背景颜色 */
-#define CL_MENU_ACTIVE_BODER    MEAS_BODER_COLOR     /* 光标选中文字背景颜色 */
+#define CL_MENU_TEXT2           RGB(160, 160, 160)  /* 光标选中文字颜色 */
+#define CL_MENU_BACK2           CL_YELLOW           /* 光标选中文字背景颜色 */
+#define CL_MENU_ACTIVE_BODER    MEAS_BODER_COLOR    /* 光标选中文字背景颜色 */
+#define CL_MENU_BACK3           RGB(255, 236, 222)  /* 光标选中文字背景颜色 - 用于修改参数 */
+#define CL_MENU_TEXT3           RGB(50, 50, 50)     /* 光标选中文字颜色 */
 
 #define LIST_COLOR1             RGB(255, 255, 255) 
 #define LIST_COLOR2             RGB(240, 240, 240) 

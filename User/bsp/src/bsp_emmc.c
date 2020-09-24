@@ -3,12 +3,13 @@
 *
 *    模块名称 : emmc驱动模块
 *    文件名称 : bsp_emmc.c
-*    版    本 : V1.0
+*    版    本 : V1.1
 *    说    明 : emmc存储器底层驱动。根据 stm32h750b_discovery_mmc.c文件修改。
 *
 *    修改记录 :
-*        版本号  日期        作者     说明
-*        V1.0    2019-08-13  armfly  正式发布
+*        版本号  日期        作者        说明
+*        V1.0    2019-08-13  armfly      正式发布
+*        V1.1    2020-09-17  baiyongbin  优化emmc驱动，改为4线模式
 *
 *    Copyright (C), 2018-2030, 安富莱电子 www.armfly.com
 *
@@ -110,17 +111,21 @@ uint8_t BSP_MMC_Init(void)
 {
   uint8_t mmc_state = MMC_OK;
 
+  BSP_MMC_DeInit();
+    
   /* uMMC device interface configuration */
   uSdHandle.Instance = SDMMC1;
 
   /* if CLKDIV = 0 then SDMMC Clock frequency = SDMMC Kernel Clock
      else SDMMC Clock frequency = SDMMC Kernel Clock / [2 * CLKDIV].
+     200MHz / (2*2) = 50MHz
+     200MHz / (2*3) = 33MHz 
   */
   uSdHandle.Init.ClockDiv = 3;		/* 2019-12-13 2 -> 3 */
   uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  uSdHandle.Init.BusWide = SDMMC_BUS_WIDE_8B;
+  uSdHandle.Init.BusWide = SDMMC_BUS_WIDE_4B;
 
   /* Msp MMC initialization */
   BSP_MMC_MspInit(&uSdHandle, NULL);
@@ -130,6 +135,9 @@ uint8_t BSP_MMC_Init(void)
   {
     mmc_state = MMC_ERROR;
   }
+  
+  /* SDIO的四线方式或8线方式 */
+  HAL_MMC_ConfigWideBusOperation(&uSdHandle, SDMMC_BUS_WIDE_8B);
 
   return mmc_state;
 }
@@ -294,7 +302,7 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   /* Common GPIO configuration */
   gpio_init_structure.Mode = GPIO_MODE_AF_PP;
   gpio_init_structure.Pull = GPIO_PULLUP; 
-  gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;	/* 改为GPIO_SPEED_FREQ_HIGH    以前GPIO_SPEED_FREQ_VERY_HIGH*/
+  gpio_init_structure.Speed = GPIO_SPEED_FREQ_MEDIUM;	/* 改为GPIO_SPEED_FREQ_HIGH    以前GPIO_SPEED_FREQ_VERY_HIGH*/
   gpio_init_structure.Alternate = GPIO_AF12_SDIO1;
 
   /* SDMMC GPIO CLKIN PB8, D0 PC8, D1 PC9, D2 PC10, D3 PC11, CK PC12, CMD PD2 */

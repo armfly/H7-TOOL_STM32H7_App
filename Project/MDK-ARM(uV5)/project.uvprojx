@@ -478,6 +478,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\status_mini_dso.c</FilePath>
             </File>
+            <File>
+              <FileName>modify_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\modify_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_can_monitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_can_monitor.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_uart_monitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_uart_monitor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -492,11 +507,6 @@
               <FileName>bsp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\bsp.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_user_lib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\bsp\src\bsp_user_lib.c</FilePath>
             </File>
             <File>
               <FileName>bsp_timer.c</FileName>
@@ -553,6 +563,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>bsp_user_lib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_user_lib.c</FilePath>
             </File>
             <File>
               <FileName>bsp_led.c</FileName>
