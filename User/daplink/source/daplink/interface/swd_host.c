@@ -1661,48 +1661,40 @@ uint8_t swd_set_target_state_sw(TARGET_RESET_STATE state)
 uint8_t swd_enter_debug_program(void)
 {
     uint32_t val;
+    uint8_t ResetMode;
     
-
-    /* 进入编程状态，先复位一次，应对已看门狗低功耗程序的片子 */
-    swd_set_target_reset(1);
-    osDelay(10);
-    swd_set_target_reset(0);
+    /* --0:自动模式,  1:软件模式  2:硬件UnderReset */   
+    ResetMode = g_tProg.ResetMode;
     
-    if (swd_init_debug() == 0)
+    /* 自动模式暂未实现 */
+    if (ResetMode == 0)
     {
-        printf("error 1: swd_init_debug()\r\n");
-        return 0;
+        ResetMode = 1;
     }
-	
-    if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+
+    /* 软件复位 */
+    if (ResetMode == 1)
     {
-        if (swd_get_target_reset() == 0)
-        {
-            swd_set_target_reset(1);    /* 硬件复位 */
-            osDelay(g_tProg.SwdResetDelay);
-        }
-        
-        if (swd_init_debug() == 0)
-        {
-            printf("error 2: swd_init_debug()\r\n");
+        uint32_t i;        
+           
+        if (!swd_init_debug()) {
             return 0;
         }
-        
-        if (swd_freeze_dog() == 0) 
-        {
-            ;
-        }   
-    }
 
-    /*
-        DBG_HCSR : 调试控制和状态寄存器. 提供内核状态信息，允许内核进入调试模式，
-            和提供单步功能。
-    */
-    // Enable debug and halt the core (DHCSR <- 0xA05F0003)
-    {
-        uint8_t i;
+        if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+        {            
+            if (swd_freeze_dog() == 0) 
+            {
+                ;
+            }   
+        }
         
-        for (i = 0; i < 10; i++)
+        /*
+            DBG_HCSR : 调试控制和状态寄存器. 提供内核状态信息，允许内核进入调试模式，
+                和提供单步功能。
+        */
+        // Enable debug and halt the core (DHCSR <- 0xA05F0003)
+        for (i = 0; i < 5; i++)
         {
             if (swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
             {
@@ -1711,85 +1703,223 @@ uint8_t swd_enter_debug_program(void)
             swd_set_target_reset(1);
             osDelay(20);
             swd_set_target_reset(0);
-            osDelay(i * 5);     /* 硬件复位退出后 立即写指令 */            
-        }
-    }     
-
-    // Enable halt on reset
-    if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
-        printf("error 3: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
-        return 0;   /* 超时 */
-    }
-    
-    swd_read_word(DBG_HCSR, &val);
-    if ((val & S_HALT) == 0)
-    {
-        if (swd_get_target_reset() == 0)
+            osDelay(i * 5);
+        }        
+        if (i >= 5)
+        {    
+            printf("error : swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT)\r\n");
+            return 0;
+        }       
+        
+        /* 2020-01-18 armfly 增加退出机制 */
+        // Wait until core is halted
         {
-            swd_set_target_reset(1); 
-            osDelay(20);
+            uint32_t i;
+            
+            for (i = 0; i < 100000; i++)
+            {
+                if (!swd_read_word(DBG_HCSR, &val)) {
+                    printf("error: swd_read_word(DBG_HCSR, &val) --1 i = %d\r\n", i);
+                    return 0;
+                }
+                
+                if ((val & S_HALT) != 0)
+                {
+                    break;
+                }
+            }
+            
+            if (i == 100000)
+            {
+                printf("error: swd_read_word(DBG_HCSR, &val) --1\r\n"); 
+                return 0;   /* 超时 */
+            }
         }
         
-        if (swd_get_target_reset() == 1)
-        {
-            swd_set_target_reset(0);        /* 退出硬件复位 */    
-            osDelay(g_tProg.SwdResetDelay);
-        }  
-    }
-    
-//    // Perform a soft reset
-//    if (!swd_read_word(NVIC_AIRCR, &val)) {
-//        printf("error 2: swd_read_word(NVIC_AIRCR, &val)\r\n");
-//        return 0;
-//    }
+        // Enable halt on reset
+        if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+            printf("error: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
+            return 0;
+        }
 
-//    if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
-//        printf("error 3: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
-//        return 0;
-//    }    
-                    
-    /* 2020-01-18 armfly 增加退出机制 */
-    {
-        uint32_t i;
-        
-        for (i = 0; i < 100000; i++)
+        // Perform a soft reset
+        if (!swd_read_word(NVIC_AIRCR, &val)) {
+            printf("error: swd_read_word(NVIC_AIRCR, &val)\r\n");
+            return 0;
+        }
+
+        if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+            printf("error: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
+            return 0;
+        }
+
+        osDelay(2);
+
+        /* 增加超时退出机制 */
         {
-            if (!swd_read_word(DBG_HCSR, &val)) {
-                printf("error 4: swd_read_word(DBG_HCSR, &val) i = %d\r\n", i);
+            uint32_t i;
+            
+            for (i = 0; i < 100000; i++)
+            {
+                if (!swd_read_word(DBG_HCSR, &val)) {
+                    printf("error: swd_read_word(DBG_HCSR, &val) --2 i = %d\r\n", i);
+                    return 0;
+                }
+                
+                if ((val & S_HALT) != 0)
+                {
+                    break;
+                }
+            }
+            
+            if (i == 100000)
+            {
+                printf("error: swd_read_word(DBG_HCSR, &val) --2\r\n"); 
+                return 0;   /* 超时 */
+            }
+        }            
+
+        // Disable halt on reset
+        if (!swd_write_word(DBG_EMCR, 0)) {
+            return 0;
+        }
+
+        {
+            uint32_t cpuid;
+            
+            /* NVIC_CPUID = 0xE000ED00 */
+            if (!swd_read_memory(NVIC_CPUID, (uint8_t *)&cpuid, 4))
+            {
+                 return 0;          
+            } 
+            printf(".NVIC_CPUID = %08X, %s\r\n", cpuid, swd_arm_core_info(cpuid));        
+        }
+        
+        return 1;
+    }    
+   
+    /* 硬件复位 */
+    if (ResetMode == 2)
+    {
+        /* 进入编程状态，先复位一次，应对已看门狗低功耗程序的片子 */
+        swd_set_target_reset(1);
+        osDelay(10);
+        swd_set_target_reset(0);
+        
+        if (swd_init_debug() == 0)
+        {
+            printf("error 1: swd_init_debug()\r\n");
+            return 0;
+        }
+        
+        if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+        {
+            if (swd_get_target_reset() == 0)
+            {
+                swd_set_target_reset(1);    /* 硬件复位 */
+                osDelay(g_tProg.SwdResetDelay);
+            }
+            
+            if (swd_init_debug() == 0)
+            {
+                printf("error 2: swd_init_debug()\r\n");
                 return 0;
             }
             
-            if ((val & S_HALT) != 0)
+            if (swd_freeze_dog() == 0) 
             {
-                break;
+                ;
+            }   
+        }
+
+        /*
+            DBG_HCSR : 调试控制和状态寄存器. 提供内核状态信息，允许内核进入调试模式，
+                和提供单步功能。
+        */
+        // Enable debug and halt the core (DHCSR <- 0xA05F0003)
+        {
+            uint8_t i;
+            
+            for (i = 0; i < 10; i++)
+            {
+                if (swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
+                {
+                    break;
+                }
+                swd_set_target_reset(1);
+                osDelay(20);
+                swd_set_target_reset(0);
+                osDelay(i * 5);     /* 硬件复位退出后 立即写指令 */            
+            }
+        }     
+
+        // Enable halt on reset
+        if (!swd_write_word(DBG_EMCR, VC_CORERESET)) {
+            printf("error 3: swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
+            return 0;   /* 超时 */
+        }
+        
+        swd_read_word(DBG_HCSR, &val);
+        if ((val & S_HALT) == 0)
+        {
+            if (swd_get_target_reset() == 0)
+            {
+                swd_set_target_reset(1); 
+                osDelay(20);
+            }
+            
+            if (swd_get_target_reset() == 1)
+            {
+                swd_set_target_reset(0);        /* 退出硬件复位 */    
+                osDelay(g_tProg.SwdResetDelay);
+            }  
+        } 
+                        
+        /* 2020-01-18 armfly 增加退出机制 */
+        {
+            uint32_t i;
+            
+            for (i = 0; i < 100000; i++)
+            {
+                if (!swd_read_word(DBG_HCSR, &val)) {
+                    printf("error 4: swd_read_word(DBG_HCSR, &val) i = %d\r\n", i);
+                    return 0;
+                }
+                
+                if ((val & S_HALT) != 0)
+                {
+                    break;
+                }
+            }
+            
+            if (i == 100000)
+            {
+                printf("error 5: swd_read_word(DBG_HCSR, &val)\r\n"); 
+                return 0;   /* 超时 */
             }
         }
         
-        if (i == 100000)
-        {
-            printf("error 5: swd_read_word(DBG_HCSR, &val)\r\n"); 
-            return 0;   /* 超时 */
+
+        // Disable halt on reset
+        if (!swd_write_word(DBG_EMCR, 0)) {
+            printf("error 6: swd_write_word(DBG_EMCR, 0)\r\n"); 
+            return 0;
         }
+
+        {
+            uint32_t cpuid;
+            
+            /* NVIC_CPUID = 0xE000ED00 */
+            if (!swd_read_memory(NVIC_CPUID, (uint8_t *)&cpuid, 4))
+            {
+                 return 0;          
+            } 
+            printf(".NVIC_CPUID = %08X, %s\r\n", cpuid, swd_arm_core_info(cpuid));        
+        }
+            
+        return 1;
     }
     
-
-    // Disable halt on reset
-    if (!swd_write_word(DBG_EMCR, 0)) {
-        printf("error 6: swd_write_word(DBG_EMCR, 0)\r\n"); 
-        return 0;
-    }
-
-    {
-        uint32_t cpuid;
-        
-        /* NVIC_CPUID = 0xE000ED00 */
-        if (!swd_read_memory(NVIC_CPUID, (uint8_t *)&cpuid, 4))
-        {
-             return 0;          
-        } 
-        printf(".NVIC_CPUID = %08X, %s\r\n", cpuid, swd_arm_core_info(cpuid));        
-    }
-        
-    return 1;
+    return 0;
 }
 #endif

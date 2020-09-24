@@ -893,6 +893,7 @@ void status_ProgSetting(void)
         g_tMenuProg1.Font.Space = 0;
         g_tMenuProg1.RollBackEn = 1;  /* 允许回滚 */
         g_tMenuProg1.GBK = 0;
+        g_tMenuProg1.ActiveBackColor = 0;   /* 选中行背景色ID */
         LCD_InitMenu(&g_tMenuProg1, (char **)g_MenuProg1_Text); /* 初始化菜单结构 */
     }    
     LCD_DispMenu(&g_tMenuProg1);

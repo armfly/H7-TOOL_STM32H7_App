@@ -93,6 +93,9 @@ typedef struct
 
 CMD_LIST_T tBtnList[16];
 
+char g_OutText[4 * 1024] = {0}; /* 最多支持4K字节文本缓存 */
+MEMO_T g_LuaMemo = {0};
+
 /* 
 char s_lua_prog_buf[LUA_PROG_LEN_MAX + 1];
 uint32_t s_lua_prog_len;
@@ -154,8 +157,6 @@ void FindBtnNoteCmd(void)
 	}
 }
 
-char g_OutText[2 * 1024] = {0}; /* 最多支持2K字节文本缓存 */
-MEMO_T g_LuaMemo = {0};
 void status_LuaRun(void)
 {
     uint8_t ucKeyCode; /* 按键代码 */
@@ -175,7 +176,9 @@ void status_LuaRun(void)
         //g_LuaMemo.Color = CL_WHITE;
         g_LuaMemo.Text = g_OutText;
         g_LuaMemo.MaxLen = sizeof(g_OutText);
-        g_LuaMemo.LineCount = 0;
+        g_LuaMemo.LineCount = 0;        
+        g_LuaMemo.WordWrap = 0;
+        g_LuaMemo.LineOffset = 0;
         
         LCD_InitMemo(&g_LuaMemo);
         LCD_DrawMemo(&g_LuaMemo);

@@ -23,8 +23,8 @@ const uint8_t *g_Menu1_Text[] =
     " 1 脱机烧录器(单路)",
     " 2 脱机烧录器(多路)",
     " 3 LUA小程序",
-    " 4 数据记录仪",
-    " 6 系统设置", 
+    " 4 数据监视器",
+    " 5 系统设置", 
 
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"    
@@ -34,10 +34,8 @@ MENU_T g_tMenu1;
 
 const uint8_t *g_MenuRec_Text[] = 
 {
-//    " 1 串口记录仪",
-//    " 2 CAN记录仪",
-//    " 3 IO记录仪",
-//    " 4 模拟量记录仪",
+    "1 串口(TTL 485 232)",
+    "2 CAN总线(预留)",
 
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
@@ -78,6 +76,7 @@ void status_ExtendMenu1(void)
         g_tMenu1.Font.Space = 0;
         g_tMenu1.RollBackEn = 1;  /* 允许回滚 */
         g_tMenu1.GBK = 0;
+        g_tMenu1.ActiveBackColor = 0;   /* 选中行背景色ID */        
         LCD_InitMenu(&g_tMenu1, (char **)g_Menu1_Text); /* 初始化菜单结构 */
     }    
     LCD_DispMenu(&g_tMenu1);
@@ -103,13 +102,11 @@ void status_ExtendMenu1(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-                case KEY_UP_S: /* S键 上 */
+                case KEY_UP_S:          /* S键 上 */
                     LCD_MoveUpMenu(&g_tMenu1);
                     break;
 
-                case KEY_LONG_DOWN_S: /* S键 上 */
-                    PlayKeyTone();
-
+                case KEY_LONG_DOWN_S:   /* S键 上 */
                     if (g_tMenu1.Cursor == 0)
                     {
                         g_gMulSwd.MultiMode = 0;
@@ -134,11 +131,11 @@ void status_ExtendMenu1(void)
                     }                 
                     break;
 
-                case KEY_UP_C: /* C键 下 */
+                case KEY_UP_C:          /* C键 下 */
                     LCD_MoveDownMenu(&g_tMenu1);
                     break;
 
-                case KEY_LONG_DOWN_C: /* C键长按 */
+                case KEY_LONG_DOWN_C:   /* C键长按 */
                     PlayKeyTone();
                     g_MainStatus = MS_LINK_MODE;
                     break;
@@ -177,7 +174,8 @@ void status_ExtendMenuRec(void)
         g_tMenuRec.Font.FontCode = FC_ST_24;
         g_tMenuRec.Font.Space = 0;
         g_tMenuRec.RollBackEn = 1;  /* 允许回滚 */   
-        g_tMenuRec.GBK = 0;        
+        g_tMenuRec.GBK = 0; 
+        g_tMenuRec.ActiveBackColor = 0;   /* 选中行背景色ID */      
         LCD_InitMenu(&g_tMenuRec, (char **)g_MenuRec_Text); /* 初始化菜单结构 */
     }
     LCD_DispMenu(&g_tMenuRec);
@@ -209,36 +207,38 @@ void status_ExtendMenuRec(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-                case KEY_UP_S: /* S键 上 */
+                case KEY_UP_S:          /* S键 上 */
+                    PlayKeyTone();
                     LCD_MoveUpMenu(&g_tMenuRec);
                     break;
 
-                case KEY_LONG_DOWN_S: /* S键 上 */
+                case KEY_LONG_DOWN_S:   /* S键 上 */
                     PlayKeyTone();
 
-    //                if (g_tMenuRec.Cursor == 0)
-    //                {
-    //                    g_MainStatus = MS_PROG_WORK;
-    //                }
-    //                else if (g_tMenuRec.Cursor == 1)
-    //                {
-    //                    g_MainStatus = MS_MODIFY_PARAM;
-    //                }
-    //                else if (g_tMenuRec.Cursor == 2)
-    //                {
-    //                    g_MainStatus = MS_ESP32_TEST;
-    //                }
-    //                else if (g_tMenuRec.Cursor == 3)
-    //                {
-    //                    g_MainStatus = MS_USB_EMMC;
-    //                }                                
+                    if (g_tMenuRec.Cursor == 0)
+                    {
+                        g_MainStatus = MS_MONITOR_UART;
+                    }
+                    else if (g_tMenuRec.Cursor == 1)
+                    {
+                        g_MainStatus = MS_MONITOR_CAN;
+                    }
+                    else if (g_tMenuRec.Cursor == 2)
+                    {
+                        g_MainStatus = MS_MONITOR_GPIO;
+                    }
+                    else if (g_tMenuRec.Cursor == 3)
+                    {
+                        g_MainStatus = MS_MONITOR_ANALOG;
+                    }                                
                     break;
 
-            case KEY_UP_C: /* C键 下 */
+            case KEY_UP_C:              /* C键 下 */
+                PlayKeyTone();
                 LCD_MoveDownMenu(&g_tMenuRec);
                 break;
 
-            case KEY_LONG_DOWN_C: /* C键长按 */
+            case KEY_LONG_DOWN_C:       /* C键长按 */
                 PlayKeyTone();
                 g_MainStatus = MS_EXTEND_MENU1;
                 break;

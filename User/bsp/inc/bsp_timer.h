@@ -47,6 +47,9 @@ uint8_t bsp_CheckTimer(uint8_t _id);
 int32_t bsp_GetRunTime(void);
 int32_t bsp_CheckRunTime(int32_t _LastTime);
 
+uint64_t bsp_GetRunTimeUs(void);
+int64_t bsp_CheckRunTimeUs(int64_t _LastTime);
+
 void bsp_InitHardTimer(void);
 void bsp_StartHardTimer(uint8_t _CC, uint32_t _uiTimeOut, void *_pCallBack);
 void bsp_DelayNS(uint32_t n);

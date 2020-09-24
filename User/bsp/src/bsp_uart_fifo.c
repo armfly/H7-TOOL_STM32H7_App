@@ -1129,8 +1129,8 @@ static void InitHardUart(void)
     /* 配置波特率、奇偶校验 */
     bsp_InitUartParam(COM1, UART1_BAUD, UART_PARITY_NONE, UART_MODE_TX_RX);
 
-    // USART_CR1_PEIE | USART_CR1_RXNEIE
-    SET_BIT(USART1->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
+    /* 使能RX接受中断，接收超时中断  */
+    SET_BIT(USART1->CR1, USART_CR1_RXNEIE | USART_CR1_RTOIE); 
 #endif
 
 #if UART2_FIFO_EN == 1 /* 串口2 */
@@ -1316,7 +1316,8 @@ static void InitHardUart(void)
     /* 配置波特率、奇偶校验 */
     bsp_InitUartParam(COM7, UART7_BAUD, UART_PARITY_NONE, UART_MODE_TX_RX);
 
-    SET_BIT(UART7->CR1, USART_CR1_RXNEIE); /* 使能PE. RX接受中断 */
+    /* 使能RX接受中断，接收超时中断  */
+    SET_BIT(UART7->CR1, USART_CR1_RXNEIE | USART_CR1_RTOIE);     
 #endif
 
 #if UART8_FIFO_EN == 1 /* UART8 */
@@ -1505,6 +1506,70 @@ void comPutRxFifo(COM_PORT_E _ucPort, uint8_t *_buf, uint16_t _len)
 
 /*
 *********************************************************************************************************
+*   函 数 名: comSetCallBackReciveNew
+*   功能说明: 配置接收回调函数
+*   形    参:  _pUart : 串口设备
+*              _ReciveNew : 函数指针，0表示取消
+*   返 回 值: 无
+*********************************************************************************************************
+*/
+void comSetCallBackReciveNew(COM_PORT_E _ucPort, void (*_ReciveNew)(uint8_t _byte))
+{
+    UART_T *pUart;
+    pUart = ComToUart(_ucPort);
+    if (pUart == 0)
+    {
+        return;
+    }
+    
+    pUart->ReciveNew = _ReciveNew;
+}
+
+/*
+*********************************************************************************************************
+*   函 数 名: comSetCallBackIdleLine
+*   功能说明: 配置线路空闲中断回调函数
+*   形    参:  _pUart : 串口设备
+*             _IdleLine : 函数指针，0表示取消
+*   返 回 值: 无
+*********************************************************************************************************
+*/
+void comSetCallBackIdleLine(COM_PORT_E _ucPort, void (*_IdleLine)(void))
+{
+    UART_T *pUart;
+    pUart = ComToUart(_ucPort);
+    if (pUart == 0)
+    {
+        return;
+    }
+    
+    pUart->IdleLine = _IdleLine;
+}
+
+/*
+*********************************************************************************************************
+*   函 数 名: comSetReciverTimeout
+*   功能说明: 配置接收器超时，并启用接收器中断
+*   形    参:  _pUart : 串口设备
+*             _Timeout : 超时间, 按bit单位
+*   返 回 值: 无
+*********************************************************************************************************
+*/
+void comSetReciverTimeout(COM_PORT_E _ucPort, uint32_t _Timeout)
+{
+    UART_T *pUart;
+    pUart = ComToUart(_ucPort);
+    if (pUart == 0)
+    {
+        return;
+    }
+    
+    pUart->huart.Instance->RTOR = _Timeout;
+    pUart->huart.Instance->CR2 |= USART_CR2_RTOEN;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: UartIRQ
 *    功能说明: 供中断服务程序调用，通用串口中断处理函数
 *    形    参: _pUart : 串口设备
@@ -1518,7 +1583,7 @@ void UartIRQ(UART_T *_pUart)
     uint32_t cr3its = READ_REG(_pUart->huart.Instance->CR3);
 
     /* 处理接收中断  */
-    if ((isrflags & USART_ISR_RXNE_RXFNE) != RESET)
+    if ((isrflags & USART_ISR_RXNE_RXFNE) != 0 && (isrflags & USART_ISR_PE) == 0U)
     {
         /* 从串口接收数据寄存器读取数据存放到接收FIFO */
         uint8_t ch;
@@ -1542,6 +1607,16 @@ void UartIRQ(UART_T *_pUart)
             {
                 _pUart->ReciveNew(ch);
             }
+        }
+    }
+    
+    /* 字节间超时中断 (MODBUS RTU 3.5字符超时） */
+    if (isrflags & USART_ISR_RTOF)
+    {
+        SET_BIT(_pUart->huart.Instance->ICR, UART_CLEAR_RTOF);
+        if (_pUart->IdleLine)
+        {
+            _pUart->IdleLine();
         }
     }
 

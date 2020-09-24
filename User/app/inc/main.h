@@ -46,6 +46,11 @@ enum
     
     MS_LUA_SELECT_FILE,     /* 浏览lua文件 */
     MS_LUA_EXEC_FILE,       /* 执行lua文件 */
+    
+    MS_MONITOR_UART,        /* 串口监视器 */
+    MS_MONITOR_CAN,         /* CAN监视器 */
+    MS_MONITOR_GPIO,        /* IO监视器 */
+    MS_MONITOR_ANALOG,      /* 模拟量监视器 */    
 };
 
 void DispHeader(char *_str);

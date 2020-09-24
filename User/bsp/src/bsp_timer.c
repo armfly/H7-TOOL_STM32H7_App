@@ -62,7 +62,7 @@
 #define TIM_HARD_IRQHandler TIM5_IRQHandler
 #endif
 
-__IO uint32_t g_uiTimeHighWord = 0; 
+
 
 /* 保存 TIM定时中断到后执行的回调函数指针 */
 static void (*s_TIM_CallBack1)(void);
@@ -77,11 +77,13 @@ static volatile uint8_t s_ucTimeOutFlag = 0;
 /* 定于软件定时器结构体变量 */
 static SOFT_TMR s_tTmr[TMR_COUNT] = {0};
 
+
 /*
     全局运行时间，单位1ms
     最长可以表示 24.85天，如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 */
 __IO int32_t g_iRunTime = 0;
+__IO uint64_t g_uiTimeHighWord = 0; 
 
 static __IO uint8_t g_ucEnableSystickISR = 0; /* 等待变量初始化 */
 
@@ -408,7 +410,8 @@ uint8_t bsp_CheckTimer(uint8_t _id)
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_GetRunTime
-*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 24.85天，如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
+*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 24.85天，
+*              如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 *    形    参:  无
 *    返 回 值: CPU运行时间，单位1ms
 *********************************************************************************************************
@@ -425,7 +428,8 @@ int32_t bsp_GetRunTime(void)
 
 //    return runtime;
     
-    g_iRunTime = TIM_HARD->CNT / 1000;
+    /* 用硬件定时器计时后，4294秒，约 1.19小时 */
+    g_iRunTime = (TIM_HARD->CNT / 1000);
     
     return g_iRunTime;
 }
@@ -454,6 +458,48 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
     else
     {
         time_diff = 0x7FFFFFFF - _LastTime + now_time;
+    }
+
+    return time_diff;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_GetRunTimeUs
+*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 24.85天，
+*              如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
+*    形    参:  无
+*    返 回 值: CPU运行时间，单位1us.  
+*********************************************************************************************************
+*/
+uint64_t bsp_GetRunTimeUs(void)
+{
+    return TIM_HARD->CNT + g_uiTimeHighWord;;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_CheckRunTimeUs
+*    功能说明: 计算当前运行时间和给定时刻之间的差值。处理了计数器循环。
+*    形    参:  _LastTime 上个时刻
+*    返 回 值: 当前时间和过去时间的差值，单位1us
+*********************************************************************************************************
+*/
+int64_t bsp_CheckRunTimeUs(int64_t _LastTime)
+{
+    int64_t now_time;
+    int64_t time_diff;
+
+    now_time = TIM_HARD->CNT + g_uiTimeHighWord;
+
+    if (now_time >= _LastTime)
+    {
+        time_diff = now_time - _LastTime;
+    }
+    else
+    {
+        /* Windwos计算机将 0xFFFFFFFFFFFFFFFF 做 -1处理 */
+        time_diff = 0xFFFFFFFFFFFFFFFE - _LastTime + now_time;
     }
 
     return time_diff;
@@ -714,7 +760,7 @@ void TIM_HARD_IRQHandler(void)
     {
         TIMx->SR = (uint16_t)~TIM_IT_UPDATE;
         
-        g_uiTimeHighWord++;
+        g_uiTimeHighWord += 0x100000000;
     }
     
     itstatus = timesr & TIM_IT_CC1;

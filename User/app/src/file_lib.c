@@ -1244,7 +1244,7 @@ uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, c
             g_tMenuLua.Font.Space = 0;            
             g_tMenuLua.RollBackEn = 1;
             g_tMenuLua.GBK = 1;
-            
+            g_tMenuLua.ActiveBackColor = 0;   /* 选中行背景色ID */              
             for (i = 0; i < g_tFileList.Count; i++)
             {
                 g_MenuLua_Text[i] = (uint8_t *)g_tFileList.Name[i];

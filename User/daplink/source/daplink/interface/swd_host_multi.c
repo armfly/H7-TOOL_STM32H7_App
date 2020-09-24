@@ -2080,188 +2080,363 @@ uint8_t MUL_swd_enter_debug_program(void)
 {
     uint32_t val[4];
     uint32_t i;
+    uint8_t ResetMode;
     
-    /* 进入编程状态，先复位一次，应对已看门狗低功耗程序的片子 */
-    MUL_swd_set_target_reset(1);
-    osDelay(10);
-    MUL_swd_set_target_reset(0);
+    /* --0:自动模式,  1:软件模式  2:硬件UnderReset */   
+    ResetMode = g_tProg.ResetMode;
     
-    if (MUL_swd_init_debug() == 0)
+    /* 自动模式暂未实现 */
+    if (ResetMode == 0)
     {
-        printf("error 1: MUL_swd_init_debug()\r\n");        
-        return 0;
-    }
-	
-    osDelay(5);
+        ResetMode = 1;
+    }   
     
-    if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+    /* 软件复位 */
+    if (ResetMode == 1)
     {
-        if (MUL_swd_get_target_reset() == 0)
-        {
-            MUL_swd_set_target_reset(1);    /* 硬件复位 */ 
-            osDelay(g_tProg.SwdResetDelay);
+        if (!MUL_swd_init_debug()) {
+            return 0;
         }
+
+        if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
+        {
+            if (swd_freeze_dog() == 0) 
+            {
+                /* 失败 */;
+            }   
+        }
+        
+        // Enable debug and halt the core (DHCSR <- 0xA05F0003)
+        for (i = 0; i < 5; i++)
+        {
+            if (MUL_swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
+            {
+                break;
+            }
+            
+            // Target is in invalid state?
+            MUL_swd_set_target_reset(1);
+            osDelay(20);
+            MUL_swd_set_target_reset(0);
+            osDelay(i * 5);
+        }
+
+        // Wait until core is halted
+        for (i = 0; i < 500; i++)
+        {
+            uint8_t err;
+            
+            if (!MUL_swd_read_word(DBG_HCSR, val)) 
+            {
+                return 0;
+            }
+            
+            err = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+            {
+                err = 1;
+            }   
+            if (err == 0)
+            {
+                break;
+            }
+            
+            bsp_DelayUS(100);
+        }
+
+        // Enable halt on reset
+        if (!MUL_swd_write_word(DBG_EMCR, VC_CORERESET)) {
+            return 0;
+        }
+
+        // Perform a soft reset
+        if (!MUL_swd_read_word(NVIC_AIRCR, val)) {
+            return 0;
+        }
+
+        if (!MUL_swd_write_word(NVIC_AIRCR, VECTKEY | (val[0] & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
+            return 0;
+        }
+
+        osDelay(2);
+
+        for (i = 0; i < 500; i++)
+        {
+            uint8_t err;
+            
+            if (!MUL_swd_read_word(DBG_HCSR, val)) 
+            {
+                return 0;
+            }
+            
+            err = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+            {
+                err = 1;
+            }   
+            if (err == 0)
+            {
+                break;
+            }
+            
+            bsp_DelayUS(100);
+        }
+        // Disable halt on reset
+        if (!MUL_swd_write_word(DBG_EMCR, 0)) {
+            return 0;
+        }
+        
+        /* 解锁后重读 NVIC_CPUID */
+        {
+            uint32_t cpuid[4];
+            
+            /* NVIC_CPUID = 0xE000ED00 */
+            if (!MUL_swd_read_word(NVIC_CPUID, cpuid))
+            {
+                printf(".MUL_swd_read_word(NVIC_CPUID, cpuid) error\r\n");
+                return 0;             
+            }
+            
+            if (g_gMulSwd.MultiMode >= 1)
+            {
+                printf(".NVIC_CPUID1 = %08X, %s\r\n", cpuid[0], swd_arm_core_info(cpuid[0]));
+            }
+            if (g_gMulSwd.MultiMode >= 2)
+            {
+                printf(".NVIC_CPUID2 = %08X, %s\r\n", cpuid[1], swd_arm_core_info(cpuid[1]));
+            }
+            if (g_gMulSwd.MultiMode >= 3)
+            {
+                printf(".NVIC_CPUID3 = %08X, %s\r\n", cpuid[2], swd_arm_core_info(cpuid[2]));
+            }
+            if (g_gMulSwd.MultiMode >= 4)
+            {                
+                printf(".NVIC_CPUID4 = %08X, %s\r\n", cpuid[3], swd_arm_core_info(cpuid[3]));
+            }
+            {
+                uint8_t err = 0;
+                
+                for (i = 0; i < 4; i++)
+                {
+                    if (g_gMulSwd.Active[i] == 1)
+                    {
+                        if ((cpuid[i] & 0xFF000000) != 0x41000000)
+                        {
+                            err = 1;
+                        }
+                    }
+                }
+                
+                if (err == 1)
+                {
+                    ;
+                }
+            }
+        }   
+        
+        return 1;
+    }    
+        
+    /* 硬件复位 */
+    if (ResetMode == 2)
+    {
+        /* 进入编程状态，先复位一次，应对已看门狗低功耗程序的片子 */
+        MUL_swd_set_target_reset(1);
+        osDelay(10);
+        MUL_swd_set_target_reset(0);
         
         if (MUL_swd_init_debug() == 0)
         {
-            printf("error 2: MUL_swd_init_debug()\r\n");
+            printf("error 1: MUL_swd_init_debug()\r\n");        
             return 0;
         }
         
-        if (swd_freeze_dog() == 0) 
-        {
-            /* 失败 */;
-        }   
-    }
-
-    // Enable debug and halt the core (DHCSR <- 0xA05F0003)
-    for (i = 0; i < 10; i++)
-    {
-        if (MUL_swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
-        {
-            break;
-        }
-        // Target is in invalid state?
-        MUL_swd_set_target_reset(1);
-        osDelay(20);
-        MUL_swd_set_target_reset(0);
-        osDelay(i * 5);                
-    }
-    if (i == 10)
-    {
-        printf("error 3: MUL_swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT)\r\n");
-        return 0;
-    }    
-
-    // Enable halt on reset
-    if (!MUL_swd_write_word(DBG_EMCR, VC_CORERESET)) {
-        printf("error 4: MUL_swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
-        return 0;   /* 超时 */
-    }
-    
-    MUL_swd_read_word(DBG_HCSR, val);
-    if ((val[0] & S_HALT) == 0)
-    {
-        if (MUL_swd_get_target_reset() == 0)
-        {
-            MUL_swd_set_target_reset(1);    /* 硬件复位 */ 
-            osDelay(20);
-        }
+        osDelay(5);
         
-        if (MUL_swd_get_target_reset() == 1)
+        if (swd_freeze_dog() == 0)      /* 如果冻结看门狗时钟失败（STM32H7）*/
         {
-            MUL_swd_set_target_reset(0);    /* 退出硬件复位 */ 
-            osDelay(g_tProg.SwdResetDelay);
-        }
-    }
-
-    // Wait until core is halted
-    for (i = 0; i < 1000; i++)
-    {
-        uint8_t err;
-        
-        if (!MUL_swd_read_word(DBG_HCSR, val)) 
-        {
-            printf("error 5: MUL_swd_read_word(DBG_HCSR, val)\r\n");
-            return 0;
-        }
-        
-        err = 0;
-        if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
-        {
-            err = 1;
-        }
-        if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
-        {
-            err = 1;
-        }
-        if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
-        {
-            err = 1;
-        }
-        if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
-        {
-            err = 1;
-        }   
-        
-        if (err == 0)
-        {
-            break;
-        }
-        
-        bsp_DelayUS(1000);
-    }
-    if (i == 1000)
-    {
-        printf("error 6: MUL_swd_read_word(DBG_HCSR, val)\r\n");
-        return 0;
-    }
-    
-     // Perform a soft reset
-//    if (!swd_read_word(NVIC_AIRCR, &val)) {
-//        printf("error 2: swd_read_word(NVIC_AIRCR, &val)\r\n");
-//        return 0;
-//    }
-
-//    if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
-//        printf("error 3: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
-//        return 0;
-//    }     
-
-    // Disable halt on reset
-    if (!MUL_swd_write_word(DBG_EMCR, 0)) 
-    {
-        printf("error 7: MUL_swd_write_word(DBG_EMCR, 0)\r\n");
-        return 0;
-    }
-    
-    /* 解锁后重读 NVIC_CPUID */
-    {
-        uint32_t cpuid[4];
-        
-        /* NVIC_CPUID = 0xE000ED00 */
-        if (!MUL_swd_read_word(NVIC_CPUID, cpuid))
-        {
-            printf(".MUL_swd_read_word(NVIC_CPUID, cpuid) error\r\n");
-            return 0;             
-        }
-        
-        if (g_gMulSwd.MultiMode >= 1)
-        {
-            printf(".NVIC_CPUID1 = %08X, %s\r\n", cpuid[0], swd_arm_core_info(cpuid[0]));
-        }
-        if (g_gMulSwd.MultiMode >= 2)
-        {
-            printf(".NVIC_CPUID2 = %08X, %s\r\n", cpuid[1], swd_arm_core_info(cpuid[1]));
-        }
-        if (g_gMulSwd.MultiMode >= 3)
-        {
-            printf(".NVIC_CPUID3 = %08X, %s\r\n", cpuid[2], swd_arm_core_info(cpuid[2]));
-        }
-        if (g_gMulSwd.MultiMode >= 4)
-        {                
-            printf(".NVIC_CPUID4 = %08X, %s\r\n", cpuid[3], swd_arm_core_info(cpuid[3]));
-        }
-        {
-            uint8_t err = 0;
-            
-            for (i = 0; i < 4; i++)
+            if (MUL_swd_get_target_reset() == 0)
             {
-                if (g_gMulSwd.Active[i] == 1)
+                MUL_swd_set_target_reset(1);    /* 硬件复位 */ 
+                osDelay(g_tProg.SwdResetDelay);
+            }
+            
+            if (MUL_swd_init_debug() == 0)
+            {
+                printf("error 2: MUL_swd_init_debug()\r\n");
+                return 0;
+            }
+            
+            if (swd_freeze_dog() == 0) 
+            {
+                /* 失败 */;
+            }   
+        }
+
+        // Enable debug and halt the core (DHCSR <- 0xA05F0003)
+        for (i = 0; i < 10; i++)
+        {
+            if (MUL_swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT) != 0)
+            {
+                break;
+            }
+            // Target is in invalid state?
+            MUL_swd_set_target_reset(1);
+            osDelay(20);
+            MUL_swd_set_target_reset(0);
+            osDelay(i * 5);                
+        }
+        if (i == 10)
+        {
+            printf("error 3: MUL_swd_write_word(DBG_HCSR, DBGKEY | C_DEBUGEN | C_HALT)\r\n");
+            return 0;
+        }    
+
+        // Enable halt on reset
+        if (!MUL_swd_write_word(DBG_EMCR, VC_CORERESET)) {
+            printf("error 4: MUL_swd_write_word(DBG_EMCR, VC_CORERESET)\r\n");
+            return 0;   /* 超时 */
+        }
+        
+        MUL_swd_read_word(DBG_HCSR, val);
+        if ((val[0] & S_HALT) == 0)
+        {
+            if (MUL_swd_get_target_reset() == 0)
+            {
+                MUL_swd_set_target_reset(1);    /* 硬件复位 */ 
+                osDelay(20);
+            }
+            
+            if (MUL_swd_get_target_reset() == 1)
+            {
+                MUL_swd_set_target_reset(0);    /* 退出硬件复位 */ 
+                osDelay(g_tProg.SwdResetDelay);
+            }
+        }
+
+        // Wait until core is halted
+        for (i = 0; i < 1000; i++)
+        {
+            uint8_t err;
+            
+            if (!MUL_swd_read_word(DBG_HCSR, val)) 
+            {
+                printf("error 5: MUL_swd_read_word(DBG_HCSR, val)\r\n");
+                return 0;
+            }
+            
+            err = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((val[0] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((val[1] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((val[2] & S_HALT) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((val[3] & S_HALT) == 0))
+            {
+                err = 1;
+            }   
+            
+            if (err == 0)
+            {
+                break;
+            }
+            
+            bsp_DelayUS(1000);
+        }
+        if (i == 1000)
+        {
+            printf("error 6: MUL_swd_read_word(DBG_HCSR, val)\r\n");
+            return 0;
+        }  
+
+        // Disable halt on reset
+        if (!MUL_swd_write_word(DBG_EMCR, 0)) 
+        {
+            printf("error 7: MUL_swd_write_word(DBG_EMCR, 0)\r\n");
+            return 0;
+        }
+        
+        /* 解锁后重读 NVIC_CPUID */
+        {
+            uint32_t cpuid[4];
+            
+            /* NVIC_CPUID = 0xE000ED00 */
+            if (!MUL_swd_read_word(NVIC_CPUID, cpuid))
+            {
+                printf(".MUL_swd_read_word(NVIC_CPUID, cpuid) error\r\n");
+                return 0;             
+            }
+            
+            if (g_gMulSwd.MultiMode >= 1)
+            {
+                printf(".NVIC_CPUID1 = %08X, %s\r\n", cpuid[0], swd_arm_core_info(cpuid[0]));
+            }
+            if (g_gMulSwd.MultiMode >= 2)
+            {
+                printf(".NVIC_CPUID2 = %08X, %s\r\n", cpuid[1], swd_arm_core_info(cpuid[1]));
+            }
+            if (g_gMulSwd.MultiMode >= 3)
+            {
+                printf(".NVIC_CPUID3 = %08X, %s\r\n", cpuid[2], swd_arm_core_info(cpuid[2]));
+            }
+            if (g_gMulSwd.MultiMode >= 4)
+            {                
+                printf(".NVIC_CPUID4 = %08X, %s\r\n", cpuid[3], swd_arm_core_info(cpuid[3]));
+            }
+            {
+                uint8_t err = 0;
+                
+                for (i = 0; i < 4; i++)
                 {
-                    if ((cpuid[i] & 0xFF000000) != 0x41000000)
+                    if (g_gMulSwd.Active[i] == 1)
                     {
-                        err = 1;
+                        if ((cpuid[i] & 0xFF000000) != 0x41000000)
+                        {
+                            err = 1;
+                        }
                     }
                 }
+                
+                if (err == 1)
+                {
+                    ;
+                }
             }
-            
-            if (err == 1)
-            {
-                ;
-            }
-        }
-    }     
-    return 1;
+        }     
+        return 1;
+    }
+    
+    return 0;
 }
 #endif

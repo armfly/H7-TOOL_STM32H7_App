@@ -181,6 +181,8 @@ typedef struct
     void (*SendBefor)(void);            /* 开始发送之前的回调函数指针（主要用于RS485切换到发送模式） */
     void (*SendOver)(void);             /* 发送完毕的回调函数指针（主要用于RS485将发送模式切换为接收模式） */
     void (*ReciveNew)(uint8_t _byte);   /* 串口收到数据的回调函数指针 */
+    void (*IdleLine)(void);             /* 字符间超时（线路空闲）中断 */
+    
     uint8_t Sending;                    /* 正在发送中 */
 }UART_T;
 
@@ -210,6 +212,9 @@ void bsp_SetUartParam(COM_PORT_E _ucPort, uint32_t BaudRate, uint32_t Parity, ui
 
 uint32_t comGetBaud(COM_PORT_E _ucPort);
 void comSetBaud(COM_PORT_E _ucPort, uint32_t _BaudRate);
+void comSetCallBackReciveNew(COM_PORT_E _ucPort, void (*_ReciveNew)(uint8_t _byte));
+void comSetCallBackIdleLine(COM_PORT_E _ucPort, void (*_IdleLine)(void));
+void comSetReciverTimeout(COM_PORT_E _ucPort, uint32_t _Timeout);
 
 #endif
 

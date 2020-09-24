@@ -29,6 +29,7 @@ const uint8_t *g_MenuSys_Text[] =
     " 3 ESP32固件升级",
     " 4 USB eMMC磁盘",
     " 5 数据维护",
+    " 6 重启",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -56,6 +57,7 @@ void status_SystemSetMain(void)
     uint8_t ucKeyCode; /* 按键代码 */
     uint8_t fRefresh;
     static uint8_t s_enter_sub_menu = 0;
+    uint8_t ResetReq = 0;
 
     DispHeader2(90, "系统设置");
 
@@ -73,6 +75,7 @@ void status_SystemSetMain(void)
         g_tMenuSys.Font.Space = 0;
         g_tMenuSys.RollBackEn = 1;  /* 允许回滚 */        
         g_tMenuSys.GBK = 0;
+        g_tMenuSys.ActiveBackColor = 0;   /* 选中行背景色ID */
         LCD_InitMenu(&g_tMenuSys, (char **)g_MenuSys_Text); /* 初始化菜单结构 */
     }
     LCD_DispMenu(&g_tMenuSys);
@@ -98,7 +101,7 @@ void status_SystemSetMain(void)
             /* 有键按下 */
             switch (ucKeyCode)
             {
-                case KEY_UP_S: /* S键 上 */
+                case KEY_UP_S: /* S键 上 */                   
                     LCD_MoveUpMenu(&g_tMenuSys);
                     break;
 
@@ -125,9 +128,22 @@ void status_SystemSetMain(void)
                     else if (g_tMenuSys.Cursor == 4)
                     {
                         g_MainStatus = MS_FILE_MANAGE;
-                    }                                
+                    }
+                    else if (g_tMenuSys.Cursor == 5)    /* 重启 */
+                    {
+                        ResetReq = 1;   
+                    }                     
                     break;
 
+                case KEY_LONG_UP_S:     /* 长按弹起 */
+                    if (ResetReq == 1)
+                    {
+                        /* 复位进入APP */
+                        *(uint32_t *)0x20000000 = 0;
+                        NVIC_SystemReset(); /* 复位CPU */
+                    }                     
+                    break;
+                    
                 case KEY_UP_C: /* C键 下 */
                     LCD_MoveDownMenu(&g_tMenuSys);
                     break;

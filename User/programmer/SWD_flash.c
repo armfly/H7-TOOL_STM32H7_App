@@ -461,13 +461,31 @@ error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t si
             STM32F429BI 大概16秒 2MB
         */        
         g_tProg.FLMFuncTimeout = g_tProg.EraseChipTime;
+        
+        if (g_tFLM.Device.toProg > g_tProg.FLMFuncTimeout)
+        {
+            g_tProg.FLMFuncTimeout = g_tFLM.Device.toProg;
+        }
     }
     else
     {
         g_tProg.FLMFuncTimeout = g_tFLM.Device.toProg;
     }
+    
+    /* AT32F403的FLM，UOB page size = 1K, 应该等于OB的size */
+    if (size > g_tFLM.Device.szDev)
+    {
+        size = g_tFLM.Device.szDev;
+    }
+    
     while (size > 0) {
-        uint32_t write_size = size > flash_algo.program_buffer_size ? flash_algo.program_buffer_size : size;
+        uint32_t write_size;
+
+        write_size = flash_algo.program_buffer_size;
+        if (write_size > g_tFLM.Device.szDev)
+        {
+            write_size = g_tFLM.Device.szDev;
+        }
 
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
@@ -480,7 +498,7 @@ error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t si
             if (!MUL_swd_flash_syscall_exec(&flash_algo.sys_call_s,
                                         flash_algo.program_page,
                                         addr,
-                                        flash_algo.program_buffer_size,
+                                        write_size,
                                         flash_algo.program_buffer,
                                         0)) {
                 return ERROR_WRITE;
@@ -498,7 +516,7 @@ error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t si
             if (!swd_flash_syscall_exec(&flash_algo.sys_call_s,
                                         flash_algo.program_page,
                                         addr,
-                                        flash_algo.program_buffer_size,
+                                        write_size,
                                         flash_algo.program_buffer,
                                         0)) {
                 return ERROR_WRITE;
@@ -519,11 +537,23 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
     {
         return ERROR_SUCCESS;
     }
-        
+
+    /* AT32F403的FLM，UOB page size = 1K, 应该等于OB的size */
+    if (size > g_tFLM.Device.szDev)
+    {
+        size = g_tFLM.Device.szDev;
+    }
+    
     g_tProg.FLMFuncTimeout = 3000;
     while (size > 0) 
     {
-        uint32_t write_size = size > flash_algo.program_buffer_size ? flash_algo.program_buffer_size : size;
+        uint32_t write_size;
+
+        write_size = flash_algo.program_buffer_size;
+        if (write_size > g_tFLM.Device.szDev)
+        {
+            write_size = g_tFLM.Device.szDev;
+        }
 
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
@@ -540,7 +570,7 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
             ret_val = (uint32_t *)MUL_swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                         flash_algo.verify,
                                         addr,
-                                        flash_algo.program_buffer_size,
+                                        write_size,
                                         flash_algo.program_buffer,
                                         0);
             
@@ -577,7 +607,7 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
             ret_val = (uint32_t *)swd_flash_syscall_exec_ex(&flash_algo.sys_call_s,
                                         flash_algo.verify,
                                         addr,
-                                        flash_algo.program_buffer_size,
+                                        write_size,
                                         flash_algo.program_buffer,
                                         0);
             if (ret_val == 0)   /* 通信错误 */
