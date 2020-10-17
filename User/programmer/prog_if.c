@@ -24,6 +24,7 @@
 #include "elf_file.h"
 #include "main.h"
 #include "stm8_flash.h"
+#include "n76e003_flash.h"
 #include "SW_DP_Multi.h"
 #include "swd_host_multi.h"
 
@@ -95,7 +96,11 @@ uint32_t GetChipTypeFromLua(lua_State *L)
                 else if (strcmp(name, "I2C") == 0)
                 {
                     g_tProg.ChipType = CHIP_I2C_EEPROM;
-                }                
+                }  
+                else if (strcmp(name, "NUVOTON_8051") == 0)
+                {
+                    g_tProg.ChipType = CHIP_NUVOTON_8051;
+                }                 
             }           
         }
         lua_pop(L, 1);
@@ -182,99 +187,30 @@ void PG_ReloadLuaVar(void)
 {
     GetChipTypeFromLua(g_Lua);
 
+    /* VERIFY_MODE;  校验模式 */
+    g_tProg.VerifyMode = lua_GetVarUint32("VERIFY_MODE", VERIFY_READ_BACK);
+
+    /* ERASE_CHIP_TIME;  全片擦除时间ms */
+    g_tProg.EraseChipTime = lua_GetVarUint32("ERASE_CHIP_TIME", 60 * 1000);      
+    
+    /* 0B VERIFY;  option byte 验证取消 */
+    g_tProg.VerifyOptionByteDisalbe = lua_GetVarUint32("OB_VERIFY_DISABLE", 0);
+    
+    /*  SwdClockDelay;  SWD接口时序延迟 */
+    g_tProg.SwdClockDelay = lua_GetVarUint32("SWD_CLOCK_DELAY", 0);
+    
+    /*  复位延迟 */
+    g_tProg.SwdResetDelay = lua_GetVarUint32("RESET_DELAY", 20); 
+
+    /* 读取复位类型： 软件还是硬件复位 */
+    g_tProg.ResetMode = lua_GetVarUint32("RESET_MODE", 0); 
+
+    /* 多路模式下，出错后立刻同时终止 */
+    g_tProg.AbortOnError = lua_GetVarUint32("ABORT_ON_ERROR", 1);
+        
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {    
-        /* VERIFY_MODE;  校验模式 */
-        {
-            /* 读取复位类型： 软件还是硬件复位 */
-            lua_getglobal(g_Lua, "VERIFY_MODE");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {    
-                g_tProg.VerifyMode = lua_tointeger(g_Lua, -1);
-            }
-            else
-            {
-                /* 没有定义则用读回模式校验 */
-                g_tProg.VerifyMode = VERIFY_READ_BACK;
-            }
-            lua_pop(g_Lua, 1);            
-        }
-
-        /* ERASE_CHIP_TIME;  全片擦除时间ms */
-        {
-            lua_getglobal(g_Lua, "ERASE_CHIP_TIME");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {
-                g_tProg.EraseChipTime = lua_tointeger(g_Lua, -1);
-                if (g_tProg.EraseChipTime == 0)
-                {
-                    g_tProg.EraseChipTime = 60 * 1000;
-                }
-            }
-            else
-            {
-                g_tProg.EraseChipTime = 60 * 1000;
-            }
-            lua_pop(g_Lua, 1);            
-        }       
-        
-        /* 0B VERIFY;  option byte 验证取消 */
-        {
-            lua_getglobal(g_Lua, "OB_VERIFY_DISABLE");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {    
-                g_tProg.VerifyOptionByteDisalbe = lua_tointeger(g_Lua, -1);
-            }
-            else
-            {
-                g_tProg.VerifyOptionByteDisalbe = 0;
-            }
-            lua_pop(g_Lua, 1);            
-        }
-        
-        /*  SwdClockDelay;  SWD接口时序延迟 */
-        {
-            lua_getglobal(g_Lua, "SWD_CLOCK_DELAY");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {    
-                g_tProg.SwdClockDelay = lua_tointeger(g_Lua, -1);
-            }
-            else
-            {
-                g_tProg.SwdClockDelay = 0;
-            }
-            lua_pop(g_Lua, 1);            
-        }
-        
-        /*  复位延迟 */
-        {
-            lua_getglobal(g_Lua, "RESET_DELAY");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {    
-                g_tProg.SwdResetDelay = lua_tointeger(g_Lua, -1);
-            }
-            else
-            {
-                g_tProg.SwdResetDelay = 20;
-            }
-            lua_pop(g_Lua, 1);            
-        }
-
-        /* 读取复位类型： 软件还是硬件复位 */
-        {
-           
-            lua_getglobal(g_Lua, "RESET_MODE");  
-            if (lua_isinteger(g_Lua, -1)) 
-            {    
-                g_tProg.ResetMode = lua_tointeger(g_Lua, -1);
-            }
-            else
-            {
-                g_tProg.ResetMode = 0;
-            }
-            lua_pop(g_Lua, 1);            
-        }         
-        
+        ;
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)  
     {
@@ -376,19 +312,19 @@ void PG_PrintText(char *_str)
 
     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
     {
-        if (g_gMulSwd.Error[0] == 1)
+        if (g_gMulSwd.Error[0] != 0)
         {
             strcat(str, " #1");
         }
-        if (g_gMulSwd.Error[1] == 1)
+        if (g_gMulSwd.Error[1] != 0)
         {
             strcat(str, " #2");
         }
-        if (g_gMulSwd.Error[2] == 1)
+        if (g_gMulSwd.Error[2] != 0)
         {
             strcat(str, " #3");
         }
-        if (g_gMulSwd.Error[3] == 1)
+        if (g_gMulSwd.Error[3] != 0)
         {
             strcat(str, " #4");
         }          
@@ -419,13 +355,13 @@ void PG_PrintPercent(float _Percent, uint32_t _Addr)
     #if 1
         if (_Percent == 0)
         {
-            printf("  %dms, %0.2f%%\r\n  ", bsp_CheckRunTime(g_tProg.Time), _Percent);
+            printf("  %dms, %0.2f%%\r\n", bsp_CheckRunTime(g_tProg.Time), _Percent);
         }
         else if (_Percent == 100)
         {
             //printf("\r\n  %dms, %0.2f%%\r\n", bsp_CheckRunTime(g_tProg.Time), _Percent);
-            printf("\r\n");
-            printf("  %dms, %0.2f%%\r\n  ", bsp_CheckRunTime(g_tProg.Time), _Percent);
+            //printf("\r\n");
+            printf("  %dms, %0.2f%%\r\n", bsp_CheckRunTime(g_tProg.Time), _Percent);
         }
         else
         {
@@ -584,6 +520,294 @@ uint8_t PG_FixDataIsDiff(void)
     }
     
     return 0;
+}
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_GetSectorSize
+*    功能说明: 获得扇区大小
+*    形    参: _Addr : 地址
+*    返 回 值: 扇区大小
+*********************************************************************************************************
+*/
+uint32_t PG_GetSectorSize(const char *_Algo, uint32_t _Addr)
+{    
+    uint32_t sz;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        sz = 1024;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        sz = lua_GetVarUint32("FLASH_BLOCK_SIZE", 64);
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        sz = 128;
+    }            
+    return sz;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_EraseSector
+*    功能说明: 擦除扇区 通用芯片API
+*    形    参: _Addr : 地址
+*    返 回 值: 0表示失败 1表示OK
+*********************************************************************************************************
+*/
+uint8_t PG_EraseSector(const char *_Algo, uint32_t _Addr)
+{
+    return 1;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_GetPageSize
+*    功能说明: 获得编程page大小
+*    形    参: 无
+*    返 回 值: 页大小
+*********************************************************************************************************
+*/
+uint32_t PG_GetPageSize(const char *_Algo)
+{
+    uint32_t sz;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        sz = 1024;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        sz = lua_GetVarUint32("FLASH_BLOCK_SIZE", 64);
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        sz = 32;
+    }            
+    return sz;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_GetDeviceAddr
+*    功能说明: 获得芯片起始地址
+*    形    参: 无
+*    返 回 值: 芯片起始地址
+*********************************************************************************************************
+*/
+uint32_t PG_GetDeviceAddr(const char *_Algo)
+{
+    uint32_t addr;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        addr = 0x08000000;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        if (strcmp(_Algo, "FLASH") == 0)
+        {
+            addr = lua_GetVarUint32("FLASH_ADDRESS", 0);
+        }
+        else if (strcmp(_Algo, "EEPROM") == 0)
+        {
+            addr = lua_GetVarUint32("EEPROM_ADDRESS", 0);
+        }
+        else
+        {
+            addr = 0x008000;
+        }        
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        if (strcmp(_Algo, "APROM") == 0)
+        {
+            addr = lua_GetVarUint32("APROM_ADDRESS", 0);
+        }
+        else if (strcmp(_Algo, "LDROM") == 0)
+        {
+            addr = lua_GetVarUint32("LDROM_ADDRESS", 0);
+        }
+        else if (strcmp(_Algo, "SPROM") == 0)
+        {
+            addr = lua_GetVarUint32("SPROM_ADDRESS", 0);
+        }      
+        else
+        {
+            addr = 0;
+        }
+    }
+
+    return addr;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_GetDeviceSize
+*    功能说明: 获得芯片容量大小
+*    形    参: 无
+*    返 回 值: 页大小
+*********************************************************************************************************
+*/
+uint32_t PG_GetDeviceSize(const char *_Algo)
+{
+    uint32_t sz;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        sz = 0x08000000;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        if (strcmp(_Algo, "FLASH") == 0)
+        {
+            sz = lua_GetVarUint32("FLASH_SIZE", 0);
+        }
+        else if (strcmp(_Algo, "EEPROM") == 0)
+        {
+            sz = lua_GetVarUint32("EEPROM_SIZE", 0);
+        }
+        else
+        {
+            sz = 1024;
+        }        
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        if (strcmp(_Algo, "APROM") == 0)
+        {
+            sz = lua_GetVarUint32("APROM_SIZE", 0);
+        }
+        else if (strcmp(_Algo, "LDROM") == 0)
+        {
+            sz = lua_GetVarUint32("LDROM_SIZE", 0);
+        }
+        else if (strcmp(_Algo, "SPROM") == 0)
+        {
+            sz = lua_GetVarUint32("SPROM_SIZE", 0);
+        }      
+        else
+        {
+            sz = 1024;
+        }
+    }
+
+    return sz;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_EraseChip
+*    功能说明: 擦除整片 通用芯片API
+*    形    参: 无
+*    返 回 值: 0表示失败 1表示OK
+*********************************************************************************************************
+*/
+uint8_t PG_EraseChip(void)
+{
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        ;
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        N76E_EraseChip();
+    }
+    
+    return 1;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_CheckBlank
+*    功能说明: 检查空片
+*    形    参: 无
+*    返 回 值: 0表示不空 1表示空片
+*********************************************************************************************************
+*/
+uint8_t PG_CheckBlank(const char *_Algo, uint32_t _Addr, uint32_t _Size)
+{
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        ;
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+       ;
+    }
+    
+    return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_ProgramBuf
+*    功能说明: Programs a memory block
+*    形    参: _FlashAddr : 绝对地址。 
+*              _Buff : Pointer to buffer containing source data.
+*              _Size : 数据大小，可以大于1个block
+*    返 回 值: 0 : 出错;  1 : 成功
+*********************************************************************************************************
+*/ 
+uint8_t PG_ProgramBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, uint32_t _Size)
+{
+    uint8_t re = 0;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        re = STM8_FLASH_ProgramBuf(_FlashAddr, _Buff, _Size);
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        re = N76E_FLASH_ProgramBuf(_FlashAddr, _Buff, _Size);
+    }
+    
+    return re;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PG_ReadBuf
+*    功能说明: 读flash
+*    形    参: _FlashAddr : 绝对地址。 
+*              _Buff : Pointer to buffer containing source data.
+*              _Size : 数据大小，可以大于1个block
+*    返 回 值: 0 : 出错;  1 : 成功
+*********************************************************************************************************
+*/ 
+uint8_t PG_ReadBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, uint32_t _Size)
+{
+    uint8_t re = 0;
+    
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        re = STM8_FLASH_ReadBuf(_FlashAddr, _Buff, _Size);
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        re = N76E_ReadBuf(_FlashAddr, _Buff, _Size);
+    }
+    
+    return re;   
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

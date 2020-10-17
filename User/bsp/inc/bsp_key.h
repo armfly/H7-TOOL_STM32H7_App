@@ -91,6 +91,8 @@ typedef enum
     KEY_2_LONG_UP,      /* 2键长按后的弹起 */  
     KEY_2_AUTO_UP,      /* 2键长按后自动发码 */
     KEY_2_DB_UP,        /* 2键双击 */    
+        
+    KEY_LCD_SLEEP,      /* 虚拟一次按键，禁止LCD休眠 */
 } KEY_ENUM;
 
 /* 按键FIFO用到变量 */

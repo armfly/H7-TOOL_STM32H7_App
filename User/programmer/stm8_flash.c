@@ -636,20 +636,6 @@ err_quit:
 */ 
 uint8_t STM8_FLASH_EraseChip(uint32_t _FlashAddr)
 {
-#if 0
-    uint8_t value;
-    
-    value = 0xAA;
-    STM8_ProgramOptionBytes(0x4800, &value, 1);
-    
-    bsp_DelayUS(100);
-    
-    SWIM_EntrySequence();
-       
-    STM8_ProgramOptionBytes(0x4800, &value, 1);
-    
-    bsp_DelayUS(100);
-#else    
     uint32_t i;
     const uint8_t zefo[4] = {0,0,0,0};
     uint8_t re;
@@ -691,8 +677,7 @@ uint8_t STM8_FLASH_EraseChip(uint32_t _FlashAddr)
     return 1;
     
 err_quit:
-    return 0;
-#endif    
+    return 0;  
 }
 
 /*

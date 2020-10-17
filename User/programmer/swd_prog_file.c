@@ -37,7 +37,7 @@ extern const program_target_t flash_algo;
 *               _FlashAddr : flash起始地址
 *               _EndAddr : 结束地址 + 1（用于避免重复写滚码加密区）
 *               _CtrlByte : 控制字节，bit0 = 1表示全片擦除，0表示扇区擦除
-*               _FileIndex : 文件编号（1-10）
+*               _FileIndex : 文件编号（1-10）,用于滚码UID加密
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
@@ -139,6 +139,7 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
         err_t = target_flash_enter_debug_program();
         if (err_t != ERROR_SUCCESS)
         {            
+            PG_PrintText("error: target_flash_enter_debug_program()");
             err = 1;
             goto quit;  
         }
@@ -850,22 +851,48 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                     if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
                     {                    
                         uint8_t i;
-                        uint8_t err0 = 0;
                         char errstr[32];
+                        uint8_t err0 = 0;                        
           
                         strcpy(errstr, "CRC校验失败");
                         
-                        for (i = 0; i < 4; i++)
+                        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                         {
-                            if (g_gMulSwd.Active[i] == 1)
+                            for (i = 0; i < 4; i++)
                             {
-                                if (crc2 != ((uint32_t *)crc1)[i])
-                                {                     
-                                    err0 = 1;
-                                    
-                                    sprintf(&errstr[strlen(errstr)], " #%d", i + 1);                                
+                                if (g_gMulSwd.Active[i] == 1)
+                                {
+                                    if (crc2 != ((uint32_t *)crc1)[i])
+                                    {                     
+                                        err0 = 1;
+                                        
+                                        sprintf(&errstr[strlen(errstr)], " #%d", i + 1);
+                                        g_gMulSwd.Error[i] = 1;
+                                    }
                                 }
-                            }
+                            }                           
+                        }
+                        else
+                        {
+                            err0 = 1;
+                            
+                            for (i = 0; i < 4; i++)
+                            {
+                                if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Error[i] == 0)
+                                {
+                                    if (crc2 != ((uint32_t *)crc1)[i])
+                                    {                     
+                                        //err0 = 1;
+                                        
+                                        sprintf(&errstr[strlen(errstr)], " #%d", i + 1);
+                                        g_gMulSwd.Error[i] = 1;
+                                    }
+                                    else
+                                    {
+                                        err0 = 0; 
+                                    }
+                                }
+                            }                            
                         }
 
                         if (err0 == 1)
@@ -873,9 +900,9 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                             PG_PrintText(errstr);  
                             err = 1;
                             goto quit;	                        
-                        }
+                        }                         
                     }
-                    else
+                    else    /* 单路模式 */
                     {
                         if (((uint32_t *)crc1)[0] != crc2)
                         {              
@@ -886,7 +913,8 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                                 PG_PrintText(buf); 
                                 
                                 printf("crc_read = %08X  crc_ok = %08X\r\n", crc1, crc2);
-                            } 
+                            }
+                            g_gMulSwd.Error[0] = 1;
                             err = 1;
                             goto quit;	                    
                         }                    
@@ -924,25 +952,55 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                             goto quit;  
                         }
 
-                        for (i = 0; i < 4; i++)
+                        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                         {
-                            if (g_gMulSwd.Active[i] == 1)
-                            {                    
-                                if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
-                                {
+                            for (i = 0; i < 4; i++)
+                            {
+                                if (g_gMulSwd.Active[i] == 1)
+                                {                    
+                                    if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
                                     {
-                                        char buf[128];
-                                        
-                                        sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
-                                        PG_PrintText(buf); 
-                                    }                     
-                                    err = 1;
-                                    goto quit;				
-                                } 
+                                        {
+                                            char buf[128];
+                                            
+                                            sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                                            PG_PrintText(buf); 
+                                        }                     
+                                        err = 1;
+                                        g_gMulSwd.Error[i] = 1;
+                                        //goto quit;				
+                                    } 
+                                }
                             }
                         }
+                        else
+                        {
+                            err = 1;
+                            for (i = 0; i < 4; i++)
+                            {
+                                if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Error[i] == 0)
+                                {                    
+                                    if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
+                                    {
+                                        {
+                                            char buf[128];
+                                            
+                                            sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                                            PG_PrintText(buf); 
+                                        }                
+                                        g_gMulSwd.Error[i] = 1;
+                                        //err = 1;
+                                        //goto quit;				
+                                    }
+                                    else
+                                    {
+                                        err = 0;    /* 至少1路OK */
+                                    }
+                                }
+                            }      
+                        }
                     }
-                    else
+                    else    /* 单路模式 */
                     {
                         /* 读回进行校验 */                    
                         if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
@@ -962,7 +1020,7 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                                 
                                 sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
                                 PG_PrintText(buf); 
-                            }                     
+                            }                                               
                             err = 1;
                             goto quit;				
                         } 
@@ -1036,42 +1094,50 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
               
                             strcpy(errstr, "CRC校验失败");
                             
-                            for (i = 0; i < 4; i++)
+                            if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                             {
-                                if (g_gMulSwd.Active[i] == 1)
+                                for (i = 0; i < 4; i++)
                                 {
-                                    if (crc2 != ((uint32_t *)crc1)[i])
-                                    {                     
-                                        err0 = 1;
-                                        
-                                        sprintf(&errstr[strlen(errstr)], " #%d", i + 1);                                
+                                    if (g_gMulSwd.Active[i] == 1)
+                                    {
+                                        if (crc2 != ((uint32_t *)crc1)[i])
+                                        {                     
+                                            err0 = 1;
+                                            
+                                            sprintf(&errstr[strlen(errstr)], " #%d", i + 1);
+                                            g_gMulSwd.Error[i] = 1;
+                                        }
                                     }
                                 }
                             }
-
+                            else
+                            {
+                                err0 = 1;
+                                for (i = 0; i < 4; i++)
+                                {
+                                    if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Error[i] == 0)
+                                    {
+                                        if (crc2 != ((uint32_t *)crc1)[i])
+                                        {                     
+                                            //err0 = 1;                                            
+                                            sprintf(&errstr[strlen(errstr)], " #%d", i + 1);
+                                            g_gMulSwd.Error[i] = 1;
+                                        }
+                                        else
+                                        {
+                                            err0 = 0;
+                                        }
+                                    }
+                                }                                
+                            }
+                            
                             if (err0 == 1)
                             {
                                 PG_PrintText(errstr);  
                                 err = 1;
                                 goto quit;	                        
                             }
-                        }
-//                        else
-//                        {
-//                            if (((uint32_t *)crc1)[0] != crc2)
-//                            {              
-//                                {
-//                                    char buf[128];
-//                                    
-//                                    sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
-//                                    PG_PrintText(buf); 
-//                                    
-//                                    printf("crc_read = %08X  crc_ok = %08X\r\n", crc1, crc2);
-//                                } 
-//                                err = 1;
-//                                goto quit;	                    
-//                            }                    
-//                        }                                
+                        }                               
                     }
                     else if (flash_algo.verify > 0 && g_tProg.VerifyMode == VERIFY_AUTO)     /* FLM有verify校验函数 */
                     {
@@ -1080,7 +1146,7 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                             {
                                 char buf[128];
                                 
-                                sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                                sprintf(buf, "校验失败3, 0x%08X", g_tFLM.Device.DevAdr + addr);
                                 PG_PrintText(buf); 
                             }   
                             err = 1;
@@ -1105,49 +1171,58 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
                                 goto quit;  
                             }
 
-                            for (i = 0; i < 4; i++)
+                            if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                             {
-                                if (g_gMulSwd.Active[i] == 1)
-                                {                    
-                                    if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
-                                    {
+                                for (i = 0; i < 4; i++)
+                                {
+                                    if (g_gMulSwd.Active[i] == 1)
+                                    {                    
+                                        if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
                                         {
-                                            char buf[128];
-                                            
-                                            sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
-                                            PG_PrintText(buf); 
-                                        }                     
-                                        err = 1;
-                                        goto quit;				
-                                    } 
+                                            {
+                                                char buf[128];
+                                                
+                                                sprintf(buf, "校验失败1, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                                                PG_PrintText(buf); 
+                                            }              
+                                            g_gMulSwd.Error[i] = 1;                                            
+                                            err = 1;
+                                            goto quit;				
+                                        } 
+                                    }
                                 }
                             }
+                            else
+                            {
+                                err = 1;
+                                for (i = 0; i < 4; i++)
+                                {
+                                    if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Error[i] == 0)
+                                    {                    
+                                        if (memcmp(FsReadBuf, &flash_buff[bytes * i], bytes) != 0)
+                                        {
+                                            {
+                                                char buf[128];
+                                                
+                                                sprintf(buf, "校验失败2, 0x%08X", g_tFLM.Device.DevAdr + addr);
+                                                PG_PrintText(buf); 
+                                            }                   
+                                            g_gMulSwd.Error[i] = 1;                                            
+                                            //err = 1;
+                                            //goto quit;				
+                                        }
+                                        else
+                                        {
+                                            err = 0;
+                                        }
+                                    }
+                                }                               
+                            }
                         }
-//                        else
-//                        {
-//                            /* 读回进行校验 */                    
-//                            if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
-//                            {
-//                                char buf[128];
-//                                
-//                                sprintf(buf, "swd_read_memory error, addr = %X, len = %X", g_tFLM.Device.DevAdr + addr, bytes);
-//                                PG_PrintText(buf);    
-//                                err = 1;
-//                                goto quit;  
-//                            }
-//                                
-//                            if (memcmp(FsReadBuf, flash_buff, bytes) != 0)
-//                            {
-//                                {
-//                                    char buf[128];
-//                                    
-//                                    sprintf(buf, "校验失败, 0x%08X", g_tFLM.Device.DevAdr + addr);
-//                                    PG_PrintText(buf); 
-//                                }                     
-//                                err = 1;
-//                                goto quit;				
-//                            } 
-//                        }                                  
+                        else
+                        {
+                            /* 不会进来 */
+                        }
                     }
                 }
 
@@ -1175,6 +1250,10 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
         }
     } 
 quit:
+    if (g_gMulSwd.MultiMode == 0)
+    {
+        g_gMulSwd.Error[0] = err;   /* 单路模式，借用该变量用于机台信号lua程序用 */
+    }    
     return err;
 }
 
@@ -1338,19 +1417,49 @@ uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen
                                 PG_PrintText("swd_read_memory error");        
                                 err = 1;
                                 goto quit;				
-                            }                     
-                            for (i = 0; i < 4; i++)
+                            } 
+                            
+                            if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                             {
-                                if (g_gMulSwd.Active[i] == 1)
-                                {                    
-                                    if (memcmp(&_DataBuf[FileOffset], &flash_buff[bytes * i], bytes) != 0)
-                                    {
-                                        PG_PrintText("校验数据失败");                            
-                                        err = 1;
-                                        goto quit;				
-                                    } 
+                                for (i = 0; i < 4; i++)
+                                {
+                                    if (g_gMulSwd.Active[i] == 1)
+                                    {                    
+                                        if (memcmp(&_DataBuf[FileOffset], &flash_buff[bytes * i], bytes) != 0)
+                                        {
+                                            PG_PrintText("校验数据失败");                            
+                                            err = 1;
+                                            goto quit;				
+                                        } 
+                                    }
                                 }
-                            }                       
+                            }
+                            else
+                            {
+                                err = 1;
+                                for (i = 0; i < 4; i++)
+                                {
+                                    if (g_gMulSwd.Active[i] == 1)
+                                    {                    
+                                        if (memcmp(&_DataBuf[FileOffset], &flash_buff[bytes * i], bytes) != 0)
+                                        {
+                                            PG_PrintText("校验数据失败");                            
+                                            //err = 1;
+                                            //goto quit;
+                                            g_gMulSwd.Error[i] = 1;
+                                        }
+                                        else
+                                        {
+                                            err = 0;
+                                        }
+                                    }
+                                }
+                                if (err == 1)
+                                {
+                                    err = 1;
+                                    goto quit;
+                                }
+                            }
                         }
                         else
                         {
@@ -1379,75 +1488,75 @@ uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen
             {
 //                PG_PrintText("正在擦除扇区..."); 
                 
-                /*　开始擦除扇区 */
-                if (target_flash_erase_sector(g_tFLM.Device.DevAdr + PageStartAddr) != 0)
-                {
-                    PG_PrintText("扇区擦除失败");        
-                    err = 1;
-                    goto quit;
-                }         
+//                /*　开始擦除扇区 */
+//                if (target_flash_erase_sector(g_tFLM.Device.DevAdr + PageStartAddr) != 0)
+//                {
+//                    PG_PrintText("扇区擦除失败");        
+//                    err = 1;
+//                    goto quit;
+//                }         
 
-                if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-                {
-                    MUL_swd_read_memory(PageStartAddr + g_tFLM.Device.DevAdr, flash_buff, PageSize);
-                }
-                else
-                {
-                    swd_read_memory(PageStartAddr + g_tFLM.Device.DevAdr, flash_buff, PageSize);
-                }
-                memcpy(&flash_buff[addr % PageSize], (uint8_t *)&_DataBuf[FileOffset], bytes);               
-                
-//                PG_PrintText("正在编程..."); 
-                /* 整页编程 */
-                if (target_flash_program_page(g_tFLM.Device.DevAdr + PageStartAddr, flash_buff, PageSize) != 0)
-                {
-                    PG_PrintText("编程失败");        
-                    err = 1;
-                    goto quit;
-                }
+//                if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+//                {
+//                    MUL_swd_read_memory(PageStartAddr + g_tFLM.Device.DevAdr, flash_buff, PageSize);
+//                }
+//                else
+//                {
+//                    swd_read_memory(PageStartAddr + g_tFLM.Device.DevAdr, flash_buff, PageSize);
+//                }
+//                memcpy(&flash_buff[addr % PageSize], (uint8_t *)&_DataBuf[FileOffset], bytes);               
+//                
+////                PG_PrintText("正在编程..."); 
+//                /* 整页编程 */
+//                if (target_flash_program_page(g_tFLM.Device.DevAdr + PageStartAddr, flash_buff, PageSize) != 0)
+//                {
+//                    PG_PrintText("编程失败");        
+//                    err = 1;
+//                    goto quit;
+//                }
 
-                memset(flash_buff, 0xFF, PageSize);
-                
-                /* 读回进行校验 */
-                if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-                {
-                    uint8_t i;
-                    
-                    if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
-                    {
-                        PG_PrintText("swd_read_memory error");        
-                        err = 1;
-                        goto quit;				
-                    }                
-                    for (i = 0; i < 4; i++)
-                    {
-                        if (g_gMulSwd.Active[i] == 1)
-                        {                    
-                            if (memcmp(&_DataBuf[FileOffset], &flash_buff[bytes * i], bytes) != 0)
-                            {
-                                PG_PrintText("校验数据失败");                            
-                                err = 1;
-                                goto quit;				
-                            } 
-                        }
-                    }                     
-                }
-                else
-                {
-                    if (MUL_swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
-                    {
-                        PG_PrintText("swd_read_memory error");        
-                        err = 1;
-                        goto quit;				
-                    }       
-                    
-                    if (memcmp((uint8_t *)&_DataBuf[FileOffset], flash_buff, bytes) != 0)
-                    {
-                        PG_PrintText("校验数据失败");        
-                        err = 1;
-                        goto quit;				
-                    }
-                }
+//                memset(flash_buff, 0xFF, PageSize);
+//                
+//                /* 读回进行校验 */
+//                if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+//                {
+//                    uint8_t i;
+//                    
+//                    if (swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+//                    {
+//                        PG_PrintText("swd_read_memory error");        
+//                        err = 1;
+//                        goto quit;				
+//                    }                
+//                    for (i = 0; i < 4; i++)
+//                    {
+//                        if (g_gMulSwd.Active[i] == 1)
+//                        {                    
+//                            if (memcmp(&_DataBuf[FileOffset], &flash_buff[bytes * i], bytes) != 0)
+//                            {
+//                                PG_PrintText("校验数据失败");                            
+//                                err = 1;
+//                                goto quit;				
+//                            } 
+//                        }
+//                    }                     
+//                }
+//                else
+//                {
+//                    if (MUL_swd_read_memory(g_tFLM.Device.DevAdr + addr, flash_buff, bytes) == 0)
+//                    {
+//                        PG_PrintText("swd_read_memory error");        
+//                        err = 1;
+//                        goto quit;				
+//                    }       
+//                    
+//                    if (memcmp((uint8_t *)&_DataBuf[FileOffset], flash_buff, bytes) != 0)
+//                    {
+//                        PG_PrintText("校验数据失败");        
+//                        err = 1;
+//                        goto quit;				
+//                    }
+//                }
             }
             else if (_Mode == 0)    /* 读 - 修改 - 写，同page内其他数据保持不变 */
             {
@@ -1519,6 +1628,10 @@ uint16_t PG_SWD_ProgBuf(uint32_t _FlashAddr, uint8_t *_DataBuf, uint32_t _BufLen
 	
 //	swd_set_target_state_hw(RUN);
 quit:
+    if (g_gMulSwd.MultiMode == 0)
+    {
+        g_gMulSwd.Error[0] = err;   /* 单路模式，借用该变量用于机台信号lua程序用 */
+    }    
     return err;
 }
 

@@ -19,6 +19,7 @@
 #define SWIM_RESET_0()      BSP_SET_GPIO_0(GPIOE, GPIO_PIN_4 | GPIO_PIN_2);
 
 void SWIM_InitHard(void);
+void SWIM_SetResetPin(uint8_t _state);
 uint8_t SWIM_EntrySequence(void);
 uint8_t SWIM_WriteBuf(uint32_t _Addr, uint8_t *_Buf, uint16_t _Len);
 uint8_t SWIM_WriteByte(uint32_t _Addr, uint8_t _data);

@@ -22,10 +22,10 @@ void lua_gpio_RegisterFun(void)
 {
     //将指定的函数注册为Lua的全局函数变量，其中第一个字符串参数为Lua代码
     //在调用C函数时使用的全局函数名，第二个参数为实际C函数的指针。
-    lua_register(g_Lua, "gpio_cfg",  lua_GpioCfg);        /* gpio_cfg(0, 1) */
-    lua_register(g_Lua, "gpio_write", lua_GpioWrite);    /* gpio_write(0, 1) */
-    lua_register(g_Lua, "gpio_read", lua_GpioRead);        /* gpio_write(0, 1) */
-    lua_register(g_Lua, "read_bus", lua_ReadFmcBus);    /* read_bus() */
+    lua_register(g_Lua, "gpio_cfg",  lua_GpioCfg);          /* gpio_cfg(0, 1) */
+    lua_register(g_Lua, "gpio_write", lua_GpioWrite);       /* gpio_write(0, 1) */
+    lua_register(g_Lua, "gpio_read", lua_GpioRead);         /* gpio_read(0) */
+    lua_register(g_Lua, "read_bus", lua_ReadFmcBus);        /* read_bus() */
     
     lua_register(g_Lua, "set_tvcc", lua_SetTVCC);    /* */
     

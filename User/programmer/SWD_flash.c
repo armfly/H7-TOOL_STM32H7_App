@@ -580,21 +580,41 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
             }
             else
             {
-                for (i = 0; i < 4; i++)
+                if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
                 {
-                    if (g_gMulSwd.Active[i] == 1 && ret_val[i] != addr + size)
+                    for (i = 0; i < 4; i++)
                     {
-                        g_gMulSwd.Error[i] = 1;
-                        err = 1;        /* 结果错误 */
+                        if (g_gMulSwd.Active[i] == 1 && ret_val[i] != addr + size)
+                        {
+                            g_gMulSwd.Error[i] = 1;
+                            err = 1;        /* 结果错误 */
+                        }
                     }
                 }
+                else
+                {
+                    err = 1;
+                    
+                    for (i = 0; i < 4; i++)
+                    {
+                        if (g_gMulSwd.Active[i] == 1 && ret_val[i] != addr + size)
+                        {
+                            g_gMulSwd.Error[i] = 1;
+                        }
+                        else
+                        {
+                            err = 0;    /* 有1路OK */
+                        }
+                    }                    
+                }
             }
+                
             if (err == 1)
             {
                 return ERROR_WRITE;
             }
         }
-        else
+        else    /* 单路模式 */
         {
             uint32_t *ret_val;
             
@@ -618,6 +638,7 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
             {
                 if (ret_val[0] != addr + size)
                 {
+                    g_gMulSwd.Error[0] = 1;
                     printf("target_flash_verify_page() %08X != %08X(ok)\r\n", ret_val[0], addr + size);
 					return ERROR_WRITE;
                 }

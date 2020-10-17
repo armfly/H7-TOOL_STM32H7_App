@@ -1620,6 +1620,21 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\stm8_prog_file.c</FilePath>
             </File>
+            <File>
+              <FileName>n76e_prog_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\n76e_prog_file.c</FilePath>
+            </File>
+            <File>
+              <FileName>n76e003_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\n76e003_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>cx32_isp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\cx32_isp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

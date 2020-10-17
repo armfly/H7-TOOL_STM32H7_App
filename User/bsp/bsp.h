@@ -26,7 +26,7 @@
 #define ERROR_HANDLER()     Error_Handler(__FILE__, __LINE__)
 
 #define BSP_SET_GPIO_1(gpio, pin)   gpio->BSRR = pin
-#define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)pin << 16U
+#define BSP_SET_GPIO_0(gpio, pin)   gpio->BSRR = (uint32_t)(pin) << 16U
 
 /* 默认是关闭状态 */
 #define Enable_EventRecorder 0
@@ -59,6 +59,7 @@
 #include "bsp_timer.h"
 #include "bsp_led.h"
 #include "bsp_key.h"
+#include "bsp_msg.h"
 
 #include "bsp_cpu_adc.h"
 #include "bsp_cpu_dac.h"
@@ -97,6 +98,8 @@
 #include "bsp_ext_io.h"
 
 #include "bsp_rng.h"
+
+
 
 #define HARD_MODEL              0x0750
 #define BOOT_VERSION            *(uint16_t *)(0x08000000 + 28)

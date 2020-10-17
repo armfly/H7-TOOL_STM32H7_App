@@ -754,8 +754,8 @@ void EIO_D8_Config(EIO_SELECT_E _mode)
             GPIO_INIT_INPUT(GPIOD, GPIO_PIN_4);     /* 配置为GPIO 输入功能 */
             GPIO_INIT_OUT_PP(GPIOI, GPIO_PIN_3);    /* 配置为GPIO 输出功能 */
         #else  /* FOR 软件SWD优化 */
-            GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_4);    /* 配置为GPIO 输入功能 */
-            GPIO_INIT_INPUT(GPIOI, GPIO_PIN_3);     /* 配置为GPIO 输出功能 */       
+            GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_4);    /* 配置为GPIO 输出功能 */
+            GPIO_INIT_INPUT(GPIOI, GPIO_PIN_3);     /* 配置为GPIO 输入功能 */       
         #endif
     }
     else if (_mode == ES_GPIO_SWD_OUT)
@@ -1488,5 +1488,64 @@ uint16_t EIO_ReadFMC(void)
     return EIO_READ_FMC();
 }
 
+/*
+*********************************************************************************************************
+*    函 数 名: BSP_CFG_GPIO_OUT
+*    功能说明: 配置多个GPIO为输出模式
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void BSP_CFG_GPIO_OUT(GPIO_TypeDef* GPIOx, uint16_t pin)
+{
+    uint32_t uiMask;
+    uint32_t uiNewValue;
+    uint8_t i;
+
+    uiMask = 0;
+    uiNewValue = 0;
+    for (i = 0; i < 16; i++)
+    {
+        uiMask <<= 2;
+        uiNewValue <<= 2;
+        if (pin & 0x8000)
+        {
+            uiMask += 0x03;
+            uiNewValue += 0x01;
+        }
+        pin <<= 1;
+    }
+    uiMask = ~uiMask;
+    
+    GPIOx->MODER = (GPIOx->MODER & uiMask) | uiNewValue;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: BSP_CFG_GPIO_IN
+*    功能说明: 配置多个GPIO为输入模式
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void BSP_CFG_GPIO_IN(GPIO_TypeDef* GPIOx, uint16_t pin)
+{
+    uint32_t uiMask;
+    uint8_t i;
+
+    uiMask = 0;
+    for (i = 0; i < 16; i++)
+    {
+        uiMask <<= 2;
+        if (pin & 0x8000)
+        {
+            uiMask += 0x03;
+        }
+        pin <<= 1;
+    }
+    uiMask = ~uiMask;
+    
+    GPIOx->MODER = GPIOx->MODER & uiMask;
+}
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

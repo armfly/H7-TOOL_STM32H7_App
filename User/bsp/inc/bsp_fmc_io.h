@@ -79,6 +79,9 @@ void EIO_D13_Config(EIO_SELECT_E _mode);
 
 uint16_t EIO_ReadFMC(void);
 
+void BSP_CFG_GPIO_OUT(GPIO_TypeDef* GPIOx, uint16_t pin);
+void BSP_CFG_GPIO_IN(GPIO_TypeDef* GPIOx, uint16_t pin);
+
 #endif
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

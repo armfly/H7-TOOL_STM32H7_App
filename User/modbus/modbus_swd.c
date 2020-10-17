@@ -27,6 +27,7 @@
 #include "swd_host_multi.h"
 #include "stm8_flash.h"
 #include "stm8_swim.h"
+#include "n76e003_flash.h"
 
 /* 64H帧子功能码定义 */
 enum
@@ -223,6 +224,20 @@ static void MODS66_ReadMem(void)
         
         memcpy(&g_tModS.TxBuf[g_tModS.TxCount], s_lua_read_buf, package_len);
         g_tModS.TxCount += package_len;         
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051) 
+    {
+        if (N76E_ReadBuf(offset_addr, s_lua_read_buf, package_len) == 0)
+        {
+            g_tModS.TxBuf[g_tModS.TxCount++] = 0x01;    /*　出错 */
+        }
+        else
+        {
+            g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;    /* 执行结果 00 */
+        }
+        
+        memcpy(&g_tModS.TxBuf[g_tModS.TxCount], s_lua_read_buf, package_len);
+        g_tModS.TxCount += package_len;   
     }
     else
     {

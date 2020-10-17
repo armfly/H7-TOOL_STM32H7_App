@@ -130,7 +130,7 @@ void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port)
     {
         udp_print_put(_buf[i]);
     }
-    bsp_StartHardTimer(3, 5, udp_print_send);
+    bsp_StartHardTimer(3, 5000, udp_print_send);
 }
 
 /*

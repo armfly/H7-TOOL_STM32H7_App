@@ -41,7 +41,7 @@ void bsp_InitMsg(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-void bsp_PutMsg(uint16_t _MsgCode, uint32_t _MsgParam)
+void bsp_PutMsg(uint32_t _MsgCode, uint32_t _MsgParam)
 {
     g_tMsg.Buf[g_tMsg.Write].MsgCode = _MsgCode;
     g_tMsg.Buf[g_tMsg.Write].MsgParam = _MsgParam;
