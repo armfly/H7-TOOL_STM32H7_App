@@ -294,17 +294,29 @@ extern uint8_t GetParity(uint32_t data);
 */ 
 void MUL_SWD_GPIOConfig(void)
 {
-    EIO_D0_Config(ES_GPIO_OUT); 
-    EIO_D1_Config(ES_GPIO_IN);          /* 输入 */        
-    EIO_D2_Config(ES_GPIO_OUT);
-    EIO_D3_Config(ES_GPIO_OUT);
-    EIO_D4_Config(ES_GPIO_OUT);
-    EIO_D5_Config(ES_GPIO_OUT);
-    
-    EIO_D6_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-    EIO_D7_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-    EIO_D8_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-    EIO_D9_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+    EIO_D0_Config(ES_GPIO_OUT);         /* reset */
+    EIO_D1_Config(ES_GPIO_IN);          /* 输入 */
+  
+    if (g_gMulSwd.Active[0] == 1)
+    {
+        EIO_D8_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+        EIO_D9_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+    }
+    if (g_gMulSwd.Active[1] == 1)
+    {
+        EIO_D5_Config(ES_GPIO_OUT);
+        EIO_D7_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+    }
+    if (g_gMulSwd.Active[2] == 1)
+    {
+        EIO_D4_Config(ES_GPIO_OUT);    
+        EIO_D6_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+    }
+    if (g_gMulSwd.Active[3] == 1)
+    {
+        EIO_D2_Config(ES_GPIO_OUT);
+        EIO_D3_Config(ES_GPIO_OUT);
+    }    
 }
 
 /*

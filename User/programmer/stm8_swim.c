@@ -55,7 +55,7 @@
     #define SWIM_DELAY_6BIT()       bsp_DelayNS(6 * 125 - 100) 
     #define SWIM_DELAY_8BIT()       bsp_DelayNS(8 * 125 - 100) 
     #define SWIM_DELAY_18BIT()      bsp_DelayNS(18 * 125 - 100) //  - 210) 
-#else   /* 加速10% ，不稳定。 需要上来电阻680欧姆*/
+#else   /* 加速10% ，不稳定。 需要上拉电阻680欧姆*/
     #define SWIM_0_DELAY_2BIT()     bsp_DelayNS(2 * 125 - (400 - 2 * 125) -30)
     #define SWIM_1_DELAY_2BIT()     bsp_DelayNS(2 * 125 - (456 - 2 * 125) -30)
 
@@ -101,6 +101,26 @@ void SWIM_InitHard(void)
     EIO_D9_Config(ES_GPIO_OUT);         /* SWIM  - 数据线 */    
     
     g_HighSpeed = 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: SWIM_SetResetPin
+*    功能说明: 设置复位脚电平
+*    形    参: _state : 电平状态
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void SWIM_SetResetPin(uint8_t _state)
+{
+    if (_state == 0)
+    {
+        SWIM_RESET_0();     /* 复位 */
+    }
+    else
+    {
+        SWIM_RESET_1();     /* 复位解除 */
+    }
 }
 
 /*

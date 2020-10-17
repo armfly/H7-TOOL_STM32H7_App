@@ -79,16 +79,36 @@ uint8_t MUL_CheckAckTransferOk(uint8_t *_ack)
     uint8_t err = 0;
     uint8_t i;
     
-    
-    for (i = 0; i < 4; i++)
+    if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
     {
-        if (g_gMulSwd.Active[i] == 1)
+        for (i = 0; i < 4; i++)
         {
-            if (_ack[i] != DAP_TRANSFER_OK)
+            if (g_gMulSwd.Active[i] == 1)
             {
-                err++;
+                if (_ack[i] != DAP_TRANSFER_OK)
+                {
+                    err++;
+                }
             }
         }
+    }
+    else            
+    {
+        err = 1;
+        for (i = 0; i < 4; i++)
+        {
+            if (g_gMulSwd.Active[i] == 1)
+            {
+                if (_ack[i] != DAP_TRANSFER_OK)
+                {
+                    ;
+                }
+                else
+                {
+                    err = 0;
+                }
+            }
+        }        
     }
     
     if (err == 0)
@@ -96,15 +116,9 @@ uint8_t MUL_CheckAckTransferOk(uint8_t *_ack)
         return 1;
     }
     
-    return 0;
+    return 0;   
 }
 
-#if  0  // armfly debug
-__attribute__((weak)) void MUL_swd_set_target_reset(uint8_t asserted)
-{
-    (asserted) ? PIN_nRESET_OUT(0) : PIN_nRESET_OUT(1);
-}
-#else
 void MUL_swd_set_target_reset(uint8_t asserted)
 {       
 //    if(asserted == 0)
@@ -125,7 +139,7 @@ void MUL_swd_set_target_reset(uint8_t asserted)
         EIO_SetOutLevel(EIO_D0, 0);     /* 转接板NRESET 反相 */
     }
 }
-#endif
+
 
 uint8_t MUL_swd_get_target_reset(void)
 {    
@@ -202,7 +216,7 @@ uint8_t *MUL_swd_transfer_retry(uint32_t req, uint32_t *data)
         }
         else    /* 通道已经激活 */
         {
-//            if (g_gMulSwd.Error[i] == 1)    /* 该通道已经错误，后续不在重试 */
+//            if (g_gMulSwd.Error[i] != 0)    /* 该通道已经错误，后续不在重试 */
 //            {
 //                g_gMulSwd.Ignore[i] = 1;    /* 传送数据时，忽略该通道 */
 //                done |= (1 << i);
@@ -996,28 +1010,52 @@ static uint8_t MUL_swd_write_debug_state(DEBUG_STATE *state)
 
         pAck = MUL_swd_read_dp(DP_CTRL_STAT, status);
  
-        for (i = 0; i < 4; i++)
+        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
         {
-            if (g_gMulSwd.Active[i] == 1)
+            for (i = 0; i < 4; i++)
             {
-                if (pAck[i] == 1)                    
+                if (g_gMulSwd.Active[i] == 1)
                 {
-                    if (status[i] & (STICKYERR | WDATAERR))
+                    if (pAck[i] == 1)                    
+                    {
+                        if (status[i] & (STICKYERR | WDATAERR))
+                        {
+                            err = 1;
+                        }
+                    }
+                    else
                     {
                         err = 1;
                     }
                 }
-                else
-                {
-                    err = 1;
-                }
-            }
-            else
+            }   
+        }
+        else
+        {        
+            err = 1;
+            for (i = 0; i < 4; i++)
             {
-                ;
-            }
-        }   
-
+                if (g_gMulSwd.Active[i] == 1)
+                {
+                    if (pAck[i] == 1)                    
+                    {
+                        if (status[i] & (STICKYERR | WDATAERR))
+                        {
+                            err = 1;
+                        }
+                        else
+                        {
+                            err = 0;
+                        }
+                    }
+                    else
+                    {
+                        //err = 1;
+                    }
+                }
+            }            
+        }
+        
         if (err == 1)
         {
             return 0;
@@ -1047,31 +1085,59 @@ uint8_t MUL_swd_read_core_register(uint32_t n, uint32_t *val)
 //        if (*val & S_REGRDY) {
 //            break;
 //        }
-        continu_wait = 0;
-        if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
         {
-            continu_wait = 1;
+            continu_wait = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }   
+            if (continu_wait == 0)
+            {
+                break;
+            }
         }
-        if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+        else
         {
-            continu_wait = 1;
+            continu_wait = 0;
+            if (g_gMulSwd.Active[0] == 1 && g_gMulSwd.Error[0] == 0 && ((readval[0] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && g_gMulSwd.Error[1] == 0 && ((readval[1] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && g_gMulSwd.Error[2] == 0 && ((readval[2] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && g_gMulSwd.Error[3] == 0 && ((readval[3] & S_REGRDY) == 0))
+            {
+                continu_wait = 1;
+            }   
+            if (continu_wait == 0)
+            {
+                break;
+            }           
         }
-        if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
-        {
-            continu_wait = 1;
-        }
-        if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
-        {
-            continu_wait = 1;
-        }   
-        if (continu_wait == 0)
-        {
-            break;
-        }        
+            
     }
 
     if (i == timeout) {
-        return 0;
+        return 0;    
     }
 
     if (!MUL_swd_read_word(DCRDR, val)) {
@@ -1096,7 +1162,7 @@ uint8_t MUL_swd_write_core_register(uint32_t n, uint32_t val)
 
     // wait for S_REGRDY
     for (i = 0; i < timeout; i++) {
-        uint8_t err;
+       
         
         if (!MUL_swd_read_word(DHCSR, readval)) {
             return 0;
@@ -1104,28 +1170,59 @@ uint8_t MUL_swd_write_core_register(uint32_t n, uint32_t val)
 
 //        if ((readval[0] & S_REGRDY) && (readval[1] & S_REGRDY) && (readval[2] & S_REGRDY) && (readval[3] & S_REGRDY)) {
 //            return 1;
-//        }        
-        err = 0;
-        if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+//        }
+        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
         {
-            err = 1;
+            uint8_t err;
+            
+            err = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
+            {
+                err = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
+            {
+                err = 1;
+            }   
+            if (err == 0)
+            {
+                return 1;
+            }
         }
-        if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) == 0))
+        else     /* 有1个ok 则返回ok */
         {
-            err = 1;
-        }
-        if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) == 0))
-        {
-            err = 1;
-        }
-        if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) == 0))
-        {
-            err = 1;
-        }   
-        if (err == 0)
-        {
-            return 1;
-        }
+            uint8_t ok;
+            
+            ok = 0;
+            if (g_gMulSwd.Active[0] == 1 && ((readval[0] & S_REGRDY) != 0))
+            {
+                ok = 1;
+            }
+            if (g_gMulSwd.Active[1] == 1 && ((readval[1] & S_REGRDY) != 0))
+            {
+                ok = 1;
+            }
+            if (g_gMulSwd.Active[2] == 1 && ((readval[2] & S_REGRDY) != 0))
+            {
+                ok = 1;
+            }
+            if (g_gMulSwd.Active[3] == 1 && ((readval[3] & S_REGRDY) != 0))
+            {
+                ok = 1;
+            }   
+            if (ok == 1)
+            {
+                return 1;
+            }
+         }
     }
 
     return 0;
@@ -1205,6 +1302,7 @@ static uint8_t MUL_swd_wait_until_halted(void)
             break;
         }
         
+        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
         {
             uint8_t err = 0;
             uint8_t i;
@@ -1231,6 +1329,36 @@ static uint8_t MUL_swd_wait_until_halted(void)
                 return 1;   /* 成功 */
             }
         }
+        else
+        {
+            uint8_t err = 0;
+            uint8_t i;
+            
+            /* 只要有1个没有停机则继续等待 */
+            for (i = 0; i < 4; i++)
+            {
+                if (g_gMulSwd.Active[i] == 1)
+                {                    
+                    if (g_gMulSwd.Error[i] == 0)
+                    {
+                        if ((val[i] & S_HALT) == 0)
+                        {
+                            err = 1;
+                            //break;
+                        }
+                        else
+                        {
+                            ok[i] = 1;
+                        }
+                    }
+                }
+            }
+            if (err == 0)
+            {
+                g_tProg.FLMFuncDispProgress = 0;
+                return 1;   /* 成功 */
+            }
+        }       
 
         if (ProgCancelKey())
         {
@@ -1278,6 +1406,7 @@ uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32
 
     // Flash functions return 0 if successful.
     //if (state.r[0] != 0) {
+    if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
     {
         uint8_t err = 0;
         uint8_t i;
@@ -1291,6 +1420,24 @@ uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32
         }
         
         if (err == 1)
+        {
+            return 0;
+        }
+    }
+    else      /* 只要有1路ok ，则返回ok */
+    {
+        uint8_t ok = 0;
+        uint8_t i;
+        
+        for (i = 0; i < 4; i++)
+        {
+            if (g_gMulSwd.Active[i] == 1 && R0[i] == 0)
+            {
+                ok = 1;
+            }
+        }
+        
+        if (ok == 0)
         {
             return 0;
         }
@@ -1540,6 +1687,7 @@ uint8_t MUL_swd_init_debug(void)
             }
         }
 
+        if (g_tProg.AbortOnError == 1)   /* 有1个错误 则返回错误 */
         {
             uint8_t err = 0;
             
@@ -1560,6 +1708,27 @@ uint8_t MUL_swd_init_debug(void)
                 continue;      
             }
         }
+        else   /* 有1路OK，则设置OK */
+        {
+            uint8_t ok = 0;
+            
+            for (i = 0; i < 4; i++)
+            {
+                if (g_gMulSwd.Active[i] == 1)
+                {
+                    if (g_gMulSwd.CoreID[i] > 0)
+                    {
+                        ok = 1;
+                    }
+                }
+            }
+            
+            if (ok == 0)
+            {
+                do_abort = 2;
+                continue;      
+            }
+        }        
         
         if (!MUL_swd_clear_errors()) {
             do_abort = 2;

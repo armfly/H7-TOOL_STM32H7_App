@@ -18,6 +18,9 @@
 #include "swd_flash.h"
 #include "SW_DP_Multi.h"
 #include "debug_cm.h"
+#include "n76e003_flash.h"
+#include "cx32_isp.h"
+
 
 /* 为了避免和DAP驱动中的函数混淆，本模块函数名前缀用 h7swd */
 
@@ -52,6 +55,8 @@ static int h7_ReadCVar(lua_State* L);
 
 static int h7swd_ReadExtID(lua_State* L);
 
+static int h7_N76E_Iap(lua_State* L);
+static int h7_Iap(lua_State* L);
 
 /*
 *********************************************************************************************************
@@ -86,7 +91,6 @@ void lua_swd_RegisterFun(void)
     
     lua_register(g_Lua, "pg_get_ext_id", h7swd_ReadExtID);       
 
-
     lua_register(g_Lua, "pg_load_algo_file", h7_LoadAlgoFile);
     lua_register(g_Lua, "pg_prog_file", h7_ProgFile);
     lua_register(g_Lua, "pg_prog_buf", h7_ProgBuf);
@@ -106,8 +110,13 @@ void lua_swd_RegisterFun(void)
     
     lua_register(g_Lua, "pg_read_c_var", h7_ReadCVar);
     
+    /* N76E003 */
+    lua_register(g_Lua, "pg_n76e_iap", h7_N76E_Iap);
     
+    /* 通用的IAP指令接口，第1个形参是CPU型号 第2个形参是指令代码 */
+    lua_register(g_Lua, "pg_iap", h7_Iap);
 }
+   
 
 /*
 *********************************************************************************************************
@@ -168,6 +177,14 @@ static int h7_ReadCVar(lua_State* L)
         {
             lua_pushnumber(L, g_gMulSwd.MultiMode);   
         }
+        else if (strcmp(pVarName, "MultiProgError") == 0)
+        {
+            lua_pushnumber(L, g_gMulSwd.Error[0]);
+            lua_pushnumber(L, g_gMulSwd.Error[1]);
+            lua_pushnumber(L, g_gMulSwd.Error[2]);
+            lua_pushnumber(L, g_gMulSwd.Error[3]);
+            return 4;
+        }        
         else if (strcmp(pVarName, "ToolSn") == 0)
         {
             lua_pushnumber(L, g_tParam.ToolSn);   
@@ -191,7 +208,7 @@ static int h7_ReadCVar(lua_State* L)
 /*
 *********************************************************************************************************
 *    函 数 名: h7swd_Init
-*    功能说明: 初始化swd
+*    功能说明: 初始化swd. swim. iap.  pg_init()
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -216,6 +233,12 @@ static int h7swd_Init(lua_State* L)
         SWIM_InitHard();           /* 进入swd debug状态 */
         
         SWIM_EntrySequence();            
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        N76E_ExitIAP();            /* 进入IAP状态 */
+
+        N76E_EnterIAP();           /* 进入IAP状态 */
     }
     else
     {
@@ -443,6 +466,20 @@ static int h7swd_ReadMemory(lua_State* L)
         lua_pushlstring(L, (char *)s_lua_read_buf, num); 
         return 2;        
     }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        if (N76E_ReadBuf(addr, s_lua_read_buf, num) == 0)
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+        }
+        else
+        {
+            lua_pushnumber(L, 1);    /* 成功 */
+        }
+        
+        lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+        return 2;        
+    }    
     else
     {
         lua_pushnumber(L, 0);    /* 出错 */   
@@ -1079,9 +1116,12 @@ static int h7_LoadAlgoFile(lua_State* L)
 *    返 回 值: 0 失败   1 成功
 *********************************************************************************************************
 */
+uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, 
+    uint32_t _FileIndex, const char *_AlgoName);
 static int h7_ProgFile(lua_State* L)
 {
     const char *file_name;
+    const char *AlgoName;
     size_t len = 0;
     uint32_t FlashAddr;
     uint32_t EndAddr;
@@ -1092,7 +1132,7 @@ static int h7_ProgFile(lua_State* L)
         lua调用:
         pg_prog_file(TaskList[i + 1], TaskList[i + 2], EndAddress, TaskList[i + 3])
     */
-    if (lua_type(L, 1) == LUA_TSTRING)      /* 判断第1个参数 */
+    if (lua_type(L, 1) == LUA_TSTRING)      /* 判断第1个参数 - 文件名 */
     {        
         file_name = luaL_checklstring(L, 1, &len); /* 1是参数的位置， len是string的长度 */   
     }
@@ -1102,7 +1142,7 @@ static int h7_ProgFile(lua_State* L)
         return 1;
     }
     
-    if (lua_type(L, 2) == LUA_TNUMBER)      /* 判断第2个参数 */
+    if (lua_type(L, 2) == LUA_TNUMBER)      /* 判断第2个参数 - 开始地址 */
     {
         FlashAddr = luaL_checknumber(L, 2);       
     }
@@ -1122,7 +1162,7 @@ static int h7_ProgFile(lua_State* L)
         return 1;
     } 
     
-    if (lua_type(L, 4) == LUA_TNUMBER)      /* 判断第4个参数 - 控制字节， bit0表示滚码是否在本次烧录中写入 */
+    if (lua_type(L, 4) == LUA_TNUMBER)      /* 判断第4个参数 - 控制字节， bit0=1表示整片擦除， 0按扇区擦除 */
     {
         CtrlByte = luaL_checknumber(L, 4);       
     }
@@ -1132,7 +1172,7 @@ static int h7_ProgFile(lua_State* L)
         return 1;
     }    
 
-    if (lua_type(L, 5) == LUA_TNUMBER)      /* 判断第5个参数 - 文件序号 */
+    if (lua_type(L, 5) == LUA_TNUMBER)      /* 判断第5个参数 - 文件序号，用于滚码 */
     {
         FileIndex = luaL_checknumber(L, 5);       
     }
@@ -1142,6 +1182,17 @@ static int h7_ProgFile(lua_State* L)
         return 1;
     }  
        
+    if (lua_type(L, 1) == LUA_TSTRING)      /* 判断第6个参数 - 算法文件名 */
+    {        
+        AlgoName = luaL_checklstring(L, 6, &len); /* 1是参数的位置， len是string的长度 */   
+    }
+    else
+    {
+        lua_pushnumber(L, 0);    /* 出错 */
+        return 1;
+    }     
+    
+    /* 开始编程文件 */
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {    
         if (PG_SWD_ProgFile((char *)file_name, FlashAddr, EndAddr, CtrlByte, FileIndex) == 0)
@@ -1163,7 +1214,18 @@ static int h7_ProgFile(lua_State* L)
         {
             lua_pushnumber(L, 0);    /* 出错 */
         }        
-    }  
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        if (PG_N76E_ProgFile(file_name, FlashAddr, EndAddr, CtrlByte, FileIndex, AlgoName) == 0)
+        {
+            lua_pushnumber(L, 1);    /*OK */
+        }
+        else
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+        }        
+    }     
     else
     {
         lua_pushnumber(L, 0);    /* 出错 */
@@ -1197,43 +1259,61 @@ static int h7_reset(lua_State* L)
     
     printf("hardware reset %dms\r\n", delay);
     
-    /* 硬件复位 */
-    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-    {
-
-        MUL_swd_set_target_reset(1);
-        
-        // Perform a soft reset
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {    
+        /* 硬件复位 */
+        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
-            uint32_t val[4];
-            
-            MUL_swd_read_word(NVIC_AIRCR, val);
 
-            swd_write_word(NVIC_AIRCR, VECTKEY | (val[0] & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+            MUL_swd_set_target_reset(1);
+            
+            // Perform a soft reset
+            {
+                uint32_t val[4];
+                
+                MUL_swd_read_word(NVIC_AIRCR, val);
+
+                MUL_swd_write_word(NVIC_AIRCR, VECTKEY | (val[0] & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+            }
+            
+            osDelay(delay);        
+     
+            MUL_swd_set_target_reset(0);
+            osDelay(delay); 
         }
-        
-        osDelay(delay);        
- 
-        MUL_swd_set_target_reset(0);
-        osDelay(delay); 
-    }
-    else        
-    {
-        swd_set_target_reset(1);
-        // Perform a soft reset
+        else        
         {
-            uint32_t val;
-            
-            swd_read_word(NVIC_AIRCR, &val);
+            swd_set_target_reset(1);
+            // Perform a soft reset
+            {
+                uint32_t val;
+                
+                swd_read_word(NVIC_AIRCR, &val);
 
-            swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+                swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+            }
+            
+            osDelay(delay);
+            swd_set_target_reset(0);
+            osDelay(delay); 
         }
-        
-        osDelay(delay);
-        swd_set_target_reset(0);
-        osDelay(delay); 
     }
-    
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        SWIM_SetResetPin(0);
+        bsp_DelayMS(delay);
+        SWIM_SetResetPin(1);
+        bsp_DelayMS(delay);
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        N76E_SetResetPin(0);
+        N76E_ExitIAP();         /* 退出IAP状态 */
+        bsp_DelayMS(delay);         
+        N76E_SetResetPin(1);
+        bsp_DelayMS(delay);
+    }        
+
     return 0;
 }
 
@@ -1367,6 +1447,17 @@ static int h7_DetectIC(lua_State* L)
         lua_pushnumber(L, id);      /* 成功,返回ID */
         return 1;
     }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051) 
+    {
+        uint32_t id;
+        
+        if (N76E_DetectIC(&id) == 0)
+        {
+            id = 0;     /* 失败 */
+        }        
+        lua_pushnumber(L, id);      /* 成功,返回ID */
+        return 1;
+    }    
     lua_pushnumber(L, -1);          /* 失败 */
     return 1;
 }
@@ -1521,7 +1612,7 @@ static int h7_ProgBuf_OB(lua_State* L)
         return 1;
     }
     
-    if (lua_type(L, 2) == LUA_TSTRING)          /* 判断第12个参数 */
+    if (lua_type(L, 2) == LUA_TSTRING)          /* 判断第2个参数 */
     {        
         str = luaL_checklstring(L, 2, &DataLen); /* 2是参数的位置， len是string的长度 */ 
         /* 将字符换转换为2进制数组 "FF 00 12 34"   -> 0xFF,0x00,0x12,0x34 */
@@ -2015,6 +2106,155 @@ static int h7swd_ReadExtID(lua_State* L)
         lua_pushnumber(L, 0);    /* 出错 */
     }
     return 1;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: h7_N76E_Iap
+*    功能说明: N76E003，发IAP指令. 暂时不支持多路烧录
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int h7_N76E_Iap(lua_State* L)
+{
+    /*
+        ob_read = pg_n76e_iap("read_cfg_all");
+        pg_n76e_iap("write_cfg", ob);
+        return pg_n76e_iap("erase_chip");
+        return pg_n76e_iap("read_cfg_all");
+        return pg_n76e_iap("read_cfg_byte", addr);
+        return pg_n76e_iap("read_uid");
+    */
+    const char *StrCmd;
+    size_t len;    
+    
+    if (lua_type(L, 1) == LUA_TSTRING)              /* 判断第1个参数 */
+    {
+        StrCmd = luaL_checklstring(L, 1, &len);    /* 1是参数的位置， len是string的长度 */       
+    }
+    else
+    {
+        return 0;
+    }
+    
+    if (strcmp(StrCmd, "enter_iap") == 0)
+    {
+        N76E_EnterIAP();
+        return 0;
+    }
+    else if (strcmp(StrCmd, "exit_iap") == 0)
+    {
+        N76E_EnterIAP();
+        return 0;
+    }    
+    else if (strcmp(StrCmd, "read_cfg_all") == 0)
+    {
+        //uint8_t N76E_ReadCfg(uint8_t _addr, uint8_t _len, uint8_t *_cfg)
+        uint8_t ob_buf[8];
+        
+        N76E_ReadCfg(0, 8, ob_buf);
+        
+        lua_pushnumber(L, 1);    /* OK */
+        lua_pushlstring(L, (char *)ob_buf, 8);
+        return 2;
+    }
+    else if (strcmp(StrCmd, "read_cfg_byte") == 0)
+    {
+        uint16_t addr;
+        uint8_t re;
+        
+        if (lua_type(L, 2) == LUA_TNUMBER)      /* 判断第1个参数 */
+        {
+            addr = luaL_checknumber(L, 2);       
+        }
+        else
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+            return 1;
+        }
+
+        N76E_ReadCfg(addr, 1, &re);
+        
+        lua_pushnumber(L, 1);       /* OK */
+        lua_pushnumber(L, re);      /* 读回字节 */
+        return 2;        
+    }     
+    else if (strcmp(StrCmd, "write_cfg") == 0)
+    {
+        const char *cfg;
+        uint8_t DataBuf[1024];
+        
+        cfg = luaL_checklstring(L, 2, &len);    /* 1是参数的位置， len是string的长度 */       
+        
+        /* 将字符换转换为2进制数组 "FF 00 12 34"   -> 0xFF,0x00,0x12,0x34 */
+        AsciiToHex((char *)cfg, DataBuf, 8);         
+        
+        N76E_EraseCfg();
+        N76E_ProgramCfg((uint8_t *)DataBuf);
+        return 0;
+    }
+    else if (strcmp(StrCmd, "erase_chip") == 0)
+    {
+        N76E_EraseChip();       
+        return 0;        
+    }  
+    else if (strcmp(StrCmd, "read_uid") == 0)
+    {
+        ;
+    } 
+
+    return 0;        
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: h7_Iap
+*    功能说明: 发IAP指令. 暂时不支持多路烧录
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int h7_Iap(lua_State* L)
+{
+    /*
+
+    */
+    const char *StrChip;
+    const char *StrCmd;
+    size_t len;    
+    
+    if (lua_type(L, 1) == LUA_TSTRING)              /* 判断第1个参数 */
+    {
+        StrChip = luaL_checklstring(L, 1, &len);    /* 1是参数的位置， len是string的长度 */       
+    }
+    
+    if (lua_type(L, 2) == LUA_TSTRING)              /* 判断第1个参数 */
+    {
+        StrCmd = luaL_checklstring(L, 2, &len);    /* 1是参数的位置， len是string的长度 */       
+    }
+    else
+    {
+        return 0;
+    }
+    
+    if (strcmp(StrChip, "CX32L003") == 0)
+    {
+        if (strcmp(StrCmd, "remove_swd_lock") == 0)
+        {
+            CX32_RemoveSwdLock();
+            return 0;
+        }
+    }
+    else if (strcmp(StrChip, "HS32F0") == 0)
+    {
+        if (strcmp(StrCmd, "remove_swd_lock") == 0)
+        {
+            CX32_RemoveSwdLock();
+            return 0;
+        }
+    }
+    return 0;        
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

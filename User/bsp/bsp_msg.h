@@ -23,15 +23,18 @@ enum
     MSG_CAN1_RX,
     MSG_CAN2_RX,
     
-    MSG_RESET_CPU,            /* 复位CPU */
+    MSG_RESET_CPU,              /* 复位CPU */
     
-    MSG_SAVE_PARAM,            /* 保存参数消息 */
+    MSG_SAVE_PARAM,             /* 保存参数消息 */
+    
+    MSG_PG_START = 0x00001001,   /* 开始烧录 */
+    MSG_PG_ABORT = 0x00001002,   /* 终止烧录 */    
 };
 
 /* 按键FIFO用到变量 */
 typedef struct
 {
-    uint16_t MsgCode;        /* 消息代码 */
+    uint32_t MsgCode;        /* 消息代码 */
     uint32_t MsgParam;        /* 消息的数据体, 也可以是指针（强制转化） */
 }MSG_T;
 
@@ -46,7 +49,7 @@ typedef struct
 
 /* 供外部调用的函数声明 */
 void bsp_InitMsg(void);
-void bsp_PutMsg(uint16_t _MsgCode, uint32_t _MsgParam);
+void bsp_PutMsg(uint32_t _MsgCode, uint32_t _MsgParam);
 uint8_t bsp_GetMsg(MSG_T *_pMsg);
 uint8_t bsp_GetMsg2(MSG_T *_pMsg);
 void bsp_ClearMsg(void);

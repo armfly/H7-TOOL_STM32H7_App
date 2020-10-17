@@ -242,10 +242,8 @@ void bsp_PutKey(uint8_t _KeyCode)
     /* 屏幕熄灭阶段，丢弃唤醒键 */
     if (s_LcdOn == 0)
     {        
-        uint8_t key;
-        
-        key = ((_KeyCode - 1) % KEY_MSG_STEP) + 1;
-        if (key == KEY_1_UP || key == KEY_1_LONG_UP || KEY_1_AUTO_UP | KEY_1_DB_UP)
+        if (_KeyCode == KEY_1_UP || _KeyCode == KEY_1_LONG_UP 
+            || _KeyCode == KEY_2_UP || _KeyCode == KEY_2_LONG_UP)
         {
             s_LcdOn = 1;            
             g_LcdSleepReq = 2;    /* 控制LCD唤醒, 在bsp_Idle执行. 不可以在此调用 LCD_DispOff() */
@@ -336,16 +334,16 @@ uint8_t bsp_GetKeyState(KEY_ID_E _ucKeyID)
 *    函 数 名: bsp_SetKeyParam
 *    功能说明: 设置按键参数
 *    形    参：_ucKeyID : 按键ID，从0开始
-*            _LongTime : 长按事件时间
-*             _RepeatSpeed : 连发速度
+*            _LongTime : 长按事件时间  10ms单位
+*             _RepeatSpeed : 连发速度(间隔时间)  10ms单位
 *    返 回 值: 无
 *********************************************************************************************************
 */
 void bsp_SetKeyParam(uint8_t _ucKeyID, uint16_t _LongTime, uint8_t _RepeatSpeed)
 {
-    s_tBtn[_ucKeyID].LongTime = _LongTime;             /* 长按时间 0 表示不检测长按键事件 */
-    s_tBtn[_ucKeyID].RepeatSpeed = _RepeatSpeed; /* 按键连发的速度，0表示不支持连发 */
-    s_tBtn[_ucKeyID].RepeatCount = 0;                         /* 连发计数器 */
+    s_tBtn[_ucKeyID].LongTime = _LongTime;              /* 长按时间 0 表示不检测长按键事件 */
+    s_tBtn[_ucKeyID].RepeatSpeed = _RepeatSpeed;        /* 按键连发的速度，0表示不支持连发 */
+    s_tBtn[_ucKeyID].RepeatCount = 0;                   /* 连发计数器 */
 }
 
 /*

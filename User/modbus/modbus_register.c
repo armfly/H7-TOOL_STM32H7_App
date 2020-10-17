@@ -1542,15 +1542,15 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             {
                 lua_do("init()");
             }
-            else if (reg_value == 3)
-            {
-                lua_66H_Write(0, "123", 3);
-            }
-            else if (reg_value == 4)
-            {
-                //luaL_dostring(g_Lua, "read()");
-                lua_67H_Read(0, s_lua_read_buf, 3);
-            }
+//            else if (reg_value == 3)
+//            {
+//                lua_66H_Write(0, "123", 3);
+//            }
+//            else if (reg_value == 4)
+//            {
+//                //luaL_dostring(g_Lua, "read()");
+//                lua_67H_Read(0, s_lua_read_buf, 3);
+//            }
             break;
 
         case REG03_CALIB_KEY: /* 校准参数写入使能控制 */

@@ -23,6 +23,7 @@ typedef enum
     CHIP_SWIM_STM8   = 1,
     CHIP_SPI_FLASH   = 2,
     CHIP_I2C_EEPROM  = 3,
+    CHIP_NUVOTON_8051  = 4,   /* 新唐51系,如 N76E类型 */
 }CHIP_TYPE_E;
 
 /* 校验模式 */
@@ -62,8 +63,9 @@ typedef struct
     uint32_t SwdClockDelay;     /* SWD时钟延迟，0表示最快，值越大速度越慢 */
     
     uint32_t SwdResetDelay;     /* 硬件复位后的延迟时间，ms */
-    uint32_t ResetMode;         /* 复位延迟 */
+    uint32_t ResetMode;         /* 复位模式 */
     
+    uint8_t AbortOnError;      /* 多路模式，0表示出错时继续烧录OK的芯片  1表示出错后立刻同时终止 */
     
 }OFFLINE_PROG_T;
 
@@ -110,8 +112,18 @@ uint16_t PG_SWD_EraseChip(uint32_t _FlashAddr);
 uint16_t PG_SWD_EraseSector(uint32_t _FlashAddr);
 
 void DispProgProgress(char *_str, float _progress, uint32_t _addr);
-
 uint32_t GetChipTypeFromLua(lua_State *L);
+
+uint32_t PG_GetPageSize(const char *_Algo);
+uint32_t PG_GetDeviceAddr(const char *_Algo);
+uint32_t PG_GetDeviceSize(const char *_Algo);
+uint32_t PG_GetSectorSize(const char *_Algo, uint32_t _Addr);
+uint8_t PG_CheckBlank(const char *_Algo, uint32_t _Addr, uint32_t _Size);
+uint8_t PG_EraseSector(const char *_Algo, uint32_t _Addr);
+uint8_t PG_EraseChip(void);
+uint8_t PG_ProgramBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, uint32_t _Size);
+uint8_t PG_ReadBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, uint32_t _Size);
+
 
 extern uint8_t flash_buff[16*1024];   /* flash_buff[sizeof(FsReadBuf)]; */
 

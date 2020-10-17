@@ -357,55 +357,6 @@ void lua_StackDump(lua_State *L)
     }
 }
 
-// 通信写文件
-uint8_t lua_66H_Write(uint32_t _addr, uint8_t *_buf, uint32_t _len)
-{
-    uint8_t re;
-    
-    lua_getglobal(g_Lua, "write");    // 函数入栈 获取lua函数write
-    lua_pushinteger(g_Lua, _addr);     
-    lua_pushlstring(g_Lua, (char *)_buf, _len); 
-    lua_pushinteger(g_Lua, _len); 
-    
-    lua_pcall(g_Lua, 3, 1, 0);
-    /*
-        lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
-        1
-        nargs 参数个数
-        nresults 返回值个数
-        errFunc 错误处理函数，0表示无，表示错误处理函数在栈中的索引
-    */
-    re = lua_tonumber(g_Lua, -1);
-    lua_pop(g_Lua, 1);
-    return re;
-}
-
-// 通信读文件
-uint8_t lua_67H_Read(uint32_t _addr, uint8_t *_buf, uint32_t _len)
-{
-    uint8_t re = 0;
-    uint32_t i;
-    
-    lua_getglobal(g_Lua, "read");    // 函数入栈 获取lua函数write
-    lua_pushinteger(g_Lua, _addr);     
-    lua_pushinteger(g_Lua, _len); 
-    
-    lua_pcall(g_Lua, 2, 1, 0);
-    /*
-        lua_pcall(lua_State *L,int nargs,int nresults,int errfunc)
-        1
-        nargs 参数个数
-        nresults 返回值个数
-        errFunc 错误处理函数，0表示无，表示错误处理函数在栈中的索引
-    */
-    
-    for (i = 0; i < _len; i++)
-    {
-        _buf[i] = s_lua_read_buf[i];
-    }
-
-    return re;
-}
 
 /*
 *********************************************************************************************************
@@ -900,9 +851,8 @@ static int put_key(lua_State* L)
     if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 */
     {
         key = luaL_checknumber(L, 1);
+        bsp_PutKey(key);
     }
-    
-    bsp_PutKey(key);
     return 0;
 }
 
@@ -917,6 +867,42 @@ static int put_key(lua_State* L)
 static int clear_key(lua_State* L)
 {   
     bsp_ClearKey();
+    return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: put_key
+*    功能说明: 模拟一个键值
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int put_msg(lua_State* L)
+{
+    uint32_t msg_code;
+    uint32_t msg_param;
+    
+    if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 */
+    {
+        msg_code = luaL_checknumber(L, 1);
+    }
+    else
+    {
+        return 0;
+    }
+
+    if (lua_type(L, 2) == LUA_TNUMBER)  /* 判断第2个参数 */
+    {
+        msg_param = luaL_checknumber(L, 2);
+    }
+    else
+    {
+        msg_param = 0;
+    }
+    
+    bsp_PutMsg(msg_code, msg_param);
+    
     return 0;
 }
 
@@ -996,6 +982,34 @@ static int crc32_stm32(lua_State* L)
 
 /*
 *********************************************************************************************************
+*    函 数 名: lua_GetVarUint32
+*    功能说明: 读取lua全局变量，返回UINT32型
+*    形    参: _VarName : 变量名    _Default : 缺省值
+*    返 回 值: 变量值
+*********************************************************************************************************
+*/
+uint32_t lua_GetVarUint32(const char *_VarName, uint32_t _Default)
+{
+    uint32_t data;
+    
+    /* 读取复位类型： 软件还是硬件复位 */
+    lua_getglobal(g_Lua, _VarName);  
+    if (lua_isinteger(g_Lua, -1)) 
+    {    
+        data = lua_tointeger(g_Lua, -1);
+    }
+    else
+    {
+        /* 没有定义则用缺省值 */
+        data = _Default;
+    }
+    lua_pop(g_Lua, 1);
+
+    return data;        
+}
+        
+/*
+*********************************************************************************************************
 *    函 数 名: lua_RegisterFunc
 *    功能说明: 注册lua可调用的c函数
 *    形    参: 无
@@ -1020,11 +1034,12 @@ static void lua_RegisterFunc(void)
     lua_register(g_Lua, "get_key", get_key);
     lua_register(g_Lua, "put_key", put_key);
     lua_register(g_Lua, "clear_key", clear_key);
-        
+    lua_register(g_Lua, "put_msg", put_msg);    
     lua_register(g_Lua, "load_file", load_file);
     
     lua_register(g_Lua, "get_rng", get_rng);
     lua_register(g_Lua, "crc32_stm32", crc32_stm32);
+    
     
     /* 注册接口函数 */
     lua_gpio_RegisterFun();    

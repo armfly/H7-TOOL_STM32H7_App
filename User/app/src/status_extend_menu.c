@@ -17,6 +17,7 @@
 #include "main.h"
 #include "lcd_menu.h"
 #include "SW_DP_Multi.h"
+#include "modify_param.h"
 
 const uint8_t *g_Menu1_Text[] =
 {
@@ -127,7 +128,7 @@ void status_ExtendMenu1(void)
                     }   
                     else if (g_tMenu1.Cursor == 4)
                     {
-                        g_MainStatus = MS_SYSTEM_SET;
+                        g_MainStatus = MS_SYSTEM_SET;                        
                     }                 
                     break;
 

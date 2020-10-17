@@ -20,6 +20,7 @@
 #include "prog_if.h"
 #include "lcd_menu.h"
 #include "SW_DP_Multi.h"
+#include "modify_param.h"
 
 /* 三个按钮 */
 #define BTN1_X     (240 - BTN1_W - 5)
@@ -252,34 +253,34 @@ void status_ProgWork(void)
         else if (g_gMulSwd.MultiMode == 4) PG_PrintText("多路模式:1-4路");         
     }     
          
-    /* 配置RS485串口，驱动RS485数码管显示状态 */
-    {
-        bsp_SetUartParam(COM_RS485, 9600, UART_PARITY_NONE, UART_WORDLENGTH_8B, UART_STOPBITS_1);
-        
-        if (g_gMulSwd.MultiMode == 0)
-        {
-            comSendBuf(COM_RS485, "$001,-   #", 10);
-        }
-        else
-        {
-            if (g_gMulSwd.MultiMode == 1)
-            {
-                comSendBuf(COM_RS485, "$001,-   #", 10);
-            }
-            else if (g_gMulSwd.MultiMode == 2)
-            {
-                comSendBuf(COM_RS485, "$001,--  #", 10);
-            }
-            else if (g_gMulSwd.MultiMode == 3)
-            {
-                comSendBuf(COM_RS485, "$001,--- #", 10);
-            }
-            else if (g_gMulSwd.MultiMode == 4)
-            {
-                comSendBuf(COM_RS485, "$001,----#", 10);
-            }
-        }
-    }
+//    /* 配置RS485串口，驱动RS485数码管显示状态 */
+//    {
+//        bsp_SetUartParam(COM_RS485, 9600, UART_PARITY_NONE, UART_WORDLENGTH_8B, UART_STOPBITS_1);
+//        
+//        if (g_gMulSwd.MultiMode == 0)
+//        {
+//            comSendBuf(COM_RS485, "$001,-   #", 10);
+//        }
+//        else
+//        {
+//            if (g_gMulSwd.MultiMode == 1)
+//            {
+//                comSendBuf(COM_RS485, "$001,-   #", 10);
+//            }
+//            else if (g_gMulSwd.MultiMode == 2)
+//            {
+//                comSendBuf(COM_RS485, "$001,--  #", 10);
+//            }
+//            else if (g_gMulSwd.MultiMode == 3)
+//            {
+//                comSendBuf(COM_RS485, "$001,--- #", 10);
+//            }
+//            else if (g_gMulSwd.MultiMode == 4)
+//            {
+//                comSendBuf(COM_RS485, "$001,----#", 10);
+//            }
+//        }
+//    }
     
     g_tProg.AutoStart = 0;
     fRefresh = 1;
@@ -422,34 +423,34 @@ void status_ProgWork(void)
                 }
                 
                 
-                /* RS485数码管显示烧录进行中 */
-                {
-                    char str[16];
-                    
-                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
-                    {                        
-                        strcpy(str, "$001,-.   #");
-                    }
-                    else /* 多路模式 */
-                    {
-                        uint8_t i;
-                        
-                        strcpy(str, "$001,");
-                        for (i = 0; i < 4; i++)
-                        {
-                            if (g_gMulSwd.Active[i] == 1)
-                            {
-                                strcat(str, "-.");
-                            }
-                            else
-                            {
-                                strcat(str, " ");                           
-                            }                            
-                        }
-                        strcat(str, "#");
-                    }      
-                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));                    
-                }  
+//                /* RS485数码管显示烧录进行中 */
+//                {
+//                    char str[16];
+//                    
+//                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
+//                    {                        
+//                        strcpy(str, "$001,-.   #");
+//                    }
+//                    else /* 多路模式 */
+//                    {
+//                        uint8_t i;
+//                        
+//                        strcpy(str, "$001,");
+//                        for (i = 0; i < 4; i++)
+//                        {
+//                            if (g_gMulSwd.Active[i] == 1)
+//                            {
+//                                strcat(str, "-.");
+//                            }
+//                            else
+//                            {
+//                                strcat(str, " ");                           
+//                            }                            
+//                        }
+//                        strcat(str, "#");
+//                    }      
+//                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));                    
+//                }  
             
                 bsp_LcdSleepEnable(0);      /* 临时屏蔽LCD背光控制，应对烧录时间大于1分钟的情况，避免中途关闭背光 */    
                 
@@ -480,56 +481,54 @@ void status_ProgWork(void)
                 } 
 
                 /* RS485数码管显示烧录结果 */
-                {
-                    char str[8];
-                    
-                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
-                    {                        
-                        if (g_tProg.Err == 0)
-                        {
-                            strcpy(str, "$001,o   #");
-                        }
-                        else
-                        {
-                            strcpy(str, "$001,E   #");
-                        }
-                    }
-                    else /* 多路模式 */
-                    {
-                        uint8_t i;
-                        
-                        strcpy(str, "$001,");
-                        for (i = 0; i < 4; i++)
-                        {
-                            if (g_gMulSwd.Active[i] == 1)
-                            {
-                                if (g_gMulSwd.Error[i] == 1)
-                                {
-                                    strcat(str, "E");
-                                }
-                                else
-                                {
-                                    if (g_tProg.Err == 1)
-                                    {
-                                        strcat(str, "-");
-                                    }
-                                    else
-                                    {
-                                        strcat(str, "o");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                strcat(str, " ");                           
-                            }                            
-                        }
-                        strcat(str, "#");
-                    }      
-                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));
-
-                    
-                }                
+//                {
+//                    char str[8];
+//                    
+//                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
+//                    {                        
+//                        if (g_tProg.Err == 0)
+//                        {
+//                            strcpy(str, "$001,o   #");
+//                        }
+//                        else
+//                        {
+//                            strcpy(str, "$001,E   #");
+//                        }
+//                    }
+//                    else /* 多路模式 */
+//                    {
+//                        uint8_t i;
+//                        
+//                        strcpy(str, "$001,");
+//                        for (i = 0; i < 4; i++)
+//                        {
+//                            if (g_gMulSwd.Active[i] == 1)
+//                            {
+//                                if (g_gMulSwd.Error[i] != 0)
+//                                {
+//                                    strcat(str, "E");
+//                                }
+//                                else
+//                                {
+//                                    if (g_tProg.Err == 1)
+//                                    {
+//                                        strcat(str, "-");
+//                                    }
+//                                    else
+//                                    {
+//                                        strcat(str, "o");
+//                                    }
+//                                }
+//                            }
+//                            else
+//                            {
+//                                strcat(str, " ");                           
+//                            }                            
+//                        }
+//                        strcat(str, "#");
+//                    }      
+//                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));         
+//                }                
                 
                 /* 编程完毕 */                
                 if (g_tProg.Err == 0)
@@ -681,31 +680,35 @@ void status_ProgWork(void)
             ;
         }
         
-        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 - 检测D1触发信号 */            
+        /* 处理消息. 和PC机或lua程序传递信息 */
         {
-            static uint8_t s_LastState = 2;
-            uint8_t NowState;
-
-            if (g_tVar.TVCCVolt > 1.0f)
+            static int32_t s_time = 0;
+            
+            MSG_T msg;            
+            
+            if (bsp_GetMsg(&msg))
             {
-                NowState = EIO_GetInputLevel(EIO_D1);
-                if (s_LastState == 1)
+                switch (msg.MsgCode)
                 {
-                    if (NowState == 0)
-                    {
-                        bsp_DelayMS(10);
-                        NowState = EIO_GetInputLevel(EIO_D1);
-                        
-                        if (NowState == 0)
-                        {
-                            bsp_PutKey(KEY_UP_C);   /* 模拟用户按键 */
-                        }
-                    }
+                    case MSG_PG_START:
+                        fRunOnce = 1;
+                        bsp_PutKey(KEY_DB_S);   /* 任意发一个本状态无用的按键消息，重开背光 */
+                        break;
+                    
+                    case MSG_PG_ABORT:
+                        break;
                 }
-                s_LastState = NowState;
+            }
+            
+            if (bsp_CheckRunTime(s_time) > 20)
+            {
+                s_time = bsp_GetRunTime();
+                lua_do("if mi_idle ~= nil then mi_idle() end");   /* 烧录空闲时刻，检测启动键，通过lua实现 */
             }
         }
         
+          
+ 
         ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
@@ -926,7 +929,12 @@ void status_ProgSetting(void)
                 case KEY_LONG_DOWN_S: /* S键 上 */
                     if (g_tMenuProg1.Cursor == 0)      /* 修改编程参数 */
                     {
-                        g_MainStatus = MS_PROG_MODIFY_PARAM;
+                        //g_MainStatus = MS_PROG_MODIFY_PARAM);;
+                        
+                        ModifyParam(MS_PROG_MODIFY_PARAM);
+                        LCD_DispMenu(&g_tMenuProg1);
+                        /* 通知lua程序，多路编程参数变化 */
+                        lua_do("MULTI_MODE = pg_read_c_var(\"MultiProgMode\")");
                     }                    
                     else if (g_tMenuProg1.Cursor == 1)      /* 本次计数清零 */
                     {

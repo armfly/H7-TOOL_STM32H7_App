@@ -21,6 +21,7 @@
 #include "wifi_if.h"
 #include "usb_if.h"
 #include "file_lib.h"
+#include "modify_param.h"
 
 const uint8_t *g_MenuSys_Text[] =
 {
@@ -115,7 +116,10 @@ void status_SystemSetMain(void)
                     }
                     else if (g_tMenuSys.Cursor == 1)
                     {
-                        g_MainStatus = MS_MODIFY_PARAM;
+                        //g_MainStatus = MS_MODIFY_PARAM;
+                        ModifyParam(MS_SYSTEM_SET);
+                        DispHeader2(90, "系统设置");    /* 需要清屏 */
+                        LCD_DispMenu(&g_tMenuSys);
                     }
                     else if (g_tMenuSys.Cursor == 2)
                     {
