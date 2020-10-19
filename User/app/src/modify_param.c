@@ -35,7 +35,6 @@ char *g_MenuParam_Text[MENU_ITEM_COUNT_MAX + 1];
 
 MENU_T g_tMenuParam;
 
-static void UartMonInitParam(uint16_t _MainStatus);
 static void UartMonDispParam(void);
 static void UartMonAdjustParam(uint8_t _index, int16_t _adj);
 
@@ -306,7 +305,7 @@ void ModifyParam(uint16_t _MainStatus)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-static void UartMonInitParam(uint16_t _MainStatus)
+void UartMonInitParam(uint16_t _MainStatus)
 {
     if (_MainStatus == MS_MONITOR_UART)
     {
@@ -541,5 +540,5 @@ void UartMonCheckParam(void)
         MonDispWriteParam(i, now);
     }
 }
-            
+
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

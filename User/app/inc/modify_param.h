@@ -25,6 +25,7 @@ typedef struct
     int32_t DefaultValue;   /* 缺省值 */ 
 }PARAM_LIST_T;
 
+void UartMonInitParam(uint16_t _MainStatus);
 void ModifyParam(uint16_t _MainStatus);
 void UartMonCheckParam(void);
 
