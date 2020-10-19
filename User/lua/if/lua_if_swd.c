@@ -1264,7 +1264,14 @@ static int h7_reset(lua_State* L)
         /* 硬件复位 */
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
-
+            /*　V1.34 ： 备份错误标志 */
+            uint8_t Bak[4];            
+            
+            Bak[0] = g_gMulSwd.Error[0];
+            Bak[1] = g_gMulSwd.Error[1];
+            Bak[2] = g_gMulSwd.Error[2];
+            Bak[3] = g_gMulSwd.Error[3];
+            
             MUL_swd_set_target_reset(1);
             
             // Perform a soft reset
@@ -1279,7 +1286,12 @@ static int h7_reset(lua_State* L)
             osDelay(delay);        
      
             MUL_swd_set_target_reset(0);
-            osDelay(delay); 
+            osDelay(delay);
+            
+            g_gMulSwd.Error[0] = Bak[0];
+            g_gMulSwd.Error[1] = Bak[1];
+            g_gMulSwd.Error[2] = Bak[2];
+            g_gMulSwd.Error[3] = Bak[3];            
         }
         else        
         {

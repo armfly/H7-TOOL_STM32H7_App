@@ -125,12 +125,25 @@ void udp_print_send(void)
 void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port)
 {
     uint16_t i;
+    uint8_t nowsend = 0;
 
     for (i = 0; i < _len; i++)
     {
         udp_print_put(_buf[i]);
+        if (_buf[i] == 0x0A)
+        {
+            nowsend = 1;
+        }
     }
-    bsp_StartHardTimer(3, 5000, udp_print_send);
+    
+    if (nowsend == 1)
+    {
+        udp_print_send();
+    }
+    else
+    {
+        bsp_StartHardTimer(3, 5000, udp_print_send);
+    }
 }
 
 /*

@@ -299,3 +299,5 @@ uint8_t i2c_CheckDevice(uint8_t _Address)
     }
     return 1; /* I2C总线异常 */
 }
+
+/***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
