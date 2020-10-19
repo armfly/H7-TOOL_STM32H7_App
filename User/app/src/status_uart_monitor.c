@@ -263,6 +263,8 @@ void status_MonitorUart(void)
     
     LCD_SetEncode(ENCODE_GBK);
     
+    /* V1.35, 检查串口参数 */
+    UartMonInitParam(g_MainStatus);  
     UartMonCheckParam();    /* 检查参数 */
     
     s_Pause = 0;    
@@ -301,6 +303,7 @@ void status_MonitorUart(void)
             }
             
             s_BeginTime = bsp_GetRunTimeUs();
+           
             
             /* 设置第1个串口 9600 无校验 */
             bsp_SetUartParam(COM_RS485, BaudTab[g_tParam.UartMonBaud], 
