@@ -69,14 +69,14 @@
     #define MUL_ICP_RST_1()         BSP_SET_GPIO_0(GPIOI, GPIO_PIN_0)       /* 转接板有三极管反相 */
     #define MUL_ICP_RST_0()         BSP_SET_GPIO_1(GPIOI, GPIO_PIN_0)
     
-    #define MUL_ICP_CLK_0()         BSP_SET_GPIO_0(GPIOE, GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_9 | GPIO_PIN_6)
-    #define MUL_ICP_CLK_1()         BSP_SET_GPIO_1(GPIOE, GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_9 | GPIO_PIN_6)    
+    #define MUL_ICP_CLK_0()         BSP_SET_GPIO_0(GPIOE, g_ICP_CLK_PIN)
+    #define MUL_ICP_CLK_1()         BSP_SET_GPIO_1(GPIOE, g_ICP_CLK_PIN)    
     
-    #define MUL_ICP_DAT_0()         BSP_SET_GPIO_0(GPIOE, GPIO_PIN_11 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5)
-    #define MUL_ICP_DAT_1()         BSP_SET_GPIO_1(GPIOE, GPIO_PIN_11 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5)
+    #define MUL_ICP_DAT_0()         BSP_SET_GPIO_0(GPIOE, g_ICP_DAT_PIN)
+    #define MUL_ICP_DAT_1()         BSP_SET_GPIO_1(GPIOE, g_ICP_DAT_PIN)
 
-    #define MUL_ICP_DAT_OUT_ENABLE()   BSP_SET_GPIO_1(GPIOG, GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_12); BSP_CFG_GPIO_OUT(GPIOE, GPIO_PIN_11 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5);
-    #define MUL_ICP_DAT_OUT_DISABLE()  BSP_SET_GPIO_0(GPIOG, GPIO_PIN_7 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_12); BSP_CFG_GPIO_IN(GPIOE, GPIO_PIN_11 | GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5); 
+    #define MUL_ICP_DAT_OUT_ENABLE()   BSP_SET_GPIO_1(GPIOG, g_ICP_DAT_DIR_PIN); BSP_CFG_GPIO_OUT(GPIOE, g_ICP_DAT_PIN);
+    #define MUL_ICP_DAT_OUT_DISABLE()  BSP_SET_GPIO_0(GPIOG, g_ICP_DAT_DIR_PIN); BSP_CFG_GPIO_IN(GPIOE, g_ICP_DAT_PIN); 
 
     #define MUL_ICP_DAT0_IS_HIGH()     (GPIOE->IDR & GPIO_PIN_11)
     #define MUL_ICP_DAT0_IS_LOW()      ((GPIOE->IDR & GPIO_PIN_11) == 0)
@@ -87,8 +87,8 @@
     #define MUL_ICP_DAT3_IS_HIGH()     (GPIOE->IDR & GPIO_PIN_5)
     #define MUL_ICP_DAT4_IS_LOW()      ((GPIOE->IDR & GPIO_PIN_5) == 0)    
  
-    #define MUL_ICP_CLK_OUT_ENABLE()   BSP_SET_GPIO_1(GPIOI, GPIO_PIN_12 | GPIO_PIN_1); BSP_SET_GPIO_1(GPIOD, GPIO_PIN_9 | GPIO_PIN_10); BSP_CFG_GPIO_OUT(GPIOE, GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_9 | GPIO_PIN_6);
-    #define MUL_ICP_CLK_OUT_DISABLE()  BSP_SET_GPIO_0(GPIOI, GPIO_PIN_12 | GPIO_PIN_1); BSP_SET_GPIO_0(GPIOD, GPIO_PIN_9 | GPIO_PIN_10); BSP_CFG_GPIO_IN(GPIOE, GPIO_PIN_12 | GPIO_PIN_10 | GPIO_PIN_9 | GPIO_PIN_6);
+    #define MUL_ICP_CLK_OUT_ENABLE()   BSP_SET_GPIO_1(GPIOI, g_ICP_CLK_DIR_PIN_I); BSP_SET_GPIO_1(GPIOD, g_ICP_CLK_DIR_PIN_D); BSP_CFG_GPIO_OUT(GPIOE, g_ICP_CLK_PIN);
+    #define MUL_ICP_CLK_OUT_DISABLE()  BSP_SET_GPIO_0(GPIOI, g_ICP_CLK_DIR_PIN_I); BSP_SET_GPIO_0(GPIOD, g_ICP_CLK_DIR_PIN_D); BSP_CFG_GPIO_IN(GPIOE, g_ICP_CLK_PIN);
 
     #define MUL_ICP_CLK0_IS_HIGH()     (GPIOE->IDR & GPIO_PIN_12)
     #define MUL_ICP_CLK0_IS_LOW()      ((GPIOE->IDR & GPIO_PIN_12) == 0)
@@ -101,6 +101,14 @@
 
 static void CX32_SendBit16(uint16_t _data);
 static void CX32_SendUart9600(uint8_t _data);
+
+uint32_t g_ICP_CLK_PIN;
+uint32_t g_ICP_DAT_PIN;
+
+uint32_t g_ICP_DAT_DIR_PIN;
+
+uint32_t g_ICP_CLK_DIR_PIN_I;
+uint32_t g_ICP_CLK_DIR_PIN_D; 
 
 /*
 *********************************************************************************************************
@@ -126,17 +134,56 @@ void CX32_InitHard(void)
     }
     else      /* 多路烧录 */
     {
-        EIO_D0_Config(ES_GPIO_OUT); 
-        EIO_D1_Config(ES_GPIO_IN);          /* 输入 */        
-        EIO_D2_Config(ES_GPIO_OUT);
-        EIO_D3_Config(ES_GPIO_OUT);
-        EIO_D4_Config(ES_GPIO_OUT);
-        EIO_D5_Config(ES_GPIO_OUT);
+        EIO_D0_Config(ES_GPIO_OUT);         /* reset */
+        EIO_D1_Config(ES_GPIO_IN);          /* 输入 */
+      
+        g_ICP_CLK_PIN = 0;
+        g_ICP_DAT_PIN = 0;
+        g_ICP_DAT_DIR_PIN = 0;
+        g_ICP_CLK_DIR_PIN_I = 0;
+        g_ICP_CLK_DIR_PIN_D = 0; 
         
-        EIO_D6_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-        EIO_D7_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-        EIO_D8_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-        EIO_D9_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+        if (g_gMulSwd.Active[0] == 1)
+        {
+            EIO_D8_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+            EIO_D9_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */            
+            
+            g_ICP_CLK_PIN |= GPIO_PIN_12;
+            g_ICP_DAT_PIN |= GPIO_PIN_11;
+            g_ICP_DAT_DIR_PIN |= GPIO_PIN_9;
+            g_ICP_CLK_DIR_PIN_I |= GPIO_PIN_12;
+        }
+        if (g_gMulSwd.Active[1] == 1)
+        {
+            EIO_D5_Config(ES_GPIO_OUT);
+            EIO_D7_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+            
+            g_ICP_CLK_PIN |= GPIO_PIN_10;
+            g_ICP_DAT_PIN |= GPIO_PIN_2;
+            g_ICP_DAT_DIR_PIN |= GPIO_PIN_7;
+            g_ICP_CLK_DIR_PIN_I |= GPIO_PIN_1;
+            
+        }
+        if (g_gMulSwd.Active[2] == 1)
+        {
+            EIO_D4_Config(ES_GPIO_OUT);    
+            EIO_D6_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+            
+            g_ICP_CLK_PIN |= GPIO_PIN_9;
+            g_ICP_DAT_PIN |= GPIO_PIN_4;
+            g_ICP_DAT_DIR_PIN |= GPIO_PIN_12;
+            g_ICP_CLK_DIR_PIN_D |= GPIO_PIN_10;
+        }
+        if (g_gMulSwd.Active[3] == 1)
+        {
+            EIO_D2_Config(ES_GPIO_OUT);
+            EIO_D3_Config(ES_GPIO_OUT);
+            
+            g_ICP_CLK_PIN |= GPIO_PIN_6;
+            g_ICP_DAT_PIN |= GPIO_PIN_5;
+            g_ICP_DAT_DIR_PIN |= GPIO_PIN_10;
+            g_ICP_CLK_DIR_PIN_D |= GPIO_PIN_9;
+        } 
     }
 }
 
@@ -213,7 +260,7 @@ void CX32_EnterIAP(void)
     }
     else      /* 多路烧录 */
     {
-        CX32_InitHard();
+        CX32_InitHard();        
         
         MUL_ICP_DAT_OUT_ENABLE();
         MUL_ICP_DAT_1();
