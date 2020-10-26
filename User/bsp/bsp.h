@@ -74,6 +74,7 @@
 #include "bsp_fmc_io.h"
 
 #include "bsp_i2c_gpio.h"
+#include "bsp_i2c_gpio_ext.h"
 #include "bsp_i2c_eeprom_24xx.h"
 #include "bsp_i2c_mcp4018.h"
 #include "bsp_i2c_mcp4725.h"

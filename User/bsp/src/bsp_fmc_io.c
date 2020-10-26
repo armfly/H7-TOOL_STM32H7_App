@@ -59,6 +59,13 @@
     gpio_init.Pin = pin;                         \
     HAL_GPIO_Init(gpio, &gpio_init);   
 
+#define GPIO_INIT_AF_PP(gpio, pin)            \
+    gpio_init.Mode = GPIO_MODE_AF_PP;        \
+    gpio_init.Pull = GPIO_NOPULL;                \
+    gpio_init.Speed = H7_GPIO_SPEED; \
+    gpio_init.Pin = pin;                         \
+    HAL_GPIO_Init(gpio, &gpio_init);
+    
 #define GPIO_DIR_SET_OUT(gpio, pin)     BSP_SET_GPIO_1(gpio, pin)       /* DIR = 1 输出 */
 #define GPIO_DIR_SET_IN(gpio, pin)      BSP_SET_GPIO_0(gpio, pin)       /* DIR = 0 输入 */
 
@@ -446,6 +453,12 @@ void EIO_D2_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOB, GPIO_PIN_7);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOE, GPIO_PIN_6);         /* 配置为GPIO 输入功能 */
     }
+    else if (_mode == ES_GPIO_SPI)
+    {
+        GPIO_DIR_SET_OUT(GPIO_D2_DIR, PIN_D2_DIR);  /* 设置为输出方向 - 先执行 */
+        GPIO_INIT_INPUT(GPIOB, GPIO_PIN_7);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_6);         /* 配置为GPIO AF功能 */
+    }    
     else
     {
         g_tVar.GpioMode[2] = 0;
@@ -494,6 +507,12 @@ void EIO_D3_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOH, GPIO_PIN_11);        /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOE, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
     }
+    else if (_mode == ES_GPIO_SPI)
+    {
+        GPIO_INIT_INPUT(GPIOH, GPIO_PIN_11);        /* 配置为GPIO 输入功能 */
+        GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_5);         /* 配置为GPIO AF */
+        GPIO_DIR_SET_IN(GPIO_D3_DIR, PIN_D3_DIR);   /* 设置为输入方向 - 后执行 */
+    }   
     else
     {
         g_tVar.GpioMode[3] = 0;
@@ -590,6 +609,12 @@ void EIO_D5_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOE, GPIO_PIN_2);         /* 配置为GPIO 输入功能 */
     }
+    else if (_mode == ES_GPIO_SPI)
+    {
+        GPIO_DIR_SET_OUT(GPIO_D5_DIR, PIN_D5_DIR);  /* 设置为输出方向 - 先执行  */
+        GPIO_INIT_INPUT(GPIOI, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_2);         /* 配置为GPIO 为AF给 */
+    }    
     else
     {
         g_tVar.GpioMode[5] = 0;

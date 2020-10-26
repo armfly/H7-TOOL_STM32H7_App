@@ -700,7 +700,16 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
     if (_hspi == &hspi4)
     {
         GPIO_InitTypeDef  GPIO_InitStruct;
-            
+
+        /* SPI4是输出SPI口，需要单独配置
+        	-- D5 : SPI_CLK
+            -- D2 : SPI_MOSI
+            -- D3 : SPI_MISO
+        */
+        EIO_D5_Config(ES_GPIO_SPI);
+        EIO_D2_Config(ES_GPIO_SPI);
+        EIO_D3_Config(ES_GPIO_SPI);
+        
         /* 配置GPIO时钟 */
         #ifdef SPI4_SCK_GPIO
         SPI4_SCK_CLK_ENABLE();
@@ -909,11 +918,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *_hspi)
 */
 void bsp_spiTransfer(SPI_TypeDef *_spi)
 {
-//    if (spi1_Len > SPI_BUFFER_SIZE)
-//    {
-//        return;
-//    }
-
 #ifdef USE_SPI_POLL    
     #if USE_SPI1_EN == 1
     if (_spi == SPI1) HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)spi1_TxBuf, (uint8_t *)spi1_RxBuf, spi1_len, 100);
@@ -1002,6 +1006,227 @@ void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
     wTransferState = TRANSFER_ERROR;
 }
 #endif
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_spiTransfer
+*    功能说明: 向SPI总线发送一组数据
+*    形    参: _txbuf :  发送的数据
+*              _txlen  : 数据长度
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_SpiSendBuf(SPI_TypeDef *_spi, const char *_txbuf, uint32_t _txlen)
+{
+    #if USE_SPI1_EN == 1
+    if (_spi == SPI1 && _txlen < SPI1_BUFFER_SIZE)
+    {
+        memcpy(spi1_TxBuf, _txbuf, _txlen);
+        spi1_len = _txlen;
+    }
+    #endif
+
+    #if USE_SPI2_EN == 1
+    if (_spi == SPI2 && _txlen < SPI2_BUFFER_SIZE)
+    {
+        memcpy(spi2_TxBuf, _txbuf, _txlen);
+        spi2_len = _txlen;
+    }
+    #endif    
+    
+    #if USE_SPI3_EN == 1
+    if (_spi == SPI3 && _txlen < SPI3_BUFFER_SIZE)
+    {
+        memcpy(spi3_TxBuf, _txbuf, _txlen);
+        spi3_len = _txlen;
+    }
+    #endif    
+
+    #if USE_SPI4_EN == 1
+    if (_spi == SPI4 && _txlen < SPI4_BUFFER_SIZE)
+    {
+        memcpy(spi4_TxBuf, _txbuf, _txlen);
+        spi4_len = _txlen;
+    }
+    #endif    
+
+    #if USE_SPI5_EN == 1
+    if (_spi == SPI5 && _txlen < SPI5_BUFFER_SIZE)
+    {
+        memcpy(spi5_TxBuf, _txbuf, _txlen);
+        spi5_len = _txlen;
+    }
+    #endif    
+    
+    #if USE_SPI6_EN == 1
+    if (_spi == SPI6 && _txlen < SPI6_BUFFER_SIZE)
+    {
+        memcpy(spi6_TxBuf, _txbuf, _txlen);
+        spi6_len = _txlen;
+    }
+    #endif     
+
+    bsp_spiTransfer(_spi);
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_SpiReciveBuf
+*    功能说明: 向SPI总线读取一组数据
+*    形    参: _rxbuf :  接受的数据
+*              _rxlen  : 数据长度
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_SpiReciveBuf(SPI_TypeDef *_spi, char *_rxbuf, uint32_t _rxlen)
+{
+    #if USE_SPI1_EN == 1
+    if (_spi == SPI1 && _txlen < SPI1_BUFFER_SIZE)
+    {
+        memset(spi1_TxBuf, 0, _rxlen);
+        spi1_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi1_RxBuf, _rxlen);
+    }
+    #endif
+
+    #if USE_SPI2_EN == 1
+    if (_spi == SPI2 && _rxlen < SPI2_BUFFER_SIZE)
+    {
+        memset(spi2_TxBuf, 0, _rxlen);
+        spi2_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi2_RxBuf, _rxlen);
+    }
+    #endif    
+    
+    #if USE_SPI3_EN == 1
+    if (_spi == SPI3 && _rxlen < SPI3_BUFFER_SIZE)
+    {
+        memset(spi3_TxBuf, 0, _rxlen);
+        spi3_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi3_RxBuf, _rxlen);
+    }
+    #endif    
+
+    #if USE_SPI4_EN == 1
+    if (_spi == SPI4 && _rxlen < SPI4_BUFFER_SIZE)
+    {
+        memset(spi4_TxBuf, 0, _rxlen);
+        spi4_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi4_RxBuf, _rxlen);
+    }
+    #endif    
+
+    #if USE_SPI5_EN == 1
+    if (_spi == SPI5 && _rxlen < SPI5_BUFFER_SIZE)
+    {
+        memset(spi5_TxBuf, 0, _rxlen);
+        spi5_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi5_RxBuf, _rxlen);
+    }
+    #endif    
+    
+    #if USE_SPI6_EN == 1
+    if (_spi == SPI6 && _rxlen < SPI6_BUFFER_SIZE)
+    {
+        memset(spi6_TxBuf, 0, _rxlen);
+        spi6_len = _rxlen;
+        bsp_spiTransfer(_spi);
+        memcpy(_rxbuf, spi6_RxBuf, _rxlen);
+    }
+    #endif
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_SpiSendRecive
+*    功能说明: 向SPI总线读取一组数据
+*    形    参: 
+*               _txbuf : 发送的数据
+*               _txlen : 发送的数据长度
+*               _rxbuf : 接受的数据
+*               _rxlen  : 接收的数据长度
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void bsp_SpiSendRecive(SPI_TypeDef *_spi, const char *_txbuf, uint32_t _txlen, char *_rxbuf, uint32_t _rxlen)
+{
+    #if USE_SPI1_EN == 1
+    if (_spi == SPI1 && _txlen + _rxlen < SPI1_BUFFER_SIZE)
+    {
+        memset(spi1_TxBuf, 0, _txlen + _rxlen);
+        memset(spi1_TxBuf, _txbuf, _txlen);    
+        spi1_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi1_RxBuf[_txlen], _rxlen);
+    }
+    #endif
+
+    #if USE_SPI2_EN == 1
+    if (_spi == SPI2 && _txlen + _rxlen < SPI2_BUFFER_SIZE)
+    {
+        memset(spi2_TxBuf, 0, _txlen + _rxlen);
+        memcpy(spi2_TxBuf, _txbuf, _txlen);    
+        spi2_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi2_RxBuf[_txlen], _rxlen);
+    }
+    #endif    
+    
+    #if USE_SPI3_EN == 1
+    if (_spi == SPI3 && _txlen + _rxlen < SPI3_BUFFER_SIZE)
+    {
+        memset(spi3_TxBuf, 0, _txlen + _rxlen);
+        memcpy(spi3_TxBuf, _txbuf, _txlen);    
+        spi3_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi3_RxBuf[_txlen], _rxlen);
+    }
+    #endif    
+
+    #if USE_SPI4_EN == 1
+    if (_spi == SPI4 && _txlen + _rxlen < SPI4_BUFFER_SIZE)
+    {
+        memset(spi4_TxBuf, 0, _txlen + _rxlen);
+        memcpy(spi4_TxBuf, _txbuf, _txlen);    
+        spi4_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi4_RxBuf[_txlen], _rxlen);
+    }
+    #endif    
+
+    #if USE_SPI5_EN == 1
+    if (_spi == SPI5 && _txlen + _rxlen < SPI5_BUFFER_SIZE)
+    {
+        memset(spi5_TxBuf, 0, _txlen + _rxlen);
+        memcpy(spi5_TxBuf, _txbuf, _txlen);    
+        spi5_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi5_RxBuf[_txlen], _rxlen);
+    }
+    #endif    
+    
+    #if USE_SPI6_EN == 1
+    if (_spi == SPI6 && _txlen + _rxlen < SPI6_BUFFER_SIZE)
+    {
+        memset(spi6_TxBuf, 0, _txlen + _rxlen);
+        memcpy(spi6_TxBuf, _txbuf, _txlen);    
+        spi6_len = _txlen + _rxlen;
+        bsp_spiTransfer(_spi);
+    
+        memcpy(_rxbuf, &spi6_RxBuf[_txlen], _rxlen);
+    }
+    #endif
+}
 
 /*
 *********************************************************************************************************
