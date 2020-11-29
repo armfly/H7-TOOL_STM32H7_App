@@ -14,19 +14,17 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "param.h"
-#include "file_lib.h"
-#include "lua_if.h"
-#include "prog_if.h"
+
+#include "includes.h"
+
 #include "swd_host.h"
 #include "swd_flash.h"
 #include "elf_file.h"
-#include "main.h"
 #include "stm8_flash.h"
 #include "n76e003_flash.h"
 #include "SW_DP_Multi.h"
 #include "swd_host_multi.h"
+#include "w25q_flash.h"
 
 extern const program_target_t flash_algo;
 
@@ -216,6 +214,29 @@ void PG_ReloadLuaVar(void)
     {
         h7swim_ReadLuaVar();        /* 读取LUA中的全局变量 */
     }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)  
+    {
+        //    uint32_t Capacity;          /* 芯片容量 */
+        //    uint32_t SectorSize;        /* 扇区大小 */
+        //    uint32_t EraseSectorCmd;    /* 扇区擦除指令 */
+        //    uint32_t EraseSectorTimeout;    /* 擦除扇区超时 ms */
+        //    uint32_t EraseChipTimeout;  /* 擦除整片超时 ms */
+        //    uint32_t ProgPageTimeout;   /* 编程page超时 */
+        //    uint8_t  AutoAddrInc;       /* AAI模式写 */
+        
+        g_tW25Q.Capacity = lua_GetVarUint32("FLASH_SIZE", 0);
+        g_tW25Q.SectorSize = lua_GetVarUint32("SECTOR_SIZE", 4096);
+        g_tW25Q.EraseSectorCmd = lua_GetVarUint32("ERASE_SECTOR_CMD", 0x20);
+        g_tW25Q.EraseSectorTimeout = lua_GetVarUint32("ERASE_SECTOR_TIMEOUT", 2 * 1000);
+        g_tW25Q.EraseChipTimeout = lua_GetVarUint32("ERASE_CHIP_TIMEOUT", 400 * 1000);
+        g_tW25Q.ProgPageTimeout = 100;   /* 100ms */        
+        g_tW25Q.AutoAddrInc = lua_GetVarUint32("PROG_AAI", 0);        
+        g_tW25Q.ReadMode = lua_GetVarUint32("READ_MODE", 0);
+        g_tW25Q.ReadIDCmd = lua_GetVarUint32("READ_ID_CMD", 0x9F); 
+        g_tW25Q.EraseChipCmd = lua_GetVarUint32("ERASE_CHIP_CMD", 0xC7);
+        g_tW25Q.UnlockCmd = lua_GetVarUint32("UNLOCK_CMD", 0x00);
+        
+    }    
 }
 
 /*
@@ -522,6 +543,11 @@ uint8_t PG_FixDataIsDiff(void)
     return 0;
 }
 
+/*
+*********************************************************************************************************
+*   下面代码，用于通用芯片编程. 被 pg_prog_file.c 文件调用
+*********************************************************************************************************
+*/
 
 /*
 *********************************************************************************************************
@@ -546,7 +572,11 @@ uint32_t PG_GetSectorSize(const char *_Algo, uint32_t _Addr)
     else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
     {
         sz = 128;
-    }            
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        sz = lua_GetVarUint32("SECTOR_SIZE", 4*1024);
+    }     
     return sz;
 }
 
@@ -560,6 +590,23 @@ uint32_t PG_GetSectorSize(const char *_Algo, uint32_t _Addr)
 */
 uint8_t PG_EraseSector(const char *_Algo, uint32_t _Addr)
 {
+    if (g_tProg.ChipType == CHIP_SWD_ARM)
+    {
+        /* ARM不用这个文件 */;
+    }
+    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+    {
+        /* STM8都是整片擦除 */;
+    }
+    else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {
+        /* 选择整片擦除 */
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        W25Q_EraseSector(_Addr);
+    }
+    
     return 1;
 }
 
@@ -586,7 +633,11 @@ uint32_t PG_GetPageSize(const char *_Algo)
     else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
     {
         sz = 32;
-    }            
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        sz = lua_GetVarUint32("FLASH_PAGE_SIZE", 1024);;
+    }     
     return sz;
 }
 
@@ -640,7 +691,10 @@ uint32_t PG_GetDeviceAddr(const char *_Algo)
             addr = 0;
         }
     }
-
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        addr = lua_GetVarUint32("FLASH_ADDRESS", 0);
+    }
     return addr;
 }
 
@@ -694,7 +748,10 @@ uint32_t PG_GetDeviceSize(const char *_Algo)
             sz = 1024;
         }
     }
-
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        sz = lua_GetVarUint32("FLASH_SIZE", 0);
+    }
     return sz;
 }
 
@@ -720,7 +777,10 @@ uint8_t PG_EraseChip(void)
     {
         N76E_EraseChip();
     }
-    
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        W25Q_EraseChip();
+    }  
     return 1;
 }
 
@@ -746,7 +806,10 @@ uint8_t PG_CheckBlank(const char *_Algo, uint32_t _Addr, uint32_t _Size)
     {
        ;
     }
-    
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+       ;
+    }    
     return 0;
 }
 
@@ -776,7 +839,10 @@ uint8_t PG_ProgramBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, ui
     {
         re = N76E_FLASH_ProgramBuf(_FlashAddr, _Buff, _Size);
     }
-    
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        re = W25Q_FLASH_ProgramBuf(_FlashAddr, _Buff, _Size);
+    }    
     return re;
 }
 
@@ -805,6 +871,10 @@ uint8_t PG_ReadBuf(const char *_Algo, uint32_t _FlashAddr, uint8_t *_Buff, uint3
     else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
     {
         re = N76E_ReadBuf(_FlashAddr, _Buff, _Size);
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        re = W25Q_ReadBuf(_FlashAddr, _Buff, _Size);
     }
     
     return re;   

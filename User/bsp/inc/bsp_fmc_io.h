@@ -55,7 +55,8 @@ typedef enum
     
     ES_GPIO_SWD_OUT = 8,    /* 1拖4 SWD接口用 */
     
-    ES_GPIO_SPI = 9,    /* SPI功能 */    
+    ES_GPIO_SPI = 9,        /* 硬件SPI功能 */
+    ES_PROG_SPI_FLASH = 10, /* 脱机烧录SPI FLASH */
 } EIO_SELECT_E;
 
 void bsp_InitExtIO(void);

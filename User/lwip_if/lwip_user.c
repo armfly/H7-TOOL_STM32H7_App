@@ -38,7 +38,7 @@
 #include "lwip_user.h"
 #include "net_udp.h"
 
-static uint8_t s_init_lwip_ok = 0;
+static uint8_t s_lwip_status = 0;
 
 struct netif gnetif;
 
@@ -74,34 +74,6 @@ static void Netif_Config(void)
 
 /*
 *********************************************************************************************************
-*    函 数 名: lwip_start
-*    功能说明: 启动lwip_start,  网络参数存在在全局变量 g_tParam.lwip_ip, g_tParam.lwip_net_mask, 
-*              g_tParam.lwip_gateway 
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void lwip_start(void)
-{
-    /* Initialize the LwIP stack */
-    lwip_init();
-
-    /* Configure the Network interface */
-    Netif_Config();
-
-    /* Http webserver Init */
-    http_server_init();
-
-    /* tcp server init */
-    tcp_echoserver_init();
-
-    udp_server_init(); /* 开启UDP监听 */
-
-    s_init_lwip_ok = 1;
-}
-
-/*
-*********************************************************************************************************
 *    函 数 名: lwip_pro
 *    功能说明: lwip 轮询，插入到主循环中
 *    形    参: 无
@@ -110,25 +82,48 @@ void lwip_start(void)
 */
 void lwip_pro(void)
 {
-    if (s_init_lwip_ok == 0)
-    {
-        return;
+    switch (s_lwip_status)
+    {       
+        case 0:
+            lwip_init();    /* Initialize the LwIP stack */
+            s_lwip_status++;
+            break;
+
+        case 1:
+            /* Configure the Network interface */
+            Netif_Config();
+            s_lwip_status++;
+            break;
+
+        case 2:
+            /* Http webserver Init */
+            http_server_init();
+
+            /* tcp server init */
+            tcp_echoserver_init();
+
+            udp_server_init();      /* 开启UDP监听 */
+        
+            s_lwip_status = 10;
+            break;        
+
+        case 10:    
+            /* Read a received packet from the Ethernet buffers and send it 
+               to the lwIP for handling */
+            ethernetif_input(&gnetif);
+
+            /* Handle timeouts */
+            sys_check_timeouts();
+
+        #if LWIP_NETIF_LINK_CALLBACK
+            Ethernet_Link_Periodic_Handle(&gnetif);
+        #endif
+
+        #if LWIP_DHCP
+            DHCP_Periodic_Handle(&gnetif);
+        #endif            
+            break;        
     }
-
-    /* Read a received packet from the Ethernet buffers and send it 
-       to the lwIP for handling */
-    ethernetif_input(&gnetif);
-
-    /* Handle timeouts */
-    sys_check_timeouts();
-
-#if LWIP_NETIF_LINK_CALLBACK
-    Ethernet_Link_Periodic_Handle(&gnetif);
-#endif
-
-#if LWIP_DHCP
-    DHCP_Periodic_Handle(&gnetif);
-#endif
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

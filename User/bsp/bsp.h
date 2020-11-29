@@ -99,6 +99,7 @@
 #include "bsp_ext_io.h"
 
 #include "bsp_rng.h"
+#include "bsp_ds18b20.h"
 
 
 
@@ -108,6 +109,7 @@
 
 /* 提供给其他C文件调用的函数 */
 void bsp_Init(void);
+void bsp_DeInit(void);
 void bsp_Idle(void);
 
 void bsp_GetCpuID(uint32_t *_id);

@@ -1,10 +1,10 @@
 /*
 *********************************************************************************************************
 *
-*    模块名称 : N76E003芯片编程模块
-*    文件名称 : n76e_prog_file.c
+*    模块名称 : 通用芯片编程文件
+*    文件名称 : pg_prog_file.c
 *    版    本 : V1.0
-*    说    明 : 烧写文件到N76E003芯片
+*    说    明 : 烧写文件到芯片
 *
 *    修改记录 :
 *        版本号  日期        作者     说明
@@ -31,7 +31,7 @@ extern const program_target_t flash_algo;
 
 /*
 *********************************************************************************************************
-*    函 数 名: PG_N76E_ProgFile
+*    函 数 名: PG_ProgFile
 *    功能说明: 开始编程flash。 由lua程序调用。阻塞运行，只到编程结束。
 *    形    参:  _Path : 文件名
 *               _FlashAddr : flash起始地址
@@ -42,7 +42,7 @@ extern const program_target_t flash_algo;
 *    返 回 值: 0 = ok, 其他表示错误
 *********************************************************************************************************
 */
-uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, 
+uint16_t PG_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, 
     uint32_t _FileIndex, const char *_AlgoName)
 {
     char path[256];
@@ -54,7 +54,8 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
     uint8_t CheckBankMode = 0;
 //    uint8_t fBlankChip = 0;
 //    uint32_t BlockSize;
-    uint32_t CheckLen;      /* 实际扫描的空间大小 */    
+    uint32_t CheckLen;      /* 实际扫描的空间大小 */  
+    uint8_t EmptyValue;     /* 空片的值 */
         
     /* 传入的文件名是相对路径 */
     if (strlen(_Path) + strlen(PROG_USER_DIR) > sizeof(path))
@@ -125,6 +126,19 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
         }
     }
     
+    if (g_tProg.ChipType == CHIP_SWIM_STM8 || g_tProg.ChipType == CHIP_NUVOTON_8051)
+    {        
+        EmptyValue = 0x00;
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        EmptyValue = 0xFF;
+    }
+    else
+    {
+        EmptyValue = 0x00;
+    }
+        
     /* 
         低4bit表示擦除模式  0按扇区擦除  1按整片擦除  2不执行擦除
         高4bit表示查空      0查空   1不查空
@@ -169,6 +183,9 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
             {
                 uint32_t addr;
                 uint32_t endAddr;
+                uint32_t SectorSize;
+                
+                SectorSize = PG_GetSectorSize(_AlgoName, addr);
 
                 endAddr = _FlashAddr + FileLen;            
                 if (endAddr > _EndAddr)
@@ -196,12 +213,13 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
                         float percent;
                         
                         percent = addr - _FlashAddr;    /* 已擦除大小 */
-                        percent = percent / (endAddr - _FlashAddr);                    
+                        percent = 100 * percent / (endAddr - _FlashAddr);                    
                         PG_PrintPercent(percent, addr); /* 显示100% */
                     }
                     
-                    addr += PG_GetSectorSize(_AlgoName, addr);
+                    addr += SectorSize;
                 }
+                PG_PrintPercent(100.0, addr); /* 显示100% */
             }
             else if (EraseMode == 1)      /* 1:整片擦除 */
             {
@@ -284,7 +302,7 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
                     /* V1.11 修正bug : 烧写非整数倍PageSize的文件失败 */
                     if (bytes % PageSize)
                     {
-                        memset(&FsReadBuf[bytes], 0x00 ,PageSize - (bytes % PageSize));      /* 填充空值 00 */
+                        memset(&FsReadBuf[bytes], EmptyValue ,PageSize - (bytes % PageSize));      /* 填充空值 00 or FF */
                         
                         bytes = ((bytes + PageSize - 1) / PageSize) * PageSize;
                     }
@@ -306,8 +324,8 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
                     FileOffset += PageSize;
                     
                             
-                    /* 进度指示 - 每2KB刷新一次 */
-                    if ((FileOffset % 2048) == 0 || (bytes < 2048 && (FileOffset % 512) == 0))
+                    /* 进度指示 - 每4KB刷新一次 */
+                    if ((FileOffset % 8192) == 0 || (bytes < 8192 && (FileOffset % 512) == 0))
                     {
                         float percent;
                         
@@ -393,12 +411,17 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
         {
             PageSize = sizeof(FsReadBuf);
         }
-		
+
+        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+        {
+            PageSize = PageSize / 4;
+        }
+
         if (PageSize >= DeviceSize)
         {
             PageSize = DeviceSize;
-        }
-            
+        }        
+        
         for (; FileOffset < FileLen; )
         {
             if (ProgCancelKey())
@@ -437,6 +460,7 @@ uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndA
             }            
 
             /* 进度指示 */
+            if ((FileOffset % 8192) == 0 || (bytes < 8192 && (FileOffset % 512) == 0))            
             {
                 float percent = -1;
                 

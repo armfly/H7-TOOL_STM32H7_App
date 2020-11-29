@@ -14,10 +14,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "wifi_if.h"
-#include "param.h"
-#include "main.h"
+#include "includes.h"
 
 uint8_t link_id = 0xFF; /* 当前的TCP连接id,  0-4有效。  FF表示无TCP连接 */
 uint8_t wifi_state = WIFI_STOP;

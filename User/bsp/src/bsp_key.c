@@ -252,6 +252,33 @@ void bsp_PutKey(uint8_t _KeyCode)
         return;
     }
     
+    /* 启动后 100ms内检测到按键按下全部忽略 - 例如从 DAP返回，C键一直按着. 需要忽略这个按键事件 */
+    {
+        static uint8_t s_JumpFlag = 0;
+        
+        if (s_JumpFlag == 0)
+        {
+            if (bsp_CheckRunTime(0) < 100)
+            {
+                s_JumpFlag = 1;
+                return;
+            }
+            else
+            {
+                s_JumpFlag = 2;
+            }
+        }
+        else if (s_JumpFlag == 1)
+        {
+            if (_KeyCode == KEY_1_UP || _KeyCode == KEY_1_LONG_UP 
+                || _KeyCode == KEY_2_UP || _KeyCode == KEY_2_LONG_UP)
+            {
+                s_JumpFlag = 2;
+                return;
+            }
+        }
+    }
+    
     s_tKey.Buf[s_tKey.Write] = _KeyCode;
 
     if (++s_tKey.Write >= KEY_FIFO_SIZE)

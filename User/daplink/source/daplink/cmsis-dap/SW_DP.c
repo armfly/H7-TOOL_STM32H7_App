@@ -51,21 +51,21 @@
 */
 
 /*
-    无延迟最高速度时，烧写H7-TOOL程序
-    正在校验...(FLM_CRC32)
-      19968ms, 0.00%
-      20894ms, 100.00%
-    编程成功
-
-    --延迟 PIN_DELAY_SLOW(0)
-    正在校验...(FLM_CRC32)
-      20708ms, 0.00%
-      21648ms, 100.00%
-
-    --延迟 PIN_DELAY_SLOW(1)
-    正在校验...(FLM_CRC32)
-      21417ms, 0.00%
-      22376ms, 100.00%
+    延迟0: 写16.7M, 读9M
+    
+    延迟1:   写6.2M  读5.4M
+    延迟2:   写5.7M  读5.0M
+    延迟3:   写5.3M  读4.6M
+    延迟4:   写4.2M  读4.3M
+    延迟10:  写2.94M  读3.1M
+    延迟20:  写2.1M  读2.0M
+    延迟40:  写1.29M  读1.29M
+    延迟100: 写 594K  读 594K 
+    
+    延迟200: 写 313K  读 313K
+    延迟1000:写 65K  读 65K
+    延迟2000:写 33.1K  读33.1K 
+    延迟5000:写 13.2K  读13.2K 
 */
 
 //#define PIN_SWCLK_SET()       PIN_SWCLK_TCK_SET();PIN_SWCLK_TCK_SET()
@@ -130,13 +130,13 @@
         if (val & 1)                \
         {                           \
             GPIOD->BSRR = GPIO_PIN_4 + (GPIO_PIN_3 << 16U); \
-            val >>= 1;  \
+            val >>= 1;  PIN_DELAY_S(); \
             PIN_SWCLK_SET(); PIN_DELAY_S();   \
         } \
         else \
         { \
             GPIOD->BSRR = (GPIO_PIN_4 + GPIO_PIN_3) << 16U; \
-            val >>= 1;  \
+            val >>= 1;  PIN_DELAY_S(); \
             PIN_SWCLK_SET(); PIN_DELAY_S();  \
         } 
         
@@ -212,13 +212,66 @@ uint8_t SWD_TransferFast(uint32_t request, uint32_t *data)
       /* Read data */                                                        
         /* armfly ： 优化奇偶校验算法 */  
       val = 0U;  
+      #if 0
+      {
+        uint32_t buf[32];
+
+        // PD3 = CLK  PD4 = DIO
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[0] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[1] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[2] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[3] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[4] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[5] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[6] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[7] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[8] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[9] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[10] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[11] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[12] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[13] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[14] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[15] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[16] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[17] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[18] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[19] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[20] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[21] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[22] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[23] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[24] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[25] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[26] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[27] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[28] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[29] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[30] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[31] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
+
+        parity = 0;
+        for (n = 0; n < 32; n++)
+        {
+            val >>= 1;
+            if (buf[n] & GPIO_PIN_4)
+            {
+                val |= 0x80000000;
+                parity++;
+            }
+        }
+        //parity = GetParity(val);
+      }
+      #else
       for (n = 32U; n; n--) {                                                
         SW_READ_BIT_FAST(bit);               /* Read RDATA[0:31] */                                                                    
         val >>= 1;                                                           
         val  |= bit << 31;                                                   
-      }    
+      } 
+      parity = GetParity(val);  
+      #endif     
 
-      parity = GetParity(val);
+      
 
           
       SW_READ_BIT_FAST(bit);                 /* Read Parity */                    

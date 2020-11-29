@@ -13,24 +13,17 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
-
-#include "status_system_set.h"
-#include "lcd_menu.h"
-#include "wifi_if.h"
-#include "usb_if.h"
-#include "file_lib.h"
-#include "modify_param.h"
+#include "includes.h"
 
 const uint8_t *g_MenuSys_Text[] =
 {
-    " 1 硬件信息",
-    " 2 参数设置",
+    " 1 基本参数",
+    " 2 网络参数",
     " 3 ESP32固件升级",
     " 4 USB eMMC磁盘",
     " 5 数据维护",
-    " 6 重启",
+    " 6 硬件信息",    
+    " 7 重启",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -109,15 +102,16 @@ void status_SystemSetMain(void)
                 case KEY_LONG_DOWN_S: /* S键 上 */
                     PlayKeyTone();
                     s_enter_sub_menu = 1;
-
+                
                     if (g_tMenuSys.Cursor == 0)
                     {
-                        g_MainStatus = MS_HARD_INFO;
+                        ModifyParam(MODIFY_PARAM_SYSTEM);
+                        DispHeader2(90, "系统设置");    /* 需要清屏 */
+                        LCD_DispMenu(&g_tMenuSys);
                     }
                     else if (g_tMenuSys.Cursor == 1)
                     {
-                        //g_MainStatus = MS_MODIFY_PARAM;
-                        ModifyParam(MS_SYSTEM_SET);
+                        ModifyParam(MODIFY_PARAM_NET);
                         DispHeader2(90, "系统设置");    /* 需要清屏 */
                         LCD_DispMenu(&g_tMenuSys);
                     }
@@ -133,7 +127,11 @@ void status_SystemSetMain(void)
                     {
                         g_MainStatus = MS_FILE_MANAGE;
                     }
-                    else if (g_tMenuSys.Cursor == 5)    /* 重启 */
+                    else if (g_tMenuSys.Cursor == 5)
+                    {
+                        g_MainStatus = MS_HARD_INFO;
+                    }                    
+                    else if (g_tMenuSys.Cursor == 6)    /* 重启 */
                     {
                         ResetReq = 1;   
                     }                     
@@ -376,250 +374,6 @@ void status_HardInfo(void)
                     break;
             }
         }
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: status_ModifyParam
-*    功能说明: 修改常用参数
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-#define PARAM_NUM       4
-void status_ModifyParam(void)
-{
-    uint8_t ucKeyCode; /* 按键代码 */
-    uint8_t fRefresh = 1;
-    uint8_t fSaveParam = 0;
-    uint8_t cursor = 0;
-    char buf[48];
-    uint8_t ucIgnoreKey = 1; 
-    uint8_t active;
-
-    DispHeader2(92, "参数设置");
-    DispHelpBar("长按S键选择参数",
-                "短按S、C键修改参数值");
-    
-    while (g_MainStatus == MS_MODIFY_PARAM)
-    {
-        bsp_Idle();
-
-        if (fRefresh == 1)
-        {
-            fRefresh = 0;
-            
-            /* 第1个参数 */
-            {
-                if (cursor == 0)
-                {
-                    active = 1;       
-                }
-                else 
-                {
-                    active = 0;
-                }
-                if (g_tParam.KeyToneEnable == 0)
-                {               
-                    sprintf(buf, "关闭");
-                    DispParamBar(0, "1 按键音:", buf, active);
-                }
-                else
-                {
-                    sprintf(buf, "打开");
-                    DispParamBar(0, "1 按键音:", buf, active);
-                }                
-            }
-            
-            /* 第2个参数 - 界面风格  */
-            {
-                if (cursor == 1)
-                {
-                    active = 1;       
-                }
-                else 
-                {
-                    active = 0;
-                }
-                sprintf(buf, "%3d", g_tParam.UIStyle);
-                DispParamBar(1, "2 主 题:", buf, active);
-            }   
-
-            /* 第3个参数 - 屏保  */
-            {
-                uint16_t min;
-                
-                if (cursor == 2)
-                {
-                    active = 1;       
-                }
-                else 
-                {
-                    active = 0;
-                }
-                
-                min = GetSleepTimeMinute();
-                if (min == 0)
-                {
-                    sprintf(buf, "关闭");
-                }
-                else
-                {
-                    sprintf(buf, "%3d 分钟", min);
-                }
-                DispParamBar(2, "3 屏 保:", buf, active);
-            }      
-            
-            /* 第3个参数 - 文件列表字体  */
-            {
-                if (cursor == 3)
-                {
-                    active = 1;       
-                }
-                else 
-                {
-                    active = 0;
-                }
-                
-                if (g_tParam.FileListFont24 == 1)
-                {
-                    sprintf(buf, "24点阵");
-                }
-                else
-                {
-                    sprintf(buf, "16点阵");
-                }
-                DispParamBar(3, "4 列表字体:", buf, active);
-            }             
-        }
-        
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
-        {
-            /* 有键按下 */
-            switch (ucKeyCode)
-            {
-                case KEY_UP_S:      /* S键 弹起 */
-                    if (ucIgnoreKey == 1)
-                    {
-                        ucIgnoreKey = 0;
-                        break;
-                    }
-                    
-                    if (cursor == 0)
-                    {
-                        if (g_tParam.KeyToneEnable == 0)
-                        {
-                            g_tParam.KeyToneEnable = 1;
-                        }
-                        else
-                        {
-                            g_tParam.KeyToneEnable = 0;
-                        }     
-                    }
-                    else if (cursor == 1)
-                    {
-                        g_tParam.UIStyle++;
-                        if (g_tParam.UIStyle >= UI_STYLE_NUM)
-                        {
-                            g_tParam.UIStyle = 0;
-                        }  
-                    }     
-                    else if (cursor == 2)
-                    {
-                        if (g_tParam.LcdSleepTime > 0)
-                        {
-                            g_tParam.LcdSleepTime--;
-                        }
-                        else
-                        {
-                            g_tParam.LcdSleepTime = 4;
-                        }
-                    }  
-                    else if (cursor == 3)
-                    {
-                        if (g_tParam.FileListFont24 == 0)
-                        {
-                            g_tParam.FileListFont24 = 1;
-                        } 
-                        else
-                        {
-                            g_tParam.FileListFont24 = 0;
-                        }
-                    }                 
-                    fRefresh = 1;
-                    fSaveParam = 1;
-                    break;
-
-                case KEY_UP_C:      /* C键 下 */
-                    if (cursor == 0)
-                    {                
-                        if (g_tParam.KeyToneEnable == 0)
-                        {
-                            g_tParam.KeyToneEnable = 1;
-                        }
-                        else
-                        {
-                            g_tParam.KeyToneEnable = 0;
-                        }
-                    }
-                    else if (cursor == 1)
-                    {
-                        if (g_tParam.UIStyle > 0)
-                        {
-                            g_tParam.UIStyle--;
-                        }     
-                        else
-                        {
-                            g_tParam.UIStyle = UI_STYLE_NUM;
-                        }
-                    } 
-                    else if (cursor == 2)
-                    {
-                        if (++g_tParam.LcdSleepTime > 4)
-                        {
-                            g_tParam.LcdSleepTime = 0;
-                        } 
-                    }         
-                    else if (cursor == 3)
-                    {
-                        if (g_tParam.FileListFont24 == 0)
-                        {
-                            g_tParam.FileListFont24 = 1;
-                        } 
-                        else
-                        {
-                            g_tParam.FileListFont24 = 0;
-                        }
-                    }                 
-                    fRefresh = 1;
-                    fSaveParam = 1;
-                    break;
-
-                case KEY_LONG_DOWN_S:        /* S键长按 - 选择参数 */
-                    if (++cursor >= PARAM_NUM)
-                    {
-                        cursor = 0;
-                    }
-                    ucIgnoreKey = 1;
-                    fRefresh = 1;
-                    break;
-
-                case KEY_LONG_DOWN_C:        /* C键长按 - 返回 */
-                    PlayKeyTone();
-                    g_MainStatus = MS_SYSTEM_SET;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    }
-    
-    if (fSaveParam == 1)
-    {
-        SaveParam();    /* 保存参数 */
     }
 }
 

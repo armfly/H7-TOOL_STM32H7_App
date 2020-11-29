@@ -333,6 +333,7 @@ void ST7789_DrawScreen(void)
     }
 #else    
     static int32_t s_time1 = 0;
+    static uint8_t s_first_run = 0;     /* 上电第1次运行，准备好数据后开背光，避免短暂花屏 */
     
     if (s_DispRefresh == 0)
     {
@@ -343,7 +344,7 @@ void ST7789_DrawScreen(void)
     if (bsp_CheckRunTime(s_time1) < 50)
     {
          return;
-    }   
+    }
         
     s_DispRefresh = 0;
     
@@ -360,6 +361,13 @@ void ST7789_DrawScreen(void)
     while (wTransferState == 0){}  
         
     s_time1 = bsp_GetRunTime();
+        
+    if (s_first_run == 0)
+    {
+        s_first_run = 1;
+        
+        LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 255 */
+    }
 #endif    
 }
 

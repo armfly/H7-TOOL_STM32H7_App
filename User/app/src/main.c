@@ -16,8 +16,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 
 #include "status_link_mode.h"
 #include "status_voltage_meter.h"
@@ -51,7 +50,11 @@
 #include "file_lib.h"
 #include "elf_file.h"
 
-static void DispLogo(void);
+#include "w25q_flash.h"
+
+
+extern void status_DS18B20Meter(void);
+
 uint16_t GetStatusIndex(uint16_t _NowStatus);
 
 uint16_t g_MainStatus;  /* 主状态字 */
@@ -66,37 +69,8 @@ static const uint16_t StatusOrder[] =
     MS_TEMP_METER,       /* 温度表 */
     MS_TVCC_POWER,       /* 微型数控电源 */   
     MS_PULSE_METER,      /* 脉冲计 */
-    MS_MINI_DSO,         /* 迷你示波器 */    
+    //MS_MINI_DSO,         /* 迷你示波器 */    
 };
-
-
-uint32_t stm32crc(uint32_t *ptr, int len)
-{
-	uint32_t xbit, data;
-	uint32_t crc = 0xFFFFFFFF;    // init value
-    uint32_t polynom = 0x04c11db7;
-
-	while (len--) {
-		xbit = 1u << 31;
-
-		data = *ptr++;
-		for (int bits = 0; bits < 32; bits++) 
-		{
-			if (crc & 0x80000000) {
-				crc <<= 1;
-				crc ^= polynom;
-			}
-			else
-				crc <<= 1;
-
-			if (data & xbit)
-				crc ^= polynom;
-
-			xbit >>= 1;
-		}
-	}
-	return crc;
-}
 
 /*
 *********************************************************************************************************
@@ -106,53 +80,16 @@ uint32_t stm32crc(uint32_t *ptr, int len)
 *    返 回 值: 错误代码(无需处理)
 *********************************************************************************************************
 */
+void JumpToDAPLink(void);
+extern MENU_T g_tMenu1;
 int main(void)
-{
+{    
     bsp_Init();
+    
     LoadParam(); /* 读取应用程序参数, 该函数在param.c */
-
-    PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LED一直闪烁, 非阻塞 */
-
-    DispLogo();
     
-    bsp_InitESP32();
+    ST7789_SetDirection(g_tParam.DispDir);
 
-    bsp_SetTVCC(3300);
-    
-    DSO_InitHard();
-    DSO_SetDC(1, 1);
-    DSO_SetDC(2, 1);
-    DSO_SetGain(1, 3);
-    DSO_SetGain(2, 3);
-
-    /* 测试一拖四模式 */
-    {
-        g_gMulSwd.MultiMode = 0;   
-        g_gMulSwd.Active[0] = 1;
-        g_gMulSwd.Active[1] = 1;
-        g_gMulSwd.Active[2] = 1;
-        g_gMulSwd.Active[3] = 1;
-    }
-    
-    /* LwIP 初始化 */
-    {
-        /* 如果不插网线，此函数执行时间过长 */
-        /* 网络参数存在在全局变量 g_tParam.lwip_ip, g_tParam.lwip_net_mask, g_tParam.lwip_gateway */
-        lwip_start();
-
-        lwip_pro();
-    }
-
-    PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
-    
-    usbd_Init();        /* 初始化USB协议栈 */
-    
-    FileSystemLoad();   /* 挂载文件系统 */
-        
-    lua_Init();         /* 启动lua */
-    
-    //wifi_state = WIFI_INIT;
-  
     /* 主程序采用状态机实现程序功能切换 */
     g_MainStatus = MS_LINK_MODE; /* 初始状态 = 联机界面 */
     if (g_tParam.StartRun == 1)
@@ -164,7 +101,84 @@ int main(void)
     {
         g_gMulSwd.MultiMode = g_tParam.MultiProgMode; 
         g_MainStatus = MS_PROG_WORK;    /* 多路烧录 */
-    }    
+    } 
+    else if (g_tParam.StartRun == 3)
+    {
+        uint32_t RegJump;
+        /*
+            备份寄存器，32bit。 
+            RTC_BKP_DR0 ： 用于RTC初始化标志
+            RTC_BKP_DR1 ： 用于状态之间跳转
+                - boot = 1, app = 2, dap = 3
+                - 0x0102 : 表示从boot来，要去app
+                - 0x0301 : 表示从dap来，要去app
+                - 0x0103 : 表示从boot来，要去dap
+        */
+        RegJump = RTC_ReadBkup32(RTC_BKP_DR1);
+        
+        if (RegJump == 0x0000)
+        {
+            JumpToDAPLink();    /* 进入DAP */
+        }
+        
+        /* 从DAP返回，直接到菜单选择状态 */
+        if (RegJump == 0x0301)
+        {
+            g_tMenu1.Cursor = 0;
+            g_MainStatus = MS_EXTEND_MENU1;
+        }        
+        
+        /* 进入00 待机界面 */
+        RTC_WriteBkup32(RTC_BKP_DR1, 0x0000);        
+    }
+    else    /* 0 - 缺省*/
+    {
+        uint32_t RegJump;
+        RegJump = RTC_ReadBkup32(RTC_BKP_DR1);
+        
+        /* 从DAP返回，直接到菜单选择状态 */
+        if (RegJump == 0x0301)
+        {
+            g_tMenu1.Cursor = 0;
+            g_MainStatus = MS_EXTEND_MENU1;
+        }
+        
+        RTC_WriteBkup32(RTC_BKP_DR1, 0x0000);
+    }
+    
+    /* 执行较快的初始化代码部分 */
+    {
+        //PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LED一直闪烁, 非阻塞 */
+        PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
+        
+        bsp_InitESP32();
+
+        bsp_SetTVCC(3300);        
+        
+        DSO_InitHard();
+        DSO_SetDC(1, 1);
+        DSO_SetDC(2, 1);
+        DSO_SetGain(1, 3);
+        DSO_SetGain(2, 3);
+
+        /* 脱机烧录用的全局变量 */
+        {
+            g_gMulSwd.MultiMode = 0;   
+            g_gMulSwd.Active[0] = 1;
+            g_gMulSwd.Active[1] = 1;
+            g_gMulSwd.Active[2] = 1;
+            g_gMulSwd.Active[3] = 1;
+        }
+
+        usbd_Init();        /* 初始化USB协议栈 */
+        
+        FileSystemLoad();   /* 挂载文件系统 */
+            
+        lua_Init();         /* 启动lua */        
+    }
+    
+    //wifi_state = WIFI_INIT;   
+    
     while (1)
     {
         switch (g_MainStatus)
@@ -182,7 +196,7 @@ int main(void)
                 break;
 
             case MS_MODIFY_PARAM:   /* 修改参数 */
-                status_ModifyParam();
+                //status_ModifyParam();
                 break;   
             
             case MS_ESP32_TEST:     /* ESP32模块固件升级 */
@@ -265,13 +279,13 @@ int main(void)
                 status_MonitorCan();
                 break;
             
-            case MS_MONITOR_GPIO:   /* IO监视器 */
+            case MS_MONITOR_GPIO:   /* 串口视器 */
                 status_MonitorUart();
                 break;
-            
-            case MS_MONITOR_ANALOG: /* 模拟量监视器 */              
-                status_MonitorUart();
-                break;
+
+            case MS_DS18B20_METER:  /* DS18B20温度表 */              
+                status_DS18B20Meter();
+                break;              
             
             default:
                 g_MainStatus = MS_LINK_MODE;
@@ -279,7 +293,6 @@ int main(void)
         }
     }
 }
-
 
 /*
 *********************************************************************************************************
@@ -382,472 +395,6 @@ uint16_t GetStatusIndex(uint16_t _NowStatus)
 
 /*
 *********************************************************************************************************
-*    函 数 名: DispLogo
-*    功能说明: 开机显示版本号
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-static void DispLogo(void)
-{
-    FONT_T tFont; /* 定义字体结构体变量 */
-
-    tFont.FontCode = FC_ST_16;                  /* 字体代码 16点阵 */
-    tFont.FrontColor = RGB(200, 200, 200);      /* 字体颜色 */
-    tFont.BackColor = FORM_BACK_COLOR;          /* 文字背景颜色 */
-    tFont.Space = 0;                            /* 文字间距，单位 = 像素 */
-
-    ST7789_SetDirection(g_tParam.DispDir);
-
-    LCD_ClrScr(FORM_BACK_COLOR);    /* 清屏，背景蓝色 */
-
-    /* 显示APP固件版本。版本号放在中断向量表 */
-    {
-        char buf[64];
-        uint16_t x = 5;
-        uint16_t y = 3;
-        uint16_t line_cap = 20;
-
-        //LCD_DispStr(x, y, "H7-TOOL多功能开发工具", &tFont);
-        LCD_DispStr(x, y, "H7-TOOL", &tFont);
-        y += line_cap;
-
-        sprintf(buf, "App Ver:%d.%02X",
-                        APP_VERSION >> 8, APP_VERSION & 0xFF);
-        LCD_DispStr(x, y, buf, &tFont);
-
-        y += line_cap;
-        sprintf(buf, "Boot Ver:%d.%02X",
-                        BOOT_VERSION >> 8, BOOT_VERSION & 0xFF);
-        LCD_DispStr(x, y, buf, &tFont);
-
-        y += line_cap;
-        LCD_DispStr(x, y, "正在配置网络...", &tFont);
-    }
-
-    ST7789_DrawScreen();        /* 立即刷屏一次 */
-    
-    bsp_DelayMS(50);            /* 刷屏后延迟50ms再开背光, 避免花屏闪一下问题 */
-    
-    LCD_SetBackLight(BRIGHT_DEFAULT);   /* 打开背光 */    
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispHeader
-*    功能说明: 显示界面标题（抬头第1行）
-*    形    参: _str : 标题文字
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispHeader(char *_str)
-{    
-    uint8_t idx;
-    
-    idx  = GetStatusIndex(g_MainStatus);
-    DispHeader2(idx, _str);
-}
-
-/* 带序号参数 */
-void DispHeader2(uint8_t _idx, char *_str)
-{
-    FONT_T tFont;
-    char buf[48];
-
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
-        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    LCD_Fill_Rect(0, 0, HEAD_HEIGHT, HEAD_HEIGHT, HEAD_SN_COLOR);       /* 清屏标题序号区  */
-    LCD_Fill_Rect(HEAD_HEIGHT, 0, HEAD_HEIGHT, 240 - HEAD_HEIGHT, HEAD_BACK_COLOR);   /* 清屏标题栏文本区  */
-    
-    sprintf(buf, "%02d", _idx);
-    tFont.BackColor = HEAD_SN_COLOR;    /* 文字背景颜色 */
-    LCD_DispStr(4, 4, buf, &tFont);
-    
-    /* 显示标题文字 */
-    tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-    LCD_DispStrEx(HEAD_HEIGHT, 4, _str, &tFont, 240 - HEAD_HEIGHT, ALIGN_CENTER);
-
-    LCD_DrawLine(0, HEAD_HEIGHT, 239, HEAD_HEIGHT, HEAD_BODER_COLOR);
-    
-    LCD_Fill_Rect(0, HEAD_HEIGHT + 1, 240 - HEAD_HEIGHT - 1, 240, FORM_BACK_COLOR); /* 清屏正文区  */
-}
-
-/* 只刷新标题文字部分，不清屏 */
-void DispHeaderStr(char *_str)
-{
-    FONT_T tFont;
-
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
-        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    LCD_Fill_Rect(HEAD_HEIGHT, 0, HEAD_HEIGHT, 240 - HEAD_HEIGHT, HEAD_BACK_COLOR);   /* 清屏标题栏文本区  */
-    
-    /* 显示标题文字 */
-    tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-    LCD_DispStrEx(HEAD_HEIGHT, 4, _str, &tFont, 240 - HEAD_HEIGHT, ALIGN_CENTER);
-}
-
-/* 显示序号 */
-void DispHeaderSn(uint8_t _idx)
-{
-    FONT_T tFont;
-    char buf[48];
-
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
-        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    LCD_Fill_Rect(0, 0, HEAD_HEIGHT, HEAD_HEIGHT, HEAD_SN_COLOR);       /* 清屏标题序号区  */
-    
-    sprintf(buf, "%02d", _idx);
-    tFont.BackColor = HEAD_SN_COLOR;    /* 文字背景颜色 */
-    LCD_DispStr(4, 4, buf, &tFont);
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispBox
-*    功能说明: 显示一个圆角矩形框，固定风格。
-*    形    参: _usX : 坐标X
-*              _usY : 坐标Y
-*              _usHeight : 高度
-*              _usWidth : 宽度
-*              _usColor : 填充颜色
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
-{    
-    /* 绘制边框 */
-    LCD_DrawRoundRect(_usX, _usY, _usHeight, _usWidth, B0X_ARC, MEAS_BODER_COLOR);
-    
-    /* 填充矩形 */
-    LCD_FillRoundRect(_usX + 1, _usY + 1, _usHeight - 2, _usWidth - 2, B0X_ARC, _usColor);
-}   
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispLabel
-*    功能说明: 显示一个文本标签框
-*    形    参: _usX : 坐标X
-*              _usY : 坐标Y
-*              _usHeight : 高度
-*              _usWidth : 宽度
-*              _usColor : 填充颜色
-*              _pStr : 显示内容
-*              _pFont : 字体
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispLabel(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-    uint16_t _usColor, char *_pStr, FONT_T *_tFont)
-{    
-    /* 填充矩形 */
-    LCD_Fill_Rect(_usX, _usY, _usHeight, _usWidth, _usColor);    
-    LCD_DispStr(_usX, _usY, _pStr, _tFont);
-}  
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispMeasBar
-*    功能说明: 显示测量值
-*    形    参: _ucLine : 行号 0 - 3 (最多4行)
-*              _pName : 参数名称
-*              _pValue : 测量值
-*              _pUnit : 单位
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispMeasBar(uint8_t _ucLine, char *_pName, char *_pValue, char *_pUnit)
-{
-    DispMeasBarEx(_ucLine, _pName, _pValue, _pUnit, MEAS_BACK_COLOR);
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispMeasBarEx
-*    功能说明: 显示测量值，带填充颜色参数
-*    形    参: _ucLine : 行号 0 - 3 (最多4行)
-*              _pName : 参数名称
-*              _pValue : 测量值
-*              _pUnit : 单位
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispMeasBarEx(uint8_t _ucLine, char *_pName, char *_pValue, char *_pUnit, uint16_t _usFillColor)
-{
-    FONT_T tFont;    
-    uint16_t x;
-    uint16_t y;
-    
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = MEAS_NAME_COLOR; /* 字体颜色 */
-        tFont.BackColor = CL_MASK;          /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    x = MEAS_WIN_LEFT;
-    y = HEAD_HEIGHT + 9 + _ucLine * (MEAS_WIN_HEIGHT + 9);
-    
-    DispBox(x, y, MEAS_WIN_HEIGHT, MEAS_WIN_WIDTH, _usFillColor);
-    
-    /* 参数名字 */
-    tFont.FrontColor = MEAS_NAME_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 5, y + 4, _pName, &tFont);
-
-    /* 测量值 */
-    tFont.FrontColor = MEAS_VALUE_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 80, y + 4, _pValue, &tFont);
-
-    /* 单位 */
-    tFont.FrontColor = MEAS_UNIT_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 188, y + 4, _pUnit, &tFont);    
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispParamBar
-*    功能说明: 显示参数设置 - 系统设置中使用
-*    形    参: _ucLine : 行号 0 - 3 (最多4行)
-*              _pName : 参数名称
-*              _pValue : 测量值
-*              _ucActive : 选中否
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispParamBar(uint8_t _ucLine, char *_pName, char *_pValue, uint8_t _ucActive)
-{
-    FONT_T tFont;    
-    uint16_t x;
-    uint16_t y;
-    uint16_t NameWidth;
-    
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
-        tFont.FrontColor = MEAS_NAME_COLOR; /* 字体颜色 */
-        tFont.BackColor = CL_MASK;          /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    x = MEAS_WIN_LEFT;
-    y = HEAD_HEIGHT + 9 + _ucLine * (MEAS_WIN_HEIGHT + 3);
-    
-    /* 绘制圆角矩形 */
-    if (_ucActive == 1)    /* 选中是用黄色底 */
-    {    
-        DispBox(x, y, MEAS_WIN_HEIGHT, MEAS_WIN_WIDTH, CL_YELLOW);
-    }
-    else
-    {
-        DispBox(x, y, MEAS_WIN_HEIGHT, MEAS_WIN_WIDTH, MEAS_BACK_COLOR);
-    }
-    
-    /* 参数名字 */
-    tFont.FrontColor = MEAS_NAME_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 5, y + 4, _pName, &tFont);
-
-    NameWidth = LCD_GetStrWidth(_pName, &tFont);
-    
-    /* 测量值 */
-    tFont.FrontColor = MEAS_VALUE_COLOR;
-    LCD_DispStr(MEAS_WIN_LEFT + 5 + NameWidth + 5, y + 4, _pValue, &tFont);    
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispProgressBar
-*    功能说明: 显示进度条
-*    形    参:  _usX : 坐标
-*               _usX : 坐标
-*               _usHeight : 高度
-*               _usWidth : 宽度
-*               _str : 显示文字
-*               _Percent : 百分比, 浮点数
-*               tFont : 字体
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-extern uint8_t s_DispRefresh;
-static uint16_t s_ProgressBarColor1 = PROGRESS_BACK_COLOR1;
-void ProgressBarSetColor(uint16_t _Color)
-{
-    s_ProgressBarColor1 = _Color;
-}
-
-void DispProgressBar(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
-    char *_str1, float _Percent, char *_str2, FONT_T *_tFont)    
-{   
-    uint16_t width;
-    char buf[16];
-    uint16_t StrWidth;
-    uint16_t StrHeight;
-    uint16_t x, y;
-    
-    if (_Percent > 100)
-    {
-        _Percent = 100;
-    }
-    
-    width = ((_usWidth - 4) * _Percent) / 100;
-    
-    /* 填充矩形 */
-    LCD_DrawRect(_usX,          _usY,     _usHeight,     _usWidth,  PROGRESS_BODER_COLOR);
-    
-    LCD_Fill_Rect(_usX + 2,     _usY + 2, _usHeight - 4, width,     s_ProgressBarColor1);
-    
-    if (_Percent < 100)
-    {
-        LCD_Fill_Rect(_usX + width + 2, _usY + 2, _usHeight - 4, _usWidth - width - 4, PROGRESS_BACK_COLOR2); 
-    }
-
-    StrHeight = LCD_GetFontHeight(_tFont);
-    y = _usY + (_usHeight - StrHeight) / 2;
-    if (_str1[0] == 0)   /* 只显示显示百分比文字 */
-    {              
-        sprintf(buf, "%0.0f%%", _Percent);
-        StrWidth = LCD_GetStrWidth(buf, _tFont);
-        x = _usX + (_usWidth - StrWidth) / 2;
-        LCD_DispStr(x, y, buf, _tFont);  
-    }
-    else
-    {
-        /* 显示左侧文本 */
-        x = _usX + 4;
-        LCD_DispStr(x, y, _str1, _tFont);  
-        
-        /* 显示百分比 */
-        sprintf(buf, "%0.0f%%", _Percent);
-        StrWidth = LCD_GetStrWidth(buf, _tFont);
-        x = _usX + (_usWidth - StrWidth) / 2;
-        LCD_DispStr(x, y, buf, _tFont);
-
-        /* 显示右侧文本 */
-        x = x + 36;
-        LCD_DispStr(x, y, _str2, _tFont);          
-    }     
-}
-
-/*
-*********************************************************************************************************
-*   函 数 名: DispHelpBar
-*   功能说明: 显示操作提示
-*   形    参: 无
-*   返 回 值: 无
-*********************************************************************************************************
-*/
-const unsigned char g_ImageHelp[512] = { /* 0X10,0X10,0X00,0X10,0X00,0X10,0X01,0X1B, */
-    0XF7,0X9E,0XF7,0X9E,0XF7,0X9E,0XFF,0XBE,0XFF,0XBE,0XEF,0X9E,0XD7,0X5E,0XCF,0X3F,
-    0XCF,0X1F,0XD7,0X5F,0XE7,0X9F,0XFF,0XDF,0XFF,0XDE,0XF7,0X9E,0XF7,0X9E,0XF7,0X9E,
-    0XF7,0X9E,0XF7,0X9E,0XF7,0XBE,0XEF,0X7E,0XC6,0XFE,0XAE,0XBE,0XA6,0X7E,0X9E,0X7E,
-    0X9E,0X7E,0X9E,0X7E,0XA6,0X7E,0XBE,0XDE,0XE7,0X7E,0XFF,0XBE,0XF7,0X9E,0XF7,0X9E,
-    0XF7,0X9E,0XF7,0XBE,0XE7,0X5E,0XB6,0XBE,0XA6,0X7E,0X9E,0X5E,0X96,0X5E,0X8E,0X1E,
-    0X8E,0X1E,0X96,0X3E,0X96,0X5E,0X9E,0X5E,0XAE,0X9E,0XDF,0X5E,0XFF,0XBE,0XF7,0X9E,
-    0XF7,0XBE,0XEF,0X7E,0XB6,0XBD,0X9E,0X7E,0X96,0X3E,0X96,0X3E,0X8E,0X1E,0XA6,0X7E,
-    0XA6,0X7E,0X8E,0X1D,0X8E,0X1E,0X8E,0X3D,0X96,0X3D,0XA6,0X7D,0XE7,0X7E,0XFF,0XDE,
-    0XFF,0XBE,0XBE,0XDD,0X9E,0X5D,0X96,0X3D,0X8E,0X1D,0X8E,0X1D,0X85,0XFD,0XDF,0X7E,
-    0XE7,0X9F,0X85,0XFD,0X86,0X1D,0X86,0X1D,0X8E,0X1D,0X8E,0X1D,0XB6,0XBD,0XFF,0XDF,
-    0XE7,0X7E,0X96,0X3D,0X8E,0X1D,0X86,0X1D,0X85,0XFD,0X86,0X1D,0X7D,0XFD,0X96,0X3D,
-    0X96,0X3D,0X85,0XFD,0X85,0XFD,0X85,0XFD,0X85,0XFD,0X85,0XFD,0X8E,0X1C,0XE7,0X7E,
-    0XCF,0X1E,0X7D,0XFC,0X85,0XFD,0X85,0XFD,0X7D,0XFD,0X7D,0XFD,0X8E,0X3D,0X96,0X3D,
-    0X8E,0X1D,0X7D,0XFD,0X7D,0XFD,0X7D,0XFD,0X7D,0XDC,0X7D,0XFC,0X75,0XDC,0XC6,0XFE,
-    0XB6,0XBD,0X75,0XBC,0X7D,0XDC,0X7D,0XDC,0X7D,0XFD,0X7D,0XDD,0X8E,0X3D,0XE7,0X7F,
-    0XD7,0X5E,0X75,0XDC,0X7D,0XDC,0X7D,0XDC,0X7D,0XDC,0X7D,0XDC,0X75,0X9C,0XAE,0X9D,
-    0XAE,0X9D,0X75,0X9C,0X7D,0XDC,0X7D,0XDC,0X7D,0XDC,0X7D,0XDC,0X6D,0X9C,0XBE,0XDE,
-    0XDF,0X5E,0X75,0XBC,0X7D,0XDC,0X7D,0XDC,0X75,0XBC,0X75,0XBC,0X6D,0X7B,0XA6,0X7D,
-    0XC6,0XFD,0X75,0X9C,0X7D,0XBC,0X75,0XBC,0X75,0XBC,0X75,0XBC,0X6D,0X9C,0XBE,0XDD,
-    0XD7,0X5E,0X6D,0X9C,0X75,0XBC,0X75,0XBC,0X75,0X9C,0X75,0X9C,0X65,0X7B,0XBE,0XDD,
-    0XE7,0X7E,0X85,0XDC,0X7D,0XBC,0X75,0X9C,0X75,0X9B,0X75,0X9C,0X65,0X7B,0XB6,0XBD,
-    0XD7,0X3E,0X65,0X7B,0X6D,0X9C,0X6D,0X7B,0X6D,0X7B,0X75,0X9B,0X75,0X9B,0XDF,0X5E,
-    0XFF,0XDE,0XAE,0X7C,0X85,0XDB,0X75,0X9B,0X6D,0X7B,0X6D,0X7B,0X5D,0X3B,0XB6,0XBD,
-    0XD7,0X5E,0X5D,0X3B,0X6D,0X7B,0X6D,0X7B,0X6D,0X7B,0X75,0X7B,0X9E,0X3C,0XFF,0XDF,
-    0XFF,0XBE,0XE7,0X5E,0X96,0X1C,0X7D,0XBB,0X75,0X7B,0X65,0X5B,0X75,0X9B,0XCF,0X1D,
-    0XDF,0X7E,0X85,0XDB,0X5D,0X3A,0X6D,0X5B,0X75,0X7B,0X85,0XDB,0XDF,0X5D,0XFF,0XDE,
-    0XF7,0X9E,0XFF,0XBE,0XD7,0X3D,0X95,0XFB,0X75,0X9B,0X6D,0X7B,0X6D,0X5B,0X6D,0X5A,
-    0X65,0X5A,0X6D,0X5A,0X65,0X5A,0X6D,0X5A,0X7D,0XBB,0XCE,0XFD,0XFF,0XDE,0XF7,0X9E,
-    0XF7,0X9E,0XF7,0X9E,0XFF,0XBE,0XDF,0X3D,0X9E,0X1B,0X6D,0X7A,0X5D,0X1A,0X4C,0XFA,
-    0X4C,0XDA,0X4C,0XFA,0X5D,0X3A,0X8D,0XFB,0XDF,0X3D,0XFF,0XBE,0XF7,0X9E,0XF7,0X9E,
-    0XF7,0X9E,0XF7,0X9E,0XF7,0X9E,0XF7,0X9E,0XEF,0X5D,0XCE,0XBB,0XA6,0X1A,0X85,0XBA,
-    0X85,0XBA,0X9E,0X1A,0XC6,0XBC,0XEF,0X7D,0XF7,0XBE,0XF7,0X9E,0XF7,0X9E,0XF7,0X9E,
-};
-void DispHelpBar(char *_str1, char *_str2)
-{
-    FONT_T tFont;   /* 定义字体结构体变量 */
-
-    tFont.FontCode = FC_ST_16;              /* 字体代码 16点阵 */
-    tFont.FrontColor = HELP_TEXT_COLOR;     /* 字体颜色 */
-    tFont.BackColor = HELP_BACK_COLOR;      /* 文字背景颜色 */
-    tFont.Space = 0;                        /* 文字间距，单位 = 像素 */
-
-    ST7789_DrawBMP8(1, 240 - 36, 16, 16, (uint8_t *)g_ImageHelp);
-    
-    LCD_DispStr(20, 240 - 36, _str1, &tFont);
-    LCD_DispStr(20, 240 - 18, _str2, &tFont);  
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispInfoBar16
-*    功能说明: 显示信息，16点阵.
-*    形    参: _line   : 行号
-*              _str1 : 参数名
-*              _str2 : 参数值
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispInfoBar16(uint8_t _ucLine, char *_pName, char *_pValue)
-{
-    DispInfoBar16Ex(_ucLine, _pName, _pValue, INFO_VALUE_COLOR);
-}
-
-/* 带颜色参数 - 用于显示红色超标参数 */
-void DispInfoBar16Ex(uint8_t _ucLine, char *_pName, char *_pValue, uint16_t _ucColor)
-{
-    FONT_T tFont;    
-    uint16_t x;
-    uint16_t y;
-    
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-        tFont.FrontColor = INFO_NAME_COLOR; /* 字体颜色 */
-        tFont.BackColor = INFO_BACK_COLOR;  /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    x = 5;
-    y = HEAD_HEIGHT + 5 + _ucLine * INFO_HEIGHT;
-    
-    /* 参数名字 */
-    tFont.FrontColor = INFO_NAME_COLOR;
-    LCD_DispStr(x, y, _pName, &tFont);
-
-    x += LCD_GetStrWidth(_pName, &tFont) + 5;
-    
-    /* 参数值 */
-    tFont.FrontColor = _ucColor;
-    LCD_DispStr(x, y, _pValue, &tFont);  
-}
-
-/*
-*********************************************************************************************************
 *    函 数 名: DSO_StartMode2
 *    功能说明: 启动示波器欧式2，多通道低速扫描模式
 *    形    参: 无
@@ -888,33 +435,6 @@ void PlayKeyTone(void)
     {
         BEEP_KeyTone();
     }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: DispMsgBox
-*    功能说明: 显示一个消息框. 字体16点阵
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void DispMsgBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, char *_str)    
-{   
-    FONT_T tFont;
-    
-    /* 设置字体参数 */
-    {
-        tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-        tFont.FrontColor = MEAS_NAME_COLOR; /* 字体颜色 */
-        tFont.BackColor = CL_MASK;          /* 文字背景颜色 */
-        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
-    }
-    
-    DispBox(_usX, _usY, _usHeight, _usWidth, MEAS_BACK_COLOR);
-
-    /* 参数名字 */
-    tFont.FrontColor = MEAS_NAME_COLOR;
-    LCD_DispStr(_usX + 5, _usY + 4, _str, &tFont);
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

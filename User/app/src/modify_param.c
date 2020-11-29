@@ -14,12 +14,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "fonts.h"
-#include "ui_def.h"
-#include "main.h"
-#include "lcd_menu.h"
-#include "modify_param.h"
+#include "includes.h"
 
 /* 多行文本框 */
 #define MEMO_X     5
@@ -63,16 +58,27 @@ const PARAM_LIST_T UartMonParamList[UART_MON_PARAM_COUNT] =
 };          
             
 /****** 系统设置-基本参数 ******************************************************************************/
-#define SYS_BASE_PARAM_COUNT   16
+#define SYS_BASE_PARAM_COUNT   4
 const char *SysBaseParam0[] = {"关闭", "打开"};
 const char *SysBaseParam1[] = {"1分钟", "5分钟", "15分钟", "1小时", "关闭"};
 const char *SysBaseParam2[] = {"16点阵", "24点阵"};
+const char *SysBaseParam3[] = {"缺省", "单路烧录", "多路烧录", "DAP-Link"};
+
 const PARAM_LIST_T SysBaseParamList[SYS_BASE_PARAM_COUNT] = 
 { 
     /*  数据类型,      名称          可选列表,      最小值, 最大值, 缺省值 */
     {   0,         "按键音: ",       SysBaseParam0,   0,      1,     1},
     {   0,         "屏保超时: ",     SysBaseParam1,   0,      4,     0},
     {   0,         "列表字体: ",     SysBaseParam2,   0,      1,     0},
+    {   0,         "开机启动: ",     SysBaseParam3,      0,      3,       0}, 
+};
+
+/****** 系统设置-IP参数 ******************************************************************************/
+#define NET_PARAM_COUNT   13
+
+const PARAM_LIST_T NetParamList[NET_PARAM_COUNT] = 
+{ 
+    /*  数据类型,      名称          可选列表,      最小值, 最大值, 缺省值 */
     {   0,         "RJ45本机IP0: ",   0,              0,      255,   192},
     {   0,         "RJ45本机IP1: ",   0,              0,      255,   168},
     {   0,         "RJ45本机IP2: ",   0,              0,      255,   1},
@@ -88,17 +94,18 @@ const PARAM_LIST_T SysBaseParamList[SYS_BASE_PARAM_COUNT] =
     {   0,         "端口号: ",        0,              1024, 65535,   30010},    
 };
 
+
 /****** 烧录参数   ******************************************************************************/
 #define PROG_PARAM_COUNT   4
 const char *ProgParam0[] = {"关闭", "1路", "1-2路", "1-3路", "1-4路"};
-const char *ProgParam1[] = {"缺省", "单路烧录", "多路烧录"};
+//const char *ProgParam1[] = {"缺省", "单路烧录", "多路烧录", "DAP-Link"};
 const PARAM_LIST_T ProgParamList[PROG_PARAM_COUNT] = 
 { 
     /*  数据类型,      名称          可选列表,      最小值, 最大值, 缺省值 */
     {   0,         "多路模式: ",     ProgParam0,    0,      4,       4},
     {   0,         "工厂代码: ",     0,             0,      999,     0},
     {   0,         "烧录器编号: ",   0,             0,      999,     0},
-    {   0,         "开机启动: ",     ProgParam1,    0,      2,       0}, 
+    {   0,         "开机启动: ",     SysBaseParam3, 0,      3,       0}, 
 };
 
 /*
@@ -307,21 +314,26 @@ void ModifyParam(uint16_t _MainStatus)
 */
 void UartMonInitParam(uint16_t _MainStatus)
 {
-    if (_MainStatus == MS_MONITOR_UART)
+    if (_MainStatus == MODIFY_PARAM_UART_MON)
     {
         s_pParamList = UartMonParamList;
         s_ParamCount = UART_MON_PARAM_COUNT;
     }
-    else if (_MainStatus == MS_SYSTEM_SET)
+    else if (_MainStatus == MODIFY_PARAM_SYSTEM)
     {
         s_pParamList = SysBaseParamList;
         s_ParamCount = SYS_BASE_PARAM_COUNT;        
     }    
-    else if (_MainStatus == MS_PROG_MODIFY_PARAM)
+    else if (_MainStatus == MODIFY_PARAM_PROG)
     {
         s_pParamList = ProgParamList;
         s_ParamCount = PROG_PARAM_COUNT;         
     }
+    else if (_MainStatus == MODIFY_PARAM_NET)
+    {
+        s_pParamList = NetParamList;
+        s_ParamCount = NET_PARAM_COUNT;         
+    }    
 }
 
 /*
@@ -351,20 +363,24 @@ static int32_t MonDispReadParam(uint8_t _index)
         if (_index == 0) value = g_tParam.KeyToneEnable;
         else if (_index == 1) value = g_tParam.LcdSleepTime;
         else if (_index == 2) value = g_tParam.FileListFont24;
-        else if (_index == 3) value = g_tParam.LocalIPAddr[0];
-        else if (_index == 4) value = g_tParam.LocalIPAddr[1];
-        else if (_index == 5) value = g_tParam.LocalIPAddr[2];
-        else if (_index == 6) value = g_tParam.LocalIPAddr[3];
-        else if (_index == 7) value = g_tParam.Gateway[0];
-        else if (_index == 8) value = g_tParam.Gateway[1];
-        else if (_index == 9) value = g_tParam.Gateway[2];
-        else if (_index == 10) value = g_tParam.Gateway[3];
-        else if (_index == 11) value = g_tParam.NetMask[0];
-        else if (_index == 12) value = g_tParam.NetMask[1];
-        else if (_index == 13) value = g_tParam.NetMask[2];
-        else if (_index == 14) value = g_tParam.NetMask[3];
-        else if (_index == 15) value = g_tParam.LocalTCPPort;         
+        else if (_index == 3) value = g_tParam.StartRun;       
     }
+    else if (s_pParamList == NetParamList)
+    {
+        if (_index == 0) value = g_tParam.LocalIPAddr[0];
+        else if (_index == 1) value = g_tParam.LocalIPAddr[1];
+        else if (_index == 2) value = g_tParam.LocalIPAddr[2];
+        else if (_index == 3) value = g_tParam.LocalIPAddr[3];
+        else if (_index == 4) value = g_tParam.Gateway[0];
+        else if (_index == 5) value = g_tParam.Gateway[1];
+        else if (_index == 6) value = g_tParam.Gateway[2];
+        else if (_index == 7) value = g_tParam.Gateway[3];
+        else if (_index == 8) value = g_tParam.NetMask[0];
+        else if (_index == 9) value = g_tParam.NetMask[1];
+        else if (_index == 10) value = g_tParam.NetMask[2];
+        else if (_index == 11) value = g_tParam.NetMask[3];
+        else if (_index == 12) value = g_tParam.LocalTCPPort;         
+    }    
     else if (s_pParamList == ProgParamList)
     {
         if (_index == 0) value = g_tParam.MultiProgMode;
@@ -401,20 +417,24 @@ static void MonDispWriteParam(uint8_t _index, int32_t _value)
         if (_index == 0) g_tParam.KeyToneEnable = _value;
         else if (_index == 1) g_tParam.LcdSleepTime = _value;
         else if (_index == 2) g_tParam.FileListFont24 = _value;
-        else if (_index == 3) g_tParam.LocalIPAddr[0] = _value;
-        else if (_index == 4) g_tParam.LocalIPAddr[1] = _value;
-        else if (_index == 5) g_tParam.LocalIPAddr[2] = _value;
-        else if (_index == 6) g_tParam.LocalIPAddr[3] = _value;
-        else if (_index == 7) g_tParam.Gateway[0] = _value;
-        else if (_index == 8) g_tParam.Gateway[1] = _value;
-        else if (_index == 9) g_tParam.Gateway[2] = _value;
-        else if (_index == 10) g_tParam.Gateway[3] = _value;
-        else if (_index == 11) g_tParam.NetMask[0] = _value;
-        else if (_index == 12) g_tParam.NetMask[1] = _value;
-        else if (_index == 13) g_tParam.NetMask[2] = _value;
-        else if (_index == 14) g_tParam.NetMask[3] = _value;
-        else if (_index == 15) g_tParam.LocalTCPPort = _value;   
+        else if (_index == 3) g_tParam.StartRun = _value;
     }
+    else if (s_pParamList == NetParamList)
+    {     
+        if (_index == 0) g_tParam.LocalIPAddr[0] = _value;
+        else if (_index == 1) g_tParam.LocalIPAddr[1] = _value;
+        else if (_index == 2) g_tParam.LocalIPAddr[2] = _value;
+        else if (_index == 3) g_tParam.LocalIPAddr[3] = _value;
+        else if (_index == 4) g_tParam.Gateway[0] = _value;
+        else if (_index == 5) g_tParam.Gateway[1] = _value;
+        else if (_index == 6) g_tParam.Gateway[2] = _value;
+        else if (_index == 7) g_tParam.Gateway[3] = _value;
+        else if (_index == 8) g_tParam.NetMask[0] = _value;
+        else if (_index == 9) g_tParam.NetMask[1] = _value;
+        else if (_index == 10) g_tParam.NetMask[2] = _value;
+        else if (_index == 11) g_tParam.NetMask[3] = _value;
+        else if (_index == 12) g_tParam.LocalTCPPort = _value;   
+    }    
     else if (s_pParamList == ProgParamList)
     {
         if (_index == 0)  g_tParam.MultiProgMode = _value;

@@ -9,4 +9,24 @@
 2020-09-16  V1.31固件
 普通触发模式还有遗留问题：拖动触发位置滚动条时，超出波形范围后H7-TOOL程序假死（频繁进入看门狗中断），暂未解决。H7-TOOL界面翻到电压档界面可恢复。
 
+
+2020-10-26 SPI Flash烧录器接口方案
+ - 待定方案， 口线不够实现4路烧录
+  
+    D0  PD14 PA15 PI0    - DIR PH8       CS2    
+    D1  PD15 PA8 PH19    - DIR PG8       CS3
+    
+    D2  PE6  PD0 PB7     - DIR PD9       MOSI    (硬件SPI信号)
+    D3  PE5  PD1 PH11    - DIR PG10      MISO_1  (硬件SPI信号)
+    D4  PE4  PE7 PH12    - DIR PG12      CS1     (软件控制片选)
+    D5  PE2  PE8 PI5     - DIR PG7       SCK     (硬件SPI信号)
+    D6  PE9  PD3 PA0     - DIR PD10      CS4
+    D7  PE10 PI6         - DIR PI1       MISO_2  (第2路MISO) 
+    D8  PE11 PD4  PI3    - DIR PG9       MISO_3  (第3路MISO)     
+    D9  PE12 PD5         - DIR PI12      MISO_4  (第4路MISO)
+    
+    RS232_TX             - RS232串口机台信号扩展 START BUSY OK NG
+    RS232_RX             - RS232串口机台信号扩展
+  
+
   

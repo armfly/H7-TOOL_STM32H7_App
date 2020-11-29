@@ -13,14 +13,9 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
-#include "file_lib.h"
-#include "lua_if.h"
-#include "prog_if.h"
-#include "lcd_menu.h"
+#include "includes.h"
+
 #include "SW_DP_Multi.h"
-#include "modify_param.h"
 
 /* 三个按钮 */
 #define BTN1_X     (240 - BTN1_W - 5)
@@ -98,6 +93,7 @@ static void DispProgCounter(void);
 extern void sysTickInit(void);
 extern uint8_t swd_init_debug(void);
 extern uint8_t swd_read_idcode(uint32_t *id);
+extern uint8_t swd_init(void);
 
 /*
 *********************************************************************************************************
@@ -281,6 +277,18 @@ void status_ProgWork(void)
 //            }
 //        }
 //    }
+    
+    /* V1.36 解决第一次上电第1次烧录失败问题 */
+    {
+        if (g_gMulSwd.MultiMode == 0)
+        {
+            MUL_PORT_SWD_SETUP();
+        }
+        else
+        {
+            swd_init();
+        }
+    }
     
     g_tProg.AutoStart = 0;
     fRefresh = 1;
@@ -931,7 +939,7 @@ void status_ProgSetting(void)
                     {
                         //g_MainStatus = MS_PROG_MODIFY_PARAM);;
                         
-                        ModifyParam(MS_PROG_MODIFY_PARAM);
+                        ModifyParam(MODIFY_PARAM_PROG);
                         LCD_DispMenu(&g_tMenuProg1);
                         /* 通知lua程序，多路编程参数变化 */
                         lua_do("MULTI_MODE = pg_read_c_var(\"MultiProgMode\")");

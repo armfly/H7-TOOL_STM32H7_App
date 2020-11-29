@@ -18,6 +18,7 @@
 #include "usbd_cdc_interface.h"
 
 void usbd_Init(void);
+void usbd_UnInit(void);
 void usbd_OpenCDC(uint8_t _com);
 void usbd_OpenCDC2(uint8_t _com);
 void usbd_CloseCDC(void);

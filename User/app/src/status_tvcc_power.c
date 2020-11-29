@@ -13,8 +13,7 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 
 static void DispTVccVoltCurr(void);
 static void DispTVccSetting(uint16_t _volt, uint8_t _mode);

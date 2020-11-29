@@ -33,6 +33,8 @@ void bsp_InitRTC(void);
 uint8_t RTC_WriteClock(uint16_t _year, uint8_t _mon, uint8_t _day, uint8_t _hour, uint8_t _min, uint8_t _sec);
 void RTC_ReadClock(void);
 uint8_t RTC_CalcWeek(uint16_t _year, uint8_t _mon, uint8_t _day);
+uint32_t RTC_ReadBkup32(uint32_t _addr);
+void RTC_WriteBkup32(uint32_t _addr, uint32_t _value);
 
 extern RTC_T g_tRTC;
 

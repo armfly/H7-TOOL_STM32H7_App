@@ -28,6 +28,7 @@
 #include "stm8_flash.h"
 #include "stm8_swim.h"
 #include "n76e003_flash.h"
+#include "w25q_flash.h"
 
 /* 64H帧子功能码定义 */
 enum
@@ -42,8 +43,8 @@ static void MODS66_WriteMem(void);
 
 /*
 *********************************************************************************************************
-*    函 数 名: MODS_64H
-*    功能说明: 文件操作通信接口
+*    函 数 名: MODS_66H
+*    功能说明: SWD内存读写操作通信接口
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
@@ -239,9 +240,23 @@ static void MODS66_ReadMem(void)
         memcpy(&g_tModS.TxBuf[g_tModS.TxCount], s_lua_read_buf, package_len);
         g_tModS.TxCount += package_len;   
     }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH) 
+    {
+        if (W25Q_ReadBuf(offset_addr, s_lua_read_buf, package_len) == 0)
+        {
+            g_tModS.TxBuf[g_tModS.TxCount++] = 0x01;    /*　出错 */
+        }
+        else
+        {
+            g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;    /* 执行结果 00 */
+        }
+        
+        memcpy(&g_tModS.TxBuf[g_tModS.TxCount], s_lua_read_buf, package_len);
+        g_tModS.TxCount += package_len;   
+    }
     else
     {
-        ;
+        g_tModS.TxBuf[g_tModS.TxCount++] = 0x01;    /*　出错 */    
     }
 }
 

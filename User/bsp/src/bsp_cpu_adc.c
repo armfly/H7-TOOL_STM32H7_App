@@ -633,10 +633,10 @@ void DSO_SetGain(uint8_t _ch, uint8_t _gain)
     {
         if (_gain == 0)      {G1C_0(); G1B_0(); G1A_0();}
         else if (_gain == 1) {G1C_0(); G1B_0(); G1A_1();}
-        else if (_gain == 2) {G1C_0(); G1B_1();    G1A_0();}
+        else if (_gain == 2) {G1C_0(); G1B_1(); G1A_0();}
         else if (_gain == 3) {G1C_0(); G1B_1(); G1A_1();}
         else if (_gain == 4) {G1C_1(); G1B_0(); G1A_0();}
-        else if (_gain == 5) {G1C_1(); G1B_0();    G1A_1();}
+        else if (_gain == 5) {G1C_1(); G1B_0(); G1A_1();}
         else if (_gain == 6) {G1C_1(); G1B_1(); G1A_0();}
         else if (_gain == 7) {G1C_1(); G1B_1(); G1A_1();}
     }
@@ -644,10 +644,10 @@ void DSO_SetGain(uint8_t _ch, uint8_t _gain)
     {
         if (_gain == 0)      {G2C_0(); G2B_0(); G2A_0();}
         else if (_gain == 1) {G2C_0(); G2B_0(); G2A_1();}
-        else if (_gain == 2) {G2C_0(); G2B_1();    G2A_0();}
+        else if (_gain == 2) {G2C_0(); G2B_1(); G2A_0();}
         else if (_gain == 3) {G2C_0(); G2B_1(); G2A_1();}
         else if (_gain == 4) {G2C_1(); G2B_0(); G2A_0();}
-        else if (_gain == 5) {G2C_1(); G2B_0();    G2A_1();}
+        else if (_gain == 5) {G2C_1(); G2B_0(); G2A_1();}
         else if (_gain == 6) {G2C_1(); G2B_1(); G2A_0();}
         else if (_gain == 7) {G2C_1(); G2B_1(); G2A_1();}    
     }

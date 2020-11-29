@@ -14,9 +14,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "param.h"
-#include "modbus_reg_addr.h"
+#include "includes.h"
 
 PARAM_T g_tParam;            /* 基本参数 */
 CALIB_T g_tCalib;            /* 校准参数 */
@@ -59,6 +57,18 @@ void LoadParam(void)
     g_tVar.MACaddr[5] = g_tVar.CPU_Sn[0] >> 0;
     
     LoadCalibParam();
+    
+    /* 固件升级新增参数的处理 */
+    {
+        if (g_tParam.DAP_TVCCVolt > 50)
+        {
+            g_tParam.DAP_TVCCVolt = 0;
+            g_tParam.DAP_BeepEn = 1;
+            bsp_GenRNG(&g_tParam.DAP_Sn, 1);
+            
+            SaveParam();
+        }
+    }
 }
 
 /*
@@ -154,6 +164,10 @@ void InitBaseParam(void)
     g_tParam.ToolSn = 1;                /* 烧录器编号 */
     
     g_tParam.StartRun = 0;              /* 开机启动 */
+        
+    g_tParam.DAP_TVCCVolt = 0;
+    g_tParam.DAP_BeepEn = 1;
+    bsp_GenRNG(&g_tParam.DAP_Sn, 1);
     
     SaveParam();
 }

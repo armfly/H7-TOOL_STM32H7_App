@@ -1,11 +1,24 @@
+/*
+*********************************************************************************************************
+*
+*    模块名称 : lua接口SWD烧录器器
+*    文件名称 : lua_if_swd.c
+*    版    本 : V1.0
+*    说    明 : 
+*    修改记录 :
+*        版本号  日期        作者     说明
+*        V1.0    2019-10-06 armfly  正式发布
+*
+*    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
+*
+*********************************************************************************************************
+*/
+#include "includes.h"
+
 #include "lauxlib.h"
 #include "lualib.h"
 #include "time.h"
-#include "lua_if.h"
-#include "bsp.h"
 #include "elf_file.h"
-#include "file_lib.h"
-#include "prog_if.h"
 #include "target_reset.h"
 #include "target_config.h"
 #include "swd_host.h"
@@ -20,7 +33,7 @@
 #include "debug_cm.h"
 #include "n76e003_flash.h"
 #include "cx32_isp.h"
-
+#include "w25q_flash.h"
 
 /* 为了避免和DAP驱动中的函数混淆，本模块函数名前缀用 h7swd */
 
@@ -240,9 +253,9 @@ static int h7swd_Init(lua_State* L)
 
         N76E_EnterIAP();           /* 进入IAP状态 */
     }
-    else
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
     {
-        ;
+        W25Q_InitHard();
     }
             
     return 0;
@@ -258,44 +271,70 @@ static int h7swd_Init(lua_State* L)
 */
 static int h7swd_ReadID(lua_State* L)
 {
-    uint32_t id;
-    uint32_t id_buf[4];
+//    uint32_t id;
+//    uint32_t id_buf[4];
 
-    if (g_tProg.ChipType == CHIP_SWD_ARM)
-    {
-		if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
-        {
-	        if (MUL_swd_read_idcode(id_buf) == 0)        
-	        {
-	            lua_pushnumber(L, 0);    /* 出错 */
-	        }
-	        else
-	        {
-	            lua_pushnumber(L, id);    /* 成功,返回ID */
-	        }             
-		}
-		else
-		{
-	        if (swd_read_idcode(&id) == 0)   
-	        {
-	            lua_pushnumber(L, 0);    /* 出错 */
-	        }
-	        else
-	        {
-	            lua_pushnumber(L, id);    /* 成功,返回ID */
-	        }			
-		}
-    }
-    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
-    {
-        id = 0x00000800;            /* STM8没有ID, 填一个固定值 */
-        lua_pushnumber(L, id);      /* 成功,返回ID */        
-    }
-    else
-    {
-        id = 0;
-        lua_pushnumber(L, 0);    /* 出错 */
-    }
+//    if (g_tProg.ChipType == CHIP_SWD_ARM)
+//    {
+//		if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+//        {
+//	        if (MUL_swd_read_idcode(id_buf) == 0)        
+//	        {
+//	            lua_pushnumber(L, 0);    /* 出错 */
+//	        }
+//	        else
+//	        {
+//	            lua_pushnumber(L, id);    /* 成功,返回ID */
+//	        }             
+//		}
+//		else
+//		{
+//	        if (swd_read_idcode(&id) == 0)   
+//	        {
+//	            lua_pushnumber(L, 0);    /* 出错 */
+//	        }
+//	        else
+//	        {
+//	            lua_pushnumber(L, id);    /* 成功,返回ID */
+//	        }			
+//		}
+//    }
+//    else if (g_tProg.ChipType == CHIP_SWIM_STM8)
+//    {
+//        id = 0x00000800;            /* STM8没有ID, 填一个固定值 */
+//        lua_pushnumber(L, id);      /* 成功,返回ID */        
+//    }
+//    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+//    {
+//        W25Q_DetectIC(id_buf);
+//		if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+//        {
+//	        if (MUL_swd_read_idcode(id_buf) == 0)        
+//	        {
+//	            lua_pushnumber(L, 0);    /* 出错 */
+//	        }
+//	        else
+//	        {
+//	            lua_pushnumber(L, id);    /* 成功,返回ID */
+//	        }             
+//		}
+//		else
+//		{
+//	        if (swd_read_idcode(&id) == 0)   
+//	        {
+//	            lua_pushnumber(L, 0);    /* 出错 */
+//	        }
+//	        else
+//	        {
+//	            lua_pushnumber(L, id);    /* 成功,返回ID */
+//	        }			
+//		}        
+//    }    
+//    else
+//    {
+//        id = 0;
+//        lua_pushnumber(L, 0);    /* 出错 */
+//    }
     return 1;
 }
 
@@ -479,7 +518,42 @@ static int h7swd_ReadMemory(lua_State* L)
         
         lua_pushlstring(L, (char *)s_lua_read_buf, num); 
         return 2;        
-    }    
+    }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+        {    
+            if (W25Q_ReadBuf(addr, s_lua_read_buf, num) == 0)
+            {
+                lua_pushnumber(L, 0);    /* 出错 */
+            }
+            else
+            {
+                lua_pushnumber(L, 1);    /* 成功 */
+            }
+            
+            lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + num), num); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 2 * num), num); 
+            lua_pushlstring(L, (char *)(s_lua_read_buf + 3 * num), num); 
+            return 5;
+        }
+        else
+        {            
+            if (W25Q_ReadBuf(addr, s_lua_read_buf, num) == 0)
+            {
+                lua_pushnumber(L, 0);    /* 出错 */
+            }
+            else
+            {
+                lua_pushnumber(L, 1);    /* 成功 */
+            }
+
+            lua_pushlstring(L, (char *)s_lua_read_buf, num); 
+            
+            return 2;
+        }      
+    }     
     else
     {
         lua_pushnumber(L, 0);    /* 出错 */   
@@ -1116,7 +1190,7 @@ static int h7_LoadAlgoFile(lua_State* L)
 *    返 回 值: 0 失败   1 成功
 *********************************************************************************************************
 */
-uint16_t PG_N76E_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, 
+extern uint16_t PG_ProgFile(const char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, uint32_t _CtrlByte, 
     uint32_t _FileIndex, const char *_AlgoName);
 static int h7_ProgFile(lua_State* L)
 {
@@ -1217,7 +1291,7 @@ static int h7_ProgFile(lua_State* L)
     }
     else if (g_tProg.ChipType == CHIP_NUVOTON_8051)
     {
-        if (PG_N76E_ProgFile(file_name, FlashAddr, EndAddr, CtrlByte, FileIndex, AlgoName) == 0)
+        if (PG_ProgFile(file_name, FlashAddr, EndAddr, CtrlByte, FileIndex, AlgoName) == 0)
         {
             lua_pushnumber(L, 1);    /*OK */
         }
@@ -1226,6 +1300,17 @@ static int h7_ProgFile(lua_State* L)
             lua_pushnumber(L, 0);    /* 出错 */
         }        
     }     
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        if (PG_ProgFile(file_name, FlashAddr, EndAddr, CtrlByte, FileIndex, AlgoName) == 0)
+        {
+            lua_pushnumber(L, 1);    /*OK */
+        }
+        else
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+        }        
+    }
     else
     {
         lua_pushnumber(L, 0);    /* 出错 */
@@ -1374,7 +1459,7 @@ static int h7_reset_pin(lua_State* L)
 static int h7_DetectIC(lua_State* L)
 {
     uint32_t mode = 0;
-        
+
     if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第1个参数 */
     {
         mode = luaL_checknumber(L, 1);  /* 1表示仅用于检测芯片插入状态, 无需检测3次 */      
@@ -1469,7 +1554,28 @@ static int h7_DetectIC(lua_State* L)
         }        
         lua_pushnumber(L, id);      /* 成功,返回ID */
         return 1;
-    }    
+    } 
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH) 
+    {
+        uint32_t id[4];
+        
+        W25Q_InitHard();
+        W25Q_DetectIC(id);
+        if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+        {
+            lua_pushnumber(L, id[0]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[1]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[2]);    /* 成功,返回ID */
+            lua_pushnumber(L, id[3]);    /* 成功,返回ID */            
+            return 4;            
+        }
+        else
+        {                
+            lua_pushnumber(L, id[0]);    /* 成功,返回ID */
+            return 1;
+        }
+    } 
+    
     lua_pushnumber(L, -1);          /* 失败 */
     return 1;
 }
@@ -2021,6 +2127,17 @@ static int h7_EraseSector(lua_State* L)
             lua_pushnumber(L, 1);    /* 成功 */
         }       
     }
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
+    {
+        if (W25Q_EraseSector(FlashAddr) == 0)
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+        }
+        else
+        {
+            lua_pushnumber(L, 1);    /* 成功 */
+        }       
+    }    
     else
     {
         lua_pushnumber(L, 0);    /* 出错 */

@@ -384,9 +384,9 @@
           <GroupName>App</GroupName>
           <Files>
             <File>
-              <FileName>main.h</FileName>
+              <FileName>includes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\..\User\app\inc\main.h</FilePath>
+              <FilePath>..\..\User\app\inc\includes.h</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -492,6 +492,16 @@
               <FileName>status_uart_monitor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\status_uart_monitor.c</FilePath>
+            </File>
+            <File>
+              <FileName>status_ds18b20_meter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_ds18b20_meter.c</FilePath>
+            </File>
+            <File>
+              <FileName>disp_lib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\disp_lib.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -733,6 +743,11 @@
               <FileName>bsp_i2c_gpio_ext.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\bsp\src\bsp_i2c_gpio_ext.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_ds18b20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\bsp\src\bsp_ds18b20.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1575,19 +1590,24 @@
               <FilePath>..\..\User\programmer\stm8_prog_file.c</FilePath>
             </File>
             <File>
-              <FileName>n76e_prog_file.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\programmer\n76e_prog_file.c</FilePath>
-            </File>
-            <File>
               <FileName>n76e003_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\n76e003_flash.c</FilePath>
             </File>
             <File>
+              <FileName>w25q_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\w25q_flash.c</FilePath>
+            </File>
+            <File>
               <FileName>cx32_isp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\cx32_isp.c</FilePath>
+            </File>
+            <File>
+              <FileName>pg_prog_file.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\pg_prog_file.c</FilePath>
             </File>
           </Files>
         </Group>
