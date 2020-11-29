@@ -14,13 +14,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "main.h"
-#include "lcd_menu.h"
-#include "file_lib.h"
-#include "lua_if.h"
-#include "prog_if.h"
-#include "modify_param.h"
+#include "includes.h"
 
 /* 多行文本框 */
 #define MEMO_X     0
@@ -213,7 +207,7 @@ void status_MonitorCan(void)
 
                 case KEY_LONG_DOWN_S:   /* S键 长按 */                    
                     LCD_SetEncode(ENCODE_UTF8);
-                    ModifyParam(MS_MONITOR_UART);       /* 参数修改界面，阻塞 */
+                    ModifyParam(MODIFY_PARAM_UART_MON);       /* 参数修改界面，阻塞 */
                     LCD_SetEncode(ENCODE_GBK);
                     fRefresh = 1;
                     fInit = 1;

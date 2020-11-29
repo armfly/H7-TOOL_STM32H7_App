@@ -1,3 +1,21 @@
+/*
+*********************************************************************************************************
+*
+*    模块名称 : lua接口API
+*    文件名称 : lua_if.c
+*    版    本 : V1.0
+*    说    明 : 
+*    修改记录 :
+*        版本号  日期        作者     说明
+*        V1.0    2019-10-06 armfly  正式发布
+*
+*    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
+*
+*********************************************************************************************************
+*/
+
+#include "includes.h"
+
 #include "lua_if.h"
 #include "bsp.h"
 #include "param.h"
@@ -164,8 +182,8 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
             }
         }        
     }
-        
-    if (g_MainStatus == MS_PROG_WORK)
+    else  
+    //if (g_MainStatus == MS_PROG_WORK)  在其他状态按C键退出
     {
         uint8_t ucKeyCode;
 
@@ -1007,7 +1025,79 @@ uint32_t lua_GetVarUint32(const char *_VarName, uint32_t _Default)
 
     return data;        
 }
+
+/*
+*********************************************************************************************************
+*    函 数 名: lua_ReadDev
+*    功能说明: 通用外设读。 ok, temp = read("DS18B20", 1)
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int lua_ReadDev(lua_State* L)
+{
+    const char *device;
+    size_t len;    
+    
+    if (lua_type(L, 1) == LUA_TSTRING)              /* 判断第1个参数 */
+    {        
+        device = luaL_checklstring(L, 1, &len);     /* 1是参数的位置， len是string的长度 */     
+    }
+    
+    if (strcmp(device, "DS18B20") == 0)  /* re,temp = read("DS18B20", 0) */
+    {
+        float ftemp;
+        uint8_t ch;
         
+        if (lua_type(L, 2) == LUA_TNUMBER)          /* 判断第2个参数, 通道 */
+        {
+            ch = luaL_checknumber(L, 2);
+        }
+        else
+        {
+            ch = 0;
+        }
+    
+        if (DS18B20_ReadTemp(ch, &ftemp) == 1)  /* 正常返回温度值 */
+        {
+            lua_pushnumber(L, 1);
+            lua_pushnumber(L, ftemp);            
+            return 2;
+        }
+        else
+        {
+            lua_pushnumber(L, 0); 
+            return 1;
+        }
+    }  
+    return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: lua_WriteDev
+*    功能说明: 通用外设写 
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static int lua_WriteDev(lua_State* L)
+{
+    const char *device;
+    size_t len;    
+    
+    if (lua_type(L, 1) == LUA_TSTRING)              /* 判断第1个参数 */
+    {        
+        device = luaL_checklstring(L, 1, &len);     /* 1是参数的位置， len是string的长度 */     
+    }
+    
+    if (strcmp(device, "DS18B20") == 0)  /* re,temp = read("DS18B20", 0) */
+    {
+        ;
+    }  
+    return 0;
+}
+
 /*
 *********************************************************************************************************
 *    函 数 名: lua_RegisterFunc
@@ -1039,7 +1129,10 @@ static void lua_RegisterFunc(void)
     
     lua_register(g_Lua, "get_rng", get_rng);
     lua_register(g_Lua, "crc32_stm32", crc32_stm32);
-    
+
+    /* 读写2个通用函数 */
+    lua_register(g_Lua, "read", lua_ReadDev);
+    lua_register(g_Lua, "write", lua_WriteDev);
     
     /* 注册接口函数 */
     lua_gpio_RegisterFun();    

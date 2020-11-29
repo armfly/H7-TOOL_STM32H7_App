@@ -13,8 +13,7 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 #include "lcd_menu.h"
 #include "file_lib.h"
 #include "lua_if.h"

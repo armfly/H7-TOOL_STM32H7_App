@@ -13,13 +13,8 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
-#include "lcd_menu.h"
-#include "file_lib.h"
-#include "lua_if.h"
-#include "prog_if.h"
-#include "modify_param.h"
+#include "includes.h"
+
 
 /* 多行文本框 */
 #define TITLE_X     0
@@ -183,6 +178,10 @@ void UartReciveNew2(uint8_t _byte)
     
     if (g_tParam.UartMonHex == 0)   /* ASCII格式显示 */
     {
+        if (_byte < ' ')
+        {
+            _byte = ' ';    /* 不可见字符转换为空格 */
+        }
         LCD_MemoAddChar(&g_RecMemo, _byte);  
     }
     else    /* HEX格式显示 */
@@ -396,7 +395,7 @@ void status_MonitorUart(void)
                     else if (g_tMenuUart.Cursor == 3)    /* 设置串口参数 */
                     {
                         LCD_SetEncode(ENCODE_UTF8);
-                        ModifyParam(MS_MONITOR_UART);       /* 参数修改界面，阻塞 */
+                        ModifyParam(MODIFY_PARAM_UART_MON);       /* 参数修改界面，阻塞 */
                         LCD_SetEncode(ENCODE_GBK);       
                         fInit = 1;                        
                     }

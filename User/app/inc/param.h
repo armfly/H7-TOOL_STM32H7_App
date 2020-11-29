@@ -25,7 +25,7 @@
 #define CALIB_VER           0x00000201  /* 校准参数版本 200 */
 
 /* 暂未启用 程序缓存 */
-#define APP_BUF_ADDR 0x08000000 + 1 * 1024 * 1024
+#define APP_BUF_ADDR        0x08000000 + 1 * 1024 * 1024
 
 /* 校准参数结构，两点校准， 通用校准参数，ADC */
 typedef struct
@@ -117,6 +117,11 @@ typedef struct
     uint8_t UartMonHex;         /* 串口监视，按HEX显示 */
     uint8_t UartMonTimeStamp;   /* 串口监视，加上时间戳 */
     uint8_t UartMonProxy;       /* 串口监视，协议 */
+    
+    /* DAP-Link相关参数 */
+    uint8_t DAP_TVCCVolt;       /* DAP=Link TVCC设置 0-关闭  0-50 表示 0-5.0V */
+    uint8_t DAP_BeepEn;         /* DAP=Link 提示音使能 0:关闭 1:烧录完毕鸣叫 */
+    uint8_t DAP_Sn;             /* DAP-Link 序号，用于驱动识别: */
     
 } PARAM_T;
 

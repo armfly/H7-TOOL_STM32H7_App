@@ -13,8 +13,7 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 #include "usbd_user.h"
 
 #define DATE_X      5

@@ -475,12 +475,6 @@ static void TIM_Config(void)
 	/* ##  Enable TIM peripherals Clock ####################################### */
 	TIMx_CLK_ENABLE();
 
-	/* ##  Configure the NVIC for TIMx ######################################## */
-	/* Set Interrupt Group Priority */
-	HAL_NVIC_SetPriority(TIMx_IRQn, 6, 0);
-
-	/* Enable the TIMx global Interrupt */
-	HAL_NVIC_EnableIRQ(TIMx_IRQn);		
 
 	/* Set TIMx instance */
 	TimHandle.Instance = TIMx;
@@ -507,6 +501,14 @@ static void TIM_Config(void)
 		/* Starting Error */
 		ERROR_HANDLER();
 	}
+
+    /* 2020-11-27 V1.36 移动到后面，在前面从DAP跳转时会死机 */
+	/* ##  Configure the NVIC for TIMx ######################################## */
+	/* Set Interrupt Group Priority */
+	HAL_NVIC_SetPriority(TIMx_IRQn, 6, 0);
+
+	/* Enable the TIMx global Interrupt */
+	HAL_NVIC_EnableIRQ(TIMx_IRQn);		    
 }
 
 /*

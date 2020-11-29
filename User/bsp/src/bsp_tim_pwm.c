@@ -413,6 +413,40 @@ void bsp_SetTIMforInt(TIM_TypeDef* TIMx, uint32_t _ulFreq, uint8_t _PreemptionPr
     uint16_t usPrescaler;
     uint32_t uiTIMxCLK;
     
+    if (_ulFreq == 0)
+    {
+        bsp_RCC_TIM_Disable(TIMx);
+        
+        
+        __HAL_TIM_ENABLE_IT(&TimHandle, TIM_IT_UPDATE);
+
+        /* 配置TIM定时更新中断 (Update) */
+        {
+            uint8_t irq = 0;    /* 中断号, 定义在 stm32h7xx.h */
+
+            if (TIMx == TIM1) irq = TIM1_UP_IRQn;
+            else if (TIMx == TIM2) irq = TIM2_IRQn;
+            else if (TIMx == TIM3) irq = TIM3_IRQn;
+            else if (TIMx == TIM4) irq = TIM4_IRQn;
+            else if (TIMx == TIM5) irq = TIM5_IRQn;
+            else if (TIMx == TIM6) irq = TIM6_DAC_IRQn;
+            else if (TIMx == TIM7) irq = TIM7_IRQn;
+            else if (TIMx == TIM8) irq = TIM8_UP_TIM13_IRQn;
+            else if (TIMx == TIM12) irq = TIM8_BRK_TIM12_IRQn;
+            else if (TIMx == TIM13) irq = TIM8_UP_TIM13_IRQn;
+            else if (TIMx == TIM14) irq = TIM8_TRG_COM_TIM14_IRQn;
+            else if (TIMx == TIM15) irq = TIM15_IRQn;
+            else if (TIMx == TIM16) irq = TIM16_IRQn;
+            else if (TIMx == TIM17) irq = TIM17_IRQn;
+            else
+            {
+                Error_Handler(__FILE__, __LINE__);
+            }   
+            HAL_NVIC_DisableIRQ((IRQn_Type)irq);     
+        }        
+        return;
+    }
+    
     /* 使能TIM时钟 */
     bsp_RCC_TIM_Enable(TIMx);
     

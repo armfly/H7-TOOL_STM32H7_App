@@ -14,11 +14,8 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "file_lib.h"
-#include "lcd_menu.h"
-#include "main.h"
-#include "prog_if.h"
+
+#include "includes.h"
 #include "md5.h"
 
 /*

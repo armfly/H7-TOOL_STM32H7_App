@@ -351,6 +351,12 @@ void EIO_D0_Config(EIO_SELECT_E _mode)
         GPIO_INIT_UART7(GPIOA, GPIO_PIN_15);        /* 配置GPIO为UART7功能 */
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_0);         /* 配置为GPIO 输入功能 */
     }
+    else if (_mode == ES_PROG_SPI_FLASH)
+    {
+        GPIO_DIR_SET_OUT(GPIO_D0_DIR, PIN_D0_DIR);  /* 设置为输出方向  - 先执行 */
+        GPIO_INIT_INPUT(GPIOA, GPIO_PIN_15);        /* 配置为GPIO 输入功能 */
+        GPIO_INIT_OUT_PP(GPIOI, GPIO_PIN_0);        /* 配置为GPIO 输出功能 */        
+    }
     else
     {
         g_tVar.GpioMode[0] = 0;
@@ -405,6 +411,13 @@ void EIO_D1_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_0);         /* 配置为GPIO 输入功能 */
         GPIO_DIR_SET_IN(GPIO_D1_DIR, PIN_D1_DIR);   /* 设置为输入方向 - 后执行 */        
     }    
+    else if (_mode == ES_PROG_SPI_FLASH)            /* PD15 输出 */
+    {
+        GPIO_DIR_SET_OUT(GPIO_D1_DIR, PIN_D1_DIR);  /* 设置为输出方向 - 先执行 */
+        GPIO_INIT_INPUT(GPIOA, GPIO_PIN_8);         /* 配置为GPIO输入功能 */
+        GPIO_INIT_INPUT(GPIOH, GPIO_PIN_10);        /* 配置为GPIO输入功能 */
+        GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_15);        /* 配置为GPIO输出功能 */
+    }    
     else
     {
         g_tVar.GpioMode[1] = 0;
@@ -420,8 +433,8 @@ void EIO_D1_Config(EIO_SELECT_E _mode)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-#define GPIO_D2_DIR GPIOD
-#define PIN_D2_DIR GPIO_PIN_9
+#define GPIO_D2_DIR     GPIOD
+#define PIN_D2_DIR      GPIO_PIN_9
 void EIO_D2_Config(EIO_SELECT_E _mode)
 {
     /*
@@ -458,6 +471,13 @@ void EIO_D2_Config(EIO_SELECT_E _mode)
         GPIO_DIR_SET_OUT(GPIO_D2_DIR, PIN_D2_DIR);  /* 设置为输出方向 - 先执行 */
         GPIO_INIT_INPUT(GPIOB, GPIO_PIN_7);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_6);         /* 配置为GPIO AF功能 */
+    }  
+    else if (_mode == ES_PROG_SPI_FLASH)    /* MOSI_1 = PD0(写时) PE6(读时) */
+    {
+        GPIO_DIR_SET_OUT(GPIO_D2_DIR, PIN_D2_DIR);  /* 设置为输出方向 - 先执行 */
+        GPIO_INIT_INPUT(GPIOB, GPIO_PIN_7);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_6);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_0);        /* 配置为GPIO 输出功能 */
     }    
     else
     {
@@ -512,7 +532,14 @@ void EIO_D3_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOH, GPIO_PIN_11);        /* 配置为GPIO 输入功能 */
         GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_5);         /* 配置为GPIO AF */
         GPIO_DIR_SET_IN(GPIO_D3_DIR, PIN_D3_DIR);   /* 设置为输入方向 - 后执行 */
-    }   
+    }  
+    else if (_mode == ES_PROG_SPI_FLASH)    /* MOSI_2 = PD1(写时) PE5(读时) */
+    {
+        GPIO_DIR_SET_OUT(GPIO_D3_DIR, PIN_D3_DIR);  /* 设置为输出方向 - 先执行 */
+        GPIO_INIT_INPUT(GPIOH, GPIO_PIN_11);        /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_5);        /* 配置为GPIO 输入功能 */
+        GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_1);        /* 配置为GPIO 输出功能 */                
+    }
     else
     {
         g_tVar.GpioMode[3] = 0;
@@ -560,6 +587,12 @@ void EIO_D4_Config(EIO_SELECT_E _mode)
         GPIO_DIR_SET_OUT(GPIO_D4_DIR, PIN_D4_DIR);  /* 设置为输出方向 - 先执行  */
         GPIO_INIT_INPUT(GPIOH, GPIO_PIN_12);        /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOE, GPIO_PIN_4);         /* 配置为GPIO 输入功能 */
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /* MISO_1 = PE4 */
+    {
+        GPIO_INIT_INPUT(GPIOH, GPIO_PIN_12);        /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_4);         /* 配置为GPIO 输入功能 */
+        GPIO_DIR_SET_IN(GPIO_D4_DIR, PIN_D4_DIR);   /* 设置为输入方向 - 后执行 */        
     }
     else
     {
@@ -614,7 +647,13 @@ void EIO_D5_Config(EIO_SELECT_E _mode)
         GPIO_DIR_SET_OUT(GPIO_D5_DIR, PIN_D5_DIR);  /* 设置为输出方向 - 先执行  */
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_AF_PP(GPIOE, GPIO_PIN_2);         /* 配置为GPIO 为AF给 */
-    }    
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /* MISO_2 = PE2 */
+    {
+        GPIO_INIT_INPUT(GPIOI, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_2);         /* 配置为GPIO 输入功能 */
+        GPIO_DIR_SET_IN(GPIO_D5_DIR, PIN_D5_DIR);   /* 设置为输入方向 - 后执行 */
+    }
     else
     {
         g_tVar.GpioMode[5] = 0;
@@ -669,6 +708,13 @@ void EIO_D6_Config(EIO_SELECT_E _mode)
         GPIO_DIR_SET_OUT(GPIO_D6_DIR, PIN_D6_DIR);  /* 设置为输出方向 - 先执行  */
         GPIO_INIT_INPUT(GPIOA, GPIO_PIN_0);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOD, GPIO_PIN_3);         /* 配置为GPIO 输入功能 */
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /*  MOSI_3 = PD3(写时) PE9(读时) */
+    {
+        GPIO_DIR_SET_OUT(GPIO_D6_DIR, PIN_D6_DIR);  /* 设置为输出方向 - 先执行  */
+        GPIO_INIT_INPUT(GPIOA, GPIO_PIN_0);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_3);        /* 配置为GPIO 输出功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_9);
     }
     else
     {
@@ -730,6 +776,13 @@ void EIO_D7_Config(EIO_SELECT_E _mode)
     {
         GPIO_INIT_OUT_OD(GPIOF, GPIO_PIN_0);        /* 配置为GPIO 输出开漏功能 */
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_6);         /* 配置为GPIO 输入功能 */
+        GPIO_DIR_SET_IN(GPIO_D7_DIR, PIN_D7_DIR);   /* 设置为输入方向 - 后执行 */        
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /*  MISO_3 = PE10 */
+    {
+        GPIO_INIT_INPUT(GPIOF, GPIO_PIN_0);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOI, GPIO_PIN_6);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_10);        /* 配置为GPIO 输入功能 */
         GPIO_DIR_SET_IN(GPIO_D7_DIR, PIN_D7_DIR);   /* 设置为输入方向 - 后执行 */        
     }
     else
@@ -805,6 +858,14 @@ void EIO_D8_Config(EIO_SELECT_E _mode)
         GPIO_INIT_INPUT(GPIOI, GPIO_PIN_3);         /* 配置为GPIO 输入功能 */
         GPIO_INIT_INPUT(GPIOE, GPIO_PIN_11);        /* 配置为GPIO 输入功能 */
         GPIO_INIT_FMC(GPIOD, GPIO_PIN_4);           /* 配置为FMC功能 NOE */
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /*  MOSI_4 = PD4(写时) PE11(读时) */
+    {
+        GPIO_DIR_SET_OUT(GPIO_D8_DIR, PIN_D8_DIR);  /* 设置为输出方向 - 先执行  */
+        
+        GPIO_INIT_OUT_PP(GPIOD, GPIO_PIN_4);    /* 配置为GPIO 输出功能 */
+        GPIO_INIT_INPUT(GPIOI, GPIO_PIN_3);     /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_3);     /* 配置为GPIO 输入功能 */         
     }
     else
     {
@@ -882,6 +943,14 @@ void EIO_D9_Config(EIO_SELECT_E _mode)
         
         GPIO_INIT_INPUT(GPIOD, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
         GPIO_DIR_SET_IN(GPIO_D9_DIR, PIN_D9_DIR);   /* 设置为输入方向 - 后执行 */
+    }
+    else if (_mode == ES_PROG_SPI_FLASH)    /*   MISO_4 = PE12(读时) */
+    {
+        GPIO_INIT_INPUT(GPIOE, GPIO_PIN_12);        /* 配置为GPIO 输入功能 */
+
+        GPIO_INIT_INPUT(GPIOF, GPIO_PIN_1);         /* 配置为GPIO 输入功能 */
+        GPIO_INIT_INPUT(GPIOD, GPIO_PIN_5);         /* 配置为GPIO 输入功能 */
+        GPIO_DIR_SET_IN(GPIO_D9_DIR, PIN_D9_DIR);   /* 设置为输入方向 - 后执行 */   
     }
     else
     {

@@ -14,8 +14,7 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 
 static void DispCurrentVolt(void);
 static void AutoCurrentRange(void);

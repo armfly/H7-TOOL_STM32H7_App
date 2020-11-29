@@ -13,8 +13,7 @@
 *
 *********************************************************************************************************
 */
-#include "bsp.h"
-#include "main.h"
+#include "includes.h"
 
 static void DispResistor(void);
 

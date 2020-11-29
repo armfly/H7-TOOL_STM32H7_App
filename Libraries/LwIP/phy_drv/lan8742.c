@@ -182,7 +182,9 @@ int32_t  LAN8742_RegisterBusIO(lan8742_Object_t *pObj, lan8742_IOCtx_t *ioctx)
        }
      }
    }
-      
+   
+   /* 这里会等待2秒 */
+   #if 0
    if(status == LAN8742_STATUS_OK)
    {
      tickstart =  pObj->IO.GetTick();
@@ -193,6 +195,9 @@ int32_t  LAN8742_RegisterBusIO(lan8742_Object_t *pObj, lan8742_IOCtx_t *ioctx)
      }
      pObj->Is_Initialized = 1;
    }
+   #else
+       pObj->Is_Initialized = 1;
+   #endif
    
    return status;
  }

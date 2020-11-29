@@ -611,7 +611,7 @@ Status LEDs. In detail the operation of Hardware I/O and LED pins are enabled an
  - LED output pins are enabled and LEDs are turned off.
 */
 extern void bsp_InitSPI2_Fast(void);
-static __inline void DAP_SETUP(void)
+__inline void DAP_SETUP(void)
 {
 //    /* Enable port clock */
 //    __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -637,7 +637,9 @@ static __inline void DAP_SETUP(void)
     EIO_D6_Config(ES_GPIO_OUT);        /* SWCLK - 输出 */
     EIO_D8_Config(ES_GPIO_OUT);        /* SWDIO - 输出 */
     
-    EIO_D2_Config(ES_GPIO_OUT);        /* 测试引脚 - 输出 */
+    //EIO_D2_Config(ES_GPIO_OUT);        /* 测试引脚 - 输出 */
+    
+    //DAP_SETUP
     
     #if SPI_MODE_ENABLE == 1
         bsp_InitSPI2_Fast();

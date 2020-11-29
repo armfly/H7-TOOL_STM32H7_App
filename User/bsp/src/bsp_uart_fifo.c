@@ -238,6 +238,14 @@ void bsp_InitUart(void)
     RS485_InitTXE(); /* 配置RS485芯片的发送使能硬件，配置为推挽输出 */
 }
 
+
+void bsp_DeInitUart(void)
+{
+    HAL_UART_DeInit(&(g_tUart1.huart));
+    HAL_UART_DeInit(&(g_tUart4.huart));   
+    HAL_UART_DeInit(&(g_tUart7.huart));   
+}
+
 /*
 *********************************************************************************************************
 *    函 数 名: ComToUart

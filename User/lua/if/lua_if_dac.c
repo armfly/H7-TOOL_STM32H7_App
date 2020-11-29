@@ -50,7 +50,7 @@ static int lua_PowerOnDac(lua_State* L)
 {    
     WriteRegValue_06H(REG03_DAC_WAVE_TYPE, 0);    /* 直流 */
     WriteRegValue_06H(REG03_DAC_WAVE_START, 1);
-    return 1;
+    return 0;
 }
 
 /*
@@ -65,7 +65,7 @@ static int lua_PowerOffDac(lua_State* L)
 {    
     WriteRegValue_06H(REG03_DAC_WAVE_TYPE, 0);    /* 直流 */
     WriteRegValue_06H(REG03_DAC_WAVE_START, 0);
-    return 1;
+    return 0;
 }
 
 /*
@@ -87,7 +87,7 @@ static int lua_WriteDac(lua_State* L)
     
     WriteRegValue_06H(REG03_OUT_VOLT_DAC, value);
     
-    return 1;
+    return 0;
 }
 
 /*
@@ -109,7 +109,7 @@ static int lua_WriteVolt(lua_State* L)
     
     WriteRegValue_06H(REG03_OUT_VOLT_MV, value);
     
-    return 1;
+    return 0;
 }
 
 /*
@@ -132,7 +132,7 @@ static int lua_WriteCurr(lua_State* L)
     
     WriteRegValue_06H(REG03_OUT_CURR_UA, value);
     
-    return 1;
+    return 0;
 }
 
 /*
@@ -154,7 +154,7 @@ static int lua_WriteTvccDac(lua_State* L)
     
     WriteRegValue_06H(REG03_OUT_TVCC_DAC, value);
     
-    return 1;
+    return 0;
 }
 
 /*
@@ -176,7 +176,7 @@ static int lua_WriteTvccVolt(lua_State* L)
     
     WriteRegValue_06H(REG03_OUT_TVCC_MV, value);
     
-    return 1;
+    return 0;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/
