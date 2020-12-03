@@ -83,7 +83,7 @@ void bsp_Init(void)
     HC595_InitHard();   /* 配置示波器模块上的GPIO芯片 */
 
     bsp_InitDAC1();     /* 配置DAC引脚 */
-    bsp_InitTVCC();     /* TVCC控制引脚 */
+   //bsp_InitTVCC();     /* TVCC控制引脚 -- 放到后面读完参数后设置 */
 
     bsp_InitMCP4725();  /* 示波器偏置电压 */
 

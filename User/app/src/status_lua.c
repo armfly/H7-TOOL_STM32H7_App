@@ -95,6 +95,8 @@ CMD_LIST_T tBtnList[16];
 char g_OutText[4 * 1024] = {0}; /* 最多支持4K字节文本缓存 */
 MEMO_T g_LuaMemo = {0};
 
+uint8_t g_LuaSubStatus = 0;     /* 0表示命令行界面  1表示GUI界面 */
+
 /* 
 char s_lua_prog_buf[LUA_PROG_LEN_MAX + 1];
 uint32_t s_lua_prog_len;
@@ -158,181 +160,203 @@ void FindBtnNoteCmd(void)
 
 void status_LuaRun(void)
 {
-    uint8_t ucKeyCode; /* 按键代码 */
-    uint8_t fRefresh;
-    FONT_T tFontBtn, tFontMemo;
-    uint8_t cursor = 0;
-    BUTTON_T btn1, btn2, btn3, btn4, btn5, btn6;
+    lua_DownLoadFile(g_tFileList.Path);  /* 重新初始化lua环境，并装载lua文件到内存，不执行 */  
     
-    DispHeader("Lua小程序");
-    
+    /* --GUIMODE=1   --用于识别GUI程序还是print程序 */
+    if (memcmp(s_lua_prog_buf, "--GUIMODE=1", 11) == 0)
     {
-        g_LuaMemo.Left = MEMO_X;
-        g_LuaMemo.Top = MEMO_Y;
-        g_LuaMemo.Height = MEMO_H;
-        g_LuaMemo.Width = MEMO_W;
-        g_LuaMemo.Font = &tFontMemo;
-        //g_LuaMemo.Color = CL_WHITE;
-        g_LuaMemo.Text = g_OutText;
-        g_LuaMemo.MaxLen = sizeof(g_OutText);
-        g_LuaMemo.LineCount = 0;        
-        g_LuaMemo.WordWrap = 0;
-        g_LuaMemo.LineOffset = 0;
-        
-        LCD_InitMemo(&g_LuaMemo);
-        LCD_DrawMemo(&g_LuaMemo);
+        g_LuaSubStatus = 1;
+    }
+    else
+    {
+        g_LuaSubStatus = 0;
     }
     
-    bsp_Idle();
-
-    /* 设置字体参数 */
+    if (g_LuaSubStatus == 1)    /* GUI界面 --需要是死循环 */
     {
-        tFontBtn.FontCode = FC_ST_16;           /* 字体代码 16点阵 */
-        tFontBtn.FrontColor = INFO_NAME_COLOR;  /* 字体颜色 */
-        tFontBtn.BackColor = CL_MASK;           /* 文字背景颜色 */
-        tFontBtn.Space = 0;                     /* 文字间距，单位 = 像素 */
+        lua_RunLuaProg();   /* 执行lua -阻塞 */
         
-        tFontMemo.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-        tFontMemo.FrontColor = CL_WHITE;        /* 字体颜色 */
-        tFontMemo.BackColor = CL_MASK;          /* 文字背景颜色 */
-        tFontMemo.Space = 0;                    /* 文字间距，单位 = 像素 */                
-    }     
-    
-    lua_DownLoadFile(g_tFileList.Path);    
-    GetChipTypeFromLua(g_Lua);  /* 从lua中解析芯片类型 */
-    
-    /* 从lua文件中解析按钮名字和程序语句 */
-    FindBtnNoteCmd();
-    
-    fRefresh = 1;
-    while (g_MainStatus == MS_LUA_EXEC_FILE)
+        while(bsp_GetKey());
+        g_MainStatus = MS_LUA_SELECT_FILE;               
+    }
+    else    /* 命令行界面 -必须是非阻塞的 */
     {
-        if (fRefresh) /* 刷新整个界面 */
+        uint8_t ucKeyCode; /* 按键代码 */
+        uint8_t fRefresh;
+        FONT_T tFontBtn, tFontMemo;
+        uint8_t cursor = 0;
+        BUTTON_T btn1, btn2, btn3, btn4, btn5, btn6;
+                    
+        DispHeader("Lua小程序");
+        
         {
-            fRefresh = 0;
-
-			{
-				btn1.Left = BTN1_X;
-				btn1.Top = BTN1_Y;
-				btn1.Height = BTN1_H;
-				btn1.Width = BTN1_W;
-				btn1.pCaption = tBtnList[0].Note;
-				btn1.Font =  &tFontBtn;
-				btn1.Focus = 0;
-
-				btn2.Left = BTN2_X;
-				btn2.Top = BTN2_Y;
-				btn2.Height = BTN2_H;
-				btn2.Width = BTN2_W;
-				btn2.pCaption = tBtnList[1].Note;
-				btn2.Font =  &tFontBtn;
-				btn2.Focus = 0;
-
-				btn3.Left = BTN3_X;
-				btn3.Top = BTN3_Y;
-				btn3.Height = BTN3_H;
-				btn3.Width = BTN3_W;
-				btn3.pCaption = tBtnList[2].Note;
-				btn3.Font =  &tFontBtn;
-				btn3.Focus = 0;
-
-				btn4.Left = BTN4_X;
-				btn4.Top = BTN4_Y;
-				btn4.Height = BTN4_H;
-				btn4.Width = BTN4_W;
-				btn4.pCaption = tBtnList[3].Note;
-				btn4.Font =  &tFontBtn;
-				btn4.Focus = 0;
-                
-				btn5.Left = BTN5_X;
-				btn5.Top = BTN5_Y;
-				btn5.Height = BTN5_H;
-				btn5.Width = BTN5_W;
-				btn5.pCaption = tBtnList[4].Note;
-				btn5.Font =  &tFontBtn;
-				btn5.Focus = 0;
-
-				btn6.Left = BTN6_X;
-				btn6.Top = BTN6_Y;
-				btn6.Height = BTN6_H;
-				btn6.Width = BTN6_W;
-				btn6.pCaption = tBtnList[5].Note;
-				btn6.Font =  &tFontBtn;
-				btn6.Focus = 0;
-				
-				if (cursor == 0) btn1.Focus = 1;
-				else if (cursor == 1) btn2.Focus = 1;
-				else if (cursor == 2) btn3.Focus = 1;
-                else if (cursor == 3) btn4.Focus = 1;
-                else if (cursor == 4) btn5.Focus = 1;
-                else if (cursor == 5) btn6.Focus = 1;
-				
-                LCD_SetEncode(ENCODE_GBK);  /* 按钮文字是GBK编码 */
-                
-				LCD_DrawButton(&btn1);
-				LCD_DrawButton(&btn2);
-				LCD_DrawButton(&btn3);
-                LCD_DrawButton(&btn4);
-                LCD_DrawButton(&btn5);
-                LCD_DrawButton(&btn6);
-                
-                LCD_SetEncode(ENCODE_UTF8); /* 还原UTF8编码 */
-			} 			          
-        }       
+            g_LuaMemo.Left = MEMO_X;
+            g_LuaMemo.Top = MEMO_Y;
+            g_LuaMemo.Height = MEMO_H;
+            g_LuaMemo.Width = MEMO_W;
+            g_LuaMemo.Font = &tFontMemo;
+            //g_LuaMemo.Color = CL_WHITE;
+            g_LuaMemo.Text = g_OutText;
+            g_LuaMemo.MaxLen = sizeof(g_OutText);
+            g_LuaMemo.LineCount = 0;        
+            g_LuaMemo.WordWrap = 0;
+            g_LuaMemo.LineOffset = 0;
+            
+            LCD_InitMemo(&g_LuaMemo);
+            LCD_DrawMemo(&g_LuaMemo);
+        }
         
         bsp_Idle();
-        
-        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
-        if (ucKeyCode != KEY_NONE)
+
+        /* 设置字体参数 */
         {
-            /* 有键按下 */
-            switch (ucKeyCode)
+            tFontBtn.FontCode = FC_ST_16;           /* 字体代码 16点阵 */
+            tFontBtn.FrontColor = INFO_NAME_COLOR;  /* 字体颜色 */
+            tFontBtn.BackColor = CL_MASK;           /* 文字背景颜色 */
+            tFontBtn.Space = 0;                     /* 文字间距，单位 = 像素 */
+            
+            tFontMemo.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
+            tFontMemo.FrontColor = CL_WHITE;        /* 字体颜色 */
+            tFontMemo.BackColor = CL_MASK;          /* 文字背景颜色 */
+            tFontMemo.Space = 0;                    /* 文字间距，单位 = 像素 */                
+        }     
+        
+        /* 从lua文件中解析按钮名字和程序语句 */
+        FindBtnNoteCmd();
+        
+        lua_RunLuaProg();   /* 执行lua */    
+        GetChipTypeFromLua(g_Lua);                  /* 从lua中解析芯片类型 */        
+        
+        fRefresh = 1;
+        while (g_MainStatus == MS_LUA_EXEC_FILE)
+        {
+            if (fRefresh) /* 刷新整个界面 */
             {
-                case KEY_UP_S:          /* S键 上 */
-                    if (++cursor == BTN_NUM)
-                    {
-                        cursor = 0;
-                    }                                      
-                    fRefresh = 1;
-                    break;
+                fRefresh = 0;
 
-                case KEY_LONG_DOWN_S:   /* S键 长按 */ 
-                    if (cursor > 0)
-                    {
-                        cursor--;
-                    }             
-                    else
-                    {
-                        cursor = BTN_NUM - 1;
-                    }
-                    fRefresh = 1;                    
-                    break;
+                {
+                    btn1.Left = BTN1_X;
+                    btn1.Top = BTN1_Y;
+                    btn1.Height = BTN1_H;
+                    btn1.Width = BTN1_W;
+                    btn1.pCaption = tBtnList[0].Note;
+                    btn1.Font =  &tFontBtn;
+                    btn1.Focus = 0;
 
-                case KEY_UP_C:              /* C键 下 */
-                    if (cursor < 6)
-                    {
-                        if (strlen(tBtnList[cursor].Cmd) > 0)
-                        {                            
-                            LCD_MemoClear(&g_LuaMemo);
-                            
-                            DispHeaderStr("Lua正在运行...");
-                            
-                            lua_do(tBtnList[cursor].Cmd);
-                            
-                            DispHeaderStr("Lua小程序");
+                    btn2.Left = BTN2_X;
+                    btn2.Top = BTN2_Y;
+                    btn2.Height = BTN2_H;
+                    btn2.Width = BTN2_W;
+                    btn2.pCaption = tBtnList[1].Note;
+                    btn2.Font =  &tFontBtn;
+                    btn2.Focus = 0;
+
+                    btn3.Left = BTN3_X;
+                    btn3.Top = BTN3_Y;
+                    btn3.Height = BTN3_H;
+                    btn3.Width = BTN3_W;
+                    btn3.pCaption = tBtnList[2].Note;
+                    btn3.Font =  &tFontBtn;
+                    btn3.Focus = 0;
+
+                    btn4.Left = BTN4_X;
+                    btn4.Top = BTN4_Y;
+                    btn4.Height = BTN4_H;
+                    btn4.Width = BTN4_W;
+                    btn4.pCaption = tBtnList[3].Note;
+                    btn4.Font =  &tFontBtn;
+                    btn4.Focus = 0;
+                    
+                    btn5.Left = BTN5_X;
+                    btn5.Top = BTN5_Y;
+                    btn5.Height = BTN5_H;
+                    btn5.Width = BTN5_W;
+                    btn5.pCaption = tBtnList[4].Note;
+                    btn5.Font =  &tFontBtn;
+                    btn5.Focus = 0;
+
+                    btn6.Left = BTN6_X;
+                    btn6.Top = BTN6_Y;
+                    btn6.Height = BTN6_H;
+                    btn6.Width = BTN6_W;
+                    btn6.pCaption = tBtnList[5].Note;
+                    btn6.Font =  &tFontBtn;
+                    btn6.Focus = 0;
+                    
+                    if (cursor == 0) btn1.Focus = 1;
+                    else if (cursor == 1) btn2.Focus = 1;
+                    else if (cursor == 2) btn3.Focus = 1;
+                    else if (cursor == 3) btn4.Focus = 1;
+                    else if (cursor == 4) btn5.Focus = 1;
+                    else if (cursor == 5) btn6.Focus = 1;
+                    
+                    LCD_SetEncode(ENCODE_GBK);  /* 按钮文字是GBK编码 */
+                    
+                    LCD_DrawButton(&btn1);
+                    LCD_DrawButton(&btn2);
+                    LCD_DrawButton(&btn3);
+                    LCD_DrawButton(&btn4);
+                    LCD_DrawButton(&btn5);
+                    LCD_DrawButton(&btn6);
+                    
+                    LCD_SetEncode(ENCODE_UTF8); /* 还原UTF8编码 */
+                } 			          
+            }       
+            
+            bsp_Idle();
+            
+            ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+            if (ucKeyCode != KEY_NONE)
+            {
+                /* 有键按下 */
+                switch (ucKeyCode)
+                {
+                    case KEY_UP_S:          /* S键 上 */
+                        if (++cursor == BTN_NUM)
+                        {
+                            cursor = 0;
+                        }                                      
+                        fRefresh = 1;
+                        break;
+
+                    case KEY_LONG_DOWN_S:   /* S键 长按 */ 
+                        if (cursor > 0)
+                        {
+                            cursor--;
+                        }             
+                        else
+                        {
+                            cursor = BTN_NUM - 1;
                         }
-                    }	
-                    break;
+                        fRefresh = 1;                    
+                        break;
 
-                case KEY_LONG_DOWN_C:   /* C键长按 */
-                    g_MainStatus = MS_LUA_SELECT_FILE;
-                    break;
+                    case KEY_UP_C:              /* C键 下 */
+                        if (cursor < 6)
+                        {
+                            if (strlen(tBtnList[cursor].Cmd) > 0)
+                            {                            
+                                LCD_MemoClear(&g_LuaMemo);
+                                
+                                DispHeaderStr("Lua正在运行...");
+                                
+                                lua_do(tBtnList[cursor].Cmd);
+                                
+                                DispHeaderStr("Lua小程序");
+                            }
+                        }	
+                        break;
 
-                default:
-                    break;
+                    case KEY_LONG_DOWN_C:   /* C键长按 */
+                        g_MainStatus = MS_LUA_SELECT_FILE;
+                        break;
+
+                    default:
+                        break;
+                }
             }
-        }
-    } 
+        }         
+    }    
 }
 
 

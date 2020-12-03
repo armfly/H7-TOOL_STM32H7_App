@@ -258,12 +258,11 @@ void status_MonitorUart(void)
         LCD_InitMemo(&g_RecMemo);
         LCD_DrawMemo(&g_RecMemo);
     }
-    
-    
+        
     LCD_SetEncode(ENCODE_GBK);
     
-    /* V1.35, 检查串口参数 */
-    UartMonInitParam(g_MainStatus);  
+    /* V1.35, 检查串口参数 1.41 修正升级后串口缺省参数bug */
+    UartMonInitParam(MODIFY_PARAM_UART_MON);  
     UartMonCheckParam();    /* 检查参数 */
     
     s_Pause = 0;    

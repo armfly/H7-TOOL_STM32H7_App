@@ -146,6 +146,7 @@ void lua_DeInit(void)
 // 每行执行的钩子函数，用于终止lua程序
 extern MEMO_T g_LuaMemo;
 extern void PG_PrintText(char *_str);
+extern uint8_t g_LuaSubStatus;
 void LuaYeildHook(lua_State *_L, lua_Debug *ar)
 {
 	if (s_lua_quit == 1)
@@ -160,20 +161,24 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
         uint8_t ucKeyCode;
         
         /* 显示Lua程序print的字符串. 内容在bsp_uart_fif文件 fputc 函数填充的 */
-        if (g_LuaMemo.Refresh == 1)     
+        if (g_LuaSubStatus == 0)    /* 非GUI界面，才执行如下语句 */
         {
-            LCD_SetEncode(ENCODE_GBK);
-            LCD_DrawMemo(&g_LuaMemo);            
-            LCD_SetEncode(ENCODE_UTF8);
+            if (g_LuaMemo.Refresh == 1)     
+            {
+                LCD_SetEncode(ENCODE_GBK);
+                LCD_DrawMemo(&g_LuaMemo);            
+                LCD_SetEncode(ENCODE_UTF8);
+            }
         }
-
+        
         ucKeyCode = bsp_GetKey2(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
         if (ucKeyCode != KEY_NONE)
         {
             /* 有键按下 */
             switch (ucKeyCode)
             {            
-                case KEY_LONG_DOWN_C:   /* C键长按 - 终止Lua */
+                case KEY_LONG_DOWN_C:       /* C键长按 - 终止Lua */
+                    while(bsp_GetKey());    /* 清空lua运行期间的按键消息 */
                     lua_yield(_L, 0);   
                     break;
 
@@ -196,6 +201,8 @@ void LuaYeildHook(lua_State *_L, lua_Debug *ar)
                 case KEY_LONG_DOWN_C:   /* C键长按 - 终止Lua */
                     PG_PrintText("用户终止运行");
                     g_tProg.AutoStart = 0;
+                
+                    //while(bsp_GetKey());    /* 清空lua运行期间的按键消息 */
                     lua_yield(_L, 0); 
                     break;
 
@@ -260,8 +267,11 @@ void lua_DownLoadFile(char *_path)
     if (s_lua_prog_len > 0)
     {
         s_lua_prog_buf[s_lua_prog_len] = 0; /* 文件末尾补0 */    
-    }
-    
+    }    
+}
+
+void lua_RunLuaProg(void)
+{
     lua_do(s_lua_prog_buf);
 }
 
@@ -849,7 +859,7 @@ static int get_key(lua_State* L)
 {
     uint8_t key;
     
-    key = bsp_GetKey();
+    key = bsp_GetKey3();
     lua_pushnumber(L, key); 
     return 1;
 }
@@ -1106,6 +1116,7 @@ static int lua_WriteDev(lua_State* L)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern void lua_lcd_RegisterFun(void);
 static void lua_RegisterFunc(void)
 {
     //将指定的函数注册为Lua的全局函数变量，其中第一个字符串参数为Lua代码
@@ -1149,6 +1160,7 @@ static void lua_RegisterFunc(void)
     lua_reg_RegisterFun();
     lua_extio_RegisterFun();
     lua_uart_RegisterFun();
+    lua_lcd_RegisterFun();
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

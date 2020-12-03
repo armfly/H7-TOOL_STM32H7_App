@@ -82,7 +82,7 @@ static SOFT_TMR s_tTmr[TMR_COUNT] = {0};
     全局运行时间，单位1ms
     最长可以表示 24.85天，如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 */
-__IO int32_t g_iRunTime = 0;
+
 __IO uint64_t g_uiTimeHighWord = 0; 
 
 static __IO uint8_t g_ucEnableSystickISR = 0; /* 等待变量初始化 */
@@ -410,7 +410,7 @@ uint8_t bsp_CheckTimer(uint8_t _id)
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_GetRunTime
-*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 24.85天，
+*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 2147483647ms = 24.85天
 *              如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 *    形    参:  无
 *    返 回 值: CPU运行时间，单位1ms
@@ -418,20 +418,13 @@ uint8_t bsp_CheckTimer(uint8_t _id)
 */
 int32_t bsp_GetRunTime(void)
 {
-//    int32_t runtime;
-
-//    DISABLE_INT(); /* 关中断 */
-
-//    runtime = g_iRunTime;   /* 这个变量在Systick中断中被改写，因此需要关中断进行保护 */
-
-//    ENABLE_INT(); /* 开中断 */
-
-//    return runtime;
+    uint64_t tus;
+    int32_t ms;
     
-    /* 用硬件定时器计时后，4294秒，约 1.19小时 */
-    g_iRunTime = (TIM_HARD->CNT / 1000);
+    tus = (bsp_GetRunTimeUs() / 1000) & 0x7FFFFFFF;  /* 取低4字节 */
+    ms = tus;
     
-    return g_iRunTime;
+    return ms;
 }
 
 /*
@@ -444,20 +437,45 @@ int32_t bsp_GetRunTime(void)
 */
 int32_t bsp_CheckRunTime(int32_t _LastTime)
 {
+    uint64_t tus;    
     int32_t now_time;
     int32_t time_diff;
 
-//    DISABLE_INT();                 /* 关中断 */
-    now_time = TIM_HARD->CNT / 1000; 
-//    ENABLE_INT();                  /* 开中断 */
+    tus = bsp_GetRunTimeUs() / 1000;
 
+    now_time = tus & 0x7FFFFFFF;  /* 取低4字节 */
+    
     if (now_time >= _LastTime)
     {
         time_diff = now_time - _LastTime;
     }
     else
     {
-        time_diff = 0x7FFFFFFF - _LastTime + now_time;
+        time_diff = 0x7FFFFFFF - _LastTime + now_time + 1;
+    }
+
+    return time_diff;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: bsp_SubRunTime
+*    功能说明: 计算逝去时间， 差值范围 0 - 24.85天. 
+*    形    参:  _T0: 时间1， _T1: 比T0晚的时间
+*    返 回 值: 时间差，单位1ms
+*********************************************************************************************************
+*/
+int32_t bsp_SubRunTime(int32_t _T0, int32_t _T1)
+{
+    int32_t time_diff;
+
+    if (_T1 >= _T0)
+    {
+        time_diff = _T1 - _T0;
+    }
+    else
+    {
+        time_diff = 0x7FFFFFFF - _T0 + _T1 + 1;
     }
 
     return time_diff;
@@ -466,7 +484,7 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_GetRunTimeUs
-*    功能说明: 获取CPU运行时间，单位1ms。最长可以表示 24.85天，
+*    功能说明: 获取CPU运行时间，单位1us。最长可以表示 292471年
 *              如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 *    形    参:  无
 *    返 回 值: CPU运行时间，单位1us.  
@@ -474,14 +492,18 @@ int32_t bsp_CheckRunTime(int32_t _LastTime)
 */
 uint64_t bsp_GetRunTimeUs(void)
 {
-    return TIM_HARD->CNT + g_uiTimeHighWord;;
+    /* 
+        7FFF FFFF FFFF FFFF  = 9223372036854775807 us = 9223372036854 秒
+        = 2562047788 小时 = 106751991 天 = 292471年
+    */
+    return TIM_HARD->CNT + (g_uiTimeHighWord * 0x100000000);
 }
 
 /*
 *********************************************************************************************************
 *    函 数 名: bsp_CheckRunTimeUs
 *    功能说明: 计算当前运行时间和给定时刻之间的差值。处理了计数器循环。
-*    形    参:  _LastTime 上个时刻
+*    形    参:  _LastTime 过去的某个时刻
 *    返 回 值: 当前时间和过去时间的差值，单位1us
 *********************************************************************************************************
 */
@@ -490,7 +512,7 @@ int64_t bsp_CheckRunTimeUs(int64_t _LastTime)
     int64_t now_time;
     int64_t time_diff;
 
-    now_time = TIM_HARD->CNT + g_uiTimeHighWord;
+    now_time = bsp_GetRunTimeUs();
 
     if (now_time >= _LastTime)
     {
@@ -498,8 +520,7 @@ int64_t bsp_CheckRunTimeUs(int64_t _LastTime)
     }
     else
     {
-        /* Windwos计算机将 0xFFFFFFFFFFFFFFFF 做 -1处理 */
-        time_diff = 0xFFFFFFFFFFFFFFFE - _LastTime + now_time;
+        time_diff = now_time - _LastTime;   /* 负数 */
     }
 
     return time_diff;

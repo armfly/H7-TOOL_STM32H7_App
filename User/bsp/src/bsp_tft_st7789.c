@@ -311,6 +311,21 @@ static void ST7789_ConfigGPIO(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+void ST7789_DrawScreenHard(void)
+{
+    ST7789_SetDispWin(0, 0, 240, 240);
+
+	bsp_InitSPI5ParamFast();
+    LCD_RS_1();
+    LCD_CS_0();     /* 在DMA传输完毕后设置1 */
+	
+	wTransferState = 0; 
+        
+	HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);
+
+    while (wTransferState == 0){}  
+}
+    
 void ST7789_DrawScreen(void)
 {
  #if LCD_DMA_CIRCULE_MODE == 1
@@ -348,17 +363,7 @@ void ST7789_DrawScreen(void)
         
     s_DispRefresh = 0;
     
-    ST7789_SetDispWin(0, 0, 240, 240);
-
-	bsp_InitSPI5ParamFast();
-    LCD_RS_1();
-    LCD_CS_0();     /* 在DMA传输完毕后设置1 */
-	
-	wTransferState = 0; 
-        
-	HAL_SPI_Transmit_DMA(&hspi5, (uint8_t *)(0x30000000),  240 * 240);
-
-    while (wTransferState == 0){}  
+    ST7789_DrawScreenHard();
         
     s_time1 = bsp_GetRunTime();
         

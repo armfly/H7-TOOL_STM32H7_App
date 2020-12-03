@@ -88,6 +88,9 @@ int main(void)
     
     LoadParam(); /* 读取应用程序参数, 该函数在param.c */
     
+    bsp_InitTVCC();     /* TVCC控制引脚 -- 放到后面读完参数后设置 */
+    bsp_SetTVCC(3300);    
+    
     ST7789_SetDirection(g_tParam.DispDir);
 
     /* 主程序采用状态机实现程序功能切换 */
@@ -151,9 +154,7 @@ int main(void)
         //PERIOD_Start(&g_tRunLed, 50, 50, 0); /* LED一直闪烁, 非阻塞 */
         PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */
         
-        bsp_InitESP32();
-
-        bsp_SetTVCC(3300);        
+        bsp_InitESP32();   
         
         DSO_InitHard();
         DSO_SetDC(1, 1);

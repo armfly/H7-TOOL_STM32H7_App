@@ -145,7 +145,7 @@ void status_MonitorCan(void)
     
     LCD_SetEncode(ENCODE_GBK);
     
-    UartMonInitParam(g_MainStatus);  
+    UartMonInitParam(MODIFY_PARAM_UART_MON);  
     UartMonCheckParam();    /* 检查参数 */
         
     fInit = 1;
