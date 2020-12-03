@@ -83,7 +83,7 @@ static SOFT_TMR s_tTmr[TMR_COUNT] = {0};
     最长可以表示 24.85天，如果你的产品连续运行时间超过这个数，则必须考虑溢出问题
 */
 
-__IO uint64_t g_uiTimeHighWord = 0; 
+__IO uint32_t g_uiTimeHighWord = 0; 
 
 static __IO uint8_t g_ucEnableSystickISR = 0; /* 等待变量初始化 */
 
@@ -781,7 +781,7 @@ void TIM_HARD_IRQHandler(void)
     {
         TIMx->SR = (uint16_t)~TIM_IT_UPDATE;
         
-        g_uiTimeHighWord += 0x100000000;
+        g_uiTimeHighWord++;
     }
     
     itstatus = timesr & TIM_IT_CC1;
