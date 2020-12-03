@@ -50,6 +50,7 @@ void lua_Run(void);
 int lua_CheckGlobal(const char *name);
 void lua_do(char *buf);
 void lua_DownLoadFile(char *_path);
+void lua_RunLuaProg(void);
 
 uint32_t lua_GetVarUint32(const char *_VarName, uint32_t _Default);
 

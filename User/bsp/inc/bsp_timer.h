@@ -46,7 +46,7 @@ void bsp_StopTimer(uint8_t _id);
 uint8_t bsp_CheckTimer(uint8_t _id);
 int32_t bsp_GetRunTime(void);
 int32_t bsp_CheckRunTime(int32_t _LastTime);
-
+int32_t bsp_SubRunTime(int32_t _T0, int32_t _T1);
 uint64_t bsp_GetRunTimeUs(void);
 int64_t bsp_CheckRunTimeUs(int64_t _LastTime);
 

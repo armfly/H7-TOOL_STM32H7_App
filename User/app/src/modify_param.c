@@ -308,28 +308,28 @@ void ModifyParam(uint16_t _MainStatus)
 *********************************************************************************************************
 *    函 数 名: UartMonInitParam
 *    功能说明: 初始化参数列表
-*    形    参: _MainStatus
+*    形    参: _ParamID : 参数ID
 *    返 回 值: 无
 *********************************************************************************************************
 */
-void UartMonInitParam(uint16_t _MainStatus)
+void UartMonInitParam(uint16_t _ParamID)
 {
-    if (_MainStatus == MODIFY_PARAM_UART_MON)
+    if (_ParamID == MODIFY_PARAM_UART_MON)
     {
         s_pParamList = UartMonParamList;
         s_ParamCount = UART_MON_PARAM_COUNT;
     }
-    else if (_MainStatus == MODIFY_PARAM_SYSTEM)
+    else if (_ParamID == MODIFY_PARAM_SYSTEM)
     {
         s_pParamList = SysBaseParamList;
         s_ParamCount = SYS_BASE_PARAM_COUNT;        
     }    
-    else if (_MainStatus == MODIFY_PARAM_PROG)
+    else if (_ParamID == MODIFY_PARAM_PROG)
     {
         s_pParamList = ProgParamList;
         s_ParamCount = PROG_PARAM_COUNT;         
     }
-    else if (_MainStatus == MODIFY_PARAM_NET)
+    else if (_ParamID == MODIFY_PARAM_NET)
     {
         s_pParamList = NetParamList;
         s_ParamCount = NET_PARAM_COUNT;         

@@ -319,7 +319,7 @@ void bsp_InitTVCC(void)
     /* 第1步：打开GPIO时钟 */
     ALL_TVCC_GPIO_CLK_ENABLE();
 
-    TVCC_OFF();
+    //TVCC_OFF();
 
     gpio_init.Mode = GPIO_MODE_OUTPUT_PP;        /* 设置开漏输出 */
     gpio_init.Pull = GPIO_NOPULL;                        /* 上下拉电阻不使能 */
@@ -327,7 +327,7 @@ void bsp_InitTVCC(void)
     gpio_init.Pin = TVCC_EN_PIN;
     HAL_GPIO_Init(TVCC_EN_GPIO, &gpio_init);
 
-    bsp_InitMCP4018(); /* 初始化数字电位器 */
+    //bsp_InitMCP4018(); /* 初始化数字电位器 */
 }
 
 /*

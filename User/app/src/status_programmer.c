@@ -183,7 +183,8 @@ void status_ProgWork(void)
             uint16_t len;
             uint8_t line = 0;
             
-            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件 */  
+            lua_DownLoadFile(g_tProg.FilePath);  /* 重新初始化lua环境，并装载lua文件到内存，不执行 */  
+            lua_RunLuaProg();   /* 执行lua */
             
             /* 从lua文件中获得注释字符串Note01 */
             lua_getglobal(g_Lua, "Note01");    

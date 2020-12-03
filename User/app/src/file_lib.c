@@ -1208,14 +1208,6 @@ uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, c
     fListDir = 1;
     while (g_MainStatus == _MainStatus)
     {
-        if (fRefresh) /* 刷新整个界面 */
-        {
-            fRefresh = 0;
-            
-            LCD_ClearMenu(&g_tMenuLua);
-            LCD_DispMenu(&g_tMenuLua);
-        }
-
         if (fListDir == 1)
         {
             fListDir = 0;
@@ -1261,6 +1253,14 @@ uint8_t SelectFile(char *_InitPath, uint16_t _MainStatus, uint16_t _RetStatus, c
             
             fRefresh = 1;
         }
+
+        if (fRefresh) /* 刷新整个界面 */
+        {
+            fRefresh = 0;
+            
+            LCD_ClearMenu(&g_tMenuLua);     /* 清屏菜单区 */
+            LCD_DispMenu(&g_tMenuLua);
+        }        
         
         bsp_Idle();
         
