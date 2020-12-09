@@ -25,11 +25,11 @@
 #define TIME_X      120 - (5 * 16 / 2)
 #define TIME_Y      DATE_Y + 30
 
-#define RJ45_IP_X   5
-#define RJ45_IP_Y   TIME_Y + 60
+#define RJ45_IP_X   (240 - 20 * 8)
+#define RJ45_IP_Y   TIME_Y + 90
 
-#define WIFI_IP_X   5
-#define WIFI_IP_Y   RJ45_IP_Y + 20
+#define WIFI_IP_X   RJ45_IP_X
+#define WIFI_IP_Y   RJ45_IP_Y + 18
 
 #define UDP_PORT_X  5
 #define UDP_PORT_Y  WIFI_IP_Y + 20
@@ -164,21 +164,21 @@ static void DispLinkStatus(void)
     /* 设置字体参数 */
     {
         tFont.FontCode = FC_ST_16;          /* 字体代码 16点阵 */
-        tFont.FrontColor = INFO_NAME_COLOR; /* 字体颜色 */
+        tFont.FrontColor = HELP_TEXT_COLOR; /* 字体颜色 */
         tFont.BackColor = INFO_BACK_COLOR;  /* 文字背景颜色 */
         tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
     }    
         
-    sprintf(buf, "RJ45 IP:%d.%d.%d.%d", g_tParam.LocalIPAddr[0], g_tParam.LocalIPAddr[1],
+    sprintf(buf, "RJ45 %d.%d.%d.%d", g_tParam.LocalIPAddr[0], g_tParam.LocalIPAddr[1],
                     g_tParam.LocalIPAddr[2], g_tParam.LocalIPAddr[3]);
     LCD_DispStr(RJ45_IP_X, RJ45_IP_Y, buf, &tFont);
     
-    sprintf(buf, "WiFi IP:%d.%d.%d.%d", g_tParam.WiFiIPAddr[0], g_tParam.WiFiIPAddr[1],
+    sprintf(buf, "WiFi %d.%d.%d.%d", g_tParam.WiFiIPAddr[0], g_tParam.WiFiIPAddr[1],
                     g_tParam.WiFiIPAddr[2], g_tParam.WiFiIPAddr[3]);
     LCD_DispStr(WIFI_IP_X, WIFI_IP_Y, buf, &tFont);    
     
-    sprintf(buf, "端口号:%d", g_tParam.LocalTCPPort);
-    LCD_DispStr(UDP_PORT_X, UDP_PORT_Y, buf, &tFont); 
+//    sprintf(buf, "端口号:%d", g_tParam.LocalTCPPort);
+//    LCD_DispStr(UDP_PORT_X, UDP_PORT_Y, buf, &tFont); 
     
     /* 显示APP版本 */
     tFont.FrontColor = HELP_TEXT_COLOR;

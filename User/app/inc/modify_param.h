@@ -21,6 +21,7 @@ enum
     MODIFY_PARAM_SYSTEM,              /* 系统参数 */
     MODIFY_PARAM_NET,                 /* 网络参数 */
     MODIFY_PARAM_PROG,                /* 脱机烧录器参数 */
+    MODIFY_PARAM_DAPLINK,             /* DAP-LINK参数 */
 };
 
 /* 参数列表结构 */
