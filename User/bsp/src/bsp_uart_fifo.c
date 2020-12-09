@@ -1779,5 +1779,12 @@ void UART8_IRQHandler(void)
     UartIRQ(&g_tUart8);
 }
 #endif
+
+int stdout_putchar (int ch) 
+{
+   (void)ch;
+    
+    return ch;
+}
     
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

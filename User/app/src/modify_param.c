@@ -94,18 +94,33 @@ const PARAM_LIST_T NetParamList[NET_PARAM_COUNT] =
     {   0,         "端口号: ",        0,              1024, 65535,   30010},    
 };
 
-
 /****** 烧录参数   ******************************************************************************/
 #define PROG_PARAM_COUNT   4
 const char *ProgParam0[] = {"关闭", "1路", "1-2路", "1-3路", "1-4路"};
-//const char *ProgParam1[] = {"缺省", "单路烧录", "多路烧录", "DAP-Link"};
+
 const PARAM_LIST_T ProgParamList[PROG_PARAM_COUNT] = 
 { 
     /*  数据类型,      名称          可选列表,      最小值, 最大值, 缺省值 */
     {   0,         "多路模式: ",     ProgParam0,    0,      4,       4},
     {   0,         "工厂代码: ",     0,             0,      999,     0},
     {   0,         "烧录器编号: ",   0,             0,      999,     0},
-    {   0,         "开机启动: ",     SysBaseParam3, 0,      3,       0}, 
+    {   0,         "开机启动: ",     SysBaseParam3,    0,      3,       0}, 
+};
+
+/****** DAP-Link参数   ******************************************************************************/
+#define DAP_PARAM_COUNT   4
+const char *DapParam1[] = {"关闭", "1.2V", "1.5V", "1.8V", "2.0V", "2.5V", "2.8V", "3.0V", 
+    "3.3V", "3.6V", "4.2V", "4.5V", "4.8V", "5.0V"};
+const char *DapParam2[] = {"关闭", "开启"};
+const char *DapParam3[] = {"缺省", "单路烧录", "多路烧录", "DAP-Link"};
+
+const PARAM_LIST_T DapParamList[DAP_PARAM_COUNT] = 
+{ 
+    /*  数据类型,      名称          可选列表,      最小值, 最大值, 缺省值 */
+    {   0,          "TVCC电压: ",     DapParam1,     0,      13,    0},
+    {   0,          "蜂鸣使能: ",     DapParam2,     0,      1,     1}, 
+    {   0,          "开机启动: ",     DapParam3,    0,      3,     0},
+    {   0,          "DAP 编号: ",      0,            1,      99,    1},    
 };
 
 /*
@@ -333,7 +348,12 @@ void UartMonInitParam(uint16_t _ParamID)
     {
         s_pParamList = NetParamList;
         s_ParamCount = NET_PARAM_COUNT;         
-    }    
+    }
+    else if (_ParamID == MODIFY_PARAM_DAPLINK)
+    {
+        s_pParamList = DapParamList;
+        s_ParamCount = DAP_PARAM_COUNT;         
+    }    	    
 }
 
 /*
@@ -387,7 +407,14 @@ static int32_t MonDispReadParam(uint8_t _index)
         else if (_index == 1) value = g_tParam.FactoryId;
         else if (_index == 2) value = g_tParam.ToolSn;
         else if (_index == 3) value = g_tParam.StartRun;        
-    }    
+    }   
+    else if (s_pParamList == DapParamList)
+    {
+        if (_index == 0) value = g_tParam.DAP_TVCCVolt;
+        else if (_index == 1) value = g_tParam.DAP_BeepEn;
+        else if (_index == 2) value = g_tParam.StartRun;
+        else if (_index == 3) value = g_tParam.DAP_Sn;      
+    }     
     return value;
 }
 
@@ -442,6 +469,13 @@ static void MonDispWriteParam(uint8_t _index, int32_t _value)
         else if (_index == 2)  g_tParam.ToolSn = _value;
         else if (_index == 3)  g_tParam.StartRun = _value;       
     }
+    else if (s_pParamList == DapParamList)
+    {
+        if (_index == 0) g_tParam.DAP_TVCCVolt = _value;
+        else if (_index == 1) g_tParam.DAP_BeepEn = _value;
+        else if (_index == 2) g_tParam.StartRun = _value;
+        else if (_index == 3) g_tParam.DAP_Sn = _value;      
+    }     
 }
 
 /*
