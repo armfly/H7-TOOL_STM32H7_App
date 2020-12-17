@@ -29,7 +29,7 @@
 
 typedef struct
 {
-    uint8_t *RxBuf;
+    uint8_t *RxBuf;     /* 注意是指针，没有分配内存 */
     uint16_t RxCount;
     uint8_t RxStatus;
     uint8_t RxNewFlag;
@@ -44,20 +44,6 @@ typedef struct
     uint8_t TCP_Flag;
 } MODS_T;
 
-/* 传递波形数据的通信结构 60H功能码专用 */
-typedef struct
-{
-    /* 保存PC机的指令参数 */
-    uint32_t ChEn;                /* bit0 表示CH1， bit1表示CH2 */
-    uint32_t SampleSize;    /* 每个通道样本个数 */
-    uint16_t PackageSize; /* 每通信包样本长度. 单位为1个样本 */
-    uint32_t SampleOffset;
-
-    /* 通信过程中，控制进度 */
-    uint32_t TransPos;    /* 样本缓冲区的当前位置 */
-    uint8_t StartTrans; /* 开始传输波形的标志 */
-} MOD_WAVE_T;
-
 void uart_rx_isr(void); /* 在 stm8s_it.c 中调用 */
 uint8_t AnalyzeCmd(uint8_t *_DispBuf);
 uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len);
@@ -66,7 +52,6 @@ void MODS_SendWithCRC(void);
 void MODS_SendAckOk(void);
 
 extern MODS_T g_tModS;
-extern MOD_WAVE_T g_tModWave;
 
 #endif
 

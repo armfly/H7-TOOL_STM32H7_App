@@ -513,8 +513,9 @@ static void MODS64_WriteFile(void)
             }
 
             /* 第1包就文件结束 */
-            if (s_FileOffset + s_FileRxLen >= total_len)
-            {
+            //if (s_FileOffset + s_FileRxLen >= total_len)  ---BUG : 小文件不写入
+            if (s_FileRxLen >= total_len - s_HeaderLen)
+            {               
                 if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, s_FileRxLen) == 0)
                 {
                     s_FileOffset = s_FileRxLen;
@@ -536,10 +537,10 @@ static void MODS64_WriteFile(void)
 
         if (s_LastPackaOffsetAddr != offset_addr)   /* 不是重复帧 */
         {
-            s_LastPackaOffsetAddr = offset_addr;
+            s_LastPackaOffsetAddr = offset_addr;           
             
             if (s_FileRxLen + DataLen < sizeof(FsReadBuf))
-            {
+            {                
                 memcpy(&FsReadBuf[s_FileRxLen], (char *)pData, DataLen);
                 s_FileRxLen += DataLen;
                 err = 0;    /* 文件写入OK */
@@ -570,7 +571,8 @@ static void MODS64_WriteFile(void)
             }
             
             /* 文件数据传输完毕 */
-            if (s_FileOffset + s_FileRxLen >= total_len - s_HeaderLen)
+            //if (s_FileOffset + s_FileRxLen >= total_len - s_HeaderLen)
+            if (s_FileRxLen >= total_len - s_HeaderLen)
             {
                 if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, s_FileRxLen) == 0)
                 {

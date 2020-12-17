@@ -18,6 +18,7 @@
 #include "bsp.h"
 #include "usbd_user.h"
 #include "modbus_slave.h"
+#include "status_usb_uart.h"    /* 用来虚拟串口收发数据计数 */
 
 uint8_t g_ModbusRxBuf[RX_BUF_SIZE];	
 uint16_t g_ModbusRxLen = 0;
@@ -192,6 +193,22 @@ static int8_t CDC_Itf_Control(uint8_t cmd, uint8_t * pbuf, uint16_t length)
         LineCoding.paritytype = pbuf[5];
         LineCoding.datatype = pbuf[6];
 
+        if (s_NowCom >= COM_USB1)   /* PC通信返回 */
+        {
+            break;
+        }
+        
+        BEEP_Start(5,5,1);
+        g_tUasUart.PcTxCount = 0;
+        g_tUasUart.DevTxCount = 0;
+        
+        g_tUasUart.Connected = 1;   /* 打开串口 */
+        g_tUasUart.DataBit = LineCoding.datatype;
+        g_tUasUart.StopBit = LineCoding.format;
+        g_tUasUart.Parity = LineCoding.paritytype;    
+        g_tUasUart.Baud = LineCoding.bitrate;
+        g_tUasUart.Changed = 1; 
+        
         /* Set the new configuration */
         ComPort_Config();
         break;
@@ -208,6 +225,14 @@ static int8_t CDC_Itf_Control(uint8_t cmd, uint8_t * pbuf, uint16_t length)
 
     case CDC_SET_CONTROL_LINE_STATE:
         /* Add your code here */
+        if (s_NowCom >= COM_USB1)   /* PC通信返回 */
+        {
+            break;
+        }
+
+//        g_tUasUart.Connected = 0;   /* 关闭串口 */
+//        g_tUasUart.Changed = 1;
+        
         break;
 
     case CDC_SEND_BREAK:
@@ -255,6 +280,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 		USBD_CDC_SetTxBuffer(&USBD_Device, (uint8_t *) & UserTxBuffer[buffptr],
 			buffsize);
 
+        g_tUasUart.DevTxCount += buffsize;   /* 用于虚拟串口界面显示计数值 */
+        g_tUasUart.Changed = 1;
+    
+        
 		if (USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
 		{
 			UserTxBufPtrOut += buffsize;
@@ -336,11 +365,20 @@ static int8_t CDC_Itf_Receive(uint8_t * Buf, uint32_t *Len)
 {
 	SCB_CleanDCache_by_Addr((uint32_t *)Buf, *Len);
         
-	if (s_NowCom == COM_USB1)		/*  */
+	if (s_NowCom == COM_USB1)		/* PC通信 */
 	{		
 		uint32_t len;
 		
-		len = *Len;
+		len = *Len;                
+        
+    #if 0
+    {
+        uint8_t buf[128];
+        
+        sprintf((char *)buf, "PC->H7 %u, %02X %02X %02X, len = %d\r\n", bsp_GetRunTime(), Buf[0], Buf[1], Buf[2], len);
+        comSendBuf(COM_RS485, buf, strlen(buf));
+    }
+    #endif        
 		
 		if (g_ModbusRxLen + len <= RX_BUF_SIZE)
 		{
@@ -364,8 +402,11 @@ static int8_t CDC_Itf_Receive(uint8_t * Buf, uint32_t *Len)
 		* (transmitting data over Tx line) */
 		USBD_CDC_ReceivePacket(&USBD_Device);		
 	}
-	else if (s_NowCom == COM1)
+	else if (s_NowCom == COM1)  /* 虚拟串口 */
 	{
+        g_tUasUart.PcTxCount += *Len;   /* 用于虚拟串口界面显示计数值 */
+        g_tUasUart.Changed = 1;
+        
         RS485_SendBefor();
         comSetCallbackSendOver(COM1, Uart1TxCpltCallback);
         comSendBuf(COM1, Buf, *Len);
@@ -397,14 +438,8 @@ static void ComPort_Config(void)
     uint32_t StopBits;
     uint32_t Parity;
     uint32_t WordLength;
-    uint32_t BaudRate;
+    uint32_t BaudRate;        
     
-    
-    if (s_NowCom >= COM_USB1)
-    {
-        return;
-    }
-        
 	/* set the Stop bit */
 	switch (LineCoding.format)
 	{
@@ -460,6 +495,7 @@ static void ComPort_Config(void)
 			break;
 	}
 
+    
 	BaudRate = LineCoding.bitrate;
 
     bsp_SetUartParam(s_NowCom, BaudRate, Parity, WordLength, StopBits);
@@ -521,6 +557,15 @@ static void TIM_Config(void)
 */
 uint8_t USBCom_SendBufNow(int _Port, uint8_t *_Buf, uint16_t _Len)
 {
+    #if 0
+    {
+        uint8_t buf[128];
+        
+        sprintf((char *)buf, "H7->PC %u, %02X %02X %02X, len = %d\r\n\r\n", bsp_GetRunTime(), _Buf[0], _Buf[1], _Buf[2], _Len);
+        comSendBuf(COM_RS485, buf, strlen(buf));
+    }
+    #endif
+    
 	memcpy(UserTxBuffer, _Buf, _Len);
     USBD_CDC_SetTxBuffer(&USBD_Device, UserTxBuffer, _Len);
     if (USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)

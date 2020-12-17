@@ -11,11 +11,7 @@
 *********************************************************************************************************
 */
 
-#include "bsp.h"
-#include "param.h"
-#include "modbus_reg_addr.h"
-#include "modbus_register.h"
-#include "lua_if.h"
+#include "Includes.h"
 
 uint8_t fSaveReq_06H = 0;       /* 保存基本参数请求，用于06H和10H写寄存器函数 */
 uint8_t fResetReq_06H = 0;      /* 需要复位CPU，因为网络参数变化 */
@@ -1009,6 +1005,7 @@ static uint8_t ReadCalibRegValue_03H(uint16_t _reg_addr, uint16_t *_reg_value)
 *    返 回 值: 1表示OK 0表示错误
 *********************************************************************************************************
 */
+extern void JumpToDAPLink(void);
 uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
 {
     uint8_t IPAddr[4];
@@ -1483,20 +1480,30 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
         }
         break;
 
-            /*********************************************************/
-
+        /*********************************************************/
         case REG03_RESET_TO_BOOT:
-            if (reg_value == 2)
+            if (reg_value == JUMP_TO_APP)         /* 复位进入APP */
+            {                
+                *(uint32_t *)0x20000000 = 0;
+                NVIC_SystemReset(); /* 复位CPU */
+            }
+            else if (reg_value == JUMP_TO_BOOT)    /* 复位进入BOOT 升级 */
             {
-                /* 复位进入BOOT 升级 */
+                
                 *(uint32_t *)0x20000000 = 0x5AA51234;
                 NVIC_SystemReset(); /* 复位CPU */
             }
-            else if (reg_value == 1)
+            else if (reg_value == JUMP_TO_DAP)    /* 进入DAP */
             {
-                /* 复位进入APP */
-                *(uint32_t *)0x20000000 = 0;
-                NVIC_SystemReset(); /* 复位CPU */
+                JumpToDAPLink();
+            }            
+            else if (reg_value == JUMP_TO_EMMC)    /*  进入U盘模式 */
+            {
+                g_MainStatus = MS_USB_EMMC;
+            }
+            else if (reg_value == JUMP_TO_LINK)    /*  进入APP联机 */
+            {
+                g_MainStatus = MS_LINK_MODE;
             }
             break;
 

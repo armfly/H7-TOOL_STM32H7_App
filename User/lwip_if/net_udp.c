@@ -21,129 +21,26 @@
 #include "param.h"
 #include "modbus_slave.h"
 
-#define MODS_ADDR 0x01 /* MODBSU 从站地址 */
-
-#define UDP_TX_SIZE (1500 + 8)
+#define MODS_ADDR   0x01    /* MODBSU 从站地址 */
 
 struct udp_pcb *g_udp_pcb;
 struct pbuf *p_udp_tx;
 
-static uint8_t udp_tx_buf[UDP_TX_SIZE];
-//static uint16_t udp_tx_len;
-
-//typedef void (*udp_recv_fn)(void *arg, struct udp_pcb *pcb, struct pbuf *p,
-//    const ip_addr_t *addr, u16_t port);
+uint8_t udp_tx_buf[UDP_TX_SIZE];
+uint16_t udp_tx_len;
 
 static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, const ip_addr_t *addr, u16_t port);
 
 ip_addr_t destAddr;
 
-#define PRINT_FIFO_SIZE 1024
-static uint8_t udp_print_buf[PRINT_FIFO_SIZE];
-static uint16_t udp_print_putp = 0;
-static uint16_t udp_print_getp = 0;
-static uint16_t udp_print_count = 0;
-
-void udp_print_put(uint8_t ch)
-{ 
-//    while (udp_print_count == PRINT_FIFO_SIZE - 1)
-//    {
-//        bsp_Idle();
-//    }
-    
-    udp_print_buf[udp_print_putp] = ch;
-    if (++udp_print_putp >= PRINT_FIFO_SIZE)
-    {
-        udp_print_putp = 0;
-    }
-    udp_print_count++;
-}
-
-uint8_t udp_print_get(uint8_t *ch)
+void udp_print_send(uint8_t *_buf, uint16_t _len)
 {
-    uint8_t data;
-
-    if (udp_print_putp != udp_print_getp)
-    {
-        data = udp_print_buf[udp_print_getp];
-        if (++udp_print_getp >= PRINT_FIFO_SIZE)
-        {
-            udp_print_getp = 0;
-        }
-        *ch = data;
-        
-        if (udp_print_count > 0)
-        {
-            udp_print_count--;
-        }
-        return 1;
-    }
-    return 0;
-}
-
-void udp_print_send(void)
-{
-    uint16_t len;
-    uint8_t data;
-
-    len = 0;
-    while (1)
-    {
-        if (udp_print_get(&data))
-        {
-            udp_tx_buf[len] = data;
-
-            if (++len >= UDP_TX_SIZE)
-            {
-                break;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-
     /* 准备应答数据 */
-    p_udp_tx->payload = udp_tx_buf;
-    p_udp_tx->len = len;
-    p_udp_tx->tot_len = len;
+    p_udp_tx->payload = _buf;
+    p_udp_tx->len = _len;
+    p_udp_tx->tot_len = _len;
 
     udp_sendto(g_udp_pcb, p_udp_tx, &destAddr, LUA_UDP_PORT); /* 数据发送出去 */
-    
-    //ERR_OK
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: udp_SendBuf
-*    功能说明: 发送UDP数据包，用于lua. 先缓存再发送.超时汇总后集中发送
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port)
-{
-    uint16_t i;
-    uint8_t nowsend = 0;
-
-    for (i = 0; i < _len; i++)
-    {
-        udp_print_put(_buf[i]);
-        if (_buf[i] == 0x0A)
-        {
-            nowsend = 1;
-        }
-    }
-    
-    if (nowsend == 1)
-    {
-        udp_print_send();
-    }
-    else
-    {
-        bsp_StartHardTimer(3, 5000, udp_print_send);
-    }
 }
 
 /*

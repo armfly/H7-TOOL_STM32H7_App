@@ -58,8 +58,8 @@ void status_LinkMode(void)
     DispHelpBar("长按S进入扩展功能",
                 "长按C切换方向");  
     
-    usbd_CloseCDC();
-    usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
+//    usbd_CloseCDC();
+//    usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
 
     fRefresh = 1;
     
@@ -136,13 +136,16 @@ void status_LinkMode(void)
         }
     }
 
-	if (g_MainStatus != MS_SYSTEM_SET)
-    {
-        usbd_CloseCDC();
-        usbd_OpenCDC(COM1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
-    }
+//	if (g_MainStatus != MS_SYSTEM_SET)
+//    {
+//        usbd_CloseCDC();
+//        usbd_OpenCDC(COM1); /* 启用USB虚拟串口1， 用于虚拟串口，RS232 RS485 TTL-UART */
+//    }
     
-    DSO_StartMode2();   /* 示波器启动模式2-低速多通道扫描 */
+    if (g_MainStatus != MS_EXTEND_MENU1)
+    {
+        DSO_StartMode2();   /* 示波器启动模式2-低速多通道扫描 */
+    }
     
     bsp_StopTimer(0);  
 }

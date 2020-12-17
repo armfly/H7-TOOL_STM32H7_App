@@ -437,12 +437,31 @@ error_t target_flash_init(uint32_t flash_start, unsigned long clk, unsigned long
 /* 这个函数暂时未用到 */
 error_t target_flash_uninit(void)
 {
+#if 1
+    g_tProg.FLMFuncTimeout = 500;    /* 超时 */  
+    
+    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+    {    
+        if (0 == MUL_swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.uninit, 0, 0, 0, 0)) {
+            return ERROR_INIT;
+        }
+    }
+    else
+    {
+        if (0 == swd_flash_syscall_exec(&flash_algo.sys_call_s, flash_algo.uninit, 0, 0, 0, 0)) {
+            return ERROR_INIT;
+        }        
+    }
+    return ERROR_SUCCESS;
+#else    
     g_tProg.FLMFuncTimeout = 200;       /* 函数执行超时 */
     
     swd_set_target_state_hw(RESET_RUN);
 
     swd_off();
+    
     return ERROR_SUCCESS;
+#endif    
 }
 
 error_t target_flash_program_page(uint32_t addr, const uint8_t *buf, uint32_t size)
@@ -553,6 +572,12 @@ error_t target_flash_verify_page(uint32_t addr, const uint8_t *buf, uint32_t siz
         if (write_size > g_tFLM.Device.szDev)
         {
             write_size = g_tFLM.Device.szDev;
+        }
+        
+        /* 2020-12-14 修复bug */
+        if (write_size > size)
+        {
+            write_size = size;
         }
 
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */

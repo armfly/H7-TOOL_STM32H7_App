@@ -3,12 +3,13 @@
 *
 *    模块名称 : 编程器接口文件
 *    文件名称 : prog_if.c
-*    版    本 : V1.0
+*    版    本 : V1.1
 *    说    明 : 
 *
 *    修改记录 :
 *        版本号  日期        作者     说明
 *        V1.0    2019-03-19  armfly  正式发布
+*        V1.1    2020-12-12  armfly  修正算法执行的缺陷，Init()和UnInit()按正常规范执行.
 *
 *    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
 *
@@ -175,7 +176,18 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
             flm_check_blank  = target_flash_check_blank;
         } 
         else    /* 如果FLM没有查空函数，则加载通用的算法代码(flash常量数组) */
-        {                                
+        {                           
+            /* 2020-12-14 执行init函数用于校验的, 用于QSPI Flash内存映射模式 */
+            #if 0
+            err_t = target_flash_init(_FlashAddr, 0, FLM_INIT_VERIFY);
+            if (err_t != ERROR_SUCCESS)
+            {
+                PG_PrintText("error: target_flash_init(FLM_INIT_VERIFY) for check_blank");
+                err = 1;
+                goto quit;
+            }
+            #endif
+            
             /* 装载算法代码到目标机内存 */
             LoadCheckBlankAlgoToTarget();
 
@@ -244,8 +256,6 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
         {
             /* 恢复芯片厂家的FLM算法代码到目标机内存 */
             LoadAlgoToTarget();
-            
-            
         }
         
         PG_PrintPercent(100, _FlashAddr); 
@@ -684,6 +694,27 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
     }
     
     /* 第3步 ******************** 校验 （fix区未完全校验）**********************/ 
+    
+    #if 1   /* 2020-12-13 加入，V1.43 */
+        /* 执行Uninit函数 */
+        err_t = target_flash_uninit();
+        if (err_t != ERROR_SUCCESS)
+        {
+            PG_PrintText("error: target_flash_uninit()");
+            err = 1;
+            goto quit;
+        }
+        
+        /* 装载算法并执行init函数 */
+        err_t = target_flash_init(_FlashAddr, 0, FLM_INIT_VERIFY);
+        if (err_t != ERROR_SUCCESS)
+        {
+            PG_PrintText("error: target_flash_init(FLM_INIT_VERIFY)");
+            err = 1;
+            goto quit;
+        }
+    #endif
+    
     /* 
         2020-05-22 记录: STM32F207RCT6，256K Flash
             FLM_CRC32    150ms
@@ -770,7 +801,14 @@ uint16_t PG_SWD_ProgFile(char *_Path, uint32_t _FlashAddr, uint32_t _EndAddr, ui
         if (PageSize >= sizeof(FsReadBuf))
         {
             PageSize = sizeof(FsReadBuf);
-        }         
+        }
+
+        /* 2020-12-13 FLM有verify校验函数, page_size 按照FLM中来，针对SPI FLASH, QSPI_flash */
+        if (flash_algo.verify > 0 && g_tProg.VerifyMode == VERIFY_AUTO)     
+        {
+            PageSize = g_tFLM.Device.szPage;
+        }
+        
         addr = _FlashAddr - g_tFLM.Device.DevAdr;   /* 求相对地址, 方便后面计算 */
         for (; FileOffset < FileLen; )
         {

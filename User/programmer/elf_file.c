@@ -13,7 +13,7 @@
 *
 *    Copyright (C), 2019-2030, 安富莱电子 www.armfly.com
 *
-*    本文件为安富莱电子原创，仅供学习使用，禁止在同类产品中商用.
+*    本文件为安富莱电子原创，仅供学习使用，禁止在同类产品中商用. 如需使用，需要得到我们的授权.
 *
 *********************************************************************************************************
 */
@@ -245,7 +245,13 @@ uint8_t ELF_ParseFile(char *_path)
   
     /* 解析器件信息 */
     {
-        bytes = ReadFileToMem(_path, g_tFLM.Func[IDX_FlashDevice].Offset + 52, FsReadBuf, sizeof(FlashDevice_T));
+        
+        #if 0   /* 2020-12-13，调试苏州国芯 CCM4208时修改 */
+            bytes = ReadFileToMem(_path, g_tFLM.Func[IDX_FlashDevice].Offset + 52, FsReadBuf, sizeof(FlashDevice_T));
+        #else
+            bytes = ReadFileToMem(_path, g_tFLM.Load[1].Offset, FsReadBuf, sizeof(FlashDevice_T));
+        #endif
+        
         memcpy((char *)&g_tFLM.Device, FsReadBuf, sizeof(FlashDevice_T));     
     }
     

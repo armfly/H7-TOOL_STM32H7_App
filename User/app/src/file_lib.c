@@ -1761,30 +1761,19 @@ int fgetc(FILE *f)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
-extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
 extern MEMO_T g_LuaMemo;
 extern uint16_t g_MainStatus;
+extern void MODH_PrintByte(char _ch);
 int fputc(int ch, FILE *f)
 {
     if (f == &__stdout)
     {
-        uint8_t buf[1];
-
-        buf[0] = ch;
-
-    #if PRINT_TO_UDP == 1
-        lua_udp_SendBuf(buf, 1, LUA_UDP_PORT);
-        
         if (g_MainStatus == MS_LUA_EXEC_FILE)
         {
             LCD_MemoAddChar(&g_LuaMemo, ch);
         }
-    #else
-        USBCom_SendBuf(1, buf, 1);
-    #endif
         
-        //comSendChar(COM1, ch);
+        MODH_PrintByte(ch);
         return ch;
     }
     else
