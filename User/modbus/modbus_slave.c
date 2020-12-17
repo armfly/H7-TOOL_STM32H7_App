@@ -36,7 +36,6 @@ static void MODS_10H(void);
 static void MODS_0FH(void);
 
 static void MODS_65H(void);
-static void MODS_60H(void);
 
 extern void MODS_64H(void);
 extern void MODS_66H(void);
@@ -44,7 +43,6 @@ extern void MODS_66H(void);
 void MODS_ReciveNew(uint8_t _byte);
 
 MODS_T g_tModS;
-MOD_WAVE_T g_tModWave;
 
 /*
 *********************************************************************************************************
@@ -101,56 +99,6 @@ err_ret:
     g_tModS.RxCount = 0; /* 必须清零计数器，方便下次帧同步 */
     return 0;
 }
-
-#if 0
-/*
-*********************************************************************************************************
-*    函 数 名: MODS_ReciveNew
-*    功能说明: 串口接收中断服务程序会调用本函数。当收到一个字节时，执行一次本函数。
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-//void MODS_ReciveNew(uint8_t _byte)
-//{
-//    /*
-//        3.5个字符的时间间隔，只是用在RTU模式下面，因为RTU模式没有开始符和结束符，
-//        两个数据包之间只能靠时间间隔来区分，Modbus定义在不同的波特率下，间隔时间是不一样的，
-//        所以就是3.5个字符的时间，波特率高，这个时间间隔就小，波特率低，这个时间间隔相应就大
-
-//        4800  = 7.297ms
-//        9600  = 3.646ms
-//        19200  = 1.771ms
-//        38400  = 0.885ms
-//    */
-//    uint32_t timeout;
-//    
-//    g_rtu_timeout = 0;
-//    
-//    timeout = 35000000 / g_tParam.Baud;        /* 计算超时时间，单位us */
-//    
-//    /* 硬件定时中断，定时精度us 硬件定时器1用于ADC, 定时器2用于Modbus */
-//    bsp_StartHardTimer(2, timeout, (void *)MODS_RxTimeOut);
-
-//    if (g_tModS.RxCount < RX_BUF_SIZE)
-//    {
-//        g_tModS.RxBuf[g_tModS.RxCount++] = _byte;
-//    }
-//}
-
-///*
-//*********************************************************************************************************
-//*    函 数 名: MODS_RxTimeOut
-//*    功能说明: 超过3.5个字符时间后执行本函数。 设置全局变量 g_rtu_timeout = 1; 通知主程序开始解码。
-//*    形    参: 无
-//*    返 回 值: 无
-//*********************************************************************************************************
-//*/
-//static void MODS_RxTimeOut(void)
-//{
-//    g_rtu_timeout = 1;
-//}
-#endif
 
 /*
 *********************************************************************************************************
@@ -251,10 +199,6 @@ static void MODS_AnalyzeApp(void)
 
         case 0x0F:
             MODS_0FH(); /* 强制多个线圈（对应D01/D02/D03） */
-            break;
-
-        case 0x60:  /* 读取波形数据专用功能码 */
-            MODS_60H();
             break;
 
         case 0x64: /* 文件下载 */
@@ -1058,8 +1002,6 @@ fail:
     }
 }
 
-
-
 /*
 *********************************************************************************************************
 *    函 数 名: MODS_65H
@@ -1118,249 +1060,5 @@ err_ret:
         }
     }
 }
-
-/*
-*********************************************************************************************************
-*    函 数 名: MODS_60H
-*    功能说明: PC机读取波形数据（浮点格式）
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-static void MODS_60H(void)
-{
-    /*
-        PC发送 60H 
-            01  ; 从机地址
-            60  ; 功能码
-            00  : 00表示PC下发，01表示设备应答 （仅仅用于人工分析）
-            01 00 00 00  : 通道号使能标志 32bit，bit0表示CH1，bit1表示CH2
-            00 00 04 00: 每个通道样本个数
-            01 00 : 每通信包样本长度. 单位为1个样本。
-            00 00 00 00 : 通道数据偏移 （样本单位，用于重发）
-            CC CC : CRC16
-    
-        从机首先应答: 60H -  
-            
-            01  ; 从机地址
-            60  ; 功能码
-            01  : 00表示PC下发，01表示设备应答 （仅仅用于人工分析）
-            01 00 00 00  : 通道号使能标志 32bit，bit0表示CH1，bit1表示CH2
-            00 00 04 00 : 每个通道样本个数
-            01 00 : 每通信包样本长度. 单位为1个样本。
-            00 00 00 00 : 通道数据偏移 （样本单位，用于重发）
-            CCCC : CRC16
-    
-        从机应答: （然后开始多包连续应答)
-            01  ; 从机地址
-            61  ; 功能码
-            00  ; 通道号，00表示通道1,01表示通道2,
-            00 00 00 00 : 偏移地址（样本单位）
-            01 00 : 本包数据长度。样本单位。每个样本4字节。0x100表示1024字节。
-            ..... : 数据体
-            CCCC : CRC16
-    */
-    //    uint16_t lual_len;        /* 程序长度 */
-
-    g_tModS.RspCode = RSP_OK;
-
-    if (g_tModS.RxCount != 19)
-    {
-        g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
-        goto err_ret;
-    }
-
-    if (g_tModS.RxBuf[2] != 00)
-    {
-        g_tModS.RspCode = RSP_ERR_VALUE; /* 数据值域错误 */
-        goto err_ret;
-    }
-
-    g_tModWave.ChEn = BEBufToUint32(&g_tModS.RxBuf[3]);
-    g_tModWave.SampleSize = BEBufToUint32(&g_tModS.RxBuf[7]);
-    g_tModWave.PackageSize = BEBufToUint16(&g_tModS.RxBuf[11]);
-    g_tModWave.SampleOffset = BEBufToUint32(&g_tModS.RxBuf[13]);
-
-    g_tModWave.TransPos = 0;     /* 传输的位置计数 */
-    g_tModWave.StartTrans = 1; /* 开始传输的标志 */
-
-err_ret:
-    if (g_tModS.RxBuf[0] != 0x00) /* 00广播地址不应答, FF地址应答g_tParam.Addr485 */
-    {
-        if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
-        {
-            g_tModS.TxCount = 0;
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = 0x60;                         /* 功能码 */
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[2];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[3];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[4];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[5];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[6];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[7];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[8];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[9];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[10];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[11];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[12];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[13];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[14];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[15];
-            g_tModS.TxBuf[g_tModS.TxCount++] = g_tModS.RxBuf[16];
-
-            MODS_SendWithCRC();
-        }
-        else
-        {
-            MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
-        }
-    }
-}
-
-/*
-*********************************************************************************************************
-*    函 数 名: Send_61H
-*    功能说明: 传输波形。 自动连续多包传输。废弃，不稳定。
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void Send_61H(uint8_t _Ch, uint32_t _Offset, uint16_t _PackageLen)
-{
-    /*
-        从机应答: （然后开始多包连续应答)
-            01  ; 从机地址
-            61  ; 功能码
-            00  ; 通道号，00表示通道1,01表示通道2,
-            00 00 00 00 : 偏移地址（样本单位）
-            01 00 : 本包数据长度。样本单位。每个样本4字节。0x100表示1024字节。
-            ..... : 数据体
-            CRC16
-    */
-    uint16_t i;
-    uint8_t *p;
-
-    g_tModS.TxCount = 0;
-    g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
-    g_tModS.TxBuf[g_tModS.TxCount++] = 0x61;                         /* 功能码 */
-    g_tModS.TxBuf[g_tModS.TxCount++] = _Ch;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 24;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 16;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _Offset >> 8;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _Offset;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _PackageLen >> 8;
-    g_tModS.TxBuf[g_tModS.TxCount++] = _PackageLen;
-
-    if (_Ch == 0)
-    {
-        for (i = 0; i < _PackageLen; i++)
-        {
-            p = (uint8_t *)&g_Ch1WaveBuf[_Offset + i];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[3];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[2];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[1];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[0];
-        }
-    }
-    else if (_Ch == 1)
-    {
-        for (i = 0; i < _PackageLen; i++)
-        {
-            p = (uint8_t *)&g_Ch2WaveBuf[_Offset + i];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[3];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[2];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[1];
-            g_tModS.TxBuf[g_tModS.TxCount++] = p[0];
-        }
-    }
-
-    MODS_SendWithCRC();
-
-//    USBCom_SendBufNow(0, g_tModS.TxBuf, g_tModS.TxCount);
-}
-
-#if 0
-/*
-*********************************************************************************************************
-*    函 数 名: TransWaveTask
-*    功能说明: 传输波形任务。 插入bsp_Idle运行. 废弃
-*    形    参: 无
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-void TransWaveTask(void)
-{
-    static uint32_t s_TransPos = 0;
-    static uint8_t s_ChPos = 0;
-        
-    if (g_tModWave.StartTrans == 0)
-    {
-        return;
-    }
-    
-    while (g_tModWave.StartTrans != 0)
-    {
-        lwip_pro();        /* 以太网协议栈轮询 */    
-    
-        wifi_task();
-        
-        switch (g_tModWave.StartTrans)
-        {
-            case 1:
-                s_ChPos = 0;
-                s_TransPos = g_tModWave.SampleOffset;
-                g_tModWave.StartTrans++;
-                break;
-            
-            case 2:
-                if (g_tModWave.ChEn & (1 << s_ChPos))
-                {
-                    g_tModWave.StartTrans++;
-                }
-                else
-                {
-                    s_ChPos++;
-                    
-                    if (s_ChPos >= 2)
-                    {
-                        g_tModWave.StartTrans = 100;    /* 传输完毕 */
-                    }
-                    else
-                    {
-                        g_tModWave.StartTrans++;
-                    }
-                }
-                break;
-            
-            case 3:
-                Send_61H(s_ChPos, s_TransPos, g_tModWave.PackageSize);
-                g_tModWave.StartTrans++;
-                break;
-            
-            case 4:    /* 等待发送完毕 - 暂时未做 */
-                g_tModWave.StartTrans++;
-                break;
-            
-            case 5: 
-                s_TransPos += g_tModWave.PackageSize;
-                if (s_TransPos >= g_tModWave.SampleSize)
-                {
-                    s_ChPos++;
-                    s_TransPos = g_tModWave.SampleOffset;
-                    g_tModWave.StartTrans = 2;
-                }
-                else
-                {
-                    g_tModWave.StartTrans = 3;
-                }
-                break;
-            
-            case 100:
-                g_tModWave.StartTrans = 0;    /* 传输结束 */
-                break;
-        }
-    }
-}
-#endif
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

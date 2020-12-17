@@ -138,6 +138,8 @@ void status_ProgWork(void)
     uint8_t ucAutoState = 0;
     uint8_t ucDetectCount = 0;    /* 连续多少次没有检测到芯片则认为目标板已拔出 */
     int32_t iDetectTime;
+        
+    DSO_StartMode2();   /* 示波器启动模式2-低速多通道扫描 */
     
     /* 读autorun.ini文件，获得缺省lua文件路径 */
     LoadProgAutorunFile(g_tProg.FilePath, sizeof(g_tProg.FilePath));
@@ -282,12 +284,12 @@ void status_ProgWork(void)
     /* V1.36 解决第一次上电第1次烧录失败问题 */
     {
         if (g_gMulSwd.MultiMode == 0)
-        {
-            MUL_PORT_SWD_SETUP();
+        {            
+            swd_init();
         }
         else
         {
-            swd_init();
+            MUL_PORT_SWD_SETUP();
         }
     }
     

@@ -51,7 +51,7 @@
 #define CMD_BE        0xC7		/* 批量擦除命令 */
 
 
-#define CMD_AAI         0xAD  	/* AAI 连续编程指令(FOR SST25VF016B) */
+//#define CMD_AAI         0xAD  	/* AAI 连续编程指令(FOR SST25VF016B) */
 #define CMD_ERASE_CHIP  0xC7		/* CHIP擦除命令, 镁光的片子只支持C7，很多芯片同时支持60和C7 */
 #define CMD_PAGE_PROG   0x02		/* page编程256字节 */
 
@@ -980,8 +980,11 @@ uint8_t W25Q_DetectIC(uint32_t *_id)
     }
     else if (g_tW25Q.ReadIDCmd == 0x90 || g_tW25Q.ReadIDCmd == 0xAB)     /* SST */
     {
-        txbuf[0] = g_tW25Q.ReadIDCmd;    
-        W25Q_SendAndReadData(txbuf, 1, rxbuf, 2);
+        txbuf[0] = g_tW25Q.ReadIDCmd; 
+        txbuf[1] = 0;
+        txbuf[2] = 0;
+        txbuf[3] = 0;       
+        W25Q_SendAndReadData(txbuf, 4, rxbuf, 2);
         
         for (i = 0; i < 4; i++)
         {
@@ -1016,67 +1019,6 @@ uint8_t W25Q_WriteBuf(uint32_t _Addr, uint8_t *_Buf, uint16_t _Len)
 
 /*
 *********************************************************************************************************
-*    函 数 名: W25Q_ReadBuf
-*    功能说明: 读取连续多个字节数据. APROM。  LDROM的数据地址 + 0x10000
-*    形    参: _Addr : 3个字节的地址。整数值
-*              _Buf : 目标缓冲区
-*              _Len : 字节长度
-*    返 回 值: 1表示成功，0表示失败
-*********************************************************************************************************
-*/ 
-uint8_t W25Q_ReadBuf(uint32_t _Addr, uint8_t *_Buf, uint16_t _Len)
-{
-    uint8_t txbuf[5];
-
-    if (g_tW25Q.ReadMode == 0)  /* 单线 */
-    {
-        if (_Addr > 16 * 1024 * 1024)
-        {
-            txbuf[0] = 0x13;    /* 4字节地址，读 */
-            txbuf[1] = _Addr >> 24;
-            txbuf[2] = _Addr >> 16;
-            txbuf[3] = _Addr >> 8;
-            txbuf[4] = _Addr;                
-            
-            W25Q_SendAndReadData(txbuf, 5, _Buf, _Len);
-        }
-        else    
-        {
-            txbuf[0] = 0x03;    /* 3字节地址，读 */
-            txbuf[1] = _Addr >> 16;
-            txbuf[2] = _Addr >> 8;
-            txbuf[3] = _Addr;        
-            W25Q_SendAndReadData(txbuf, 4, _Buf, _Len);        
-        }
-    }
-    else if (g_tW25Q.ReadMode == 1)  /* 双线 */
-    {
-        if (_Addr > 16 * 1024 * 1024)
-        {
-            txbuf[0] = 0x3C;    /* 4字节地址，读 Read daul output */
-            txbuf[1] = _Addr >> 24;
-            txbuf[2] = _Addr >> 16;
-            txbuf[3] = _Addr >> 8;
-            txbuf[4] = _Addr;                
-            
-            W25Q_SendAndReadDataDaul(txbuf, 5, _Buf, _Len);
-        }
-        else    
-        {
-            txbuf[0] = 0x3B;    /* 3字节地址，读 Read daul output */
-            txbuf[1] = _Addr >> 16;
-            txbuf[2] = _Addr >> 8;
-            txbuf[3] = _Addr;
-            txbuf[4] = 0;      /* 空闲字节 */      
-            W25Q_SendAndReadDataDaul(txbuf, 5, _Buf, _Len);        
-        }
-    }
-
-    return 1;
-}
-
-/*
-*********************************************************************************************************
 *    函 数 名: W25Q_CheckBlank
 *    功能说明: 读取连续多个字节数据. APROM。  LDROM的数据地址 + 0x10000
 *    形    参: _Addr : 3个字节的地址。整数值
@@ -1089,6 +1031,13 @@ uint8_t W25Q_CheckBlank(uint32_t _Addr, uint32_t _Len)
     uint8_t txbuf[5];
     uint8_t re;
 
+    if (g_tW25Q.Capacity > 16 * 1024 * 1024)
+    {
+        /* 进入四字节地址模式 */
+        txbuf[0] =  0xB7;
+        W25Q_SendData(txbuf, 1);
+    }
+        
     if (g_tW25Q.ReadMode == 0)  /* 单线 */
     {
         if (_Addr > 16 * 1024 * 1024)
@@ -1211,7 +1160,7 @@ void W25Q_WriteStatus(uint8_t _value)
 */ 
 void W25Q_UnlockBlock(void)
 {
-    if (g_tW25Q.UnlockCmd > 0x00)
+    if (g_tW25Q.UnlockCmd > 0x00)   // SST26 是0x98指令全局解锁保护
     {
         uint8_t txbuf[1];
         
@@ -1220,16 +1169,19 @@ void W25Q_UnlockBlock(void)
         txbuf[0] = g_tW25Q.UnlockCmd;
         W25Q_SendData(txbuf, 1); 
     }
-//    else
-//    {          
-//        W25Q_WriteDisable();
-//        
-//        W25Q_WaitBusy(200);
-//        
-//        W25Q_WriteStatusEnable();   
-//        
-//        W25Q_WriteStatus(0);			/* 解除所有BLOCK的写保护 */
-//    }
+    else  // 0x00 表示写状态寄存器00
+    {          
+        if (g_tW25Q.AutoAddrInc > 0)   // SST25 特殊，缺省是保护，未启用AAI
+        {
+            W25Q_WriteEnable();
+            
+            W25Q_WaitBusy(200);
+            
+            W25Q_WriteStatusEnable();   
+            
+            W25Q_WriteStatus(0x00);			/* 解除所有BLOCK的写保护 */
+        }
+    }
 }
 
 /*
@@ -1408,7 +1360,14 @@ uint8_t W25Q_FLASH_ProgramBuf(uint32_t _Addr, uint8_t *_Buff, uint32_t _Size)
     {
         uint8_t txbuf[5];
         uint32_t i;
-                
+        
+        if (g_tW25Q.Capacity > 16 * 1024 * 1024)
+        {
+            /* 进入四字节地址模式 */
+            txbuf[0] =  0xB7;
+            W25Q_SendData(txbuf, 1);
+        }
+        
         for (i = 0; i < _Size / 256; i++)
         {
             W25Q_WriteEnable();
@@ -1441,44 +1400,68 @@ uint8_t W25Q_FLASH_ProgramBuf(uint32_t _Addr, uint8_t *_Buff, uint32_t _Size)
             _Buff += 256;
         }
     }
-    else    /* 地址递增模式  SST25 */
+    else    /* 地址递增模式  SST25VF020 以下单字节  040以上双字节 */
     {
         uint8_t txbuf[6];
         uint32_t i;
         
         W25Q_WriteEnable();
-       
-//        /* 允许SO输出忙状态 */
-//        txbuf[0] = 0x70;
-//        W25Q_SendData(txbuf, 1);
         
-        txbuf[0] = CMD_AAI;
-        txbuf[1] = _Addr >> 16;
-        txbuf[2] = _Addr >> 8;
-        txbuf[3] = _Addr >> 0; 
-        txbuf[4] = *_Buff++;
-        txbuf[5] = *_Buff++;
-        W25Q_SendData(txbuf, 6);     /* 发送完毕拉高CS */
-        
-        //---- 等so 
-        if (W25Q_WaitBusy(g_tW25Q.ProgPageTimeout) == 0)
+        if (g_tW25Q.AutoAddrInc == 0xAF)    /* 单字节AAI */
         {
-            return 0;   /* 超时异常 */
-        }
-        
-        for (i = 0; i < (_Size - 2) / 2; i++)
-        {
-            txbuf[0] = CMD_AAI;
-            txbuf[1] = *_Buff++;
-            txbuf[2] = *_Buff++;
-            W25Q_SendData(txbuf, 3);     /* 发送完毕拉高CS */
-            
+            txbuf[0] = g_tW25Q.AutoAddrInc;
+            txbuf[1] = _Addr >> 16;
+            txbuf[2] = _Addr >> 8;
+            txbuf[3] = _Addr >> 0; 
+            txbuf[4] = *_Buff++;
+            W25Q_SendData(txbuf, 5);     /* 发送完毕拉高CS */
+
             if (W25Q_WaitBusy(g_tW25Q.ProgPageTimeout) == 0)
             {
                 return 0;   /* 超时异常 */
             }
-        }
+            
+            for (i = 0; i < (_Size - 1) / 1; i++)
+            {
+                txbuf[0] = g_tW25Q.AutoAddrInc;
+                txbuf[1] = *_Buff++;
+                W25Q_SendData(txbuf, 2);     /* 发送完毕拉高CS */
                 
+                if (W25Q_WaitBusy(g_tW25Q.ProgPageTimeout) == 0)
+                {
+                    return 0;   /* 超时异常 */
+                }
+            }
+        }
+        else    /* 0xAD, 双字节AAI */
+        {
+            txbuf[0] = g_tW25Q.AutoAddrInc;
+            txbuf[1] = _Addr >> 16;
+            txbuf[2] = _Addr >> 8;
+            txbuf[3] = _Addr >> 0; 
+            txbuf[4] = *_Buff++;
+            txbuf[5] = *_Buff++;
+            W25Q_SendData(txbuf, 6);     /* 发送完毕拉高CS */
+
+            if (W25Q_WaitBusy(g_tW25Q.ProgPageTimeout) == 0)
+            {
+                return 0;   /* 超时异常 */
+            }
+            
+            for (i = 0; i < (_Size - 2) / 2; i++)
+            {
+                txbuf[0] = g_tW25Q.AutoAddrInc;
+                txbuf[1] = *_Buff++;
+                txbuf[2] = *_Buff++;
+                W25Q_SendData(txbuf, 3);     /* 发送完毕拉高CS */
+                
+                if (W25Q_WaitBusy(g_tW25Q.ProgPageTimeout) == 0)
+                {
+                    return 0;   /* 超时异常 */
+                }
+            }            
+        }
+        
         // 退出AAI
         W25Q_WriteDisable();
 
@@ -1489,5 +1472,74 @@ uint8_t W25Q_FLASH_ProgramBuf(uint32_t _Addr, uint8_t *_Buff, uint32_t _Size)
     }
     return 1;
 }    
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: W25Q_ReadBuf
+*    功能说明: 读取连续多个字节数据. APROM。  LDROM的数据地址 + 0x10000
+*    形    参: _Addr : 3个字节的地址。整数值
+*              _Buf : 目标缓冲区
+*              _Len : 字节长度
+*    返 回 值: 1表示成功，0表示失败
+*********************************************************************************************************
+*/ 
+uint8_t W25Q_ReadBuf(uint32_t _Addr, uint8_t *_Buf, uint16_t _Len)
+{
+    uint8_t txbuf[5];
+
+    if (g_tW25Q.Capacity > 16 * 1024 * 1024)
+    {
+        /* 进入四字节地址模式 */
+        txbuf[0] =  0xB7;
+        W25Q_SendData(txbuf, 1);
+    }
+    
+    if (g_tW25Q.ReadMode == 0)  /* 单线 */
+    {
+        if (g_tW25Q.Capacity > 16 * 1024 * 1024)
+        {
+            txbuf[0] = 0x03;    /* 4字节地址，读 */
+            txbuf[1] = _Addr >> 24;
+            txbuf[2] = _Addr >> 16;
+            txbuf[3] = _Addr >> 8;
+            txbuf[4] = _Addr;                
+            
+            W25Q_SendAndReadData(txbuf, 5, _Buf, _Len);
+        }
+        else    
+        {
+            txbuf[0] = 0x03;    /* 3字节地址，读 */
+            txbuf[1] = _Addr >> 16;
+            txbuf[2] = _Addr >> 8;
+            txbuf[3] = _Addr;        
+            W25Q_SendAndReadData(txbuf, 4, _Buf, _Len);        
+        }
+    }
+    else if (g_tW25Q.ReadMode == 1)  /* 双线 */
+    {
+        if (g_tW25Q.Capacity > 16 * 1024 * 1024)
+        {
+            txbuf[0] = 0x3B;    /* 4字节地址，读 Read daul output */
+            txbuf[1] = _Addr >> 24;
+            txbuf[2] = _Addr >> 16;
+            txbuf[3] = _Addr >> 8;
+            txbuf[4] = _Addr;                
+            txbuf[5] = 0;      /* 空闲字节 */  
+            W25Q_SendAndReadDataDaul(txbuf, 6, _Buf, _Len);
+        }
+        else    
+        {
+            txbuf[0] = 0x3B;    /* 3字节地址，读 Read daul output */
+            txbuf[1] = _Addr >> 16;
+            txbuf[2] = _Addr >> 8;
+            txbuf[3] = _Addr;
+            txbuf[4] = 0;      /* 空闲字节 */      
+            W25Q_SendAndReadDataDaul(txbuf, 5, _Buf, _Len);        
+        }
+    }
+
+    return 1;
+}
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

@@ -82,6 +82,7 @@ static const uint16_t StatusOrder[] =
 */
 void JumpToDAPLink(void);
 extern MENU_T g_tMenu1;
+extern void status_UsbUart(void);
 int main(void)
 {    
     bsp_Init();
@@ -175,8 +176,11 @@ int main(void)
         
         FileSystemLoad();   /* 挂载文件系统 */
             
-        lua_Init();         /* 启动lua */        
+        lua_PowerOnLua();         /* 启动lua */        
     }
+    
+    usbd_CloseCDC();
+    usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
     
     //wifi_state = WIFI_INIT;   
     
@@ -287,6 +291,10 @@ int main(void)
             case MS_DS18B20_METER:  /* DS18B20温度表 */              
                 status_DS18B20Meter();
                 break;              
+            
+            case MS_USB_UART:       /* USB虚拟串口 */
+                status_UsbUart();
+                break;
             
             default:
                 g_MainStatus = MS_LINK_MODE;

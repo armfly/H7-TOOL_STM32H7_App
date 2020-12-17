@@ -6,6 +6,14 @@
 #define  TICK_INT_PRIORITY            0 // ((uint32_t)0x0F) /*!< tick interrupt priority */
 4. bsp_CheckRunTime, bsp_GetRunTime 函数内部去掉关闭中断的操作，影响QSPI写操作。
 
+
+2020-12-13 V1.42  swd_prog_file.c
+1. SWD烧录，编程完毕后执行FLM中的uninit()、target_flash_init(_FlashAddr, 0, FLM_INIT_VERIFY) 后再执行校验。
+   - 烧录STM32F407，会出现init失败。还是还原，取消掉。
+   - 代码可能存在其他问题
+2. FLM文件的校验问题，苏州国芯的QSP FLM，使用FLM_Verify校验失败，使用读回校验正常。
+
+
 2020-09-16  V1.31固件
 普通触发模式还有遗留问题：拖动触发位置滚动条时，超出波形范围后H7-TOOL程序假死（频繁进入看门狗中断），暂未解决。H7-TOOL界面翻到电压档界面可恢复。
 
@@ -28,5 +36,33 @@
     RS232_TX             - RS232串口机台信号扩展 START BUSY OK NG
     RS232_RX             - RS232串口机台信号扩展
   
+  ---中断优先级---
+
+    HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(UART4_IRQn, 0, 4);
+    HAL_NVIC_SetPriority(UART8_IRQn, 0, 6);
+HAL_NVIC_SetPriority(TIM_HARD_IRQn, 0, 2);
+
+tft	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 1);
+tft		HAL_NVIC_SetPriority(SPI5_IRQn, 1, 0);
+
+/* 使能QSPI中断 */
+HAL_NVIC_SetPriority(QUADSPI_IRQn, 0x0F, 0); /* 0x0F --> 0x04， 要高于USB中断 */
+
+/* 使能MDMA中断，并配置优先级 */
+QSPI HAL_NVIC_SetPriority(MDMA_IRQn, 0x02, 0);
+
+HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);
+HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
+  
+  HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
+   HAL_NVIC_SetPriority(CH1_DMA_Stream_IRQn, 1, 0);
+           HAL_NVIC_SetPriority(CH2_DMA_Stream_IRQn, 1, 0);   
+  
+
+【通信协议】
+功能码
+0x61 : H7-TOOL主动发送，比如print信息. 不要求主机应答
 
   

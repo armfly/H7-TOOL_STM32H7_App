@@ -23,6 +23,7 @@
 #include "main.h"
 #include "prog_if.h"
 #include "crc32_stm32.h"
+#include "modbus_print.h"
 
 /* 
 
@@ -252,6 +253,16 @@ int lua_CheckGlobal(const char *name)
     lua_pop(g_Lua, 1);
     
     return re;
+}
+
+// H7-TOOL上电时，启动lua
+void lua_PowerOnLua(void)
+{
+    lua_DeInit();   // 先释放
+    
+    lua_Init();     // 重新分配内存
+    
+    lua_do("beep()"); 
 }
                 
 // 装载文件并初始化lua全局对象
@@ -587,8 +598,7 @@ static int HexToBinString(lua_State* L)
 *    返 回 值: 无
 *********************************************************************************************************
 */
-extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
-extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
+extern void MODH_PrintByte(char _ch);
 static int print_hex(lua_State* L)
 {
     const char *data;
@@ -627,11 +637,8 @@ static int print_hex(lua_State* L)
         if (i > 1)
         {
             strcpy(&buf[strlen(buf)], "\r\n");
-            #if PRINT_TO_UDP == 1
-                lua_udp_SendBuf((uint8_t *)buf, strlen(buf), LUA_UDP_PORT);
-            #else    
-                USBCom_SendBuf(1, (uint8_t *)buf, strlen(buf));
-            #endif             
+            
+            MODH_PrintBuf((uint8_t *)buf, strlen(buf));            
         }
         return 0;
     }
@@ -684,11 +691,7 @@ static int print_hex(lua_State* L)
         }
         buf[pos++] = '\r'; 
         buf[pos++] = '\n'; 
-        #if PRINT_TO_UDP == 1
-            lua_udp_SendBuf((uint8_t *)buf, pos, LUA_UDP_PORT);
-        #else    
-            USBCom_SendBuf(1, (uint8_t *)buf, pos);
-        #endif        
+        MODH_PrintBuf((uint8_t *)buf, pos);   
         bsp_Idle();
     }
     
@@ -704,12 +707,8 @@ static int print_hex(lua_State* L)
             buf[pos++] = ' ';
         }
         buf[pos++] = '\r'; 
-        buf[pos++] = '\n'; 
-        #if PRINT_TO_UDP == 1
-            lua_udp_SendBuf((uint8_t *)buf, pos, LUA_UDP_PORT);
-        #else    
-            USBCom_SendBuf(1, (uint8_t *)buf, pos);
-        #endif         
+        buf[pos++] = '\n';   
+        MODH_PrintBuf((uint8_t *)buf, pos); 
     }
     
     return 1;

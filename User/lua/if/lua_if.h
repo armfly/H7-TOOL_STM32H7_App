@@ -43,6 +43,7 @@
 
 void lua_Test(void);
 void lua_Init(void);
+void lua_PowerOnLua(void);
 void lua_DeInit(void);
 void lua_StackDump(lua_State *L);
 void lua_DownLoad(uint32_t _addr, uint8_t *_buf, uint32_t _len, uint32_t _total_len);

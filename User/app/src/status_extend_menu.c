@@ -26,8 +26,9 @@ const uint8_t *g_Menu1_Text[] =
     " 3 脱机烧录器(多路)",
     " 4 LUA小程序",
     " 5 数据监视器",
-    " 6 系统设置", 
-
+    " 6 USB虚拟串口", 
+    " 7 系统设置", 
+    
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"    
 };
@@ -136,8 +137,12 @@ void status_ExtendMenu1(void)
                     }   
                     else if (g_tMenu1.Cursor == 5)
                     {
+                        g_MainStatus = MS_USB_UART;                        
+                    }
+                    else if (g_tMenu1.Cursor == 6)
+                    {
                         g_MainStatus = MS_SYSTEM_SET;                        
-                    }                   
+                    }                     
                     break;
 
                 case KEY_UP_C:          /* C键 下 */

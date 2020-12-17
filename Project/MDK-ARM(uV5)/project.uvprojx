@@ -469,6 +469,11 @@
               <FilePath>..\..\User\app\src\status_lua.c</FilePath>
             </File>
             <File>
+              <FileName>status_usb_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\app\src\status_usb_uart.c</FilePath>
+            </File>
+            <File>
               <FileName>file_lib.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\app\src\file_lib.c</FilePath>
@@ -1524,6 +1529,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\modbus\modbus_swd.c</FilePath>
             </File>
+            <File>
+              <FileName>modbus_print.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\modbus\modbus_print.c</FilePath>
+            </File>
+            <File>
+              <FileName>modbus_host.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\modbus\modbus_host.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2066,6 +2081,16 @@
               <FileName>SW_DP_Multi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\daplink\source\daplink\cmsis-dap\SW_DP_Multi.c</FilePath>
+            </File>
+            <File>
+              <FileName>DAP.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\daplink\source\daplink\cmsis-dap\DAP.h</FilePath>
+            </File>
+            <File>
+              <FileName>DAP_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\daplink\source\hic_hal\stm32\stm32h750\DAP_config.h</FilePath>
             </File>
           </Files>
         </Group>

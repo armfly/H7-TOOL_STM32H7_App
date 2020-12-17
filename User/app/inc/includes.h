@@ -33,6 +33,7 @@
 #include "ui_def.h"
 #include "param.h"
 #include "modbus_register.h"
+#include "modbus_reg_addr.h"
 #include "disp_lib.h"    
 #include "lcd_menu.h"
 #include "file_lib.h"
@@ -84,6 +85,7 @@ enum
     MS_JUMP_APP,            /* 跳到APP状态 */
     
     MS_DS18B20_METER,       /* DS18B20温度表 */
+    MS_USB_UART,            /* USB虚拟串口 */
 };
 
 uint16_t NextStatus(uint16_t _NowStatus);

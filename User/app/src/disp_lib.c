@@ -132,7 +132,7 @@ void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth
 /*
 *********************************************************************************************************
 *    函 数 名: DispLabel
-*    功能说明: 显示一个文本标签框
+*    功能说明: 显示一个文本标签框, 矩形边角
 *    形    参: _usX : 坐标X
 *              _usY : 坐标Y
 *              _usHeight : 高度
@@ -146,9 +146,22 @@ void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth
 void DispLabel(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
     uint16_t _usColor, char *_pStr, FONT_T *_tFont)
 {    
+    uint16_t fh;
+    uint16_t offset;
+    
+    fh = LCD_GetFontHeight(_tFont);
+    if (_usHeight > fh)
+    {
+        offset = (_usHeight - fh) / 2;
+    }
+    else
+    {
+        offset = 0;
+    }    
+    
     /* 填充矩形 */
     LCD_Fill_Rect(_usX, _usY, _usHeight, _usWidth, _usColor);    
-    LCD_DispStr(_usX, _usY, _pStr, _tFont);
+    LCD_DispStr(_usX + 2, _usY + offset, _pStr, _tFont);
 }  
 
 /*

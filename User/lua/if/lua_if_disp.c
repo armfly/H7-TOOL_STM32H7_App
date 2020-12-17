@@ -528,7 +528,7 @@ static int lua_DrawLine(lua_State* L)
     /* 第5个参数 */
     if (lua_type(L, 5) == LUA_TNUMBER)  
     {
-        color = luaL_checknumber(L, 4);
+        color = luaL_checknumber(L, 5);
     }
     else
     {

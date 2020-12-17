@@ -128,7 +128,7 @@ enum
 
 /* 4-byte Address Mode Operations */
 #define ENTER_4_BYTE_ADDR_MODE_CMD 0xB7
-#define EXIT_4_BYTE_ADDR_MODE_CMD 0xE9
+#define EXIT_4_BYTE_ADDR_MODE_CMD  0xE9
 
 /* Quad Operations */
 #define ENTER_QUAD_CMD 0x35

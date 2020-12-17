@@ -377,7 +377,19 @@ AI : 示波器 CH1 均值, mV单位
 #define REG03_NET_SYSTEM_IP_L   0xFF13  /* 管理系统IP地址低位  */
 #define REG03_NET_SYSTEM_PORT   0xFF14  /* 远程服务器端口 */
 
-#define REG03_RESET_TO_BOOT 0xFF7F /* 特殊寄存器，复位进入BOOT */
+#define REG03_RESET_TO_BOOT     0xFF7F  /* 特殊寄存器，复位进入BOOT
+    1 - 复位进入APP
+    2 - 复位进入BOOT
+    3 - 进入DAP
+    4 - 进入U盘模式
+    5 - 进入APP联机界面00
+*/
+    #define JUMP_TO_APP    1
+    #define JUMP_TO_BOOT   2
+    #define JUMP_TO_DAP    3
+    #define JUMP_TO_EMMC   4
+    #define JUMP_TO_LINK   5
+    
 
 /* BOOT 程序用的寄存器 */
 #define REG03_BOOT_CPU_ID0      0xFF80
@@ -392,10 +404,14 @@ AI : 示波器 CH1 均值, mV单位
 #define REG03_BOOT_PROG_TYPE    0xFF88  /* APP程序类型: 0 = CPU内部Flash ; 1 = QSPI Flash */
 #define REG03_BOOT_PROG_ADDR    0xFF89  /* APP程序地址 32位 */
 #define REG03_BOOT_PROG_SIZE    0xFF8B  /* APP程序长度 32位 */
+
 /* 系统控制参数  
     1 - 通知开始升级，设备开始擦除flash. 根据前面2个寄存器决定擦除空间 
     2 - 通知设备程序下载完毕
     3 - 通知系统复位
+    
+    4 - 进入U盘模式
+    5 - 退出U盘模式（需要RJ45）
 */
 #define REG03_BOOT_SYSTEM       0xFF8D
 
