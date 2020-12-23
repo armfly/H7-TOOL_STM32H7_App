@@ -15,6 +15,7 @@
 *********************************************************************************************************
 */
 #include "bsp.h"
+#include "nvic_prio_cfg.h"
 
 static void SystemClock_Config(void);
 static void CPU_CACHE_Enable(void);
@@ -98,6 +99,8 @@ void bsp_Init(void)
     bsp_InitRTC();      /* 初始化时钟 */
     
     bsp_InitRNG();      /* 配置启用随机数模块 */
+    
+    HAL_NVIC_SetPriority(SysTick_IRQn, SysTick_IRQ_PRIO, 0U);  /* 重置SysTick优先级最高 */
 }
 
 
@@ -142,7 +145,7 @@ static void SystemClock_Config(void)
 {
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+    RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
     HAL_StatusTypeDef ret = HAL_OK;
 
     /* 锁住SCU(Supply configuration update) */
@@ -326,10 +329,10 @@ static void MPU_Config(void)
     MPU_InitStruct.Size = MPU_REGION_SIZE_16KB;
     MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
     MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-    MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
-    MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+    MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+    MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
     MPU_InitStruct.Number = MPU_REGION_NUMBER1;
-    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+    MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL1;
     MPU_InitStruct.SubRegionDisable = 0x00;
     MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
 
@@ -496,6 +499,8 @@ extern void lua_Poll(void);
 extern void wifi_task(void);
 extern void EXIO_ScanTask(void);
 extern void LCD_Task(void);
+extern void PC_CmdTask(void);
+extern void DelayOpenUSBTask(void);
 void bsp_Idle(void)
 {
     /* --- 喂狗 */
@@ -508,7 +513,11 @@ void bsp_Idle(void)
     
     EXIO_ScanTask();        /* 扩展IO任务 */
     
-    LCD_Task();    			/* 显示屏任务，硬件SPI+DMA+刷屏 */
+    LCD_Task();    			/* 显示屏任务，硬件SPI+DMA+刷屏 */   
+    
+    PC_CmdTask();           /* PC机控制任务 */
+    
+    DelayOpenUSBTask();     /* 延迟启动USB */
 }
 
 /*

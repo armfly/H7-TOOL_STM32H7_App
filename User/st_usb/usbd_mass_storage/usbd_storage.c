@@ -129,6 +129,7 @@ int8_t STORAGE_Init(uint8_t lun)
     {
         case LUN_SD:    
             BSP_MMC_Init();
+
             BSP_MMC_GetCardInfo(&g_emmcInfo);
             ret = 0;
             break;

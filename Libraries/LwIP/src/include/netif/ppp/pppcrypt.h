@@ -36,13 +36,17 @@
 /* This header file is included in all PPP modules needing hashes and/or ciphers */
 
 #ifndef PPPCRYPT_H
-#define    PPPCRYPT_H
+#define	PPPCRYPT_H
 
 /*
  * If included PolarSSL copy is not used, user is expected to include
  * external libraries in arch/cc.h (which is included by lwip/arch.h).
  */
 #include "lwip/arch.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  * Map hashes and ciphers functions to PolarSSL
@@ -130,6 +134,10 @@
 #endif /* LWIP_USE_EXTERNAL_MBEDTLS */
 
 void pppcrypt_56_to_64_bit_key(u_char *key, u_char *des_key);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PPPCRYPT_H */
 

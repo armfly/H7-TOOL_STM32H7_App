@@ -3155,7 +3155,6 @@ void LCD_FillRoundRect(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_
     LCD_FillQuterCircle(_usX + _usRadius, _usY + _usHeight - _usRadius - 1, _usRadius, _usColor, 3); /* 左下角的弧 */
 }
 
-
 /*
 *********************************************************************************************************
 *    函 数 名: __MemoAddStr

@@ -27,6 +27,7 @@
 *********************************************************************************************************
 */
 #include "bsp.h"
+#include "nvic_prio_cfg.h"
 
 /*
     定义用于硬件定时器的TIM， 可以使 TIM2 - TIM5
@@ -701,7 +702,7 @@ void bsp_InitHardTimer(void)
     
     /* 配置定时器中断，给CC捕获比较中断使用 */
     {
-        HAL_NVIC_SetPriority(TIM_HARD_IRQn, 0, 2);
+        HAL_NVIC_SetPriority(TIM_HARD_IRQn, TIM_HARD_IRQ_PRIO, 0);
         HAL_NVIC_EnableIRQ(TIM_HARD_IRQn);  
     }
     

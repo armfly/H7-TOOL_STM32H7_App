@@ -47,6 +47,10 @@
 #include "lwip/ip6_addr.h"
 #endif /* PPP_IPV6_SUPPORT */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Disable non-working or rarely used PPP feature, so rarely that we don't want to bloat ppp_opts.h with them */
 #ifndef PPP_OPTIONS
 #define PPP_OPTIONS         0
@@ -103,8 +107,8 @@
 /*
  * The basic PPP frame.
  */
-#define PPP_HDRLEN    4    /* octets for standard ppp header */
-#define PPP_FCSLEN    2    /* octets for FCS */
+#define PPP_HDRLEN	4	/* octets for standard ppp header */
+#define PPP_FCSLEN	2	/* octets for FCS */
 
 /*
  * Values for phase.
@@ -684,6 +688,10 @@ err_t ppp_ioctl(ppp_pcb *pcb, u8_t cmd, void *arg);
 /* Set an lwIP-style link-callback for the selected PPP device */
 #define ppp_set_netif_linkcallback(ppp, link_cb)           \
         netif_set_link_callback(ppp->netif, link_cb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PPP_H */
 

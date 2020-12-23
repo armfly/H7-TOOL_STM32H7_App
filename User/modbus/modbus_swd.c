@@ -33,8 +33,9 @@
 /* 64H帧子功能码定义 */
 enum
 {
-    H66_READ_MEM    = 0,    /* 读内存, */
-    H66_WRITE_MEM   = 1,    /* 写内存 */
+    H66_READ_MEM_INIT   = 0,    /* 读内存, */
+    H66_READ_MEM        = 1,    /* 写内存 */
+    H66_WRITE_MEM       = 2,    /* 写内存 */    
 };
 
 static void MODS66_ReadMem(void);
@@ -82,7 +83,7 @@ void MODS_66H(void)
     
     func = BEBufToUint16(&g_tModS.RxBuf[2]);
     
-    if (func == H66_READ_MEM)     /* 下载lua程序 */
+    if (func == H66_READ_MEM || func == H66_READ_MEM_INIT)
     {
         MODS66_ReadMem();         
     }
@@ -117,6 +118,7 @@ err_ret:
 *    返 回 值: 无
 *********************************************************************************************************
 */
+extern void pg_init(void);
 static void MODS66_ReadMem(void)
 {
     /*
@@ -124,8 +126,9 @@ static void MODS66_ReadMem(void)
             01  ; 站号
             66  ; 功能码
             0000  ; 子功能,
-                - 0表示读内存
-                - 1表示写内存
+                - 0表示读内存（需要初始化pg_init())
+                - 1表示读内存 (连续读，无需初始化）
+                - 2 写
             0000 0000 : 偏移地址 4字节
             0020 0000 : 数据长度 4字节
             CCCC      : CRC16
@@ -150,7 +153,12 @@ static void MODS66_ReadMem(void)
     func = BEBufToUint16(&g_tModS.RxBuf[2]);
     offset_addr = BEBufToUint32(&g_tModS.RxBuf[4]);
     package_len = BEBufToUint32(&g_tModS.RxBuf[8]);
-        
+    
+    if (func == H66_READ_MEM_INIT)
+    {
+        pg_init();  /* 第1包数据，初始化硬件 */
+    }
+    
     {
         if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
         {
@@ -275,8 +283,9 @@ static void MODS66_WriteMem(void)
             01  ; 站号
             66  ; 功能码
             0001  ; 子功能,
-                - 0表示读内存
-                - 1表示写内存
+                - 0表示读内存（需要初始化pg_init())
+                - 1表示读内存 (连续读，无需初始化）
+                - 2 写
             0000 0000 : 偏移地址 4字节
             0020 0000 : 数据长度 4字节
             ... 数据

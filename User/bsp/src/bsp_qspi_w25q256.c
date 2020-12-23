@@ -17,6 +17,7 @@
 */
 
 #include "bsp.h"
+#include "nvic_prio_cfg.h"
 
 /* 
     STM32-V7开发板接线
@@ -249,7 +250,7 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi)
     HAL_GPIO_Init(QSPI_BK1_D3_GPIO_PORT, &GPIO_InitStruct);
 
     /* 使能QSPI中断 */
-    HAL_NVIC_SetPriority(QUADSPI_IRQn, 0x0F, 0); /* 0x0F --> 0x04， 要高于USB中断 */
+    HAL_NVIC_SetPriority(QUADSPI_IRQn, QSPI_IRQ_PRIO, 0); /* 0x0F --> 0x04， 要高于USB中断 */
     HAL_NVIC_EnableIRQ(QUADSPI_IRQn);
 
     /* 配置MDMA时钟 */
@@ -280,7 +281,7 @@ void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi)
     HAL_MDMA_Init(&hmdma);
 
     /* 使能MDMA中断，并配置优先级 */
-    HAL_NVIC_SetPriority(MDMA_IRQn, 0x02, 0);
+    HAL_NVIC_SetPriority(MDMA_IRQn, QSPI_MDMA_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(MDMA_IRQn);
 }
 

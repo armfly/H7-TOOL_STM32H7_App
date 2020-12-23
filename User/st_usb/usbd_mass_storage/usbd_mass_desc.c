@@ -49,11 +49,11 @@
 #include "usbd_mass_desc.h"
 #include "usbd_conf.h"
 
-#define printf_ok           printf
-//#define printf_ok(...)
+//#define printf_ok           printf
+#define printf_ok(...)
 
-#define printf_err            printf
-//#define printf_err(...)
+//#define printf_err            printf
+#define printf_err(...)
 
 /* Private typedef ----------------------------------------------------------- */
 /* Private define ------------------------------------------------------------ */

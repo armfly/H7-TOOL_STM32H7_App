@@ -45,6 +45,12 @@
 
 /* Includes ------------------------------------------------------------------ */
 #include "usb_if.h"
+#include "nvic_prio_cfg.h"
+
+#include "param.h"
+
+//#define print_ok        printf
+#define print_ok(...)
 
 /* Private typedef ----------------------------------------------------------- */
 /* Private define ------------------------------------------------------------ */
@@ -164,7 +170,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef * hpcd)
     __HAL_RCC_USB1_OTG_HS_CLK_ENABLE();
 
     /* Set USBHS Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority(OTG_HS_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, OTG_HS_IRQ_PRIG, 0);
 
     /* Enable USBHS Interrupt */
     HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
@@ -202,6 +208,7 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef * hpcd)
 {
+  print_ok("HAL_PCD_SetupStageCallback()\r\n"); 
   USBD_LL_SetupStage(hpcd->pData, (uint8_t *) hpcd->Setup);
 }
 
@@ -213,6 +220,7 @@ void HAL_PCD_SetupStageCallback(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
+  print_ok("HAL_PCD_DataOutStageCallback()\r\n"); 
   USBD_LL_DataOutStage(hpcd->pData, epnum, hpcd->OUT_ep[epnum].xfer_buff);
 }
 
@@ -224,6 +232,7 @@ void HAL_PCD_DataOutStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   */
 void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
+  print_ok("HAL_PCD_DataInStageCallback()\r\n");
   USBD_LL_DataInStage(hpcd->pData, epnum, hpcd->IN_ep[epnum].xfer_buff);
 }
 
@@ -234,6 +243,7 @@ void HAL_PCD_DataInStageCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   */
 void HAL_PCD_SOFCallback(PCD_HandleTypeDef * hpcd)
 {
+  print_ok("HAL_PCD_SOFCallback()\r\n");
   USBD_LL_SOF(hpcd->pData);
 }
 
@@ -243,9 +253,10 @@ void HAL_PCD_SOFCallback(PCD_HandleTypeDef * hpcd)
   * @retval None
   */
 void HAL_PCD_ResetCallback(PCD_HandleTypeDef * hpcd)
-{
+{    
   USBD_SpeedTypeDef speed = USBD_SPEED_FULL;
 
+  print_ok("HAL_PCD_ResetCallback()\r\n");    
   /* Set USB Current Speed */
   switch (hpcd->Init.speed)
   {
@@ -275,6 +286,9 @@ void HAL_PCD_ResetCallback(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_SuspendCallback(PCD_HandleTypeDef * hpcd)
 {
+  print_ok("HAL_PCD_SuspendCallback()\r\n");   
+  //g_tVar.UsbEmmcRemoved = 1;
+    
   USBD_LL_Suspend(hpcd->pData);
 }
 
@@ -285,6 +299,7 @@ void HAL_PCD_SuspendCallback(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_ResumeCallback(PCD_HandleTypeDef * hpcd)
 {
+  print_ok("HAL_PCD_ResumeCallback()\r\n");     
   USBD_LL_Resume(hpcd->pData);
 }
 
@@ -296,6 +311,7 @@ void HAL_PCD_ResumeCallback(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
+  print_ok("HAL_PCD_ISOOUTIncompleteCallback()\r\n");  
   USBD_LL_IsoOUTIncomplete(hpcd->pData, epnum);
 }
 
@@ -307,6 +323,7 @@ void HAL_PCD_ISOOUTIncompleteCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   */
 void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
 {
+  print_ok("HAL_PCD_ISOINIncompleteCallback()\r\n");
   USBD_LL_IsoINIncomplete(hpcd->pData, epnum);
 }
 
@@ -317,6 +334,7 @@ void HAL_PCD_ISOINIncompleteCallback(PCD_HandleTypeDef * hpcd, uint8_t epnum)
   */
 void HAL_PCD_ConnectCallback(PCD_HandleTypeDef * hpcd)
 {
+  print_ok("HAL_PCD_ConnectCallback()\r\n");    
   USBD_LL_DevConnected(hpcd->pData);
 }
 
@@ -327,7 +345,8 @@ void HAL_PCD_ConnectCallback(PCD_HandleTypeDef * hpcd)
   */
 void HAL_PCD_DisconnectCallback(PCD_HandleTypeDef * hpcd)
 {
-  USBD_LL_DevDisconnected(hpcd->pData);
+  print_ok("HAL_PCD_DisconnectCallback()\r\n");    
+  USBD_LL_DevDisconnected(hpcd->pData);   
 }
 
 

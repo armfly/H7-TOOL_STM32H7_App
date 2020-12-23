@@ -14,6 +14,6 @@
 #ifndef __MODBUS_FILE_H_
 #define __MODBUS_FILE_H_
 
-
+uint8_t MODS_H64CheckEnd(uint8_t *_buf, uint16_t _len);
 
 #endif

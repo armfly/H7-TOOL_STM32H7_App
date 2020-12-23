@@ -18,6 +18,7 @@
 
 #include "bsp.h"
 #include "param.h"
+#include "nvic_prio_cfg.h"
 
 /*
     PF11/ADC1_INP2    ---- CH1电压
@@ -798,10 +799,10 @@ void DSO_SetTriger(void)
 
     /* NVIC configuration for ADC interrupt */
     /* Priority: high-priority */
-    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(ADC_IRQn, CH1_ADC_IRQ_PRIO, 0);
     HAL_NVIC_DisableIRQ(ADC_IRQn);    
     
-    HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(ADC3_IRQn, CH2_ADC3_IRQ_PRIO, 0);
     HAL_NVIC_DisableIRQ(ADC3_IRQn); 
 
     {
@@ -986,10 +987,10 @@ void DSO_CloseTriger(void)
 
     /* NVIC configuration for ADC interrupt */
     /* Priority: high-priority */
-    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(ADC_IRQn, CH1_ADC_IRQ_PRIO, 0);
     HAL_NVIC_DisableIRQ(ADC_IRQn);    
     
-    HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(ADC3_IRQn, CH2_ADC3_IRQ_PRIO, 0);
     HAL_NVIC_DisableIRQ(ADC3_IRQn);    
 }
 
@@ -1756,7 +1757,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle1);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CH1_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CH1_DMA_Stream_IRQn, CH1_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CH1_DMA_Stream_IRQn);  
         }
         else if (hadc->Instance == ADCH2)
@@ -1813,7 +1814,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle2);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CH2_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CH2_DMA_Stream_IRQn, CH2_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CH2_DMA_Stream_IRQn);       
         }    
     }
@@ -1871,7 +1872,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle1);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, CT_CH1_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CT_CH1_DMA_Stream_IRQn);  
         }
         else if (hadc->Instance == CT_ADCH2)
@@ -1928,7 +1929,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle2);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);       
         }    
     }
@@ -1996,7 +1997,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle1);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, CT_CH1_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CT_CH1_DMA_Stream_IRQn);  
         }
         else if (hadc->Instance == ADC3)
@@ -2052,7 +2053,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle2);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, 1, 0);
+            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
             HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);  
         }        
     }

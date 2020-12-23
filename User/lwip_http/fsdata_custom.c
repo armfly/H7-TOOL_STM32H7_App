@@ -6,53 +6,27 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice,
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other
-  *    contributors to this software may be used to endorse or promote products
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under
-  *    this license is void and will automatically terminate your rights under
-  *    this license.
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
   
 #include "lwip/apps/fs.h"
 #include "lwip/def.h"
-#include "httpd/fsdata.h"
+//#include "httpd/fsdata.h"
 
 
 #define file_NULL (struct fsdata_file *) NULL
 
 
-static const unsigned int dummy_align__STM32H7xx_files_logo_jpg = 0;
-static const unsigned char data__STM32H7xx_files_logo_jpg[] = {
+const unsigned int dummy_align__STM32H7xx_files_logo_jpg = 0;
+const unsigned char data__STM32H7xx_files_logo_jpg[] = {
 /* /STM32H7xx_files/logo.jpg (26 chars) */
 0x2f,0x53,0x54,0x4d,0x33,0x32,0x48,0x37,0x78,0x78,0x5f,0x66,0x69,0x6c,0x65,0x73,
 0x2f,0x6c,0x6f,0x67,0x6f,0x2e,0x6a,0x70,0x67,0x00,0x00,0x00,
@@ -235,8 +209,8 @@ static const unsigned char data__STM32H7xx_files_logo_jpg[] = {
 0x22,0x04,0x31,0x25,0x72,0x04,0x48,0xe2,0x42,0xf0,0x54,0xef,0x56,0x37,0x2b,0x1d,
 0x99,0x3d,0xa7,0x18,0xa2,0x8a,0x2e,0x85,0xff,0xd9,};
 
-static const unsigned int dummy_align__STM32H7xx_files_ST_gif = 1;
-static const unsigned char data__STM32H7xx_files_ST_gif[] = {
+const unsigned int dummy_align__STM32H7xx_files_ST_gif = 1;
+const unsigned char data__STM32H7xx_files_ST_gif[] = {
 /* /STM32H7xx_files/ST.gif (24 chars) */
 0x2f,0x53,0x54,0x4d,0x33,0x32,0x48,0x37,0x78,0x78,0x5f,0x66,0x69,0x6c,0x65,0x73,
 0x2f,0x53,0x54,0x2e,0x67,0x69,0x66,0x00,
@@ -563,8 +537,8 @@ static const unsigned char data__STM32H7xx_files_ST_gif[] = {
 0xca,0x80,0x03,0x45,0x5c,0xa2,0x5a,0xfc,0x14,0x3c,0x2a,0xa0,0xea,0xa9,0xa3,0x7f,
 0x12,0x10,0x00,0x3b,};
 
-static const unsigned int dummy_align__STM32H7xx_files_stm32_jpg = 2;
-static const unsigned char data__STM32H7xx_files_stm32_jpg[] = {
+const unsigned int dummy_align__STM32H7xx_files_stm32_jpg = 2;
+const unsigned char data__STM32H7xx_files_stm32_jpg[] = {
 /* /STM32H7xx_files/stm32.jpg (27 chars) */
 0x2f,0x53,0x54,0x4d,0x33,0x32,0x48,0x37,0x78,0x78,0x5f,0x66,0x69,0x6c,0x65,0x73,
 0x2f,0x73,0x74,0x6d,0x33,0x32,0x2e,0x6a,0x70,0x67,0x00,0x00,
@@ -3126,8 +3100,8 @@ static const unsigned char data__STM32H7xx_files_stm32_jpg[] = {
 0x00,0x51,0x45,0x14,0x00,0x51,0x45,0x14,0x00,0x51,0x45,0x14,0x00,0x51,0x45,0x14,
 0x00,0x51,0x45,0x14,0x00,0x51,0x45,0x14,0x01,0xff,0xd9,};
 
-static const unsigned int dummy_align__404_html = 3;
-static const unsigned char data__404_html[] = {
+const unsigned int dummy_align__404_html = 3;
+const unsigned char data__404_html[] = {
 /* /404.html (10 chars) */
 0x2f,0x34,0x30,0x34,0x2e,0x68,0x74,0x6d,0x6c,0x00,0x00,0x00,
 
@@ -3224,8 +3198,8 @@ static const unsigned char data__404_html[] = {
 0x0d,0x0a,0x3c,0x2f,0x62,0x6f,0x64,0x79,0x3e,0x3c,0x2f,0x68,0x74,0x6d,0x6c,0x3e,
 };
 
-static const unsigned int dummy_align__index_html = 4;
-static const unsigned char data__index_html[] = {
+const unsigned int dummy_align__index_html = 4;
+const unsigned char data__index_html[] = {
 /* /index.html (12 chars) */
 0x2f,0x69,0x6e,0x64,0x65,0x78,0x2e,0x68,0x74,0x6d,0x6c,0x00,
 
@@ -3968,8 +3942,8 @@ static const unsigned char data__index_html[] = {
 0x76,0x3e,0x0d,0x0a,0x3c,0x2f,0x64,0x69,0x76,0x3e,0x0d,0x0a,0x3c,0x2f,0x62,0x6f,
 0x64,0x79,0x3e,0x3c,0x2f,0x68,0x74,0x6d,0x6c,0x3e,};
 
-static const unsigned int dummy_align__STM32H7xxADC_shtml = 5;
-static const unsigned char data__STM32H7xxADC_shtml[] = {
+const unsigned int dummy_align__STM32H7xxADC_shtml = 5;
+const unsigned char data__STM32H7xxADC_shtml[] = {
 /* /STM32H7xxADC.shtml (20 chars) */
 0x2f,0x53,0x54,0x4d,0x33,0x32,0x48,0x37,0x78,0x78,0x41,0x44,0x43,0x2e,0x73,0x68,
 0x74,0x6d,0x6c,0x00,
@@ -4262,8 +4236,8 @@ Pragma: no-cache
 0x3e,0x26,0x6e,0x62,0x73,0x70,0x3b,0x3c,0x2f,0x66,0x6f,0x6e,0x74,0x3e,0x0d,0x0a,
 0x3c,0x2f,0x62,0x6f,0x64,0x79,0x3e,0x3c,0x2f,0x68,0x74,0x6d,0x6c,0x3e,};
 
-static const unsigned int dummy_align__STM32H7xxLED_html = 6;
-static const unsigned char data__STM32H7xxLED_html[] = {
+const unsigned int dummy_align__STM32H7xxLED_html = 6;
+const unsigned char data__STM32H7xxLED_html[] = {
 /* /STM32H7xxLED.html (19 chars) */
 0x2f,0x53,0x54,0x4d,0x33,0x32,0x48,0x37,0x78,0x78,0x4c,0x45,0x44,0x2e,0x68,0x74,
 0x6d,0x6c,0x00,0x00,
@@ -4621,6 +4595,5 @@ sizeof(data__STM32H7xxLED_html) - 20,
 1,
 }};
 
-#define FS_ROOT file__STM32H7xxLED_html
-#define FS_NUMFILES 7
+
 

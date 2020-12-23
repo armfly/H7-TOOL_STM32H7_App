@@ -16,7 +16,7 @@
 #include "modbus_print.h"
 #include "net_udp.h"
 
-#define PRINT_FIFO_SIZE 1024
+#define PRINT_FIFO_SIZE 8*1024
 
 typedef struct
 {
@@ -60,7 +60,9 @@ void MODH_Send61H(uint8_t _Ch, uint8_t *_TxBuf, uint16_t _TxLen)
     g_tModH.TxBuf[g_tModH.TxCount++] = g_tParam.Addr485;        /* 本机地址 */
     g_tModH.TxBuf[g_tModH.TxCount++] = 0x61;                         /* 功能码 */
     g_tModH.TxBuf[g_tModH.TxCount++] = _Ch;
-    
+    g_tModH.TxBuf[g_tModH.TxCount++] = _TxLen >> 8;
+    g_tModH.TxBuf[g_tModH.TxCount++] = _TxLen;
+        
     for (i = 0; i < _TxLen; i++)
     {
         g_tModH.TxBuf[g_tModH.TxCount++] = _TxBuf[i];
@@ -137,7 +139,7 @@ void MODH_PrintBuf(uint8_t *_buf, uint16_t _len)
         }
     }
 
-    if (s_tPrintFiFo.Count >= 512)     
+    if (s_tPrintFiFo.Count >= PRINT_FIFO_SIZE / 2)     
     {
         stime = 100;        /* 如果已经快满了，则尽快启动一次发送 */
     }
@@ -167,31 +169,93 @@ void MODH_PrintBuf(uint8_t *_buf, uint16_t _len)
 */
 static void print_send(void)
 {
-    udp_tx_len = 0;
-    while (1)
-    {        
-        if (s_tPrintFiFo.Read == s_tPrintFiFo.Write)
-        {
-            break;
-        }
-        
-        udp_tx_buf[udp_tx_len] = s_tPrintFiFo.TxBuf[s_tPrintFiFo.Read];
-        if (++s_tPrintFiFo.Read >= PRINT_FIFO_SIZE)
-        {
-            s_tPrintFiFo.Read = 0;
-        }
-        s_tPrintFiFo.Count--;        
-        
-        if (++udp_tx_len >= UDP_TX_SIZE)
-        {
-            break;
-        }
-    }
+    #if 1
+        /*
+            H7-TOOL主动发送: 
+                01  ; 从机地址 ，为1
+                61  ; 功能码
+                00  ; 通道号，00表示print
+                01  : 长度高字节
+                08  : 长度低字节
+                xx xx xx xx ... : 数据体           
+                CC CC : CRC16
+        */
+        uint16_t crc;
+        uint16_t len;
 
-    udp_print_send(udp_tx_buf, udp_tx_len);
+        udp_tx_len = 0;
+        
+        udp_tx_buf[udp_tx_len++] = g_tParam.Addr485;        /* 本机地址 */
+        udp_tx_buf[udp_tx_len++] = 0x61;
+        udp_tx_buf[udp_tx_len++] = 0x00;
+        udp_tx_buf[udp_tx_len++] = 0;
+        udp_tx_buf[udp_tx_len++] = 0; 
+
+        len = 0;
+        while (1)
+        {        
+            if (s_tPrintFiFo.Read == s_tPrintFiFo.Write)
+            {
+                break;
+            }
+            
+            udp_tx_buf[udp_tx_len] = s_tPrintFiFo.TxBuf[s_tPrintFiFo.Read];
+            if (++s_tPrintFiFo.Read >= PRINT_FIFO_SIZE)
+            {
+                s_tPrintFiFo.Read = 0;
+            }
+            s_tPrintFiFo.Count--;        
+            
+            len++;
+            if (++udp_tx_len >= UDP_TX_SIZE - 7)
+            {
+                break;
+            }
+        }
+        udp_tx_buf[3] = len >> 8;
+        udp_tx_buf[4] = len;
+        
+        crc = CRC16_Modbus(udp_tx_buf, udp_tx_len);
+        udp_tx_buf[udp_tx_len++] = crc >> 8;
+        udp_tx_buf[udp_tx_len++]  = crc;    
+        
+        
+        if (g_tVar.LinkState == LINK_RJ45_OK || g_tVar.LinkState == LINK_WIFI_OK)
+        {
+            udp_print_send(udp_tx_buf, udp_tx_len);
+        }
+        
+        if (g_tVar.LinkState == LINK_USB_OK)
+        {
+            USBCom_SendBufNow(0, udp_tx_buf, udp_tx_len);
+        }
+    #else
+        udp_tx_len = 0;
+        while (1)
+        {        
+            if (s_tPrintFiFo.Read == s_tPrintFiFo.Write)
+            {
+                break;
+            }
+            
+            udp_tx_buf[udp_tx_len] = s_tPrintFiFo.TxBuf[s_tPrintFiFo.Read];
+            if (++s_tPrintFiFo.Read >= PRINT_FIFO_SIZE)
+            {
+                s_tPrintFiFo.Read = 0;
+            }
+            s_tPrintFiFo.Count--;        
+            
+            if (++udp_tx_len >= UDP_TX_SIZE)
+            {
+                break;
+            }
+        } 
+
+        udp_print_send(udp_tx_buf, udp_tx_len);
+    #endif    
 }
 
 extern uint8_t USBCom_SendBuf(int _Port, uint8_t *_Buf, uint16_t _Len);
-extern void lua_udp_SendBuf(uint8_t *_buf, uint16_t _len, uint16_t _port);
+extern void udp_print_send(uint8_t *_buf, uint16_t _len);
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

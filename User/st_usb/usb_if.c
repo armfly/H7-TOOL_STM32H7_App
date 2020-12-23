@@ -140,14 +140,14 @@ void usbd_CloseCDC(void)
 extern void bsp_DelayMS(uint32_t n);
 void usbd_OpenMassStorage(void)
 {
-    {
-        if (USBD_Device.dev_config != 0)
-        {
-            USBD_Stop(&USBD_Device);    
-            USBD_DeInit(&USBD_Device);
-            bsp_DelayMS(1000);            
-        }
-    }
+//    {
+//        if (USBD_Device.dev_config != 0)
+//        {
+//            USBD_Stop(&USBD_Device);    
+//            USBD_DeInit(&USBD_Device);
+//            bsp_DelayMS(1000);            
+//        }
+//    }
         
     /* Init Device Library */
     USBD_Init(&USBD_Device, &MSC_Desc, 0);
@@ -174,9 +174,9 @@ void usbd_OpenMassStorage(void)
 */
 void usbd_CloseMassStorage(void)
 {
-	USBD_Init(&USBD_Device, &MSC_Desc, 0);
-    /* Add Supported Class */
-    USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
+//	USBD_Init(&USBD_Device, &MSC_Desc, 0);
+//    /* Add Supported Class */
+//    USBD_RegisterClass(&USBD_Device, USBD_MSC_CLASS);
 		
     USBD_Stop(&USBD_Device);
     

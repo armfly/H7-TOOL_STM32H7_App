@@ -73,6 +73,7 @@ void udp_server_init(void)
 *********************************************************************************************************
 */
 //static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, struct ip_addr *addr, u16_t port)
+extern void PCCommTimeout(void);
 static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, const ip_addr_t *addr, u16_t port)
 {
     // 2019-07-03 destAddr改为全局变量
@@ -105,6 +106,7 @@ static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, c
                     //MODS_Analyze((uint8_t *)p_rx->payload + 6, p_rx->len - 6, &udp_tx_buf[6], &udp_tx_len);    /* 分析MODBUS数据帧 */
                     if (g_tModS.TxCount > 0)
                     {
+                        
                         memcpy(g_tModS.TxBuf, &g_tVar.MACaddr, 6); /* 本机MAC放到应答数据包前缀 */
                         g_tModS.TxCount += 6;
                     }
@@ -120,6 +122,12 @@ static void udp_server_recv(void *arg, struct udp_pcb *pcb, struct pbuf *p_rx, c
 
         if (g_tModS.TxCount > 0)
         {
+            /* USB连接状态 = on */
+            g_tVar.LinkState = LINK_RJ45_OK;               
+
+            /* 硬件定时器4通道（已经用完了），3秒无PC指令则显示失联 */
+            bsp_StartHardTimer(4, 3000000, PCCommTimeout); 
+            
             /* 准备应答数据 */
             p_udp_tx->payload = (void *)g_tModS.TxBuf;
             p_udp_tx->len = g_tModS.TxCount;

@@ -388,7 +388,8 @@ AI : 示波器 CH1 均值, mV单位
     #define JUMP_TO_BOOT   2
     #define JUMP_TO_DAP    3
     #define JUMP_TO_EMMC   4
-    #define JUMP_TO_LINK   5
+    #define JUMP_TO_LINK          5
+    #define JUMP_TO_UPDATE_BOOT   6     /* 更新boot */
     
 
 /* BOOT 程序用的寄存器 */

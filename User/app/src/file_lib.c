@@ -193,7 +193,7 @@ uint8_t DeleteFile(char *_Path)
 *    函 数 名: MakeDir
 *    功能说明: 创建目录. 自动创建每级目录
 *    形    参: _Path, 路径全名
-*    返 回 值: 0成功  1失败
+*    返 回 值: FR_EXIST  FR_OK
 *********************************************************************************************************
 */
 uint8_t MakeDir(char *_Path)
@@ -228,12 +228,12 @@ uint8_t MakeDir(char *_Path)
         }
     }
     
-    if (re == FR_EXIST || re == FR_OK)
-    {
-        return 0;
-    }
+//    if (re == FR_EXIST || re == FR_OK)
+//    {
+//        return 0;
+//    }
     
-    return 1;
+    return re;
 }
 
 /*
@@ -1768,13 +1768,23 @@ int fputc(int ch, FILE *f)
 {
     if (f == &__stdout)
     {
-        if (g_MainStatus == MS_LUA_EXEC_FILE)
-        {
-            LCD_MemoAddChar(&g_LuaMemo, ch);
-        }
-        
-        MODH_PrintByte(ch);
-        return ch;
+        #if 0
+            {
+                uint8_t buf[1];
+                
+                buf[0] = ch;
+                comSendBuf(COM_RS485,buf, 1);
+            }
+        #else
+            if (g_MainStatus == MS_LUA_EXEC_FILE)
+            {
+                LCD_MemoAddChar(&g_LuaMemo, ch);
+            }
+            
+            MODH_PrintByte(ch);
+                   
+        #endif        
+            return ch; 
     }
     else
     {

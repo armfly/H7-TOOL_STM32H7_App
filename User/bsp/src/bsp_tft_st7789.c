@@ -19,6 +19,7 @@
 #include "bsp.h"
 #include "fonts.h"
 #include "param.h"
+#include "nvic_prio_cfg.h"
 
 #define LCD_DMA_CIRCULE_MODE    0
 
@@ -200,10 +201,10 @@ void bsp_InitSPI5ParamFast(void)
 	/* Associate the initialized DMA handle to the the SPI handle */
 	__HAL_LINKDMA(&hspi5, hdmatx, hdma_tx);
 	
-	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 1);
+	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, TFT_DMA2_STREAM3_IRQ_PRIO, 0);
 	HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
 
-	HAL_NVIC_SetPriority(SPI5_IRQn, 1, 0);
+	HAL_NVIC_SetPriority(SPI5_IRQn, TFT_SPI5_IRQ_PRIO, 0);
 	HAL_NVIC_EnableIRQ(SPI5_IRQn);
 }
 
