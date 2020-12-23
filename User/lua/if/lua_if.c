@@ -262,7 +262,7 @@ void lua_PowerOnLua(void)
     
     lua_Init();     // 重新分配内存
     
-    lua_do("beep()"); 
+    //lua_do("beep()"); 
 }
                 
 // 装载文件并初始化lua全局对象
@@ -356,7 +356,8 @@ void lua_Poll(void)
     if (g_tVar.LuaRunOnce == 1)
     {
         g_tVar.LuaRunOnce = 0;
-        luaL_dostring(g_Lua, s_lua_prog_buf);
+        //luaL_dostring(g_Lua, s_lua_prog_buf);
+        lua_do(s_lua_prog_buf);
     }
 }
 
@@ -415,7 +416,7 @@ static int beep(lua_State* L)
     {        
         usBeepTime = luaL_checknumber(L, 1);
         
-        if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第2个参数. */
+        if (lua_type(L, 2) == LUA_TNUMBER)  /* 判断第2个参数. */
         {
             usStopTime = luaL_checknumber(L, 2);
         }
@@ -424,7 +425,7 @@ static int beep(lua_State* L)
             return 0;
         }
 
-        if (lua_type(L, 1) == LUA_TNUMBER)  /* 判断第3个参数. */
+        if (lua_type(L, 3) == LUA_TNUMBER)  /* 判断第3个参数. */
         {
             usCycle = luaL_checknumber(L, 3);
         } 

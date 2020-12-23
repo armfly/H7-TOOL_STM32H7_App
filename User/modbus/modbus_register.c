@@ -1484,18 +1484,15 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
         case REG03_RESET_TO_BOOT:
             if (reg_value == JUMP_TO_APP)         /* 复位进入APP */
             {                
-                *(uint32_t *)0x20000000 = 0;
-                NVIC_SystemReset(); /* 复位CPU */
+                g_tVar.ReqJump = JUMP_TO_APP;
             }
             else if (reg_value == JUMP_TO_BOOT)    /* 复位进入BOOT 升级 */
             {
-                
-                *(uint32_t *)0x20000000 = 0x5AA51234;
-                NVIC_SystemReset(); /* 复位CPU */
+                g_tVar.ReqJump = JUMP_TO_BOOT;
             }
             else if (reg_value == JUMP_TO_DAP)    /* 进入DAP */
             {
-                JumpToDAPLink();
+                g_tVar.ReqJump = JUMP_TO_DAP;
             }            
             else if (reg_value == JUMP_TO_EMMC)    /*  进入U盘模式 */
             {
@@ -1504,6 +1501,11 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             else if (reg_value == JUMP_TO_LINK)    /*  进入APP联机 */
             {
                 g_MainStatus = MS_LINK_MODE;
+            }
+            else if (reg_value == JUMP_TO_UPDATE_BOOT)    /*  进入文件管理界面 */
+            {                
+                g_tVar.ReqWriteBoot = 1;
+                g_MainStatus = MS_FILE_MANAGE;
             }
             break;
 
@@ -1546,7 +1548,7 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             RTC_WriteClock(g_tRTC.Year, g_tRTC.Mon, g_tRTC.Day, g_tRTC.Hour, g_tRTC.Min, g_tRTC.Sec);
             break;
 
-        /**************** LUA （未完善）*********************/
+        /**************** LUA （未用）*********************/
         case REG03_LUA_CMD:
             if (reg_value == 1)
             {
@@ -1557,15 +1559,6 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             {
                 lua_do("init()");
             }
-//            else if (reg_value == 3)
-//            {
-//                lua_66H_Write(0, "123", 3);
-//            }
-//            else if (reg_value == 4)
-//            {
-//                //luaL_dostring(g_Lua, "read()");
-//                lua_67H_Read(0, s_lua_read_buf, 3);
-//            }
             break;
 
         case REG03_CALIB_KEY: /* 校准参数写入使能控制 */
@@ -2197,6 +2190,48 @@ uint8_t MODS_WriteRelay(uint16_t _reg, uint8_t _on)
         return 1;
     }
     return 0;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: PC_CmdTask
+*    功能说明: 处理PC控制指令，这些指令不能在USB中断中执行。放到 bsp_Idle() 中去执行
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void PC_CmdTask(void)
+{
+    /* V1.44, 处理USB通信中的相关执行，这些指令在USB中断中不方便执行 */
+    {
+        if (g_tVar.ReqJump > 0)
+        {
+            if (g_tVar.ReqJump == JUMP_TO_APP)         /* 复位进入APP */
+            {                
+                /* 关闭USB延迟2秒 */                           
+                usbd_UnInit();
+                bsp_DelayUS(2000*1000);
+                
+                *(uint32_t *)0x20000000 = 0;
+                NVIC_SystemReset(); /* 复位CPU */
+            }
+            else if (g_tVar.ReqJump == JUMP_TO_BOOT)    /* 复位进入BOOT 升级 */
+            {
+                /* 关闭USB延迟2秒 */                           
+                usbd_UnInit();
+                bsp_DelayUS(2000*1000);                
+                
+                *(uint32_t *)0x20000000 = 0x5AA51234;
+                NVIC_SystemReset(); /* 复位CPU */
+            }
+            else if (g_tVar.ReqJump == JUMP_TO_DAP)    /* 进入DAP */
+            {
+                JumpToDAPLink();
+            }
+
+            g_tVar.ReqJump = 0;
+        }
+    }
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

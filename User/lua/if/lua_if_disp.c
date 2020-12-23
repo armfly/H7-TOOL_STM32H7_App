@@ -35,7 +35,7 @@
 
     lcd_draw_circle(x, y, r, color)
     lcd_draw_line(x1, y1, x2, y2, color)      
-    lcd_draw_points(xArray, yArray, size, color)  
+
     lcd_disp_label(x, y, h, w, color, str, fontzize, front_color, back_color)
     
     void DispLabelRound(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, 
@@ -63,7 +63,7 @@ static int lua_FillRect(lua_State* L);
 static int lua_DrawRect(lua_State* L);
 static int lua_DrawCircle(lua_State* L);
 static int lua_DrawLine(lua_State* L);
-static int lua_DrawPoints(lua_State* L);
+//static int lua_DrawPoints(lua_State* L);
 static int lua_DrawLabel(lua_State* L);
 
 /*
@@ -86,7 +86,7 @@ void lua_lcd_RegisterFun(void)
     lua_register(g_Lua, "lcd_draw_rect", lua_DrawRect);  
     lua_register(g_Lua, "lcd_draw_circle", lua_DrawCircle);  
     lua_register(g_Lua, "lcd_draw_line", lua_DrawLine);  
-    lua_register(g_Lua, "lcd_draw_points", lua_DrawPoints);  
+//    lua_register(g_Lua, "lcd_draw_points", lua_DrawPoints);  
     lua_register(g_Lua, "lcd_disp_label", lua_DrawLabel);        
 }
 
@@ -541,86 +541,6 @@ static int lua_DrawLine(lua_State* L)
 
 /*
 *********************************************************************************************************
-*    函 数 名: lua_DrawCircle
-*    功能说明: lcd_draw_line(x, y, r, color)
-*    形    参: ...
-*    返 回 值: 无
-*********************************************************************************************************
-*/
-static int lua_DrawPoints(lua_State* L)
-{
-    const char *pX;
-    const char *pY;
-    size_t len;
-    uint16_t count;    
-    uint16_t color;    
-
-    /* 第1个参数 */
-    if (lua_type(L, 1) == LUA_TSTRING)  
-    {
-        pX = luaL_checklstring(L, 1, &len);
-    }
-    else
-    {
-        return 0;
-    }
-    
-    /* 第2个参数 */
-    if (lua_type(L, 2) == LUA_TSTRING)  
-    {
-        pY = luaL_checklstring(L, 2, &len);
-    }
-    else
-    {
-        return 0;
-    }  
-    
-    /* 第3个参数 */
-    if (lua_type(L, 3) == LUA_TNUMBER)  
-    {
-        count = luaL_checknumber(L, 3);
-    }
-    else
-    {
-        return 0;
-    } 
-
-    /* 第4个参数 */
-    if (lua_type(L, 4) == LUA_TNUMBER)  
-    {
-        color = luaL_checknumber(L, 4);
-    }
-    else
-    {
-        return 0;
-    }
-    
-    {
-        uint16_t i;
-        uint16_t x1, y1;
-        uint16_t x2, y2;
-
-        for (i = 0; i < count - 1; i++)
-        {
-            x1 = (pX[0] << 8) + pX[1]; 
-            x2 = (pX[2] << 8) + pX[3]; 
-            pX += 2;
-            
-            
-            y1 = (pY[0] << 8) + pY[1]; 
-            y2 = (pY[2] << 8) + pY[3]; 
-            pY += 2;
-            
-            LCD_DrawLine(x1, y1, x2, y2, color);
-        }
-    }
-    
-    return 0;
-}
-
-
-/*
-*********************************************************************************************************
 *    函 数 名: lua_DrawLabel
 *    功能说明: lcd_disp_label(x, y, h, w, color, str, fontzize, front_color, back_color)
 *    形    参: ...
@@ -694,6 +614,37 @@ static int lua_DrawLabel(lua_State* L)
     {
         return 0;
     }
+    
+    /* 第7个参数 */
+    if (lua_type(L, 7) == LUA_TNUMBER)  
+    {
+        fontzize = luaL_checknumber(L, 7);
+    }
+    else
+    {
+        return 0;
+    }
+
+    
+    /* 第8个参数 */
+    if (lua_type(L, 8) == LUA_TNUMBER)  
+    {
+        front_color = luaL_checknumber(L, 8);
+    }
+    else
+    {
+        return 0;
+    }    
+    
+    /* 第9个参数 */
+    if (lua_type(L, 9) == LUA_TNUMBER)  
+    {
+        back_color = luaL_checknumber(L, 9);
+    }
+    else
+    {
+        return 0;
+    } 
     
     {
         FONT_T tFont;

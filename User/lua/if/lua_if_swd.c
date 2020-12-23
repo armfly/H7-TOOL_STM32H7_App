@@ -261,6 +261,13 @@ static int h7swd_Init(lua_State* L)
     return 0;
 }
 
+/* 用于PC机读Flash到文件. 读之前执行一次 */
+void pg_init(void)
+{
+    GetChipTypeFromLua(g_Lua);
+    h7swd_Init(0);
+}
+   
 /*
 *********************************************************************************************************
 *    函 数 名: h7swd_ReadID

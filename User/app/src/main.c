@@ -172,15 +172,19 @@ int main(void)
             g_gMulSwd.Active[3] = 1;
         }
 
-        usbd_Init();        /* 初始化USB协议栈 */
+        usbd_Init();        /* 初始化USB协议栈 - 实际是空的 */
         
         FileSystemLoad();   /* 挂载文件系统 */
             
         lua_PowerOnLua();         /* 启动lua */        
     }
     
-    usbd_CloseCDC();
-    usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
+    #if 0
+        usbd_CloseCDC();
+        usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
+    #else
+        g_tVar.DelayOpenUSB = 1;    /* 延迟2秒启动USB串口，WIN7系统。 */
+    #endif
     
     //wifi_state = WIFI_INIT;   
     
@@ -301,6 +305,29 @@ int main(void)
                 break;
         }
     }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: DelayOpenUSBTask
+*    功能说明: 延迟启动USB
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void DelayOpenUSBTask(void)
+{
+    if (g_tVar.DelayOpenUSB == 1)        
+    {
+        /* 延迟2秒启动USB串口，解决WIN7系统USB异常。 */
+        if (bsp_CheckRunTime(0) > 2000)
+        {
+            g_tVar.DelayOpenUSB = 0;
+                    
+            usbd_CloseCDC();
+            usbd_OpenCDC(COM_USB1); /* 启用USB虚拟串口8， 用于和PC软件USB通信 */
+        }
+    } 
 }
 
 /*

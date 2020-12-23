@@ -16,9 +16,11 @@
 */
 
 #include "bsp.h"
+#include "nvic_prio_cfg.h"
 #include "usbd_user.h"
 #include "modbus_slave.h"
 #include "status_usb_uart.h"    /* 用来虚拟串口收发数据计数 */
+#include "param.h"
 
 uint8_t g_ModbusRxBuf[RX_BUF_SIZE];	
 uint16_t g_ModbusRxLen = 0;
@@ -128,11 +130,11 @@ static int8_t CDC_Itf_Init(void)
 
 	/* ##-4- Start the TIM Base generation in interrupt mode #################### */
 	/* Start Channel1 */
-	if (HAL_TIM_Base_Start_IT(&TimHandle) != HAL_OK)
-	{
-		/* Starting Error */
-		ERROR_HANDLER();
-	}
+//	if (HAL_TIM_Base_Start_IT(&TimHandle) != HAL_OK)
+//	{
+//		/* Starting Error */
+//		ERROR_HANDLER();
+//	}
 
 	/* ##-5- Set Application Buffers ############################################ */
 	USBD_CDC_SetTxBuffer(&USBD_Device, UserTxBuffer, 0);
@@ -361,6 +363,8 @@ void Uart4TxCpltCallback(void)
 *********************************************************************************************************
 */
 void RS485_SendBefor(void);
+extern uint8_t MODS_H64CheckEnd(uint8_t *_buf, uint16_t _len);
+extern void PCCommTimeout(void);
 static int8_t CDC_Itf_Receive(uint8_t * Buf, uint32_t *Len)
 {
 	SCB_CleanDCache_by_Addr((uint32_t *)Buf, *Len);
@@ -368,6 +372,7 @@ static int8_t CDC_Itf_Receive(uint8_t * Buf, uint32_t *Len)
 	if (s_NowCom == COM_USB1)		/* PC通信 */
 	{		
 		uint32_t len;
+        uint8_t fEnd;
 		
 		len = *Len;                
         
@@ -387,13 +392,32 @@ static int8_t CDC_Itf_Receive(uint8_t * Buf, uint32_t *Len)
 		}
 		
 		/* 判断长度不是太好的方案. 如果大于512字节 */
+        fEnd = 0;
 		if (len != 512)
 		{		
+            fEnd = 1;
+        }
+        else
+        {
+            if (MODS_H64CheckEnd(g_ModbusRxBuf, g_ModbusRxLen))
+            {
+                fEnd = 1;
+            }
+        }
+        
+        if (fEnd == 1)
+        {
 			MODS_Poll(g_ModbusRxBuf, g_ModbusRxLen);
 			g_ModbusRxLen = 0;
 			
 			if (g_tModS.TxCount > 0)
 			{				
+                /* USB连接状态 = on */
+                g_tVar.LinkState = LINK_USB_OK;               
+
+                /* 硬件定时器4通道（已经用完了），3秒无PC指令则显示失联 */
+                bsp_StartHardTimer(4, 3000000, PCCommTimeout); 
+                
 				USBCom_SendBufNow(0, g_tModS.TxBuf, g_tModS.TxCount);
 			}
 		}
@@ -541,7 +565,7 @@ static void TIM_Config(void)
     /* 2020-11-27 V1.36 移动到后面，在前面从DAP跳转时会死机 */
 	/* ##  Configure the NVIC for TIMx ######################################## */
 	/* Set Interrupt Group Priority */
-	HAL_NVIC_SetPriority(TIMx_IRQn, 6, 0);
+	HAL_NVIC_SetPriority(TIMx_IRQn, CDC_TIMx_IRQ_PRIO, 0);
 
 	/* Enable the TIMx global Interrupt */
 	HAL_NVIC_EnableIRQ(TIMx_IRQn);		    
@@ -565,13 +589,60 @@ uint8_t USBCom_SendBufNow(int _Port, uint8_t *_Buf, uint16_t _Len)
         comSendBuf(COM_RS485, buf, strlen(buf));
     }
     #endif
+    uint16_t i;
+    uint8_t re;
+    uint32_t len;
     
-	memcpy(UserTxBuffer, _Buf, _Len);
-    USBD_CDC_SetTxBuffer(&USBD_Device, UserTxBuffer, _Len);
-    if (USBD_CDC_TransmitPacket(&USBD_Device) == USBD_OK)
+    len = sizeof(UserTxBuffer);
+    for (i = 0; i < _Len / len; i++)
     {
-		return 0;
+        memcpy(UserTxBuffer, _Buf, len);
+        USBD_CDC_SetTxBuffer(&USBD_Device, UserTxBuffer, len);
+        
+        while (1)
+        {
+            re = USBD_CDC_TransmitPacket(&USBD_Device);        
+            if (re == USBD_OK)
+            {
+                break;
+            }
+            else if (re == USBD_BUSY)
+            {
+                continue;
+            }
+            else if (re == USBD_FAIL)
+            {
+                break;
+            }
+        }
+
+        _Buf += len;
     }
+    
+    len = _Len % len;
+    if (len > 0)
+    {
+        memcpy(UserTxBuffer, _Buf, len);
+        USBD_CDC_SetTxBuffer(&USBD_Device, UserTxBuffer, len);
+        
+        while (1)
+        {
+            re = USBD_CDC_TransmitPacket(&USBD_Device);        
+            if (re == USBD_OK)
+            {
+                break;
+            }
+            else if (re == USBD_BUSY)
+            {
+                continue;
+            }
+            else if (re == USBD_FAIL)
+            {
+                break;
+            }
+        }        
+    }
+
 	return 1;
 }
 	

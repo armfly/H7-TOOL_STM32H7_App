@@ -199,15 +199,32 @@ typedef struct
     uint16_t OutCurrDAC;        /* 输出电流 dac值 */
     uint16_t OutCurruA;         /* 输出电流 uA值 */
 
-    uint8_t LuaRunOnce;
+    uint8_t LuaRunOnce;         /* 用于Modbus通信程序延迟执行lua */
 
     uint8_t CalibEnable;
 
     uint8_t GpioMode[16];       /* 保存GPIO模式参数、输入、输出或特殊功能 */
 
-    uint8_t SaveAlgoToCFile;     /* 解析FLM时，保存解析结果到C文件，仅仅用于debug */
+    uint8_t SaveAlgoToCFile;    /* 解析FLM时，保存解析结果到C文件，仅仅用于debug */
 
+    uint8_t ReqWriteBoot;       /* 用于PC机通知刷新boot */     
+    
+    uint8_t ReqJump;            /* 请求跳转 */ 
+    uint8_t UsbEmmcRemoved;     /* U盘移除 */
+    
+    uint8_t DelayOpenUSB;       /* 延迟启动USB */
+    
+    uint8_t LinkState;          /* 和PC机联机状态 */
+    int32_t LinkTime;
 } VAR_T;
+
+enum
+{
+    LINK_NONE = 0,      /* 无连接 */
+    LINK_USB_OK = 1,    /* USB连接中 */
+    LINK_RJ45_OK = 2,   /* RJ45连接中 */
+    LINK_WIFI_OK = 3,   /* WiFi连接中 */
+};
 
 extern PARAM_T g_tParam;
 extern CALIB_T g_tCalib;

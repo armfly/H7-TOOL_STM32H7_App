@@ -6,39 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics International N.V.
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice,
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other
-  *    contributors to this software may be used to endorse or promote products
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under
-  *    this license is void and will automatically terminate your rights under
-  *    this license.
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -79,12 +53,14 @@
 
 #define ETH_RX_BUFFER_SIZE (1536UL)
 
+#define ETH_DMA_TRANSMIT_TIMEOUT                (20U)
+
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* 
 @Note: This interface is implemented to operate in zero-copy mode only:
-        - Rx buffers are allocated statically and passed directly to the LwIP stack
-          they will return back to DMA after been processed by the stack.
+        - Rx buffers are allocated statically and passed directly to the LwIP stack,
+          they will return back to ETH DMA after been processed by the stack.
         - Tx Buffers will be allocated from LwIP stack memory heap, 
           then passed to ETH HAL driver.
 
@@ -97,27 +73,29 @@
   2.a. Rx Buffers number must be between ETH_RX_DESC_CNT and 2*ETH_RX_DESC_CNT
   2.b. Rx Buffers must have the same size: ETH_RX_BUFFER_SIZE, this value must
        passed to ETH DMA in the init field (EthHandle.Init.RxBuffLen)
+  2.c  The RX Ruffers addresses and sizes must be properly defined to be aligned
+       to L1-CACHE line size (32 bytes).
 */
 
-#if defined(__ICCARM__) /*!< IAR Compiler */
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
 
-#pragma location = 0x30040000
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
-#pragma location = 0x30040060
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
-#pragma location = 0x30040200
+#pragma location=0x30040000
+ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+#pragma location=0x30040060
+ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
+#pragma location=0x30040200
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffers */
 
-#elif defined(__CC_ARM) /* MDK ARM Compiler */
+#elif defined ( __CC_ARM )  /* MDK ARM Compiler */
 
-__attribute__((section(".RxDecripSection"))) ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT];    /* Ethernet Rx DMA Descriptors */
-__attribute__((section(".TxDecripSection"))) ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT];    /* Ethernet Tx DMA Descriptors */
+__attribute__((section(".RxDecripSection"))) ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptors */
+__attribute__((section(".TxDecripSection"))) ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 __attribute__((section(".RxArraySection"))) uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE]; /* Ethernet Receive Buffer */
 
 #elif defined(__GNUC__) /* GNU Compiler */
 
-ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection")));    /* Ethernet Rx DMA Descriptors */
-ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));    /* Ethernet Tx DMA Descriptors */
+ETH_DMADescTypeDef DMARxDscrTab[ETH_RX_DESC_CNT] __attribute__((section(".RxDecripSection"))); /* Ethernet Rx DMA Descriptors */
+ETH_DMADescTypeDef DMATxDscrTab[ETH_TX_DESC_CNT] __attribute__((section(".TxDecripSection")));   /* Ethernet Tx DMA Descriptors */
 uint8_t Rx_Buff[ETH_RX_DESC_CNT][ETH_RX_BUFFER_SIZE] __attribute__((section(".RxArraySection"))); /* Ethernet Receive Buffers */
 
 #endif
@@ -138,7 +116,7 @@ u32_t sys_now(void);
 void pbuf_free_custom(struct pbuf *p);
 
 int32_t ETH_PHY_IO_Init(void);
-int32_t ETH_PHY_IO_DeInit(void);
+int32_t ETH_PHY_IO_DeInit (void);
 int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
 int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal);
 int32_t ETH_PHY_IO_GetTick(void);
@@ -149,7 +127,7 @@ lan8742_IOCtx_t LAN8742_IOCtx = {ETH_PHY_IO_Init,
                                  ETH_PHY_IO_ReadReg,
                                  ETH_PHY_IO_GetTick};
 
-LWIP_MEMPOOL_DECLARE(RX_POOL, 4, sizeof(struct pbuf_custom), "Zero-copy RX PBUF pool");
+LWIP_MEMPOOL_DECLARE(RX_POOL, 10, sizeof(struct pbuf_custom), "Zero-copy RX PBUF pool");
 
 /* Private functions ---------------------------------------------------------*/
 /*******************************************************************************
@@ -165,21 +143,21 @@ LWIP_MEMPOOL_DECLARE(RX_POOL, 4, sizeof(struct pbuf_custom), "Zero-copy RX PBUF 
 static void low_level_init(struct netif *netif)
 {
   uint32_t idx = 0;
-  uint8_t macaddress[6] = {ETH_MAC_ADDR0, ETH_MAC_ADDR1, ETH_MAC_ADDR2, ETH_MAC_ADDR3, ETH_MAC_ADDR4, ETH_MAC_ADDR5};
-
-  EthHandle.Instance = ETH;
+  uint8_t macaddress[6]= {ETH_MAC_ADDR0, ETH_MAC_ADDR1, ETH_MAC_ADDR2, ETH_MAC_ADDR3, ETH_MAC_ADDR4, ETH_MAC_ADDR5};
+  
+  EthHandle.Instance = ETH;  
   EthHandle.Init.MACAddr = macaddress;
   EthHandle.Init.MediaInterface = HAL_ETH_RMII_MODE;
   EthHandle.Init.RxDesc = DMARxDscrTab;
   EthHandle.Init.TxDesc = DMATxDscrTab;
   EthHandle.Init.RxBuffLen = ETH_RX_BUFFER_SIZE;
-
+  
   /* configure ethernet peripheral (GPIOs, clocks, MAC, DMA) */
   HAL_ETH_Init(&EthHandle);
-
+  
   /* set MAC hardware address length */
-  netif->hwaddr_len = ETHARP_HWADDR_LEN;
-
+  netif->hwaddr_len = ETH_HWADDR_LEN;
+  
   /* set MAC hardware address */
   netif->hwaddr[0] = macaddress[0];
   netif->hwaddr[1] = macaddress[1];
@@ -235,25 +213,22 @@ static void low_level_init(struct netif *netif)
   */
 static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-  uint32_t i = 0, framelen = 0;
+  uint32_t i=0;
   struct pbuf *q;
   err_t errval = ERR_OK;
   ETH_BufferTypeDef Txbuffer[ETH_TX_DESC_CNT];
-
-  memset(Txbuffer, 0, ETH_TX_DESC_CNT * sizeof(ETH_BufferTypeDef));
-
-  for (q = p; q != NULL; q = q->next)
+  
+  memset(Txbuffer, 0 , ETH_TX_DESC_CNT*sizeof(ETH_BufferTypeDef));
+  
+  for(q = p; q != NULL; q = q->next)
   {
-    if (i >= ETH_TX_DESC_CNT)
+    if(i >= ETH_TX_DESC_CNT)	
       return ERR_IF;
 
     Txbuffer[i].buffer = q->payload;
     Txbuffer[i].len = q->len;
 
-    framelen += q->len;
-
-    //SCB_CleanDCache_by_Addr((uint32_t *)q->payload, q->len);
-    if (i > 0)
+    if(i>0)
     {
       Txbuffer[i - 1].next = &Txbuffer[i];
     }
@@ -266,11 +241,11 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
     i++;
   }
 
-  TxConfig.Length = framelen;
+  TxConfig.Length = p->tot_len;
   TxConfig.TxBuffer = Txbuffer;
 
-  HAL_ETH_Transmit(&EthHandle, &TxConfig, 0); /* 2018-10-19 ,旧: HAL_ETH_Transmit(&EthHandle, &TxConfig, 0); */
-
+  HAL_ETH_Transmit(&EthHandle, &TxConfig, ETH_DMA_TRANSMIT_TIMEOUT);
+  
   return errval;
 }
 
@@ -285,23 +260,35 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 static struct pbuf *low_level_input(struct netif *netif)
 {
   struct pbuf *p = NULL;
-  ETH_BufferTypeDef RxBuff;
-  uint32_t framelength = 0;
-  struct pbuf_custom *custom_pbuf;
+  ETH_BufferTypeDef RxBuff[ETH_RX_DESC_CNT];
+  uint32_t framelength = 0, i = 0;;
+  struct pbuf_custom* custom_pbuf;
 
+  memset(RxBuff, 0 , ETH_RX_DESC_CNT*sizeof(ETH_BufferTypeDef));
+
+  for(i = 0; i < ETH_RX_DESC_CNT -1; i++)
+  {
+    RxBuff[i].next=&RxBuff[i+1];
+  }
+  
   if (HAL_ETH_IsRxDataAvailable(&EthHandle))
   {
-    HAL_ETH_GetRxDataBuffer(&EthHandle, &RxBuff);
+    HAL_ETH_GetRxDataBuffer(&EthHandle, RxBuff);
     HAL_ETH_GetRxDataLength(&EthHandle, &framelength);
+    
+    /* Build Rx descriptor to be ready for next data reception */
+	HAL_ETH_BuildRxDescriptors(&EthHandle);
 
     /* Invalidate data cache for ETH Rx Buffers */
-    SCB_InvalidateDCache_by_Addr((uint32_t *)Rx_Buff, (ETH_RX_DESC_CNT * ETH_RX_BUFFER_SIZE));
-
-    custom_pbuf = (struct pbuf_custom *)LWIP_MEMPOOL_ALLOC(RX_POOL);
-    custom_pbuf->custom_free_function = pbuf_free_custom;
-
-    p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf, RxBuff.buffer, ETH_RX_BUFFER_SIZE);
-
+    SCB_InvalidateDCache_by_Addr((uint32_t *)RxBuff->buffer, framelength);
+    
+    custom_pbuf  = (struct pbuf_custom*)LWIP_MEMPOOL_ALLOC(RX_POOL);
+    if(custom_pbuf != NULL)
+    {
+      custom_pbuf->custom_free_function = pbuf_free_custom;
+      p = pbuf_alloced_custom(PBUF_RAW, framelength, PBUF_REF, custom_pbuf, RxBuff->buffer, framelength);
+    }
+    
     return p;
   }
   else
@@ -326,22 +313,19 @@ void ethernetif_input(struct netif *netif)
 
   /* move received packet into a new pbuf */
   p = low_level_input(netif);
-
+    
   /* no packet could be read, silently ignore this */
-  if (p == NULL)
-    return;
-
+  if (p == NULL) return;
+    
   /* entry point to the LwIP stack */
   err = netif->input(p, netif);
-
+    
   if (err != ERR_OK)
   {
     LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
     pbuf_free(p);
     p = NULL;
   }
-
-  HAL_ETH_BuildRxDescriptors(&EthHandle);
 }
 
 /**
@@ -387,8 +371,7 @@ err_t ethernetif_init(struct netif *netif)
   */
 void pbuf_free_custom(struct pbuf *p)
 {
-  struct pbuf_custom *custom_pbuf = (struct pbuf_custom *)p;
-  ;
+  struct pbuf_custom* custom_pbuf = (struct pbuf_custom*)p;
   LWIP_MEMPOOL_FREE(RX_POOL, custom_pbuf);
 }
 
@@ -430,7 +413,6 @@ void HAL_ETH_MspInit(ETH_HandleTypeDef *heth)
 
   /* Enable GPIOs clocks */
   __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
@@ -495,11 +477,11 @@ int32_t ETH_PHY_IO_DeInit(void)
   */
 int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal)
 {
-  if (HAL_ETH_ReadPHYRegister(&EthHandle, DevAddr, RegAddr, pRegVal) != HAL_OK)
+  if(HAL_ETH_ReadPHYRegister(&EthHandle, DevAddr, RegAddr, pRegVal) != HAL_OK)
   {
     return -1;
   }
-
+  
   return 0;
 }
 
@@ -512,11 +494,11 @@ int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal
   */
 int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal)
 {
-  if (HAL_ETH_WritePHYRegister(&EthHandle, DevAddr, RegAddr, RegVal) != HAL_OK)
+  if(HAL_ETH_WritePHYRegister(&EthHandle, DevAddr, RegAddr, RegVal) != HAL_OK)
   {
     return -1;
   }
-
+  
   return 0;
 }
 

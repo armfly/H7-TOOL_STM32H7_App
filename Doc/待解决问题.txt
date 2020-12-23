@@ -36,33 +36,65 @@
     RS232_TX             - RS232串口机台信号扩展 START BUSY OK NG
     RS232_RX             - RS232串口机台信号扩展
   
-  ---中断优先级---
+******************************
+中断优先级---
+******************************
 
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
     HAL_NVIC_SetPriority(UART4_IRQn, 0, 4);
     HAL_NVIC_SetPriority(UART8_IRQn, 0, 6);
-HAL_NVIC_SetPriority(TIM_HARD_IRQn, 0, 2);
+    HAL_NVIC_SetPriority(TIM_HARD_IRQn, 0, 2);
 
-tft	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 1);
-tft		HAL_NVIC_SetPriority(SPI5_IRQn, 1, 0);
+    tft	HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 1, 1);
+    tft		HAL_NVIC_SetPriority(SPI5_IRQn, 1, 0);
 
-/* 使能QSPI中断 */
-HAL_NVIC_SetPriority(QUADSPI_IRQn, 0x0F, 0); /* 0x0F --> 0x04， 要高于USB中断 */
+    /* 使能QSPI中断 */
+    HAL_NVIC_SetPriority(QUADSPI_IRQn, 0x0F, 0); /* 0x0F --> 0x04， 要高于USB中断 */
 
-/* 使能MDMA中断，并配置优先级 */
-QSPI HAL_NVIC_SetPriority(MDMA_IRQn, 0x02, 0);
+    /* 使能MDMA中断，并配置优先级 */
+    QSPI HAL_NVIC_SetPriority(MDMA_IRQn, 0x02, 0);
 
-HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);
-HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
-  
-  HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(OTG_HS_IRQn, 0, 0);  -->   HAL_NVIC_SetPriority(OTG_HS_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
+      
+    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
     HAL_NVIC_SetPriority(ADC3_IRQn, 0, 0);
-   HAL_NVIC_SetPriority(CH1_DMA_Stream_IRQn, 1, 0);
-           HAL_NVIC_SetPriority(CH2_DMA_Stream_IRQn, 1, 0);   
-  
+    HAL_NVIC_SetPriority(CH1_DMA_Stream_IRQn, 1, 0);
+    HAL_NVIC_SetPriority(CH2_DMA_Stream_IRQn, 1, 0);   
+
+
 
 【通信协议】
 功能码
 0x61 : H7-TOOL主动发送，比如print信息. 不要求主机应答
 
+
+
+    /*
+        主机发送: 小程序数据
+            01  ; 站号
+            64  ; 功能码
+            0000  ; 子功能,
+                - 0表示下载lua后复位lua环境再执行, 
+                - 1表示下载lua后，不复位lua环境直接执行
+                - 2表示 list目录下的文件
+                - 3表示读取文件MD5码
+                - 4表示删除文件 del
+                - 5表示删除目录和文件
+                - 6表示读文件数据
+                - 7表示覆盖文件（写新文件）    
+            0100 0000 ; 总长度 4字节
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 本包数据长度 4字节
+            xx ... xx : 程序数据，n个
+            CCCC      : CRC16
+    
+        从机应答:
+            01  ; 从机地址
+            64  ; 功能码    
+            0000  ; 子功能
+    
+            00  ; 执行结果，0表示OK  1表示错误
+            CCCC : CRC16
+    */
   

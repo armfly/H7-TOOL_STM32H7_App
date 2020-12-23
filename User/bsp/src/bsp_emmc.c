@@ -78,6 +78,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_emmc.h"
+#include "nvic_prio_cfg.h"
 
 /** @addtogroup BSP
   * @{
@@ -94,7 +95,7 @@
 /** @defgroup STM32H750B_DISCOVERY_MMC_Exported_Variables Exported Variables
   * @{
   */
-MMC_HandleTypeDef uSdHandle;
+MMC_HandleTypeDef uSdHandle = {0};
 /**
   * @}
   */
@@ -124,7 +125,7 @@ uint8_t BSP_MMC_Init(void)
   uSdHandle.Init.ClockDiv = 3;		/* 2019-12-13 2 -> 3 */
   uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
-  uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
+  uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;
   uSdHandle.Init.BusWide = SDMMC_BUS_WIDE_4B;
 
   /* Msp MMC initialization */
@@ -318,7 +319,7 @@ __weak void BSP_MMC_MspInit(MMC_HandleTypeDef *hmmc, void *Params)
   HAL_GPIO_Init(GPIOB, &gpio_init_structure);
 
   /* NVIC configuration for SDIO interrupts */
-  HAL_NVIC_SetPriority(SDMMC1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(SDMMC1_IRQn, SDMMC1_IRQ_PRIO, 0);
   HAL_NVIC_EnableIRQ(SDMMC1_IRQn);
 }
 

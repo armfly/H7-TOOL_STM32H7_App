@@ -29,6 +29,8 @@ enum
     
     MSG_PG_START = 0x00001001,   /* 开始烧录 */
     MSG_PG_ABORT = 0x00001002,   /* 终止烧录 */    
+    
+    MSG_MODBUS_LUA_RUN,         /* modbus 收到lua程序，不是立即执行，放到bsp_Idle执行. 未用，用的 g_tVar.LuaRunOnce */ 
 };
 
 /* 按键FIFO用到变量 */

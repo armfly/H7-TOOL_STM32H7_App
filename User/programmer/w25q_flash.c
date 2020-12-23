@@ -955,7 +955,7 @@ static uint8_t W25Q_SendAndReadDataBlankDaul(uint8_t *_txbuf, uint32_t _txlen, u
 */ 
 uint8_t W25Q_DetectIC(uint32_t *_id)
 {
-    uint8_t txbuf[1];
+    uint8_t txbuf[5];
     uint8_t rxbuf[3 * 4];
     uint8_t i;
     
@@ -1486,7 +1486,7 @@ uint8_t W25Q_FLASH_ProgramBuf(uint32_t _Addr, uint8_t *_Buff, uint32_t _Size)
 */ 
 uint8_t W25Q_ReadBuf(uint32_t _Addr, uint8_t *_Buf, uint16_t _Len)
 {
-    uint8_t txbuf[5];
+    uint8_t txbuf[6];
 
     if (g_tW25Q.Capacity > 16 * 1024 * 1024)
     {

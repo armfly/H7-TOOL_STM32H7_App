@@ -27,6 +27,7 @@
 
 #include "bsp.h"
 #include "main.h"
+#include "nvic_prio_cfg.h"
 
 #define UART_GPIO_SPEED     GPIO_SPEED_FREQ_HIGH
 
@@ -1131,7 +1132,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(USART1_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(USART1_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1163,7 +1164,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(USART2_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(USART2_IRQn, 0, 2);
+    HAL_NVIC_SetPriority(USART2_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(USART2_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1194,7 +1195,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(USART3_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(USART3_IRQn, 0, 3);
+    HAL_NVIC_SetPriority(USART3_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(USART3_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1225,7 +1226,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(UART4_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(UART4_IRQn, 0, 4);
+    HAL_NVIC_SetPriority(UART4_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(UART4_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1256,7 +1257,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(UART5_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(UART5_IRQn, 0, 5);
+    HAL_NVIC_SetPriority(UART5_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(UART5_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1287,7 +1288,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(USART6_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(USART6_IRQn, 0, 6);
+    HAL_NVIC_SetPriority(USART6_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(USART6_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1318,7 +1319,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(UART7_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(UART7_IRQn, 0, 6);
+    HAL_NVIC_SetPriority(UART7_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(UART7_IRQn);
 
     /* 配置波特率、奇偶校验 */
@@ -1356,7 +1357,7 @@ static void InitHardUart(void)
     HAL_GPIO_Init(UART8_RX_GPIO_PORT, &GPIO_InitStruct);
 
     /* 配置NVIC the NVIC for UART */
-    HAL_NVIC_SetPriority(UART8_IRQn, 0, 6);
+    HAL_NVIC_SetPriority(UART8_IRQn, UART_IRQ_PRIO, 0);
     HAL_NVIC_EnableIRQ(UART8_IRQn);
 
     /* 配置波特率、奇偶校验 */

@@ -51,6 +51,34 @@ enum
 
 /*
 *********************************************************************************************************
+*    函 数 名: MODS_H64CheckEnd
+*    功能说明: 预先判断帧是否结束
+*    形    参: 无
+*    返 回 值: 0表示无效， 1表示是完整帧
+*********************************************************************************************************
+*/
+uint8_t MODS_H64CheckEnd(uint8_t *_buf, uint16_t _len)
+{
+    uint32_t len0;      /* 本包数据长度 */
+    
+    if (_len < 18)
+    {
+        return 0;
+    }   
+    
+    if (_buf[1] == 0x64)
+    {
+        len0 = BEBufToUint32(_buf + 12);
+        if (len0 + 18 == _len)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: MODS_64H
 *    功能说明: 文件操作通信接口
 *    形    参: 无
@@ -157,7 +185,10 @@ static void MODS64_Lua(void)
 
     if (offset_addr + package_len >= total_len)
     {
-        lua_do(s_lua_prog_buf);
+        /* 必须让通信应答后 再去执行 lua  */
+        //lua_do(s_lua_prog_buf);        
+        //bsp_PutMsg(MSG_MODBUS_LUA_RUN, func);
+        g_tVar.LuaRunOnce = 1;      /* 用全局变量实现简单些 */
     }
 
     g_tModS.TxCount = 0;
@@ -458,6 +489,9 @@ static void MODS64_WriteFile(void)
     static uint32_t s_HeaderLen;    /* 头部长度 */
     static uint32_t s_LastPackaOffsetAddr;      /* 上一包的偏移地址, 用于重复帧识别 */
     
+    static char s_NewMD5[16];
+    char OldMD5[16];
+    
     func = BEBufToUint16(&g_tModS.RxBuf[2]);
     total_len = BEBufToUint32(&g_tModS.RxBuf[4]);       /* 文件总长度 */
     offset_addr = BEBufToUint32(&g_tModS.RxBuf[8]);
@@ -470,10 +504,8 @@ static void MODS64_WriteFile(void)
     {
         uint16_t NameLen;
         uint32_t NewFileSize;
-        char *NewMD5;
         uint16_t i;        
         uint32_t OldFileSize;
-        char OldMD5[16];
         uint32_t DataLen;        
         
         s_HeaderLen = 0;        /* 头部长度 */
@@ -481,7 +513,8 @@ static void MODS64_WriteFile(void)
 
         NewFileSize = BEBufToUint32(pData); pData += 4;  s_HeaderLen += 4;
         
-        NewMD5 = (char *)pData;  pData += 16;  s_HeaderLen += 16;
+        memcpy(s_NewMD5, (char *)pData, 16);
+        pData += 16;  s_HeaderLen += 16;
         
         NameLen = *pData; pData++; s_HeaderLen++;       
         for (i = 0; i < NameLen; i++)
@@ -495,7 +528,7 @@ static void MODS64_WriteFile(void)
         OldFileSize = GetFileMD5(s_FileName, OldMD5); /* 获得本地文件的长度和MD5 */
 
         /* 文件长度和MD5码均相等，则不重复写入 */
-        if (NewFileSize == OldFileSize && memcmp(OldMD5, NewMD5, 16) == 0)
+        if (NewFileSize == OldFileSize && memcmp(OldMD5, s_NewMD5, 16) == 0)
         {
             err = 1;    /* 1表示文件相等,无需写入 */
         }
@@ -521,6 +554,15 @@ static void MODS64_WriteFile(void)
                     s_FileOffset = s_FileRxLen;
                     
                     err = 0;    /* 文件写入OK */
+                    
+                    /* 校验完整性 */
+                    {
+                        GetFileMD5(s_FileName, OldMD5); /* 获得本地文件的长度和MD5 */
+                        if  (memcmp(OldMD5, s_NewMD5, 16) != 0)
+                        {
+                            err = 4;    /* 文件写入失败,MD5错误, 立即终止 */
+                        }
+                    }                    
                 }
                 else
                 {
@@ -570,15 +612,23 @@ static void MODS64_WriteFile(void)
                 s_FileRxLen = len1; 
             }
             
-            /* 文件数据传输完毕 */
-            //if (s_FileOffset + s_FileRxLen >= total_len - s_HeaderLen)
-            if (s_FileRxLen >= total_len - s_HeaderLen)
+            /* 文件数据传输完毕。 s_FileName 是16K缓冲区已存储数据的长度，不是文件长度 */
+            if (s_FileOffset + s_FileRxLen >= total_len - s_HeaderLen)
             {
                 if (WriteFile(s_FileName, s_FileOffset, (char *)FsReadBuf, s_FileRxLen) == 0)
                 {
                     s_FileOffset += s_FileRxLen;
                     
                     err = 0;    /* 文件写入OK */
+                    
+                    /* 校验完整性 */
+                    {
+                        GetFileMD5(s_FileName, OldMD5); /* 获得本地文件的长度和MD5 */
+                        if  (memcmp(OldMD5, s_NewMD5, 16) != 0)
+                        {
+                            err = 4;    /* 文件写入失败,MD5错误, 立即终止 */
+                        }
+                    }
                 }
                 else
                 {
@@ -631,6 +681,7 @@ static void MODS64_MakeDir(void)
 //    uint32_t package_len; /* 本包数据长度 */
     uint8_t err = 0;
     char *pDir;
+    uint8_t re;
   
     func = BEBufToUint16(&g_tModS.RxBuf[2]);
 //    total_len = BEBufToUint32(&g_tModS.RxBuf[4]);
@@ -638,9 +689,18 @@ static void MODS64_MakeDir(void)
 //    package_len = BEBufToUint32(&g_tModS.RxBuf[12]);
     pDir = (char *)&g_tModS.RxBuf[16];
     
-    if (MakeDir(pDir) != 0)      
+    re = MakeDir(pDir);
+    if (re == FR_EXIST)
     {
-        err = 3;    /* 目录创建失败 */
+        err = 1;        /* 文件相同 */
+    }
+    else if (re == FR_OK) 
+    {
+        err = 0;        /* 目录创建成功 */
+    }    
+    else
+    {
+        err = 3;        /* 目录创建失败 */
     }
     
     g_tModS.TxCount = 0;
