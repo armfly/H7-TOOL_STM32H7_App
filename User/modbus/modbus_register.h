@@ -25,6 +25,7 @@ uint8_t MODS_WriteRelay(uint16_t _reg, uint8_t _on);
 extern uint8_t fSaveReq_06H;    /* 保存参数请求，用于06H写寄存器函数 */
 extern uint8_t fResetReq_06H;   /* 需要复位CPU，因为网络参数变化 */
 extern uint8_t fSaveCalibParam; /* 保存校准参数请求，用于06H和10H写寄存器函数 */
+extern uint8_t fDisableAck;    /* 强制无需应答，PC发虚拟按键时用到 */
 
 #endif
 

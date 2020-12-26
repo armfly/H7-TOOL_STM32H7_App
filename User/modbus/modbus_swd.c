@@ -30,17 +30,19 @@
 #include "n76e003_flash.h"
 #include "w25q_flash.h"
 
-/* 64H帧子功能码定义 */
+/* 66H帧子功能码定义 */
 enum
 {
     H66_READ_MEM_INIT   = 0,    /* 读内存, */
     H66_READ_MEM        = 1,    /* 写内存 */
-    H66_WRITE_MEM       = 2,    /* 写内存 */    
+    H66_WRITE_MEM       = 2,    /* 写内存 */        
+    
+    H66_READ_DISP_MEM   = 0x0100,    /* 读显存 */ 
 };
 
 static void MODS66_ReadMem(void);
 static void MODS66_WriteMem(void);
-
+static void MODS66_ReadDispMem(void);
 
 /*
 *********************************************************************************************************
@@ -57,8 +59,9 @@ void MODS_66H(void)
             01  ; 站号
             66  ; 功能码
             0000  ; 子功能
-                - 0表示读内存
-                - 1表示写内存
+                - 0表示读内存（需要初始化pg_init())
+                - 1表示读内存 (连续读，无需初始化）
+                - 2 写
             0000 0000 : 偏移地址 4字节
             0020 0000 : 数据长度 4字节
             CCCC      : CRC16
@@ -87,9 +90,13 @@ void MODS_66H(void)
     {
         MODS66_ReadMem();         
     }
-    else if (func >= H66_WRITE_MEM)
+    else if (func == H66_WRITE_MEM)
     {
         MODS66_WriteMem();
+    }
+    else if (func == H66_READ_DISP_MEM)
+    {
+        MODS66_ReadDispMem();   
     }
     else 
     {
@@ -129,6 +136,8 @@ static void MODS66_ReadMem(void)
                 - 0表示读内存（需要初始化pg_init())
                 - 1表示读内存 (连续读，无需初始化）
                 - 2 写
+    
+                - 0x0100   读显示屏缓冲区，用于截屏
             0000 0000 : 偏移地址 4字节
             0020 0000 : 数据长度 4字节
             CCCC      : CRC16
@@ -142,6 +151,7 @@ static void MODS66_ReadMem(void)
     
             00  ; 执行结果，0表示OK  1表示错误
             
+            XX   : 数据
             CCCC : CRC16
     */    
     uint16_t func;          /* 子功能代码 */
@@ -295,6 +305,8 @@ static void MODS66_WriteMem(void)
             01  ; 从机地址
             66  ; 功能码    
             0000  ; 子功能
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 数据长度 4字节
     
             00  ; 执行结果，0表示OK  1表示错误
             CCCC : CRC16
@@ -333,6 +345,16 @@ static void MODS66_WriteMem(void)
     g_tModS.TxBuf[g_tModS.TxCount++] = 0x66;                         /* 功能码 */
     g_tModS.TxBuf[g_tModS.TxCount++] = func >> 8;
     g_tModS.TxBuf[g_tModS.TxCount++] = func;
+
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 0; 
+    
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 0;     
     
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {
@@ -374,6 +396,75 @@ static void MODS66_WriteMem(void)
     {
         ;
     }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: MODS66_ReadDispMem
+*    功能说明: 读显存，用于截屏
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static void MODS66_ReadDispMem(void)
+{
+    /*
+        主机发送: 小程序数据
+            01  ; 站号
+            66  ; 功能码
+            0000  ; 子功能,
+                - 0表示读内存（需要初始化pg_init())
+                - 1表示读内存 (连续读，无需初始化）
+                - 2 写
+    
+                - 0x0100   读显示屏缓冲区，用于截屏
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 数据长度 4字节
+            CCCC      : CRC16
+    
+        从机应答:
+            01  ; 从机地址
+            66  ; 功能码    
+            0000  ; 子功能
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 数据长度 4字节
+    
+            00  ; 执行结果，0表示OK  1表示错误
+            
+            XX XX ... XX : 数据
+            
+            CCCC : CRC16
+    */    
+    uint16_t func;          /* 子功能代码 */
+    uint32_t offset_addr;
+    uint32_t package_len;   /* 本包数据长度 */
+      
+    func = BEBufToUint16(&g_tModS.RxBuf[2]);
+    offset_addr = BEBufToUint32(&g_tModS.RxBuf[4]);
+    package_len = BEBufToUint32(&g_tModS.RxBuf[8]);
+    
+    /* 读内存 */
+    g_tModS.TxCount = 0;
+    g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0x66;                         /* 功能码 */
+    g_tModS.TxBuf[g_tModS.TxCount++] = func >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = func;
+
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 0; 
+    
+    g_tModS.TxBuf[g_tModS.TxCount++] = package_len >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = package_len >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = package_len >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = package_len >> 0;      
+    
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0x00;    /* 执行结果 00 */
+    
+    memcpy((char *)&g_tModS.TxBuf[g_tModS.TxCount], (uint8_t *)(0x30000000 + offset_addr), package_len);
+    g_tModS.TxCount += package_len;   
+
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

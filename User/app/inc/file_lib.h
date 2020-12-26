@@ -90,5 +90,7 @@ int32_t WriteProgIniFile(char *_LuaPath, PROG_INI_T *_pIni);
 void LoadProgAutorunFile(char *_OutBuff, uint32_t _BuffSize);
 void SaveProgAutorunFile(const char *_NewStr);
 uint32_t GetFileMD5(char *_Path, char *_OutMD5);
+uint32_t GetFileSum32(const char *_Path, uint32_t *_Out);
+uint32_t GetFileCRC32(const char *_Path, uint32_t *_Out);
 
 #endif

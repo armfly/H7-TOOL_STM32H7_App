@@ -16,6 +16,7 @@
 uint8_t fSaveReq_06H = 0;       /* 保存基本参数请求，用于06H和10H写寄存器函数 */
 uint8_t fResetReq_06H = 0;      /* 需要复位CPU，因为网络参数变化 */
 uint8_t fSaveCalibParam = 0;    /* 保存校准参数请求，用于06H和10H写寄存器函数 */
+uint8_t fDisableAck = 0;          /* 强制无需应答，PC发虚拟按键时用到 */
 
 static uint8_t WriteCalibRegValue_06H(uint16_t _reg_addr, uint16_t _reg_value);
 static uint8_t ReadCalibRegValue_03H(uint16_t reg_addr, uint16_t *reg_value);
@@ -1480,6 +1481,31 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
         }
         break;
 
+        case REG03_SEND_KEY:        /* 不应答给PC，因为lua打印返回会冲突 */
+            {
+                uint8_t kid;
+                uint8_t state;
+                
+                kid = reg_value >> 8;
+                state = reg_value;
+                
+                if (kid == KID_S)
+                {
+                    g_tVar.PC_CKeyState = 0;
+                    g_tVar.PC_SKeyState = state;
+                    g_tVar.PC_KeyEnabled = 1;
+                }
+                else if (kid == KID_C)
+                {
+                    g_tVar.PC_SKeyState = 0;
+                    g_tVar.PC_CKeyState = state;
+                    g_tVar.PC_KeyEnabled = 2;
+                }
+                
+                fDisableAck = 1;  /* 不要应答 */
+            }
+            break;
+        
         /*********************************************************/
         case REG03_RESET_TO_BOOT:
             if (reg_value == JUMP_TO_APP)         /* 复位进入APP */
@@ -1509,7 +1535,7 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
             }
             break;
 
-            /**************************** 时钟参数 *****************************/
+        /**************************** 时钟参数 *****************************/
 
         case REG03_RTC_YEAR:
             RTC_ReadClock();
@@ -1564,16 +1590,20 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
         case REG03_CALIB_KEY: /* 校准参数写入使能控制 */
             if (reg_value == 1)
             {
-                g_tVar.CalibEnable = 1; /* 允许修改校准参数 */
+                g_tVar.CalibEnable = 1;     /* 允许修改校准参数 */
             }
             else if (reg_value == 0)
             {
-                g_tVar.CalibEnable = 0; /* 禁止修改校准参数 */
+                g_tVar.CalibEnable = 0;     /* 禁止修改校准参数 */
             }
             else if (reg_value == 0x5AA5)
             {
                 InitCalibParam();
             }
+            else if (reg_value == 0xEF55)   /* 恢复基本参数缺省值，不含校准参数 */
+            {
+                InitBaseParam();
+            }                        
             break;
 
         default:

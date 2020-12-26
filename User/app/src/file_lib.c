@@ -17,6 +17,7 @@
 
 #include "includes.h"
 #include "md5.h"
+#include "crc32_stm32.h"
 
 /*
     1、V7开发板的SD卡接口是用的SDMMC1，而这个接口仅支持AXI SRAM区访问，其它SRAM和TCP均不支持。
@@ -1096,6 +1097,104 @@ uint32_t GetFileMD5(char *_Path, char *_OutMD5)
         }
     }
 	MD5Final(&md5, (uint8_t *)_OutMD5);
+    return size;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetFileSum32
+*    功能说明: 得到文件的累加校验和，32bit
+*    形    参: _Path : 文件名
+*              _Out : 输出结果 4字节
+*    返 回 值: 文件大小. 0表示打开文件失败
+*********************************************************************************************************
+*/
+uint32_t GetFileSum32(const char *_Path, uint32_t *_Out)
+{
+    uint32_t bytes;  
+    uint32_t offset = 0;   
+    FRESULT re;
+    uint32_t size;
+    uint32_t sum32;
+    uint32_t i;
+       
+    *_Out = 0;  
+        
+    re = f_open(&g_file, _Path, FA_OPEN_EXISTING | FA_READ);
+    if (re != FR_OK)
+    {
+        return 0;
+    }
+    size = f_size(&g_file);
+    
+    f_close(&g_file);  
+
+    sum32 = 0;
+    while (1)
+    {
+        bytes = ReadFileToMem((char *)_Path, offset, FsReadBuf, sizeof(FsReadBuf)); 
+        offset += bytes;
+        if (bytes > 0)
+        {
+            for (i = 0; i < bytes; i++)
+            {
+                sum32 += FsReadBuf[i];
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    *_Out = sum32;    
+    return size;
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: GetFileCRC32
+*    功能说明: 得到文件的CRC32校验和，32bit
+*    形    参: _Path : 文件名
+*              _Out : 输出结果 4字节
+*    返 回 值: 文件大小. 0表示打开文件失败
+*********************************************************************************************************
+*/
+uint32_t GetFileCRC32(const char *_Path, uint32_t *_Out)
+{
+    uint32_t bytes;  
+    uint32_t offset = 0;   
+    FRESULT re;
+    uint32_t size;
+       
+    *_Out = 0;  
+        
+    re = f_open(&g_file, _Path, FA_OPEN_EXISTING | FA_READ);
+    if (re != FR_OK)
+    {
+        return 0;
+    }
+    size = f_size(&g_file);
+    
+    f_close(&g_file);  
+
+    CRC32_Init();   /* 硬件CRC32计算 */
+    
+    while (1)
+    {
+        bytes = ReadFileToMem((char *)_Path, offset, FsReadBuf, sizeof(FsReadBuf)); 
+        offset += bytes;
+        if (bytes > 0)
+        {
+            CRC32_Update(FsReadBuf, bytes);
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    *_Out = CRC32_Final();    
     return size;
 }
 

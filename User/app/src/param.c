@@ -164,10 +164,20 @@ void InitBaseParam(void)
     g_tParam.ToolSn = 1;                /* 烧录器编号 */
     
     g_tParam.StartRun = 0;              /* 开机启动 */
-        
+
+    /* V1.32 */
+    g_tParam.UartMonBaud = 7;        /* 串口监视，波特率 */
+    g_tParam.UartMonParit = 0;       /* 串口监视，奇偶校验 */
+    g_tParam.UartMonWordWrap = 1;    /* 串口监视，自动换行 */    
+    g_tParam.UartMonFont = 1;        /* 串口监视，字体 */
+    g_tParam.UartMonHex = 0;         /* 串口监视，按HEX显示 */
+    g_tParam.UartMonTimeStamp = 0;   /* 串口监视，加上时间戳 */
+    g_tParam.UartMonProxy = 0;       /* 串口监视，协议 */
+    
     g_tParam.DAP_TVCCVolt = 0;
     g_tParam.DAP_BeepEn = 1;
-    bsp_GenRNG(&g_tParam.DAP_Sn, 1);
+    //bsp_GenRNG(&g_tParam.DAP_Sn, 1);
+    g_tParam.DAP_Sn = 1;
     
     SaveParam();
 }

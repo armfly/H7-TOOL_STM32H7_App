@@ -39,6 +39,7 @@ static void MODS_65H(void);
 
 extern void MODS_64H(void);
 extern void MODS_66H(void);
+extern void MODS_70H(void);
 
 void MODS_ReciveNew(uint8_t _byte);
 
@@ -212,7 +213,11 @@ static void MODS_AnalyzeApp(void)
         case 0x66:   /* SWD操作指令(读内存，写内存等) */
             MODS_66H();
             break;
-        
+
+        case 0x70:   /* PC控制帧，无需应答。发送虚拟按键消息用 */
+            MODS_70H();
+            break;
+                
         default:
             g_tModS.RspCode = RSP_ERR_CMD;
             MODS_SendAckErr(g_tModS.RspCode); /* 告诉主机命令错误 */
@@ -480,8 +485,15 @@ static void MODS_06H(void)
             }
         }
     }
-
+    
 err_ret:
+    /* 不需要应答的情况 */
+    if (fDisableAck == 1)
+    {
+        fDisableAck = 0;
+        return;
+    }
+    
     if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
     {
         MODS_SendAckOk();
@@ -596,6 +608,13 @@ static void MODS_10H(void)
     }
 
 err_ret:
+    /* 不需要应答的情况 */
+    if (fDisableAck == 1)
+    {
+        fDisableAck = 0;
+        return;
+    }
+    
     if (g_tModS.RspCode == RSP_OK) /* 正确应答 */
     {
         MODS_SendAckOk();

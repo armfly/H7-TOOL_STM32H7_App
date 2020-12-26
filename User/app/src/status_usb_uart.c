@@ -80,7 +80,7 @@ void status_UsbUart(void)
                     break;
 
                 case KEY_LONG_DOWN_C:    /* C键长按 */
-                    g_MainStatus = MS_SYSTEM_SET;
+                    g_MainStatus = MS_EXTEND_MENU1;
                     break;
 
                 default:
