@@ -1650,6 +1650,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\User\modbus\modbus_host.c</FilePath>
             </File>
+            <File>
+              <FileName>modbus_msg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\modbus\modbus_msg.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

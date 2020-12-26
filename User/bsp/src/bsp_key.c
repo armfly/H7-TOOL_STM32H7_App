@@ -26,6 +26,7 @@
 */
 
 #include "bsp.h"
+#include "param.h"
 
 /*
     一次双击动作触发如下事件
@@ -87,7 +88,7 @@ static uint8_t s_LcdOn = 1;
 static uint8_t KeyPinActive(uint8_t _id)
 {
     uint8_t level;
-
+    
     if ((s_gpio_list[_id].gpio->IDR & s_gpio_list[_id].pin) == 0)
     {
         level = 0;
@@ -99,12 +100,41 @@ static uint8_t KeyPinActive(uint8_t _id)
 
     if (level == s_gpio_list[_id].ActiveLevel)
     {
-        return 1;
+        level = 1;
     }
     else
     {
-        return 0;
+        level = 0;
     }
+    
+    /* V1.45 2020-12-25 增加PC机模拟按键功能 */
+    if (g_tVar.PC_KeyEnabled == 1)
+    {
+        g_tVar.PC_CKeyState = 0;
+        if (_id == KID_S)
+        {
+            level = level | g_tVar.PC_SKeyState;
+            
+            if (level == 0)
+            {
+                g_tVar.PC_KeyEnabled = 0;
+            }
+        }
+    }
+    else if (g_tVar.PC_KeyEnabled == 2)
+    {
+        g_tVar.PC_SKeyState = 0;
+        if (_id == KID_C)
+        {
+            level = level | g_tVar.PC_CKeyState;
+            if (level == 0)
+            {
+                g_tVar.PC_KeyEnabled = 0;
+            }            
+        }
+    }
+    
+    return level;
 }
 
 /*
@@ -117,6 +147,7 @@ static uint8_t KeyPinActive(uint8_t _id)
 */
 static uint8_t IsKeyDownFunc(uint8_t _id)
 {
+    
     /* 实体单键 */
     if (_id < HARD_KEY_NUM)
     {

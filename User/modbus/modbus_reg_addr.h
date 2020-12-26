@@ -253,7 +253,7 @@ AI : 示波器 CH1 均值, mV单位
     0x5AA5 = 初始化校准参数   InitCalibParam();初始化校准参数
      
 */
-#define REG03_CALIB_KEY 0xBFFF
+#define REG03_CALIB_KEY             0xBFFF
 
 /* 输入模拟量校准 */
 #define REG03_CALIB_CH1_R1_X1   0xC000 /* CH1 X1档位 校准参数，X1 Y1 X2 Y2 均为浮点数. 每个浮点数占用2个寄存器 */
@@ -352,7 +352,7 @@ AI : 示波器 CH1 均值, mV单位
 
 #define REG03_CALIB_PARAM_END REG03_CALIB_NTC_RES_Y4 + 1 /* 校准参数如最后1个寄存器 */
 
-#define REG03_BOOT_VER 0xE000 /* BOOT 固件版本，0x0102 表示V1.02 */
+#define REG03_BOOT_VER          0xE000  /* BOOT 固件版本，0x0102 表示V1.02 */
 
 /* 重映射部分寄存器，专用于UDP网路搜索 */
 #define REG03_NET_CPU_ID0       0xFF00
@@ -376,6 +376,10 @@ AI : 示波器 CH1 均值, mV单位
 #define REG03_NET_SYSTEM_IP_H   0xFF12  /* 管理系统IP地址高位 */
 #define REG03_NET_SYSTEM_IP_L   0xFF13  /* 管理系统IP地址低位  */
 #define REG03_NET_SYSTEM_PORT   0xFF14  /* 远程服务器端口 */
+
+
+#define REG03_SEND_KEY          0xFF7E  /* 特殊寄存器，模拟一个按键操作 */
+
 
 #define REG03_RESET_TO_BOOT     0xFF7F  /* 特殊寄存器，复位进入BOOT
     1 - 复位进入APP

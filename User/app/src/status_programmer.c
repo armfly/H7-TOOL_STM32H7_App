@@ -39,15 +39,15 @@
 #define TEXT1_X    5
 #define TEXT1_Y    BTN1_Y
 
-/* 本次次数 */
+/* 本次次数  */
 #define TEXT2_X    TEXT1_X
-#define TEXT2_Y    TEXT1_Y + 20
+#define TEXT2_Y    TEXT1_Y + 18
 
-/* 累积次数 */
+/* 累积次数+限制次数 */
 #define TEXT3_X    TEXT1_X
-#define TEXT3_Y    TEXT2_Y + 20
+#define TEXT3_Y    TEXT2_Y + 24
 
-/* TVCC电压 */
+/* CRC32 */
 #define TEXT4_X    TEXT1_X
 #define TEXT4_Y    TEXT3_Y + 20
 
@@ -89,11 +89,15 @@ MENU_T g_tMenuProg1;
 void DispProgVoltCurrent(void);
 
 static void DispProgCounter(void);
+static uint32_t GetDataFileSum(void);
 
 extern void sysTickInit(void);
 extern uint8_t swd_init_debug(void);
 extern uint8_t swd_read_idcode(uint32_t *id);
 extern uint8_t swd_init(void);
+
+
+static uint32_t s_DataFileSum = 0;
 
 /*
 *********************************************************************************************************
@@ -234,9 +238,11 @@ void status_ProgWork(void)
             
             LCD_SetEncode(ENCODE_UTF8);
             
+            s_DataFileSum = GetDataFileSum();   /* 读数据文件，计算文件校验和 */
+            
             /* 读ini配置文件 */
             ReadProgIniFile(g_tProg.FilePath, &g_tProgIni);
-            DispProgCounter();
+            DispProgCounter();     
         }
 //        else
 //        {
@@ -252,35 +258,6 @@ void status_ProgWork(void)
         else if (g_gMulSwd.MultiMode == 4) PG_PrintText("多路模式:1-4路");         
     }     
          
-//    /* 配置RS485串口，驱动RS485数码管显示状态 */
-//    {
-//        bsp_SetUartParam(COM_RS485, 9600, UART_PARITY_NONE, UART_WORDLENGTH_8B, UART_STOPBITS_1);
-//        
-//        if (g_gMulSwd.MultiMode == 0)
-//        {
-//            comSendBuf(COM_RS485, "$001,-   #", 10);
-//        }
-//        else
-//        {
-//            if (g_gMulSwd.MultiMode == 1)
-//            {
-//                comSendBuf(COM_RS485, "$001,-   #", 10);
-//            }
-//            else if (g_gMulSwd.MultiMode == 2)
-//            {
-//                comSendBuf(COM_RS485, "$001,--  #", 10);
-//            }
-//            else if (g_gMulSwd.MultiMode == 3)
-//            {
-//                comSendBuf(COM_RS485, "$001,--- #", 10);
-//            }
-//            else if (g_gMulSwd.MultiMode == 4)
-//            {
-//                comSendBuf(COM_RS485, "$001,----#", 10);
-//            }
-//        }
-//    }
-    
     /* V1.36 解决第一次上电第1次烧录失败问题 */
     {
         if (g_gMulSwd.MultiMode == 0)
@@ -431,37 +408,7 @@ void status_ProgWork(void)
                         g_gMulSwd.Active[2] = 1;
                         g_gMulSwd.Active[3] = 1;
                     }                                
-                }
-                
-                
-//                /* RS485数码管显示烧录进行中 */
-//                {
-//                    char str[16];
-//                    
-//                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
-//                    {                        
-//                        strcpy(str, "$001,-.   #");
-//                    }
-//                    else /* 多路模式 */
-//                    {
-//                        uint8_t i;
-//                        
-//                        strcpy(str, "$001,");
-//                        for (i = 0; i < 4; i++)
-//                        {
-//                            if (g_gMulSwd.Active[i] == 1)
-//                            {
-//                                strcat(str, "-.");
-//                            }
-//                            else
-//                            {
-//                                strcat(str, " ");                           
-//                            }                            
-//                        }
-//                        strcat(str, "#");
-//                    }      
-//                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));                    
-//                }  
+                }               
             
                 bsp_LcdSleepEnable(0);      /* 临时屏蔽LCD背光控制，应对烧录时间大于1分钟的情况，避免中途关闭背光 */    
                 
@@ -489,57 +436,7 @@ void status_ProgWork(void)
                     {
                         g_tProg.Err = 1;                        
                     }
-                } 
-
-                /* RS485数码管显示烧录结果 */
-//                {
-//                    char str[8];
-//                    
-//                    if (g_gMulSwd.MultiMode == 0)   /* 单路模式 */
-//                    {                        
-//                        if (g_tProg.Err == 0)
-//                        {
-//                            strcpy(str, "$001,o   #");
-//                        }
-//                        else
-//                        {
-//                            strcpy(str, "$001,E   #");
-//                        }
-//                    }
-//                    else /* 多路模式 */
-//                    {
-//                        uint8_t i;
-//                        
-//                        strcpy(str, "$001,");
-//                        for (i = 0; i < 4; i++)
-//                        {
-//                            if (g_gMulSwd.Active[i] == 1)
-//                            {
-//                                if (g_gMulSwd.Error[i] != 0)
-//                                {
-//                                    strcat(str, "E");
-//                                }
-//                                else
-//                                {
-//                                    if (g_tProg.Err == 1)
-//                                    {
-//                                        strcat(str, "-");
-//                                    }
-//                                    else
-//                                    {
-//                                        strcat(str, "o");
-//                                    }
-//                                }
-//                            }
-//                            else
-//                            {
-//                                strcat(str, " ");                           
-//                            }                            
-//                        }
-//                        strcat(str, "#");
-//                    }      
-//                    comSendBuf(COM_RS485, (uint8_t *)str, strlen(str));         
-//                }                
+                }              
                 
                 /* 编程完毕 */                
                 if (g_tProg.Err == 0)
@@ -1295,7 +1192,6 @@ void status_ProgModifyParam(void)
 static void DispProgCounter(void)
 {
     char buf[32];
-    int32_t count;  
     FONT_T tFontText;
     FONT_T tFont2;
 
@@ -1313,29 +1209,32 @@ static void DispProgCounter(void)
     LCD_DispStrEx(TEXT1_X,    TEXT1_Y, "本次", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);
     LCD_DispStrEx(TEXT2_X,    TEXT2_Y, "计数", &tFontText,  TEXT_WIDTH, ALIGN_LEFT);    
     sprintf(buf, "%05d", g_tProg.NowProgCount);    /* 最大 99999 */
-    LCD_DispStrEx(TEXT1_X + 38,    TEXT1_Y + 4, buf, &tFont2,  16 * 6, ALIGN_CENTER);
+    LCD_DispStrEx(TEXT1_X + 38,    TEXT1_Y + 2, buf, &tFont2,  16 * 6, ALIGN_CENTER);
     
-    /* 显示剩余次数 */
-    if (g_tProgIni.Locked == 1)
-    {
-        sprintf(buf, "剩余次数: 已锁死");
-    }
-    else 
-    {
-        count = g_tProgIni.ProgramLimit - g_tProgIni.ProgrammedCount;
-    }
+    /* 
+        显示剩余次数+累积次数
+        累计 20000 / 60000
+    
+    */
+//    if (g_tProgIni.Locked == 1)
+//    {
+//        sprintf(buf, "已锁死");
+//    }
+//    else 
+//    {
+//        count = g_tProgIni.ProgramLimit - g_tProgIni.ProgrammedCount;
+//    }
     if (g_tProgIni.ProgramLimit == 0)
     {
-        sprintf(buf, "剩余次数: 不限制");
+        sprintf(buf, "累计: %d", g_tProgIni.ProgrammedCount);
     }
     else
     {
-        sprintf(buf, "剩余次数: %d", count);
+        sprintf(buf, "累计: %d/%d", g_tProgIni.ProgrammedCount, g_tProgIni.ProgramLimit);
     }         
     LCD_DispStrEx(TEXT3_X,    TEXT3_Y, buf, &tFontText,  TEXT_WIDTH, ALIGN_LEFT); 
-
     
-    sprintf(buf, "累积次数: %d", g_tProgIni.ProgrammedCount);
+    sprintf(buf, "校验: 0x%08X", s_DataFileSum);
          
     LCD_DispStrEx(TEXT4_X,    TEXT4_Y, buf, &tFontText,  TEXT_WIDTH, ALIGN_LEFT);     
 }
@@ -1377,5 +1276,79 @@ void DispProgVoltCurrent(void)
     sprintf(buf, "%0.0fmA", g_tVar.TVCCCurr);
     LCD_DispStrEx(TEXT_CURR_X, TEXT_CURR_Y, buf, &tFont16, TEXT_CURR_W, 1);         
 }    
+/*
+*********************************************************************************************************
+*    函 数 名: GetDataFileSum
+*    功能说明: 获取数据文件校验和. 通过STM32硬件CRC32单元计算. 多个文件时，每个文件单独计算CRC32,然后累加。
+*    形    参: 无
+*    返 回 值: CRC32
+*********************************************************************************************************
+*/
+#define MAX_FILE_SUM 128        /* 最大文件个数 */
+static uint32_t GetDataFileSum(void)
+{
+#if 1   /* 由PC机计算 */
+    uint32_t crc_sum; 
+    
+    crc_sum = lua_GetVarUint32("DATA_FILE_CHECK_SUMS", 0x00000000);
+    
+    return crc_sum;
+#else   /* 由H7-TOOL计算，数据文件2MB时，0.5秒。如果更大文件，则载入界面太慢，废弃 */
+    size_t FileLen;
+    uint32_t i;
+    const char *pFileName;
+    uint32_t crc_sum;   /* 多个数据文件，分别计算CRC32，然后求和 */
+    uint32_t crc32;
+    char path[256];
 
+    /*
+      TaskList = {
+        AlgoFile_FLASH, --算法文件
+        "2K.bin",       --数据文件
+        0x00000000,     --目标地址
+        1,  --0表示按扇区擦除, 1表示整片擦除
+      }
+    */
+    
+    crc_sum = 0;
+    //lua->stack，得到全局表，位置-1
+    lua_getglobal(g_Lua, "TaskList");
+    for (i = 0; i < MAX_FILE_SUM; i++)
+    {
+        lua_pushinteger(g_Lua, i * 4 + 2);  //c->statck，设置key值，位置-1(上面的-1变为-2)
+        lua_gettable(g_Lua, -2);//返回值为值的类型        
+        if (lua_isstring(g_Lua, -1))
+        {
+            pFileName = luaL_checklstring(g_Lua, -1, &FileLen); /* 1是参数的位置， len是string的长度 */              
+            lua_pop(g_Lua, 1);            
+ 
+            if (pFileName[0] == '0' && pFileName[1] == ':')         /* 是绝对路径 */
+            {
+                strncpy(path, pFileName, sizeof(pFileName));
+            }
+            else    /* 是相对路路径 */ 
+            {
+                GetDirOfFileName(g_tProg.FilePath, path);   /* 从lua文件名、中获取目录 */
+                strcat(path, "/");
+                strcat(path, pFileName);
+
+                FixFileName(path);  /* 去掉路径中的..上级目录 */
+            }
+    
+            GetFileCRC32(path, &crc32);
+            crc_sum += crc32;
+        }
+        else
+        {
+            lua_pop(g_Lua, 1);
+            break;            
+        }
+    }
+    
+    lua_pop(g_Lua, 1);
+    return crc_sum;
+#endif
+
+}   
+    
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

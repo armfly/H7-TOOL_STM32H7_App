@@ -42,6 +42,7 @@ uint32_t STM32_CRC32_LE(uint8_t *_pBuf, uint32_t _Len, uint32_t _InitValue)
     CRC->INIT = _InitValue;
     
     CRC->CR |= CRC_CR_RESET;
+    
     for (i = 0; i < _Len / 4; i++)
     {
         p[0] = *_pBuf++;
@@ -65,6 +66,58 @@ uint32_t STM32_CRC32_LE(uint8_t *_pBuf, uint32_t _Len, uint32_t _InitValue)
     }
     
     return (CRC->DR);
+}
+
+// 赋初值 0xFFFFFFFFUL
+void CRC32_Init(void)
+{
+    __HAL_RCC_CRC_CLK_ENABLE();
+    
+    CRC->INIT = 0xFFFFFFFFUL;
+    
+    CRC->CR |= CRC_CR_RESET;
+}
+
+//更新数据
+void CRC32_Update(char *_pBuf, uint32_t _Len)
+{
+    uint32_t i;
+    uint32_t dd;
+    uint8_t *p;
+    
+    p = (uint8_t *)&dd;
+    
+    for (i = 0; i < _Len / 4; i++)
+    {
+        p[0] = *_pBuf++;
+        p[1] = *_pBuf++;
+        p[2] = *_pBuf++;
+        p[3] = *_pBuf++;        
+        CRC->DR = dd;
+    }
+    
+    // 补齐4字节校验
+    if (_Len % 4)
+    {
+        p[1] = 0; 
+        p[2] = 0;
+        p[3] = 0;
+        for (i = 0; i < _Len % 4; i++)
+        {
+            p[i] = *_pBuf++;
+        }
+        CRC->DR = dd;
+    }
+}
+
+// 最终结果 异或 0xFFFFFFFFUL;
+uint32_t CRC32_Final(void)
+{
+    uint32_t crc;
+    
+    crc = CRC->DR ^ 0xFFFFFFFFUL;
+    
+    return crc;
 }
 
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

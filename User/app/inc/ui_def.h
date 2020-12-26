@@ -52,7 +52,7 @@
 #define MEAS_VALUE_COLOR        RGB(102, 156, 247)  /* 测量栏正文颜色 */
 #define MEAS_UNIT_COLOR         RGB(189, 189, 189)  /* 测量栏单位颜色 */
 
-#define HELP_TEXT_COLOR         RGB(210, 210, 210)  /* 帮助文字颜色 */
+#define HELP_TEXT_COLOR         RGB(200, 200, 200)  /* 帮助文字颜色 */
 #define HELP_BACK_COLOR         FORM_BACK_COLOR     /* 帮助文字背景颜色 */
 
 #define INFO_BACK_COLOR         FORM_BACK_COLOR     /* 联机模式正文文字背景颜色 */

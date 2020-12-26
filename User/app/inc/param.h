@@ -216,6 +216,10 @@ typedef struct
     
     uint8_t LinkState;          /* 和PC机联机状态 */
     int32_t LinkTime;
+    
+    uint8_t PC_SKeyState;       /* PC控制的S键状态 */
+    uint8_t PC_CKeyState;       /* PC控制的C键状态 */
+    uint8_t PC_KeyEnabled;      /* PC控制按键进行中... */
 } VAR_T;
 
 enum

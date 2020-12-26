@@ -14,5 +14,9 @@
 #define CRC32_STM32_H
 
 uint32_t STM32_CRC32_LE(uint8_t *_pBuf, uint32_t _Len, uint32_t _InitValue);
- 
+
+void CRC32_Init(void);
+void CRC32_Update(char *_pBuf, uint32_t _Len);
+uint32_t CRC32_Final(void);
+
 #endif
