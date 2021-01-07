@@ -26,44 +26,60 @@ uint8_t s_D2State = 2;
 
 /*
 *********************************************************************************************************
+*	函 数 名: System_Init
+*	功能说明: 系统初始化，主要是MPU，Cache和系统时钟配置
+*	形    参：无
+*	返 回 值: 无
+*********************************************************************************************************
+*/
+void System_Init(void)
+{
+	
+	/* 配置MPU */
+	MPU_Config();
+	
+	/* 使能L1 Cache */
+	CPU_CACHE_Enable();
+
+	/* 
+       STM32H7xx HAL 库初始化，此时系统用的还是H7自带的64MHz，HSI时钟:
+	   - 调用函数HAL_InitTick，初始化滴答时钟中断1ms。
+	   - 设置NVIV优先级分组为4。
+	 */
+	HAL_Init();
+
+	/* 
+       配置系统时钟到400MHz
+       - 切换使用HSE。
+       - 此函数会更新全局变量SystemCoreClock，并重新配置HAL_InitTick。
+    */
+	SystemClock_Config();
+
+	/* 
+	   Event Recorder：
+	   - 可用于代码执行时间测量，MDK5.25及其以上版本才支持，IAR不支持。
+	   - 默认不开启，如果要使能此选项，务必看V7开发板用户手册第8章
+	*/	
+#if Enable_EventRecorder == 1  
+	/* 初始化EventRecorder并开启 */
+	EventRecorderInitialize(EventRecordAll, 1U);
+	EventRecorderStart();
+#endif
+
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: bsp_Init
 *    功能说明: 初始化所有的硬件设备。该函数配置CPU寄存器和外设的寄存器并初始化一些全局变量。只需要调用一次
 *    形    参: 无
 *    返 回 值: 无
 *********************************************************************************************************
 */
+#include "param.h"
 void bsp_Init(void)
 {
-    /* 配置MPU */
-    MPU_Config();
-
-    /* 使能L1 Cache */
-    CPU_CACHE_Enable();
-
-    /* 
-       STM32H7xx HAL 库初始化，此时系统用的还是H7自带的64MHz，HSI时钟:
-       - 调用函数HAL_InitTick，初始化滴答时钟中断1ms。
-       - 设置NVIV优先级分组为4。
-     */
-    HAL_Init();
-
-    /* 
-       配置系统时钟到400MHz
-       - 切换使用HSE。
-       - 此函数会更新全局变量SystemCoreClock，并重新配置HAL_InitTick。
-    */
-    SystemClock_Config();
-
-    /* 
-       Event Recorder：
-       - 可用于代码执行时间测量，MDK5.25及其以上版本才支持，IAR不支持。
-       - 默认不开启，如果要使能此选项，务必看V7开发板用户手册第xx章
-    */
-#if Enable_EventRecorder == 1
-    /* 初始化EventRecorder并开启 */
-    EventRecorderInitialize(EventRecordAll, 1U);
-    EventRecorderStart();
-#endif
+	System_Init();
 
     bsp_InitKey();     /* 按键初始化，要放在滴答定时器之前，因为按钮检测是通过滴答定时器扫描 */
     bsp_InitTimer();    /* 初始化滴答定时器 */
@@ -119,26 +135,26 @@ void bsp_DeInit(void)
 
 /*
 *********************************************************************************************************
-*    函 数 名: SystemClock_Config
-*    功能说明: 初始化系统时钟
-*                System Clock source            = PLL (HSE BYPASS)
-*                SYSCLK(Hz)                     = 400000000 (CPU Clock)
-*               HCLK(Hz)                       = 200000000 (AXI and AHBs Clock)
-*                AHB Prescaler                  = 2
-*                D1 APB3 Prescaler              = 2 (APB3 Clock  100MHz)
-*                D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz)
-*                D2 APB2 Prescaler              = 2 (APB2 Clock  100MHz)
-*                D3 APB4 Prescaler              = 2 (APB4 Clock  100MHz)
-*                HSE Frequency(Hz)              = 25000000   (8000000)
-*               PLL_M                          = 5          (4)
-*                PLL_N                          = 160        (400)
-*                PLL_P                          = 2
-*                PLL_Q                          = 4
-*                PLL_R                          = 2
-*                VDD(V)                         = 3.3
-*                Flash Latency(WS)              = 4
-*    形    参: 无
-*    返 回 值: 无
+*	函 数 名: SystemClock_Config
+*	功能说明: 初始化系统时钟
+*            	System Clock source            = PLL (HSE)
+*            	SYSCLK(Hz)                     = 400000000 (CPU Clock)
+*           	HCLK(Hz)                       = 200000000 (AXI and AHBs Clock)
+*            	AHB Prescaler                  = 2
+*            	D1 APB3 Prescaler              = 2 (APB3 Clock  100MHz)
+*            	D2 APB1 Prescaler              = 2 (APB1 Clock  100MHz)
+*            	D2 APB2 Prescaler              = 2 (APB2 Clock  100MHz)
+*            	D3 APB4 Prescaler              = 2 (APB4 Clock  100MHz)
+*            	HSE Frequency(Hz)              = 25000000
+*           	PLL_M                          = 5
+*            	PLL_N                          = 160
+*            	PLL_P                          = 2
+*            	PLL_Q                          = 4
+*            	PLL_R                          = 2
+*            	VDD(V)                         = 3.3
+*            	Flash Latency(WS)              = 4
+*	形    参: 无
+*	返 回 值: 无
 *********************************************************************************************************
 */
 static void SystemClock_Config(void)

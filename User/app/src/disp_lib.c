@@ -63,8 +63,29 @@ void DispHeader2(uint8_t _idx, char *_str)
 
     LCD_DrawLine(0, HEAD_HEIGHT, 239, HEAD_HEIGHT, HEAD_BODER_COLOR);
     
-    /*  清屏正文区  00联机界面背景颜色不同于其他界面，便于识别 */
-    LCD_Fill_Rect(0, HEAD_HEIGHT + 1, 240 - HEAD_HEIGHT - 1, 240, FORM_BACK_COLOR);
+    LCD_Fill_Rect(0, HEAD_HEIGHT + 1, 240 - HEAD_HEIGHT - 1, 240, FORM_BACK_COLOR); /* 清屏正文区  */
+}
+
+/* 不带数字标号，整行文本居中 */
+void DispHeader3(char *_str)
+{
+    FONT_T tFont;
+
+    /* 设置字体参数 */
+    {
+        tFont.FontCode = FC_ST_24;          /* 字体代码 16点阵 */
+        tFont.FrontColor = HEAD_TEXT_COLOR; /* 字体颜色 */
+        tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
+        tFont.Space = 0;                    /* 文字间距，单位 = 像素 */
+    }
+    
+    LCD_Fill_Rect(0, 0, HEAD_HEIGHT, 240 , HEAD_BACK_COLOR);   /* 清屏标题栏文本区  */
+    
+    /* 显示标题文字 */
+    tFont.BackColor = HEAD_BACK_COLOR;  /* 文字背景颜色 */
+    LCD_DispStrEx(0, 4, _str, &tFont, 240, ALIGN_CENTER);
+    
+    LCD_Fill_Rect(0, HEAD_HEIGHT + 0, 240 - HEAD_HEIGHT - 0, 240, FORM_BACK_COLOR); /* 清屏正文区  */
 }
 
 /* 只刷新标题文字部分，不清屏 */
@@ -123,7 +144,7 @@ void DispHeaderSn(uint8_t _idx)
 void DispBox(uint16_t _usX, uint16_t _usY, uint16_t _usHeight, uint16_t _usWidth, uint16_t _usColor)
 {    
     /* 绘制边框 */
-    LCD_DrawRoundRect(_usX, _usY, _usHeight, _usWidth, B0X_ARC, MEAS_BODER_COLOR);
+    LCD_DrawRoundRect(_usX, _usY, _usHeight, _usWidth, B0X_ARC + 2, MEAS_BODER_COLOR);
     
     /* 填充矩形 */
     LCD_FillRoundRect(_usX + 1, _usY + 1, _usHeight - 2, _usWidth - 2, B0X_ARC, _usColor);

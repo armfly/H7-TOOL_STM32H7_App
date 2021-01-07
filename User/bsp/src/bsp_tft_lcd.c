@@ -1534,6 +1534,13 @@ static void LCD_DispStrEx0(uint16_t _usX, uint16_t _usY, char *_ptr, FONT_T *_tF
             asc_bytes = 5;
             hz_bytes = 10;
             break;
+        
+        default:
+            font_height = 16;
+            font_width = 16;
+            asc_bytes = 1;
+            hz_bytes = 2;
+            break;        
     }
 
     str_width = LCD_GetStrWidth(_ptr, _tFont); /* 计算字符串实际宽度(RA8875内部ASCII点阵宽度为变长 */
@@ -3694,5 +3701,388 @@ void LCD_DrawMemo(MEMO_T *_pMemo)
         CharNum = 0;                    
     }     
 }
+
+/*
+*********************************************************************************************************
+*    函 数 名: LCD_DrawMemoEx
+*    功能说明: 在LCD上绘制一个多行文本框(增强版），支持文本着色（未完成）
+*    形    参:
+*            _usX, _usY : 图片的坐标
+*            _usHeight  : 图片高度
+*            _usWidth   : 图片宽度
+*            _ptr       : 图片点阵指针
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+#define LINE_CAP    2       /* 文字行间距 */
+void LCD_DrawMemoEx(MEMO_T *_pMemo)
+{
+    uint16_t x, y;
+    uint16_t TextLineNum;
+    uint16_t line;
+    uint16_t CanDispLineNum;    /* 可以显示的行数 */
+    int16_t BeginLine;
+    uint32_t i;
+    uint8_t FontHeight;
+    char buf[128];          /* 每行最大128字符 */
+    uint16_t CharNum;       /* 自动换行时，每行字符个数 */
+    uint16_t LenPerLine;    /* 每行最大字符数 */
+    uint16_t FifoRead;
+    uint16_t FifoWrite;
+    uint16_t FifoLen;       
     
+    _pMemo->Refresh = 0;
+    
+    if (_pMemo->Text == 0)
+    {
+        return;
+    }
+    
+    DISABLE_INT();
+    FifoRead = _pMemo->FifoRead;    /*  确定首字符位置 */
+    FifoWrite = _pMemo->FifoWrite;
+    ENABLE_INT();
+    
+    if (FifoRead == FifoWrite)
+    {
+        return;
+    }
+    else if (FifoWrite  > FifoRead)
+    {
+        FifoLen = FifoWrite - FifoRead;
+    }
+    else
+    {
+        FifoLen = _pMemo->MaxLen - FifoRead + FifoWrite;
+    }
+    
+    /* 绘制边框，填充窗口 */
+    LCD_DrawRect(_pMemo->Left, _pMemo->Top, _pMemo->Height, _pMemo->Width, EDIT_BORDER_COLOR);
+    LCD_Fill_Rect(_pMemo->Left + 1, _pMemo->Top + 1, _pMemo->Height - 2, _pMemo->Width - 2, EDIT_BACK_COLOR);
+    
+    if (_pMemo->WordWrap == 0)    /* 不自动换行 */
+    {
+        /* 解析文本，计算行数 */
+        TextLineNum = 0;
+        for (i = 0; i < FifoLen; i++)
+        {
+            uint8_t ch;
+            uint16_t idx;
+            
+            idx = FifoRead + i;
+            if (idx >= _pMemo->MaxLen)
+            {
+                idx = idx - _pMemo->MaxLen;
+            }
+            ch = _pMemo->Text[idx];
+            
+            if (ch == 0)
+            {
+                break;
+            }
+            if (ch == 0x0D || ch == 0x0A)
+            {
+                TextLineNum++;
+                
+                idx++;
+                if (idx >= _pMemo->MaxLen)
+                {
+                    idx = idx - _pMemo->MaxLen;
+                }
+                ch = _pMemo->Text[idx];
+            
+                if (ch == 0x0A)
+                {
+                    i++;
+                }
+            }
+        }
+        _pMemo->LineCount = TextLineNum;
+        
+        /* 计算可以显示的行数 */
+        FontHeight = LCD_GetFontHeight(_pMemo->Font);
+        CanDispLineNum = (_pMemo->Height - 2) / (FontHeight + LINE_CAP) - 1;
+        
+        /* 计算第1行位置 */
+        if (TextLineNum <= CanDispLineNum)
+        {
+            BeginLine = 0;
+        }
+        else
+        {
+            BeginLine = TextLineNum - CanDispLineNum;
+        }
+        
+        /* 翻页功能 */
+        BeginLine += _pMemo->LineOffset;
+        if (BeginLine >= TextLineNum)
+        {
+            BeginLine = TextLineNum - 1;
+            //_pMemo->LineOffset = 0;
+        }
+        if (BeginLine < 0)
+        {
+            BeginLine = 0;
+            //_pMemo->LineOffset = 0;
+        }        
+        
+        x = _pMemo->Left + 2;
+        y = _pMemo->Top + 2;
+        line = 0;
+        CharNum = 0;
+        for (i = 0; i < FifoLen; i++)
+        {
+            uint8_t ch;
+            uint16_t idx;
+            
+            idx = FifoRead + i;
+            if (idx >= _pMemo->MaxLen)
+            {
+                idx = idx - _pMemo->MaxLen;
+            }
+            ch = _pMemo->Text[idx];
+            
+            if (ch == 0)
+            {
+                if (CharNum > 0)
+                {
+                    buf[CharNum] = 0;
+                    LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                }
+                break;
+            }         
+            
+            if (CharNum < sizeof(buf))
+            {
+                buf[CharNum++] = ch;
+            }
+            
+            if (ch == 0x0D || ch == 0x0A)
+            {
+                if (line++ >= BeginLine)
+                {         
+                    buf[CharNum] = 0;
+                    LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                    
+                    y += FontHeight + LINE_CAP;
+                }
+                CharNum = 0;
+
+                if (++idx >= _pMemo->MaxLen)
+                {
+                    idx = idx - _pMemo->MaxLen;
+                }
+                
+                ch = _pMemo->Text[idx];                
+                if (ch == 0x0A)
+                {
+                    i++;
+                }
+            }
+        }
+    }
+    else    /* 自动换行 */
+    {
+        if (_pMemo->Font->FontCode == FC_ST_12)
+        {
+            LenPerLine = (_pMemo->Width - 4) / 6;
+        }
+        else if (_pMemo->Font->FontCode == FC_ST_16)
+        {
+            LenPerLine = (_pMemo->Width - 4) / 8;
+        }
+        else if (_pMemo->Font->FontCode == FC_ST_24)
+        {
+            LenPerLine = (_pMemo->Width - 4) / 12;
+        }
+        else
+        {
+            LenPerLine = (_pMemo->Width - 4) / 8;
+        }
+        
+        /* 解析文本，计算行数 */
+        TextLineNum = 0;
+        CharNum = 0;
+        for (i = 0; i < FifoLen; i++)
+        {           
+            uint8_t ch;
+            uint16_t idx;
+            
+            idx = FifoRead + i;
+            if (idx >= _pMemo->MaxLen)
+            {
+                idx = idx - _pMemo->MaxLen;
+            }
+            ch = _pMemo->Text[idx];
+            
+            if (ch == 0x0D || ch == 0x0A)
+            {
+                TextLineNum++;
+                CharNum = 0;
+                
+                if (++idx >= _pMemo->MaxLen)
+                {
+                    idx = idx - _pMemo->MaxLen;
+                }
+                ch = _pMemo->Text[idx];                
+                if (ch == 0x0A)
+                {
+                    i++;
+                }                
+            }
+            else
+            {
+                if (ch == 0)
+                {
+                    if (CharNum > 0)
+                    {
+                        TextLineNum++;
+                    }
+                    break;
+                } 
+                
+                CharNum++;
+                if (ch > 0x80)     /* 简单处理半个汉字问题 */
+                {
+                    CharNum++;
+                    i++;
+                }
+                
+                if (CharNum > LenPerLine - 1)
+                {              
+                    TextLineNum++;
+                    CharNum = 0;
+                }
+
+            }
+        }
+        _pMemo->LineCount = TextLineNum;
+        
+        /* 计算可以显示的行数 */
+        FontHeight = LCD_GetFontHeight(_pMemo->Font);
+        CanDispLineNum = (_pMemo->Height - 2) / (FontHeight + LINE_CAP) - 1;
+        
+        /* 计算第1行位置 */
+        if (TextLineNum <= CanDispLineNum)
+        {
+            BeginLine = 0;
+        }
+        else
+        {
+            BeginLine = TextLineNum - CanDispLineNum;
+        }
+
+        /* 翻页功能 */
+        BeginLine += _pMemo->LineOffset;
+        if (BeginLine >= TextLineNum)
+        {
+            BeginLine = TextLineNum - 1;
+            _pMemo->LineOffset--;
+        }
+        if (BeginLine < 0)
+        {
+            BeginLine = 0;
+            _pMemo->LineOffset++;
+        }         
+        
+        /* 开始显示 */
+        x = _pMemo->Left + 2;
+        y = _pMemo->Top + 2;
+        line = 0;
+        CharNum = 0;
+        for (i = 0; i < FifoLen; i++)
+        {
+            uint8_t ch;
+            uint16_t idx;
+            
+            idx = FifoRead + i;
+            if (idx >= _pMemo->MaxLen)
+            {
+                idx = idx - _pMemo->MaxLen;
+            }
+            ch = _pMemo->Text[idx];
+            
+            if (ch == 0x0D || ch == 0x0A)
+            {
+                buf[CharNum] = 0;
+                CharNum = 0;
+                if (line >= BeginLine && line < BeginLine + CanDispLineNum)
+                {
+                    LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                    
+                    y += FontHeight + LINE_CAP;   
+                }
+                line++;
+                
+                if (++idx >= _pMemo->MaxLen)
+                {
+                    idx = idx - _pMemo->MaxLen;
+                }
+                ch = _pMemo->Text[idx];                
+                if (ch == 0x0A)
+                {
+                    i++;
+                }                
+            }
+            else
+            {
+                if (ch == 0)
+                {
+                    if (CharNum > 0)
+                    {
+                        buf[CharNum] = 0;
+                        CharNum = 0;
+                        if (line >= BeginLine && line < BeginLine + CanDispLineNum)
+                        {
+                            LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                    
+                            y += FontHeight + LINE_CAP;
+                        }
+                        line++;
+                    }
+                    break;
+                } 
+                
+                buf[CharNum] = ch;
+                CharNum++;
+                if (ch > 0x80)     /* 简单处理半个汉字问题 */
+                {
+                    if (++idx >= _pMemo->MaxLen)
+                    {
+                        idx = idx - _pMemo->MaxLen;
+                    }
+                    ch = _pMemo->Text[idx];                      
+                    buf[CharNum] = ch;
+                    CharNum++;
+                    i++;
+                }
+                
+                if (CharNum > LenPerLine - 1)
+                {             
+                    if (line >= BeginLine && line < BeginLine + CanDispLineNum)
+                    {
+                        buf[CharNum] = 0;
+                           
+                        LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+                        
+                        y += FontHeight + LINE_CAP;
+                    }
+                    line++;                    
+                    CharNum = 0;                    
+                }                           
+            }
+        }         
+    }
+
+    if (CharNum > 0)
+    {             
+        buf[CharNum] = 0;
+               
+        LCD_DispStrEx(x, y, buf, _pMemo->Font, _pMemo->Width - 4, ALIGN_LEFT);
+            
+        y += FontHeight + LINE_CAP;                    
+        CharNum = 0;                    
+    }     
+}
+
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

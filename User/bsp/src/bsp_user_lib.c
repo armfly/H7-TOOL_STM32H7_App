@@ -171,8 +171,7 @@ uint32_t STM32_CRC32_Word(uint32_t *_pBuf, uint32_t _Len)
     for (i = 0; i < _Len / 4; i++)
     {
         CRC->DR = *_pBuf++;
-    }
-    
+    }    
     return (CRC->DR);
 }
 

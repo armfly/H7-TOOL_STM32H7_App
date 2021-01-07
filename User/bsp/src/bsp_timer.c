@@ -126,7 +126,9 @@ void bsp_InitTimer(void)
 
         对于常规的应用，我们一般取定时周期1ms。对于低速CPU或者低功耗应用，可以设置定时周期为 10ms
     */
+#if USE_RTX == 0
     SysTick_Config(SystemCoreClock / 1000);
+#endif
 
     g_ucEnableSystickISR = 1; /* 1表示执行systick中断 */
 
@@ -590,6 +592,7 @@ void bsp_DelayNS(uint32_t n)
 *    返 回 值: 无
 *********************************************************************************************************
 */
+#if USE_RTX == 0
 void SysTick_Handler(void)
 {
     HAL_IncTick(); /* ST HAL库的滴答定时中断服务程序 */
@@ -601,6 +604,7 @@ void SysTick_Handler(void)
 
     SysTick_ISR(); /* 安富莱bsp库的滴答定时中断服务程序 */
 }
+#endif
 
 /*
 *********************************************************************************************************
@@ -687,7 +691,13 @@ void bsp_InitHardTimer(void)
     TimHandle.Init.ClockDivision     = 0;
     TimHandle.Init.CounterMode       = TIM_COUNTERMODE_UP;
     TimHandle.Init.RepetitionCounter = 0;
-    TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;     
+    TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+
+    if (HAL_TIM_Base_DeInit(&TimHandle) != HAL_OK)
+    {
+        Error_Handler(__FILE__, __LINE__);
+    }
+    
     if (HAL_TIM_Base_Init(&TimHandle) != HAL_OK)
     {
         Error_Handler(__FILE__, __LINE__);
@@ -699,6 +709,11 @@ void bsp_InitHardTimer(void)
     TIMx->SR = (uint16_t)~TIM_IT_CC2;   /* 清除CC2中断标志 */ 
     TIMx->SR = (uint16_t)~TIM_IT_CC3;   /* 清除CC3中断标志 */ 
     TIMx->SR = (uint16_t)~TIM_IT_CC4;   /* 清除CC4中断标志 */ 
+    
+    TIMx->DIER &= (uint16_t)~TIM_IT_CC1; /* 禁能CC1中断 */
+    TIMx->DIER &= (uint16_t)~TIM_IT_CC2; /* 禁能CC2中断 */
+    TIMx->DIER &= (uint16_t)~TIM_IT_CC3; /* 禁能CC3中断 */
+    TIMx->DIER &= (uint16_t)~TIM_IT_CC4; /* 禁能CC4中断 */
     
     /* 配置定时器中断，给CC捕获比较中断使用 */
     {
@@ -789,7 +804,7 @@ void TIM_HARD_IRQHandler(void)
 
     timesr = TIMx->SR;
     
-    /* 溢出中断，用于CPU运行时间计算.  */
+    /* 溢出中断，用于CPU运行时间计算. 65.535ms进入一次 */
     if (timesr & TIM_IT_UPDATE)
     {
         TIMx->SR = (uint16_t)~TIM_IT_UPDATE;

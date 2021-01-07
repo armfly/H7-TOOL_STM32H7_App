@@ -322,5 +322,4 @@ void RTC_WriteBkup32(uint32_t _addr, uint32_t _value)
     HAL_RTCEx_BKUPWrite(&RtcHandle, _addr, _value);
 }
 
-
 /***************************** 安富莱电子 www.armfly.com (END OF FILE) *********************************/

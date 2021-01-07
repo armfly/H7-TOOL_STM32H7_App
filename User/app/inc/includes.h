@@ -33,13 +33,15 @@
 #include "ui_def.h"
 #include "param.h"
 #include "modbus_register.h"
+#include "disp_lib.h"   
 #include "modbus_reg_addr.h"
-#include "disp_lib.h"    
+ 
 #include "lcd_menu.h"
 #include "file_lib.h"
 #include "lua_if.h"
 #include "prog_if.h"
 #include "modify_param.h"
+#include "param.h"
 #include "wifi_if.h"
 #include "usb_if.h"
     
@@ -82,8 +84,11 @@ enum
     MS_MONITOR_ANALOG,      /* 模拟量监视器 */
     
     MS_DAPLINK,             /* 仿真器状态 */    
+    MS_DAP_SETTING_MENU,    /* DAP长按S进入，功能设置 */
     MS_JUMP_APP,            /* 跳到APP状态 */
     
+    MS_RTT_VIEWER,          /* rtt viewer */
+		
     MS_DS18B20_METER,       /* DS18B20温度表 */
     MS_USB_UART,            /* USB虚拟串口 */
 };

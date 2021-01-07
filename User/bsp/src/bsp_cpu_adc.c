@@ -845,7 +845,7 @@ void DSO_SetTriger(void)
 */
 void DSO_SetTrigerToggle(uint8_t _TrigEdge)
 {    
-    ADC_AnalogWDGConfTypeDef WdgCfg;    
+    ADC_AnalogWDGConfTypeDef WdgCfg = {0};  
 
    
     /* ADC 通道1模拟看门狗配置 */
@@ -965,7 +965,7 @@ void DSO_SetTrigerToggle(uint8_t _TrigEdge)
 */
 void DSO_CloseTriger(void)
 {    
-    ADC_AnalogWDGConfTypeDef WdgCfg;    
+    ADC_AnalogWDGConfTypeDef WdgCfg = {0};    
 
     /* ADC 通道1模拟看门狗配置 */
     WdgCfg.WatchdogNumber = ADC_ANALOGWATCHDOG_1;

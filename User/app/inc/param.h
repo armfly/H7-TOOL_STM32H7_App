@@ -122,7 +122,6 @@ typedef struct
     uint8_t DAP_TVCCVolt;       /* DAP=Link TVCC设置 0-关闭  0-50 表示 0-5.0V */
     uint8_t DAP_BeepEn;         /* DAP=Link 提示音使能 0:关闭 1:烧录完毕鸣叫 */
     uint8_t DAP_Sn;             /* DAP-Link 序号，用于驱动识别: */
-    
 } PARAM_T;
 
 /* 模拟量校准参数 */
