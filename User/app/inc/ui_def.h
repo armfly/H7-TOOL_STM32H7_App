@@ -48,11 +48,11 @@
 
 #define MEAS_BACK_COLOR         RGB(255, 255, 255)  /* 测量栏背景颜色 */
 #define MEAS_BODER_COLOR        RGB(230, 230, 230)  /* 测量栏边框颜色 */
-#define MEAS_NAME_COLOR         RGB(189, 189, 189)  /* 测量栏名称颜色 */
+#define MEAS_NAME_COLOR         RGB(140, 140, 140)  /* 测量栏名称颜色 RGB(189, 189, 189) */
 #define MEAS_VALUE_COLOR        RGB(102, 156, 247)  /* 测量栏正文颜色 */
-#define MEAS_UNIT_COLOR         RGB(189, 189, 189)  /* 测量栏单位颜色 */
+#define MEAS_UNIT_COLOR         RGB(140, 140, 140)  /* 测量栏单位颜色 RGB(189, 189, 189) */
 
-#define HELP_TEXT_COLOR         RGB(200, 200, 200)  /* 帮助文字颜色 */
+#define HELP_TEXT_COLOR         RGB(140, 140, 140)  /* 帮助文字颜色  RGB (200 200 200) */
 #define HELP_BACK_COLOR         FORM_BACK_COLOR     /* 帮助文字背景颜色 */
 
 #define INFO_BACK_COLOR         FORM_BACK_COLOR     /* 联机模式正文文字背景颜色 */
@@ -60,10 +60,10 @@
 #define INFO_VALUE_COLOR        RGB(190, 190, 190)  /* 联机模式正文文字颜色 */
 #define INFO_HEIGHT             18                  /* 高度 */
 
-#define CL_MENU_TEXT1           RGB(189, 189, 189)  /* 菜单文字颜色 */
+#define CL_MENU_TEXT1           RGB(140, 140, 140)  /* 菜单文字颜色 RGB(189, 189, 189) */
 //#define CL_MENU_BACK1           RGB(5, 54, 131)   /* 菜单文字背景颜色 */
 #define CL_MENU_BACK1           CL_WHITE            /* 菜单文字背景颜色 */
-#define CL_MENU_TEXT2           RGB(160, 160, 160)  /* 光标选中文字颜色 */
+#define CL_MENU_TEXT2           RGB(140, 140, 140)  /* 光标选中文字颜色 RGB(160, 160, 160) */
 #define CL_MENU_BACK2           CL_YELLOW           /* 光标选中文字背景颜色 */
 #define CL_MENU_ACTIVE_BODER    MEAS_BODER_COLOR    /* 光标选中文字背景颜色 */
 #define CL_MENU_BACK3           RGB(255, 236, 222)  /* 光标选中文字背景颜色 - 用于修改参数 */

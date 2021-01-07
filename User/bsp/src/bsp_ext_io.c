@@ -128,7 +128,7 @@ void EXIO_Start(void)
     EIO_D8_Config(ES_GPIO_IN);
     EIO_D9_Config(ES_GPIO_OUT);
 
-    memset(s_hc165_buf, EX165_CHIP_NUM, 0);
+    memset(s_hc165_buf, 0, EX165_CHIP_NUM);
 
     s_uiEX595 = 0;
 
@@ -162,7 +162,7 @@ void EXIO_Stop(void)
     EIO_D8_Config(ES_GPIO_IN);
     EIO_D9_Config(ES_GPIO_IN);
 
-    memset(s_hc165_buf, EX165_CHIP_NUM, 0);
+    memset(s_hc165_buf, 0, EX165_CHIP_NUM);
 
     EX595_WritePort(0);
 

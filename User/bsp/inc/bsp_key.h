@@ -14,6 +14,11 @@
 #ifndef __BSP_KEY_H
 #define __BSP_KEY_H
 
+
+/* 借用KEYI FIFO做消息缓冲区 */
+#define MSG_PC_RESET        0x80        /* PC机控制RESET硬件口线 */
+#define MSG_DETECT_RESET    0x81
+
 /* 根据应用程序的功能重命名按键宏 */
 #define KEY_DOWN_S          KEY_1_DOWN
 #define KEY_UP_S            KEY_1_UP
