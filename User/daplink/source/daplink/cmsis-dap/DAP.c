@@ -1599,6 +1599,7 @@ uint32_t DAP_ExecuteCommand(const uint8_t *request, uint8_t *response) {
 
 
 // Setup DAP
+extern void DAP_SETUP(void);
 void DAP_Setup(void) {
 
     // Default settings

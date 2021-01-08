@@ -355,15 +355,33 @@ Configures the DAP Hardware I/O pins for Serial Wire Debug (SWD) mode:
 */
 static __inline void PORT_SWD_SETUP(void)
 {
-    // Set SWCLK HIGH
-    BSP_SET_GPIO_1(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);
-    
-    // Set SWDIO HIGH
-    BSP_SET_GPIO_1(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
-    
-    // Set RESET HIGH
-    //pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);//TODO - fix reset logic
-    //BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
+    GPIO_InitTypeDef gpio_init = {0};
+
+	/* µÚ1²½£º´ò¿ªGPIOÊ±ÖÓ */
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	
+	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* ÉèÖÃ¿ªÂ©Êä³ö */
+	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;	// GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */
+	
+    /* SWCLK */
+	gpio_init.Pin = GPIO_PIN_3;	
+	HAL_GPIO_Init(GPIOD, &gpio_init);	
+
+    /* SWDIO */	
+	gpio_init.Pin = GPIO_PIN_4;	
+	HAL_GPIO_Init(GPIOD, &gpio_init);
+
+    /* RESET */	   
+    gpio_init.Pull = GPIO_PULLUP;			
+    gpio_init.Mode = GPIO_MODE_OUTPUT_OD;    
+  	gpio_init.Pin = GPIO_PIN_4;	
+	HAL_GPIO_Init(GPIOE, &gpio_init); 
+
+    GPIOD->BSRR = GPIO_PIN_3;
+    GPIOD->BSRR = GPIO_PIN_4;
+    GPIOE->BSRR = GPIO_PIN_4;
 }
 
 /** Disable JTAG/SWD I/O Pins.
@@ -372,9 +390,27 @@ Disables the DAP Hardware I/O pins which configures:
 */
 static __inline void PORT_OFF(void)
 {
-//    pin_in_init(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN_Bit, 0);
-//    pin_in_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit, 0);
-//    pin_in_init(SWDIO_IN_PIN_PORT, SWDIO_IN_PIN_Bit, 0);
+    GPIO_InitTypeDef gpio_init = {0};
+
+	/* µÚ1²½£º´ò¿ªGPIOÊ±ÖÓ */
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	
+	gpio_init.Mode = GPIO_MODE_INPUT;	    /* ÉèÖÃÎªÊäÈë */
+	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;	// GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */
+	
+    /* SWCLK */
+	gpio_init.Pin = GPIO_PIN_3;	
+	HAL_GPIO_Init(GPIOD, &gpio_init);	
+
+    /* SWDIO */	
+	gpio_init.Pin = GPIO_PIN_4;	
+	HAL_GPIO_Init(GPIOD, &gpio_init);
+    
+    /* RESET */	
+	gpio_init.Pin = GPIO_PIN_4;	
+	HAL_GPIO_Init(GPIOE, &gpio_init);
 }
 
 // SWCLK/TCK I/O pin -------------------------------------
@@ -459,10 +495,25 @@ called prior \ref PIN_SWDIO_OUT function calls.
 */
 static __forceinline void PIN_SWDIO_OUT_ENABLE(void)
 {
-    BSP_SET_GPIO_1(GPIOG, GPIO_PIN_9);    /* PG9 = 1 åˆ‡æ¢ä¸ºè¾“å‡ºæ–¹å‘ */    
-    pin_out_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
+//    GPIO_InitTypeDef gpio_init = {0};
+
+    BSP_SET_GPIO_1(GPIOG, GPIO_PIN_9);
     
-    BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
+//	gpio_init.Mode = GPIO_MODE_OUTPUT_PP;	/* ÉèÖÃ¿ªÂ©Êä³ö */
+//	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
+//	gpio_init.Speed = GPIO_SPEED_FREQ_LOW;	// GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */
+
+//	gpio_init.Pin = GPIO_PIN_4;	
+//	HAL_GPIO_Init(GPIOD, &gpio_init);
+    
+    uint32_t temp;
+
+    temp = GPIOD->MODER;
+    temp &= 0xFFFFFCFF;
+    temp |= 0x00000D00;
+    GPIOD->MODER = temp;  
+
+    BSP_SET_GPIO_0(GPIOD, GPIO_PIN_4); 
 }
 
 /** SWDIO I/O pin: Switch to Input mode (used in SWD mode only).
@@ -472,10 +523,24 @@ called prior \ref PIN_SWDIO_IN function calls.
 //static __forceinline void PIN_SWDIO_OUT_DISABLE(void)
 static  void PIN_SWDIO_OUT_DISABLE(void)
 {
-    BSP_SET_GPIO_0(GPIOG, GPIO_PIN_9);    /* PG9 = 0 åˆ‡æ¢ä¸ºè¾“å…¥æ–¹å‘  */    
-    pin_in_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
+//   GPIO_InitTypeDef gpio_init = {0};
+
+    BSP_SET_GPIO_0(GPIOG, GPIO_PIN_9);
     
-    BSP_SET_GPIO_0(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN);
+//	gpio_init.Mode = GPIO_MODE_INPUT;	    /* ÉèÖÃ¿ªÂ©Êä³ö */
+//	gpio_init.Pull = GPIO_NOPULL;			/* ÉÏÏÂÀ­µç×è²»Ê¹ÄÜ */
+//	gpio_init.Speed = GPIO_SPEED_FREQ_LOW;	// GPIO_SPEED_FREQ_HIGH;  /* GPIOËÙ¶ÈµÈ¼¶ */
+
+//	gpio_init.Pin = GPIO_PIN_4;	
+//	HAL_GPIO_Init(GPIOD, &gpio_init);
+
+    uint32_t temp;
+
+    temp = GPIOD->MODER;
+    temp &= 0xFFFFFCFF;
+    GPIOD->MODER = temp;  
+
+    BSP_SET_GPIO_0(GPIOD, GPIO_PIN_4);
 }
 
 
@@ -548,10 +613,37 @@ static __forceinline uint32_t PIN_nRESET_IN(void)
 
 static __forceinline void     PIN_nRESET_OUT(uint32_t bit)
 {
+#if 0
     if (bit & 1)
         BSP_SET_GPIO_1(nRESET_PIN_PORT, nRESET_PIN);
     else
         BSP_SET_GPIO_0(nRESET_PIN_PORT, nRESET_PIN);
+#else
+    if (bit & 1)
+    {
+        //GPIOE->BSRR = GPIO_PIN_4;
+        BSP_SET_GPIO_0(GPIOG, GPIO_PIN_3);      /* PG3 = 0   NRESET = 1 */        
+        
+    }
+    else
+    {
+        //GPIOE->BSRR = ((uint32_t)GPIO_PIN_4 << 16U);  
+        BSP_SET_GPIO_1(GPIOG, GPIO_PIN_3);      /* PG3 = 1   NRESET = 0 */
+        
+//        /* ç¡¬ä»¶å¤ä½æ—¶ï¼Œæ‰§è¡Œè½¯ä»¶å¤ä½ */
+//        {
+//            uint32_t val;
+
+//            swd_read_word(NVIC_AIRCR, &val);
+
+//            swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | SYSRESETREQ);
+//            
+//            /* ä¸åšå¤ä½é¸£å«äº? ä½“éªŒä¸å¥½ */
+//            //BEEP_Start(5, 1, 1); /* é¸£å«50msï¼Œåœ10msï¼?1æ¬?*/
+//        }
+    }
+    
+#endif
 }
 
 //**************************************************************************************************
@@ -613,33 +705,30 @@ Status LEDs. In detail the operation of Hardware I/O and LED pins are enabled an
 extern void bsp_InitSPI2_Fast(void);
 __inline void DAP_SETUP(void)
 {
-//    /* Enable port clock */
-//    __HAL_RCC_GPIOA_CLK_ENABLE();
-//    __HAL_RCC_GPIOB_CLK_ENABLE();
-//    __HAL_RCC_GPIOC_CLK_ENABLE();
-//    __HAL_RCC_GPIOD_CLK_ENABLE();
-//    
-//    /* Configure I/O pin SWCLK */
-//    pin_out_init(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN_Bit);
-//    SWCLK_TCK_PIN_PORT->BSRR = SWCLK_TCK_PIN;
+    GPIO_InitTypeDef gpio_init = {0};
 
-//    pin_out_init(SWDIO_OUT_PIN_PORT, SWDIO_OUT_PIN_Bit);
-//    SWDIO_OUT_PIN_PORT->BSRR = SWDIO_OUT_PIN;
+	/* ç¬¬1æ­¥ï¼šæ‰“å¼€GPIOæ—¶é’Ÿ */
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOG_CLK_ENABLE();
 
-//    pin_in_init(SWDIO_IN_PIN_PORT, SWDIO_IN_PIN_Bit, 1);
-
-//    pin_out_od_init(nRESET_PIN_PORT, nRESET_PIN_Bit);
-//    nRESET_PIN_PORT->BSRR = nRESET_PIN;
-
-//    pin_out_init(CONNECTED_LED_PORT, CONNECTED_LED_PIN_Bit);
-//    CONNECTED_LED_PORT->BSRR = CONNECTED_LED_PIN;
-    EIO_D4_Config(ES_GPIO_OUT);        /* RESET - Êä³ö */
-    EIO_D6_Config(ES_GPIO_OUT);        /* SWCLK - Êä³ö */
-    EIO_D8_Config(ES_GPIO_OUT);        /* SWDIO - Êä³ö */
+    BSP_SET_GPIO_1(GPIOD, GPIO_PIN_3);
+    BSP_SET_GPIO_1(GPIOD, GPIO_PIN_4);
+    BSP_SET_GPIO_1(GPIOE, GPIO_PIN_4); /* è®¾ç½®ä¸º1 */
+        
+    EIO_D4_Config(ES_GPIO_IN);         /* RESET - è¾“å…¥ã€‚ ç”¨PG3æŽ§åˆ¶ */
+    EIO_D6_Config(ES_GPIO_OUT);        /* SWCLK - è¾“å‡º */
+    EIO_D8_Config(ES_GPIO_OUT);        /* SWDIO - è¾“å‡º */
+    EIO_D2_Config(ES_GPIO_OUT);        /* æµ‹è¯•å¼•è„š - è¾“å‡º */
     
-    //EIO_D2_Config(ES_GPIO_OUT);        /* ²âÊÔÒý½Å - Êä³ö */
+    /* RESET ç”¨PG3æŽ¨æŒ½ ç¡¬ä»¶ä¸‰æžç®¡å¼€æ¼åå‘ */	 
+    BSP_SET_GPIO_0(GPIOG, GPIO_PIN_3);
     
-    //DAP_SETUP
+	gpio_init.Speed = GPIO_SPEED_FREQ_HIGH;	// GPIO_SPEED_FREQ_HIGH;  /* GPIOé€Ÿåº¦ç­‰çº§ */   
+    gpio_init.Pull = GPIO_PULLUP;			
+    gpio_init.Mode = GPIO_MODE_OUTPUT_PP;    
+  	gpio_init.Pin = GPIO_PIN_3;	
+	HAL_GPIO_Init(GPIOG, &gpio_init);   
     
     #if SPI_MODE_ENABLE == 1
         bsp_InitSPI2_Fast();
