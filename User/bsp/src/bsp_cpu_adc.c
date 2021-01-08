@@ -1929,8 +1929,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle2);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
-            HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);       
+//            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
+//            HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);       
         }    
     }
     else if (g_tDSO.MeasuteMode == 2)    /* 低速扫描多通道模式 - 1024过采样 */    
@@ -1997,8 +1997,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle1);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, CT_CH1_DMA_Stream_IRQ_PRIO, 0);
-            HAL_NVIC_EnableIRQ(CT_CH1_DMA_Stream_IRQn);  
+//            HAL_NVIC_SetPriority(CT_CH1_DMA_Stream_IRQn, CT_CH1_DMA_Stream_IRQ_PRIO, 0);
+//            HAL_NVIC_EnableIRQ(CT_CH1_DMA_Stream_IRQn);  
         }
         else if (hadc->Instance == ADC3)
         {
@@ -2053,8 +2053,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
             __HAL_LINKDMA(hadc, DMA_Handle, DmaHandle2);
 
             /* NVIC configuration for DMA Input data interrupt */
-            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
-            HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);  
+//            HAL_NVIC_SetPriority(CT_CH2_DMA_Stream_IRQn, CT_CH2_DMA_Stream_IRQ_PRIO, 0);
+//            HAL_NVIC_EnableIRQ(CT_CH2_DMA_Stream_IRQn);  
         }        
     }
 }
