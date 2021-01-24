@@ -208,7 +208,12 @@ void PG_ReloadLuaVar(void)
         
     if (g_tProg.ChipType == CHIP_SWD_ARM)
     {    
-        ;
+        /*
+            2021-01-24 多路烧录MM32L073FP时，增加如下延迟才正常        
+            static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val);            
+            20us 失败，30us成功, 选择50us
+        */
+        g_tProg.MulDelayUsReadData = lua_GetVarUint32("MUL_DELAYUS_READ_DATA", 0);
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)  
     {

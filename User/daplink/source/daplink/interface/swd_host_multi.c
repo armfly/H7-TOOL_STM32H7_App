@@ -686,6 +686,12 @@ static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
         return 0;
     }
 
+    /* 2021-01-24 多路烧录MM32L073FP时，增加如下延迟才正常 */
+    if (g_tProg.MulDelayUsReadData > 0)
+    {
+        bsp_DelayUS(g_tProg.MulDelayUsReadData);    /* 20us 失败，30us成功, 选择50us  */
+    }
+        
     // dummy read
     req = SWD_REG_DP | SWD_REG_R | SWD_REG_ADR(DP_RDBUFF);
     pAck = MUL_swd_transfer_retry(req, (uint32_t *)val);
@@ -696,6 +702,9 @@ static uint8_t MUL_swd_read_data(uint32_t addr, uint32_t *val)
     else
     {
         ack = 0;
+        
+        printf("MUL_swd_read_data() Error, MUL_DELAYUS_READ_DATA\r\n");
+        
     }    
 //    *val = 0;
 //    tmp = tmp_out[3];
@@ -1389,7 +1398,7 @@ uint8_t MUL_swd_flash_syscall_exec(const program_syscall_t *sysCallParam, uint32
     if (!MUL_swd_write_debug_state(&state)) {
         return 0;
     }
-
+        
     if (!MUL_swd_wait_until_halted()) {
         return 0;
     }

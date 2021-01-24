@@ -65,10 +65,11 @@ typedef struct
     uint32_t SwdResetDelay;     /* 硬件复位后的延迟时间，ms */
     uint32_t ResetMode;         /* 复位模式 */
     
-    uint8_t AbortOnError;      /* 多路模式，0表示出错时继续烧录OK的芯片  1表示出错后立刻同时终止 */
+    uint8_t AbortOnError;       /* 多路模式，0表示出错时继续烧录OK的芯片  1表示出错后立刻同时终止 */
     
-    uint8_t ChNum;              /* 通道个数 */
+    uint8_t ChNum;                  /* 通道个数 */
     
+    uint16_t MulDelayUsReadData;    /* 多路模式读内存操作中的延迟，仅 MM32L073系列 */    
 }OFFLINE_PROG_T;
 
 /* lua脚本fix_data_begin()返回一个table，用于通知C程序哪些内存地址需要填充数据 */
