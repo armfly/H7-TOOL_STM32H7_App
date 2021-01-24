@@ -561,6 +561,9 @@ void status_ProgWork(void)
                             ucAutoState = 0;
                             fRunOnce = 1;
                             bsp_PutKey(KEY_DB_S);   /* 任意发一个本状态无用的按键消息，重开背光 */
+                            
+                            /* 2021-01-21 V1.47 增加延迟，有些客户的板子上电延迟比较大 */
+                            bsp_DelayMS(lua_GetVarUint32("POWEROFF_TIME3", 20));
                         }
                     }
                     else
