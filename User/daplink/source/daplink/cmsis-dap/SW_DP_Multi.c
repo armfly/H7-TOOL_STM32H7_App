@@ -61,6 +61,7 @@
 #include "DAP.h"
 
 #include "SW_DP_Multi.h"
+#include "prog_if.h"
 
 /*
     BSP_SET_GPIO_1(SWCLK_TCK_PIN_PORT, SWCLK_TCK_PIN);  
@@ -446,7 +447,14 @@ uint8_t* MUL_SWD_TransferFast(uint32_t request, uint32_t *data)
     MUL_SW_WRITE_BIT_FAST(1U);                     /* Park Bit */                       
                                                                              
     /* Turnaround */                                                           
-    MUL_PIN_SWDIO_OUT_DISABLE();                                                   
+    MUL_PIN_SWDIO_OUT_DISABLE();
+
+    /* 估计某国产STM32F103C8T6，延迟800ns不稳定，延迟1000ns稳定 */
+    if (g_tProg.MulDelayUsReadAck > 0)
+    {
+        bsp_DelayUS(g_tProg.MulDelayUsReadAck);
+    }
+    
     for (n = DAP_Data.swd_conf.turnaround; n; n--) 
     {                           
         MUL_SW_CLOCK_CYCLE_FAST();                                                        
@@ -704,7 +712,14 @@ uint8_t* MUL_SWD_TransferSlow(uint32_t request, uint32_t *data)
     MUL_SW_WRITE_BIT_SLOW(1U);                     /* Park Bit */                       
                                                                              
     /* Turnaround */                                                           
-    MUL_PIN_SWDIO_OUT_DISABLE();                                                   
+    MUL_PIN_SWDIO_OUT_DISABLE();  
+
+    /* 估计某国产STM32F103C8T6，延迟800ns不稳定，延迟1000ns稳定 */
+    if (g_tProg.MulDelayUsReadAck > 0)
+    {
+        bsp_DelayUS(g_tProg.MulDelayUsReadAck);
+    }
+    
     for (n = DAP_Data.swd_conf.turnaround; n; n--) 
     {                           
         MUL_SW_CLOCK_CYCLE_SLOW();                                                        
