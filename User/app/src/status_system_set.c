@@ -22,8 +22,9 @@ const uint8_t *g_MenuSys_Text[] =
     " 3 ESP32固件升级",
     " 4 USB eMMC磁盘",
     " 5 数据维护",
-    " 6 硬件信息",    
-    " 7 重启",
+    " 6 硬件信息",
+    " 7 APP固件升级",
+    " 8 重启",
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"
 };
@@ -54,7 +55,7 @@ void status_SystemSetMain(void)
         g_tMenuSys.Height = MENU_HEIGHT;
         g_tMenuSys.Width = MENU_WIDTH;
         g_tMenuSys.LineCap = MENU_CAP;
-        g_tMenuSys.ViewLine = 8;
+        g_tMenuSys.ViewLine = 7;
         g_tMenuSys.Font.FontCode = FC_ST_24;
 //        g_tMenuSys.Font.FrontColor = CL_BLACK;        /* 字体颜色 */
 //        g_tMenuSys.Font.BackColor = FORM_BACK_COLOR;    /* 文字背景颜色 */
@@ -123,19 +124,29 @@ void status_SystemSetMain(void)
                     {
                         g_MainStatus = MS_HARD_INFO;
                     }                    
-                    else if (g_tMenuSys.Cursor == 6)    /* 重启 */
+                    else if (g_tMenuSys.Cursor == 6)    /* 重启进入boot */
                     {
                         ResetReq = 1;   
+                    }
+                    else if (g_tMenuSys.Cursor == 7)    /* 重启 */
+                    {
+                        ResetReq = 2;   
                     }                     
                     break;
 
                 case KEY_LONG_UP_S:     /* 长按弹起 */
                     if (ResetReq == 1)
                     {
+                        /* 复位进入BOOT */
+                        *(uint32_t *)0x20000000 = 0x5AA51234;
+                        NVIC_SystemReset(); /* 复位CPU */
+                    }
+                    else if (ResetReq == 2)
+                    {
                         /* 复位进入APP */
                         *(uint32_t *)0x20000000 = 0;
                         NVIC_SystemReset(); /* 复位CPU */
-                    }                     
+                    }                    
                     break;
                     
                 case KEY_UP_C: /* C键 下 */

@@ -69,7 +69,8 @@ typedef struct
     
     uint8_t ChNum;                  /* 通道个数 */
     
-    uint16_t MulDelayUsReadData;    /* 多路模式读内存操作中的延迟，仅 MM32L073系列 */    
+    uint16_t MulDelayUsReadData;    /* 多路模式读内存操作中的延迟，仅 MM32L073系列 */
+    uint16_t MulDelayUsReadAck;     /* 多路模式等待ACK前延迟, STM32F103C8T6 */      
 }OFFLINE_PROG_T;
 
 /* lua脚本fix_data_begin()返回一个table，用于通知C程序哪些内存地址需要填充数据 */
