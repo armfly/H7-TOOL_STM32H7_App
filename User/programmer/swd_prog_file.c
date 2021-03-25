@@ -1734,6 +1734,8 @@ uint16_t PG_SWD_EraseChip(uint32_t _FlashAddr)
         goto quit;
     }                    
 
+    target_flash_uninit();
+    
     PG_PrintPercent(100, 0xFFFFFFFF);           
 	
 quit:

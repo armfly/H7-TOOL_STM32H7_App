@@ -29,20 +29,12 @@
 #include "stm8_swim.h"
 #include "n76e003_flash.h"
 #include "w25q_flash.h"
-
-/* 66H帧子功能码定义 */
-enum
-{
-    H66_READ_MEM_INIT   = 0,    /* 读内存, */
-    H66_READ_MEM        = 1,    /* 写内存 */
-    H66_WRITE_MEM       = 2,    /* 写内存 */        
-    
-    H66_READ_DISP_MEM   = 0x0100,    /* 读显存 */ 
-};
+#include "file_lib.h"
 
 static void MODS66_ReadMem(void);
 static void MODS66_WriteMem(void);
 static void MODS66_ReadDispMem(void);
+static void MODS66_WriteProgAutoIni(void);
 
 /*
 *********************************************************************************************************
@@ -94,6 +86,10 @@ void MODS_66H(void)
     {
         MODS66_WriteMem();
     }
+    else if (func == H66_WRITE_PROG_AUTO_INI)
+    {
+        MODS66_WriteProgAutoIni();
+    }    
     else if (func == H66_READ_DISP_MEM)
     {
         MODS66_ReadDispMem();   
@@ -295,7 +291,8 @@ static void MODS66_WriteMem(void)
             0001  ; 子功能,
                 - 0表示读内存（需要初始化pg_init())
                 - 1表示读内存 (连续读，无需初始化）
-                - 2 写
+                - 2表示写内存
+                - 0x0100, 读显存 
             0000 0000 : 偏移地址 4字节
             0020 0000 : 数据长度 4字节
             ... 数据
@@ -396,6 +393,84 @@ static void MODS66_WriteMem(void)
     {
         ;
     }
+}
+
+/*
+*********************************************************************************************************
+*    函 数 名: MODS66_WriteProgAutoIni
+*    功能说明: 写脱机烧录启动ini文件
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+static void MODS66_WriteProgAutoIni(void)
+{
+    /*
+        主机发送: 小程序数据
+            01  ; 站号
+            66  ; 功能码
+            0001  ; 子功能,
+                - 0表示读内存（需要初始化pg_init())
+                - 1表示读内存 (连续读，无需初始化）
+                - 2表示写内存
+                - 3写脱机烧录启动文件
+                - 0x0100, 读显存 
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 数据长度 4字节
+            ... 数据
+            CCCC      : CRC16
+    
+        从机应答:
+            01  ; 从机地址
+            66  ; 功能码    
+            0000  ; 子功能
+            0000 0000 : 偏移地址 4字节
+            0020 0000 : 数据长度 4字节
+    
+            00  ; 执行结果，0表示OK  1表示错误
+            CCCC : CRC16
+    */    
+    uint16_t func;          /* 子功能代码 */
+    uint32_t offset_addr;
+    uint32_t package_len;   /* 本包数据长度 - 文件名长度+1 */
+    //uint8_t ch_num;
+    uint8_t *pData;
+    uint8_t err;
+      
+    func = BEBufToUint16(&g_tModS.RxBuf[2]);
+    offset_addr = BEBufToUint32(&g_tModS.RxBuf[4]);
+    package_len = BEBufToUint32(&g_tModS.RxBuf[8]);
+    
+    pData = (uint8_t *)&g_tModS.RxBuf[12];
+    
+    if (package_len > 12 && package_len < 256)
+    {    
+        SaveProgAutorunFile((const char *)pData);
+        err = 0;
+    }
+    else
+    {
+        err = 1; 
+    }
+    
+    /* 应答数据 */
+    g_tModS.TxCount = 0;
+    g_tModS.TxBuf[g_tModS.TxCount++] = g_tParam.Addr485; /* 本机地址 */
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0x66;                         /* 功能码 */
+    g_tModS.TxBuf[g_tModS.TxCount++] = func >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = func;
+
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = offset_addr >> 0; 
+    
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 24;
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 16; 
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 8;
+    g_tModS.TxBuf[g_tModS.TxCount++] = 0 >> 0; 
+
+    g_tModS.TxBuf[g_tModS.TxCount++] = err;    /* 执行结果  */    
 }
 
 /*

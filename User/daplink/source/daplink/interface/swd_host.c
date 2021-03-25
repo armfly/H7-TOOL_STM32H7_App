@@ -963,14 +963,14 @@ static uint8_t JTAG2SWD()
         return 0;
     }
 
-    /* 旧协议，J-LINK如此发送 */
-    if (!swd_switch(0xEDB6)) {
-        return 0;
-    }
+//    /* 旧协议，J-LINK如此发送 */
+//    if (!swd_switch(0xEDB6)) {
+//        return 0;
+//    }
 
-    if (!swd_reset()) {
-        return 0;
-    }
+//    if (!swd_reset()) {
+//        return 0;
+//    }
     
     if (!swd_read_idcode(&tmp)) {
         return 0;
@@ -995,14 +995,14 @@ static uint8_t JTAG2SWD_2(uint32_t *tmp)
         return 0;
     }
 
-    /* 旧协议，J-LINK如此发送 */
-    if (!swd_switch(0xEDB6)) {
-        return 0;
-    }
+//    /* 旧协议，J-LINK如此发送 */
+//    if (!swd_switch(0xEDB6)) {
+//        return 0;
+//    }
 
-    if (!swd_reset()) {
-        return 0;
-    }
+//    if (!swd_reset()) {
+//        return 0;
+//    }
     
     if (!swd_read_idcode(tmp)) {
         return 0;
@@ -1748,9 +1748,20 @@ uint8_t swd_enter_debug_program(void)
             return 0;
         }
 
-        if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) {
-            printf("error: swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)\r\n");
-            return 0;
+        if (!swd_write_word(NVIC_AIRCR, VECTKEY | (val & SCB_AIRCR_PRIGROUP_Msk) | soft_reset)) 
+        {
+            printf("not surport:  NVIC_AIRCR soft_reset\r\n");
+            
+            /* 2021-03-20 国民技术 N32G455, 执行软件复位会返回异常 */
+            //return 0;
+            
+            {
+                uint32_t id;
+                swd_reset();
+                if (!swd_read_idcode(&id)) {
+                    return 0;
+                }
+            }
         }
 
         osDelay(2);

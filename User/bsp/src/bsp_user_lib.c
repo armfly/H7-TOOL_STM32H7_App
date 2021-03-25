@@ -956,6 +956,69 @@ int str_to_int3(char *_pStr)
 
 /*
 *********************************************************************************************************
+*    函 数 名: str_to_int64
+*    功能说明: 将ASCII码字符串转换成整数 （用于ini文件）。 遇到空格和TAB自动略过，遇到小数点和非0-9字符结束
+*    形    参: _pStr :待转换的ASCII码串，前面可以有空格和tab，结束是非0-9字符。
+*    返 回 值: 二进制整数值
+*********************************************************************************************************
+*/
+int64_t str_to_int64(char *_pStr)
+{
+    unsigned char state = 0;
+    unsigned char flag = 0;
+    char *p;
+    int64_t ulInt;
+    unsigned char ucTemp;
+
+    p = _pStr;
+
+    ulInt = 0;
+   
+    while (1)
+    {
+        ucTemp = *p++;
+
+        if (state == 0)
+        {
+            if (ucTemp == ' ' || ucTemp == '\t')
+            {
+                continue;
+            }
+            else 
+            {
+                if (ucTemp == '-')
+                {
+                    flag = 1;       /* 是负数 */
+                }
+                else
+                {
+                    ulInt = ulInt * 10 + (ucTemp - '0');
+                    state = 1;
+                }
+            }
+        }
+        else if (state == 1)
+        {
+            if ((ucTemp >= '0') && (ucTemp <= '9'))
+            {
+                ulInt = ulInt * 10 + (ucTemp - '0');
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    if (flag == 1)
+    {
+        return -ulInt;
+    }
+    return ulInt;
+}
+
+/*
+*********************************************************************************************************
 *    函 数 名: ip_str_decode
 *    功能说明: 带小数点的IP字符串，转换为4字节数组
 *    形    参: _ipstr :待转换的ASCII码串

@@ -122,7 +122,7 @@ uint8_t BSP_MMC_Init(void)
      200MHz / (2*2) = 50MHz
      200MHz / (2*3) = 33MHz 
   */
-  uSdHandle.Init.ClockDiv = 3;		/* 2019-12-13 2 -> 3 */
+  uSdHandle.Init.ClockDiv = 4;		/* 2019-12-13 2 -> 3   2021-03-22由3改为4*/
   uSdHandle.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   uSdHandle.Init.ClockEdge = SDMMC_CLOCK_EDGE_RISING;
   uSdHandle.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_ENABLE;

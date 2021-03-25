@@ -214,9 +214,9 @@ void PG_ReloadLuaVar(void)
             20us 失败，30us成功, 选择50us
         */
         g_tProg.MulDelayUsReadData = lua_GetVarUint32("MUL_DELAYUS_READ_DATA", 0);
-
+        
         /* 2021-03-16 多路模式烧录STM32F103C8T6(可能是国产的），增加延迟1us */
-        g_tProg.MulDelayUsReadAck = lua_GetVarUint32("MUL_DELAYUS_READ_ACK", 0);            
+        g_tProg.MulDelayUsReadAck = lua_GetVarUint32("MUL_DELAYUS_READ_ACK", 0);       
     }
     else if (g_tProg.ChipType == CHIP_SWIM_STM8)  
     {
@@ -339,24 +339,37 @@ void PG_PrintText(char *_str)
     /* 输出文本 */
     StrUTF8ToGBK(_str, str, sizeof(str));
 
-    if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
+    if (g_gMulSwd.MultiMode > 0)   /* 多路模式, 1拖1 */
     {
-        if (g_gMulSwd.Error[0] != 0)
+        if (g_gMulSwd.MultiMode == 1)
         {
-            strcat(str, " #1");
+            if (g_gMulSwd.Error[0] != 0)
+            {
+                if (g_gMulSwd.SwitchPin == 0) strcat(str, " #1");
+                else if (g_gMulSwd.SwitchPin == 1) strcat(str, " #2");
+                else if (g_gMulSwd.SwitchPin == 2) strcat(str, " #3");
+                else if (g_gMulSwd.SwitchPin == 3) strcat(str, " #4");                
+            }
         }
-        if (g_gMulSwd.Error[1] != 0)
+        else    /* 1拖2,3,4 */
         {
-            strcat(str, " #2");
+            if (g_gMulSwd.Error[0] != 0)
+            {
+                strcat(str, " #1");
+            }
+            if (g_gMulSwd.Error[1] != 0)
+            {
+                strcat(str, " #2");
+            }
+            if (g_gMulSwd.Error[2] != 0)
+            {
+                strcat(str, " #3");
+            }
+            if (g_gMulSwd.Error[3] != 0)
+            {
+                strcat(str, " #4");
+            }
         }
-        if (g_gMulSwd.Error[2] != 0)
-        {
-            strcat(str, " #3");
-        }
-        if (g_gMulSwd.Error[3] != 0)
-        {
-            strcat(str, " #4");
-        }          
     }           
     
     if (g_MainStatus == MS_PROG_WORK)
@@ -364,8 +377,7 @@ void PG_PrintText(char *_str)
         DispProgProgress(str, -1, 0xFFFFFFFF);      /* -1表示不刷新进度 */
     }
     
-    strcat(str, "\r\n"); 
-    printf(str);    
+    printf("%s\r\n", str);    
     
     bsp_Idle();
 }

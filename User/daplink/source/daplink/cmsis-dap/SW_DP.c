@@ -212,66 +212,13 @@ uint8_t SWD_TransferFast(uint32_t request, uint32_t *data)
       /* Read data */                                                        
         /* armfly ： 优化奇偶校验算法 */  
       val = 0U;  
-      #if 0
-      {
-        uint32_t buf[32];
-
-        // PD3 = CLK  PD4 = DIO
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[0] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[1] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[2] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[3] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[4] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[5] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[6] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[7] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[8] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[9] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[10] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[11] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[12] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[13] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[14] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[15] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[16] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[17] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[18] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[19] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[20] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[21] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[22] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[23] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[24] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[25] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[26] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[27] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[28] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[29] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[30] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-        GPIOD->BSRR = (GPIO_PIN_3 << 16U); buf[31] = GPIOD->IDR; GPIOD->BSRR = GPIO_PIN_3;
-
-        parity = 0;
-        for (n = 0; n < 32; n++)
-        {
-            val >>= 1;
-            if (buf[n] & GPIO_PIN_4)
-            {
-                val |= 0x80000000;
-                parity++;
-            }
-        }
-        //parity = GetParity(val);
-      }
-      #else
       for (n = 32U; n; n--) {                                                
         SW_READ_BIT_FAST(bit);               /* Read RDATA[0:31] */                                                                    
         val >>= 1;                                                           
         val  |= bit << 31;                                                   
-      } 
-      parity = GetParity(val);  
-      #endif     
+      }    
 
-      
+      parity = GetParity(val);
 
           
       SW_READ_BIT_FAST(bit);                 /* Read Parity */                    

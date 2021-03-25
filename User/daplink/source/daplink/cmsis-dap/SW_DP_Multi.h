@@ -37,6 +37,8 @@ typedef struct
     
     uint32_t CoreID[4];
     
+    uint8_t SwitchPin;          /* 0: 1拖1第1路模式，1:1拖1第2路 */
+    
 }MUL_SWD_T;
 
 extern MUL_SWD_T g_gMulSwd;

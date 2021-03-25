@@ -1696,14 +1696,14 @@
               <FilePath>..\..\User\programmer\SWD_flash.h</FilePath>
             </File>
             <File>
-              <FileName>stm8_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\programmer\stm8_flash.c</FilePath>
-            </File>
-            <File>
               <FileName>stm8_swim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\programmer\stm8_swim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm8_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\programmer\stm8_flash.c</FilePath>
             </File>
             <File>
               <FileName>edc_crc_a.asm</FileName>

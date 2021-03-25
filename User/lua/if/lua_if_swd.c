@@ -205,7 +205,11 @@ static int h7_ReadCVar(lua_State* L)
         else if (strcmp(pVarName, "FactoryId") == 0)
         {
             lua_pushnumber(L, g_tParam.FactoryId);   
-        }         
+        }  
+        else if (strcmp(pVarName, "MultiProgSwitchPin") == 0)
+        {
+           lua_pushnumber(L, g_gMulSwd.SwitchPin);    
+        }        
         else
         {
             lua_pushnumber(L, 0);    /* 出错 */
@@ -455,6 +459,11 @@ static int h7swd_ReadMemory(lua_State* L)
         num = luaL_checknumber(L, 2);
         
         memset(s_lua_read_buf, 0, num);        
+    }
+    else
+    {
+        lua_pushnumber(L, 0);    /* 出错 */
+        return 1;
     }
     
     if (num > LUA_READ_LEN_MAX)
@@ -1606,8 +1615,7 @@ static int h7_PrintText(lua_State* L)
         
         if (g_MainStatus == MS_PROG_WORK)
         {
-            printf(str);
-            printf("\r\n");
+            printf("%s\r\n", str);
                     
             if (g_MainStatus == MS_PROG_WORK)
             {
@@ -1768,21 +1776,24 @@ static int h7_ProgBuf_OB(lua_State* L)
             {
                 if (len > 0)
                 {
-                    DataBuf2[len++] = ~DataBuf2[len - 1];
+                    DataBuf2[len] = ~DataBuf2[len - 1];
+                    len++;
                 }
             }
             else if (Address == 0xFFFFFFFE)          /* 遇到0xFFFFFFFE,则插入前第2个数据取反的数据 */
             {
                 if (len >= 2)
                 {
-                    DataBuf2[len++] = ~DataBuf2[len - 2];
+                    DataBuf2[len] = ~DataBuf2[len - 2];
+                    len++;
                 }
             }
             else if (Address == 0xFFFFFFFD)          /* 遇到0xFFFFFFFD,则插入前第4个数据取反的数据 */
             {
                 if (len >= 4)
                 {
-                    DataBuf2[len++] = ~DataBuf2[len - 4];
+                    DataBuf2[len] = ~DataBuf2[len - 4];
+                    len++;
                 }
             }             
             else
@@ -2082,10 +2093,18 @@ static int h7_EraseChip(lua_State* L)
             lua_pushnumber(L, 1);    /* 成功 */
         }       
     }
-    else
+    else if (g_tProg.ChipType == CHIP_SPI_FLASH)
     {
-        lua_pushnumber(L, 0);    /* 出错 */
-    }    
+        if (W25Q_EraseChip() == 0)
+        {
+            lua_pushnumber(L, 0);    /* 出错 */
+        }
+        else
+        {
+            lua_pushnumber(L, 1);    /* 成功 */
+        }         
+    } 
+  
     return 1;    
 }
 
@@ -2176,7 +2195,7 @@ static int h7_Read_ProductSN(lua_State* L)
 */
 static int h7_Write_ProductSN(lua_State* L)
 {
-    uint32_t sn;
+    int64_t sn;
     
     if (lua_type(L, 1) == LUA_TNUMBER)      /* 判断第1个参数 */
     {

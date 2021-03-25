@@ -1533,6 +1533,36 @@ uint8_t WriteRegValue_06H(uint16_t reg_addr, uint16_t reg_value)
                 g_tVar.ReqWriteBoot = 1;
                 g_MainStatus = MS_FILE_MANAGE;
             }
+            else if (reg_value == JUMP_TO_PROGRAMMER_NOT_DO)    /*  进入脱机烧录界面， 不执行烧录。 传送文件时执行 */
+            {               
+                if (g_MainStatus == MS_PROG_WORK)
+                {
+                    g_tVar.ReqProgOnce = 1;     /* 已经在烧录状态, 则重载lua文件后烧录一次 */
+                }
+                else
+                {
+                    g_tVar.ReqProgOnce = 2;     /* 其他状态时，进入新状态后会自动重载 */
+                }
+                
+                g_MainStatus = MS_PROG_WORK;                                
+                
+                bsp_PutKey(KEY_WAKE_UP);        /* 任意发一个本状态无用的按键消息，重开背光 */
+            }
+            else if (reg_value == JUMP_TO_PROGRAMMER_DO_ONCE)    /*  进入脱机烧录界面，并烧录1次 */
+            {                
+                if (g_MainStatus == MS_PROG_WORK)
+                {
+                    g_tVar.ReqProgOnce = 3;     /* 已经在烧录状态, 则重载lua文件后烧录一次 */
+                }
+                else
+                {
+                    g_tVar.ReqProgOnce = 4;     /* 其他状态时，进入新状态后会自动重载 */
+                }
+                
+                g_MainStatus = MS_PROG_WORK;                                
+                
+                bsp_PutKey(KEY_WAKE_UP);        /* 任意发一个本状态无用的按键消息，重开背光 */
+            }            
             break;
 
         /**************************** 时钟参数 *****************************/

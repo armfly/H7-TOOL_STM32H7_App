@@ -75,6 +75,8 @@ enum
     MS_EXTEND_MENU_LUA,     /* 第2级菜单-LUA程序 */      
     MS_EXTEND_MENU_REC,     /* 第2级菜单-数据记录仪 */    
     
+    MS_EXTEND_MENU_PROG_MODE,     /* 第2级菜单-烧录器 */  
+    
     MS_LUA_SELECT_FILE,     /* 浏览lua文件 */
     MS_LUA_EXEC_FILE,       /* 执行lua文件 */
     

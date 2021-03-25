@@ -44,6 +44,17 @@ typedef struct
     uint8_t TCP_Flag;
 } MODS_T;
 
+/* 66H帧子功能码定义 */
+enum
+{
+    H66_READ_MEM_INIT   = 0,        /* 读内存, */
+    H66_READ_MEM        = 1,        /* 写内存 */
+    H66_WRITE_MEM       = 2,        /* 写内存 */            
+    H66_WRITE_PROG_AUTO_INI  = 3,   /* 更改脱机烧录缺省启动文件（用于PC在线烧录) */  
+    
+    H66_READ_DISP_MEM   = 0x0100,   /* 读显存 */ 
+};
+
 void uart_rx_isr(void); /* 在 stm8s_it.c 中调用 */
 uint8_t AnalyzeCmd(uint8_t *_DispBuf);
 uint8_t MODS_Poll(uint8_t *_buf, uint16_t _len);
