@@ -34,6 +34,8 @@
 #define KEY_AUTO_C          KEY_2_AUTO_UP
 #define KEY_DB_C            KEY_2_DB_UP
 
+#define KEY_WAKE_UP         KEY_DB_S    /* 用于唤醒屏幕背光 */
+
 /* 按键ID, 主要用于bsp_KeyState()函数的入口参数 */
 typedef enum
 {

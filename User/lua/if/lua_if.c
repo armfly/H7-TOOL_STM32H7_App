@@ -306,8 +306,7 @@ void lua_do(char *buf)
         }
         else    /* 程序语法或执行错误 */
         {
-            printf(str);
-            printf("\r\n");
+            printf("%s\r\n", str);
         }  
 		lua_pop(g_Lua, 1); //将错误信息出栈        
 	}

@@ -82,38 +82,73 @@
 #define MUL_GPIO_SWD        GPIOE
 #define MUL_GPIO_DIR        GPIOG
 
-#define MUL_PIN_SWCLK_1     GPIO_PIN_12 
-#define MUL_PIN_SWDIO_1     GPIO_PIN_11 
-#define MUL_PIN_DIR_1       GPIO_PIN_9 
+#if 1   // 正确引脚
+    #define MUL_PIN_SWCLK_1     GPIO_PIN_12 
+    #define MUL_PIN_SWDIO_1     GPIO_PIN_11 
+    #define MUL_PIN_DIR_1       GPIO_PIN_9 
 
-#define MUL_PIN_SWCLK_2     GPIO_PIN_10 
-#define MUL_PIN_SWDIO_2     GPIO_PIN_2 
-#define MUL_PIN_DIR_2       GPIO_PIN_7 
+    #define MUL_PIN_SWCLK_2     GPIO_PIN_10 
+    #define MUL_PIN_SWDIO_2     GPIO_PIN_2 
+    #define MUL_PIN_DIR_2       GPIO_PIN_7 
 
-#define MUL_PIN_SWCLK_3     GPIO_PIN_9 
-#define MUL_PIN_SWDIO_3     GPIO_PIN_4 
-#define MUL_PIN_DIR_3       GPIO_PIN_12
+    #define MUL_PIN_SWCLK_3     GPIO_PIN_9 
+    #define MUL_PIN_SWDIO_3     GPIO_PIN_4 
+    #define MUL_PIN_DIR_3       GPIO_PIN_12
 
-#define MUL_PIN_SWCLK_4     GPIO_PIN_6 
-#define MUL_PIN_SWDIO_4     GPIO_PIN_5 
-#define MUL_PIN_DIR_4       GPIO_PIN_10
+    #define MUL_PIN_SWCLK_4     GPIO_PIN_6 
+    #define MUL_PIN_SWDIO_4     GPIO_PIN_5 
+    #define MUL_PIN_DIR_4       GPIO_PIN_10
 
-/* pin bit */
-#define MUL_PINB_SWCLK_1    12 
-#define MUL_PINB_SWDIO_1    11 
-#define MUL_PINB_DIR_1      9 
+    /* pin bit */
+    #define MUL_PINB_SWCLK_1    12 
+    #define MUL_PINB_SWDIO_1    11 
+    #define MUL_PINB_DIR_1      9 
 
-#define MUL_PINB_SWCLK_2    10 
-#define MUL_PINB_SWDIO_2    2 
-#define MUL_PINB_DIR_2      7 
+    #define MUL_PINB_SWCLK_2    10 
+    #define MUL_PINB_SWDIO_2    2 
+    #define MUL_PINB_DIR_2      7 
 
-#define MUL_PINB_SWCLK_3    9 
-#define MUL_PINB_SWDIO_3    4 
-#define MUL_PINB_DIR_3      12
+    #define MUL_PINB_SWCLK_3    9 
+    #define MUL_PINB_SWDIO_3    4 
+    #define MUL_PINB_DIR_3      12
 
-#define MUL_PINB_SWCLK_4    6 
-#define MUL_PINB_SWDIO_4    5
-#define MUL_PINB_DIR_4      10
+    #define MUL_PINB_SWCLK_4    6 
+    #define MUL_PINB_SWDIO_4    5
+    #define MUL_PINB_DIR_4      10
+#else   // PORT1 he  PORT2交换, 用于测试
+    #define MUL_PIN_SWCLK_1     GPIO_PIN_10 //GPIO_PIN_12 
+    #define MUL_PIN_SWDIO_1     GPIO_PIN_2  //GPIO_PIN_11 
+    #define MUL_PIN_DIR_1       GPIO_PIN_7  //GPIO_PIN_9 
+
+    #define MUL_PIN_SWCLK_2     GPIO_PIN_12 //GPIO_PIN_10 
+    #define MUL_PIN_SWDIO_2     GPIO_PIN_11 //GPIO_PIN_2 
+    #define MUL_PIN_DIR_2       GPIO_PIN_9  //GPIO_PIN_7 
+
+    #define MUL_PIN_SWCLK_3     GPIO_PIN_9 
+    #define MUL_PIN_SWDIO_3     GPIO_PIN_4 
+    #define MUL_PIN_DIR_3       GPIO_PIN_12
+
+    #define MUL_PIN_SWCLK_4     GPIO_PIN_6 
+    #define MUL_PIN_SWDIO_4     GPIO_PIN_5 
+    #define MUL_PIN_DIR_4       GPIO_PIN_10
+
+    /* pin bit */
+    #define MUL_PINB_SWCLK_1    10  //12 
+    #define MUL_PINB_SWDIO_1    2   //11 
+    #define MUL_PINB_DIR_1      7   //9 
+
+    #define MUL_PINB_SWCLK_2    12  //10 
+    #define MUL_PINB_SWDIO_2    11  //2 
+    #define MUL_PINB_DIR_2      9   //7 
+
+    #define MUL_PINB_SWCLK_3    9 
+    #define MUL_PINB_SWDIO_3    4 
+    #define MUL_PINB_DIR_3      12
+
+    #define MUL_PINB_SWCLK_4    6 
+    #define MUL_PINB_SWDIO_4    5
+    #define MUL_PINB_DIR_4      10
+#endif
 
 /* GPIO_MODER寄存器 */
 #define MUL_DIO_MODE_MASK_1   ~(3u << (MUL_PINB_SWDIO_1 * 2)) 
@@ -139,6 +174,16 @@
 #define CLK_0_DIO_1_4    (((uint32_t)MUL_PIN_SWCLK_4 << 16) | MUL_PIN_SWDIO_4)
 
 MUL_SWD_T g_gMulSwd = {0};
+
+const uint32_t TablePinDIR[4]   = {MUL_PIN_DIR_1, MUL_PIN_DIR_2, MUL_PIN_DIR_3, MUL_PIN_DIR_4};
+const uint32_t TablePinSWClK[4] = {MUL_PIN_SWCLK_1, MUL_PIN_SWCLK_2, MUL_PIN_SWCLK_3, MUL_PIN_SWCLK_4};
+const uint32_t TablePinSWDIO[4] = {MUL_PIN_SWDIO_1, MUL_PIN_SWDIO_2, MUL_PIN_SWDIO_3, MUL_PIN_SWDIO_4};
+
+const uint32_t TableModeMask[4] = {MUL_DIO_MODE_MASK_1, MUL_DIO_MODE_MASK_2, MUL_DIO_MODE_MASK_3, MUL_DIO_MODE_MASK_4};
+const uint32_t TableModeOut[4]  = {MUL_DIO_MODE_OUT_1, MUL_DIO_MODE_OUT_2, MUL_DIO_MODE_OUT_3, MUL_DIO_MODE_OUT_4};
+
+const uint32_t TableClk0Dio0[4] = {CLK_0_DIO_0_1, CLK_0_DIO_0_2, CLK_0_DIO_0_3, CLK_0_DIO_0_4};
+const uint32_t TableClk0Dio1[4] = {CLK_0_DIO_1_1, CLK_0_DIO_1_2, CLK_0_DIO_1_3, CLK_0_DIO_1_4};
 
 /* 4个SWDIO配置为输出 */
 static __forceinline void MUL_PIN_SWDIO_OUT_ENABLE(void)
@@ -168,26 +213,35 @@ static __forceinline uint32_t MUL_PIN_SWDIO_IN(void)
     
     input = MUL_GPIO_SWD->IDR;
     
-    if (input & MUL_PIN_SWDIO_1)
-    {
-        ret += 0x00000001;
+    if (g_gMulSwd.MultiMode == 1)       /* 多路模式只烧写一路 */
+    {    
+        if (input & TablePinSWDIO[g_gMulSwd.SwitchPin])
+        {
+            ret += 0x00000001;
+        }
     }
-    
-    if (input & MUL_PIN_SWDIO_2)
+    else
     {
-        ret += 0x00000100;
-    }
+        if (input & MUL_PIN_SWDIO_1)
+        {
+            ret += 0x00000001;
+        }
+        
+        if (input & MUL_PIN_SWDIO_2)
+        {
+            ret += 0x00000100;
+        }
 
     if (input & MUL_PIN_SWDIO_3)
     {
         ret += 0x00010000;
     }
 
-    if (input & MUL_PIN_SWDIO_4)
-    {
-        ret += 0x01000000;
-    }  
-
+        if (input & MUL_PIN_SWDIO_4)
+        {
+            ret += 0x01000000;
+        }        
+    }
     return ret;
 }
 
@@ -243,8 +297,8 @@ static __forceinline void MUL_PIN_SWCLK_CLR(void)
     }
 static __forceinline void MUL_SEND_32BIT_FAST(uint32_t val)
 {    
-    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
-    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
+    __IO uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
+    __IO uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
     
     MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
     MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();MUL_SEND_32BIT_ONCE_FAST();
@@ -270,8 +324,8 @@ static __forceinline void MUL_SEND_32BIT_FAST(uint32_t val)
     }
 static __forceinline void MUL_SEND_32BIT_SLOW(uint32_t val)
 {    
-    uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
-    uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
+    __IO uint32_t CLK_0_DIO_1 = g_gMulSwd.CLK_0_DIO_1;
+    __IO uint32_t CLK_0_DIO_0 = g_gMulSwd.CLK_0_DIO_0;
     
     MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
     MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
@@ -283,7 +337,27 @@ static __forceinline void MUL_SEND_32BIT_SLOW(uint32_t val)
     MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();MUL_SEND_32BIT_ONCE_SLOW();
 }
 
-extern uint8_t GetParity(uint32_t data);
+//extern uint8_t GetParity(uint32_t data);
+static const uint8_t MUL_ParityTable256[256] = 
+{
+#   define P2(n) n, n^1, n^1, n
+#   define P4(n) P2(n), P2(n^1), P2(n^1), P2(n)
+#   define P6(n) P4(n), P4(n^1), P4(n^1), P4(n)
+    P6(0), P6(1), P6(1), P6(0)
+};
+
+uint8_t MUL_GetParity(uint32_t data)
+{
+    uint8_t parity;
+    
+    data ^= data >> 16;
+    data ^= data >> 8;
+    
+    parity = MUL_ParityTable256[data & 0xff];
+    
+    return parity;
+}
+
 
 /*
 *********************************************************************************************************
@@ -298,26 +372,52 @@ void MUL_SWD_GPIOConfig(void)
     EIO_D0_Config(ES_GPIO_OUT);         /* reset */
     EIO_D1_Config(ES_GPIO_IN);          /* 输入 */
   
-    if (g_gMulSwd.Active[0] == 1)
-    {
-        EIO_D8_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-        EIO_D9_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+    if (g_gMulSwd.MultiMode == 1)       /* 多路模式只烧写一路 */
+    {    
+        if (g_gMulSwd.SwitchPin == 0)
+        {
+            EIO_D8_Config(ES_GPIO_SWD_OUT);
+            EIO_D9_Config(ES_GPIO_SWD_OUT);
+        }
+        else if (g_gMulSwd.SwitchPin == 1)
+        {
+            EIO_D5_Config(ES_GPIO_OUT);
+            EIO_D7_Config(ES_GPIO_SWD_OUT);
+        }
+        else if (g_gMulSwd.SwitchPin == 2)
+        {
+            EIO_D4_Config(ES_GPIO_OUT);    
+            EIO_D6_Config(ES_GPIO_SWD_OUT);
+        }
+        else if (g_gMulSwd.SwitchPin == 3)
+        {
+            EIO_D2_Config(ES_GPIO_OUT);
+            EIO_D3_Config(ES_GPIO_OUT);
+        }        
     }
-    if (g_gMulSwd.Active[1] == 1)
+    else
     {
-        EIO_D5_Config(ES_GPIO_OUT);
-        EIO_D7_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
+        if (g_gMulSwd.Active[0] == 1)
+        {
+            EIO_D8_Config(ES_GPIO_SWD_OUT);
+            EIO_D9_Config(ES_GPIO_SWD_OUT);
+        }
+        if (g_gMulSwd.Active[1] == 1)
+        {
+            EIO_D5_Config(ES_GPIO_OUT);
+            EIO_D7_Config(ES_GPIO_SWD_OUT);
+        }
+        if (g_gMulSwd.Active[2] == 1)
+        {
+            EIO_D4_Config(ES_GPIO_OUT);    
+            EIO_D6_Config(ES_GPIO_SWD_OUT);
+        }
+        if (g_gMulSwd.Active[3] == 1)
+        {
+            EIO_D2_Config(ES_GPIO_OUT);
+            EIO_D3_Config(ES_GPIO_OUT);
+        }
     }
-    if (g_gMulSwd.Active[2] == 1)
-    {
-        EIO_D4_Config(ES_GPIO_OUT);    
-        EIO_D6_Config(ES_GPIO_SWD_OUT);     /* 用FMC口线做GPIO。因此FMC功能失效 */
-    }
-    if (g_gMulSwd.Active[3] == 1)
-    {
-        EIO_D2_Config(ES_GPIO_OUT);
-        EIO_D3_Config(ES_GPIO_OUT);
-    }    
 }
 
 /*
@@ -351,15 +451,6 @@ void MUL_PORT_SWD_SETUP(void)
 *    返 回 值: 无
 *********************************************************************************************************
 */ 
-const uint32_t TablePinDIR[4]   = {MUL_PIN_DIR_1, MUL_PIN_DIR_2, MUL_PIN_DIR_3, MUL_PIN_DIR_4};
-const uint32_t TablePinSWClK[4] = {MUL_PIN_SWCLK_1, MUL_PIN_SWCLK_2, MUL_PIN_SWCLK_3, MUL_PIN_SWCLK_4};
-const uint32_t TablePinSWDIO[4] = {MUL_PIN_SWDIO_1, MUL_PIN_SWDIO_2, MUL_PIN_SWDIO_3, MUL_PIN_SWDIO_4};
-
-const uint32_t TableModeMask[4] = {MUL_DIO_MODE_MASK_1, MUL_DIO_MODE_MASK_2, MUL_DIO_MODE_MASK_3, MUL_DIO_MODE_MASK_4};
-const uint32_t TableModeOut[4]  = {MUL_DIO_MODE_OUT_1, MUL_DIO_MODE_OUT_2, MUL_DIO_MODE_OUT_3, MUL_DIO_MODE_OUT_4};
-
-const uint32_t TableClk0Dio0[4] = {CLK_0_DIO_0_1, CLK_0_DIO_0_2, CLK_0_DIO_0_3, CLK_0_DIO_0_4};
-const uint32_t TableClk0Dio1[4] = {CLK_0_DIO_1_1, CLK_0_DIO_1_2, CLK_0_DIO_1_3, CLK_0_DIO_1_4};
 
 void MUL_RefreshGpioParam(void)
 {    
@@ -372,9 +463,11 @@ void MUL_RefreshGpioParam(void)
     uint32_t CLK_0_DIO_1 = 0;
     uint8_t i;
     
-    for (i = 0; i < 4; i++)
+    if (g_gMulSwd.MultiMode == 1)   /* 烧写1路 */
     {
-        if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Ignore[i] == 0 && g_gMulSwd.TempIgnore[i] == 0)
+        i = g_gMulSwd.SwitchPin;    /* 硬件端口可切换到1-4中任意一路 */
+
+        if (g_gMulSwd.Active[0] == 1 && g_gMulSwd.Ignore[0] == 0 && g_gMulSwd.TempIgnore[0] == 0)
         {
             DIR_Pins |= TablePinDIR[i];
             SWCLK_Pins  |= TablePinSWClK[i];
@@ -384,14 +477,37 @@ void MUL_RefreshGpioParam(void)
             CLK_0_DIO_0 |= TableClk0Dio0[i];
             CLK_0_DIO_1 |= TableClk0Dio1[i];
         }
+        g_gMulSwd.DIR_Pins    = DIR_Pins;  
+        g_gMulSwd.SWCLK_Pins  = SWCLK_Pins;
+        g_gMulSwd.SWDIO_Pins  = SWDIO_Pins;
+        g_gMulSwd.MODER_Mask  = MODER_Mask;
+        g_gMulSwd.MODER_Out   = MODER_Out;
+        g_gMulSwd.CLK_0_DIO_0 = CLK_0_DIO_0;
+        g_gMulSwd.CLK_0_DIO_1 = CLK_0_DIO_1;
     }
-    g_gMulSwd.DIR_Pins    = DIR_Pins;  
-    g_gMulSwd.SWCLK_Pins  = SWCLK_Pins;
-    g_gMulSwd.SWDIO_Pins  = SWDIO_Pins;
-    g_gMulSwd.MODER_Mask  = MODER_Mask;
-    g_gMulSwd.MODER_Out   = MODER_Out;
-    g_gMulSwd.CLK_0_DIO_0 = CLK_0_DIO_0;
-    g_gMulSwd.CLK_0_DIO_1 = CLK_0_DIO_1;   
+    else
+    {
+        for (i = 0; i < 4; i++)
+        {
+            if (g_gMulSwd.Active[i] == 1 && g_gMulSwd.Ignore[i] == 0 && g_gMulSwd.TempIgnore[i] == 0)
+            {
+                DIR_Pins |= TablePinDIR[i];
+                SWCLK_Pins  |= TablePinSWClK[i];
+                SWDIO_Pins  |= TablePinSWDIO[i];
+                MODER_Mask  &= TableModeMask[i];
+                MODER_Out   |= TableModeOut[i];
+                CLK_0_DIO_0 |= TableClk0Dio0[i];
+                CLK_0_DIO_1 |= TableClk0Dio1[i];
+            }
+        }
+        g_gMulSwd.DIR_Pins    = DIR_Pins;  
+        g_gMulSwd.SWCLK_Pins  = SWCLK_Pins;
+        g_gMulSwd.SWDIO_Pins  = SWDIO_Pins;
+        g_gMulSwd.MODER_Mask  = MODER_Mask;
+        g_gMulSwd.MODER_Out   = MODER_Out;
+        g_gMulSwd.CLK_0_DIO_0 = CLK_0_DIO_0;
+        g_gMulSwd.CLK_0_DIO_1 = CLK_0_DIO_1;
+    }
 }
 
 /*
@@ -512,7 +628,7 @@ uint8_t* MUL_SWD_TransferFast(uint32_t request, uint32_t *data)
             
             for (i = 0; i < 4; i++)
             {
-                pb_buf[i] = GetParity(val_buf[i]);
+                pb_buf[i] = MUL_GetParity(val_buf[i]);
             }
             
             MUL_SW_READ_BIT_FAST(bit);                 /* Read Parity */                    
@@ -556,7 +672,7 @@ uint8_t* MUL_SWD_TransferFast(uint32_t request, uint32_t *data)
             val = *data;     
 
             /* armfly ： 优化奇偶校验算法 */
-            pb = GetParity(val);
+            pb = MUL_GetParity(val);
             MUL_SEND_32BIT_FAST(val);      
 
             MUL_SW_WRITE_BIT_FAST(pb);             /* Write Parity Bit */               
@@ -777,7 +893,7 @@ uint8_t* MUL_SWD_TransferSlow(uint32_t request, uint32_t *data)
             
             for (i = 0; i < 4; i++)
             {
-                pb_buf[i] = GetParity(val_buf[i]);
+                pb_buf[i] = MUL_GetParity(val_buf[i]);
             }
             
             MUL_SW_READ_BIT_SLOW(bit);                 /* Read Parity */                    
@@ -821,7 +937,7 @@ uint8_t* MUL_SWD_TransferSlow(uint32_t request, uint32_t *data)
             val = *data;     
 
             /* armfly ： 优化奇偶校验算法 */
-            pb = GetParity(val);
+            pb = MUL_GetParity(val);
             MUL_SEND_32BIT_SLOW(val);      
 
             MUL_SW_WRITE_BIT_SLOW(pb);             /* Write Parity Bit */               

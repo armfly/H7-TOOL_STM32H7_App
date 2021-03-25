@@ -207,6 +207,7 @@ typedef struct
     uint8_t SaveAlgoToCFile;    /* 解析FLM时，保存解析结果到C文件，仅仅用于debug */
 
     uint8_t ReqWriteBoot;       /* 用于PC机通知刷新boot */     
+    uint8_t ReqProgOnce;        /* 用于PC机通知TOOL烧录一次*/ 
     
     uint8_t ReqJump;            /* 请求跳转 */ 
     uint8_t UsbEmmcRemoved;     /* U盘移除 */

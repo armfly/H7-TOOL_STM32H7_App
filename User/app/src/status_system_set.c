@@ -55,7 +55,16 @@ void status_SystemSetMain(void)
         g_tMenuSys.Height = MENU_HEIGHT;
         g_tMenuSys.Width = MENU_WIDTH;
         g_tMenuSys.LineCap = MENU_CAP;
-        g_tMenuSys.ViewLine = 7;
+        
+        if (g_LcdHeight == 320)
+        {
+            g_tMenuSys.ViewLine = 8;
+        }
+        else
+        {
+            g_tMenuSys.ViewLine = 7;
+        }
+        
         g_tMenuSys.Font.FontCode = FC_ST_24;
 //        g_tMenuSys.Font.FrontColor = CL_BLACK;        /* 字体颜色 */
 //        g_tMenuSys.Font.BackColor = FORM_BACK_COLOR;    /* 文字背景颜色 */

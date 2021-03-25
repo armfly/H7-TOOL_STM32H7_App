@@ -394,7 +394,12 @@ AI : 示波器 CH1 均值, mV单位
     #define JUMP_TO_EMMC   4
     #define JUMP_TO_LINK          5
     #define JUMP_TO_UPDATE_BOOT   6     /* 更新boot */
-    
+
+    #define JUMP_TO_PROGRAMMER_NOT_DO   7     /* 进入单路烧录模式, 不烧录 */
+    #define JUMP_TO_PROGRAMMER_DO_ONCE  8     /* 进入单路烧录模式,并烧录1次 */
+    #define JUMP_TO_USB_UART    9
+    #define JUMP_TO_USB_ESP32   10
+    #define JUMP_TO_RTT_VIEWER  11
 
 /* BOOT 程序用的寄存器 */
 #define REG03_BOOT_CPU_ID0      0xFF80

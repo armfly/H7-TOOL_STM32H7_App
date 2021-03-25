@@ -132,6 +132,13 @@ __forceinline void PIN_DELAY_SLOW (uint32_t delay) {
 #define W25_SCK_1()         BSP_SET_GPIO_1(GPIOD, GPIO_PIN_15)
 
 /* MOSI 四路不同 */
+#define W25_MOSI1_PIN       GPIO_PIN_0
+#define W25_MOSI2_PIN       GPIO_PIN_1
+#define W25_MOSI3_PIN       GPIO_PIN_3
+#define W25_MOSI4_PIN       GPIO_PIN_4
+
+#define W25_SCK_PIN         GPIO_PIN_15
+
 #define W25_MOSI1_0()       BSP_SET_GPIO_0(GPIOD, GPIO_PIN_0)
 #define W25_MOSI1_1()       BSP_SET_GPIO_1(GPIOD, GPIO_PIN_0)
  
@@ -144,8 +151,8 @@ __forceinline void PIN_DELAY_SLOW (uint32_t delay) {
 #define W25_MOSI4_0()       BSP_SET_GPIO_0(GPIOD, GPIO_PIN_4)
 #define W25_MOSI4_1()       BSP_SET_GPIO_1(GPIOD, GPIO_PIN_4)
 
-#define W25_MOSI_0_SCK_0()  GPIOD->BSRR = (uint32_t)(GPIO_PIN_15 | GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4) << 16
-#define W25_MOSI_1_SCK_0()  GPIOD->BSRR = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | ((uint32_t)GPIO_PIN_15 << 16)
+#define __W25_MOSI_0_SCK_0()  GPIOD->BSRR = (uint32_t)(GPIO_PIN_15 | GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4) << 16
+#define __W25_MOSI_1_SCK_0()  GPIOD->BSRR = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_3 | GPIO_PIN_4 | ((uint32_t)GPIO_PIN_15 << 16)
 
 /* MISO 四路不同 */
 
@@ -203,9 +210,88 @@ void W25Q_InitHard(void)
     EIO_D9_Config(ES_PROG_SPI_FLASH);
     
     /* 选MODE3，平时SCK为1 */
-    W25_SCK_1();   
-
+    W25_SCK_1();    
+    W25_CS_1();
+    
     W25Q_UnlockBlock();         /* SST26VFxxx 需要解除块保护 */
+}
+
+static void W25_MOSI_0_SCK_0(void)
+{
+    if (g_gMulSwd.MultiMode == 0)   /* 单路烧录, */
+    {
+        GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI1_PIN) << 16;
+    }
+    else if (g_gMulSwd.MultiMode == 4)   /* 1拖4 烧录 */ 
+    {
+        GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI1_PIN | W25_MOSI2_PIN | W25_MOSI3_PIN | W25_MOSI4_PIN) << 16;
+    }
+    else if (g_gMulSwd.MultiMode == 3)   /* 1拖3 烧录 */
+    {
+        GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI1_PIN | W25_MOSI2_PIN | W25_MOSI3_PIN) << 16;
+    }
+    else if (g_gMulSwd.MultiMode == 2)   /* 1拖2 烧录 */
+    {
+        GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI1_PIN | W25_MOSI2_PIN) << 16;
+    }
+    else if (g_gMulSwd.MultiMode == 1)   /* 1拖1 烧录 */
+    {
+        if (g_gMulSwd.SwitchPin == 0)
+        {
+            GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI1_PIN) << 16;
+        }
+        else if (g_gMulSwd.SwitchPin == 1)
+        {
+            GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI2_PIN) << 16;
+        }
+        else if (g_gMulSwd.SwitchPin == 2)
+        {
+            GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI3_PIN) << 16;
+        }
+        else if (g_gMulSwd.SwitchPin == 3)
+        {
+            GPIOD->BSRR = (uint32_t)(W25_SCK_PIN | W25_MOSI4_PIN) << 16;
+        } 
+    }    
+}
+
+static void W25_MOSI_1_SCK_0(void)
+{       
+    if (g_gMulSwd.MultiMode == 0)   /* 单路烧录, */
+    {
+        GPIOD->BSRR = W25_MOSI1_PIN | ((uint32_t)W25_SCK_PIN << 16);
+    }
+    else if (g_gMulSwd.MultiMode == 4)   /* 1拖4 烧录 */ 
+    {
+        GPIOD->BSRR = W25_MOSI1_PIN | W25_MOSI2_PIN | W25_MOSI3_PIN | W25_MOSI4_PIN | ((uint32_t)W25_SCK_PIN << 16);
+    }
+    else if (g_gMulSwd.MultiMode == 3)   /* 1拖3 烧录 */
+    {
+        GPIOD->BSRR = W25_MOSI1_PIN | W25_MOSI2_PIN | W25_MOSI3_PIN | ((uint32_t)W25_SCK_PIN << 16);
+    }
+    else if (g_gMulSwd.MultiMode == 2)   /* 1拖2 烧录 */
+    {
+        GPIOD->BSRR = W25_MOSI1_PIN | W25_MOSI2_PIN | ((uint32_t)W25_SCK_PIN << 16);
+    }
+    else if (g_gMulSwd.MultiMode == 1)   /* 1拖1 烧录 */
+    {
+        if (g_gMulSwd.SwitchPin == 0)
+        {
+            GPIOD->BSRR = W25_MOSI1_PIN | ((uint32_t)W25_SCK_PIN << 16);
+        }
+        else if (g_gMulSwd.SwitchPin == 1)
+        {
+            GPIOD->BSRR = W25_MOSI2_PIN | ((uint32_t)W25_SCK_PIN << 16);
+        }
+        else if (g_gMulSwd.SwitchPin == 2)
+        {
+            GPIOD->BSRR = W25_MOSI3_PIN | ((uint32_t)W25_SCK_PIN << 16);
+        }
+        else if (g_gMulSwd.SwitchPin == 3)
+        {
+            GPIOD->BSRR = W25_MOSI4_PIN | ((uint32_t)W25_SCK_PIN << 16);
+        } 
+    }    
 }
 
 /*
@@ -289,23 +375,89 @@ static void W25Q_RaedBit8Fast(uint8_t *_rxbuf)
         W25_SCK_1();
         gpio = W25_READ_MISO();    
        
-        if (gpio & W25_MISO1_PIN_A)
+        if (g_gMulSwd.MultiMode == 0)
         {
-            ret |= 0x00000001;
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
         }
-        if (gpio & W25_MISO2_PIN_A)
+        else if (g_gMulSwd.MultiMode == 4)
         {
-            ret |= 0x00000100;
-        }
-        if (gpio & W25_MISO3_PIN_A)
-        {
-            ret |= 0x00010000;
-        }
-        if (gpio & W25_MISO4_PIN_A)
-        {
-            ret |= 0x01000000;
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00010000;
+            }
+            if (gpio & W25_MISO4_PIN_A)
+            {
+                ret |= 0x01000000;
+            }
         }        
-        
+        else if (g_gMulSwd.MultiMode == 3)
+        {
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00010000;
+            }
+        }         
+        else if (g_gMulSwd.MultiMode == 2)
+        {
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
+        }
+        else if (g_gMulSwd.MultiMode == 1)
+        {
+            if (g_gMulSwd.SwitchPin == 0)
+            {    
+                if (gpio & W25_MISO1_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 1)
+            {    
+                if (gpio & W25_MISO2_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 2)
+            {    
+                if (gpio & W25_MISO3_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 3)
+            {    
+                if (gpio & W25_MISO4_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+        }        
     }
     
     _rxbuf[0] = ret;
@@ -332,81 +484,157 @@ static void W25Q_RaedBit8FastDaul(uint8_t *_rxbuf)
     for (i = 0; i < 4; i++)
     {        
         W25_SCK_0();
-        if (gpio & W25_MISO1_PIN_B)
-        {
-            ret |= 0x00000001;
-        }
-        if (gpio & W25_MISO1_PIN_A)
-        {
-            ret |= 0x00000002;
-        }
         
-        if (gpio & W25_MISO2_PIN_B)
+        if (g_gMulSwd.MultiMode == 0)
         {
-            ret |= 0x00000100;
+            if (gpio & W25_MISO1_PIN_B)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000002;
+            }
         }
-        if (gpio & W25_MISO2_PIN_A)
+        else if (g_gMulSwd.MultiMode == 4)
         {
-            ret |= 0x00000200;
-        }
-        
-        if (gpio & W25_MISO3_PIN_B)
+            if (gpio & W25_MISO1_PIN_B)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000002;
+            }
+            
+            if (gpio & W25_MISO2_PIN_B)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000200;
+            }
+            
+            if (gpio & W25_MISO3_PIN_B)
+            {
+                ret |= 0x00010000;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00020000;
+            }
+            
+            if (gpio & W25_MISO4_PIN_B)
+            {
+                ret |= 0x01000000;
+            }
+            if (gpio & W25_MISO4_PIN_A)
+            {
+                ret |= 0x02000000;
+            }
+        }        
+        else if (g_gMulSwd.MultiMode == 3)
         {
-            ret |= 0x00010000;
-        }
-        if (gpio & W25_MISO3_PIN_A)
+            if (gpio & W25_MISO1_PIN_B)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000002;
+            }
+            
+            if (gpio & W25_MISO2_PIN_B)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000200;
+            }
+            
+            if (gpio & W25_MISO3_PIN_B)
+            {
+                ret |= 0x00010000;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00020000;
+            }
+        }         
+        else if (g_gMulSwd.MultiMode == 2)
         {
-            ret |= 0x00020000;
+            if (gpio & W25_MISO1_PIN_B)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000002;
+            }
+            
+            if (gpio & W25_MISO2_PIN_B)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000200;
+            }
         }
-        
-        if (gpio & W25_MISO4_PIN_B)
+        else if (g_gMulSwd.MultiMode == 1)
         {
-            ret |= 0x01000000;
-        }
-        if (gpio & W25_MISO4_PIN_A)
-        {
-            ret |= 0x02000000;
-        }
+            if (g_gMulSwd.SwitchPin == 0)
+            {    
+                if (gpio & W25_MISO1_PIN_B)
+                {
+                    ret |= 0x00000001;
+                }
+                if (gpio & W25_MISO1_PIN_A)
+                {
+                    ret |= 0x00000002;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 1)
+            {    
+                if (gpio & W25_MISO2_PIN_B)
+                {
+                    ret |= 0x00000001;
+                }
+                if (gpio & W25_MISO2_PIN_A)
+                {
+                    ret |= 0x00000002;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 2)
+            {    
+                if (gpio & W25_MISO3_PIN_B)
+                {
+                    ret |= 0x00000001;
+                }
+                if (gpio & W25_MISO3_PIN_A)
+                {
+                    ret |= 0x00000002;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 3)
+            {    
+                if (gpio & W25_MISO4_PIN_B)
+                {
+                    ret |= 0x00000001;
+                }
+                if (gpio & W25_MISO4_PIN_A)
+                {
+                    ret |= 0x00000002;
+                }
+            }
+        }     
+ 
         ret <<= 2;        
         W25_SCK_1();
         gpio = W25_READ_MISO();            
     }
-
-    if (gpio & W25_MISO1_PIN_B)
-    {
-        ret |= 0x00000001;
-    }
-    if (gpio & W25_MISO1_PIN_A)
-    {
-        ret |= 0x00000002;
-    }
-    
-    if (gpio & W25_MISO2_PIN_B)
-    {
-        ret |= 0x00000100;
-    }
-    if (gpio & W25_MISO2_PIN_A)
-    {
-        ret |= 0x00000200;
-    }
-    
-    if (gpio & W25_MISO3_PIN_B)
-    {
-        ret |= 0x00010000;
-    }
-    if (gpio & W25_MISO3_PIN_A)
-    {
-        ret |= 0x00020000;
-    }
-    
-    if (gpio & W25_MISO4_PIN_B)
-    {
-        ret |= 0x01000000;
-    }
-    if (gpio & W25_MISO4_PIN_A)
-    {
-        ret |= 0x02000000;
-    }    
 
     _rxbuf[0] = ret;
     _rxbuf[1] = ret >> 8;
@@ -438,22 +666,89 @@ static void W25Q_RaedBit8Slow(uint8_t *_rxbuf)
         gpio = W25_READ_MISO();
         PIN_DELAY_S();
         
-        if (gpio & W25_MISO1_PIN_A)
+        if (g_gMulSwd.MultiMode == 0)
         {
-            ret |= 0x00000001;
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
         }
-        if (gpio & W25_MISO2_PIN_A)
+        else if (g_gMulSwd.MultiMode == 4)
         {
-            ret |= 0x00000100;
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00010000;
+            }
+            if (gpio & W25_MISO4_PIN_A)
+            {
+                ret |= 0x01000000;
+            }
+        }        
+        else if (g_gMulSwd.MultiMode == 3)
+        {
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
+            if (gpio & W25_MISO3_PIN_A)
+            {
+                ret |= 0x00010000;
+            }
+        }         
+        else if (g_gMulSwd.MultiMode == 2)
+        {
+            if (gpio & W25_MISO1_PIN_A)
+            {
+                ret |= 0x00000001;
+            }
+            if (gpio & W25_MISO2_PIN_A)
+            {
+                ret |= 0x00000100;
+            }
         }
-        if (gpio & W25_MISO3_PIN_A)
+        else if (g_gMulSwd.MultiMode == 1)
         {
-            ret |= 0x00010000;
-        }
-        if (gpio & W25_MISO4_PIN_A)
-        {
-            ret |= 0x01000000;
-        }                      
+            if (g_gMulSwd.SwitchPin == 0)
+            {    
+                if (gpio & W25_MISO1_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 1)
+            {    
+                if (gpio & W25_MISO2_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 2)
+            {    
+                if (gpio & W25_MISO3_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+            else if (g_gMulSwd.SwitchPin == 3)
+            {    
+                if (gpio & W25_MISO4_PIN_A)
+                {
+                    ret |= 0x00000001;
+                }
+            }
+        }                         
     }
     _rxbuf[0] = ret;
     _rxbuf[1] = ret >> 8;
@@ -476,6 +771,7 @@ static void W25Q_RaedBit8SlowDaul(uint8_t *_rxbuf)
         W25_SCK_1();
         PIN_DELAY_S();
         gpio = W25_READ_MISO();     
+        
         if (gpio & W25_MISO1_PIN_B)
         {
             ret |= 0x00000001;
@@ -1239,6 +1535,18 @@ uint8_t W25Q_WaitBusy(uint32_t _timeout)
         
         W25Q_SendAndReadData(txbuf, 1, rxbuf, 1);        
 		
+        if (g_gMulSwd.MultiMode == 0)   /* 单路烧录 */
+        {
+            if ((rxbuf[0] & WIP_FLAG) != 0)	    
+            {
+                ;
+            }
+            else
+            {
+                return 1;   /* OK */
+            }
+        }
+        else    /* 多路模式 */
         {
             uint8_t err = 0;
             

@@ -54,6 +54,7 @@
 
 
 extern void status_DS18B20Meter(void);
+extern void status_ExtendMenuProg(void);    
 
 uint16_t GetStatusIndex(uint16_t _NowStatus);
 
@@ -228,6 +229,10 @@ int main(void)
                 status_ProgWork();
                 break;            
 
+            case MS_EXTEND_MENU_PROG_MODE:  /* 脱机下载器 - 菜单选择模式 */
+                status_ExtendMenuProg();
+                break;
+            
             case MS_PROG_SETTING:       /* 脱机下载器 - 参数设置 */
                 status_ProgSetting();
                 break;

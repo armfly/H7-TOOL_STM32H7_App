@@ -22,12 +22,11 @@
 const uint8_t *g_Menu1_Text[] =
 {
     " 1 CMSIS-DAP仿真器",     
-    " 2 脱机烧录器(单路)",
-    " 3 脱机烧录器(多路)",
-    " 4 LUA小程序",
-    " 5 数据监视器",
-    " 6 USB虚拟串口", 
-    " 7 系统设置", 
+    " 2 脱机烧录器",
+    " 3 LUA小程序",
+    " 4 数据监视器",
+    " 5 USB虚拟串口", 
+    " 6 系统设置", 
     
     /* 结束符号, 用于菜单函数自动识别菜单项个数 */
     "&"    
@@ -46,6 +45,22 @@ const uint8_t *g_MenuRec_Text[] =
 
 MENU_T g_tMenuRec;
 
+const char *g_MenuProgMode_Text[] = 
+{
+    "1 单路(无需1拖4板)",
+    "2 1拖4(第1-4路)",
+    "3 1拖3(第1-3路)",
+    "4 1拖2(第1-2路)",
+    "5 1拖1(第1路)",
+    "6 1拖1(第2路)",
+    "7 1拖1(第3路)", 
+    "8 1拖1(第4路)",     
+
+    /* 结束符号, 用于菜单函数自动识别菜单项个数 */
+    "&"
+};
+MENU_T g_tMenuProgMode;
+
 void JumpToDAPLink(void);
 
 /*
@@ -63,7 +78,7 @@ void status_ExtendMenu1(void)
     static uint8_t s_MenuInit = 0;
     
 
-    DispHeader("扩展功能");
+    DispHeader2(8, "扩展功能");
 //    DispHelpBar("",
 //                ""); 
     
@@ -76,14 +91,24 @@ void status_ExtendMenu1(void)
         g_tMenu1.Height = MENU_HEIGHT;
         g_tMenu1.Width = MENU_WIDTH;
         g_tMenu1.LineCap = MENU_CAP;
-        g_tMenu1.ViewLine = 8;
+        if (g_LcdHeight == 320)
+        {
+            g_tMenu1.ViewLine = 8;
+        }
+        else
+        {
+            g_tMenu1.ViewLine = 7;
+        }
         g_tMenu1.Font.FontCode = FC_ST_24;
         g_tMenu1.Font.Space = 0;
         g_tMenu1.RollBackEn = 1;  /* 允许回滚 */
         g_tMenu1.GBK = 0;
         g_tMenu1.ActiveBackColor = 0;   /* 选中行背景色ID */        
         LCD_InitMenu(&g_tMenu1, (char **)g_Menu1_Text); /* 初始化菜单结构 */
-    }    
+    }
+    g_tMenu1.Left = MENU_LEFT;     /* 横竖屏切换回修改居中坐标 */
+    
+    
     LCD_DispMenu(&g_tMenu1);
 
     fRefresh = 1;
@@ -119,27 +144,21 @@ void status_ExtendMenu1(void)
                     }                     
                     else if (g_tMenu1.Cursor == 1)
                     {
-                        g_gMulSwd.MultiMode = 0;
-                        g_MainStatus = MS_PROG_WORK;
-                    }
+                        g_MainStatus = MS_EXTEND_MENU_PROG_MODE;
+                    }                  
                     else if (g_tMenu1.Cursor == 2)
-                    {
-                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;        
-                        g_MainStatus = MS_PROG_WORK;
-                    }                    
-                    else if (g_tMenu1.Cursor == 3)
                     {
                         g_MainStatus = MS_LUA_SELECT_FILE;
                     }
-                    else if (g_tMenu1.Cursor == 4)
+                    else if (g_tMenu1.Cursor == 3)
                     {
                         g_MainStatus = MS_EXTEND_MENU_REC;
                     }   
-                    else if (g_tMenu1.Cursor == 5)
+                    else if (g_tMenu1.Cursor == 4)
                     {
                         g_MainStatus = MS_USB_UART;                        
                     }
-                    else if (g_tMenu1.Cursor == 6)
+                    else if (g_tMenu1.Cursor == 5)
                     {
                         g_MainStatus = MS_SYSTEM_SET;                        
                     }                     
@@ -192,9 +211,10 @@ void status_ExtendMenuRec(void)
         g_tMenuRec.ActiveBackColor = 0;   /* 选中行背景色ID */      
         LCD_InitMenu(&g_tMenuRec, (char **)g_MenuRec_Text); /* 初始化菜单结构 */
     }
+    g_tMenuRec.Left = MENU_LEFT;     /* 横竖屏切换回修改居中坐标 */
     LCD_DispMenu(&g_tMenuRec);
     
-    DispHeader("请选择");
+    DispHeader2(84, "请选择");
 //    DispHelpBar("",
 //                ""); 
     
@@ -261,6 +281,159 @@ void status_ExtendMenuRec(void)
                 break;
             }
         }
+    }
+}
+
+
+/*
+*********************************************************************************************************
+*    函 数 名: status_ExtendMenuProg
+*    功能说明: 扩展功能菜单 选择烧录器
+*    形    参: 无
+*    返 回 值: 无
+*********************************************************************************************************
+*/
+void status_ExtendMenuProg(void)
+{
+    uint8_t ucKeyCode; /* 按键代码 */
+    uint8_t fRefresh;
+    static uint8_t s_MenuInit = 0;
+
+    if (s_MenuInit == 0)
+    {
+        s_MenuInit = 1;
+        
+        g_tMenuProgMode.Left = MENU_LEFT;
+        g_tMenuProgMode.Top = MENU_TOP;
+        g_tMenuProgMode.Height = MENU_HEIGHT;
+        g_tMenuProgMode.Width = MENU_WIDTH;
+        g_tMenuProgMode.LineCap = MENU_CAP;
+        if (g_LcdHeight == 320)
+        {
+            g_tMenuProgMode.ViewLine = 8;
+        }
+        else
+        {
+            g_tMenuProgMode.ViewLine = 7;
+        }
+        g_tMenuProgMode.Font.FontCode = FC_ST_24;
+        g_tMenuProgMode.Font.Space = 0;
+        g_tMenuProgMode.RollBackEn = 1;  /* 允许回滚 */   
+        g_tMenuProgMode.GBK = 0; 
+        g_tMenuProgMode.ActiveBackColor = 0;   /* 选中行背景色ID */      
+        LCD_InitMenu(&g_tMenuProgMode, (char **)g_MenuProgMode_Text); /* 初始化菜单结构 */
+    }
+    g_tMenuProgMode.Left = MENU_LEFT;     /* 横竖屏切换回修改居中坐标 */
+    LCD_DispMenu(&g_tMenuProgMode);
+    
+    DispHeader2(82,  "选择烧录模式");
+//    DispHelpBar("",
+//                ""); 
+    
+    LCD_DispMenu(&g_tMenuProgMode);
+
+    fRefresh = 1;
+    while (g_MainStatus == MS_EXTEND_MENU_PROG_MODE)
+    {
+        if (fRefresh) /* 刷新整个界面 */
+        {
+            fRefresh = 0;
+
+            if (g_tMenuRec.Cursor == 0)
+            {
+                ;
+            }
+        }
+
+        bsp_Idle();
+        
+        ucKeyCode = bsp_GetKey(); /* 读取键值, 无键按下时返回 KEY_NONE = 0 */
+        if (ucKeyCode != KEY_NONE)
+        {
+            /* 有键按下 */
+            switch (ucKeyCode)
+            {
+                case KEY_UP_S:          /* S键 上 */
+                    PlayKeyTone();
+                    LCD_MoveUpMenu(&g_tMenuProgMode);
+                    break;
+
+                case KEY_LONG_DOWN_S:   /* S键 上 */
+                    PlayKeyTone();
+
+                    g_gMulSwd.SwitchPin = 0;
+                    if (g_tMenuProgMode.Cursor == 0)
+                    {
+                        g_gMulSwd.MultiMode = 0;
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 1)
+                    {                        
+                        g_tParam.MultiProgMode = 4;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;        
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 2)
+                    {
+                        g_tParam.MultiProgMode = 3;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;       
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 3)
+                    {
+                        g_tParam.MultiProgMode = 2;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;        
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 4)
+                    {
+                        g_tParam.MultiProgMode = 1;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode; 
+                        g_gMulSwd.SwitchPin = 0;        /* 只烧写第1通道 */                    
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 5)
+                    {
+                        g_tParam.MultiProgMode = 1;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;
+                        g_gMulSwd.SwitchPin = 1;        /* 只烧写第2通道 */
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 6)
+                    {
+                        g_tParam.MultiProgMode = 1;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;
+                        g_gMulSwd.SwitchPin = 2;        /* 只烧写第3通道 */
+                        g_MainStatus = MS_PROG_WORK;
+                    }
+                    else if (g_tMenuProgMode.Cursor == 7)
+                    {
+                        g_tParam.MultiProgMode = 1;
+                        g_gMulSwd.MultiMode = g_tParam.MultiProgMode;
+                        g_gMulSwd.SwitchPin = 3;        /* 只烧写第4通道 */
+                        g_MainStatus = MS_PROG_WORK;
+                    }                    
+                    break;
+
+            case KEY_UP_C:              /* C键 下 */
+                PlayKeyTone();
+                LCD_MoveDownMenu(&g_tMenuProgMode);
+                break;
+
+            case KEY_LONG_DOWN_C:       /* C键长按 */
+                PlayKeyTone();
+                g_MainStatus = MS_EXTEND_MENU1;
+                break;
+
+            default:
+                break;
+            }
+        }
+    }
+    
+    if (g_MainStatus == MS_PROG_WORK)
+    {
+        ;
     }
 }
 

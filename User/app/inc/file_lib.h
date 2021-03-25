@@ -13,6 +13,7 @@
 #include "ff.h" /* FatFS文件系统模块*/
 #include "ff_gen_drv.h"
 #include "sd_diskio_dma.h"
+#include "bsp.h"
 
 /* Lua程序根目录 */
 #define LUA_ROOT_DIR    "0:/H7-TOOL/Lua"
@@ -36,7 +37,9 @@ typedef struct
     uint8_t Type[FILE_MAX_NUM];
     char Name[FILE_MAX_NUM][FILE_NAME_MAX_LEN + 1];
     uint8_t Count;   
-    char Path[200];     
+    char Path[200];
+
+    uint16_t Cursor;
 }FILE_LIST_T;
 
 /* prog ini文件结构 */
@@ -47,7 +50,7 @@ typedef struct
     uint32_t ProgramLimit;      /* 烧录次数限制 0表示不限制 */
     uint32_t ProgrammedCount;
     
-    uint32_t ProductSN;         /* 产品序号（整数部分） */
+    int64_t ProductSN;          /* 产品序号（整数部分） */
 
 }PROG_INI_T;
 
@@ -82,7 +85,7 @@ void FixFileName(char *_Path);
 
 
 void ini_ReadString(const char *_IniBuf, const char *_ParamName, char *_OutBuff, int32_t _BuffSize);
-int32_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName);
+int64_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName);
 void ini_WriteString(const char *_IniBuf, const char *_ParamName, const char *_NewStr, uint32_t _IniBufSize);
 void ini_WriteInteger(const char *_IniBuf, const char *_ParamName, int _IntValue, uint32_t _IniBufSize);
 int32_t ReadProgIniFile(char *_LuaPath, PROG_INI_T *pIni);

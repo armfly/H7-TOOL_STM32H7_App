@@ -489,7 +489,7 @@ void ini_WriteString(const char *_IniBuf, const char *_ParamName, const char *_N
 *    返 回 值: 读到的整数值。如果没找到则返回0
 *********************************************************************************************************
 */
-int32_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName)
+int64_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName)
 {
     /*
     Count = -1
@@ -510,7 +510,7 @@ int32_t ini_ReadInteger(const char *_IniBuf, const char *_ParamName)
         return 0;
     }
     
-    return str_to_int3(p + 1);
+    return str_to_int64(p + 1);
 }
 
 /*
@@ -694,7 +694,7 @@ int32_t WriteProgIniFile(char *_LuaPath, PROG_INI_T *_pIni)
     sprintf(FsReadBuf, "Locked = %d\r\n", _pIni->Locked);
     sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProgramLimit = %d\r\n", _pIni->ProgramLimit);
     sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProgrammedCount = %d\r\n", _pIni->ProgrammedCount);
-    sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProductSN = %d\r\n", _pIni->ProductSN);    
+    sprintf(&FsReadBuf[strlen(FsReadBuf)], "ProductSN = %lld\r\n", _pIni->ProductSN);    
     
     /*　打开ini文件准备写 */
     re = f_open(&g_file, path, FA_WRITE | FA_CREATE_ALWAYS);

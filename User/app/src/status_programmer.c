@@ -251,11 +251,22 @@ void status_ProgWork(void)
 //        }
         
         /* 当前烧录模式 */
+        g_gMulSwd.Error[0] = 0;
+        g_gMulSwd.Error[1] = 0;
+        g_gMulSwd.Error[2] = 0;
+        g_gMulSwd.Error[3] = 0;  
+        
         if (g_gMulSwd.MultiMode == 0) PG_PrintText("单路模式"); 
-        else if (g_gMulSwd.MultiMode == 1) PG_PrintText("多路模式:1路");
-        else if (g_gMulSwd.MultiMode == 2) PG_PrintText("多路模式:1-2路");
-        else if (g_gMulSwd.MultiMode == 3) PG_PrintText("多路模式:1-3路"); 
-        else if (g_gMulSwd.MultiMode == 4) PG_PrintText("多路模式:1-4路");         
+        else if (g_gMulSwd.MultiMode == 1) 
+        {
+            if (g_gMulSwd.SwitchPin == 0) PG_PrintText("1拖1,烧录第1路");
+            else if (g_gMulSwd.SwitchPin == 1) PG_PrintText("1拖1,烧录第2路");
+            else if (g_gMulSwd.SwitchPin == 2) PG_PrintText("1拖1,烧录第3路");
+            else if (g_gMulSwd.SwitchPin == 3) PG_PrintText("1拖1,烧录第4路");
+        }
+        else if (g_gMulSwd.MultiMode == 2) PG_PrintText("1拖2,烧录第1-2路");
+        else if (g_gMulSwd.MultiMode == 3) PG_PrintText("1拖3,烧录第1-3路"); 
+        else if (g_gMulSwd.MultiMode == 4) PG_PrintText("1拖4,烧录第1-4路");        
     }     
          
     /* V1.36 解决第一次上电第1次烧录失败问题 */
@@ -367,6 +378,10 @@ void status_ProgWork(void)
                     lua_if.c 中的钩子函数LuaYeildHook()实现长按S键终止lua执行。
                     界面的绘制由编程函数内部负责刷新
                 */
+                g_gMulSwd.Error[0] = 0;
+                g_gMulSwd.Error[1] = 0;
+                g_gMulSwd.Error[2] = 0;
+                g_gMulSwd.Error[3] = 0;                  
                 PG_PrintText("开始烧录...");
                 
                 if (g_gMulSwd.MultiMode > 0)   /* 多路模式 */
@@ -677,7 +692,7 @@ void status_ProgWork(void)
                     }
                     else
                     {
-                        g_MainStatus = MS_EXTEND_MENU1;
+                        g_MainStatus = MS_EXTEND_MENU_PROG_MODE;
                     }
                     break;
 
@@ -685,6 +700,37 @@ void status_ProgWork(void)
                     break;
             }
         }
+
+        /* PC控制烧录一次 */
+        if (g_tVar.ReqProgOnce > 0)
+        {
+            /* 进入单路烧录模式, 不烧录 */    
+            if (g_tVar.ReqProgOnce == 1)
+            {
+                g_tVar.ReqProgOnce = 2;       
+                g_MainStatus = MS_PROG_WORK;                                
+                return;     /* 退出烧录状态，重新再进入一次烧录状态，自动装载一次lua文件 */
+            }
+            else if (g_tVar.ReqProgOnce == 2)
+            {
+                g_tVar.ReqProgOnce = 0;
+            }
+            
+            /* 进入单路烧录模式,并烧录1次 */ 
+            if (g_tVar.ReqProgOnce == 3)
+            {
+                g_tVar.ReqProgOnce = 4;      
+                g_MainStatus = MS_PROG_WORK;                                
+                return;     /* 退出烧录状态，重新再进入一次烧录状态，自动装载一次lua文件 */
+            }
+            else if (g_tVar.ReqProgOnce == 4)
+            {
+                g_tVar.ReqProgOnce = 0;
+                /* 烧录一次 */
+                g_tProg.AutoStart = 0;
+                fRunOnce = 1;
+            }            
+        }         
     }
     
     PERIOD_Start(&g_tRunLed, 1000, 1000, 0);    /* LED一直闪烁, 每2秒闪1次 */

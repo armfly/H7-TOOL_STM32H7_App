@@ -41,6 +41,7 @@ uint8_t TwoCharToInt(char *_ch);
 
 int str_to_int2(char *_pStr);
 int str_to_int3(char *_pStr);
+int64_t str_to_int64(char *_pStr);
 uint8_t ip_str_decode(char *_ipstr, uint8_t *_out);
 
 uint16_t GetHigh16OfFloat(float _ff);
